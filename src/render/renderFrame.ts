@@ -279,7 +279,7 @@ function drawPhoto(
   const ih = img.naturalHeight;
   const fill = (photo.fit ?? "fill") === "fill";
   const base = fill ? Math.max(W / iw, H / ih) : Math.min(W / iw, H / ih);
-  const sc = base * zoom;
+  const sc = base * zoom * (fill ? Math.max(1, photo.zoom ?? 1) : 1);
   const dw = iw * sc;
   const dh = ih * sc;
   let x: number;
@@ -482,10 +482,16 @@ export async function ensureFonts(frames: Frame[]) {
   if (typeof document === "undefined" || !document.fonts) return;
   const specs = new Set<string>();
   for (const f of frames) {
-    if (f.headline?.text) specs.add(`${f.headline.font_weight ?? 700} 48px "${fontFamilyOf(f.headline)}"`);
-    if (f.subline?.text) specs.add(`${f.subline.font_weight ?? 500} 48px "${fontFamilyOf(f.subline)}"`);
+    if (f.headline?.text) specs.add(`${f.headline.font_weight ?? 700}|${fontFamilyOf(f.headline)}`);
+    if (f.subline?.text) specs.add(`${f.subline.font_weight ?? 500}|${fontFamilyOf(f.subline)}`);
   }
-  await Promise.all([...specs].map((s) => document.fonts.load(s).catch(() => [])));
+  const { loadFont } = await import("@/lib/stillframe/fonts");
+  await Promise.all(
+    [...specs].map((s) => {
+      const [w, family] = s.split("|");
+      return loadFont(family!, Number(w));
+    }),
+  );
 }
 
 export function mediaPaths(project: Project, frames: Frame[]) {
