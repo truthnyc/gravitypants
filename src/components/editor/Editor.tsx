@@ -224,10 +224,13 @@ export function Editor({ initial }: { initial: EditorDoc }) {
   const copyStyle = (at: number) => {
     const f = frames[at];
     if (!f) return;
-    const { fit, movement, brightness, darken_for_text, background_color } = f.photo ?? {};
+    const p = f.photo ?? {};
+    const photo = Object.fromEntries(
+      (["fit", "movement", "brightness", "darken_for_text", "background_color"] as const).filter((k) => p[k] !== undefined).map((k) => [k, p[k]]),
+    ) as FrameStyle["photo"];
     setStyleClip({
       transition_in: f.transition_in,
-      photo: { fit, movement, brightness, darken_for_text, background_color },
+      photo,
       headline: pickStyle(f.headline),
       subline: pickStyle(f.subline),
     });
@@ -353,7 +356,7 @@ export function Editor({ initial }: { initial: EditorDoc }) {
         frames: d.frames.map((f) => ({ ...f, duration_sec: PACE_SECONDS[pace] })),
       })),
     onTransition: (patch: Partial<TransitionSettings>) =>
-      updateFrame(idx, (f) => ({ ...f, transition_in: { type: "cut", speed: "smooth", ...f.transition_in, ...patch } })),
+      updateFrame(idx, (f) => ({ ...f, transition_in: { ...{ type: "cut" as const, speed: "smooth" as const }, ...f.transition_in, ...patch } })),
     onTransitionAll: () => {
       const tr = frame?.transition_in;
       if (tr) apply((d) => ({ ...d, frames: d.frames.map((f, j) => (j === 0 ? f : { ...f, transition_in: { ...tr } })) }));

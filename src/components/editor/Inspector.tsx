@@ -545,7 +545,7 @@ function LogoPanel({
   const size = logo.size_pct ?? 16;
   const version = logo.version ?? "auto";
   const show = logo.show_on ?? "all";
-  const tiles: { value: NonNullable<LogoSettings["version"]>; label: string; hint: string; path?: string | null }[] = [
+  const tiles: { value: NonNullable<LogoSettings["version"]>; label: string; hint: string; path: string | null | undefined }[] = [
     { value: "auto", label: "Auto", hint: "Best contrast", path: logo.dark_path ?? logo.path },
     { value: "light", label: "Light logo", hint: "For dark photos", path: logo.light_path },
     { value: "dark", label: "Dark logo", hint: "For light photos", path: logo.dark_path },
