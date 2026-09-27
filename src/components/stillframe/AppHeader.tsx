@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Play, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSearch } from "./search-context";
+import { UserMenu } from "./UserMenu";
 
 const navItems = [
   { to: "/", label: "Your Ads" },
@@ -54,6 +55,7 @@ export function AppHeader() {
             )}
           />
         </div>
+        <UserMenu />
       </div>
     </header>
   );
