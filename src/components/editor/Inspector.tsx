@@ -188,6 +188,25 @@ function HeadlinePanel({
           </SelectContent>
         </Select>
       </Field>
+      <Field label="Weight">
+        {weights.length > 1 ? (
+          <div className="flex rounded-lg bg-control-fill p-0.5">
+            {weights.map((w) => (
+              <button
+                key={w.value}
+                type="button"
+                onClick={() => onChange({ font_weight: w.value })}
+                className={cn("h-7 flex-1 rounded-lg text-[12px] font-medium", weight === w.value && "bg-card shadow-segment")}
+                style={{ fontFamily: `"${family}"`, fontWeight: w.value }}
+              >
+                {w.label}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <p className="text-[12px] text-secondary-text">This font has one weight.</p>
+        )}
+      </Field>
       <Field label="Size">
         <div className="flex items-center gap-2">
           <span className="text-[11px] text-secondary-text">A</span>
