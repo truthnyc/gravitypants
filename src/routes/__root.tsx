@@ -12,7 +12,6 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import { AppHeader } from "@/components/stillframe/AppHeader";
 import { SearchProvider } from "@/components/stillframe/search-context";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -133,8 +132,6 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const router = useRouter();
-  const inEditor = pathname.startsWith("/ad/");
-  const onAuthPage = ["/signin", "/signup", "/reset"].includes(pathname);
 
   useEffect(() => {
     const { data } = supabase.auth.onAuthStateChange((event) => {
@@ -149,8 +146,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <SearchProvider>
         <div className="min-h-screen bg-canvas">
-          {!inEditor && !onAuthPage && <AppHeader />}
-          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+                    {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
           <Outlet />
         </div>
         <Toaster />
