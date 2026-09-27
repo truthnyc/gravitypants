@@ -14,17 +14,36 @@ const PROJECT_COLUMNS = "*";
 function normalizeProject(row: Record<string, unknown>): Project {
   return {
     ...(row as unknown as Project),
-    logo: { ...DEFAULT_LOGO, ...((row.logo as object) ?? {}) },
-    end_card: (row.end_card as Project["end_card"]) ?? {},
-    formats: (row.formats as Project["formats"]) ?? [],
+    logo: { ...DEFAULT_LOGO, ...((row["logo"] as object) ?? {}) },
+    end_card: (row["end_card"] as Project["end_card"]) ?? {},
+    formats: (row["formats"] as Project["formats"]) ?? [],
   };
 }
 
 function normalizeFrame(row: Record<string, unknown>): Frame {
   return {
     ...(row as unknown as Frame),
-    duration_sec: Number(row.duration_sec ?? 2.5),
+    duration_sec: Number(row["duration_sec"] ?? 2.5),
   };
+}
+
+/** Uploads files one by one, reporting a per-file progress bar. */
+async function uploadAll(
+  files: File[],
+  onProgress?: (items: UploadProgress[]) => void,
+): Promise<UploadedPhoto[]> {
+  const state: UploadProgress[] = files.map((file) => ({ name: file.name, progress: 0 }));
+  onProgress?.([...state]);
+
+  const uploaded: UploadedPhoto[] = [];
+  for (const [index, file] of files.entries()) {
+    state[index] = { name: file.name, progress: 0.15 };
+    onProgress?.([...state]);
+    uploaded.push(await uploadMedia(file, "photo"));
+    state[index] = { name: file.name, progress: 1 };
+    onProgress?.([...state]);
+  }
+  return uploaded;
 }
 
 export const projectKeys = {
