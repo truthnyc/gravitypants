@@ -29,6 +29,11 @@ export function Stage({
   onSelect,
   onMove,
   onText,
+  adjusting = false,
+  sizeOf,
+  onResize,
+  onFocus,
+  onAdjustDone,
 }: {
   doc: EditorDoc;
   frameIndex: number;
@@ -41,7 +46,15 @@ export function Stage({
   onSelect: (el: ElementKey) => void;
   onMove: (el: DragEl, anchor: Anchor) => void;
   onText: (el: "headline" | "subline", text: string) => void;
+  adjusting?: boolean;
+  sizeOf: (el: DragEl) => number;
+  onResize: (el: DragEl, value: number, key: string) => void;
+  onFocus: (patch: { focus?: { x: number; y: number }; zoom?: number }, key: string) => void;
+  onAdjustDone: () => void;
 }) {
+  const [resize, setResize] = useState<{ el: DragEl; x: number; w: number; v: number; id: number } | null>(null);
+  const [pan, setPan] = useState<{ x: number; y: number; fx: number; fy: number; id: number } | null>(null);
+  const sessions = useRef(0);
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [box, setBox] = useState({ w: 0, h: 0 });
@@ -114,7 +127,7 @@ export function Stage({
   };
 
   const frame = doc.frames[frameIndex];
-  const showTags = !playing && layout;
+  const showTags = !playing && !adjusting && layout;
 
   const tag = (el: ElementKey, b: Box | null, draggable: boolean, text?: TextSettings | null) => {
     if (!b) return null;
@@ -142,6 +155,29 @@ export function Stage({
         onDoubleClick={() => (el === "headline" || el === "subline") && setEditing(el)}
       >
         <Tag el={el} active={active} className="absolute -top-[22px] left-[-2px]" />
+        {active && draggable && !editing && (
+          <span
+            role="presentation"
+            aria-hidden
+            className="absolute -bottom-[5px] -right-[5px] size-2.5 cursor-nwse-resize rounded-[2px] border-2 bg-card"
+            style={{ borderColor: meta.color }}
+            onPointerDown={(e) => {
+              e.stopPropagation();
+              (e.target as HTMLElement).setPointerCapture(e.pointerId);
+              setResize({ el: el as DragEl, x: e.clientX, w: Math.max(20, css.width), v: sizeOf(el as DragEl), id: ++sessions.current });
+            }}
+            onPointerMove={(e) => {
+              if (!resize) return;
+              e.stopPropagation();
+              const ratio = Math.max(0.1, (resize.w + (e.clientX - resize.x)) / resize.w);
+              onResize(resize.el, resize.v * ratio, `drag:resize-${resize.el}:${resize.id}`);
+            }}
+            onPointerUp={(e) => {
+              e.stopPropagation();
+              setResize(null);
+            }}
+          />
+        )}
         {editing === el && text && (
           <textarea
             autoFocus
@@ -191,6 +227,56 @@ export function Stage({
             {tag("subline", layout.subline, true, frame.subline)}
             {tag("logo", layout.logo, true)}
           </>
+        )}
+        {adjusting && frame && (
+          <div
+            className="absolute inset-0 cursor-move rounded-sm ring-2 ring-el-photo"
+            onPointerDown={(e) => {
+              e.stopPropagation();
+              (e.target as HTMLElement).setPointerCapture(e.pointerId);
+              const f = frame.photo?.focus ?? { x: 0.5, y: 0.5 };
+              setPan({ x: e.clientX, y: e.clientY, fx: f.x, fy: f.y, id: ++sessions.current });
+            }}
+            onPointerMove={(e) => {
+              if (!pan) return;
+              const z = frame.photo?.zoom ?? 1;
+              const x = Math.min(1, Math.max(0, pan.fx - (e.clientX - pan.x) / (box.w * z * 1.4)));
+              const y = Math.min(1, Math.max(0, pan.fy - (e.clientY - pan.y) / (box.h * z * 1.4)));
+              onFocus({ focus: { x, y } }, `drag:focus:${pan.id}`);
+            }}
+            onPointerUp={() => setPan(null)}
+            onWheel={(e) => {
+              const z = frame.photo?.zoom ?? 1;
+              onFocus({ zoom: Math.min(3, Math.max(1, z - e.deltaY * 0.002)) }, "zoom-wheel");
+            }}
+          >
+            <div className="pointer-events-none absolute inset-0 grid grid-cols-3 grid-rows-3">
+              {Array.from({ length: 9 }, (_, i) => (
+                <span key={i} className="border border-background/30" />
+              ))}
+            </div>
+            <div
+              className="absolute inset-x-4 bottom-4 flex items-center gap-3 rounded-lg bg-card/95 px-3 py-2 shadow-popover"
+              onPointerDown={(e) => e.stopPropagation()}
+            >
+              <span className="text-[12px] font-medium">Zoom</span>
+              <input
+                type="range"
+                min={100}
+                max={300}
+                value={Math.round((frame.photo?.zoom ?? 1) * 100)}
+                onChange={(e) => onFocus({ zoom: Number(e.target.value) / 100 }, "zoom-range")}
+                aria-label="Zoom"
+                className="flex-1 accent-[var(--el-photo)]"
+              />
+              <button type="button" onClick={onAdjustDone} className="text-[13px] font-semibold text-link">
+                Done
+              </button>
+            </div>
+            <span className="pointer-events-none absolute left-1/2 top-3 -translate-x-1/2 rounded-lg bg-foreground/70 px-2.5 py-1 text-[12px] text-background">
+              Drag to choose what stays in view
+            </span>
+          </div>
         )}
         {drag?.moving && layout && (
           <div className="pointer-events-none absolute inset-0">
