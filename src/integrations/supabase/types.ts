@@ -92,6 +92,38 @@ export type Database = {
         }
         Relationships: []
       }
+      export_usage: {
+        Row: {
+          created_at: string
+          id: string
+          project_id: string | null
+          stamp: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          project_id?: string | null
+          stamp: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          project_id?: string | null
+          stamp?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "export_usage_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       frames: {
         Row: {
           created_at: string
@@ -141,6 +173,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      plans: {
+        Row: {
+          amount_cents: number
+          id: string
+          interval: string
+          monthly_exports: number | null
+          name: string
+          price_id: string
+          sort_order: number
+        }
+        Insert: {
+          amount_cents: number
+          id: string
+          interval: string
+          monthly_exports?: number | null
+          name: string
+          price_id: string
+          sort_order?: number
+        }
+        Update: {
+          amount_cents?: number
+          id?: string
+          interval?: string
+          monthly_exports?: number | null
+          name?: string
+          price_id?: string
+          sort_order?: number
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -214,6 +276,59 @@ export type Database = {
         }
         Relationships: []
       }
+      workspace_billing: {
+        Row: {
+          cancel_at_period_end: boolean
+          created_at: string
+          current_period_end: string | null
+          current_period_start: string | null
+          environment: string
+          plan: string
+          status: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          trial_ends_at: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          cancel_at_period_end?: boolean
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          environment?: string
+          plan?: string
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          trial_ends_at?: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          cancel_at_period_end?: boolean
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          environment?: string
+          plan?: string
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          trial_ends_at?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_billing_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: true
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspace_members: {
         Row: {
           created_at: string
@@ -269,8 +384,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_save_export: {
+        Args: { _stamp: string; _ws: string }
+        Returns: boolean
+      }
       ensure_workspace: { Args: never; Returns: string }
+      export_status: { Args: { _ws: string }; Returns: Json }
       is_workspace_member: { Args: { _ws: string }; Returns: boolean }
+      record_export: {
+        Args: { _project: string; _stamp: string; _ws: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
