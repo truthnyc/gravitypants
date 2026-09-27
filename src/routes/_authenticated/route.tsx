@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { setWorkspaceId } from "@/lib/stillframe/workspace";
 import { Button } from "@/components/ui/button";
 import { useSignOut } from "@/lib/stillframe/account";
+import { sendWelcomeEmail } from "@/lib/stillframe/welcome.functions";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
