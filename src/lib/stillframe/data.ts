@@ -134,7 +134,7 @@ export function useUpdateProject() {
   });
 }
 
-function framePayloadFromPhoto(photo: UploadedPhoto, index: number) {
+export function framePayloadFromPhoto(photo: UploadedPhoto, index: number) {
   return {
     sort_order: index,
     duration_sec: 2.5,
@@ -299,4 +299,36 @@ export function useSetTrashed() {
 
 export function totalSeconds(frames: Frame[]) {
   return frames.reduce((sum, frame) => sum + Number(frame.duration_sec ?? 0), 0);
+}
+
+export type EditorDoc = { project: Project; frames: Frame[] };
+
+const PROJECT_SAVE_FIELDS = ["name", "formats", "primary_format", "pace", "logo", "end_card"] as const;
+
+/** Persists the difference between two editor snapshots (project fields, changed/new frames, removed frames). */
+export async function saveEditorDoc(prev: EditorDoc, next: EditorDoc) {
+  const patch: Record<string, unknown> = {};
+  for (const key of PROJECT_SAVE_FIELDS) {
+    if (JSON.stringify(prev.project[key]) !== JSON.stringify(next.project[key])) patch[key] = next.project[key];
+  }
+  if (Object.keys(patch).length) {
+    const { error } = await supabase.from("projects").update(patch as never).eq("id", next.project.id);
+    if (error) throw error;
+  }
+
+  const before = new Map(prev.frames.map((f, i) => [f.id, JSON.stringify({ ...f, sort_order: i })]));
+  const rows = next.frames
+    .map((f, i) => ({ ...f, sort_order: i, project_id: next.project.id }))
+    .filter((f) => before.get(f.id) !== JSON.stringify({ ...f }));
+  const keep = new Set(next.frames.map((f) => f.id));
+  const removed = prev.frames.filter((f) => !keep.has(f.id)).map((f) => f.id);
+
+  if (removed.length) {
+    const { error } = await supabase.from("frames").delete().in("id", removed);
+    if (error) throw error;
+  }
+  if (rows.length) {
+    const { error } = await supabase.from("frames").upsert(rows as never);
+    if (error) throw error;
+  }
 }

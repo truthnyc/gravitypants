@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
+import { Editor } from "@/components/editor/Editor";
+import { useProject } from "@/lib/stillframe/data";
 
 export const Route = createFileRoute("/ad/$id/edit")({
   head: () => ({
@@ -10,29 +12,27 @@ export const Route = createFileRoute("/ad/$id/edit")({
       { property: "og:description", content: "Edit photos, text, timing and transitions." },
     ],
   }),
-  component: EditPlaceholder,
+  component: EditPage,
 });
 
-function EditPlaceholder() {
+function EditPage() {
   const { id } = Route.useParams();
-  return (
-    <main className="flex min-h-[70vh] items-center justify-center px-8">
-      <div className="max-w-[420px] rounded-sm bg-card p-10 text-center shadow-card">
-        <h1 className="text-[22px] font-bold tracking-[-0.02em]">Editor coming next</h1>
-        <p className="mt-2 text-[14px] text-secondary-text">
-          This ad is saved and ready. Frames, text, timing and transitions land here next.
-        </p>
-        <div className="mt-6 flex justify-center gap-2">
-          <Button asChild variant="plain">
+  const { data, isLoading } = useProject(id);
+
+  if (isLoading) return <div className="h-screen bg-canvas" aria-busy="true" />;
+  if (!data || !data.frames.length) {
+    return (
+      <main className="flex h-screen items-center justify-center px-8">
+        <div className="max-w-[400px] rounded-sm bg-card p-10 text-center shadow-card">
+          <h1 className="text-[22px] font-bold tracking-[-0.02em]">This ad isn't available</h1>
+          <p className="mt-2 text-[14px] text-secondary-text">It may have been moved to the trash.</p>
+          <Button asChild variant="plain" className="mt-6">
             <Link to="/">Back to Your Ads</Link>
           </Button>
-          <Button asChild>
-            <Link to="/ad/$id/export" params={{ id }}>
-              Export
-            </Link>
-          </Button>
         </div>
-      </div>
-    </main>
-  );
+      </main>
+    );
+  }
+  const { frames, ...project } = data;
+  return <Editor key={id} initial={{ project, frames }} />;
 }

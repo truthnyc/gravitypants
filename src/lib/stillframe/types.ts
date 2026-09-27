@@ -12,6 +12,9 @@ export type LogoPosition =
 
 export type LogoSettings = {
   asset_id?: string | null;
+  path?: string | null;
+  light_path?: string | null;
+  dark_path?: string | null;
   version?: "auto" | "light" | "dark";
   size_pct?: number;
   opacity?: "solid" | "soft";
@@ -102,3 +105,7 @@ export function formatSeconds(totalSeconds: number) {
   const rounded = Math.round(totalSeconds * 10) / 10;
   return Number.isInteger(rounded) ? `${rounded}` : rounded.toFixed(1);
 }
+
+export const TEXT_FONTS = ["DM Sans", "Space Grotesk", "Playfair Display", "Fraunces", "Bebas Neue"];
+/** Ad text colors are content, not UI chrome. */
+export const TEXT_COLORS = ["#FFFFFF", "#1D1D1F", "#FFD60A", "#FF6B4A", "#0071E3", "#7D3BD6"];
