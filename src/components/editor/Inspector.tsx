@@ -3,6 +3,7 @@ import type { EditorDoc } from "@/lib/stillframe/data";
 import {
   TEXT_COLORS,
   TEXT_FONTS,
+  weightsForFont,
   formatSeconds,
   type Format,
   type Frame,
@@ -150,6 +151,9 @@ function HeadlinePanel({
 }) {
   const h = headline ?? {};
   const size = h.size_px ?? 108;
+  const family = h.font_family ?? DEFAULT_FONT;
+  const weights = weightsForFont(family);
+  const weight = h.font_weight ?? 700;
   return (
     <div className="space-y-4 rounded-sm bg-card p-4 shadow-card">
       <Field label="Text">
@@ -161,8 +165,18 @@ function HeadlinePanel({
         />
       </Field>
       <Field label="Font">
-        <Select value={h.font_family ?? DEFAULT_FONT} onValueChange={(v) => onChange({ font_family: v })}>
-          <SelectTrigger className="h-9 rounded-sm" style={{ fontFamily: `"${h.font_family ?? DEFAULT_FONT}"` }}>
+        <Select
+          value={family}
+          onValueChange={(v) => {
+            const ws = weightsForFont(v);
+            // Keep the current weight if the new font has it, otherwise pick the closest available.
+            const next = ws.some((w) => w.value === weight)
+              ? weight
+              : ws.reduce((best, w) => (Math.abs(w.value - weight) < Math.abs(best.value - weight) ? w : best), ws[0]!).value;
+            onChange({ font_family: v, font_weight: next });
+          }}
+        >
+          <SelectTrigger className="h-9 rounded-sm" style={{ fontFamily: `"${family}"` }}>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -173,6 +187,25 @@ function HeadlinePanel({
             ))}
           </SelectContent>
         </Select>
+      </Field>
+      <Field label="Weight">
+        {weights.length > 1 ? (
+          <div className="flex rounded-lg bg-control-fill p-0.5">
+            {weights.map((w) => (
+              <button
+                key={w.value}
+                type="button"
+                onClick={() => onChange({ font_weight: w.value })}
+                className={cn("h-7 flex-1 rounded-lg text-[12px] font-medium", weight === w.value && "bg-card shadow-segment")}
+                style={{ fontFamily: `"${family}"`, fontWeight: w.value }}
+              >
+                {w.label}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <p className="text-[12px] text-secondary-text">This font has one weight.</p>
+        )}
       </Field>
       <Field label="Size">
         <div className="flex items-center gap-2">

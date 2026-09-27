@@ -107,5 +107,35 @@ export function formatSeconds(totalSeconds: number) {
 }
 
 export const TEXT_FONTS = ["DM Sans", "Space Grotesk", "Playfair Display", "Fraunces", "Bebas Neue"];
+
+/** Weights actually loaded for each font (see the Google Fonts link in __root). */
+export const FONT_WEIGHTS: Record<string, { value: number; label: string }[]> = {
+  "DM Sans": [
+    { value: 400, label: "Regular" },
+    { value: 500, label: "Medium" },
+    { value: 700, label: "Bold" },
+    { value: 800, label: "Extra Bold" },
+  ],
+  "Space Grotesk": [
+    { value: 400, label: "Regular" },
+    { value: 500, label: "Medium" },
+    { value: 700, label: "Bold" },
+  ],
+  "Playfair Display": [
+    { value: 500, label: "Medium" },
+    { value: 700, label: "Bold" },
+    { value: 900, label: "Black" },
+  ],
+  Fraunces: [
+    { value: 500, label: "Medium" },
+    { value: 700, label: "Bold" },
+    { value: 900, label: "Black" },
+  ],
+  "Bebas Neue": [{ value: 400, label: "Regular" }],
+};
+
+export function weightsForFont(family: string) {
+  return FONT_WEIGHTS[family] ?? [{ value: 400, label: "Regular" }];
+}
 /** Ad text colors are content, not UI chrome. */
 export const TEXT_COLORS = ["#FFFFFF", "#1D1D1F", "#FFD60A", "#FF6B4A", "#0071E3", "#7D3BD6"];
