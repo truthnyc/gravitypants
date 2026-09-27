@@ -1,19 +1,27 @@
-import { Clock, Image as ImageIcon, Shapes, Sparkles, Type, TextQuote } from "lucide-react";
+import { useRef, useState } from "react";
+import { ChevronRight, Clock, Crop, Image as ImageIcon, Minus, Plus, Shapes, Sparkles, TextQuote, Type } from "lucide-react";
 import type { EditorDoc } from "@/lib/stillframe/data";
 import {
+  PACE_SECONDS,
   TEXT_COLORS,
-  TEXT_FONTS,
-  weightsForFont,
   formatSeconds,
+  type BrandKit,
   type Format,
   type Frame,
+  type LogoSettings,
+  type Pace,
+  type PhotoSettings,
   type TextSettings,
+  type TransitionSettings,
 } from "@/lib/stillframe/types";
-import { ANCHORS, DEFAULT_FONT } from "@/render/renderFrame";
-import { Input } from "@/components/ui/input";
+import { WEIGHT_NAMES } from "@/lib/stillframe/fonts";
+import { ANCHORS, DEFAULT_FONT, totalDuration } from "@/render/renderFrame";
+import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { FontPicker } from "@/components/stillframe/FontPicker";
+import { MediaImage } from "@/components/stillframe/MediaImage";
 import { ELEMENT_META, type ElementKey } from "./use-editor";
 import { cn } from "@/lib/utils";
 
@@ -26,7 +34,7 @@ const ICONS: Record<ElementKey, typeof Type> = {
   transition: Sparkles,
 };
 
-const TRANSITION_LABEL: Record<string, string> = {
+export const TRANSITION_LABEL: Record<TransitionSettings["type"], string> = {
   cut: "Cut",
   fade: "Fade",
   slide: "Slide",
@@ -44,11 +52,26 @@ function firstWords(t?: TextSettings | null) {
   return words.slice(0, 3).join(" ") + (words.length > 3 ? "…" : "");
 }
 
-function fileName(path?: string | null) {
+export function fileName(path?: string | null) {
   if (!path) return "No photo";
   const base = path.split("/").pop() ?? path;
   return base.replace(/^[0-9a-f-]{36}-/, "");
 }
+
+export type InspectorActions = {
+  onPhoto: (patch: Partial<PhotoSettings>, key?: string) => void;
+  onText: (el: "headline" | "subline", patch: Partial<TextSettings>, key?: string) => void;
+  onLogo: (patch: Partial<LogoSettings>, key?: string) => void;
+  onLogoVisible: (visible: boolean) => void;
+  onDuration: (seconds: number, key?: string) => void;
+  onSameLength: (on: boolean) => void;
+  onPace: (pace: Pace) => void;
+  onTransition: (patch: Partial<TransitionSettings>) => void;
+  onTransitionAll: () => void;
+  onReplacePhoto: () => void;
+  onAdjust: () => void;
+  onAddLogo: (file: File) => void;
+};
 
 export function Inspector({
   doc,
@@ -56,28 +79,33 @@ export function Inspector({
   frameIndex,
   format,
   selected,
+  kit,
+  adjusting,
   onSelect,
-  onHeadline,
+  actions,
 }: {
   doc: EditorDoc;
   frame: Frame;
   frameIndex: number;
   format: Format;
   selected: ElementKey;
+  kit: BrandKit | null | undefined;
+  adjusting: boolean;
   onSelect: (el: ElementKey) => void;
-  onHeadline: (patch: Partial<TextSettings>, key?: string) => void;
+  actions: InspectorActions;
 }) {
+  const hasLogo = Boolean(doc.project.logo.path || doc.project.logo.light_path || doc.project.logo.dark_path);
   const values: Record<ElementKey, string> = {
     photo: fileName(frame.photo?.path),
     headline: firstWords(frame.headline),
     subline: firstWords(frame.subline),
-    logo: doc.project.logo.path || doc.project.logo.light_path
-      ? pretty(doc.project.logo.positions?.[format] ?? "top-right")
-      : "No logo yet",
+    logo: hasLogo ? pretty(doc.project.logo.positions?.[format] ?? "top-right") : "No logo yet",
     timing: `${formatSeconds(frame.duration_sec)} seconds`,
-    transition: frameIndex === 0 ? "Start" : (TRANSITION_LABEL[frame.transition_in?.type ?? "cut"] ?? "Cut"),
+    transition: frameIndex === 0 ? "Start" : TRANSITION_LABEL[frame.transition_in?.type ?? "cut"],
   };
   const meta = ELEMENT_META[selected];
+  const scope = selected === "logo" ? "Whole video" : selected === "transition" ? `Into frame ${frameIndex + 1}` : `Frame ${frameIndex + 1}`;
+  const colors = kit?.colors.length ? kit.colors : TEXT_COLORS;
 
   return (
     <aside className="flex w-[344px] shrink-0 flex-col overflow-y-auto bg-inspector p-4">
@@ -107,161 +135,610 @@ export function Inspector({
       <div className="mt-5 flex items-center gap-2">
         <span className="size-2 rounded-full" style={{ background: meta.color }} />
         <span className="text-[15px] font-semibold">{meta.label}</span>
-        <span className="ml-auto text-[12px] text-secondary-text nums">
-          {selected === "logo" ? "Whole video" : `Frame ${frameIndex + 1}`}
-        </span>
+        <span className="ml-auto text-[12px] text-secondary-text nums">{scope}</span>
       </div>
 
-      <div className="mt-3">
-        {selected === "headline" ? (
-          <HeadlinePanel headline={frame.headline} onChange={onHeadline} />
-        ) : (
-          <p className="rounded-sm bg-card p-4 text-[13px] text-secondary-text shadow-card">
-            {meta.label} settings arrive in the next step. You can already drag it on the preview.
-          </p>
+      <div className="mt-3 space-y-4 rounded-sm bg-card p-4 shadow-card">
+        {selected === "photo" && <PhotoPanel photo={frame.photo ?? {}} adjusting={adjusting} actions={actions} />}
+        {(selected === "headline" || selected === "subline") && (
+          <TextPanel key={selected} el={selected} text={frame[selected]} colors={colors} onChange={(p, k) => actions.onText(selected, p, k)} />
         )}
+        {selected === "logo" && (
+          <LogoPanel logo={doc.project.logo} format={format} frame={frame} hasLogo={hasLogo} kit={kit} actions={actions} />
+        )}
+        {selected === "timing" && <TimingPanel frames={doc.frames} frame={frame} actions={actions} />}
+        {selected === "transition" && <TransitionPanel frames={doc.frames} frame={frame} first={frameIndex === 0} actions={actions} />}
       </div>
     </aside>
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+/* ---------------- shared controls */
+
+export function Field({ label, value, children }: { label: string; value?: React.ReactNode; children: React.ReactNode }) {
   return (
     <div className="space-y-1.5">
-      <div className="text-[12px] font-medium text-secondary-text">{label}</div>
+      <div className="flex items-baseline justify-between text-[12px] font-medium text-secondary-text">
+        <span>{label}</span>
+        {value !== undefined && <span className="text-foreground nums">{value}</span>}
+      </div>
       {children}
     </div>
   );
 }
 
-const ANIMATIONS: { value: NonNullable<TextSettings["animation"]>; label: string }[] = [
-  { value: "none", label: "None" },
-  { value: "rise", label: "Rise" },
-  { value: "fade", label: "Fade" },
-  { value: "pop", label: "Pop" },
-  { value: "typewriter", label: "Type" },
-];
-
-function HeadlinePanel({
-  headline,
+export function Segmented<T extends string>({
+  value,
+  options,
   onChange,
 }: {
-  headline: TextSettings | null;
+  value: T;
+  options: { value: T; label: string }[];
+  onChange: (v: T) => void;
+}) {
+  return (
+    <div className="flex rounded-lg bg-control-fill p-0.5" role="radiogroup">
+      {options.map((o) => (
+        <button
+          key={o.value}
+          type="button"
+          role="radio"
+          aria-checked={value === o.value}
+          onClick={() => onChange(o.value)}
+          className={cn("h-7 flex-1 rounded-lg px-1 text-[12px] font-medium", value === o.value && "bg-card shadow-segment")}
+        >
+          {o.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/** Slider whose live drag coalesces into a single undo step, committed on release. */
+export function ElementSlider({
+  name,
+  color,
+  min,
+  max,
+  step = 1,
+  value,
+  onChange,
+  left,
+  right,
+}: {
+  name: string;
+  color: string;
+  min: number;
+  max: number;
+  step?: number;
+  value: number;
+  onChange: (v: number, key: string) => void;
+  left?: React.ReactNode;
+  right?: React.ReactNode;
+}) {
+  const session = useRef(0);
+  return (
+    <div className="flex items-center gap-2.5">
+      {left}
+      <Slider
+        min={min}
+        max={max}
+        step={step}
+        value={[value]}
+        aria-label={name}
+        style={{ "--slider-color": color } as React.CSSProperties}
+        onValueChange={([v]) => onChange(v ?? value, `drag:${name}:${session.current}`)}
+        onValueCommit={() => {
+          session.current += 1;
+        }}
+      />
+      {right}
+    </div>
+  );
+}
+
+function PositionGrid({ value, color, onChange }: { value: string; color: string; onChange: (a: string) => void }) {
+  return (
+    <div className="grid w-[96px] grid-cols-3 gap-1 rounded-sm bg-control-fill p-1">
+      {ANCHORS.map((a) => (
+        <button
+          key={a}
+          type="button"
+          aria-label={pretty(a)}
+          aria-pressed={value === a}
+          onClick={() => onChange(a)}
+          className="flex size-7 items-center justify-center rounded-sm hover:bg-card"
+          style={value === a ? { background: color } : undefined}
+        >
+          <span className={cn("size-2 rounded-full", value === a ? "bg-primary-foreground" : "bg-secondary-text/40")} />
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function ToggleRow({ label, checked, onChange }: { label: string; checked: boolean; onChange: (v: boolean) => void }) {
+  return (
+    <label className="flex items-center justify-between text-[13px]">
+      {label}
+      <Switch checked={checked} onCheckedChange={onChange} className="data-[state=checked]:bg-toggle-on" />
+    </label>
+  );
+}
+
+/* ---------------- Photo */
+
+const MOVEMENTS: { value: NonNullable<PhotoSettings["movement"]>; label: string }[] = [
+  { value: "none", label: "None" },
+  { value: "slow_zoom_in", label: "Slow zoom in" },
+  { value: "slow_zoom_out", label: "Slow zoom out" },
+  { value: "pan_left", label: "Pan left" },
+  { value: "pan_right", label: "Pan right" },
+];
+const BG_COLORS = ["#000000", "#1D1D1F", "#FFFFFF", "#F1F3F0"];
+
+function PhotoPanel({ photo, adjusting, actions }: { photo: PhotoSettings; adjusting: boolean; actions: InspectorActions }) {
+  const brightness = Math.round(Number(photo.brightness ?? 0) * 200);
+  const fit = photo.fit ?? "fill";
+  return (
+    <>
+      <div className="flex items-center gap-3">
+        <div className="size-14 shrink-0 overflow-hidden rounded-sm bg-control-fill">
+          {photo.path && <MediaImage path={photo.path} className="size-full object-cover" alt="" />}
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="truncate text-[13px] font-medium">{fileName(photo.path)}</div>
+          <Button variant="plain" size="sm" className="-ml-2 mt-0.5" onClick={actions.onReplacePhoto}>
+            Replace Photo
+          </Button>
+        </div>
+      </div>
+      <Field label="Fill the frame">
+        <Segmented
+          value={fit}
+          options={[
+            { value: "fill", label: "Fill" },
+            { value: "fit", label: "Fit" },
+          ]}
+          onChange={(v) => actions.onPhoto({ fit: v })}
+        />
+      </Field>
+      {fit === "fit" && (
+        <Field label="Background color">
+          <div className="flex items-center gap-2">
+            {BG_COLORS.map((c) => (
+              <button
+                key={c}
+                type="button"
+                aria-label={`Background ${c}`}
+                onClick={() => actions.onPhoto({ background_color: c })}
+                className={cn("size-7 rounded-full border border-border", (photo.background_color ?? "").toUpperCase() === c && "ring-2 ring-primary ring-offset-2")}
+                style={{ background: c }}
+              />
+            ))}
+            <CustomColor onPick={(c) => actions.onPhoto({ background_color: c }, "drag:photo-bg")} />
+          </div>
+        </Field>
+      )}
+      {fit === "fill" && (
+        <Field label="Crop & focus">
+          <Button variant={adjusting ? "primary" : "default"} size="sm" onClick={actions.onAdjust}>
+            <Crop strokeWidth={1.7} /> {adjusting ? "Done" : "Adjust…"}
+          </Button>
+        </Field>
+      )}
+      <Field label="Movement">
+        <div className="flex flex-wrap gap-1.5">
+          {MOVEMENTS.map((m) => (
+            <button
+              key={m.value}
+              type="button"
+              onClick={() => actions.onPhoto({ movement: m.value })}
+              aria-pressed={(photo.movement ?? "none") === m.value}
+              className={cn(
+                "h-7 rounded-lg px-2.5 text-[12px] font-medium",
+                (photo.movement ?? "none") === m.value ? "bg-el-photo text-primary-foreground" : "bg-control-fill",
+              )}
+            >
+              {m.label}
+            </button>
+          ))}
+        </div>
+      </Field>
+      <Field label="Brightness" value={brightness > 0 ? `+${brightness}` : brightness}>
+        <ElementSlider
+          name="Brightness"
+          color="var(--el-photo)"
+          min={-100}
+          max={100}
+          value={brightness}
+          onChange={(v, k) => actions.onPhoto({ brightness: v / 200 }, k)}
+        />
+      </Field>
+      <ToggleRow label="Darken for text" checked={Boolean(photo.darken_for_text)} onChange={(v) => actions.onPhoto({ darken_for_text: v })} />
+    </>
+  );
+}
+
+function CustomColor({ onPick }: { onPick: (c: string) => void }) {
+  return (
+    <label className="relative flex size-7 cursor-pointer items-center justify-center rounded-full border border-dashed border-placeholder-border text-icon" aria-label="Custom color">
+      <Plus className="size-3.5" strokeWidth={1.7} />
+      <input type="color" className="absolute inset-0 cursor-pointer opacity-0" onChange={(e) => onPick(e.target.value.toUpperCase())} />
+    </label>
+  );
+}
+
+/* ---------------- Headline / Subline */
+
+const ANIMATIONS: { value: NonNullable<TextSettings["animation"]>; label: string }[] = [
+  { value: "none", label: "None" },
+  { value: "rise", label: "Rise up" },
+  { value: "fade", label: "Fade in" },
+  { value: "pop", label: "Pop" },
+  { value: "typewriter", label: "Typewriter" },
+];
+
+function TextPanel({
+  el,
+  text,
+  colors,
+  onChange,
+}: {
+  el: "headline" | "subline";
+  text: TextSettings | null;
+  colors: string[];
   onChange: (patch: Partial<TextSettings>, key?: string) => void;
 }) {
-  const h = headline ?? {};
-  const size = h.size_px ?? 108;
-  const family = h.font_family ?? DEFAULT_FONT;
-  const weights = weightsForFont(family);
-  const weight = h.font_weight ?? 700;
+  const isHead = el === "headline";
+  const t = text ?? {};
+  const color = isHead ? "var(--el-headline)" : "var(--el-subline)";
+  const size = t.size_px ?? (isHead ? 108 : 48);
+  const family = t.font_family ?? DEFAULT_FONT;
+  const weight = t.font_weight ?? (isHead ? 700 : 500);
+  const under = t.keep_under_headline ?? true;
+  const current = (t.color ?? "#FFFFFF").toUpperCase();
+  const [extra, setExtra] = useState<string[]>([]);
+  const swatches = [...new Set([...colors.map((c) => c.toUpperCase()), ...extra, ...(colors.map((c) => c.toUpperCase()).includes(current) ? [] : [current])])];
+
   return (
-    <div className="space-y-4 rounded-sm bg-card p-4 shadow-card">
+    <>
       <Field label="Text">
-        <Input
-          value={h.text ?? ""}
-          placeholder="Add a headline"
-          onChange={(e) => onChange({ text: e.target.value }, "headline-text")}
-          className="h-9 rounded-sm"
+        <Textarea
+          value={t.text ?? ""}
+          placeholder={isHead ? "Add a headline" : "Add a line under the headline"}
+          onChange={(e) => onChange({ text: e.target.value }, `${el}-text`)}
+          className="min-h-[72px] rounded-sm text-[15px]"
         />
       </Field>
       <Field label="Font">
-        <Select
-          value={family}
-          onValueChange={(v) => {
-            const ws = weightsForFont(v);
-            // Keep the current weight if the new font has it, otherwise pick the closest available.
-            const next = ws.some((w) => w.value === weight)
-              ? weight
-              : ws.reduce((best, w) => (Math.abs(w.value - weight) < Math.abs(best.value - weight) ? w : best), ws[0]!).value;
-            onChange({ font_family: v, font_weight: next });
-          }}
+        <FontPicker
+          title={isHead ? "Headline font" : "Subline font"}
+          family={family}
+          weight={weight}
+          onChange={(f, w) => onChange({ font_family: f, font_weight: w })}
         >
-          <SelectTrigger className="h-9 rounded-sm" style={{ fontFamily: `"${family}"` }}>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {TEXT_FONTS.map((f) => (
-              <SelectItem key={f} value={f} style={{ fontFamily: `"${f}"` }}>
-                {f}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+          <button
+            type="button"
+            className="flex h-9 w-full items-center justify-between rounded-sm border bg-card px-3 text-left text-[14px]"
+            aria-label={`Font: ${family}`}
+          >
+            <span className="truncate" style={{ fontFamily: `"${family}"`, fontWeight: weight }}>
+              {family}
+            </span>
+            <span className="flex items-center gap-1 text-[12px] text-secondary-text">
+              {WEIGHT_NAMES[weight] ?? weight}
+              <ChevronRight className="size-3.5" strokeWidth={1.7} />
+            </span>
+          </button>
+        </FontPicker>
       </Field>
-      <Field label="Weight">
-        {weights.length > 1 ? (
-          <div className="flex rounded-lg bg-control-fill p-0.5">
-            {weights.map((w) => (
-              <button
-                key={w.value}
-                type="button"
-                onClick={() => onChange({ font_weight: w.value })}
-                className={cn("h-7 flex-1 rounded-lg text-[12px] font-medium", weight === w.value && "bg-card shadow-segment")}
-                style={{ fontFamily: `"${family}"`, fontWeight: w.value }}
-              >
-                {w.label}
-              </button>
-            ))}
-          </div>
-        ) : (
-          <p className="text-[12px] text-secondary-text">This font has one weight.</p>
-        )}
-      </Field>
-      <Field label="Size">
-        <div className="flex items-center gap-2">
-          <span className="text-[11px] text-secondary-text">A</span>
-          <Slider min={24} max={240} step={1} value={[size]} onValueChange={([v]) => onChange({ size_px: v ?? size }, "headline-size")} aria-label="Headline size" />
-          <span className="text-[17px] text-secondary-text">A</span>
-          <span className="w-14 text-right text-[12px] nums">{size} px</span>
-        </div>
+      <Field label="Size" value={`${size} px`}>
+        <ElementSlider
+          name={`${isHead ? "Headline" : "Subline"} size`}
+          color={color}
+          min={24}
+          max={240}
+          value={size}
+          onChange={(v, k) => onChange({ size_px: v }, k)}
+          left={<span className="text-[11px] font-semibold text-secondary-text">A</span>}
+          right={<span className="text-[19px] font-semibold text-secondary-text">A</span>}
+        />
       </Field>
       <Field label="Color">
-        <div className="flex gap-2">
-          {TEXT_COLORS.map((c) => (
+        <div className="flex flex-wrap items-center gap-2">
+          {swatches.map((c) => (
             <button
               key={c}
               type="button"
               aria-label={`Color ${c}`}
               onClick={() => onChange({ color: c })}
-              className={cn("size-7 rounded-full border border-border", (h.color ?? "#FFFFFF").toUpperCase() === c && "ring-2 ring-primary ring-offset-2")}
-              style={{ background: c }}
+              className={cn("size-7 rounded-full border border-border", current === c && "ring-2 ring-offset-2")}
+              style={{ background: c, ["--tw-ring-color" as string]: color }}
             />
           ))}
+          <CustomColor
+            onPick={(c) => {
+              setExtra((x) => (x.includes(c) ? x : [...x, c]));
+              onChange({ color: c }, `drag:${el}-color`);
+            }}
+          />
         </div>
       </Field>
       <Field label="Animation">
-        <div className="flex rounded-lg bg-control-fill p-0.5">
+        <div className="flex flex-wrap gap-1.5">
           {ANIMATIONS.map((a) => (
             <button
               key={a.value}
               type="button"
               onClick={() => onChange({ animation: a.value })}
-              className={cn("h-7 flex-1 rounded-lg text-[12px] font-medium", (h.animation ?? "none") === a.value && "bg-card shadow-segment")}
+              aria-pressed={(t.animation ?? "none") === a.value}
+              className={cn("h-7 rounded-lg px-2.5 text-[12px] font-medium", (t.animation ?? "none") !== a.value && "bg-control-fill")}
+              style={(t.animation ?? "none") === a.value ? { background: color, color: "var(--on-accent)" } : undefined}
             >
               {a.label}
             </button>
           ))}
         </div>
       </Field>
-      <Field label="Position">
-        <div className="grid w-[96px] grid-cols-3 gap-1 rounded-sm bg-control-fill p-1">
-          {ANCHORS.map((a) => (
+      {!isHead && (
+        <ToggleRow label="Keep under headline" checked={under} onChange={(v) => onChange({ keep_under_headline: v })} />
+      )}
+      {(isHead || !under) && (
+        <Field label="Position">
+          <PositionGrid value={t.position ?? (isHead ? "center" : "bottom-center")} color={color} onChange={(a) => onChange({ position: a })} />
+        </Field>
+      )}
+      <ToggleRow label="Same on all frames" checked={Boolean(t.same_on_all)} onChange={(v) => onChange({ same_on_all: v })} />
+    </>
+  );
+}
+
+/* ---------------- Logo */
+
+function LogoPanel({
+  logo,
+  format,
+  frame,
+  hasLogo,
+  kit,
+  actions,
+}: {
+  logo: LogoSettings;
+  format: Format;
+  frame: Frame;
+  hasLogo: boolean;
+  kit: BrandKit | null | undefined;
+  actions: InspectorActions;
+}) {
+  const fileRef = useRef<HTMLInputElement>(null);
+  const input = (
+    <input
+      ref={fileRef}
+      type="file"
+      accept="image/png,image/svg+xml,image/webp"
+      className="hidden"
+      onChange={(e) => {
+        const f = e.target.files?.[0];
+        e.target.value = "";
+        if (f) actions.onAddLogo(f);
+      }}
+    />
+  );
+  if (!hasLogo) {
+    return (
+      <div className="flex flex-col items-center py-4 text-center">
+        <span className="flex size-11 items-center justify-center rounded-full bg-control-fill">
+          <Shapes className="size-5 text-el-logo" strokeWidth={1.7} />
+        </span>
+        <div className="mt-3 text-[14px] font-semibold">Add your logo</div>
+        <p className="mt-1 max-w-[230px] text-[13px] text-secondary-text">
+          It's saved to your Brand Kit and shows on every ad. A PNG or SVG with a see-through background works best.
+        </p>
+        <Button variant="primary" size="sm" className="mt-4" onClick={() => fileRef.current?.click()}>
+          Add Logo
+        </Button>
+        {input}
+      </div>
+    );
+  }
+  const size = logo.size_pct ?? 16;
+  const version = logo.version ?? "auto";
+  const show = logo.show_on ?? "all";
+  const tiles: { value: NonNullable<LogoSettings["version"]>; label: string; hint: string; path: string | null | undefined }[] = [
+    { value: "auto", label: "Auto", hint: "Best contrast", path: logo.dark_path ?? logo.path },
+    { value: "light", label: "Light logo", hint: "For dark photos", path: logo.light_path },
+    { value: "dark", label: "Dark logo", hint: "For light photos", path: logo.dark_path },
+  ];
+  return (
+    <>
+      <Field label="Version">
+        <div className="grid grid-cols-3 gap-2">
+          {tiles.map((t) => {
+            const disabled = t.value !== "auto" && !t.path;
+            return (
+              <button
+                key={t.value}
+                type="button"
+                disabled={disabled}
+                onClick={() => actions.onLogo({ version: t.value })}
+                title={disabled ? "Add this version in your Brand Kit" : undefined}
+                className={cn(
+                  "flex flex-col items-center gap-1 rounded-sm p-2 text-center disabled:opacity-40",
+                  version === t.value ? "ring-2 ring-el-logo" : "ring-1 ring-border",
+                )}
+              >
+                <span className={cn("flex h-9 w-full items-center justify-center rounded-sm", t.value === "light" ? "bg-foreground" : "bg-control-fill")}>
+                  {t.path && <MediaImage path={t.path} className="max-h-6 max-w-[80%] object-contain" alt="" />}
+                </span>
+                <span className="text-[12px] font-medium leading-tight">{t.label}</span>
+                <span className="text-[10px] leading-tight text-secondary-text">{t.hint}</span>
+              </button>
+            );
+          })}
+        </div>
+        {kit && !kit.logos.some((l) => l.role === "reversed") && (
+          <p className="text-[11px] text-secondary-text">Add a reversed logo in your Brand Kit so Auto can switch on dark photos.</p>
+        )}
+      </Field>
+      <Field label={`Position on ${format}`}>
+        <PositionGrid
+          value={logo.positions?.[format] ?? "top-right"}
+          color="var(--el-logo)"
+          onChange={(a) => actions.onLogo({ positions: { ...logo.positions, [format]: a } })}
+        />
+      </Field>
+      <Field label="Size" value={`${size}% of width`}>
+        <ElementSlider
+          name="Logo size"
+          color="var(--el-logo)"
+          min={5}
+          max={40}
+          value={size}
+          onChange={(v, k) => actions.onLogo({ size_pct: v }, k)}
+          left={<span className="size-2.5 rounded-[2px] bg-secondary-text/50" />}
+          right={<span className="size-4 rounded-[3px] bg-secondary-text/50" />}
+        />
+      </Field>
+      <Field label="See-through">
+        <Segmented
+          value={logo.opacity ?? "solid"}
+          options={[
+            { value: "solid", label: "Solid" },
+            { value: "soft", label: "Soft" },
+          ]}
+          onChange={(v) => actions.onLogo({ opacity: v })}
+        />
+      </Field>
+      <Field label="Show logo on">
+        <div className="flex gap-1.5">
+          {(
+            [
+              { value: "all", label: "All frames" },
+              { value: "first_last", label: "First & last" },
+              { value: "selected", label: "This frame" },
+            ] as const
+          ).map((o) => (
             <button
-              key={a}
+              key={o.value}
               type="button"
-              aria-label={pretty(a)}
-              onClick={() => onChange({ position: a })}
-              className="flex size-7 items-center justify-center rounded-sm hover:bg-card"
+              aria-pressed={show === o.value}
+              onClick={() => {
+                actions.onLogo({ show_on: o.value });
+                if (o.value === "selected") actions.onLogoVisible(true);
+              }}
+              className={cn("h-7 rounded-lg px-2.5 text-[12px] font-medium", show === o.value ? "bg-el-logo text-primary-foreground" : "bg-control-fill")}
             >
-              <span className={cn("size-2 rounded-full bg-secondary-text/40", (h.position ?? "center") === a && "size-2.5 bg-el-headline")} />
+              {o.label}
             </button>
           ))}
         </div>
+        {show === "selected" && (
+          <ToggleRow label="Show on this frame" checked={frame.logo_visible} onChange={actions.onLogoVisible} />
+        )}
       </Field>
-      <label className="flex items-center justify-between text-[13px]">
-        Same on all frames
-        <Switch checked={Boolean(h.same_on_all)} onCheckedChange={(v) => onChange({ same_on_all: v })} className="data-[state=checked]:bg-toggle-on" />
-      </label>
-    </div>
+      {input}
+    </>
+  );
+}
+
+/* ---------------- Timing */
+
+function TimingPanel({ frames, frame, actions }: { frames: Frame[]; frame: Frame; actions: InspectorActions }) {
+  const d = frame.duration_sec;
+  const same = frames.every((f) => f.duration_sec === frames[0]?.duration_sec);
+  const pace = (Object.keys(PACE_SECONDS) as Pace[]).find((p) => frames.every((f) => f.duration_sec === PACE_SECONDS[p]));
+  const set = (v: number) => actions.onDuration(Math.max(0.5, Math.min(15, Math.round(v * 2) / 2)));
+  return (
+    <>
+      <Field label="Show this frame for">
+        <div className="flex items-center justify-between">
+          <Button variant="default" size="icon" aria-label="Shorter" onClick={() => set(d - 0.5)} disabled={d <= 0.5}>
+            <Minus strokeWidth={1.7} />
+          </Button>
+          <div className="text-center">
+            <span className="text-[34px] font-semibold tracking-[-0.02em] nums">{formatSeconds(d)}</span>
+            <span className="ml-1 text-[13px] text-secondary-text">seconds</span>
+          </div>
+          <Button variant="default" size="icon" aria-label="Longer" onClick={() => set(d + 0.5)} disabled={d >= 15}>
+            <Plus strokeWidth={1.7} />
+          </Button>
+        </div>
+        <ElementSlider name="Frame length" color="var(--el-timing)" min={0.5} max={10} step={0.5} value={d} onChange={(v, k) => actions.onDuration(v, k)} />
+      </Field>
+      <Field label="Pace for the whole video">
+        <Segmented
+          value={pace ?? ("" as Pace)}
+          options={[
+            { value: "relaxed", label: "Relaxed" },
+            { value: "standard", label: "Standard" },
+            { value: "fast", label: "Fast" },
+          ]}
+          onChange={actions.onPace}
+        />
+        <p className="text-[11px] text-secondary-text nums">Relaxed 3.5s · Standard 2.5s · Fast 1.5s per frame</p>
+      </Field>
+      <div className="flex items-center justify-between rounded-sm bg-control-fill px-3 py-2.5 text-[13px]">
+        <span className="text-secondary-text">Total video length</span>
+        <span className="font-semibold nums">{formatSeconds(totalDuration(frames))} seconds</span>
+      </div>
+      <ToggleRow label="Same length for all frames" checked={same} onChange={actions.onSameLength} />
+    </>
+  );
+}
+
+/* ---------------- Transition */
+
+const TR_ANIM: Record<TransitionSettings["type"], string> = {
+  cut: "tr-cut",
+  fade: "tr-fade",
+  slide: "tr-slide",
+  zoom: "tr-zoom",
+  wipe: "tr-wipe",
+  dip_black: "tr-dip-b",
+};
+
+function TransitionPanel({ frames, frame, first, actions }: { frames: Frame[]; frame: Frame; first: boolean; actions: InspectorActions }) {
+  if (first) {
+    return (
+      <p className="py-2 text-center text-[13px] text-secondary-text">The first frame starts the video.</p>
+    );
+  }
+  const tr = frame.transition_in ?? { type: "cut", speed: "smooth" };
+  const rest = frames.slice(1);
+  const allSame = rest.every((f) => f.transition_in?.type === tr.type && f.transition_in?.speed === tr.speed);
+  return (
+    <>
+      <div className="grid grid-cols-3 gap-2">
+        {(Object.keys(TRANSITION_LABEL) as TransitionSettings["type"][]).map((type) => (
+          <button
+            key={type}
+            type="button"
+            data-type={type}
+            aria-pressed={tr.type === type}
+            onClick={() => actions.onTransition({ type })}
+            className={cn("tr-tile flex flex-col items-center gap-1.5 rounded-sm p-1.5", tr.type === type ? "ring-2 ring-el-timing" : "ring-1 ring-border")}
+            style={{ "--tr-anim": TR_ANIM[type] } as React.CSSProperties}
+          >
+            <span className="relative block h-12 w-full overflow-hidden rounded-[3px] bg-secondary-text/40">
+              <span className="tr-b absolute inset-0 bg-el-photo/80" />
+              {type === "dip_black" && <span className="tr-k absolute inset-0 bg-foreground" />}
+            </span>
+            <span className="text-[12px] font-medium">{TRANSITION_LABEL[type]}</span>
+          </button>
+        ))}
+      </div>
+      <Field label="Speed">
+        <Segmented
+          value={tr.speed}
+          options={[
+            { value: "smooth", label: "Smooth" },
+            { value: "quick", label: "Quick" },
+          ]}
+          onChange={(v) => actions.onTransition({ speed: v })}
+        />
+      </Field>
+      <ToggleRow label="Use for all frames" checked={allSame} onChange={(v) => v && actions.onTransitionAll()} />
+    </>
   );
 }

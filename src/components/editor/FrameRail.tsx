@@ -4,6 +4,7 @@ import type { EditorDoc } from "@/lib/stillframe/data";
 import { ACCEPTED_IMAGE_TYPES } from "@/lib/stillframe/media";
 import type { Format, Frame } from "@/lib/stillframe/types";
 import { FrameThumb } from "./FrameThumb";
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from "@/components/ui/context-menu";
 import { cn } from "@/lib/utils";
 
 const LABEL: Record<string, string> = {
@@ -48,6 +49,12 @@ export function FrameRail({
   onSelectTransition,
   onReorder,
   onAddFiles,
+  canPaste,
+  onDuplicate,
+  onReplacePhoto,
+  onCopyStyle,
+  onPasteStyle,
+  onDelete,
 }: {
   doc: EditorDoc;
   format: Format;
@@ -59,6 +66,12 @@ export function FrameRail({
   onSelectTransition: (i: number) => void;
   onReorder: (from: number, to: number) => void;
   onAddFiles: (files: File[]) => void;
+  canPaste: boolean;
+  onDuplicate: (i: number) => void;
+  onReplacePhoto: (i: number) => void;
+  onCopyStyle: (i: number) => void;
+  onPasteStyle: (i: number) => void;
+  onDelete: (i: number) => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragFrom, setDragFrom] = useState<number | null>(null);
@@ -74,6 +87,8 @@ export function FrameRail({
               <TransitionChip frame={f} onClick={() => onSelectTransition(i)} />
             </div>
           )}
+          <ContextMenu>
+          <ContextMenuTrigger asChild>
           <button
             type="button"
             draggable
@@ -107,6 +122,17 @@ export function FrameRail({
               {i + 1}
             </span>
           </button>
+          </ContextMenuTrigger>
+          <ContextMenuContent className="w-44">
+            <ContextMenuItem onSelect={() => onDuplicate(i)}>Duplicate</ContextMenuItem>
+            <ContextMenuItem onSelect={() => onReplacePhoto(i)}>Replace Photo…</ContextMenuItem>
+            <ContextMenuSeparator />
+            <ContextMenuItem onSelect={() => onCopyStyle(i)}>Copy Style</ContextMenuItem>
+            <ContextMenuItem disabled={!canPaste} onSelect={() => onPasteStyle(i)}>Paste Style</ContextMenuItem>
+            <ContextMenuSeparator />
+            <ContextMenuItem className="text-destructive focus:text-destructive" onSelect={() => onDelete(i)}>Delete</ContextMenuItem>
+          </ContextMenuContent>
+          </ContextMenu>
           <span className="mt-1 text-[11px] text-secondary-text nums">{f.duration_sec.toFixed(1)}s</span>
         </div>
       ))}

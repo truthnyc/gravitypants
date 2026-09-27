@@ -52,10 +52,12 @@ export type Database = {
           body_font: string | null
           colors: string[]
           created_at: string
+          custom_fonts: Json
           default_logo_positions: Json
           end_card: Json
           headline_font: string | null
           id: string
+          logo_size_pct: number
           logos: Json
           updated_at: string
           workspace_id: string
@@ -64,10 +66,12 @@ export type Database = {
           body_font?: string | null
           colors?: string[]
           created_at?: string
+          custom_fonts?: Json
           default_logo_positions?: Json
           end_card?: Json
           headline_font?: string | null
           id?: string
+          logo_size_pct?: number
           logos?: Json
           updated_at?: string
           workspace_id: string
@@ -76,10 +80,12 @@ export type Database = {
           body_font?: string | null
           colors?: string[]
           created_at?: string
+          custom_fonts?: Json
           default_logo_positions?: Json
           end_card?: Json
           headline_font?: string | null
           id?: string
+          logo_size_pct?: number
           logos?: Json
           updated_at?: string
           workspace_id?: string

@@ -4,7 +4,10 @@ import { uploadMedia, type UploadedPhoto } from "./media";
 import {
   DEFAULT_LOGO,
   WORKSPACE_ID,
+  PACE_SECONDS,
+  type BrandKit,
   type Frame,
+  type LogoSettings,
   type Project,
   type ProjectWithFrames,
 } from "./types";
@@ -180,7 +183,7 @@ export function useCreateAdFromPhotos() {
       onProgress?: (items: UploadProgress[]) => void;
     }) => {
       const uploaded = await uploadAll(files, onProgress);
-
+      const kit = await fetchBrandKit();
 
       const { data: project, error } = await supabase
         .from("projects")
@@ -190,16 +193,25 @@ export function useCreateAdFromPhotos() {
           primary_format: "9:16",
           formats: ["9:16"],
           pace: "standard",
-          logo: DEFAULT_LOGO,
-          end_card: {},
+          logo: logoFromBrandKit(kit),
+          end_card: kit?.end_card ?? {},
         })
         .select("id")
         .single();
       if (error) throw error;
 
-      const { error: framesError } = await supabase
-        .from("frames")
-        .insert(uploaded.map((photo, i) => ({ ...framePayloadFromPhoto(photo, i), project_id: project.id })));
+      const { error: framesError } = await supabase.from("frames").insert(
+        uploaded.map((photo, i) => {
+          const payload = framePayloadFromPhoto(photo, i);
+          if (payload.headline && kit) {
+            Object.assign(payload.headline, {
+              font_family: kit.headline_font ?? undefined,
+              color: kit.colors[0] ?? "#FFFFFF",
+            });
+          }
+          return { ...payload, project_id: project.id };
+        }),
+      );
       if (framesError) throw framesError;
 
       return project.id as string;
@@ -332,3 +344,71 @@ export async function saveEditorDoc(prev: EditorDoc, next: EditorDoc) {
     if (error) throw error;
   }
 }
+
+/* ---------------- Brand Kit */
+
+export const brandKitKey = ["brand-kit", WORKSPACE_ID] as const;
+
+function normalizeBrandKit(row: Record<string, unknown>): BrandKit {
+  return {
+    ...(row as unknown as BrandKit),
+    logos: (row["logos"] as BrandKit["logos"]) ?? [],
+    colors: (row["colors"] as string[]) ?? [],
+    default_logo_positions: (row["default_logo_positions"] as BrandKit["default_logo_positions"]) ?? {},
+    end_card: (row["end_card"] as BrandKit["end_card"]) ?? {},
+    custom_fonts: (row["custom_fonts"] as BrandKit["custom_fonts"]) ?? [],
+    logo_size_pct: Number(row["logo_size_pct"] ?? 16),
+  };
+}
+
+export async function fetchBrandKit(): Promise<BrandKit | null> {
+  const { data, error } = await supabase.from("brand_kit").select("*").eq("workspace_id", WORKSPACE_ID).maybeSingle();
+  if (error) throw error;
+  if (data) return normalizeBrandKit(data as Record<string, unknown>);
+  const { data: created, error: e2 } = await supabase
+    .from("brand_kit")
+    .insert({ workspace_id: WORKSPACE_ID })
+    .select("*")
+    .single();
+  if (e2) throw e2;
+  return normalizeBrandKit(created as Record<string, unknown>);
+}
+
+export function useBrandKit() {
+  return useQuery({ queryKey: brandKitKey, queryFn: fetchBrandKit });
+}
+
+/** Optimistic Brand Kit update. */
+export function useUpdateBrandKit() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (patch: Partial<BrandKit>) => {
+      const { error } = await supabase
+        .from("brand_kit")
+        .update(patch as never)
+        .eq("workspace_id", WORKSPACE_ID);
+      if (error) throw error;
+    },
+    onMutate: (patch) => {
+      queryClient.setQueryData<BrandKit | null>(brandKitKey, (k) => (k ? { ...k, ...patch } : k));
+    },
+    onError: () => queryClient.invalidateQueries({ queryKey: brandKitKey }),
+  });
+}
+
+/** Logo settings a new ad starts with. Primary = for light photos (dark artwork), Reversed = for dark photos. */
+export function logoFromBrandKit(kit: BrandKit | null | undefined, base: LogoSettings = DEFAULT_LOGO): LogoSettings {
+  if (!kit) return base;
+  const primary = kit.logos.find((l) => l.role === "primary") ?? kit.logos[0];
+  const reversed = kit.logos.find((l) => l.role === "reversed");
+  return {
+    ...base,
+    path: primary?.path ?? reversed?.path ?? null,
+    dark_path: primary?.path ?? null,
+    light_path: reversed?.path ?? null,
+    size_pct: kit.logo_size_pct ?? base.size_pct,
+    positions: { ...base.positions, ...kit.default_logo_positions },
+  };
+}
+
+export const paceSeconds = PACE_SECONDS;

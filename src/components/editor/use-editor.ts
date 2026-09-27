@@ -22,7 +22,7 @@ export function useEditorDoc(initial: EditorDoc) {
 
   const apply = useCallback((fn: (d: EditorDoc) => EditorDoc, key?: string) => {
     const now = Date.now();
-    const coalesce = Boolean(key && last.current?.key === key && now - last.current.at < 1000);
+    const coalesce = Boolean(key && last.current?.key === key && (key.startsWith("drag:") || now - last.current.at < 1000));
     last.current = key ? { key, at: now } : null;
     setState((s) => {
       const next = fn(s.doc);

@@ -47,7 +47,7 @@ function safeName(name: string) {
 
 export async function uploadMedia(
   file: File,
-  kind: "photo" | "logo" = "photo",
+  kind: "photo" | "logo" | "font" = "photo",
 ): Promise<UploadedPhoto> {
   const path = `${WORKSPACE_ID}/${kind}/${crypto.randomUUID()}-${safeName(file.name)}`;
   const { error: uploadError } = await supabase.storage
@@ -55,7 +55,7 @@ export async function uploadMedia(
     .upload(path, file, { cacheControl: "3600", upsert: false });
   if (uploadError) throw uploadError;
 
-  const size = await readImageSize(file);
+  const size = kind === "font" ? { width: 0, height: 0 } : await readImageSize(file);
   const { data, error } = await supabase
     .from("assets")
     .insert({

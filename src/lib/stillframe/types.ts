@@ -19,7 +19,7 @@ export type LogoSettings = {
   size_pct?: number;
   opacity?: "solid" | "soft";
   show_on?: "all" | "first_last" | "selected";
-  positions?: Partial<Record<Format, LogoPosition>>;
+  positions?: Partial<Record<Format, LogoPosition | string>>;
 };
 
 export type EndCard = {
@@ -33,6 +33,8 @@ export type PhotoSettings = {
   url?: string | null;
   fit?: "fill" | "fit";
   focus?: { x: number; y: number };
+  /** extra crop zoom for Fill, 1..3 */
+  zoom?: number;
   movement?: "none" | "slow_zoom_in" | "slow_zoom_out" | "pan_left" | "pan_right";
   brightness?: number;
   darken_for_text?: boolean;
@@ -106,36 +108,24 @@ export function formatSeconds(totalSeconds: number) {
   return Number.isInteger(rounded) ? `${rounded}` : rounded.toFixed(1);
 }
 
-export const TEXT_FONTS = ["DM Sans", "Space Grotesk", "Playfair Display", "Fraunces", "Bebas Neue"];
+/** Ad text colors are content, not UI chrome. Used when the Brand Kit has none. */
+export const TEXT_COLORS = ["#FFFFFF", "#1D1D1F", "#FFD60A", "#FF6B4A", "#0071E3", "#7D3BD6"];
 
-/** Weights actually loaded for each font (see the Google Fonts link in __root). */
-export const FONT_WEIGHTS: Record<string, { value: number; label: string }[]> = {
-  "DM Sans": [
-    { value: 400, label: "Regular" },
-    { value: 500, label: "Medium" },
-    { value: 700, label: "Bold" },
-    { value: 800, label: "Extra Bold" },
-  ],
-  "Space Grotesk": [
-    { value: 400, label: "Regular" },
-    { value: 500, label: "Medium" },
-    { value: 700, label: "Bold" },
-  ],
-  "Playfair Display": [
-    { value: 500, label: "Medium" },
-    { value: 700, label: "Bold" },
-    { value: 900, label: "Black" },
-  ],
-  Fraunces: [
-    { value: 500, label: "Medium" },
-    { value: 700, label: "Bold" },
-    { value: 900, label: "Black" },
-  ],
-  "Bebas Neue": [{ value: 400, label: "Regular" }],
+export type BrandLogoRole = "primary" | "reversed" | "icon" | "other";
+export type BrandLogo = { id: string; path: string; name: string; role: BrandLogoRole };
+export type CustomFont = { family: string; path: string };
+
+export type BrandKit = {
+  id: string;
+  workspace_id: string;
+  logos: BrandLogo[];
+  colors: string[];
+  headline_font: string | null;
+  body_font: string | null;
+  default_logo_positions: Partial<Record<Format, string>>;
+  logo_size_pct: number;
+  end_card: EndCard;
+  custom_fonts: CustomFont[];
 };
 
-export function weightsForFont(family: string) {
-  return FONT_WEIGHTS[family] ?? [{ value: 400, label: "Regular" }];
-}
-/** Ad text colors are content, not UI chrome. */
-export const TEXT_COLORS = ["#FFFFFF", "#1D1D1F", "#FFD60A", "#FF6B4A", "#0071E3", "#7D3BD6"];
+export const PACE_SECONDS: Record<Pace, number> = { relaxed: 3.5, standard: 2.5, fast: 1.5 };
