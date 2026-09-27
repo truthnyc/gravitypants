@@ -13,11 +13,49 @@ function mapStatus(s: string): string {
   return "canceled";
 }
 
+const PLAN_NAMES: Record<string, string> = {
+  simple: "Simple",
+  business: "Business",
+  business_yearly: "Business Yearly",
+};
+
 const iso = (sec?: number | null) => (sec ? new Date(sec * 1000).toISOString() : null);
 
 async function admin() {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   return supabaseAdmin;
+}
+
+/** Workspace owner's email + display name, for lifecycle emails. */
+async function ownerContact(db: any, ws: string) {
+  const { data: m } = await db
+    .from("workspace_members")
+    .select("user_id")
+    .eq("workspace_id", ws)
+    .eq("role", "owner")
+    .maybeSingle();
+  if (!m) return null;
+  const { data: u } = await db.auth.admin.getUserById(m.user_id);
+  const email = u?.user?.email as string | undefined;
+  if (!email) return null;
+  const { data: p } = await db.from("profiles").select("display_name").eq("user_id", m.user_id).maybeSingle();
+  return { email, name: (p?.display_name as string | null) ?? undefined };
+}
+
+/** Sends a lifecycle email; failures are logged, never thrown (billing sync must not fail). */
+async function sendLifecycle(template: string, ws: string, data: Record<string, unknown>, key: string) {
+  try {
+    const db = await admin();
+    const contact = await ownerContact(db, ws);
+    if (!contact) return;
+    const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
+    await sendTemplateEmail(template, contact.email, {
+      templateData: { name: contact.name, ...data },
+      idempotencyKey: key,
+    });
+  } catch (e) {
+    console.error("Lifecycle email failed:", template, e);
+  }
 }
 
 async function syncSubscription(sub: any, env: StripeEnv, deleted = false) {
