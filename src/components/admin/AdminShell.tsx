@@ -35,7 +35,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
   );
 }
 
-export function PageTitle({ title, sub, right }: { title: string; sub?: string; right?: ReactNode }) {
+export function PageTitle({ title, sub, right }: { title: string; sub?: string | undefined; right?: ReactNode }) {
   return (
     <div className="mb-6 flex items-end justify-between gap-4">
       <div>

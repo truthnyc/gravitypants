@@ -93,7 +93,7 @@ function ClientPage() {
         <Card>
           <h2 className="mb-2 text-[15px] font-semibold">Members</h2>
           <ul className="divide-y divide-border text-[14px]">
-            {data.members.map((m) => (
+            {data.members.map((m: { userId: string; email: string; role: string; lastSignIn: string | null }) => (
               <li key={m.userId} className="flex items-center justify-between py-2">
                 <span>{m.email} <span className="text-secondary-text">· {m.role}</span></span>
                 <span className="text-[13px] text-secondary-text nums">Last sign-in {fmtDateTime(m.lastSignIn)}</span>

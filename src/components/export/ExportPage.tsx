@@ -201,7 +201,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
     track({
       status: "running",
       channels: [...new Set(files.map((f) => f.name.replace(/\.(mp4|gif)$/i, "")))],
-      formats: [...new Set(jobs.map(([, j]) => j.kind.toUpperCase()))],
+      formats: [...new Set([...jobs.values()].map((j) => j.kind.toUpperCase()))],
     });
     let failure: string | null = null;
     const set = (k: string, s: Partial<JobState>) => setState((prev) => ({ ...prev, [k]: { ...prev[k]!, ...s } }));
