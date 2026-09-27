@@ -63,7 +63,7 @@ export function useProjects() {
       const { data, error } = await supabase
         .from("projects")
         .select(`${PROJECT_COLUMNS}, frames(*)`)
-        .eq("workspace_id", )
+        .eq("workspace_id", getWorkspaceId())
         .is("deleted_at", null)
         .order("updated_at", { ascending: false });
       if (error) throw error;
@@ -363,7 +363,7 @@ function normalizeBrandKit(row: Record<string, unknown>): BrandKit {
 }
 
 export async function fetchBrandKit(): Promise<BrandKit | null> {
-  const { data, error } = await supabase.from("brand_kit").select("*").eq("workspace_id", ).maybeSingle();
+  const { data, error } = await supabase.from("brand_kit").select("*").eq("workspace_id", getWorkspaceId()).maybeSingle();
   if (error) throw error;
   if (data) return normalizeBrandKit(data as Record<string, unknown>);
   const { data: created, error: e2 } = await supabase
@@ -387,7 +387,7 @@ export function useUpdateBrandKit() {
       const { error } = await supabase
         .from("brand_kit")
         .update(patch as never)
-        .eq("workspace_id", );
+        .eq("workspace_id", getWorkspaceId());
       if (error) throw error;
     },
     onMutate: (patch) => {

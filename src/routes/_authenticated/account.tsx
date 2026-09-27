@@ -84,7 +84,7 @@ function AccountPage() {
   }
 
   async function changePassword() {
-    if (pw.length < 6) return toast.error("Please use a password with at least 6 characters.");
+    if (pw.length < 6) { toast.error("Please use a password with at least 6 characters."); return; }
     const { error } = await supabase.auth.updateUser({ password: pw, current_password: current } as never);
     if (error) toast.error(error.message.toLowerCase().includes("current") ? "Your current password isn't right." : "Couldn't change your password.");
     else {
