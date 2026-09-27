@@ -9,21 +9,44 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as ResetRouteImport } from './routes/reset'
+import { Route as SigninRouteImport } from './routes/signin'
+import { Route as SignupRouteImport } from './routes/signup'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedBrandRouteImport } from './routes/_authenticated/brand'
 import { Route as ApiPublicCleanupExportsRouteImport } from './routes/api/public/cleanup-exports'
 import { Route as AuthenticatedAdIdEditRouteImport } from './routes/_authenticated/ad.$id.edit'
 import { Route as AuthenticatedAdIdExportRouteImport } from './routes/_authenticated/ad.$id.export'
 
-const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
-  id: '/_authenticated/',
-  path: '/',
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedBrandRoute = AuthenticatedBrandRouteImport.update({
-  id: '/_authenticated/brand',
-  path: '/brand',
+const ResetRoute = ResetRouteImport.update({
+  id: '/reset',
+  path: '/reset',
   getParentRoute: () => rootRouteImport,
+} as any)
+const SigninRoute = SigninRouteImport.update({
+  id: '/signin',
+  path: '/signin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedBrandRoute = AuthenticatedBrandRouteImport.update({
+  id: '/brand',
+  path: '/brand',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const ApiPublicCleanupExportsRoute = ApiPublicCleanupExportsRouteImport.update({
   id: '/api/public/cleanup-exports',
@@ -31,24 +54,30 @@ const ApiPublicCleanupExportsRoute = ApiPublicCleanupExportsRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdIdEditRoute = AuthenticatedAdIdEditRouteImport.update({
-  id: '/_authenticated/ad/$id/edit',
+  id: '/ad/$id/edit',
   path: '/ad/$id/edit',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedAdIdExportRoute = AuthenticatedAdIdExportRouteImport.update({
-  id: '/_authenticated/ad/$id/export',
+  id: '/ad/$id/export',
   path: '/ad/$id/export',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/brand': typeof AuthenticatedBrandRoute
   '/': typeof AuthenticatedIndexRoute
+  '/reset': typeof ResetRoute
+  '/signin': typeof SigninRoute
+  '/signup': typeof SignupRoute
+  '/brand': typeof AuthenticatedBrandRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
   '/ad/$id/edit': typeof AuthenticatedAdIdEditRoute
   '/ad/$id/export': typeof AuthenticatedAdIdExportRoute
 }
 export interface FileRoutesByTo {
+  '/reset': typeof ResetRoute
+  '/signin': typeof SigninRoute
+  '/signup': typeof SignupRoute
   '/brand': typeof AuthenticatedBrandRoute
   '/': typeof AuthenticatedIndexRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
@@ -57,6 +86,10 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/reset': typeof ResetRoute
+  '/signin': typeof SigninRoute
+  '/signup': typeof SignupRoute
   '/_authenticated/brand': typeof AuthenticatedBrandRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
@@ -66,13 +99,19 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/brand'
     | '/'
+    | '/reset'
+    | '/signin'
+    | '/signup'
+    | '/brand'
     | '/api/public/cleanup-exports'
     | '/ad/$id/edit'
     | '/ad/$id/export'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/reset'
+    | '/signin'
+    | '/signup'
     | '/brand'
     | '/'
     | '/api/public/cleanup-exports'
@@ -80,6 +119,10 @@ export interface FileRouteTypes {
     | '/ad/$id/export'
   id:
     | '__root__'
+    | '/_authenticated'
+    | '/reset'
+    | '/signin'
+    | '/signup'
     | '/_authenticated/brand'
     | '/_authenticated/'
     | '/api/public/cleanup-exports'
@@ -88,28 +131,56 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  AuthenticatedBrandRoute: typeof AuthenticatedBrandRoute
-  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  ResetRoute: typeof ResetRoute
+  SigninRoute: typeof SigninRoute
+  SignupRoute: typeof SignupRoute
   ApiPublicCleanupExportsRoute: typeof ApiPublicCleanupExportsRoute
-  AuthenticatedAdIdEditRoute: typeof AuthenticatedAdIdEditRoute
-  AuthenticatedAdIdExportRoute: typeof AuthenticatedAdIdExportRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset': {
+      id: '/reset'
+      path: '/reset'
+      fullPath: '/reset'
+      preLoaderRoute: typeof ResetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signin': {
+      id: '/signin'
+      path: '/signin'
+      fullPath: '/signin'
+      preLoaderRoute: typeof SigninRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/': {
       id: '/_authenticated/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/brand': {
       id: '/_authenticated/brand'
       path: '/brand'
       fullPath: '/brand'
       preLoaderRoute: typeof AuthenticatedBrandRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/api/public/cleanup-exports': {
       id: '/api/public/cleanup-exports'
@@ -123,24 +194,41 @@ declare module '@tanstack/react-router' {
       path: '/ad/$id/edit'
       fullPath: '/ad/$id/edit'
       preLoaderRoute: typeof AuthenticatedAdIdEditRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/ad/$id/export': {
       id: '/_authenticated/ad/$id/export'
       path: '/ad/$id/export'
       fullPath: '/ad/$id/export'
       preLoaderRoute: typeof AuthenticatedAdIdExportRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
   }
 }
 
-const rootRouteChildren: RootRouteChildren = {
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedBrandRoute: typeof AuthenticatedBrandRoute
+  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedAdIdEditRoute: typeof AuthenticatedAdIdEditRoute
+  AuthenticatedAdIdExportRoute: typeof AuthenticatedAdIdExportRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedBrandRoute: AuthenticatedBrandRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
-  ApiPublicCleanupExportsRoute: ApiPublicCleanupExportsRoute,
   AuthenticatedAdIdEditRoute: AuthenticatedAdIdEditRoute,
   AuthenticatedAdIdExportRoute: AuthenticatedAdIdExportRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
+const rootRouteChildren: RootRouteChildren = {
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  ResetRoute: ResetRoute,
+  SigninRoute: SigninRoute,
+  SignupRoute: SignupRoute,
+  ApiPublicCleanupExportsRoute: ApiPublicCleanupExportsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
