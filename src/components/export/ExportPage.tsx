@@ -538,6 +538,13 @@ function ProgressSheet({
   zipName: string;
 }) {
   const done = files.filter((f) => state[f.job]?.blob);
+  const [wasHidden, setWasHidden] = useState(false);
+  useEffect(() => {
+    if (!running) return setWasHidden(false);
+    const onVis = () => document.visibilityState === "hidden" && setWasHidden(true);
+    document.addEventListener("visibilitychange", onVis);
+    return () => document.removeEventListener("visibilitychange", onVis);
+  }, [running]);
   const zipAll = async () => {
     const entries: Record<string, [Uint8Array, { level: 0 }]> = {};
     for (const f of done) entries[f.name] = [new Uint8Array(await state[f.job]!.blob!.arrayBuffer()), { level: 0 }];
@@ -550,6 +557,11 @@ function ProgressSheet({
           <DialogTitle>{running ? "Making your files…" : "Your files are ready"}</DialogTitle>
           <DialogDescription>{running ? "Keep this tab open until everything is done." : "Download them one by one or all together."}</DialogDescription>
         </DialogHeader>
+        {running && wasHidden && (
+          <div role="status" className="rounded-sm bg-control-fill px-3 py-2 text-[13px]">
+            Keep this tab open until your files are ready
+          </div>
+        )}
         <div className="max-h-[50vh] space-y-2 overflow-y-auto">
           {files.map((f) => {
             const s = state[f.job];
