@@ -66,7 +66,10 @@ async function syncSubscription(sub: any, env: StripeEnv, deleted = false) {
     const { data } = await db.from("workspace_billing").select("workspace_id").eq("stripe_customer_id", customer).maybeSingle();
     ws = data?.workspace_id;
   }
-  if (!ws) return console.error("Subscription without workspace", sub.id);
+  if (!ws) {
+    console.error("Subscription without workspace", sub.id);
+    return undefined;
+  }
   const item = sub.items?.data?.[0];
   const key = item?.price?.lookup_key || item?.price?.metadata?.lovable_external_id || "";
   const plan = PLAN_BY_PRICE[key];
@@ -83,6 +86,7 @@ async function syncSubscription(sub: any, env: StripeEnv, deleted = false) {
       cancel_at_period_end: Boolean(sub.cancel_at_period_end || sub.cancel_at),
     })
     .eq("workspace_id", ws);
+  return { ws, plan };
 }
 
 async function handle(req: Request, env: StripeEnv) {

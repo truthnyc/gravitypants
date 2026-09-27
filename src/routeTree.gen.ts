@@ -25,6 +25,7 @@ import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminClientsRouteImport } from './routes/_authenticated/admin/clients'
 import { Route as AuthenticatedAdminExportsRouteImport } from './routes/_authenticated/admin/exports'
 import { Route as ApiPublicCleanupExportsRouteImport } from './routes/api/public/cleanup-exports'
+import { Route as ApiPublicTrialRemindersRouteImport } from './routes/api/public/trial-reminders'
 import { Route as AuthenticatedAdIdEditRouteImport } from './routes/_authenticated/ad.$id.edit'
 import { Route as AuthenticatedAdIdExportRouteImport } from './routes/_authenticated/ad.$id.export'
 import { Route as AuthenticatedAdminClientsIdRouteImport } from './routes/_authenticated/admin/clients_.$id'
@@ -116,6 +117,11 @@ const ApiPublicCleanupExportsRoute = ApiPublicCleanupExportsRouteImport.update({
   path: '/api/public/cleanup-exports',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicTrialRemindersRoute = ApiPublicTrialRemindersRouteImport.update({
+  id: '/api/public/trial-reminders',
+  path: '/api/public/trial-reminders',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAdIdEditRoute = AuthenticatedAdIdEditRouteImport.update({
   id: '/ad/$id/edit',
   path: '/ad/$id/edit',
@@ -170,6 +176,7 @@ export interface FileRoutesByFullPath {
   '/admin/clients': typeof AuthenticatedAdminClientsRoute
   '/admin/exports': typeof AuthenticatedAdminExportsRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
+  '/api/public/trial-reminders': typeof ApiPublicTrialRemindersRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/ad/$id/edit': typeof AuthenticatedAdIdEditRoute
   '/ad/$id/export': typeof AuthenticatedAdIdExportRoute
@@ -193,6 +200,7 @@ export interface FileRoutesByTo {
   '/admin/clients': typeof AuthenticatedAdminClientsRoute
   '/admin/exports': typeof AuthenticatedAdminExportsRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
+  '/api/public/trial-reminders': typeof ApiPublicTrialRemindersRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/ad/$id/edit': typeof AuthenticatedAdIdEditRoute
   '/ad/$id/export': typeof AuthenticatedAdIdExportRoute
@@ -219,6 +227,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/clients': typeof AuthenticatedAdminClientsRoute
   '/_authenticated/admin/exports': typeof AuthenticatedAdminExportsRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
+  '/api/public/trial-reminders': typeof ApiPublicTrialRemindersRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/ad/$id/edit': typeof AuthenticatedAdIdEditRoute
   '/_authenticated/ad/$id/export': typeof AuthenticatedAdIdExportRoute
@@ -245,6 +254,7 @@ export interface FileRouteTypes {
     | '/admin/clients'
     | '/admin/exports'
     | '/api/public/cleanup-exports'
+    | '/api/public/trial-reminders'
     | '/admin/'
     | '/ad/$id/edit'
     | '/ad/$id/export'
@@ -268,6 +278,7 @@ export interface FileRouteTypes {
     | '/admin/clients'
     | '/admin/exports'
     | '/api/public/cleanup-exports'
+    | '/api/public/trial-reminders'
     | '/admin'
     | '/ad/$id/edit'
     | '/ad/$id/export'
@@ -293,6 +304,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/clients'
     | '/_authenticated/admin/exports'
     | '/api/public/cleanup-exports'
+    | '/api/public/trial-reminders'
     | '/_authenticated/admin/'
     | '/_authenticated/ad/$id/edit'
     | '/_authenticated/ad/$id/export'
@@ -310,6 +322,7 @@ export interface RootRouteChildren {
   SigninRoute: typeof SigninRoute
   SignupRoute: typeof SignupRoute
   ApiPublicCleanupExportsRoute: typeof ApiPublicCleanupExportsRoute
+  ApiPublicTrialRemindersRoute: typeof ApiPublicTrialRemindersRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
@@ -430,6 +443,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicCleanupExportsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/trial-reminders': {
+      id: '/api/public/trial-reminders'
+      path: '/api/public/trial-reminders'
+      fullPath: '/api/public/trial-reminders'
+      preLoaderRoute: typeof ApiPublicTrialRemindersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/ad/$id/edit': {
       id: '/_authenticated/ad/$id/edit'
       path: '/ad/$id/edit'
@@ -536,6 +556,7 @@ const rootRouteChildren: RootRouteChildren = {
   SigninRoute: SigninRoute,
   SignupRoute: SignupRoute,
   ApiPublicCleanupExportsRoute: ApiPublicCleanupExportsRoute,
+  ApiPublicTrialRemindersRoute: ApiPublicTrialRemindersRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
