@@ -26,3 +26,4 @@
 - Export: finished files are kept 30 days; daily 03:00 UTC cleanup via /api/public/cleanup-exports (only removes expired files, so no caller secret).
 - Accounts: app routes live under `src/routes/_authenticated/` (ssr:false gate → /signin?redirect=); the gate calls RPC `ensure_workspace()` and stores the id via `setWorkspaceId` in `src/lib/stillframe/workspace.ts` — data code reads `getWorkspaceId()`, never a constant, so each user only touches their workspace.
 - Privacy: RLS on every table via `is_workspace_member()`; media files live under `<workspace_id>/…` (exports at `<workspace_id>/exports/<project>/<stamp>/`) and storage policies check the first folder.
+- Billing: per-workspace in `workspace_billing` (synced only by /api/public/payments/webhook), plans in `plans`; export gating via SQL `export_status`/`record_export` plus a restrictive storage policy on `<ws>/exports/` — the browser is never trusted for plan status.
