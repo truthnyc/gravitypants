@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Copy, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,7 @@ import {
   type TransitionSettings,
 } from "@/lib/stillframe/types";
 import { ALL_FORMATS, FORMAT_SIZE } from "@/render/formats";
-import { DEFAULT_FONT, frameIndexAt, restTime, totalDuration, type Anchor } from "@/render/renderFrame";
+import { DEFAULT_FONT, END_CARD_SECONDS, endCardOf, frameIndexAt, restTime, videoDuration, type Anchor, type BrandStyle } from "@/render/renderFrame";
 import { EditorHeader } from "./EditorHeader";
 import { FrameRail } from "./FrameRail";
 import { Inspector, type InspectorActions } from "./Inspector";
@@ -64,7 +64,6 @@ function isTyping(target: EventTarget | null) {
 export function Editor({ initial }: { initial: EditorDoc }) {
   const { doc, apply, undo, redo, canUndo } = useEditorDoc(initial);
   const status = useAutosave(doc);
-  const { images, version } = useRenderAssets(doc);
 
   const [frameIndex, setFrameIndex] = useState(0);
   const [selected, setSelected] = useState<ElementKey>("headline");
@@ -78,6 +77,12 @@ export function Editor({ initial }: { initial: EditorDoc }) {
   const replaceAt = useRef(0);
   const { data: kit } = useBrandKit();
   const updateKit = useUpdateBrandKit();
+  const brand = useMemo<BrandStyle>(
+    () => ({ color: kit?.colors[0] ?? null, font: kit?.body_font ?? null, endCard: kit?.end_card ?? null }),
+    [kit?.colors, kit?.body_font, kit?.end_card],
+  );
+  const { images, version } = useRenderAssets(doc, brand);
+  const endSeconds = endCardOf(doc.project, brand).enabled ? END_CARD_SECONDS : 0;
 
   useEffect(() => {
     if (kit?.custom_fonts.length) void registerCustomFonts(kit.custom_fonts);
@@ -86,7 +91,7 @@ export function Editor({ initial }: { initial: EditorDoc }) {
   const frames = doc.frames;
   const idx = Math.min(frameIndex, Math.max(0, frames.length - 1));
   const frame = frames[idx];
-  const total = totalDuration(frames);
+  const total = videoDuration(doc.project, frames, brand);
 
   const selectFrame = useCallback(
     (i: number) => {
@@ -476,6 +481,7 @@ export function Editor({ initial }: { initial: EditorDoc }) {
           <div className="min-h-0 flex-1 py-8">
             <Stage
               doc={doc}
+              brand={brand}
               frameIndex={idx}
               format={format}
               time={time}
@@ -533,6 +539,7 @@ export function Editor({ initial }: { initial: EditorDoc }) {
 
         <Inspector
           doc={doc}
+          endSeconds={endSeconds}
           frame={frame}
           frameIndex={idx}
           format={format}
@@ -549,6 +556,7 @@ export function Editor({ initial }: { initial: EditorDoc }) {
 
       <Timeline
         frames={frames}
+        endSeconds={endSeconds}
         frameIndex={idx}
         time={time}
         playing={playing}

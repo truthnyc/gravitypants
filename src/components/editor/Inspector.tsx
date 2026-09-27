@@ -83,7 +83,9 @@ export function Inspector({
   adjusting,
   onSelect,
   actions,
+  endSeconds = 0,
 }: {
+  endSeconds?: number;
   doc: EditorDoc;
   frame: Frame;
   frameIndex: number;
@@ -146,7 +148,7 @@ export function Inspector({
         {selected === "logo" && (
           <LogoPanel logo={doc.project.logo} format={format} frame={frame} hasLogo={hasLogo} kit={kit} actions={actions} />
         )}
-        {selected === "timing" && <TimingPanel frames={doc.frames} frame={frame} actions={actions} />}
+        {selected === "timing" && <TimingPanel frames={doc.frames} frame={frame} actions={actions} endSeconds={endSeconds} />}
         {selected === "transition" && <TransitionPanel frames={doc.frames} frame={frame} first={frameIndex === 0} actions={actions} />}
       </div>
     </aside>
@@ -205,6 +207,7 @@ export function ElementSlider({
   onChange,
   left,
   right,
+  snap,
 }: {
   name: string;
   color: string;
@@ -215,6 +218,8 @@ export function ElementSlider({
   onChange: (v: number, key: string) => void;
   left?: React.ReactNode;
   right?: React.ReactNode;
+  /** Adjusts the released value (e.g. snap to center); the result joins the same undo step. */
+  snap?: (v: number) => number;
 }) {
   const session = useRef(0);
   return (
@@ -228,7 +233,11 @@ export function ElementSlider({
         aria-label={name}
         style={{ "--slider-color": color } as React.CSSProperties}
         onValueChange={([v]) => onChange(v ?? value, `drag:${name}:${session.current}`)}
-        onValueCommit={() => {
+        onValueCommit={([v]) => {
+          if (snap && v !== undefined) {
+            const s = snap(v);
+            if (s !== v) onChange(s, `drag:${name}:${session.current}`);
+          }
           session.current += 1;
         }}
       />
@@ -352,6 +361,7 @@ function PhotoPanel({ photo, adjusting, actions }: { photo: PhotoSettings; adjus
           min={-100}
           max={100}
           value={brightness}
+          snap={(v) => (Math.abs(v) <= 5 ? 0 : v)}
           onChange={(v, k) => actions.onPhoto({ brightness: v / 200 }, k)}
         />
       </Field>
@@ -644,7 +654,7 @@ function LogoPanel({
 
 /* ---------------- Timing */
 
-function TimingPanel({ frames, frame, actions }: { frames: Frame[]; frame: Frame; actions: InspectorActions }) {
+function TimingPanel({ frames, frame, actions, endSeconds }: { frames: Frame[]; frame: Frame; actions: InspectorActions; endSeconds: number }) {
   const d = frame.duration_sec;
   const same = frames.every((f) => f.duration_sec === frames[0]?.duration_sec);
   const pace = (Object.keys(PACE_SECONDS) as Pace[]).find((p) => frames.every((f) => f.duration_sec === PACE_SECONDS[p]));
@@ -680,7 +690,7 @@ function TimingPanel({ frames, frame, actions }: { frames: Frame[]; frame: Frame
       </Field>
       <div className="flex items-center justify-between rounded-sm bg-control-fill px-3 py-2.5 text-[13px]">
         <span className="text-secondary-text">Total video length</span>
-        <span className="font-semibold nums">{formatSeconds(totalDuration(frames))} seconds</span>
+        <span className="font-semibold nums">{formatSeconds(totalDuration(frames) + endSeconds)} seconds</span>
       </div>
       <ToggleRow label="Same length for all frames" checked={same} onChange={actions.onSameLength} />
     </>

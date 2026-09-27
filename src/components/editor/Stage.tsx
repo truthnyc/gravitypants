@@ -9,6 +9,7 @@ import {
   layoutFrame,
   renderAt,
   type Anchor,
+  type BrandStyle,
   type Box,
   type FrameLayout,
 } from "@/render/renderFrame";
@@ -34,7 +35,9 @@ export function Stage({
   onResize,
   onFocus,
   onAdjustDone,
+  brand,
 }: {
+  brand?: BrandStyle;
   doc: EditorDoc;
   frameIndex: number;
   format: Format;
@@ -85,9 +88,9 @@ export function Stage({
   useEffect(() => {
     const ctx = canvasRef.current?.getContext("2d");
     if (!ctx || !W || !H) return;
-    renderAt(ctx, doc.project, doc.frames, format, time, { width: W, height: H, images, showGuides: !playing && Boolean(drag?.moving) });
+    renderAt(ctx, doc.project, doc.frames, format, time, { width: W, height: H, images, brand, showGuides: !playing && Boolean(drag?.moving) });
     if (!playing) setLayout(layoutFrame(ctx, doc.project, doc.frames, frameIndex, format, W, H, images));
-  }, [doc, format, time, W, H, images, version, playing, frameIndex, drag?.moving]);
+  }, [doc, brand, format, time, W, H, images, version, playing, frameIndex, drag?.moving]);
 
   const toCss = (b: Box) => ({ left: b.x / dpr, top: b.y / dpr, width: b.w / dpr, height: b.h / dpr });
 

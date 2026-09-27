@@ -1,8 +1,7 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Plus, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { FontPicker } from "@/components/stillframe/FontPicker";
@@ -256,6 +255,18 @@ function FontsCard({ kit, save }: SaveProps) {
 
 function PlacementCard({ kit, save }: SaveProps) {
   const [size, setSize] = useState(kit.logo_size_pct ?? 16);
+  const [sizeStatus, setSizeStatus] = useState<"idle" | "saving" | "saved">("idle");
+  const saved = kit.logo_size_pct ?? 16;
+  useEffect(() => {
+    if (size === saved) return;
+    setSizeStatus("saving");
+    const t = setTimeout(() => {
+      save({ logo_size_pct: size });
+      setSizeStatus("saved");
+    }, 600);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [size]);
   const positions = kit.default_logo_positions;
   const def: Record<Format, string> = { "9:16": "top-right", "1:1": "top-right", "16:9": "bottom-right" };
   return (
@@ -298,13 +309,9 @@ function PlacementCard({ kit, save }: SaveProps) {
             left={<span className="size-2.5 rounded-[2px] bg-secondary-text/50" />}
             right={<span className="size-4 rounded-[3px] bg-secondary-text/50" />}
           />
-          <div className="flex justify-end">
-            {size !== kit.logo_size_pct && (
-              <Button variant="plain" size="sm" onClick={() => save({ logo_size_pct: size })}>
-                Save size
-              </Button>
-            )}
-          </div>
+          <p className="h-4 text-right text-[11px] text-secondary-text" aria-live="polite">
+            {sizeStatus === "saving" ? "Saving…" : sizeStatus === "saved" ? "Saved" : ""}
+          </p>
         </div>
       </div>
     </Card>

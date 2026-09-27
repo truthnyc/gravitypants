@@ -1,4 +1,5 @@
 import type {
+  EndCard,
   Format,
   Frame,
   Project,
@@ -15,7 +16,30 @@ export type RenderOptions = {
   showGuides?: boolean;
   /** Loaded images keyed by storage path. */
   images?: Map<string, HTMLImageElement>;
+  /** Brand Kit look for the end card (first color, body font, fallback end card settings). */
+  brand?: BrandStyle | undefined;
 };
+
+export type BrandStyle = { color?: string | null; font?: string | null; endCard?: EndCard | null };
+
+export const END_CARD_SECONDS = 1.5;
+const END_CARD_FADE = 0.6;
+const END_CARD_FALLBACK = "#1D1D1F";
+
+/** The end card in effect: the ad's own setting wins, otherwise the Brand Kit's. */
+export function endCardOf(project: Project, brand?: BrandStyle) {
+  const own = project.end_card ?? {};
+  const kit = brand?.endCard ?? {};
+  const enabled = own.enabled ?? kit.enabled ?? false;
+  const cta = (own.cta_text || kit.cta_text || "").trim();
+  return { enabled: Boolean(enabled), cta };
+}
+
+/** Full video length including the end card, matching what export produces. */
+export function videoDuration(project: Project, frames: Frame[], brand?: BrandStyle) {
+  if (!frames.length) return 0;
+  return totalDuration(frames) + (endCardOf(project, brand).enabled ? END_CARD_SECONDS : 0);
+}
 
 export type Anchor =
   | "top-left"
@@ -413,7 +437,7 @@ export function renderAt(
   frames: Frame[],
   format: Format,
   timeSec: number,
-  { width: W, height: H, showGuides, images }: RenderOptions,
+  { width: W, height: H, showGuides, images, brand }: RenderOptions,
 ) {
   ctx.save();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -426,7 +450,10 @@ export function renderAt(
   }
 
   const starts = frameStarts(frames);
-  const t = clamp(timeSec, 0, Math.max(0, totalDuration(frames) - 0.0001));
+  const framesEnd = totalDuration(frames);
+  const endCard = endCardOf(project, brand);
+  const endT = endCard.enabled ? timeSec - framesEnd : -1;
+  const t = clamp(timeSec, 0, Math.max(0, framesEnd - 0.0001));
   const i = frameIndexAt(frames, t);
   const localOf = (j: number) => t - (starts[j] ?? 0) + incoming(frames, j);
   const layer = (j: number) => drawFrame(ctx, project, frames, j, localOf(j), format, W, H, images);
@@ -465,6 +492,13 @@ export function renderAt(
     layer(i);
   }
 
+  if (endT >= 0) {
+    ctx.save();
+    ctx.globalAlpha = easeInOut(clamp(endT / END_CARD_FADE));
+    drawEndCard(ctx, project, endCard.cta, brand, W, H, images);
+    ctx.restore();
+  }
+
   if (showGuides) {
     const s = safeRect(format, W, H);
     ctx.setLineDash([W * 0.01, W * 0.01]);
@@ -475,16 +509,63 @@ export function renderAt(
   ctx.restore();
 }
 
+function hexLuma(color: string) {
+  const m = /^#?([0-9a-f]{6})$/i.exec(color.trim());
+  if (!m) return 0;
+  const n = parseInt(m[1]!, 16);
+  return (0.2126 * ((n >> 16) & 255) + 0.7152 * ((n >> 8) & 255) + 0.0722 * (n & 255)) / 255;
+}
+
+function drawEndCard(
+  ctx: CanvasRenderingContext2D,
+  project: Project,
+  cta: string,
+  brand: BrandStyle | undefined,
+  W: number,
+  H: number,
+  images?: Map<string, HTMLImageElement>,
+) {
+  const bg = brand?.color || END_CARD_FALLBACK;
+  const light = hexLuma(bg) > 0.55;
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, W, H);
+
+  const l = project.logo;
+  const path = (light ? l.dark_path || l.path || l.light_path : l.light_path || l.path || l.dark_path) ?? null;
+  const img = path ? images?.get(path) : undefined;
+  const logoW = W * 0.3;
+  const logoH = img && img.naturalWidth ? (logoW * img.naturalHeight) / img.naturalWidth : 0;
+
+  const fontPx = (48 * W) / 1080;
+  const lineH = fontPx * 1.25;
+  const family = brand?.font || DEFAULT_FONT;
+  ctx.font = `600 ${fontPx}px "${family}", sans-serif`;
+  const lines = cta ? wrap(ctx, cta, W * 0.84) : [];
+  const gap = logoH && lines.length ? H * 0.04 : 0;
+  const blockH = logoH + gap + lines.length * lineH;
+  let y = (H - blockH) / 2;
+
+  if (img && logoH) {
+    ctx.drawImage(img, (W - logoW) / 2, y, logoW, logoH);
+    y += logoH + gap;
+  }
+  ctx.fillStyle = light ? "#1D1D1F" : "#FFFFFF";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "alphabetic";
+  lines.forEach((line, i) => ctx.fillText(line, W / 2, y + i * lineH + lineH * 0.5 + fontPx * 0.35));
+}
+
 /* ------------------------------------------------------------ preparation */
 
 /** Awaits every font the frames use so canvas text never falls back. */
-export async function ensureFonts(frames: Frame[]) {
+export async function ensureFonts(frames: Frame[], brand?: BrandStyle) {
   if (typeof document === "undefined" || !document.fonts) return;
   const specs = new Set<string>();
   for (const f of frames) {
     if (f.headline?.text) specs.add(`${f.headline.font_weight ?? 700}|${fontFamilyOf(f.headline)}`);
     if (f.subline?.text) specs.add(`${f.subline.font_weight ?? 500}|${fontFamilyOf(f.subline)}`);
   }
+  specs.add(`600|${brand?.font || DEFAULT_FONT}`);
   const { loadFont } = await import("@/lib/stillframe/fonts");
   await Promise.all(
     [...specs].map((s) => {

@@ -1,3 +1,4 @@
+import type { BrandStyle } from "@/render/renderFrame";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { projectKeys, saveEditorDoc, type EditorDoc } from "@/lib/stillframe/data";
@@ -83,7 +84,7 @@ export function useAutosave(doc: EditorDoc) {
 }
 
 /** Loads photos, logos and fonts the render engine needs. `version` bumps when ready. */
-export function useRenderAssets(doc: EditorDoc) {
+export function useRenderAssets(doc: EditorDoc, brand?: BrandStyle) {
   const [images, setImages] = useState(() => new Map<string, HTMLImageElement>());
   const [version, setVersion] = useState(0);
   const paths = mediaPaths(doc.project, doc.frames);
@@ -94,7 +95,7 @@ export function useRenderAssets(doc: EditorDoc) {
 
   useEffect(() => {
     let alive = true;
-    Promise.all([loadImages(paths), ensureFonts(doc.frames)]).then(([map]) => {
+    Promise.all([loadImages(paths), ensureFonts(doc.frames, brand)]).then(([map]) => {
       if (!alive) return;
       setImages(map);
       setVersion((v) => v + 1);
@@ -103,7 +104,7 @@ export function useRenderAssets(doc: EditorDoc) {
       alive = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathKey, fontKey]);
+  }, [pathKey, fontKey, brand?.font]);
 
   return { images, version };
 }
