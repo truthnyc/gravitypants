@@ -179,17 +179,8 @@ export function useCreateAdFromPhotos() {
       files: File[];
       onProgress?: (items: UploadProgress[]) => void;
     }) => {
-      const state: UploadProgress[] = files.map((f) => ({ name: f.name, progress: 0 }));
-      onProgress?.([...state]);
+      const uploaded = await uploadAll(files, onProgress);
 
-      const uploaded: UploadedPhoto[] = [];
-      for (let i = 0; i < files.length; i++) {
-        state[i].progress = 0.15;
-        onProgress?.([...state]);
-        uploaded.push(await uploadMedia(files[i], "photo"));
-        state[i].progress = 1;
-        onProgress?.([...state]);
-      }
 
       const { data: project, error } = await supabase
         .from("projects")
@@ -284,16 +275,7 @@ export function useDuplicateWithNewPhotos() {
       files: File[];
       onProgress?: (items: UploadProgress[]) => void;
     }) => {
-      const state: UploadProgress[] = files.map((f) => ({ name: f.name, progress: 0 }));
-      onProgress?.([...state]);
-      const uploaded: UploadedPhoto[] = [];
-      for (let i = 0; i < files.length; i++) {
-        state[i].progress = 0.15;
-        onProgress?.([...state]);
-        uploaded.push(await uploadMedia(files[i], "photo"));
-        state[i].progress = 1;
-        onProgress?.([...state]);
-      }
+      const uploaded = await uploadAll(files, onProgress);
       return insertCopy(project, `${project.name} — Copy`, uploaded);
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: projectKeys.all }),
