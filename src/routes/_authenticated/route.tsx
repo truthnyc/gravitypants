@@ -1,5 +1,6 @@
 import { createFileRoute, Outlet, redirect, useRouterState } from "@tanstack/react-router";
 import { AppHeader } from "@/components/stillframe/AppHeader";
+import { PaymentProblemBanner } from "@/components/billing/BillingNotices";
 import { supabase } from "@/integrations/supabase/client";
 import { setWorkspaceId } from "@/lib/stillframe/workspace";
 
@@ -22,6 +23,7 @@ function Layout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   return (
     <>
+      <PaymentProblemBanner />
       {!pathname.startsWith("/ad/") && <AppHeader />}
       <Outlet />
     </>

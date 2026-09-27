@@ -15,6 +15,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { SearchProvider } from "@/components/stillframe/search-context";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { PaymentTestModeBanner } from "@/components/billing/BillingNotices";
 
 function NotFoundComponent() {
   return (
@@ -144,6 +145,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <SearchProvider>
+        <PaymentTestModeBanner />
         <div className="min-h-screen bg-canvas">
                     {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
           <Outlet />
