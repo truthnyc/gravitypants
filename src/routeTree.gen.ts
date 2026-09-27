@@ -14,6 +14,7 @@ import { Route as ResetRouteImport } from './routes/reset'
 import { Route as SigninRouteImport } from './routes/signin'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 import { Route as AuthenticatedBrandRouteImport } from './routes/_authenticated/brand'
 import { Route as ApiPublicCleanupExportsRouteImport } from './routes/api/public/cleanup-exports'
 import { Route as AuthenticatedAdIdEditRouteImport } from './routes/_authenticated/ad.$id.edit'
@@ -43,6 +44,11 @@ const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAccountRoute = AuthenticatedAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedBrandRoute = AuthenticatedBrandRouteImport.update({
   id: '/brand',
   path: '/brand',
@@ -69,6 +75,7 @@ export interface FileRoutesByFullPath {
   '/reset': typeof ResetRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
+  '/account': typeof AuthenticatedAccountRoute
   '/brand': typeof AuthenticatedBrandRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
   '/ad/$id/edit': typeof AuthenticatedAdIdEditRoute
@@ -78,6 +85,7 @@ export interface FileRoutesByTo {
   '/reset': typeof ResetRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
+  '/account': typeof AuthenticatedAccountRoute
   '/brand': typeof AuthenticatedBrandRoute
   '/': typeof AuthenticatedIndexRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
@@ -90,6 +98,7 @@ export interface FileRoutesById {
   '/reset': typeof ResetRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
+  '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/_authenticated/brand': typeof AuthenticatedBrandRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
@@ -103,6 +112,7 @@ export interface FileRouteTypes {
     | '/reset'
     | '/signin'
     | '/signup'
+    | '/account'
     | '/brand'
     | '/api/public/cleanup-exports'
     | '/ad/$id/edit'
@@ -112,6 +122,7 @@ export interface FileRouteTypes {
     | '/reset'
     | '/signin'
     | '/signup'
+    | '/account'
     | '/brand'
     | '/'
     | '/api/public/cleanup-exports'
@@ -123,6 +134,7 @@ export interface FileRouteTypes {
     | '/reset'
     | '/signin'
     | '/signup'
+    | '/_authenticated/account'
     | '/_authenticated/brand'
     | '/_authenticated/'
     | '/api/public/cleanup-exports'
@@ -175,6 +187,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/account': {
+      id: '/_authenticated/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AuthenticatedAccountRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/brand': {
       id: '/_authenticated/brand'
       path: '/brand'
@@ -207,6 +226,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
   AuthenticatedBrandRoute: typeof AuthenticatedBrandRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedAdIdEditRoute: typeof AuthenticatedAdIdEditRoute
@@ -214,6 +234,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAccountRoute: AuthenticatedAccountRoute,
   AuthenticatedBrandRoute: AuthenticatedBrandRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedAdIdEditRoute: AuthenticatedAdIdEditRoute,

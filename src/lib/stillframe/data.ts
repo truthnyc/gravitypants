@@ -189,7 +189,7 @@ export function useCreateAdFromPhotos() {
       const { data: project, error } = await supabase
         .from("projects")
         .insert({
-          workspace_id: 
+          workspace_id: getWorkspaceId(),
           name: "Untitled ad",
           primary_format: "9:16",
           formats: ["9:16"],
@@ -225,7 +225,7 @@ async function insertCopy(source: ProjectWithFrames, name: string, photos?: Uplo
   const { data: project, error } = await supabase
     .from("projects")
     .insert({
-      workspace_id: 
+      workspace_id: getWorkspaceId(),
       name,
       primary_format: source.primary_format,
       formats: source.formats,
@@ -368,7 +368,7 @@ export async function fetchBrandKit(): Promise<BrandKit | null> {
   if (data) return normalizeBrandKit(data as Record<string, unknown>);
   const { data: created, error: e2 } = await supabase
     .from("brand_kit")
-    .insert({ workspace_id:  })
+    .insert({ workspace_id: getWorkspaceId() })
     .select("*")
     .single();
   if (e2) throw e2;
