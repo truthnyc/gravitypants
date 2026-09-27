@@ -177,7 +177,7 @@ function HeadlinePanel({
       <Field label="Size">
         <div className="flex items-center gap-2">
           <span className="text-[11px] text-secondary-text">A</span>
-          <Slider min={24} max={240} step={1} value={[size]} onValueChange={([v]) => onChange({ size_px: v }, "headline-size")} aria-label="Headline size" />
+          <Slider min={24} max={240} step={1} value={[size]} onValueChange={([v]) => onChange({ size_px: v ?? size }, "headline-size")} aria-label="Headline size" />
           <span className="text-[17px] text-secondary-text">A</span>
           <span className="w-14 text-right text-[12px] nums">{size} px</span>
         </div>

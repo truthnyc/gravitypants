@@ -72,7 +72,7 @@ export function Stage({
   useEffect(() => {
     const ctx = canvasRef.current?.getContext("2d");
     if (!ctx || !W || !H) return;
-    renderAt(ctx, doc.project, doc.frames, format, time, { width: W, height: H, images, showGuides: !playing && drag?.moving });
+    renderAt(ctx, doc.project, doc.frames, format, time, { width: W, height: H, images, showGuides: !playing && Boolean(drag?.moving) });
     if (!playing) setLayout(layoutFrame(ctx, doc.project, doc.frames, frameIndex, format, W, H, images));
   }, [doc, format, time, W, H, images, version, playing, frameIndex, drag?.moving]);
 
