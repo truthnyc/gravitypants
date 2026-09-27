@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Play } from "lucide-react";
+import { GravityPantsLogo } from "@/components/GravityPantsLogo";
 import { PlanCards } from "@/components/billing/PlanCards";
 
 export const Route = createFileRoute("/pricing")({
@@ -20,10 +20,7 @@ function Pricing() {
   return (
     <main className="mx-auto max-w-[1040px] px-8 pb-20 pt-10">
       <Link to="/" className="inline-flex items-center gap-2.5 rounded-lg" aria-label="Gravity Pants home">
-        <span className="flex h-[26px] w-[26px] items-center justify-center rounded-lg bg-foreground">
-          <Play size={13} strokeWidth={1.7} className="text-card" fill="currentColor" />
-        </span>
-        <span className="text-[16px] font-semibold tracking-[-0.01em]">Gravity Pants</span>
+        <GravityPantsLogo size={26} showWordmark />
       </Link>
       <div className="mx-auto mt-14 max-w-[640px] text-center">
         <h1 className="text-[56px] font-bold leading-[1.05] tracking-[-0.03em]">Pick a plan.</h1>
