@@ -10,33 +10,63 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BrandRouteImport } from './routes/brand'
+import { Route as AdIdEditRouteImport } from './routes/ad.$id.edit'
+import { Route as AdIdExportRouteImport } from './routes/ad.$id.export'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BrandRoute = BrandRouteImport.update({
+  id: '/brand',
+  path: '/brand',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdIdEditRoute = AdIdEditRouteImport.update({
+  id: '/ad/$id/edit',
+  path: '/ad/$id/edit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdIdExportRoute = AdIdExportRouteImport.update({
+  id: '/ad/$id/export',
+  path: '/ad/$id/export',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/brand': typeof BrandRoute
+  '/ad/$id/edit': typeof AdIdEditRoute
+  '/ad/$id/export': typeof AdIdExportRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/brand': typeof BrandRoute
+  '/ad/$id/edit': typeof AdIdEditRoute
+  '/ad/$id/export': typeof AdIdExportRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/brand': typeof BrandRoute
+  '/ad/$id/edit': typeof AdIdEditRoute
+  '/ad/$id/export': typeof AdIdExportRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/brand' | '/ad/$id/edit' | '/ad/$id/export'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/brand' | '/ad/$id/edit' | '/ad/$id/export'
+  id: '__root__' | '/' | '/brand' | '/ad/$id/edit' | '/ad/$id/export'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BrandRoute: typeof BrandRoute
+  AdIdEditRoute: typeof AdIdEditRoute
+  AdIdExportRoute: typeof AdIdExportRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +78,35 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/brand': {
+      id: '/brand'
+      path: '/brand'
+      fullPath: '/brand'
+      preLoaderRoute: typeof BrandRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ad/$id/edit': {
+      id: '/ad/$id/edit'
+      path: '/ad/$id/edit'
+      fullPath: '/ad/$id/edit'
+      preLoaderRoute: typeof AdIdEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ad/$id/export': {
+      id: '/ad/$id/export'
+      path: '/ad/$id/export'
+      fullPath: '/ad/$id/export'
+      preLoaderRoute: typeof AdIdExportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BrandRoute: BrandRoute,
+  AdIdEditRoute: AdIdEditRoute,
+  AdIdExportRoute: AdIdExportRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
