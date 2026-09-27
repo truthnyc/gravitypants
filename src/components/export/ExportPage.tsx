@@ -18,6 +18,8 @@ import { loadImages } from "@/render/images";
 import { ensureFonts, layoutFrame, mediaPaths, renderAt, restTime, videoDuration, type BrandStyle } from "@/render/renderFrame";
 import { ExportCancelled, exportGif, exportMp4, isOutOfMemory, killFFmpeg, type GifColors, type RenderInput } from "@/render/exportMedia";
 import { cn } from "@/lib/utils";
+import { fetchExportStatus, useExportStatus, useRefreshBilling } from "@/lib/stillframe/billing";
+import { PlanCards } from "@/components/billing/PlanCards";
 
 type GifSize = "full" | "half" | "small";
 type Target = { key: string; name: string; slug: string; format: Format; width: number; height: number };
@@ -139,8 +141,24 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
   const abort = useRef<AbortController | null>(null);
   const [historyVersion, setHistoryVersion] = useState(0);
 
+  const { data: exportStatus } = useExportStatus();
+  const refreshBilling = useRefreshBilling();
+  const [planSheet, setPlanSheet] = useState<string | null>(null);
+
   const start = async () => {
     if (!images || !files.length) return;
+    // Server-side check right before starting.
+    try {
+      const st = await fetchExportStatus();
+      if (!st.allowed) {
+        void refreshBilling();
+        setPlanSheet(st.reason ?? "no_plan");
+        return;
+      }
+    } catch {
+      toast.error("Couldn't check your plan. Please try again.");
+      return;
+    }
     const ac = new AbortController();
     abort.current = ac;
     setState(Object.fromEntries([...jobs.keys()].map((k) => [k, { progress: 0, status: "waiting" as const }])));
@@ -172,6 +190,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
     if (!images) return;
     await ensureFonts(frames, brand);
     const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+    let counted = false;
     const set = (k: string, s: Partial<JobState>) => setState((prev) => ({ ...prev, [k]: { ...prev[k]!, ...s } }));
 
     for (const [key, job] of jobs) {
@@ -196,6 +215,18 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
           }
         }
         set(key, { status: "done", progress: 1, blob, ...(note ? { note } : {}) });
+        if (!counted) {
+          // Count this export once, after the first file is finished; the server refuses if not allowed.
+          const { data: ok } = await supabase.rpc("record_export", { _ws: getWorkspaceId(), _project: project.id, _stamp: stamp });
+          void refreshBilling();
+          if (!ok) {
+            ac.abort();
+            set(key, { status: "error", note: "This file wasn't saved — your plan doesn't allow more exports right now." });
+            setPlanSheet("limit_reached");
+            break;
+          }
+          counted = true;
+        }
         for (const f of files.filter((f) => f.job === key)) {
           void supabase.storage
             .from(MEDIA_BUCKET)
@@ -283,6 +314,11 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
             <p className="mt-2 text-[13px] text-secondary-text nums">
               {videos} {videos === 1 ? "video" : "videos"} + {gifs} animated {gifs === 1 ? "GIF" : "GIFs"} · {formatSeconds(seconds)} seconds each
             </p>
+            {exportStatus?.limit != null && (
+              <p className="mt-2 text-[13px] font-medium nums">
+                {Math.max(0, exportStatus.limit - (exportStatus.used ?? 0))} of {exportStatus.limit} exports left this month
+              </p>
+            )}
           </div>
 
           <Group label="Save as">
@@ -318,12 +354,34 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
             </Group>
           )}
 
-          <Button size="main" className="w-full" disabled={!files.length || blocked || !images || !fontsReady || running} onClick={() => void start()}>
-            {!images || !fontsReady ? "Getting ready…" : `Export ${files.length} ${files.length === 1 ? "File" : "Files"}`}
-          </Button>
+          {exportStatus && !exportStatus.allowed ? (
+            <Button size="main" className="w-full" onClick={() => setPlanSheet(exportStatus.reason ?? "no_plan")}>
+              Choose a Plan to Export
+            </Button>
+          ) : (
+            <Button size="main" className="w-full" disabled={!files.length || blocked || !images || !fontsReady || running} onClick={() => void start()}>
+              {!images || !fontsReady ? "Getting ready…" : `Export ${files.length} ${files.length === 1 ? "File" : "Files"}`}
+            </Button>
+          )}
           {blocked && <p className="text-center text-[12px] text-destructive">Add a photo to every frame to export.</p>}
         </aside>
       </main>
+
+      <Dialog open={!!planSheet} onOpenChange={(o) => !o && setPlanSheet(null)}>
+        <DialogContent className="max-w-[900px]">
+          <DialogHeader>
+            <DialogTitle>{planSheet === "limit_reached" ? "You've used this month's exports" : planSheet === "payment_problem" ? "There's a problem with your payment" : "Pick a plan to export"}</DialogTitle>
+            <DialogDescription>
+              {planSheet === "limit_reached"
+                ? "Simple includes 2 exports a month. Move to Business for unlimited exports."
+                : planSheet === "payment_problem"
+                  ? "We couldn't take your last payment. Update your card in Manage Billing to keep exporting."
+                  : "Your free trial lets you build and preview. Pick a plan to export your videos and GIFs."}
+            </DialogDescription>
+          </DialogHeader>
+          <PlanCards compact />
+        </DialogContent>
+      </Dialog>
 
       <ProgressSheet open={open} onOpenChange={(v) => !running && setOpen(v)} files={files} state={state} running={running} onCancel={cancel} zipName={`${base}.zip`} />
     </div>
