@@ -165,8 +165,18 @@ function HeadlinePanel({
         />
       </Field>
       <Field label="Font">
-        <Select value={h.font_family ?? DEFAULT_FONT} onValueChange={(v) => onChange({ font_family: v })}>
-          <SelectTrigger className="h-9 rounded-sm" style={{ fontFamily: `"${h.font_family ?? DEFAULT_FONT}"` }}>
+        <Select
+          value={family}
+          onValueChange={(v) => {
+            const ws = weightsForFont(v);
+            // Keep the current weight if the new font has it, otherwise pick the closest available.
+            const next = ws.some((w) => w.value === weight)
+              ? weight
+              : ws.reduce((best, w) => (Math.abs(w.value - weight) < Math.abs(best.value - weight) ? w : best), ws[0]!).value;
+            onChange({ font_family: v, font_weight: next });
+          }}
+        >
+          <SelectTrigger className="h-9 rounded-sm" style={{ fontFamily: `"${family}"` }}>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
