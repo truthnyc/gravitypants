@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { isPaid, trialDaysLeft, useBilling, useManageBilling } from "@/lib/stillframe/billing";
 
-const clientToken = import.meta.env.VITE_PAYMENTS_CLIENT_TOKEN as string | undefined;
+const clientToken = import.meta.env['VITE_PAYMENTS_CLIENT_TOKEN'] as string | undefined;
 
 /** Test-mode note; hidden once real payments are live. */
 export function PaymentTestModeBanner() {
