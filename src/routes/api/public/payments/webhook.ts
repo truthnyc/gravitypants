@@ -13,11 +13,49 @@ function mapStatus(s: string): string {
   return "canceled";
 }
 
+const PLAN_NAMES: Record<string, string> = {
+  simple: "Simple",
+  business: "Business",
+  business_yearly: "Business Yearly",
+};
+
 const iso = (sec?: number | null) => (sec ? new Date(sec * 1000).toISOString() : null);
 
 async function admin() {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   return supabaseAdmin;
+}
+
+/** Workspace owner's email + display name, for lifecycle emails. */
+async function ownerContact(db: any, ws: string) {
+  const { data: m } = await db
+    .from("workspace_members")
+    .select("user_id")
+    .eq("workspace_id", ws)
+    .eq("role", "owner")
+    .maybeSingle();
+  if (!m) return null;
+  const { data: u } = await db.auth.admin.getUserById(m.user_id);
+  const email = u?.user?.email as string | undefined;
+  if (!email) return null;
+  const { data: p } = await db.from("profiles").select("display_name").eq("user_id", m.user_id).maybeSingle();
+  return { email, name: (p?.display_name as string | null) ?? undefined };
+}
+
+/** Sends a lifecycle email; failures are logged, never thrown (billing sync must not fail). */
+async function sendLifecycle(template: string, ws: string, data: Record<string, unknown>, key: string) {
+  try {
+    const db = await admin();
+    const contact = await ownerContact(db, ws);
+    if (!contact) return;
+    const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
+    await sendTemplateEmail(template, contact.email, {
+      templateData: { name: contact.name, ...data },
+      idempotencyKey: key,
+    });
+  } catch (e) {
+    console.error("Lifecycle email failed:", template, e);
+  }
 }
 
 async function syncSubscription(sub: any, env: StripeEnv, deleted = false) {
@@ -28,7 +66,10 @@ async function syncSubscription(sub: any, env: StripeEnv, deleted = false) {
     const { data } = await db.from("workspace_billing").select("workspace_id").eq("stripe_customer_id", customer).maybeSingle();
     ws = data?.workspace_id;
   }
-  if (!ws) return console.error("Subscription without workspace", sub.id);
+  if (!ws) {
+    console.error("Subscription without workspace", sub.id);
+    return undefined;
+  }
   const item = sub.items?.data?.[0];
   const key = item?.price?.lookup_key || item?.price?.metadata?.lovable_external_id || "";
   const plan = PLAN_BY_PRICE[key];
@@ -45,6 +86,7 @@ async function syncSubscription(sub: any, env: StripeEnv, deleted = false) {
       cancel_at_period_end: Boolean(sub.cancel_at_period_end || sub.cancel_at),
     })
     .eq("workspace_id", ws);
+  return { ws, plan };
 }
 
 async function handle(req: Request, env: StripeEnv) {
@@ -59,16 +101,35 @@ async function handle(req: Request, env: StripeEnv) {
       }
       break;
     }
-    case "customer.subscription.created":
+    case "customer.subscription.created": {
+      const r = await syncSubscription(obj, env);
+      if (r?.ws && r.plan) {
+        await sendLifecycle("plan-started", r.ws, { planName: PLAN_NAMES[r.plan] ?? "Your plan" }, `plan-started-${obj.id}`);
+      }
+      break;
+    }
     case "customer.subscription.updated":
       await syncSubscription(obj, env);
       break;
-    case "customer.subscription.deleted":
-      await syncSubscription(obj, env, true);
+    case "customer.subscription.deleted": {
+      const r = await syncSubscription(obj, env, true);
+      if (r?.ws) {
+        const end = obj.current_period_end
+          ? new Date(obj.current_period_end * 1000).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
+          : undefined;
+        await sendLifecycle("plan-cancelled", r.ws, { endDate: end }, `plan-cancelled-${obj.id}`);
+      }
       break;
+    }
     case "invoice.payment_failed": {
       const db = await admin();
-      if (obj.customer) await db.from("workspace_billing").update({ status: "past_due" }).eq("stripe_customer_id", obj.customer);
+      if (obj.customer) {
+        await db.from("workspace_billing").update({ status: "past_due" }).eq("stripe_customer_id", obj.customer);
+        const { data } = await db.from("workspace_billing").select("workspace_id").eq("stripe_customer_id", obj.customer).maybeSingle();
+        if (data?.workspace_id) {
+          await sendLifecycle("payment-failed", data.workspace_id, {}, `payment-failed-${obj.id}`);
+        }
+      }
       break;
     }
     default:

@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { setWorkspaceId } from "@/lib/stillframe/workspace";
 import { Button } from "@/components/ui/button";
 import { useSignOut } from "@/lib/stillframe/account";
+import { sendWelcomeEmail } from "@/lib/stillframe/welcome.functions";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
@@ -16,6 +17,8 @@ export const Route = createFileRoute("/_authenticated")({
     const { data: ws, error: wsError } = await supabase.rpc("ensure_workspace");
     if (wsError || !ws) throw wsError ?? new Error("No workspace");
     setWorkspaceId(ws as string);
+    // Fire-and-forget: sends the welcome email once for brand-new workspaces.
+    void sendWelcomeEmail().catch(() => {});
     const { data: w } = await supabase.from("workspaces").select("suspended_at").eq("id", ws as string).maybeSingle();
     return { user: data.user, workspaceId: ws as string, suspended: !!(w as { suspended_at: string | null } | null)?.suspended_at };
   },
