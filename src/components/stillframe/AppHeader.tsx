@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Search } from "lucide-react";
-import logo from "@/assets/gravity-pants-logo.png";
+import { GravityPantsLogo } from "@/components/GravityPantsLogo";
 import { cn } from "@/lib/utils";
 import { useSearch } from "./search-context";
 import { UserMenu } from "./UserMenu";
@@ -18,8 +18,7 @@ export function AppHeader() {
     <header className="sticky top-0 z-30 h-[60px] bg-card/90 backdrop-blur-xl hairline-b">
       <div className="mx-auto flex h-full items-center gap-6 px-6">
         <Link to="/" className="flex items-center gap-2.5 rounded-lg" aria-label="Gravity Pants home">
-          <img src={logo} alt="" width={26} height={26} className="h-[26px] w-[26px]" />
-          <span className="text-[16px] font-semibold tracking-[-0.01em]">Gravity Pants</span>
+          <GravityPantsLogo size={26} showWordmark />
         </Link>
 
         <nav className="flex items-center gap-1">
