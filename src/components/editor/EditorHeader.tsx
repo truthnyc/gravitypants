@@ -13,6 +13,7 @@ export function EditorHeader({
   onRename,
   onUndo,
   onPlayVideo,
+  exportDisabled = false,
 }: {
   id: string;
   name: string;
@@ -22,6 +23,7 @@ export function EditorHeader({
   onRename: (name: string) => void;
   onUndo: () => void;
   onPlayVideo: () => void;
+  exportDisabled?: boolean;
 }) {
   const [editing, setEditing] = useState(false);
 
@@ -90,11 +92,17 @@ export function EditorHeader({
           {playing ? <Square strokeWidth={1.7} /> : <Play strokeWidth={1.7} />}
           {playing ? "Stop" : "Play Video"}
         </Button>
-        <Button asChild size="header">
-          <Link to="/ad/$id/export" params={{ id }}>
+        {exportDisabled ? (
+          <Button size="header" disabled>
             Next: Export <ChevronRight strokeWidth={1.7} />
-          </Link>
-        </Button>
+          </Button>
+        ) : (
+          <Button asChild size="header">
+            <Link to="/ad/$id/export" params={{ id }}>
+              Next: Export <ChevronRight strokeWidth={1.7} />
+            </Link>
+          </Button>
+        )}
       </div>
     </header>
   );

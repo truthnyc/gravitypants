@@ -61,9 +61,9 @@ function isTyping(target: EventTarget | null) {
   return Boolean(el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable || el.getAttribute("role") === "combobox"));
 }
 
-export function Editor({ initial }: { initial: EditorDoc }) {
+export function Editor({ initial, readOnly = false, banner, exportDisabled = false }: { initial: EditorDoc; readOnly?: boolean; banner?: React.ReactNode; exportDisabled?: boolean }) {
   const { doc, apply, undo, redo, canUndo } = useEditorDoc(initial);
-  const status = useAutosave(doc);
+  const status = useAutosave(doc, !readOnly);
 
   const [frameIndex, setFrameIndex] = useState(0);
   const [selected, setSelected] = useState<ElementKey>("headline");
@@ -430,8 +430,10 @@ export function Editor({ initial }: { initial: EditorDoc }) {
         onRename={(name) => apply((d) => ({ ...d, project: { ...d.project, name } }))}
         onUndo={undo}
         onPlayVideo={playVideo}
+        exportDisabled={exportDisabled}
       />
-      <div className="flex min-h-0 flex-1">
+      {banner}
+      <div className={cn("flex min-h-0 flex-1", readOnly && "pointer-events-none select-none")} aria-readonly={readOnly || undefined}>
         <FrameRail
           doc={doc}
           format={format}

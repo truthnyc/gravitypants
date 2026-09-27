@@ -56,14 +56,14 @@ export function useEditorDoc(initial: EditorDoc) {
 export type SaveStatus = "saved" | "saving" | "error";
 
 /** Debounced (600ms) autosave through the data layer. */
-export function useAutosave(doc: EditorDoc) {
+export function useAutosave(doc: EditorDoc, enabled = true) {
   const queryClient = useQueryClient();
   const saved = useRef(doc);
   const chain = useRef<Promise<void>>(Promise.resolve());
   const [status, setStatus] = useState<SaveStatus>("saved");
 
   useEffect(() => {
-    if (doc === saved.current) return;
+    if (!enabled || doc === saved.current) return;
     setStatus("saving");
     const timer = setTimeout(() => {
       chain.current = chain.current.then(async () => {
@@ -78,7 +78,7 @@ export function useAutosave(doc: EditorDoc) {
       });
     }, 600);
     return () => clearTimeout(timer);
-  }, [doc, queryClient]);
+  }, [doc, queryClient, enabled]);
 
   return status;
 }

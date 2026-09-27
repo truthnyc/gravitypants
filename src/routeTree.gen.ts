@@ -20,10 +20,14 @@ import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authentic
 import { Route as AuthenticatedBrandRouteImport } from './routes/_authenticated/brand'
 import { Route as AuthenticatedAccountBillingRouteImport } from './routes/_authenticated/account_.billing'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
+import { Route as AuthenticatedAdminAdminsRouteImport } from './routes/_authenticated/admin/admins'
+import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin/audit'
 import { Route as AuthenticatedAdminClientsRouteImport } from './routes/_authenticated/admin/clients'
+import { Route as AuthenticatedAdminExportsRouteImport } from './routes/_authenticated/admin/exports'
 import { Route as ApiPublicCleanupExportsRouteImport } from './routes/api/public/cleanup-exports'
 import { Route as AuthenticatedAdIdEditRouteImport } from './routes/_authenticated/ad.$id.edit'
 import { Route as AuthenticatedAdIdExportRouteImport } from './routes/_authenticated/ad.$id.export'
+import { Route as AuthenticatedAdminClientsIdRouteImport } from './routes/_authenticated/admin/clients_.$id'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
@@ -84,10 +88,27 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
 } as any)
+const AuthenticatedAdminAdminsRoute =
+  AuthenticatedAdminAdminsRouteImport.update({
+    id: '/admins',
+    path: '/admins',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminAuditRoute = AuthenticatedAdminAuditRouteImport.update({
+  id: '/audit',
+  path: '/audit',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
 const AuthenticatedAdminClientsRoute =
   AuthenticatedAdminClientsRouteImport.update({
     id: '/clients',
     path: '/clients',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminExportsRoute =
+  AuthenticatedAdminExportsRouteImport.update({
+    id: '/exports',
+    path: '/exports',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
 const ApiPublicCleanupExportsRoute = ApiPublicCleanupExportsRouteImport.update({
@@ -105,6 +126,12 @@ const AuthenticatedAdIdExportRoute = AuthenticatedAdIdExportRouteImport.update({
   path: '/ad/$id/export',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminClientsIdRoute =
+  AuthenticatedAdminClientsIdRouteImport.update({
+    id: '/clients_/$id',
+    path: '/clients/$id',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const ApiPublicPaymentsWebhookRoute =
   ApiPublicPaymentsWebhookRouteImport.update({
     id: '/api/public/payments/webhook',
@@ -138,11 +165,15 @@ export interface FileRoutesByFullPath {
   '/account': typeof AuthenticatedAccountRoute
   '/brand': typeof AuthenticatedBrandRoute
   '/account/billing': typeof AuthenticatedAccountBillingRoute
+  '/admin/admins': typeof AuthenticatedAdminAdminsRoute
+  '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/clients': typeof AuthenticatedAdminClientsRoute
+  '/admin/exports': typeof AuthenticatedAdminExportsRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/ad/$id/edit': typeof AuthenticatedAdIdEditRoute
   '/ad/$id/export': typeof AuthenticatedAdIdExportRoute
+  '/admin/clients/$id': typeof AuthenticatedAdminClientsIdRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -157,11 +188,15 @@ export interface FileRoutesByTo {
   '/brand': typeof AuthenticatedBrandRoute
   '/': typeof AuthenticatedIndexRoute
   '/account/billing': typeof AuthenticatedAccountBillingRoute
+  '/admin/admins': typeof AuthenticatedAdminAdminsRoute
+  '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/clients': typeof AuthenticatedAdminClientsRoute
+  '/admin/exports': typeof AuthenticatedAdminExportsRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/ad/$id/edit': typeof AuthenticatedAdIdEditRoute
   '/ad/$id/export': typeof AuthenticatedAdIdExportRoute
+  '/admin/clients/$id': typeof AuthenticatedAdminClientsIdRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -179,11 +214,15 @@ export interface FileRoutesById {
   '/_authenticated/brand': typeof AuthenticatedBrandRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/account_/billing': typeof AuthenticatedAccountBillingRoute
+  '/_authenticated/admin/admins': typeof AuthenticatedAdminAdminsRoute
+  '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/admin/clients': typeof AuthenticatedAdminClientsRoute
+  '/_authenticated/admin/exports': typeof AuthenticatedAdminExportsRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/ad/$id/edit': typeof AuthenticatedAdIdEditRoute
   '/_authenticated/ad/$id/export': typeof AuthenticatedAdIdExportRoute
+  '/_authenticated/admin/clients_/$id': typeof AuthenticatedAdminClientsIdRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -201,11 +240,15 @@ export interface FileRouteTypes {
     | '/account'
     | '/brand'
     | '/account/billing'
+    | '/admin/admins'
+    | '/admin/audit'
     | '/admin/clients'
+    | '/admin/exports'
     | '/api/public/cleanup-exports'
     | '/admin/'
     | '/ad/$id/edit'
     | '/ad/$id/export'
+    | '/admin/clients/$id'
     | '/api/public/payments/webhook'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -220,11 +263,15 @@ export interface FileRouteTypes {
     | '/brand'
     | '/'
     | '/account/billing'
+    | '/admin/admins'
+    | '/admin/audit'
     | '/admin/clients'
+    | '/admin/exports'
     | '/api/public/cleanup-exports'
     | '/admin'
     | '/ad/$id/edit'
     | '/ad/$id/export'
+    | '/admin/clients/$id'
     | '/api/public/payments/webhook'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -241,11 +288,15 @@ export interface FileRouteTypes {
     | '/_authenticated/brand'
     | '/_authenticated/'
     | '/_authenticated/account_/billing'
+    | '/_authenticated/admin/admins'
+    | '/_authenticated/admin/audit'
     | '/_authenticated/admin/clients'
+    | '/_authenticated/admin/exports'
     | '/api/public/cleanup-exports'
     | '/_authenticated/admin/'
     | '/_authenticated/ad/$id/edit'
     | '/_authenticated/ad/$id/export'
+    | '/_authenticated/admin/clients_/$id'
     | '/api/public/payments/webhook'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -344,11 +395,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/admins': {
+      id: '/_authenticated/admin/admins'
+      path: '/admins'
+      fullPath: '/admin/admins'
+      preLoaderRoute: typeof AuthenticatedAdminAdminsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/audit': {
+      id: '/_authenticated/admin/audit'
+      path: '/audit'
+      fullPath: '/admin/audit'
+      preLoaderRoute: typeof AuthenticatedAdminAuditRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/clients': {
       id: '/_authenticated/admin/clients'
       path: '/clients'
       fullPath: '/admin/clients'
       preLoaderRoute: typeof AuthenticatedAdminClientsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/exports': {
+      id: '/_authenticated/admin/exports'
+      path: '/exports'
+      fullPath: '/admin/exports'
+      preLoaderRoute: typeof AuthenticatedAdminExportsRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
     '/api/public/cleanup-exports': {
@@ -371,6 +443,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/ad/$id/export'
       preLoaderRoute: typeof AuthenticatedAdIdExportRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/clients_/$id': {
+      id: '/_authenticated/admin/clients_/$id'
+      path: '/clients/$id'
+      fullPath: '/admin/clients/$id'
+      preLoaderRoute: typeof AuthenticatedAdminClientsIdRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
     }
     '/api/public/payments/webhook': {
       id: '/api/public/payments/webhook'
@@ -404,14 +483,22 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedAdminRouteRouteChildren {
+  AuthenticatedAdminAdminsRoute: typeof AuthenticatedAdminAdminsRoute
+  AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
   AuthenticatedAdminClientsRoute: typeof AuthenticatedAdminClientsRoute
+  AuthenticatedAdminExportsRoute: typeof AuthenticatedAdminExportsRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+  AuthenticatedAdminClientsIdRoute: typeof AuthenticatedAdminClientsIdRoute
 }
 
 const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
   {
+    AuthenticatedAdminAdminsRoute: AuthenticatedAdminAdminsRoute,
+    AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
     AuthenticatedAdminClientsRoute: AuthenticatedAdminClientsRoute,
+    AuthenticatedAdminExportsRoute: AuthenticatedAdminExportsRoute,
     AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+    AuthenticatedAdminClientsIdRoute: AuthenticatedAdminClientsIdRoute,
   }
 
 const AuthenticatedAdminRouteRouteWithChildren =
