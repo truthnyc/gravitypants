@@ -1,0 +1,52 @@
+import { Link } from "@tanstack/react-router";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { initialsOf, useMe, useSignOut, type Me } from "@/lib/stillframe/account";
+import { MediaImage } from "./MediaImage";
+
+export function Avatar({ me, size = 32 }: { me: Me | null | undefined; size?: number }) {
+  return (
+    <span
+      className="flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-control-fill text-[12px] font-semibold text-foreground"
+      style={{ width: size, height: size, fontSize: size * 0.38 }}
+    >
+      {me?.avatarPath ? (
+        <MediaImage path={me.avatarPath} alt="" className="h-full w-full object-cover" />
+      ) : (
+        initialsOf(me)
+      )}
+    </span>
+  );
+}
+
+export function UserMenu() {
+  const { data: me } = useMe();
+  const signOut = useSignOut();
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" aria-label="Your account">
+        <Avatar me={me} />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-60">
+        <DropdownMenuLabel className="font-normal">
+          <div className="truncate text-[14px] font-semibold">{me?.displayName || "Your account"}</div>
+          <div className="truncate text-[13px] text-secondary-text">{me?.email}</div>
+        </DropdownMenuLabel>
+        <DropdownMenuItem asChild>
+          <Link to="/account">Account</Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link to="/brand">Brand Kit</Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onSelect={() => void signOut()}>Sign Out</DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
