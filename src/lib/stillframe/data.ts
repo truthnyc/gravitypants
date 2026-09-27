@@ -65,7 +65,7 @@ export function useProjects() {
       if (error) throw error;
       return (data ?? []).map((row) => ({
         ...normalizeProject(row as Record<string, unknown>),
-        frames: (((row as Record<string, unknown>).frames as Record<string, unknown>[]) ?? [])
+        frames: (((row as Record<string, unknown>)["frames"] as Record<string, unknown>[]) ?? [])
           .map(normalizeFrame)
           .sort((a, b) => a.sort_order - b.sort_order),
       }));
@@ -87,7 +87,7 @@ export function useProject(id: string | undefined) {
       if (!data) return null;
       return {
         ...normalizeProject(data as Record<string, unknown>),
-        frames: (((data as Record<string, unknown>).frames as Record<string, unknown>[]) ?? [])
+        frames: (((data as Record<string, unknown>)["frames"] as Record<string, unknown>[]) ?? [])
           .map(normalizeFrame)
           .sort((a, b) => a.sort_order - b.sort_order),
       };
