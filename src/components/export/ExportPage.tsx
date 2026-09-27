@@ -194,7 +194,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
             blob = await exportGif({ ...input, width: even(job.width / 2), height: even(job.height / 2) }, opts, ac.signal, onProgress);
           }
         }
-        set(key, { status: "done", progress: 1, blob, note });
+        set(key, { status: "done", progress: 1, blob, ...(note ? { note } : {}) });
         for (const f of files.filter((f) => f.job === key)) {
           void supabase.storage
             .from(MEDIA_BUCKET)
@@ -641,7 +641,7 @@ function PreviousExports({ projectId, version }: { projectId: string; version: n
   if (!items.length) return null;
   const download = async (stamp: string, name: string) => {
     const { data, error } = await supabase.storage.from(MEDIA_BUCKET).createSignedUrl(`exports/${projectId}/${stamp}/${name}`, 300, { download: name });
-    if (error || !data) return toast.error("That file couldn't be downloaded. Try again.");
+    if (error || !data) { toast.error("That file couldn't be downloaded. Try again."); return; }
     window.location.href = data.signedUrl;
   };
   const parse = (stamp: string) => new Date(stamp.replace(/T(\d\d)-(\d\d)-(\d\d)-(\d+)Z/, "T$1:$2:$3.$4Z"));
