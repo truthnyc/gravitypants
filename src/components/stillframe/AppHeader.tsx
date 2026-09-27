@@ -16,11 +16,11 @@ export function AppHeader() {
   return (
     <header className="sticky top-0 z-30 h-[60px] bg-card/90 backdrop-blur-xl hairline-b">
       <div className="mx-auto flex h-full items-center gap-6 px-6">
-        <Link to="/" className="flex items-center gap-2.5 rounded-lg" aria-label="Stillframe home">
+        <Link to="/" className="flex items-center gap-2.5 rounded-lg" aria-label="Gravity Pants home">
           <span className="flex h-[26px] w-[26px] items-center justify-center rounded-lg bg-foreground">
             <Play size={13} strokeWidth={1.7} className="text-card" fill="currentColor" />
           </span>
-          <span className="text-[16px] font-semibold tracking-[-0.01em]">Stillframe</span>
+          <span className="text-[16px] font-semibold tracking-[-0.01em]">Gravity Pants</span>
         </Link>
 
         <nav className="flex items-center gap-1">

@@ -9,9 +9,9 @@ export const Route = createFileRoute("/signin")({
   validateSearch: z.object({ redirect: z.string().optional() }),
   head: () => ({
     meta: [
-      { title: "Sign in — Stillframe" },
-      { name: "description", content: "Sign in to Stillframe to make video ads and GIFs from your photos." },
-      { property: "og:title", content: "Sign in — Stillframe" },
+      { title: "Sign in — Gravity Pants" },
+      { name: "description", content: "Sign in to Gravity Pants to make video ads and GIFs from your photos." },
+      { property: "og:title", content: "Sign in — Gravity Pants" },
       { property: "og:description", content: "Sign in to make video ads and GIFs from your photos." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

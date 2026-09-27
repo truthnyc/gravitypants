@@ -82,7 +82,7 @@ async function ensurePortalConfig(stripe: ReturnType<typeof createStripeClient>)
   }
   const cfg = await stripe.billingPortal.configurations.create({
     metadata: { tag: PORTAL_TAG },
-    business_profile: { headline: "Manage your Stillframe plan" },
+    business_profile: { headline: "Manage your Gravity Pants plan" },
     features: {
       invoice_history: { enabled: true },
       payment_method_update: { enabled: true },

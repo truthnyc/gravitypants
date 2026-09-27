@@ -10,9 +10,9 @@ import { getWorkspaceId } from "@/lib/stillframe/workspace";
 export const Route = createFileRoute("/_authenticated/ad/$id/edit")({
   head: () => ({
     meta: [
-      { title: "Edit ad — Stillframe" },
+      { title: "Edit ad — Gravity Pants" },
       { name: "description", content: "Edit photos, text, timing and transitions for your ad." },
-      { property: "og:title", content: "Edit ad — Stillframe" },
+      { property: "og:title", content: "Edit ad — Gravity Pants" },
       { property: "og:description", content: "Edit photos, text, timing and transitions." },
     ],
   }),

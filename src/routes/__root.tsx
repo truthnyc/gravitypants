@@ -82,12 +82,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Stillframe" },
+      { title: "Gravity Pants" },
       {
         name: "description",
         content: "Turn still photos into short video ads and animated GIFs.",
       },
-      { property: "og:title", content: "Stillframe" },
+      { property: "og:title", content: "Gravity Pants" },
       {
         property: "og:description",
         content: "Turn still photos into short video ads and animated GIFs.",

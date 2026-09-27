@@ -9,10 +9,10 @@ export const Route = createFileRoute("/_authenticated/admin")({
   },
   head: () => ({
     meta: [
-      { title: "Admin — Stillframe" },
+      { title: "Admin — Gravity Pants" },
       { name: "description", content: "Private admin area." },
       { name: "robots", content: "noindex" },
-      { property: "og:title", content: "Admin — Stillframe" },
+      { property: "og:title", content: "Admin — Gravity Pants" },
       { property: "og:description", content: "Private admin area." },
     ],
   }),

@@ -7,9 +7,9 @@ import { AuthShell, FieldGroup, plainAuthError } from "@/components/auth/AuthShe
 export const Route = createFileRoute("/reset")({
   head: () => ({
     meta: [
-      { title: "Reset your password — Stillframe" },
-      { name: "description", content: "Get a link to reset your Stillframe password." },
-      { property: "og:title", content: "Reset your password — Stillframe" },
+      { title: "Reset your password — Gravity Pants" },
+      { name: "description", content: "Get a link to reset your Gravity Pants password." },
+      { property: "og:title", content: "Reset your password — Gravity Pants" },
       { property: "og:description", content: "Get a link to reset your password." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

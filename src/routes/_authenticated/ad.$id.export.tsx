@@ -6,9 +6,9 @@ import { useProject } from "@/lib/stillframe/data";
 export const Route = createFileRoute("/_authenticated/ad/$id/export")({
   head: () => ({
     meta: [
-      { title: "Export ad — Stillframe" },
+      { title: "Export ad — Gravity Pants" },
       { name: "description", content: "Save your ad as MP4 videos and animated GIFs for every social channel." },
-      { property: "og:title", content: "Export ad — Stillframe" },
+      { property: "og:title", content: "Export ad — Gravity Pants" },
       { property: "og:description", content: "Save your ad as MP4 videos and animated GIFs for every channel." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

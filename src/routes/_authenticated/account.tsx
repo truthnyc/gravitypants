@@ -15,9 +15,9 @@ import { AccountTabs } from "@/components/billing/AccountTabs";
 export const Route = createFileRoute("/_authenticated/account")({
   head: () => ({
     meta: [
-      { title: "Account — Stillframe" },
-      { name: "description", content: "Your Stillframe profile, email, password and account settings." },
-      { property: "og:title", content: "Account — Stillframe" },
+      { title: "Account — Gravity Pants" },
+      { name: "description", content: "Your Gravity Pants profile, email, password and account settings." },
+      { property: "og:title", content: "Account — Gravity Pants" },
       { property: "og:description", content: "Your profile, email and password." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
