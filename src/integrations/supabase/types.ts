@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_audit_log: {
+        Row: {
+          action: string
+          admin_user_id: string
+          created_at: string
+          id: string
+          reason: string | null
+          target: string | null
+          workspace_id: string | null
+        }
+        Insert: {
+          action: string
+          admin_user_id: string
+          created_at?: string
+          id?: string
+          reason?: string | null
+          target?: string | null
+          workspace_id?: string | null
+        }
+        Update: {
+          action?: string
+          admin_user_id?: string
+          created_at?: string
+          id?: string
+          reason?: string | null
+          target?: string | null
+          workspace_id?: string | null
+        }
+        Relationships: []
+      }
       assets: {
         Row: {
           created_at: string
@@ -117,6 +147,56 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "export_usage_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      exports: {
+        Row: {
+          channels: string[]
+          created_at: string
+          error: string | null
+          formats: string[]
+          id: string
+          project_id: string | null
+          stamp: string
+          status: string
+          total_bytes: number
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          channels?: string[]
+          created_at?: string
+          error?: string | null
+          formats?: string[]
+          id?: string
+          project_id?: string | null
+          stamp: string
+          status?: string
+          total_bytes?: number
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          channels?: string[]
+          created_at?: string
+          error?: string | null
+          formats?: string[]
+          id?: string
+          project_id?: string | null
+          stamp?: string
+          status?: string
+          total_bytes?: number
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exports_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
@@ -276,9 +356,49 @@ export type Database = {
         }
         Relationships: []
       }
+      support_sessions: {
+        Row: {
+          admin_user_id: string
+          created_at: string
+          ended_at: string | null
+          expires_at: string
+          id: string
+          reason: string
+          workspace_id: string
+        }
+        Insert: {
+          admin_user_id: string
+          created_at?: string
+          ended_at?: string | null
+          expires_at?: string
+          id?: string
+          reason: string
+          workspace_id: string
+        }
+        Update: {
+          admin_user_id?: string
+          created_at?: string
+          ended_at?: string | null
+          expires_at?: string
+          id?: string
+          reason?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_sessions_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspace_billing: {
         Row: {
           cancel_at_period_end: boolean
+          comp_plan: string | null
+          comp_until: string | null
           created_at: string
           current_period_end: string | null
           current_period_start: string | null
@@ -293,6 +413,8 @@ export type Database = {
         }
         Insert: {
           cancel_at_period_end?: boolean
+          comp_plan?: string | null
+          comp_until?: string | null
           created_at?: string
           current_period_end?: string | null
           current_period_start?: string | null
@@ -307,6 +429,8 @@ export type Database = {
         }
         Update: {
           cancel_at_period_end?: boolean
+          comp_plan?: string | null
+          comp_until?: string | null
           created_at?: string
           current_period_end?: string | null
           current_period_start?: string | null
@@ -364,18 +488,21 @@ export type Database = {
           id: string
           name: string
           owner_id: string | null
+          suspended_at: string | null
         }
         Insert: {
           created_at?: string
           id?: string
           name: string
           owner_id?: string | null
+          suspended_at?: string | null
         }
         Update: {
           created_at?: string
           id?: string
           name?: string
           owner_id?: string | null
+          suspended_at?: string | null
         }
         Relationships: []
       }
@@ -390,6 +517,8 @@ export type Database = {
       }
       ensure_workspace: { Args: never; Returns: string }
       export_status: { Args: { _ws: string }; Returns: Json }
+      has_support_session: { Args: { _ws: string }; Returns: boolean }
+      is_platform_admin: { Args: never; Returns: boolean }
       is_workspace_member: { Args: { _ws: string }; Returns: boolean }
       record_export: {
         Args: { _project: string; _stamp: string; _ws: string }
