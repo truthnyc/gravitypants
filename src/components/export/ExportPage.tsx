@@ -145,6 +145,30 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
     setState(Object.fromEntries([...jobs.keys()].map((k) => [k, { progress: 0, status: "waiting" as const }])));
     setOpen(true);
     setRunning(true);
+    // Keep the screen awake while exporting; ignore if unsupported or refused.
+    type Lock = { release: () => Promise<void> };
+    const holder: { lock: Lock | null } = { lock: null };
+    const wake = async () => {
+      try {
+        const wl = (navigator as Navigator & { wakeLock?: { request: (t: "screen") => Promise<Lock> } }).wakeLock;
+        if (wl && document.visibilityState === "visible") holder.lock = await wl.request("screen");
+      } catch {
+        holder.lock = null;
+      }
+    };
+    const onVis = () => void (document.visibilityState === "visible" && wake());
+    document.addEventListener("visibilitychange", onVis);
+    await wake();
+    try {
+      await runJobs(ac);
+    } finally {
+      document.removeEventListener("visibilitychange", onVis);
+      void holder.lock?.release().catch(() => undefined);
+    }
+  };
+
+  const runJobs = async (ac: AbortController) => {
+    if (!images) return;
     await ensureFonts(frames, brand);
     const stamp = new Date().toISOString().replace(/[:.]/g, "-");
     const set = (k: string, s: Partial<JobState>) => setState((prev) => ({ ...prev, [k]: { ...prev[k]!, ...s } }));
@@ -170,7 +194,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
             blob = await exportGif({ ...input, width: even(job.width / 2), height: even(job.height / 2) }, opts, ac.signal, onProgress);
           }
         }
-        set(key, { status: "done", progress: 1, blob, note });
+        set(key, { status: "done", progress: 1, blob, ...(note ? { note } : {}) });
         for (const f of files.filter((f) => f.job === key)) {
           void supabase.storage
             .from(MEDIA_BUCKET)
@@ -514,6 +538,13 @@ function ProgressSheet({
   zipName: string;
 }) {
   const done = files.filter((f) => state[f.job]?.blob);
+  const [wasHidden, setWasHidden] = useState(false);
+  useEffect(() => {
+    if (!running) return setWasHidden(false);
+    const onVis = () => document.visibilityState === "hidden" && setWasHidden(true);
+    document.addEventListener("visibilitychange", onVis);
+    return () => document.removeEventListener("visibilitychange", onVis);
+  }, [running]);
   const zipAll = async () => {
     const entries: Record<string, [Uint8Array, { level: 0 }]> = {};
     for (const f of done) entries[f.name] = [new Uint8Array(await state[f.job]!.blob!.arrayBuffer()), { level: 0 }];
@@ -526,6 +557,11 @@ function ProgressSheet({
           <DialogTitle>{running ? "Making your files…" : "Your files are ready"}</DialogTitle>
           <DialogDescription>{running ? "Keep this tab open until everything is done." : "Download them one by one or all together."}</DialogDescription>
         </DialogHeader>
+        {running && wasHidden && (
+          <div role="status" className="rounded-sm bg-control-fill px-3 py-2 text-[13px]">
+            Keep this tab open until your files are ready
+          </div>
+        )}
         <div className="max-h-[50vh] space-y-2 overflow-y-auto">
           {files.map((f) => {
             const s = state[f.job];
@@ -605,12 +641,19 @@ function PreviousExports({ projectId, version }: { projectId: string; version: n
   if (!items.length) return null;
   const download = async (stamp: string, name: string) => {
     const { data, error } = await supabase.storage.from(MEDIA_BUCKET).createSignedUrl(`exports/${projectId}/${stamp}/${name}`, 300, { download: name });
-    if (error || !data) return toast.error("That file couldn't be downloaded. Try again.");
+    if (error || !data) { toast.error("That file couldn't be downloaded. Try again."); return; }
     window.location.href = data.signedUrl;
   };
+  const parse = (stamp: string) => new Date(stamp.replace(/T(\d\d)-(\d\d)-(\d\d)-(\d+)Z/, "T$1:$2:$3.$4Z"));
   const when = (stamp: string) => {
-    const d = new Date(stamp.replace(/T(\d\d)-(\d\d)-(\d\d)-(\d+)Z/, "T$1:$2:$3.$4Z"));
+    const d = parse(stamp);
     return isNaN(d.getTime()) ? stamp : d.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
+  };
+  const daysLeft = (stamp: string) => {
+    const d = parse(stamp);
+    if (isNaN(d.getTime())) return null;
+    const left = Math.max(0, Math.ceil(30 - (Date.now() - d.getTime()) / 86_400_000));
+    return left <= 1 ? "Deleted within a day" : `${left} days left`;
   };
   return (
     <Collapsible className="mt-8">
@@ -619,10 +662,14 @@ function PreviousExports({ projectId, version }: { projectId: string; version: n
         Previous exports
         <span className="font-normal text-secondary-text nums">({items.length})</span>
       </CollapsibleTrigger>
+      <p className="mt-1 pl-[22px] text-[12px] text-secondary-text">Kept for 30 days</p>
       <CollapsibleContent className="mt-3 space-y-3">
         {items.map((it) => (
           <div key={it.stamp} className="rounded-sm bg-card p-3 shadow-card">
-            <div className="mb-2 text-[12px] text-secondary-text nums">{when(it.stamp)}</div>
+            <div className="mb-2 flex justify-between gap-2 text-[12px] text-secondary-text nums">
+              <span>{when(it.stamp)}</span>
+              <span>{daysLeft(it.stamp)}</span>
+            </div>
             <ul className="space-y-1">
               {it.files.map((n) => (
                 <li key={n} className="flex items-center justify-between gap-2 text-[13px]">

@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as BrandRouteImport } from './routes/brand'
 import { Route as AdIdEditRouteImport } from './routes/ad.$id.edit'
 import { Route as AdIdExportRouteImport } from './routes/ad.$id.export'
+import { Route as ApiPublicCleanupExportsRouteImport } from './routes/api/public/cleanup-exports'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -34,18 +35,25 @@ const AdIdExportRoute = AdIdExportRouteImport.update({
   path: '/ad/$id/export',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicCleanupExportsRoute = ApiPublicCleanupExportsRouteImport.update({
+  id: '/api/public/cleanup-exports',
+  path: '/api/public/cleanup-exports',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/brand': typeof BrandRoute
   '/ad/$id/edit': typeof AdIdEditRoute
   '/ad/$id/export': typeof AdIdExportRoute
+  '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/brand': typeof BrandRoute
   '/ad/$id/edit': typeof AdIdEditRoute
   '/ad/$id/export': typeof AdIdExportRoute
+  '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -53,13 +61,30 @@ export interface FileRoutesById {
   '/brand': typeof BrandRoute
   '/ad/$id/edit': typeof AdIdEditRoute
   '/ad/$id/export': typeof AdIdExportRoute
+  '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/brand' | '/ad/$id/edit' | '/ad/$id/export'
+  fullPaths:
+    | '/'
+    | '/brand'
+    | '/ad/$id/edit'
+    | '/ad/$id/export'
+    | '/api/public/cleanup-exports'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/brand' | '/ad/$id/edit' | '/ad/$id/export'
-  id: '__root__' | '/' | '/brand' | '/ad/$id/edit' | '/ad/$id/export'
+  to:
+    | '/'
+    | '/brand'
+    | '/ad/$id/edit'
+    | '/ad/$id/export'
+    | '/api/public/cleanup-exports'
+  id:
+    | '__root__'
+    | '/'
+    | '/brand'
+    | '/ad/$id/edit'
+    | '/ad/$id/export'
+    | '/api/public/cleanup-exports'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -67,6 +92,7 @@ export interface RootRouteChildren {
   BrandRoute: typeof BrandRoute
   AdIdEditRoute: typeof AdIdEditRoute
   AdIdExportRoute: typeof AdIdExportRoute
+  ApiPublicCleanupExportsRoute: typeof ApiPublicCleanupExportsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -99,6 +125,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdIdExportRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/cleanup-exports': {
+      id: '/api/public/cleanup-exports'
+      path: '/api/public/cleanup-exports'
+      fullPath: '/api/public/cleanup-exports'
+      preLoaderRoute: typeof ApiPublicCleanupExportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -107,6 +140,7 @@ const rootRouteChildren: RootRouteChildren = {
   BrandRoute: BrandRoute,
   AdIdEditRoute: AdIdEditRoute,
   AdIdExportRoute: AdIdExportRoute,
+  ApiPublicCleanupExportsRoute: ApiPublicCleanupExportsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
