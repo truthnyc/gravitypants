@@ -644,9 +644,16 @@ function PreviousExports({ projectId, version }: { projectId: string; version: n
     if (error || !data) return toast.error("That file couldn't be downloaded. Try again.");
     window.location.href = data.signedUrl;
   };
+  const parse = (stamp: string) => new Date(stamp.replace(/T(\d\d)-(\d\d)-(\d\d)-(\d+)Z/, "T$1:$2:$3.$4Z"));
   const when = (stamp: string) => {
-    const d = new Date(stamp.replace(/T(\d\d)-(\d\d)-(\d\d)-(\d+)Z/, "T$1:$2:$3.$4Z"));
+    const d = parse(stamp);
     return isNaN(d.getTime()) ? stamp : d.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
+  };
+  const daysLeft = (stamp: string) => {
+    const d = parse(stamp);
+    if (isNaN(d.getTime())) return null;
+    const left = Math.max(0, Math.ceil(30 - (Date.now() - d.getTime()) / 86_400_000));
+    return left <= 1 ? "Deleted within a day" : `${left} days left`;
   };
   return (
     <Collapsible className="mt-8">
@@ -655,10 +662,14 @@ function PreviousExports({ projectId, version }: { projectId: string; version: n
         Previous exports
         <span className="font-normal text-secondary-text nums">({items.length})</span>
       </CollapsibleTrigger>
+      <p className="mt-1 pl-[22px] text-[12px] text-secondary-text">Kept for 30 days</p>
       <CollapsibleContent className="mt-3 space-y-3">
         {items.map((it) => (
           <div key={it.stamp} className="rounded-sm bg-card p-3 shadow-card">
-            <div className="mb-2 text-[12px] text-secondary-text nums">{when(it.stamp)}</div>
+            <div className="mb-2 flex justify-between gap-2 text-[12px] text-secondary-text nums">
+              <span>{when(it.stamp)}</span>
+              <span>{daysLeft(it.stamp)}</span>
+            </div>
             <ul className="space-y-1">
               {it.files.map((n) => (
                 <li key={n} className="flex items-center justify-between gap-2 text-[13px]">
