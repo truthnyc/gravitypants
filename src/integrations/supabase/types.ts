@@ -511,6 +511,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_storage_by_workspace: {
+        Args: never
+        Returns: {
+          bytes: number
+          workspace_id: string
+        }[]
+      }
       can_save_export: {
         Args: { _stamp: string; _ws: string }
         Returns: boolean
