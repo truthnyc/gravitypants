@@ -16,6 +16,7 @@ export function fmtTime(t: number, withTenths = true) {
 
 export function Timeline({
   frames,
+  endSeconds = 0,
   frameIndex,
   time,
   playing,
@@ -25,6 +26,7 @@ export function Timeline({
   onDuration,
 }: {
   frames: Frame[];
+  endSeconds?: number;
   frameIndex: number;
   time: number;
   playing: boolean;
@@ -34,7 +36,7 @@ export function Timeline({
   onDuration: (i: number, seconds: number) => void;
 }) {
   const trackRef = useRef<HTMLDivElement>(null);
-  const total = totalDuration(frames);
+  const total = totalDuration(frames) + (frames.length ? endSeconds : 0);
   const starts = frameStarts(frames);
 
   const seekFrom = (clientX: number) => {
@@ -117,6 +119,13 @@ export function Timeline({
             )}
           </div>
         ))}
+        {endSeconds > 0 && frames.length > 0 && (
+          <div className="relative flex min-w-0 items-stretch" style={{ flexGrow: endSeconds, flexBasis: 0 }}>
+            <div className="mx-[2px] flex flex-1 items-end overflow-hidden rounded-sm bg-control-fill/60 px-2 pb-1 text-[11px] text-secondary-text nums">
+              <span className="truncate">End card · {endSeconds.toFixed(1)}s</span>
+            </div>
+          </div>
+        )}
         {total > 0 && (
           <div
             className="pointer-events-none absolute -bottom-1 -top-1 z-30 w-0.5 rounded-full bg-primary"
