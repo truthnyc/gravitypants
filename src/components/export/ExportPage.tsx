@@ -1,3 +1,4 @@
+import { getWorkspaceId } from "@/lib/stillframe/workspace";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { AlertCircle, Check, ChevronDown, ChevronLeft, Download, Film, Image as ImageIcon, LayoutGrid } from "lucide-react";
@@ -198,7 +199,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
         for (const f of files.filter((f) => f.job === key)) {
           void supabase.storage
             .from(MEDIA_BUCKET)
-            .upload(`exports/${project.id}/${stamp}/${f.name}`, blob, { contentType: blob.type, upsert: true })
+            .upload(`${getWorkspaceId()}/exports/${project.id}/${stamp}/${f.name}`, blob, { contentType: blob.type, upsert: true })
             .then(({ error }) => !error && setHistoryVersion((v) => v + 1));
         }
       } catch (e) {
@@ -622,7 +623,7 @@ function PreviousExports({ projectId, version }: { projectId: string; version: n
   useEffect(() => {
     let alive = true;
     void (async () => {
-      const root = `exports/${projectId}`;
+      const root = `${getWorkspaceId()}/exports/${projectId}`;
       const { data: folders } = await supabase.storage.from(MEDIA_BUCKET).list(root, { limit: 50, sortBy: { column: "name", order: "desc" } });
       const out: PastExport[] = [];
       for (const f of folders ?? []) {
@@ -640,7 +641,7 @@ function PreviousExports({ projectId, version }: { projectId: string; version: n
 
   if (!items.length) return null;
   const download = async (stamp: string, name: string) => {
-    const { data, error } = await supabase.storage.from(MEDIA_BUCKET).createSignedUrl(`exports/${projectId}/${stamp}/${name}`, 300, { download: name });
+    const { data, error } = await supabase.storage.from(MEDIA_BUCKET).createSignedUrl(`${getWorkspaceId()}/exports/${projectId}/${stamp}/${name}`, 300, { download: name });
     if (error || !data) { toast.error("That file couldn't be downloaded. Try again."); return; }
     window.location.href = data.signedUrl;
   };

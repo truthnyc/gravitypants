@@ -4,7 +4,7 @@ import { DropZone } from "@/components/stillframe/DropZone";
 import { useSearch } from "@/components/stillframe/search-context";
 import { useProjects } from "@/lib/stillframe/data";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/_authenticated/")({
   head: () => ({
     meta: [
       { title: "Your Ads — Stillframe" },

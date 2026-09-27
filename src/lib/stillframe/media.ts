@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { WORKSPACE_ID } from "./types";
+import { getWorkspaceId } from "./workspace";
 
 export const MEDIA_BUCKET = "media";
 
@@ -49,7 +49,7 @@ export async function uploadMedia(
   file: File,
   kind: "photo" | "logo" | "font" = "photo",
 ): Promise<UploadedPhoto> {
-  const path = `${WORKSPACE_ID}/${kind}/${crypto.randomUUID()}-${safeName(file.name)}`;
+  const path = `${getWorkspaceId()}/${kind}/${crypto.randomUUID()}-${safeName(file.name)}`;
   const { error: uploadError } = await supabase.storage
     .from(MEDIA_BUCKET)
     .upload(path, file, { cacheControl: "3600", upsert: false });
@@ -59,7 +59,7 @@ export async function uploadMedia(
   const { data, error } = await supabase
     .from("assets")
     .insert({
-      workspace_id: WORKSPACE_ID,
+      workspace_id: getWorkspaceId(),
       kind,
       url: path,
       width: size.width,
