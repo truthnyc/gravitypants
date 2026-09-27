@@ -3,6 +3,10 @@ import { getWorkspaceId } from "./workspace";
 
 export const MEDIA_BUCKET = "media";
 
+export function clearMediaCache() {
+  signedUrlCache.clear();
+}
+
 const signedUrlCache = new Map<string, { url: string; expires: number }>();
 
 /** Signed URL for a private media path; cached until shortly before expiry. */
