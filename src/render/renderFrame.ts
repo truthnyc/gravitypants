@@ -17,7 +17,7 @@ export type RenderOptions = {
   /** Loaded images keyed by storage path. */
   images?: Map<string, HTMLImageElement>;
   /** Brand Kit look for the end card (first color, body font, fallback end card settings). */
-  brand?: BrandStyle;
+  brand?: BrandStyle | undefined;
 };
 
 export type BrandStyle = { color?: string | null; font?: string | null; endCard?: EndCard | null };
