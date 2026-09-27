@@ -131,3 +131,19 @@
 @utility ring-focus {
   box-shadow: var(--focus-ring);
 }
+
+/* Transition tile previews (play on hover) */
+@keyframes tr-cut { 0%, 49% { opacity: 0; } 50%, 100% { opacity: 1; } }
+@keyframes tr-fade { 0%, 15% { opacity: 0; } 70%, 100% { opacity: 1; } }
+@keyframes tr-slide { 0%, 15% { transform: translateX(100%); } 70%, 100% { transform: translateX(0); } }
+@keyframes tr-zoom { 0%, 15% { transform: scale(1.3); opacity: 0; } 70%, 100% { transform: scale(1); opacity: 1; } }
+@keyframes tr-wipe { 0%, 15% { clip-path: inset(0 100% 0 0); } 70%, 100% { clip-path: inset(0 0 0 0); } }
+@keyframes tr-dip-b { 0%, 49% { opacity: 0; } 50%, 100% { opacity: 1; } }
+@keyframes tr-dip-k { 0%, 15% { opacity: 0; } 50% { opacity: 1; } 85%, 100% { opacity: 0; } }
+.tr-tile .tr-b { opacity: 0; }
+.tr-tile .tr-k { opacity: 0; }
+.tr-tile[data-type="slide"] .tr-b, .tr-tile[data-type="wipe"] .tr-b { opacity: 1; }
+.tr-tile[data-type="slide"] .tr-b { transform: translateX(100%); }
+.tr-tile[data-type="wipe"] .tr-b { clip-path: inset(0 100% 0 0); }
+.tr-tile:hover .tr-b { animation: var(--tr-anim) 1.4s ease-in-out infinite; }
+.tr-tile:hover .tr-k { animation: tr-dip-k 1.4s ease-in-out infinite; }
