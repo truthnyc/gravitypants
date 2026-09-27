@@ -7,13 +7,13 @@ import { useProjects } from "@/lib/stillframe/data";
 export const Route = createFileRoute("/_authenticated/")({
   head: () => ({
     meta: [
-      { title: "Your Ads — Stillframe" },
+      { title: "Your Ads — Gravity Pants" },
       {
         name: "description",
         content:
           "Turn still photos into short video ads and animated GIFs for social channels. Drop photos, get an ad.",
       },
-      { property: "og:title", content: "Your Ads — Stillframe" },
+      { property: "og:title", content: "Your Ads — Gravity Pants" },
       {
         property: "og:description",
         content: "Turn still photos into short video ads and animated GIFs for social channels.",

@@ -9,9 +9,9 @@ export const Route = createFileRoute("/_authenticated/account_/billing")({
   validateSearch: z.object({ checkout: z.string().optional() }),
   head: () => ({
     meta: [
-      { title: "Billing — Stillframe" },
-      { name: "description", content: "Your Stillframe plan, exports this month and billing details." },
-      { property: "og:title", content: "Billing — Stillframe" },
+      { title: "Billing — Gravity Pants" },
+      { name: "description", content: "Your Gravity Pants plan, exports this month and billing details." },
+      { property: "og:title", content: "Billing — Gravity Pants" },
       { property: "og:description", content: "Your plan, usage and billing." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -55,7 +55,7 @@ function BillingPage() {
 
       {thanks && (
         <section role="status" className="rounded-sm bg-card p-6 shadow-card">
-          <h2 className="text-[17px] font-semibold">Thank you for choosing Stillframe</h2>
+          <h2 className="text-[17px] font-semibold">Thank you for choosing Gravity Pants</h2>
           <p className="mt-1 text-[14px] text-secondary-text">
             Your plan is active and exporting is unlocked. A receipt is on its way to your inbox.
           </p>

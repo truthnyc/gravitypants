@@ -17,10 +17,10 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/brand")({
   head: () => ({
     meta: [
-      { title: "Brand Kit — Stillframe" },
+      { title: "Brand Kit — Gravity Pants" },
       { name: "description", content: "Keep your logos, colors and fonts in one place so every ad matches your brand." },
-      { property: "og:title", content: "Brand Kit — Stillframe" },
-      { property: "og:description", content: "Logos, colors and fonts that every Stillframe ad reuses." },
+      { property: "og:title", content: "Brand Kit — Gravity Pants" },
+      { property: "og:description", content: "Logos, colors and fonts that every Gravity Pants ad reuses." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
