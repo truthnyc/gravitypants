@@ -37,7 +37,6 @@ export const Route = createFileRoute("/lovable/email/transactional/preview")({
 
         for (const name of templateNames) {
           const entry = TEMPLATES[name]
-          if (!entry) continue
           const displayName = entry.displayName || name
 
           if (!entry.previewData) {
