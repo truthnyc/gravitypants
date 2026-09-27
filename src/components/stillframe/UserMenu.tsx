@@ -9,6 +9,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { initialsOf, useMe, useSignOut, type Me } from "@/lib/stillframe/account";
 import { MediaImage } from "./MediaImage";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { checkAdmin } from "@/lib/stillframe/admin.functions";
 
 export function Avatar({ me, size = 32 }: { me: Me | null | undefined; size?: number }) {
   return (
@@ -28,6 +31,8 @@ export function Avatar({ me, size = 32 }: { me: Me | null | undefined; size?: nu
 export function UserMenu() {
   const { data: me } = useMe();
   const signOut = useSignOut();
+  const check = useServerFn(checkAdmin);
+  const { data: adm } = useQuery({ queryKey: ["is-admin"], queryFn: () => check(), staleTime: 300_000 });
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" aria-label="Your account">
@@ -44,6 +49,11 @@ export function UserMenu() {
         <DropdownMenuItem asChild>
           <Link to="/brand">Brand Kit</Link>
         </DropdownMenuItem>
+        {adm?.admin && (
+          <DropdownMenuItem asChild>
+            <Link to="/admin">Admin</Link>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={() => void signOut()}>Sign Out</DropdownMenuItem>
       </DropdownMenuContent>
