@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import logo from "@/assets/gravity-pants-logo.png";
+import { GravityPantsLogo } from "@/components/GravityPantsLogo";
 import { lovable } from "@/integrations/lovable";
 import { cn } from "@/lib/utils";
 
@@ -19,7 +19,7 @@ export function AuthShell({ title, subtitle, children }: { title: string; subtit
     <main className="flex min-h-screen items-start justify-center bg-canvas px-4 pt-[12vh] pb-16">
       <div className="w-full max-w-[380px]">
         <div className="flex flex-col items-center text-center">
-          <img src={logo} alt="Gravity Pants" width={56} height={56} className="h-14 w-14" />
+          <GravityPantsLogo size={56} />
           <h1 className="mt-6 text-[32px] font-bold tracking-[-0.02em]">{title}</h1>
           <p className="mt-1 text-[15px] text-secondary-text">{subtitle}</p>
         </div>
