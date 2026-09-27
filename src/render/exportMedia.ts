@@ -27,7 +27,16 @@ export class ExportCancelled extends Error {
   }
 }
 
-const tick = () => new Promise<void>((r) => setTimeout(r, 0));
+/** Yields to the event loop via MessageChannel — not throttled like timers/rAF in hidden tabs. */
+const channel = typeof MessageChannel !== "undefined" ? new MessageChannel() : null;
+const waiting: (() => void)[] = [];
+if (channel) channel.port1.onmessage = () => waiting.shift()?.();
+const tick = () =>
+  new Promise<void>((r) => {
+    if (!channel) return r();
+    waiting.push(r);
+    channel.port2.postMessage(0);
+  });
 
 function makeCanvas(w: number, h: number) {
   const canvas = new OffscreenCanvas(w, h);

@@ -145,6 +145,30 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
     setState(Object.fromEntries([...jobs.keys()].map((k) => [k, { progress: 0, status: "waiting" as const }])));
     setOpen(true);
     setRunning(true);
+    // Keep the screen awake while exporting; ignore if unsupported or refused.
+    type Lock = { release: () => Promise<void> };
+    const holder: { lock: Lock | null } = { lock: null };
+    const wake = async () => {
+      try {
+        const wl = (navigator as Navigator & { wakeLock?: { request: (t: "screen") => Promise<Lock> } }).wakeLock;
+        if (wl && document.visibilityState === "visible") holder.lock = await wl.request("screen");
+      } catch {
+        holder.lock = null;
+      }
+    };
+    const onVis = () => void (document.visibilityState === "visible" && wake());
+    document.addEventListener("visibilitychange", onVis);
+    await wake();
+    try {
+      await runJobs(ac);
+    } finally {
+      document.removeEventListener("visibilitychange", onVis);
+      void holder.lock?.release().catch(() => undefined);
+    }
+  };
+
+  const runJobs = async (ac: AbortController) => {
+    if (!images) return;
     await ensureFonts(frames, brand);
     const stamp = new Date().toISOString().replace(/[:.]/g, "-");
     const set = (k: string, s: Partial<JobState>) => setState((prev) => ({ ...prev, [k]: { ...prev[k]!, ...s } }));
