@@ -10,18 +10,26 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as ResetRouteImport } from './routes/reset'
 import { Route as SigninRouteImport } from './routes/signin'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 import { Route as AuthenticatedBrandRouteImport } from './routes/_authenticated/brand'
+import { Route as AuthenticatedAccountBillingRouteImport } from './routes/_authenticated/account_.billing'
 import { Route as ApiPublicCleanupExportsRouteImport } from './routes/api/public/cleanup-exports'
 import { Route as AuthenticatedAdIdEditRouteImport } from './routes/_authenticated/ad.$id.edit'
 import { Route as AuthenticatedAdIdExportRouteImport } from './routes/_authenticated/ad.$id.export'
+import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PricingRoute = PricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetRoute = ResetRouteImport.update({
@@ -54,6 +62,12 @@ const AuthenticatedBrandRoute = AuthenticatedBrandRouteImport.update({
   path: '/brand',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAccountBillingRoute =
+  AuthenticatedAccountBillingRouteImport.update({
+    id: '/account_/billing',
+    path: '/account/billing',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const ApiPublicCleanupExportsRoute = ApiPublicCleanupExportsRouteImport.update({
   id: '/api/public/cleanup-exports',
   path: '/api/public/cleanup-exports',
@@ -69,85 +83,111 @@ const AuthenticatedAdIdExportRoute = AuthenticatedAdIdExportRouteImport.update({
   path: '/ad/$id/export',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiPublicPaymentsWebhookRoute =
+  ApiPublicPaymentsWebhookRouteImport.update({
+    id: '/api/public/payments/webhook',
+    path: '/api/public/payments/webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
+  '/pricing': typeof PricingRoute
   '/reset': typeof ResetRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
   '/account': typeof AuthenticatedAccountRoute
   '/brand': typeof AuthenticatedBrandRoute
+  '/account/billing': typeof AuthenticatedAccountBillingRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
   '/ad/$id/edit': typeof AuthenticatedAdIdEditRoute
   '/ad/$id/export': typeof AuthenticatedAdIdExportRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesByTo {
+  '/pricing': typeof PricingRoute
   '/reset': typeof ResetRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
   '/account': typeof AuthenticatedAccountRoute
   '/brand': typeof AuthenticatedBrandRoute
   '/': typeof AuthenticatedIndexRoute
+  '/account/billing': typeof AuthenticatedAccountBillingRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
   '/ad/$id/edit': typeof AuthenticatedAdIdEditRoute
   '/ad/$id/export': typeof AuthenticatedAdIdExportRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/pricing': typeof PricingRoute
   '/reset': typeof ResetRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
   '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/_authenticated/brand': typeof AuthenticatedBrandRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/account_/billing': typeof AuthenticatedAccountBillingRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
   '/_authenticated/ad/$id/edit': typeof AuthenticatedAdIdEditRoute
   '/_authenticated/ad/$id/export': typeof AuthenticatedAdIdExportRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/pricing'
     | '/reset'
     | '/signin'
     | '/signup'
     | '/account'
     | '/brand'
+    | '/account/billing'
     | '/api/public/cleanup-exports'
     | '/ad/$id/edit'
     | '/ad/$id/export'
+    | '/api/public/payments/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/pricing'
     | '/reset'
     | '/signin'
     | '/signup'
     | '/account'
     | '/brand'
     | '/'
+    | '/account/billing'
     | '/api/public/cleanup-exports'
     | '/ad/$id/edit'
     | '/ad/$id/export'
+    | '/api/public/payments/webhook'
   id:
     | '__root__'
     | '/_authenticated'
+    | '/pricing'
     | '/reset'
     | '/signin'
     | '/signup'
     | '/_authenticated/account'
     | '/_authenticated/brand'
     | '/_authenticated/'
+    | '/_authenticated/account_/billing'
     | '/api/public/cleanup-exports'
     | '/_authenticated/ad/$id/edit'
     | '/_authenticated/ad/$id/export'
+    | '/api/public/payments/webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  PricingRoute: typeof PricingRoute
   ResetRoute: typeof ResetRoute
   SigninRoute: typeof SigninRoute
   SignupRoute: typeof SignupRoute
   ApiPublicCleanupExportsRoute: typeof ApiPublicCleanupExportsRoute
+  ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -157,6 +197,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pricing': {
+      id: '/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof PricingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset': {
@@ -201,6 +248,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedBrandRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/account_/billing': {
+      id: '/_authenticated/account_/billing'
+      path: '/account/billing'
+      fullPath: '/account/billing'
+      preLoaderRoute: typeof AuthenticatedAccountBillingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/public/cleanup-exports': {
       id: '/api/public/cleanup-exports'
       path: '/api/public/cleanup-exports'
@@ -222,6 +276,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdIdExportRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/payments/webhook': {
+      id: '/api/public/payments/webhook'
+      path: '/api/public/payments/webhook'
+      fullPath: '/api/public/payments/webhook'
+      preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -229,6 +290,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
   AuthenticatedBrandRoute: typeof AuthenticatedBrandRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedAccountBillingRoute: typeof AuthenticatedAccountBillingRoute
   AuthenticatedAdIdEditRoute: typeof AuthenticatedAdIdEditRoute
   AuthenticatedAdIdExportRoute: typeof AuthenticatedAdIdExportRoute
 }
@@ -237,6 +299,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAccountRoute: AuthenticatedAccountRoute,
   AuthenticatedBrandRoute: AuthenticatedBrandRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedAccountBillingRoute: AuthenticatedAccountBillingRoute,
   AuthenticatedAdIdEditRoute: AuthenticatedAdIdEditRoute,
   AuthenticatedAdIdExportRoute: AuthenticatedAdIdExportRoute,
 }
@@ -246,10 +309,12 @@ const AuthenticatedRouteRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  PricingRoute: PricingRoute,
   ResetRoute: ResetRoute,
   SigninRoute: SigninRoute,
   SignupRoute: SignupRoute,
   ApiPublicCleanupExportsRoute: ApiPublicCleanupExportsRoute,
+  ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

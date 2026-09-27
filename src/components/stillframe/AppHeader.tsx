@@ -3,6 +3,7 @@ import { Play, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSearch } from "./search-context";
 import { UserMenu } from "./UserMenu";
+import { TrialPill } from "@/components/billing/BillingNotices";
 
 const navItems = [
   { to: "/", label: "Your Ads" },
@@ -55,6 +56,7 @@ export function AppHeader() {
             )}
           />
         </div>
+        <TrialPill />
         <UserMenu />
       </div>
     </header>

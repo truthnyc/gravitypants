@@ -70,6 +70,7 @@ function SignIn() {
       <div className="mt-5 flex flex-col items-center gap-2 text-[14px]">
         <Link to="/reset" className="text-primary hover:underline">Forgot password?</Link>
         <Link to="/signup" search={{ redirect }} className="text-primary hover:underline">New here? Create an account</Link>
+        <Link to="/pricing" className="text-primary hover:underline">See plans and pricing</Link>
       </div>
     </AuthShell>
   );

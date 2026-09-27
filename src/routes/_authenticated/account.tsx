@@ -10,6 +10,7 @@ import { Avatar } from "@/components/stillframe/UserMenu";
 import { meKey, signOutEverywhere, useMe } from "@/lib/stillframe/account";
 import { deleteMyAccount } from "@/lib/stillframe/account.functions";
 import { uploadMedia } from "@/lib/stillframe/media";
+import { AccountTabs } from "@/components/billing/AccountTabs";
 
 export const Route = createFileRoute("/_authenticated/account")({
   head: () => ({
@@ -109,6 +110,8 @@ function AccountPage() {
   return (
     <main className="mx-auto flex max-w-[640px] flex-col gap-5 px-8 py-10">
       <h1 className="text-[28px] font-bold tracking-[-0.02em]">Account</h1>
+      <AccountTabs />
+
 
       <Card title="Profile">
         <div className="flex items-center gap-4">
