@@ -21,7 +21,7 @@ const Email = ({ name, daysLeft }: Props) => {
   return (
     <Html lang="en" dir="ltr">
       <Head />
-      <Preview>Your Gravity Pants trial ends in {days} days</Preview>
+      <Preview>{`Your Gravity Pants trial ends in ${days} days`}</Preview>
       <Body style={brandMain}>
         <Container style={brandContainer}>
           <EmailHeader />
