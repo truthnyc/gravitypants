@@ -191,6 +191,19 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
     await ensureFonts(frames, brand);
     const stamp = new Date().toISOString().replace(/[:.]/g, "-");
     let counted = false;
+    const ws = project.workspace_id;
+    let totalBytes = 0;
+    const track = (patch: Record<string, unknown>) =>
+      void (supabase.from("exports" as never) as unknown as { upsert: (v: unknown, o: unknown) => Promise<unknown> }).upsert(
+        { workspace_id: ws, project_id: project.id, stamp, ...patch },
+        { onConflict: "workspace_id,stamp" },
+      );
+    track({
+      status: "running",
+      channels: [...new Set(files.map((f) => f.name.replace(/\.(mp4|gif)$/i, "")))],
+      formats: [...new Set(jobs.map(([, j]) => j.kind.toUpperCase()))],
+    });
+    let failure: string | null = null;
     const set = (k: string, s: Partial<JobState>) => setState((prev) => ({ ...prev, [k]: { ...prev[k]!, ...s } }));
 
     for (const [key, job] of jobs) {
@@ -215,9 +228,10 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
           }
         }
         set(key, { status: "done", progress: 1, blob, ...(note ? { note } : {}) });
+        totalBytes += blob.size * files.filter((f) => f.job === key).length;
         if (!counted) {
           // Count this export once, after the first file is finished; the server refuses if not allowed.
-          const { data: ok } = await supabase.rpc("record_export", { _ws: getWorkspaceId(), _project: project.id, _stamp: stamp });
+          const { data: ok } = await supabase.rpc("record_export", { _ws: ws, _project: project.id, _stamp: stamp });
           void refreshBilling();
           if (!ok) {
             ac.abort();
@@ -230,17 +244,19 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
         for (const f of files.filter((f) => f.job === key)) {
           void supabase.storage
             .from(MEDIA_BUCKET)
-            .upload(`${getWorkspaceId()}/exports/${project.id}/${stamp}/${f.name}`, blob, { contentType: blob.type, upsert: true })
+            .upload(`${ws}/exports/${project.id}/${stamp}/${f.name}`, blob, { contentType: blob.type, upsert: true })
             .then(({ error }) => !error && setHistoryVersion((v) => v + 1));
         }
       } catch (e) {
         if (e instanceof ExportCancelled || ac.signal.aborted) set(key, { status: "cancelled" });
         else {
           console.error(e);
+          failure = e instanceof Error ? e.message : String(e);
           set(key, { status: "error", note: "Something went wrong making this file. Try again, or pick a smaller GIF size." });
         }
       }
     }
+    track({ status: failure ? "failed" : counted ? "done" : "cancelled", error: failure, total_bytes: totalBytes });
     setState((prev) =>
       Object.fromEntries(Object.entries(prev).map(([k, v]) => [k, v.status === "waiting" || v.status === "working" ? { ...v, status: "cancelled" } : v])),
     );

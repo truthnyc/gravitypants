@@ -61,7 +61,7 @@ function isTyping(target: EventTarget | null) {
   return Boolean(el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable || el.getAttribute("role") === "combobox"));
 }
 
-export function Editor({ initial, readOnly = false, banner, exportDisabled = false }: { initial: EditorDoc; readOnly?: boolean; banner?: React.ReactNode; exportDisabled?: boolean }) {
+export function Editor({ initial, readOnly = false, banner, exportDisabled = false }: { initial: EditorDoc; readOnly?: boolean; banner?: import("react").ReactNode; exportDisabled?: boolean }) {
   const { doc, apply, undo, redo, canUndo } = useEditorDoc(initial);
   const status = useAutosave(doc, !readOnly);
 
