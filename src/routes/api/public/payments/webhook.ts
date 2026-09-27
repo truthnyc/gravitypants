@@ -101,16 +101,35 @@ async function handle(req: Request, env: StripeEnv) {
       }
       break;
     }
-    case "customer.subscription.created":
+    case "customer.subscription.created": {
+      const r = await syncSubscription(obj, env);
+      if (r?.ws && r.plan) {
+        await sendLifecycle("plan-started", r.ws, { planName: PLAN_NAMES[r.plan] ?? "Your plan" }, `plan-started-${obj.id}`);
+      }
+      break;
+    }
     case "customer.subscription.updated":
       await syncSubscription(obj, env);
       break;
-    case "customer.subscription.deleted":
-      await syncSubscription(obj, env, true);
+    case "customer.subscription.deleted": {
+      const r = await syncSubscription(obj, env, true);
+      if (r?.ws) {
+        const end = obj.current_period_end
+          ? new Date(obj.current_period_end * 1000).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
+          : undefined;
+        await sendLifecycle("plan-cancelled", r.ws, { endDate: end }, `plan-cancelled-${obj.id}`);
+      }
       break;
+    }
     case "invoice.payment_failed": {
       const db = await admin();
-      if (obj.customer) await db.from("workspace_billing").update({ status: "past_due" }).eq("stripe_customer_id", obj.customer);
+      if (obj.customer) {
+        await db.from("workspace_billing").update({ status: "past_due" }).eq("stripe_customer_id", obj.customer);
+        const { data } = await db.from("workspace_billing").select("workspace_id").eq("stripe_customer_id", obj.customer).maybeSingle();
+        if (data?.workspace_id) {
+          await sendLifecycle("payment-failed", data.workspace_id, {}, `payment-failed-${obj.id}`);
+        }
+      }
       break;
     }
     default:
