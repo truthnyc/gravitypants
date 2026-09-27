@@ -32,7 +32,20 @@ export function UserMenu() {
   const { data: me } = useMe();
   const signOut = useSignOut();
   const check = useServerFn(checkAdmin);
-  const { data: adm } = useQuery({ queryKey: ["is-admin"], queryFn: () => check(), staleTime: 300_000 });
+  const { data: adm } = useQuery({
+    queryKey: ["is-admin", me?.id ?? null],
+    enabled: !!me,
+    retry: false,
+    staleTime: 300_000,
+    // Signed-out (or mid sign-out) calls have no session: treat as "not admin" instead of crashing.
+    queryFn: async () => {
+      try {
+        return await check();
+      } catch {
+        return { admin: false };
+      }
+    },
+  });
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" aria-label="Your account">
