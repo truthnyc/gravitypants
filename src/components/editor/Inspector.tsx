@@ -151,6 +151,9 @@ function HeadlinePanel({
 }) {
   const h = headline ?? {};
   const size = h.size_px ?? 108;
+  const family = h.font_family ?? DEFAULT_FONT;
+  const weights = weightsForFont(family);
+  const weight = h.font_weight ?? 700;
   return (
     <div className="space-y-4 rounded-sm bg-card p-4 shadow-card">
       <Field label="Text">
