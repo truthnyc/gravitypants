@@ -21,3 +21,5 @@
 - The Google Fonts list comes from the `listGoogleFonts` server function (`src/lib/stillframe/fonts.functions.ts`, 24h in-memory cache, secret GOOGLE_FONTS_API_KEY) with a built-in fallback list — the stack uses server functions, not edge functions.
 - Font loading for canvas goes through `loadFont()` in `src/lib/stillframe/fonts.ts` (css2 per weight, uploaded fonts via FontFace) so `ensureFonts` never renders with a fallback.
 - Slider drags use undo keys prefixed `drag:` which coalesce regardless of time, so one drag = one undo step.
+- Export runs in the browser (`src/render/exportMedia.ts`): MP4 via WebCodecs + Mediabunny with ffmpeg.wasm (lazy, from CDN) as fallback, GIF via ffmpeg.wasm two-pass palette — no server rendering, so output always matches renderAt.
+- Finished exports are uploaded to the private media bucket at `exports/<project-id>/<timestamp>/<file>` (bucket limit raised to 500MB for GIFs) and listed from storage, not a table.

@@ -1,35 +1,39 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
+import { ExportPage } from "@/components/export/ExportPage";
+import { useProject } from "@/lib/stillframe/data";
 
 export const Route = createFileRoute("/ad/$id/export")({
   head: () => ({
     meta: [
       { title: "Export ad — Stillframe" },
-      { name: "description", content: "Export your ad as an MP4 video or an animated GIF." },
+      { name: "description", content: "Save your ad as MP4 videos and animated GIFs for every social channel." },
       { property: "og:title", content: "Export ad — Stillframe" },
-      { property: "og:description", content: "Export your ad as MP4 video or animated GIF." },
+      { property: "og:description", content: "Save your ad as MP4 videos and animated GIFs for every channel." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: ExportPlaceholder,
+  component: ExportRoute,
 });
 
-function ExportPlaceholder() {
+function ExportRoute() {
   const { id } = Route.useParams();
-  return (
-    <main className="flex min-h-[70vh] items-center justify-center px-8">
-      <div className="max-w-[420px] rounded-sm bg-card p-10 text-center shadow-card">
-        <h1 className="text-[22px] font-bold tracking-[-0.02em]">Export coming soon</h1>
-        <p className="mt-2 text-[14px] text-secondary-text">
-          MP4 video and animated GIF exports for every format will appear here.
-        </p>
-        <div className="mt-6 flex justify-center gap-2">
-          <Button asChild variant="plain">
-            <Link to="/ad/$id/edit" params={{ id }}>
-              Back to editor
-            </Link>
+  const { data, isLoading } = useProject(id);
+  if (isLoading) return <div className="h-screen bg-canvas" aria-busy="true" />;
+  if (!data || !data.frames.length) {
+    return (
+      <main className="flex h-screen items-center justify-center px-8">
+        <div className="max-w-[400px] rounded-sm bg-card p-10 text-center shadow-card">
+          <h1 className="text-[22px] font-bold tracking-[-0.02em]">This ad isn't available</h1>
+          <p className="mt-2 text-[14px] text-secondary-text">It may have been moved to the trash.</p>
+          <Button asChild variant="plain" className="mt-6">
+            <Link to="/">Back to Your Ads</Link>
           </Button>
         </div>
-      </div>
-    </main>
-  );
+      </main>
+    );
+  }
+  const { frames, ...project } = data;
+  return <ExportPage key={id} project={project} frames={frames} />;
 }
