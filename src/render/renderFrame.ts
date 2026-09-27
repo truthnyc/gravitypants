@@ -540,7 +540,7 @@ function drawEndCard(
   const lineH = fontPx * 1.25;
   const family = brand?.font || DEFAULT_FONT;
   ctx.font = `600 ${fontPx}px "${family}", sans-serif`;
-  const lines = cta ? wrapLines(ctx, cta, W * 0.84) : [];
+  const lines = cta ? wrap(ctx, cta, W * 0.84) : [];
   const gap = logoH && lines.length ? H * 0.04 : 0;
   const blockH = logoH + gap + lines.length * lineH;
   let y = (H - blockH) / 2;
@@ -553,22 +553,6 @@ function drawEndCard(
   ctx.textAlign = "center";
   ctx.textBaseline = "alphabetic";
   lines.forEach((line, i) => ctx.fillText(line, W / 2, y + i * lineH + lineH * 0.5 + fontPx * 0.35));
-}
-
-function wrapLines(ctx: CanvasRenderingContext2D, text: string, maxW: number) {
-  const out: string[] = [];
-  for (const para of text.split("\n")) {
-    let cur = "";
-    for (const word of para.split(/\s+/).filter(Boolean)) {
-      const next = cur ? `${cur} ${word}` : word;
-      if (cur && ctx.measureText(next).width > maxW) {
-        out.push(cur);
-        cur = word;
-      } else cur = next;
-    }
-    out.push(cur);
-  }
-  return out;
 }
 
 /* ------------------------------------------------------------ preparation */
