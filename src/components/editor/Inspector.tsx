@@ -3,6 +3,7 @@ import type { EditorDoc } from "@/lib/stillframe/data";
 import {
   TEXT_COLORS,
   TEXT_FONTS,
+  weightsForFont,
   formatSeconds,
   type Format,
   type Frame,
