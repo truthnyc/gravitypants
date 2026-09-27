@@ -31,7 +31,7 @@ export function FrameThumb({
   useEffect(() => {
     const ctx = ref.current?.getContext("2d");
     if (!ctx) return;
-    renderAt(ctx, doc.project, doc.frames, format, restTime(doc.frames, index) + 0.4, {
+    renderAt(ctx, doc.project, doc.frames, format, restTime(doc.frames, index), {
       width: w,
       height: h,
       images,
