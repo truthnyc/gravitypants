@@ -14,7 +14,176 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      assets: {
+        Row: {
+          created_at: string
+          height: number | null
+          id: string
+          kind: string
+          name: string | null
+          url: string
+          width: number | null
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          height?: number | null
+          id?: string
+          kind?: string
+          name?: string | null
+          url: string
+          width?: number | null
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          height?: number | null
+          id?: string
+          kind?: string
+          name?: string | null
+          url?: string
+          width?: number | null
+          workspace_id?: string
+        }
+        Relationships: []
+      }
+      brand_kit: {
+        Row: {
+          body_font: string | null
+          colors: string[]
+          created_at: string
+          default_logo_positions: Json
+          end_card: Json
+          headline_font: string | null
+          id: string
+          logos: Json
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          body_font?: string | null
+          colors?: string[]
+          created_at?: string
+          default_logo_positions?: Json
+          end_card?: Json
+          headline_font?: string | null
+          id?: string
+          logos?: Json
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          body_font?: string | null
+          colors?: string[]
+          created_at?: string
+          default_logo_positions?: Json
+          end_card?: Json
+          headline_font?: string | null
+          id?: string
+          logos?: Json
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: []
+      }
+      frames: {
+        Row: {
+          created_at: string
+          duration_sec: number
+          headline: Json | null
+          id: string
+          logo_visible: boolean
+          photo: Json
+          project_id: string
+          sort_order: number
+          subline: Json | null
+          transition_in: Json
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          duration_sec?: number
+          headline?: Json | null
+          id?: string
+          logo_visible?: boolean
+          photo?: Json
+          project_id: string
+          sort_order?: number
+          subline?: Json | null
+          transition_in?: Json
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          duration_sec?: number
+          headline?: Json | null
+          id?: string
+          logo_visible?: boolean
+          photo?: Json
+          project_id?: string
+          sort_order?: number
+          subline?: Json | null
+          transition_in?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "frames_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      projects: {
+        Row: {
+          created_at: string
+          deleted_at: string | null
+          end_card: Json
+          formats: string[]
+          id: string
+          is_template: boolean
+          logo: Json
+          name: string
+          pace: string
+          primary_format: string
+          thumbnail_url: string | null
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          deleted_at?: string | null
+          end_card?: Json
+          formats?: string[]
+          id?: string
+          is_template?: boolean
+          logo?: Json
+          name?: string
+          pace?: string
+          primary_format?: string
+          thumbnail_url?: string | null
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          deleted_at?: string | null
+          end_card?: Json
+          formats?: string[]
+          id?: string
+          is_template?: boolean
+          logo?: Json
+          name?: string
+          pace?: string
+          primary_format?: string
+          thumbnail_url?: string | null
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
