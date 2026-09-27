@@ -3,7 +3,8 @@ import * as React from 'react'
 import { Img, Section, Text } from '@react-email/components'
 
 // Gravity Pants brand header shared by every email: blue play-mark icon + wordmark.
-export const LOGO_URL = 'https://gravitypants.com/apple-touch-icon.png'
+export const LOGO_URL =
+  'https://gravitypants.com/__l5e/assets-v1/b2707cba-ba3d-470b-9199-35ebb4d1df74/gravity-pants-icon.png'
 
 export function EmailHeader() {
   return (
