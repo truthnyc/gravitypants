@@ -9,24 +9,14 @@ export const LOGO_URL =
 export function EmailHeader() {
   return (
     <Section style={header}>
-      <table role="presentation" cellPadding={0} cellSpacing={0} style={{ margin: '0 auto' }}>
-        <tbody>
-          <tr>
-            <td style={{ verticalAlign: 'middle' }}>
-              <Img src={LOGO_URL} alt="Gravity Pants" width={28} height={28} style={logoImg} />
-            </td>
-            <td style={{ verticalAlign: 'middle', paddingLeft: '10px' }}>
-              <Text style={wordmark}>Gravity Pants</Text>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <Img src={LOGO_URL} alt="Gravity Pants" width={44} height={44} style={logoImg} />
+      <Text style={wordmark}>Gravity Pants</Text>
     </Section>
   )
 }
 
 const header = { padding: '0 0 24px', textAlign: 'center' as const }
-const logoImg = { display: 'block', borderRadius: '7px' }
+const logoImg = { display: 'block', margin: '0 auto 10px', borderRadius: '11px' }
 const wordmark = {
   fontSize: '16px',
   fontWeight: 600 as const,
