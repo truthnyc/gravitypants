@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { Play, Search } from "lucide-react";
+import { Search } from "lucide-react";
+import logo from "@/assets/gravity-pants-logo.png";
 import { cn } from "@/lib/utils";
 import { useSearch } from "./search-context";
 import { UserMenu } from "./UserMenu";
@@ -17,9 +18,7 @@ export function AppHeader() {
     <header className="sticky top-0 z-30 h-[60px] bg-card/90 backdrop-blur-xl hairline-b">
       <div className="mx-auto flex h-full items-center gap-6 px-6">
         <Link to="/" className="flex items-center gap-2.5 rounded-lg" aria-label="Gravity Pants home">
-          <span className="flex h-[26px] w-[26px] items-center justify-center rounded-lg bg-foreground">
-            <Play size={13} strokeWidth={1.7} className="text-card" fill="currentColor" />
-          </span>
+          <img src={logo} alt="" width={26} height={26} className="h-[26px] w-[26px]" />
           <span className="text-[16px] font-semibold tracking-[-0.01em]">Gravity Pants</span>
         </Link>
 
