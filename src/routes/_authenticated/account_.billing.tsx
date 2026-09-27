@@ -1,6 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
-import { toast } from "sonner";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { AccountTabs } from "@/components/billing/AccountTabs";
@@ -29,11 +28,12 @@ function BillingPage() {
   const { data: plans } = usePlans();
   const manage = useManageBilling();
   const refresh = useRefreshBilling();
+  const [thanks, setThanks] = useState(false);
 
   // After paying, the plan arrives a moment later — check a few times.
   useEffect(() => {
     if (checkout !== "success") return;
-    toast.success("Thanks — your plan is ready.");
+    setThanks(true);
     void navigate({ to: "/account/billing", search: {}, replace: true });
     let n = 0;
     const t = setInterval(() => {
@@ -52,6 +52,19 @@ function BillingPage() {
     <main className="mx-auto flex max-w-[640px] flex-col gap-5 px-8 py-10">
       <h1 className="text-[28px] font-bold tracking-[-0.02em]">Account</h1>
       <AccountTabs />
+
+      {thanks && (
+        <section role="status" className="rounded-sm bg-card p-6 shadow-card">
+          <h2 className="text-[17px] font-semibold">Thank you for choosing Stillframe</h2>
+          <p className="mt-1 text-[14px] text-secondary-text">
+            Your plan is active and exporting is unlocked. A receipt is on its way to your inbox.
+          </p>
+          <div className="mt-4 flex gap-2">
+            <Button asChild><Link to="/">Go to Your Ads</Link></Button>
+            <Button variant="plain" onClick={() => setThanks(false)}>Close</Button>
+          </div>
+        </section>
+      )}
 
       <section className="rounded-sm bg-card p-6 shadow-card">
         <div className="flex items-baseline justify-between">
