@@ -22,5 +22,7 @@
 - Font loading for canvas goes through `loadFont()` in `src/lib/stillframe/fonts.ts` (css2 per weight, uploaded fonts via FontFace) so `ensureFonts` never renders with a fallback.
 - Slider drags use undo keys prefixed `drag:` which coalesce regardless of time, so one drag = one undo step.
 - Export runs in the browser (`src/render/exportMedia.ts`): MP4 via WebCodecs + Mediabunny with ffmpeg.wasm (lazy, from CDN) as fallback, GIF via ffmpeg.wasm two-pass palette — no server rendering, so output always matches renderAt.
-- Finished exports are uploaded to the private media bucket at `exports/<project-id>/<timestamp>/<file>` (bucket limit raised to 500MB for GIFs) and listed from storage, not a table.
+- Finished exports are uploaded to the private media bucket at `<workspace_id>/exports/<project-id>/<timestamp>/<file>` (bucket limit raised to 500MB for GIFs) and listed from storage, not a table.
 - Export: finished files are kept 30 days; daily 03:00 UTC cleanup via /api/public/cleanup-exports (only removes expired files, so no caller secret).
+- Accounts: app routes live under `src/routes/_authenticated/` (ssr:false gate → /signin?redirect=); the gate calls RPC `ensure_workspace()` and stores the id via `setWorkspaceId` in `src/lib/stillframe/workspace.ts` — data code reads `getWorkspaceId()`, never a constant, so each user only touches their workspace.
+- Privacy: RLS on every table via `is_workspace_member()`; media files live under `<workspace_id>/…` (exports at `<workspace_id>/exports/<project>/<stamp>/`) and storage policies check the first folder.
