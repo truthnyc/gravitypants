@@ -1,24 +1,25 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import { Editor } from "@/components/editor/Editor";
+import { ExportPage } from "@/components/export/ExportPage";
 import { useProject } from "@/lib/stillframe/data";
 
-export const Route = createFileRoute("/ad/$id/edit")({
+export const Route = createFileRoute("/_authenticated/ad/$id/export")({
   head: () => ({
     meta: [
-      { title: "Edit ad — Stillframe" },
-      { name: "description", content: "Edit photos, text, timing and transitions for your ad." },
-      { property: "og:title", content: "Edit ad — Stillframe" },
-      { property: "og:description", content: "Edit photos, text, timing and transitions." },
+      { title: "Export ad — Stillframe" },
+      { name: "description", content: "Save your ad as MP4 videos and animated GIFs for every social channel." },
+      { property: "og:title", content: "Export ad — Stillframe" },
+      { property: "og:description", content: "Save your ad as MP4 videos and animated GIFs for every channel." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: EditPage,
+  component: ExportRoute,
 });
 
-function EditPage() {
+function ExportRoute() {
   const { id } = Route.useParams();
   const { data, isLoading } = useProject(id);
-
   if (isLoading) return <div className="h-screen bg-canvas" aria-busy="true" />;
   if (!data || !data.frames.length) {
     return (
@@ -34,5 +35,5 @@ function EditPage() {
     );
   }
   const { frames, ...project } = data;
-  return <Editor key={id} initial={{ project, frames }} />;
+  return <ExportPage key={id} project={project} frames={frames} />;
 }

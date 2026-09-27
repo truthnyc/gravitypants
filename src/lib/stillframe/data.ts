@@ -1,9 +1,10 @@
+import { getWorkspaceId } from "./workspace";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { uploadMedia, type UploadedPhoto } from "./media";
 import {
   DEFAULT_LOGO,
-  WORKSPACE_ID,
+  
   PACE_SECONDS,
   type BrandKit,
   type Frame,
@@ -62,7 +63,7 @@ export function useProjects() {
       const { data, error } = await supabase
         .from("projects")
         .select(`${PROJECT_COLUMNS}, frames(*)`)
-        .eq("workspace_id", WORKSPACE_ID)
+        .eq("workspace_id", getWorkspaceId())
         .is("deleted_at", null)
         .order("updated_at", { ascending: false });
       if (error) throw error;
@@ -188,7 +189,7 @@ export function useCreateAdFromPhotos() {
       const { data: project, error } = await supabase
         .from("projects")
         .insert({
-          workspace_id: WORKSPACE_ID,
+          workspace_id: getWorkspaceId(),
           name: "Untitled ad",
           primary_format: "9:16",
           formats: ["9:16"],
@@ -224,7 +225,7 @@ async function insertCopy(source: ProjectWithFrames, name: string, photos?: Uplo
   const { data: project, error } = await supabase
     .from("projects")
     .insert({
-      workspace_id: WORKSPACE_ID,
+      workspace_id: getWorkspaceId(),
       name,
       primary_format: source.primary_format,
       formats: source.formats,
@@ -347,7 +348,7 @@ export async function saveEditorDoc(prev: EditorDoc, next: EditorDoc) {
 
 /* ---------------- Brand Kit */
 
-export const brandKitKey = ["brand-kit", WORKSPACE_ID] as const;
+export const brandKitKey = ["brand-kit", ] as const;
 
 function normalizeBrandKit(row: Record<string, unknown>): BrandKit {
   return {
@@ -362,12 +363,12 @@ function normalizeBrandKit(row: Record<string, unknown>): BrandKit {
 }
 
 export async function fetchBrandKit(): Promise<BrandKit | null> {
-  const { data, error } = await supabase.from("brand_kit").select("*").eq("workspace_id", WORKSPACE_ID).maybeSingle();
+  const { data, error } = await supabase.from("brand_kit").select("*").eq("workspace_id", getWorkspaceId()).maybeSingle();
   if (error) throw error;
   if (data) return normalizeBrandKit(data as Record<string, unknown>);
   const { data: created, error: e2 } = await supabase
     .from("brand_kit")
-    .insert({ workspace_id: WORKSPACE_ID })
+    .insert({ workspace_id: getWorkspaceId() })
     .select("*")
     .single();
   if (e2) throw e2;
@@ -386,7 +387,7 @@ export function useUpdateBrandKit() {
       const { error } = await supabase
         .from("brand_kit")
         .update(patch as never)
-        .eq("workspace_id", WORKSPACE_ID);
+        .eq("workspace_id", getWorkspaceId());
       if (error) throw error;
     },
     onMutate: (patch) => {
