@@ -16,8 +16,11 @@ import { Route as SigninRouteImport } from './routes/signin'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
+import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedBrandRouteImport } from './routes/_authenticated/brand'
 import { Route as AuthenticatedAccountBillingRouteImport } from './routes/_authenticated/account_.billing'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
+import { Route as AuthenticatedAdminClientsRouteImport } from './routes/_authenticated/admin/clients'
 import { Route as ApiPublicCleanupExportsRouteImport } from './routes/api/public/cleanup-exports'
 import { Route as AuthenticatedAdIdEditRouteImport } from './routes/_authenticated/ad.$id.edit'
 import { Route as AuthenticatedAdIdExportRouteImport } from './routes/_authenticated/ad.$id.export'
@@ -60,6 +63,11 @@ const AuthenticatedAccountRoute = AuthenticatedAccountRouteImport.update({
   path: '/account',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedBrandRoute = AuthenticatedBrandRouteImport.update({
   id: '/brand',
   path: '/brand',
@@ -70,6 +78,17 @@ const AuthenticatedAccountBillingRoute =
     id: '/account_/billing',
     path: '/account/billing',
     getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
+const AuthenticatedAdminClientsRoute =
+  AuthenticatedAdminClientsRouteImport.update({
+    id: '/clients',
+    path: '/clients',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
 const ApiPublicCleanupExportsRoute = ApiPublicCleanupExportsRouteImport.update({
   id: '/api/public/cleanup-exports',
@@ -115,10 +134,13 @@ export interface FileRoutesByFullPath {
   '/reset': typeof ResetRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
+  '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/account': typeof AuthenticatedAccountRoute
   '/brand': typeof AuthenticatedBrandRoute
   '/account/billing': typeof AuthenticatedAccountBillingRoute
+  '/admin/clients': typeof AuthenticatedAdminClientsRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
+  '/admin/': typeof AuthenticatedAdminIndexRoute
   '/ad/$id/edit': typeof AuthenticatedAdIdEditRoute
   '/ad/$id/export': typeof AuthenticatedAdIdExportRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -135,7 +157,9 @@ export interface FileRoutesByTo {
   '/brand': typeof AuthenticatedBrandRoute
   '/': typeof AuthenticatedIndexRoute
   '/account/billing': typeof AuthenticatedAccountBillingRoute
+  '/admin/clients': typeof AuthenticatedAdminClientsRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
+  '/admin': typeof AuthenticatedAdminIndexRoute
   '/ad/$id/edit': typeof AuthenticatedAdIdEditRoute
   '/ad/$id/export': typeof AuthenticatedAdIdExportRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -150,11 +174,14 @@ export interface FileRoutesById {
   '/reset': typeof ResetRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/_authenticated/brand': typeof AuthenticatedBrandRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/account_/billing': typeof AuthenticatedAccountBillingRoute
+  '/_authenticated/admin/clients': typeof AuthenticatedAdminClientsRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/ad/$id/edit': typeof AuthenticatedAdIdEditRoute
   '/_authenticated/ad/$id/export': typeof AuthenticatedAdIdExportRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -170,10 +197,13 @@ export interface FileRouteTypes {
     | '/reset'
     | '/signin'
     | '/signup'
+    | '/admin'
     | '/account'
     | '/brand'
     | '/account/billing'
+    | '/admin/clients'
     | '/api/public/cleanup-exports'
+    | '/admin/'
     | '/ad/$id/edit'
     | '/ad/$id/export'
     | '/api/public/payments/webhook'
@@ -190,7 +220,9 @@ export interface FileRouteTypes {
     | '/brand'
     | '/'
     | '/account/billing'
+    | '/admin/clients'
     | '/api/public/cleanup-exports'
+    | '/admin'
     | '/ad/$id/edit'
     | '/ad/$id/export'
     | '/api/public/payments/webhook'
@@ -204,11 +236,14 @@ export interface FileRouteTypes {
     | '/reset'
     | '/signin'
     | '/signup'
+    | '/_authenticated/admin'
     | '/_authenticated/account'
     | '/_authenticated/brand'
     | '/_authenticated/'
     | '/_authenticated/account_/billing'
+    | '/_authenticated/admin/clients'
     | '/api/public/cleanup-exports'
+    | '/_authenticated/admin/'
     | '/_authenticated/ad/$id/edit'
     | '/_authenticated/ad/$id/export'
     | '/api/public/payments/webhook'
@@ -281,6 +316,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAccountRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/brand': {
       id: '/_authenticated/brand'
       path: '/brand'
@@ -294,6 +336,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/account/billing'
       preLoaderRoute: typeof AuthenticatedAccountBillingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/clients': {
+      id: '/_authenticated/admin/clients'
+      path: '/clients'
+      fullPath: '/admin/clients'
+      preLoaderRoute: typeof AuthenticatedAdminClientsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
     }
     '/api/public/cleanup-exports': {
       id: '/api/public/cleanup-exports'
@@ -347,7 +403,24 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedAdminRouteRouteChildren {
+  AuthenticatedAdminClientsRoute: typeof AuthenticatedAdminClientsRoute
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+}
+
+const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
+  {
+    AuthenticatedAdminClientsRoute: AuthenticatedAdminClientsRoute,
+    AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+  }
+
+const AuthenticatedAdminRouteRouteWithChildren =
+  AuthenticatedAdminRouteRoute._addFileChildren(
+    AuthenticatedAdminRouteRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRouteWithChildren
   AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
   AuthenticatedBrandRoute: typeof AuthenticatedBrandRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
@@ -357,6 +430,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRouteRoute: AuthenticatedAdminRouteRouteWithChildren,
   AuthenticatedAccountRoute: AuthenticatedAccountRoute,
   AuthenticatedBrandRoute: AuthenticatedBrandRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
