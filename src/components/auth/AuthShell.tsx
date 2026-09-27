@@ -20,6 +20,7 @@ export function AuthShell({ title, subtitle, children }: { title: string; subtit
       <div className="w-full max-w-[380px]">
         <div className="flex flex-col items-center text-center">
           <GravityPantsLogo size={56} />
+          <p className="mt-3 text-[16px] font-semibold tracking-[-0.01em]">Gravity Pants</p>
           <h1 className="mt-6 text-[32px] font-bold tracking-[-0.02em]">{title}</h1>
           <p className="mt-1 text-[15px] text-secondary-text">{subtitle}</p>
         </div>
