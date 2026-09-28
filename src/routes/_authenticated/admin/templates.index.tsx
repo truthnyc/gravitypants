@@ -187,7 +187,6 @@ function AdminTemplates() {
                   <td className={cn("px-3", archived && "opacity-50")}>
                     <div className="flex items-center gap-2">
                       <Link to="/admin/templates/$id/edit" params={{ id: r.id }} className="text-[14px] font-semibold hover:underline">{r.name}</Link>
-                      {r.is_reusable && <span className="inline-flex h-5 items-center rounded-full bg-primary/10 px-2 text-[11px] font-semibold text-primary">Reusable</span>}
                       {r.draft && r.status === "published" && <span className="inline-flex h-5 items-center rounded-full bg-warning-soft px-2 text-[11px] font-semibold text-warning-text">Unpublished edits</span>}
                     </div>
                     <p className="mt-0.5 text-[12px] text-secondary-text">/{r.slug} · {r.version > 0 && r.status !== "draft" ? `v${r.version}` : r.version > 0 ? `v${r.version} · unpublished` : "not published"}</p>
