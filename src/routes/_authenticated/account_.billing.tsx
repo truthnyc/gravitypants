@@ -82,18 +82,27 @@ function BillingPage() {
           </p>
         )}
 
-        {limited && status && (
+        {billing && (
+          <dl className="mt-5 grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-[14px]">
+            <dt className="text-secondary-text">Plan</dt>
+            <dd className="font-medium">{paid ? planName(billing.plan) : "Free trial"}</dd>
+            <dt className="text-secondary-text">{paid ? (billing.cancel_at_period_end || billing.status === "canceled" ? "Ends on" : "Renews on") : "Trial ends"}</dt>
+            <dd className="nums">{longDate(paid ? billing.current_period_end : billing.trial_ends_at)}</dd>
+            <dt className="text-secondary-text">Exports left</dt>
+            <dd className="nums">{exportsLeft(status)}</dd>
+          </dl>
+        )}
+
+        {status?.limit != null && (
           <div className="mt-5">
             <p className="text-[14px] nums">
-              {status.used} of {status.limit} exports used this month
+              {status.used ?? 0} of {status.limit} exports used {limited ? "this month" : "in your trial"}
             </p>
             <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-control-fill">
               <div className="h-full rounded-full bg-primary" style={{ width: `${Math.min(100, ((status.used ?? 0) / (status.limit || 1)) * 100)}%` }} />
             </div>
-            {status.resets_at && (
-              <p className="mt-1.5 text-[12px] text-secondary-text nums">
-                Resets on {new Date(status.resets_at).toLocaleDateString(undefined, { day: "numeric", month: "short" })}
-              </p>
+            {limited && status.resets_at && (
+              <p className="mt-1.5 text-[12px] text-secondary-text nums">Resets on {longDate(status.resets_at)}</p>
             )}
           </div>
         )}
