@@ -424,13 +424,21 @@ export const paceSeconds = PACE_SECONDS;
 export const brandKitsKey = ["brand-kits"] as const;
 
 export async function fetchBrandKits(): Promise<NamedBrandKit[]> {
+  const ws = getWorkspaceId();
+  // Kits are shared across every workspace the same owner has.
+  const { data: ids } = await supabase.rpc("kit_workspaces" as never, { _ws: ws } as never);
+  const list = ((ids as unknown as string[] | null) ?? []).length ? (ids as unknown as string[]) : [ws];
   const { data, error } = await supabase
     .from("brand_kits")
     .select("*")
-    .eq("workspace_id", getWorkspaceId())
+    .in("workspace_id", list)
     .order("created_at", { ascending: true });
   if (error) throw error;
-  return (data ?? []).map((r) => ({ ...(r as unknown as NamedBrandKit), colors: (r.colors as string[]) ?? [] }));
+  return (data ?? []).map((r) => ({
+    ...(r as unknown as NamedBrandKit),
+    is_default: r.workspace_id === ws && r.is_default,
+    colors: (r.colors as string[]) ?? [],
+  }));
 }
 
 async function fetchDefaultKit(): Promise<NamedBrandKit | null> {
