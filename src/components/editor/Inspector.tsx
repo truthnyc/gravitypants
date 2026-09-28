@@ -319,6 +319,12 @@ const MOVEMENTS: { value: NonNullable<PhotoSettings["movement"]>; label: string 
   { value: "slow_zoom_out", label: "Slow zoom out" },
   { value: "pan_left", label: "Pan left" },
   { value: "pan_right", label: "Pan right" },
+  { value: "custom", label: "Custom" },
+];
+const INTENSITIES: { value: NonNullable<PhotoSettings["movement_intensity"]>; label: string }[] = [
+  { value: "subtle", label: "Subtle" },
+  { value: "standard", label: "Standard" },
+  { value: "dramatic", label: "Dramatic" },
 ];
 const BG_COLORS = ["#000000", "#1D1D1F", "#FFFFFF", "#F1F3F0"];
 
