@@ -95,7 +95,7 @@ const VISIBILITY_LABEL: Record<Template["visibility"], string> = {
   global: "Ready-made for everyone",
 };
 
-function Group({ title, note, list, empty, canEdit, showShare, options, onDelete }: { title: string; note?: string; list: Template[]; empty: string; canEdit: (t: Template) => boolean; showShare: boolean; options?: readonly Template["visibility"][]; onDelete: (t: Template) => void }) {
+function Group({ title, note, list, empty, canEdit, showShare, options = ["private", "team"], onDelete }: { title: string; note?: string; list: Template[]; empty: string; canEdit: (t: Template) => boolean; showShare: boolean; options?: readonly Template["visibility"][]; onDelete: (t: Template) => void }) {
   return (
     <section>
       <h2 className="text-[17px] font-semibold">{title}</h2>
