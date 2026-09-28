@@ -68,6 +68,7 @@ function TemplatesPage() {
               empty="No ready-made templates yet."
               canEdit={() => isStaff}
               showShare={isStaff}
+              options={["private", "team", "global"]}
               onDelete={setDeleting}
             />
           )}
