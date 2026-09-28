@@ -605,7 +605,6 @@ html:has(.features-page) { scroll-behavior: smooth; }
 .pr-tier li { display:flex; align-items:flex-start; gap:10px; font-size:15px; line-height:1.35; }
 .pr-tick { width:18px; height:18px; color:var(--site-primary); flex-shrink:0; display:inline-block; }
 .pr-no { color:var(--site-muted); }
-.pr-badge { position:absolute; top:-14px; left:36px; height:28px; padding:0 12px; border-radius:14px; background:var(--site-primary); color:var(--site-on-primary); font-size:13px; font-weight:600; display:flex; align-items:center; }
 .pr-fine { text-align:center; font-size:14px; color:var(--site-muted); }
 .pr-fine a, .pr-faq-head a { color:var(--site-primary); }
 .pr-compare { padding-top:120px; display:flex; flex-direction:column; gap:32px; }
