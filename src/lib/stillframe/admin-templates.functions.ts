@@ -104,7 +104,7 @@ export const adminTemplateCreate = createServerFn({ method: "POST" })
     };
     const { data: row, error } = await db
       .from("templates")
-      .insert({ ...live(doc), source: "system", workspace_id: null, created_by: null, visibility: "global", status: "draft", version: 0, sort_order: (last?.sort_order ?? 0) + 1 })
+      .insert({ ...live(doc), source: "system", workspace_id: null, created_by: null, updated_by: ctx.userId, visibility: "global", status: "draft", version: 0, sort_order: (last?.sort_order ?? 0) + 1 })
       .select("id")
       .single();
     if (error) throw friendly(error);
@@ -123,7 +123,7 @@ export const adminTemplateSave = createServerFn({ method: "POST" })
     const doc = data.doc as TemplateDoc;
     // Published templates keep serving the live version; edits wait in `draft` until Publish.
     const patch = row.status === "published" ? { draft: { ...doc, slug: slugify(doc.slug || doc.name) }, updated_at: new Date().toISOString() } : { ...live(doc), draft: null };
-    const { error } = await db.from("templates").update(patch).eq("id", data.id);
+    const { error } = await db.from("templates").update({ ...patch, updated_by: ctx.userId }).eq("id", data.id);
     if (error) throw friendly(error);
     await log(db, ctx.userId, "template_save_draft", doc.slug);
     return { ok: true };
@@ -146,6 +146,7 @@ export const adminTemplatePublish = createServerFn({ method: "POST" })
       .update({
         ...live(doc),
         draft: null,
+        updated_by: ctx.userId,
         status: "published",
         version: (row.version ?? 0) + 1,
         published_at: now.toISOString(),
@@ -160,25 +161,33 @@ export const adminTemplatePublish = createServerFn({ method: "POST" })
 
 export const adminTemplateAction = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d) => z.object({ id: z.string().uuid(), action: z.enum(["duplicate", "unpublish", "archive", "restore", "feature", "unfeature", "delete"]) }).parse(d))
+  .inputValidator((d) => z.object({ id: z.string().uuid(), action: z.enum(["duplicate", "publish", "unpublish", "archive", "restore", "feature", "unfeature", "delete"]) }).parse(d))
   .handler(async ({ data, context }) => {
     const ctx = context as any as Ctx;
     const db = await adminDb(ctx);
     const { data: row } = await db.from("templates").select("*").eq("id", data.id).eq("source", "system").maybeSingle();
     if (!row) throw new Error("That template doesn't exist.");
     let result: { id?: string } = {};
+    const by = { updated_by: ctx.userId, updated_at: new Date().toISOString() };
     if (data.action === "duplicate") {
       const { id: _id, created_at: _c, draft, ...rest } = row;
       const src = draft ? { ...rest, ...live(draft) } : rest;
       const { data: copy, error } = await db
         .from("templates")
-        .insert({ ...src, name: `${src.name} copy`, slug: `${src.slug}-copy-${crypto.randomUUID().slice(0, 4)}`, status: "draft", version: 0, featured: false, published_at: null, new_until: null, draft: null, sort_order: row.sort_order + 1 })
+        .insert({ ...src, ...by, name: `${src.name} copy`, slug: `${src.slug}-copy-${crypto.randomUUID().slice(0, 4)}`, status: "draft", version: 0, featured: false, published_at: null, new_until: null, draft: null, sort_order: row.sort_order + 1 })
         .select("id")
         .single();
       if (error) throw friendly(error);
       result = { id: copy.id };
+    } else if (data.action === "publish") {
+      if (!(row.slides as unknown[] | null)?.length) throw new Error("Add at least one slide first.");
+      const { error } = await db.from("templates").update({
+        ...(row.draft ? live(row.draft) : {}), ...by, draft: null, status: "published",
+        version: (row.version ?? 0) + 1, published_at: new Date().toISOString(),
+      }).eq("id", data.id);
+      if (error) throw friendly(error);
     } else if (data.action === "delete") {
-      if (row.status === "published") throw new Error("Unpublish or archive it first.");
+      if (row.status !== "draft" || row.published_at || (row.version ?? 0) > 0) throw new Error("Only drafts that were never published can be deleted. Archive it instead.");
       const { count } = await db.from("projects").select("id", { count: "exact", head: true }).eq("template_id", data.id);
       if ((count ?? 0) > 0) throw new Error("Ads were made from this template. Archive it instead.");
       await db.from("templates").delete().eq("id", data.id);
@@ -188,7 +197,7 @@ export const adminTemplateAction = createServerFn({ method: "POST" })
         : data.action === "archive" ? { status: "archived", featured: false }
         : data.action === "restore" ? { status: "draft" }
         : { featured: data.action === "feature" };
-      await db.from("templates").update(patch).eq("id", data.id);
+      await db.from("templates").update({ ...patch, ...by }).eq("id", data.id);
     }
     await log(db, ctx.userId, `template_${data.action}`, row.slug);
     return result;

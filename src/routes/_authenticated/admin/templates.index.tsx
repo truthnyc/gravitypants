@@ -222,13 +222,17 @@ function AdminTemplates() {
                         <DropdownMenuItem onSelect={() => void run(r.id, "duplicate", "Duplicated as a draft")}><Copy className="size-4" strokeWidth={1.7} /> Duplicate</DropdownMenuItem>
                         {r.status === "published" && <DropdownMenuItem onSelect={() => void navigate({ to: "/app/templates/$slug", params: { slug: r.slug } })}><Play className="size-4" strokeWidth={1.7} /> Preview</DropdownMenuItem>}
                         <DropdownMenuSeparator />
-                        {r.status === "published" && <DropdownMenuItem onSelect={() => void run(r.id, "unpublish", "Unpublished")}><EyeOff className="size-4" strokeWidth={1.7} /> Unpublish</DropdownMenuItem>}
+                        {r.status === "published" ? (
+                          <DropdownMenuItem onSelect={() => void run(r.id, "unpublish", "Unpublished")}><EyeOff className="size-4" strokeWidth={1.7} /> Unpublish</DropdownMenuItem>
+                        ) : r.status === "draft" ? (
+                          <DropdownMenuItem onSelect={() => { if (confirm(`Publish \u201c${r.name}\u201d for ${r.audience?.length ? audienceLabel(r.audience) : "all users"}?`)) void run(r.id, "publish", "Published"); }}><Eye className="size-4" strokeWidth={1.7} /> Publish</DropdownMenuItem>
+                        ) : null}
                         {r.status !== "archived" ? (
                           <DropdownMenuItem onSelect={() => void run(r.id, "archive", "Archived")}><Archive className="size-4" strokeWidth={1.7} /> Archive</DropdownMenuItem>
                         ) : (
                           <DropdownMenuItem onSelect={() => void run(r.id, "restore", "Restored as a draft")}><RotateCcw className="size-4" strokeWidth={1.7} /> Restore</DropdownMenuItem>
                         )}
-                        {r.status !== "published" && (
+                        {r.status === "draft" && !r.version && !r.published_at && (
                           <DropdownMenuItem className="text-destructive" onSelect={() => { if (confirm(`Delete \u201c${r.name}\u201d? This can't be undone.`)) void run(r.id, "delete", "Deleted"); }}>
                             <Trash2 className="size-4" strokeWidth={1.7} /> Delete
                           </DropdownMenuItem>
