@@ -19,6 +19,7 @@ import type { ProjectWithFrames } from "@/lib/stillframe/types";
 import { templateForExample } from "@/lib/site/example-template";
 import { isAcceptedImage, uploadMedia } from "@/lib/stillframe/media";
 import { cn } from "@/lib/utils";
+import { openUpgrade, usePlanAccess } from "@/lib/stillframe/plan";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 
 export const Route = createFileRoute("/_authenticated/app/templates/$slug")({
@@ -49,6 +50,7 @@ function Customize() {
   const { from } = Route.useSearch();
   const { data: fromAd, isLoading: fromLoading } = useProject(from);
   const { data: templates = [], isLoading } = useTemplates();
+  const plan = usePlanAccess();
   const example = slug.startsWith("example-") ? templateForExample(slug.slice(8)) : null;
   const t: Template | null = templates.find((x) => x.slug === slug || x.id === slug) ?? example;
 
@@ -59,6 +61,18 @@ function Customize() {
         <h1 className="text-[22px] font-bold">That template isn't available</h1>
         <p className="mt-1 text-[14px] text-secondary-text">It may have been deleted or isn't shared with this workspace.</p>
         <Link to="/app/templates" className="mt-4 inline-flex h-11 items-center rounded-lg bg-control-fill px-4 text-[14px] font-medium">See all templates</Link>
+      </main>
+    );
+  }
+  if (t.source === "system" && !plan.canUseTemplate(t.audience)) {
+    return (
+      <main className="mx-auto max-w-[720px] px-4 py-10 sm:px-8">
+        <h1 className="text-[22px] font-bold">{t.name} comes with a paid plan</h1>
+        <p className="mt-1 text-[14px] text-secondary-text">Upgrade to use this template for your ads.</p>
+        <div className="mt-4 flex gap-2">
+          <Button onClick={() => openUpgrade("templates")}>See plans</Button>
+          <Link to="/app/templates" className="inline-flex h-10 items-center rounded-lg bg-control-fill px-4 text-[14px] font-medium">See all templates</Link>
+        </div>
       </main>
     );
   }

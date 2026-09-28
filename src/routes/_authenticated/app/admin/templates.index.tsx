@@ -220,7 +220,7 @@ function AdminTemplates() {
                       <DropdownMenuContent align="end" className="w-44">
                         <DropdownMenuItem onSelect={() => void navigate({ to: "/app/admin/templates/$id", params: { id: r.id } })}><Pencil className="size-4" strokeWidth={1.7} /> Edit</DropdownMenuItem>
                         <DropdownMenuItem onSelect={() => void run(r.id, "duplicate", "Duplicated as a draft")}><Copy className="size-4" strokeWidth={1.7} /> Duplicate</DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => void navigate({ to: "/app/templates/$slug", params: { slug: r.slug } })}><Play className="size-4" strokeWidth={1.7} /> Preview</DropdownMenuItem>
+                        {r.status === "published" && <DropdownMenuItem onSelect={() => void navigate({ to: "/app/templates/$slug", params: { slug: r.slug } })}><Play className="size-4" strokeWidth={1.7} /> Preview</DropdownMenuItem>}
                         <DropdownMenuSeparator />
                         {r.status === "published" && <DropdownMenuItem onSelect={() => void run(r.id, "unpublish", "Unpublished")}><EyeOff className="size-4" strokeWidth={1.7} /> Unpublish</DropdownMenuItem>}
                         {r.status !== "archived" ? (
