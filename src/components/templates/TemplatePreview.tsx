@@ -45,7 +45,7 @@ export function usePrefersReducedMotion() {
 const RATIO: Record<Aspect, string> = { "9:16": "9 / 16", "1:1": "1 / 1", "16:9": "16 / 9" };
 
 /** Template thumbnail at its real aspect ratio; plays a looping slide preview while `playing`. */
-export function TemplatePreview({ template, playing, className }: { template: Template; playing: boolean; className?: string }) {
+export function TemplatePreview({ template, playing, className, quiet = false }: { template: Template; playing: boolean; className?: string; quiet?: boolean }) {
   const format = templateFormat(template);
   const slides = templateSlides(template);
   const bg = templateBackground(template);
@@ -81,7 +81,7 @@ export function TemplatePreview({ template, playing, className }: { template: Te
           </div>
         </div>
       )}
-      {!playing && (!thumb || thumb.startsWith("/")) && slides[0] && (
+      {!playing && !quiet && (!thumb || thumb.startsWith("/")) && slides[0] && (
         <div className="tpl-text absolute inset-0 flex flex-col items-center justify-center px-[8%] text-center">
           <p className="tpl-headline font-bold leading-[1.05]">{slides[0].headline_placeholder}</p>
         </div>
@@ -94,11 +94,11 @@ export const templateSlug = (t: Template) => t.slug ?? t.id;
 
 export function StepBar({ step }: { step: 1 | 2 }) {
   return (
-    <div className="flex items-center gap-3">
-      <span className="nums text-[13px] font-medium text-secondary-text">Step {step} of 2</span>
+    <div className="flex shrink-0 items-center gap-3">
       <div className="flex gap-1.5" aria-hidden="true">
-        {[1, 2].map((n) => <span key={n} className={cn("h-1 w-8 rounded-lg", n <= step ? "bg-primary" : "bg-control-fill")} />)}
+        {[1, 2].map((n) => <span key={n} className={cn("h-1 w-[22px] rounded-lg", n <= step ? "bg-primary" : "bg-control-fill")} />)}
       </div>
+      <span className="nums text-[13px] text-secondary-text">Step {step} of 2</span>
     </div>
   );
 }

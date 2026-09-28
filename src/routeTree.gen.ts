@@ -50,6 +50,8 @@ import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/l
 import { Route as AuthenticatedAppAdIdEditRouteImport } from './routes/_authenticated/app/ad.$id.edit'
 import { Route as AuthenticatedAppAdIdExportRouteImport } from './routes/_authenticated/app/ad.$id.export'
 import { Route as AuthenticatedAppAdminClientsIdRouteImport } from './routes/_authenticated/app/admin/clients_.$id'
+import { Route as AuthenticatedAppAdminTemplatesIndexRouteImport } from './routes/_authenticated/app/admin/templates.index'
+import { Route as AuthenticatedAppAdminTemplatesIdRouteImport } from './routes/_authenticated/app/admin/templates.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -270,6 +272,18 @@ const AuthenticatedAppAdminClientsIdRoute =
     path: '/clients/$id',
     getParentRoute: () => AuthenticatedAppAdminRouteRoute,
   } as any)
+const AuthenticatedAppAdminTemplatesIndexRoute =
+  AuthenticatedAppAdminTemplatesIndexRouteImport.update({
+    id: '/templates/',
+    path: '/templates/',
+    getParentRoute: () => AuthenticatedAppAdminRouteRoute,
+  } as any)
+const AuthenticatedAppAdminTemplatesIdRoute =
+  AuthenticatedAppAdminTemplatesIdRouteImport.update({
+    id: '/templates/$id',
+    path: '/templates/$id',
+    getParentRoute: () => AuthenticatedAppAdminRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -312,6 +326,8 @@ export interface FileRoutesByFullPath {
   '/app/ad/$id/edit': typeof AuthenticatedAppAdIdEditRoute
   '/app/ad/$id/export': typeof AuthenticatedAppAdIdExportRoute
   '/app/admin/clients/$id': typeof AuthenticatedAppAdminClientsIdRoute
+  '/app/admin/templates/$id': typeof AuthenticatedAppAdminTemplatesIdRoute
+  '/app/admin/templates/': typeof AuthenticatedAppAdminTemplatesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -351,6 +367,8 @@ export interface FileRoutesByTo {
   '/app/ad/$id/edit': typeof AuthenticatedAppAdIdEditRoute
   '/app/ad/$id/export': typeof AuthenticatedAppAdIdExportRoute
   '/app/admin/clients/$id': typeof AuthenticatedAppAdminClientsIdRoute
+  '/app/admin/templates/$id': typeof AuthenticatedAppAdminTemplatesIdRoute
+  '/app/admin/templates': typeof AuthenticatedAppAdminTemplatesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -395,6 +413,8 @@ export interface FileRoutesById {
   '/_authenticated/app/ad/$id/edit': typeof AuthenticatedAppAdIdEditRoute
   '/_authenticated/app/ad/$id/export': typeof AuthenticatedAppAdIdExportRoute
   '/_authenticated/app/admin/clients_/$id': typeof AuthenticatedAppAdminClientsIdRoute
+  '/_authenticated/app/admin/templates/$id': typeof AuthenticatedAppAdminTemplatesIdRoute
+  '/_authenticated/app/admin/templates/': typeof AuthenticatedAppAdminTemplatesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -439,6 +459,8 @@ export interface FileRouteTypes {
     | '/app/ad/$id/edit'
     | '/app/ad/$id/export'
     | '/app/admin/clients/$id'
+    | '/app/admin/templates/$id'
+    | '/app/admin/templates/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -478,6 +500,8 @@ export interface FileRouteTypes {
     | '/app/ad/$id/edit'
     | '/app/ad/$id/export'
     | '/app/admin/clients/$id'
+    | '/app/admin/templates/$id'
+    | '/app/admin/templates'
   id:
     | '__root__'
     | '/'
@@ -521,6 +545,8 @@ export interface FileRouteTypes {
     | '/_authenticated/app/ad/$id/edit'
     | '/_authenticated/app/ad/$id/export'
     | '/_authenticated/app/admin/clients_/$id'
+    | '/_authenticated/app/admin/templates/$id'
+    | '/_authenticated/app/admin/templates/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -835,6 +861,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppAdminClientsIdRouteImport
       parentRoute: typeof AuthenticatedAppAdminRouteRoute
     }
+    '/_authenticated/app/admin/templates/': {
+      id: '/_authenticated/app/admin/templates/'
+      path: '/templates'
+      fullPath: '/app/admin/templates/'
+      preLoaderRoute: typeof AuthenticatedAppAdminTemplatesIndexRouteImport
+      parentRoute: typeof AuthenticatedAppAdminRouteRoute
+    }
+    '/_authenticated/app/admin/templates/$id': {
+      id: '/_authenticated/app/admin/templates/$id'
+      path: '/templates/$id'
+      fullPath: '/app/admin/templates/$id'
+      preLoaderRoute: typeof AuthenticatedAppAdminTemplatesIdRouteImport
+      parentRoute: typeof AuthenticatedAppAdminRouteRoute
+    }
   }
 }
 
@@ -845,6 +885,8 @@ interface AuthenticatedAppAdminRouteRouteChildren {
   AuthenticatedAppAdminExportsRoute: typeof AuthenticatedAppAdminExportsRoute
   AuthenticatedAppAdminIndexRoute: typeof AuthenticatedAppAdminIndexRoute
   AuthenticatedAppAdminClientsIdRoute: typeof AuthenticatedAppAdminClientsIdRoute
+  AuthenticatedAppAdminTemplatesIdRoute: typeof AuthenticatedAppAdminTemplatesIdRoute
+  AuthenticatedAppAdminTemplatesIndexRoute: typeof AuthenticatedAppAdminTemplatesIndexRoute
 }
 
 const AuthenticatedAppAdminRouteRouteChildren: AuthenticatedAppAdminRouteRouteChildren =
@@ -855,6 +897,10 @@ const AuthenticatedAppAdminRouteRouteChildren: AuthenticatedAppAdminRouteRouteCh
     AuthenticatedAppAdminExportsRoute: AuthenticatedAppAdminExportsRoute,
     AuthenticatedAppAdminIndexRoute: AuthenticatedAppAdminIndexRoute,
     AuthenticatedAppAdminClientsIdRoute: AuthenticatedAppAdminClientsIdRoute,
+    AuthenticatedAppAdminTemplatesIdRoute:
+      AuthenticatedAppAdminTemplatesIdRoute,
+    AuthenticatedAppAdminTemplatesIndexRoute:
+      AuthenticatedAppAdminTemplatesIndexRoute,
   }
 
 const AuthenticatedAppAdminRouteRouteWithChildren =

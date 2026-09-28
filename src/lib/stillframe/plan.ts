@@ -11,7 +11,22 @@ export type Feature = "export" | "gif" | "brand_kits" | "templates" | "team_shar
 /** Free trial limit, from the shared plan config (also enforced in SQL export_status). */
 export const FREE_EXPORTS = TRIAL.exports;
 
-export type Entitlements = { paid: boolean; team: boolean; exports: ExportStatus | null };
+export type Entitlements = { paid: boolean; team: boolean; exports: ExportStatus | null; tier?: string | null; admin?: boolean };
+
+/** Plan family ("simple" | "business" | "team") that the active workspace is paying for, or null. */
+export function planTier(b: { plan?: string; status?: string; comp_plan?: string | null; comp_until?: string | null; current_period_end?: string | null } | null): string | null {
+  if (!b) return null;
+  if (b.comp_plan && b.comp_until && new Date(b.comp_until) > new Date()) return b.comp_plan.replace(/_yearly$/, "");
+  const live = b.status !== "canceled" || (b.current_period_end && new Date(b.current_period_end) > new Date());
+  const p = (b.plan ?? "").replace(/_yearly$/, "");
+  return live && ["simple", "business", "team"].includes(p) ? p : null;
+}
+
+/** Ready-made templates can be limited to plans; an empty audience means everyone. */
+export function canUseAudience(e: Entitlements | undefined, audience: string[] | null | undefined): boolean {
+  if (!audience?.length || !e) return true;
+  return Boolean(e.admin) || (e.tier != null && audience.includes(e.tier));
+}
 
 export function canUseWith(e: Entitlements | undefined, f: Feature): boolean {
   if (!e) return true; // still loading: never block; the server re-checks anyway
@@ -36,16 +51,18 @@ export function usePlanAccess() {
     enabled: !!wsId,
     queryFn: async (): Promise<Entitlements> => {
       const ws = wsId as string;
-      const [{ data: paid }, { data: team }, exports] = await Promise.all([
+      const [{ data: paid }, { data: team }, exports, { data: billing }, { data: admin }] = await Promise.all([
         supabase.rpc("brand_kits_enabled", { _ws: ws }),
         supabase.rpc("workspace_is_team", { _ws: ws }),
         fetchExportStatus().catch(() => null),
+        supabase.rpc("effective_billing", { _ws: ws }),
+        supabase.rpc("is_platform_admin"),
       ]);
-      return { paid: Boolean(paid), team: Boolean(team), exports };
+      return { paid: Boolean(paid), team: Boolean(team), exports, tier: planTier(billing as never), admin: Boolean(admin) };
     },
     refetchOnWindowFocus: "always",
   });
-  return { ...q, canUse: (f: Feature) => canUseWith(q.data, f) };
+  return { ...q, canUse: (f: Feature) => canUseWith(q.data, f), canUseTemplate: (audience: string[] | null | undefined) => canUseAudience(q.data, audience) };
 }
 
 /* Upgrade dialog store: any screen can call openUpgrade(feature). */

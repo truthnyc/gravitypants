@@ -526,59 +526,80 @@ export type Database = {
       }
       templates: {
         Row: {
+          audience: string[]
           created_at: string
           created_by: string | null
           description: string | null
+          draft: Json | null
+          featured: boolean
           format: string | null
           id: string
           is_reusable: boolean
           name: string
+          new_until: string | null
+          published_at: string | null
           settings: Json
           slides: Json
           slug: string | null
           sort_order: number
           source: string
+          status: string
           style: Json
           thumbnail_url: string | null
           updated_at: string
+          version: number
           visibility: string
           workspace_id: string | null
         }
         Insert: {
+          audience?: string[]
           created_at?: string
           created_by?: string | null
           description?: string | null
+          draft?: Json | null
+          featured?: boolean
           format?: string | null
           id?: string
           is_reusable?: boolean
           name?: string
+          new_until?: string | null
+          published_at?: string | null
           settings?: Json
           slides?: Json
           slug?: string | null
           sort_order?: number
           source?: string
+          status?: string
           style?: Json
           thumbnail_url?: string | null
           updated_at?: string
+          version?: number
           visibility?: string
           workspace_id?: string | null
         }
         Update: {
+          audience?: string[]
           created_at?: string
           created_by?: string | null
           description?: string | null
+          draft?: Json | null
+          featured?: boolean
           format?: string | null
           id?: string
           is_reusable?: boolean
           name?: string
+          new_until?: string | null
+          published_at?: string | null
           settings?: Json
           slides?: Json
           slug?: string | null
           sort_order?: number
           source?: string
+          status?: string
           style?: Json
           thumbnail_url?: string | null
           updated_at?: string
+          version?: number
           visibility?: string
           workspace_id?: string | null
         }

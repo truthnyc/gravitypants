@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ChevronLeft, ImagePlus, Pause, Play } from "lucide-react";
+import { ChevronLeft, ChevronRight, ImagePlus, Pause, Play } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,6 +19,7 @@ import type { ProjectWithFrames } from "@/lib/stillframe/types";
 import { templateForExample } from "@/lib/site/example-template";
 import { isAcceptedImage, uploadMedia } from "@/lib/stillframe/media";
 import { cn } from "@/lib/utils";
+import { openUpgrade, usePlanAccess } from "@/lib/stillframe/plan";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 
 export const Route = createFileRoute("/_authenticated/app/templates/$slug")({
@@ -49,6 +50,7 @@ function Customize() {
   const { from } = Route.useSearch();
   const { data: fromAd, isLoading: fromLoading } = useProject(from);
   const { data: templates = [], isLoading } = useTemplates();
+  const plan = usePlanAccess();
   const example = slug.startsWith("example-") ? templateForExample(slug.slice(8)) : null;
   const t: Template | null = templates.find((x) => x.slug === slug || x.id === slug) ?? example;
 
@@ -59,6 +61,18 @@ function Customize() {
         <h1 className="text-[22px] font-bold">That template isn't available</h1>
         <p className="mt-1 text-[14px] text-secondary-text">It may have been deleted or isn't shared with this workspace.</p>
         <Link to="/app/templates" className="mt-4 inline-flex h-11 items-center rounded-lg bg-control-fill px-4 text-[14px] font-medium">See all templates</Link>
+      </main>
+    );
+  }
+  if (t.source === "system" && !plan.canUseTemplate(t.audience)) {
+    return (
+      <main className="mx-auto max-w-[720px] px-4 py-10 sm:px-8">
+        <h1 className="text-[22px] font-bold">{t.name} comes with a paid plan</h1>
+        <p className="mt-1 text-[14px] text-secondary-text">Upgrade to use this template for your ads.</p>
+        <div className="mt-4 flex gap-2">
+          <Button onClick={() => openUpgrade("templates")}>See plans</Button>
+          <Link to="/app/templates" className="inline-flex h-10 items-center rounded-lg bg-control-fill px-4 text-[14px] font-medium">See all templates</Link>
+        </div>
       </main>
     );
   }
@@ -94,7 +108,7 @@ function CustomizeTemplate({ template: t, slug, fromAd }: { template: Template; 
   const pb = usePlayback(slides, active);
   const openButton = (cls: string) => (
     <Button size="main" className={cn("min-h-12 w-full text-[16px] lg:min-h-10 lg:text-[14px]", cls)} disabled={create.isPending || Object.values(busy).some(Boolean)} onClick={() => void open()}>
-      {create.isPending ? "Creating…" : "Open in Editor"}
+      {create.isPending ? "Creating…" : <>Open in Editor <ChevronRight className="size-4" strokeWidth={1.7} /></>}
     </Button>
   );
 
@@ -152,14 +166,14 @@ function CustomizeTemplate({ template: t, slug, fromAd }: { template: Template; 
 
   return (
     <main className="mx-auto max-w-[1120px] px-4 pb-48 pt-6 sm:px-8 sm:pt-8 md:pb-16">
-      <div className="flex items-center justify-between gap-4">
-        <Link to="/app/templates" className="-ml-1 inline-flex h-11 items-center gap-0.5 text-[14px] font-medium text-link">
-          <ChevronLeft className="size-4" strokeWidth={1.7} /> Templates
-        </Link>
+      <Link to="/app/templates" className="-ml-1 inline-flex h-11 items-center gap-0.5 text-[14px] text-link">
+        <ChevronLeft className="size-4" strokeWidth={1.7} /> Templates
+      </Link>
+      <h1 className="mt-2 text-[32px] font-bold leading-tight tracking-[-0.02em] sm:text-[40px]">Make it yours.</h1>
+      <div className="mt-3 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+        <p className="text-[15px] text-secondary-text">{t.name} · add a photo and a line of copy to each slide.</p>
         <StepBar step={2} />
       </div>
-      <h1 className="mt-4 text-[32px] font-bold leading-tight tracking-[-0.02em] sm:text-[40px]">Make it yours.</h1>
-      <p className="mt-2 text-[16px] text-secondary-text">{t.name} · add a photo and a line of copy to each slide.</p>
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_340px]">
         <section className="min-w-0">
@@ -168,7 +182,7 @@ function CustomizeTemplate({ template: t, slug, fromAd }: { template: Template; 
           </Button>
           <input ref={bulkInput} type="file" accept="image/*" multiple className="hidden" onChange={(e) => { const f = Array.from(e.target.files ?? []); e.target.value = ""; addMany(f); }} />
 
-          <ol className="mt-4 space-y-3">
+          <ol className="mt-4 space-y-3 md:space-y-0 md:overflow-hidden md:rounded-sm md:bg-card md:shadow-card md:[&>li+li]:border-t md:[&>li+li]:border-border">
             {slides.map((s, i) => (
               <SlideRow
                 key={i}
@@ -191,10 +205,17 @@ function CustomizeTemplate({ template: t, slug, fromAd }: { template: Template; 
 
         <aside className="hidden md:block lg:sticky lg:top-20 lg:self-start">
           <FormatSwitch value={draft.format} onChange={(f) => setDraft((d) => ({ ...d, format: f }))} />
-          <div className="mt-4 flex h-[420px] items-center justify-center rounded-sm bg-site-panel p-5">
-            <Stage slides={slides} values={draft.slides} format={draft.format} bg={bg} pb={pb} className={draft.format === "16:9" ? "w-full" : "h-full"} />
+          <div className="mt-3 flex h-[470px] items-center justify-center rounded-sm bg-card p-5 shadow-card">
+            <div className={cn("relative", draft.format === "16:9" ? "w-full" : "h-full")} style={{ aspectRatio: RATIO[draft.format], maxHeight: "100%" }}>
+              <Stage slides={slides} values={draft.slides} format={draft.format} bg={bg} pb={pb} className="h-full w-full shadow-popover" />
+              <div className="absolute inset-x-3 bottom-3 flex items-center justify-between">
+                <button type="button" onClick={pb.toggle} aria-label={pb.playing ? "Pause" : "Play"} className="flex size-9 items-center justify-center rounded-full bg-card/25 text-primary-foreground backdrop-blur">
+                  {pb.playing ? <Pause className="size-3.5 fill-current" strokeWidth={1.7} /> : <Play className="size-3.5 fill-current" strokeWidth={1.7} />}
+                </button>
+                <span className="nums text-[11px] text-primary-foreground/90">{clock(pb.time)} / {clock(pb.total)}</span>
+              </div>
+            </div>
           </div>
-          <div className="mt-3"><PlayControls pb={pb} /></div>
           {openButton("mt-5")}
           <p className="mt-2 text-center text-[13px] text-secondary-text">Fine-tune timing, transitions and type in the timeline editor.</p>
         </aside>
@@ -254,7 +275,7 @@ function SlideRow({ index, slide, value, format, bg, active, busy, error, onFocu
       onFocusCapture={onFocus}
       onClick={onFocus}
       onPaste={(e) => { const f = Array.from(e.clipboardData.files)[0]; if (f) { e.preventDefault(); onFile(f); } }}
-      className={cn("flex gap-4 rounded-sm bg-card p-3 shadow-card", active && "ring-2 ring-primary/40")}
+      className={cn("flex items-center gap-4 rounded-sm bg-card p-3 shadow-card md:rounded-none md:px-4 md:py-3.5 md:shadow-none", active && "ring-2 ring-inset ring-primary/40")}
     >
       <div className={cn("group relative shrink-0 overflow-hidden rounded-sm", TILE[format])}>
         <button
@@ -266,7 +287,7 @@ function SlideRow({ index, slide, value, format, bg, active, busy, error, onFocu
           onDrop={(e) => { e.preventDefault(); setDrag(false); const f = e.dataTransfer.files[0]; if (f) onFile(f); }}
           className={cn(
             "flex h-full w-full items-center justify-center border-2 border-dashed focus-visible:outline-2 focus-visible:outline-primary",
-            value.photo ? "border-transparent" : drag ? "border-primary bg-control-fill" : "border-placeholder-border bg-control-fill",
+            value.photo ? "border-transparent" : drag ? "border-primary bg-control-fill" : "border-placeholder-border bg-canvas",
           )}
         >
           {value.photo ? (
@@ -274,7 +295,9 @@ function SlideRow({ index, slide, value, format, bg, active, busy, error, onFocu
           ) : busy ? (
             <span className="text-[11px] text-secondary-text">Uploading…</span>
           ) : (
-            <ImagePlus className="size-5 text-icon" strokeWidth={1.7} />
+            <span className="flex flex-col items-center gap-1 text-[11px] font-medium text-secondary-text">
+              <span className="text-[18px] font-light leading-none">+</span>Photo
+            </span>
           )}
         </button>
         {value.photo && (
@@ -287,7 +310,7 @@ function SlideRow({ index, slide, value, format, bg, active, busy, error, onFocu
       </div>
       <div className="min-w-0 flex-1">
         <p className="nums text-[12px] text-secondary-text">
-          Slide {index + 1} · {slide.role} · {slide.duration_sec.toFixed(1)}s{transition ? ` · ${transition}` : ""}
+          <b className="font-semibold text-foreground">Slide {index + 1}</b> · {slide.role} · {slide.duration_sec.toFixed(1)}s{transition ? ` · ${transition}` : ""}
         </p>
         <input
           value={value.headline}
