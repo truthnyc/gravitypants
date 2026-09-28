@@ -461,6 +461,53 @@ export type Database = {
           },
         ]
       }
+      support_tickets: {
+        Row: {
+          ad_id: string | null
+          attachment_url: string | null
+          created_at: string
+          id: string
+          message: string
+          priority: string
+          status: string
+          topic: string
+          user_id: string
+          workspace_id: string
+        }
+        Insert: {
+          ad_id?: string | null
+          attachment_url?: string | null
+          created_at?: string
+          id?: string
+          message: string
+          priority?: string
+          status?: string
+          topic: string
+          user_id?: string
+          workspace_id: string
+        }
+        Update: {
+          ad_id?: string | null
+          attachment_url?: string | null
+          created_at?: string
+          id?: string
+          message?: string
+          priority?: string
+          status?: string
+          topic?: string
+          user_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_tickets_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       templates: {
         Row: {
           created_at: string
