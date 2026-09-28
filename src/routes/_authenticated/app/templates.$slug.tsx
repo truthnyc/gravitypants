@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ChevronLeft, ImagePlus, Pause, Play } from "lucide-react";
+import { ChevronLeft, ChevronRight, ImagePlus, Pause, Play } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -94,7 +94,7 @@ function CustomizeTemplate({ template: t, slug, fromAd }: { template: Template; 
   const pb = usePlayback(slides, active);
   const openButton = (cls: string) => (
     <Button size="main" className={cn("min-h-12 w-full text-[16px] lg:min-h-10 lg:text-[14px]", cls)} disabled={create.isPending || Object.values(busy).some(Boolean)} onClick={() => void open()}>
-      {create.isPending ? "Creating…" : "Open in Editor"}
+      {create.isPending ? "Creating…" : <>Open in Editor <ChevronRight className="size-4" strokeWidth={1.7} /></>}
     </Button>
   );
 
