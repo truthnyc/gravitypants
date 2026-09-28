@@ -17,7 +17,8 @@ export const Route = createFileRoute("/blog")({
 });
 
 function BlogPage() {
-  const [featured, ...rest] = POSTS;
+  const featured = POSTS[0]!;
+  const rest = POSTS.slice(1);
   return (
     <SiteShell>
       <section className="mx-auto max-w-[1248px] px-5 pb-14 pt-16 md:px-8 md:pt-24 lg:px-16 xl:px-24">
