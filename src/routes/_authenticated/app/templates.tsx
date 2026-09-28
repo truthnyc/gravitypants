@@ -12,7 +12,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { TemplateThumb, UpgradeNote } from "@/components/templates/TemplateDialogs";
-import { useCanEditKits, useMyUserId, useDeleteTemplate, useTemplateAccess, useTemplates, useUpdateTemplate, type Template } from "@/lib/stillframe/data";
+import { useCanEditKits, useIsPlatformAdmin, useMyUserId, useDeleteTemplate, useTemplateAccess, useTemplates, useUpdateTemplate, type Template } from "@/lib/stillframe/data";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/app/templates")({
@@ -34,12 +34,15 @@ const fail = (e: unknown) => toast.error(e instanceof Error && e.message ? e.mes
 function TemplatesPage() {
   const { data: access } = useTemplateAccess();
   const { data: isAdmin = false } = useCanEditKits();
+  const { data: isStaff = false } = useIsPlatformAdmin();
   const { data: me } = useMyUserId();
   const { data: templates = [], isLoading } = useTemplates();
   const [deleting, setDeleting] = useState<Template | null>(null);
   const remove = useDeleteTemplate();
-  const mine = templates.filter((t) => t.created_by === access?.userId);
-  const team = templates.filter((t) => t.visibility === "team" && t.created_by !== access?.userId);
+  const global = templates.filter((t) => t.visibility === "global");
+  const own = templates.filter((t) => t.visibility !== "global");
+  const mine = own.filter((t) => t.created_by === access?.userId);
+  const team = own.filter((t) => t.visibility === "team" && t.created_by !== access?.userId);
 
   return (
     <main className="mx-auto max-w-[960px] space-y-6 px-4 pb-16 pt-6 sm:px-8 sm:pt-8">
@@ -56,6 +59,18 @@ function TemplatesPage() {
           <Group title="My templates" list={mine} empty="No templates yet." canEdit={() => true} showShare={Boolean(access?.team)} onDelete={setDeleting} />
           {access?.team && (
             <Group title="Team templates" list={team} empty="Nobody has shared a template yet." canEdit={(t) => isAdmin || t.created_by === me} showShare onDelete={setDeleting} />
+          )}
+          {(global.length > 0 || isStaff) && (
+            <Group
+              title="Ready-made templates"
+              note="Made by Gravity Pants. Anyone can start an ad from these."
+              list={global}
+              empty="No ready-made templates yet."
+              canEdit={() => isStaff}
+              showShare={isStaff}
+              options={["private", "team", "global"]}
+              onDelete={setDeleting}
+            />
           )}
         </>
       )}
@@ -74,22 +89,35 @@ function TemplatesPage() {
   );
 }
 
-function Group({ title, list, empty, canEdit, showShare, onDelete }: { title: string; list: Template[]; empty: string; canEdit: (t: Template) => boolean; showShare: boolean; onDelete: (t: Template) => void }) {
+const VISIBILITY_LABEL: Record<Template["visibility"], string> = {
+  private: "Only me",
+  team: "Shared with team",
+  global: "Ready-made for everyone",
+};
+
+function Group({ title, note, list, empty, canEdit, showShare, options = ["private", "team"], onDelete }: { title: string; note?: string; list: Template[]; empty: string; canEdit: (t: Template) => boolean; showShare: boolean; options?: readonly Template["visibility"][]; onDelete: (t: Template) => void }) {
   return (
     <section>
       <h2 className="text-[17px] font-semibold">{title}</h2>
+      {note && <p className="mt-0.5 text-[13px] text-secondary-text">{note}</p>}
       {list.length ? (
         <div className="mt-3 space-y-3">
-          {list.map((t) => <Row key={t.id} t={t} editable={canEdit(t)} showShare={showShare} onDelete={() => onDelete(t)} />)}
+          {list.map((t) => <Row key={t.id} t={t} editable={canEdit(t)} showShare={showShare} options={options} onDelete={() => onDelete(t)} />)}
         </div>
       ) : (
-        <p className="mt-3 rounded-sm border border-dashed border-placeholder-border p-6 text-center text-[13px] text-secondary-text">{empty}</p>
+        <div className="mt-3 rounded-sm border border-dashed border-placeholder-border p-6 text-center">
+          <p className="text-[14px] font-medium">{empty}</p>
+          <p className="mx-auto mt-1 max-w-[420px] text-[13px] text-secondary-text">
+            Open an ad's "…" menu and choose "Save as Template". Next time you drop photos, you can start from it.
+          </p>
+          <Link to="/app/ads" className="mt-3 inline-flex h-11 items-center rounded-lg bg-control-fill px-4 text-[14px] font-medium lg:h-9">Go to your ads</Link>
+        </div>
       )}
     </section>
   );
 }
 
-function Row({ t, editable, showShare, onDelete }: { t: Template; editable: boolean; showShare: boolean; onDelete: () => void }) {
+function Row({ t, editable, showShare, options = ["private", "team"], onDelete }: { t: Template; editable: boolean; showShare: boolean; options?: readonly Template["visibility"][]; onDelete: () => void }) {
   const update = useUpdateTemplate();
   const [name, setName] = useState(t.name);
   return (
@@ -111,13 +139,13 @@ function Row({ t, editable, showShare, onDelete }: { t: Template; editable: bool
         ) : (
           <p className="truncate text-[14px] font-semibold">{t.name}</p>
         )}
-        <p className="mt-1 text-[12px] text-secondary-text nums">{t.settings.frame_count} frames · {t.visibility === "team" ? "Shared with team" : "Only me"}</p>
+        <p className="mt-1 text-[12px] text-secondary-text nums">{t.settings.frame_count} frames · {VISIBILITY_LABEL[t.visibility]}</p>
       </div>
       {editable && (
         <div className="flex w-full items-center gap-2 sm:w-auto">
           {showShare && (
             <div className="flex flex-1 rounded-lg bg-control-fill p-0.5 sm:flex-none">
-              {(["private", "team"] as const).map((v) => (
+              {options.map((v) => (
                 <button
                   key={v}
                   type="button"
@@ -125,7 +153,7 @@ function Row({ t, editable, showShare, onDelete }: { t: Template; editable: bool
                   onClick={() => v !== t.visibility && update.mutate({ id: t.id, patch: { visibility: v } }, { onError: fail })}
                   className={cn("h-11 flex-1 rounded-lg px-3 text-[13px] font-medium disabled:opacity-40 lg:h-8", t.visibility === v && "bg-card shadow-segment")}
                 >
-                  {v === "private" ? "Only me" : "Team"}
+                  {v === "private" ? "Only me" : v === "team" ? "Team" : "Everyone"}
                 </button>
               ))}
             </div>

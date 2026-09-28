@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { MediaImage } from "@/components/stillframe/MediaImage";
-import { useSaveTemplate, useTemplateAccess, useTemplates, type Template } from "@/lib/stillframe/data";
+import { useIsPlatformAdmin, useSaveTemplate, useTemplateAccess, useTemplates, type Template } from "@/lib/stillframe/data";
 import type { ProjectWithFrames } from "@/lib/stillframe/types";
 import { cn } from "@/lib/utils";
 
@@ -22,6 +22,7 @@ export function UpgradeNote({ team = false }: { team?: boolean }) {
 
 export function SaveTemplateDialog({ project, open, onOpenChange }: { project: ProjectWithFrames; open: boolean; onOpenChange: (o: boolean) => void }) {
   const { data: access } = useTemplateAccess();
+  const { data: isStaff = false } = useIsPlatformAdmin();
   const save = useSaveTemplate();
   const [name, setName] = useState(project.name);
   const [visibility, setVisibility] = useState<Template["visibility"]>("private");
@@ -45,15 +46,16 @@ export function SaveTemplateDialog({ project, open, onOpenChange }: { project: P
               />
             </label>
             <p className="text-[12px] text-secondary-text">Keeps frames, timing, transitions, text styles, logo and formats. Photos aren't saved.</p>
-            {access?.team && (
+            {(access?.team || isStaff) && (
               <div className="space-y-1.5">
                 <span className="text-[12px] text-secondary-text">Who can use it?</span>
                 <div className="flex rounded-lg bg-control-fill p-0.5">
                   {(
                     [
-                      ["private", "Only me"],
-                      ["team", `Everyone in ${access.name}`],
-                    ] as const
+                      ["private", "Only me"] as const,
+                      ...(access?.team ? [["team", `Everyone in ${access.name}`] as const] : []),
+                      ...(isStaff ? [["global", "Everyone on Gravity Pants"] as const] : []),
+                    ]
                   ).map(([v, label]) => (
                     <button
                       key={v}
@@ -74,7 +76,7 @@ export function SaveTemplateDialog({ project, open, onOpenChange }: { project: P
           <Button variant="plain" onClick={() => onOpenChange(false)}>Cancel</Button>
           {access?.paid && (
             <Button
-              disabled={!name.trim() || save.isPending || (visibility === "team" && !access.team)}
+              disabled={!name.trim() || save.isPending || (visibility === "team" && !access.team) || (visibility === "global" && !isStaff)}
               onClick={() =>
                 save.mutate(
                   { project, name: name.trim(), visibility },
@@ -123,24 +125,27 @@ export function StartFromDialog({
 }) {
   const { data: access } = useTemplateAccess();
   const { data: templates = [] } = useTemplates();
-  const mine = access?.paid ? templates.filter((t) => t.created_by === access.userId) : [];
+  const ready = templates.filter((t) => t.visibility === "global");
+  const own = templates.filter((t) => t.visibility !== "global");
+  const mine = access?.paid ? own.filter((t) => t.created_by === access.userId) : [];
   const shared = access?.team
-    ? templates.filter((t) => t.visibility === "team" && t.created_by !== access.userId)
+    ? own.filter((t) => t.visibility === "team" && t.created_by !== access.userId)
     : [];
+  const any = mine.length > 0 || shared.length > 0 || ready.length > 0;
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onCancel()}>
       <DialogContent className="max-h-[92dvh] w-[calc(100vw-24px)] overflow-y-auto rounded-sm sm:max-w-[560px]">
         <DialogHeader className="pr-6 text-left">
           <DialogTitle className="text-[19px]">Create your ad</DialogTitle>
-          <p className="text-[14px] text-secondary-text nums">{count} {count === 1 ? "photo is" : "photos are"} ready.{mine.length || shared.length ? " Start fresh or use a saved look." : " Start a new ad with your photos."}</p>
+          <p className="text-[14px] text-secondary-text nums">{count} {count === 1 ? "photo is" : "photos are"} ready.{any ? " Start fresh or use a ready-made look." : " Start a new ad with your photos."}</p>
         </DialogHeader>
         <Button onClick={() => onPick(null)} className="h-12 w-full text-[15px]">Start with my photos</Button>
 
-        {(mine.length > 0 || shared.length > 0) && (
+        {any && (
           <div className="space-y-4 border-t border-border pt-4">
             <p className="text-[13px] font-medium text-secondary-text">Or use a saved look</p>
-            {([ ["Your templates", mine], ["Shared with your team", shared] ] as const).map(([heading, list]) => list.length > 0 && (
+            {([ ["Your templates", mine], ["Shared with your team", shared], ["Ready-made templates", ready] ] as const).map(([heading, list]) => list.length > 0 && (
               <section key={heading}>
                 <h3 className="mb-2 text-[13px] font-semibold">{heading}</h3>
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">

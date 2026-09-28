@@ -515,6 +515,15 @@ export function useMyUserId() {
   return useQuery({ queryKey: ["my-user-id"], queryFn: async () => (await supabase.auth.getUser()).data.user?.id ?? null, staleTime: Infinity });
 }
 
+/** True for Gravity Pants staff, who maintain the ready-made templates everyone sees. */
+export function useIsPlatformAdmin() {
+  return useQuery({
+    queryKey: ["is-platform-admin"],
+    queryFn: async () => Boolean((await supabase.rpc("is_platform_admin")).data),
+    staleTime: Infinity,
+  });
+}
+
 export function useCanEditKits() {
   return useQuery({
     queryKey: ["workspace-role", getWorkspaceId()],
@@ -564,7 +573,7 @@ export type Template = {
   created_by: string;
   name: string;
   thumbnail_url: string | null;
-  visibility: "private" | "team";
+  visibility: "private" | "team" | "global";
   settings: TemplateSettings;
   updated_at: string;
 };
@@ -609,14 +618,16 @@ export function templateFromProject(p: ProjectWithFrames): TemplateSettings {
   };
 }
 
+/** This workspace's templates plus the ready-made ones everyone can use. */
 export function useTemplates() {
   return useQuery({
     queryKey: [...templatesKey, getWorkspaceId()],
     queryFn: async (): Promise<Template[]> => {
+      const ws = getWorkspaceId();
       const { data, error } = await supabase
         .from("templates")
         .select("*")
-        .eq("workspace_id", getWorkspaceId())
+        .or(`workspace_id.eq.${ws},visibility.eq.global`)
         .order("updated_at", { ascending: false });
       if (error) throw error;
       return (data ?? []) as unknown as Template[];
