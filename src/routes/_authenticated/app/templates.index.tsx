@@ -15,7 +15,7 @@ import { TemplateThumb, UpgradeNote } from "@/components/templates/TemplateDialo
 import { useCanEditKits, useIsPlatformAdmin, useMyUserId, useDeleteTemplate, useTemplateAccess, useTemplates, useUpdateTemplate, type Template } from "@/lib/stillframe/data";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/_authenticated/app/templates")({
+export const Route = createFileRoute("/_authenticated/app/templates/")({
   head: () => ({
     meta: [
       { title: "Templates — Gravity Pants" },
