@@ -8,7 +8,18 @@ import { Input } from "@/components/ui/input";
 import { Card, fmtDateTime, PageTitle } from "@/components/admin/AdminShell";
 import { adminAdmins, adminSetAdmin } from "@/lib/stillframe/admin.functions";
 
-export const Route = createFileRoute("/_authenticated/admin/admins")({ component: Admins });
+export const Route = createFileRoute("/_authenticated/admin/admins")({
+  head: () => ({ meta: [
+    { title: "Admins — Gravity Pants" },
+    { name: "description", content: "Private Gravity Pants administrator list." },
+    { property: "og:title", content: "Admins — Gravity Pants" },
+    { property: "og:description", content: "Private Gravity Pants administrator list." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+    { name: "robots", content: "noindex" },
+  ] }),
+  component: Admins,
+});
 
 function Admins() {
   const fn = useServerFn(adminAdmins);
@@ -28,15 +39,15 @@ function Admins() {
   return (
     <>
       <PageTitle title="Admins" sub="People who can see every client. They need an account first." />
-      <form className="mb-4 flex gap-2" onSubmit={(e) => { e.preventDefault(); void change({ email, grant: true }); }}>
-        <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@example.com" className="h-9 w-[280px] bg-card" aria-label="Email" />
+      <form className="mb-4 flex flex-wrap gap-2" onSubmit={(e) => { e.preventDefault(); void change({ email, grant: true }); }}>
+        <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@example.com" className="h-11 min-w-0 flex-1 bg-card sm:h-9 sm:flex-none sm:w-[280px]" aria-label="Email" />
         <Button type="submit" size="header" disabled={!email}>Add Admin</Button>
       </form>
       <Card className="p-0">
         <ul className="divide-y divide-border">
           {(data ?? []).map((a) => (
-            <li key={a.userId} className="flex items-center justify-between px-5 py-3 text-[14px]">
-              <span>
+            <li key={a.userId} className="flex items-center justify-between gap-3 px-5 py-3 text-[14px]">
+              <span className="min-w-0 break-words">
                 <span className="font-medium">{a.email}</span>
                 {a.name && <span className="text-secondary-text"> · {a.name}</span>}
                 <span className="block text-[13px] text-secondary-text nums">Last sign-in {fmtDateTime(a.lastSignIn)}</span>

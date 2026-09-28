@@ -5,7 +5,18 @@ import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, X
 import { Card, fmtDate, fmtMoney, PageTitle } from "@/components/admin/AdminShell";
 import { adminOverview } from "@/lib/stillframe/admin.functions";
 
-export const Route = createFileRoute("/_authenticated/admin/")({ component: Overview });
+export const Route = createFileRoute("/_authenticated/admin/")({
+  head: () => ({ meta: [
+    { title: "Admin Overview — Gravity Pants" },
+    { name: "description", content: "Private overview of Gravity Pants clients and activity." },
+    { property: "og:title", content: "Admin Overview — Gravity Pants" },
+    { property: "og:description", content: "Private overview of Gravity Pants clients and activity." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+    { name: "robots", content: "noindex" },
+  ] }),
+  component: Overview,
+});
 
 function Overview() {
   const fn = useServerFn(adminOverview);
@@ -23,7 +34,7 @@ function Overview() {
   return (
     <>
       <PageTitle title="Overview" />
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {stats.map(([label, v]) => (
           <Card key={label}>
             <div className="text-[13px] text-secondary-text">{label}</div>
@@ -47,7 +58,7 @@ function Overview() {
           </ResponsiveContainer>
         </div>
       </Card>
-      <div className="mt-4 grid grid-cols-2 gap-4">
+      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
         <ClientList title="Trials ending soon" rows={data.trialsEnding.map((c) => ({ id: c.id, name: c.name, email: c.ownerEmail, right: `Ends ${fmtDate(c.trialEndsAt)}` }))} />
         <ClientList title="Payment problems" rows={data.paymentProblems.map((c) => ({ id: c.id, name: c.name, email: c.ownerEmail, right: "Payment problem" }))} />
       </div>

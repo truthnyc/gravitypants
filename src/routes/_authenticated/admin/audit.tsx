@@ -6,7 +6,18 @@ import { Input } from "@/components/ui/input";
 import { Card, fmtDateTime, PageTitle } from "@/components/admin/AdminShell";
 import { adminAudit } from "@/lib/stillframe/admin.functions";
 
-export const Route = createFileRoute("/_authenticated/admin/audit")({ component: Audit });
+export const Route = createFileRoute("/_authenticated/admin/audit")({
+  head: () => ({ meta: [
+    { title: "Admin Audit Log — Gravity Pants" },
+    { name: "description", content: "Private Gravity Pants administrator activity." },
+    { property: "og:title", content: "Admin Audit Log — Gravity Pants" },
+    { property: "og:description", content: "Private Gravity Pants administrator activity." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+    { name: "robots", content: "noindex" },
+  ] }),
+  component: Audit,
+});
 
 const LABEL: Record<string, string> = {
   view_client: "Viewed client", open_ad: "Opened ad", support_start: "Started support editing", support_end: "Ended support editing",

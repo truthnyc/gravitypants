@@ -6,7 +6,18 @@ import { Input } from "@/components/ui/input";
 import { Card, fmtBytes, fmtDateTime, PageTitle, Pill } from "@/components/admin/AdminShell";
 import { adminExports } from "@/lib/stillframe/admin.functions";
 
-export const Route = createFileRoute("/_authenticated/admin/exports")({ component: Exports });
+export const Route = createFileRoute("/_authenticated/admin/exports")({
+  head: () => ({ meta: [
+    { title: "Admin Exports — Gravity Pants" },
+    { name: "description", content: "Private Gravity Pants export history." },
+    { property: "og:title", content: "Admin Exports — Gravity Pants" },
+    { property: "og:description", content: "Private Gravity Pants export history." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+    { name: "robots", content: "noindex" },
+  ] }),
+  component: Exports,
+});
 
 function Exports() {
   const fn = useServerFn(adminExports);
@@ -16,7 +27,7 @@ function Exports() {
   return (
     <>
       <PageTitle title="Exports" sub="Every export across all clients, newest first." />
-      <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search client, ad, channel or status" className="mb-4 h-9 w-[320px] bg-card" aria-label="Search exports" />
+      <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search client, ad, channel or status" className="mb-4 h-11 w-full bg-card sm:h-9 sm:w-[320px]" aria-label="Search exports" />
       <Card className="overflow-x-auto p-0">
         <table className="w-full text-left text-[13px]">
           <thead className="text-secondary-text">

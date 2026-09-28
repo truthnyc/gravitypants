@@ -7,7 +7,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, fmtBytes, fmtDate, PageTitle, Pill, planLabel, statusLabel, statusTone } from "@/components/admin/AdminShell";
 import { adminClients } from "@/lib/stillframe/admin.functions";
 
-export const Route = createFileRoute("/_authenticated/admin/clients")({ component: Clients });
+export const Route = createFileRoute("/_authenticated/admin/clients")({
+  head: () => ({ meta: [
+    { title: "Admin Clients — Gravity Pants" },
+    { name: "description", content: "Private Gravity Pants client list." },
+    { property: "og:title", content: "Admin Clients — Gravity Pants" },
+    { property: "og:description", content: "Private Gravity Pants client list." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+    { name: "robots", content: "noindex" },
+  ] }),
+  component: Clients,
+});
 
 function Clients() {
   const fn = useServerFn(adminClients);
@@ -47,7 +58,7 @@ function Clients() {
     <>
       <PageTitle title="Clients" sub={data ? `${rows.length} of ${data.length}` : undefined} />
       <div className="mb-4 flex flex-wrap gap-2">
-        <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search name or email" className="h-9 w-[260px] bg-card" aria-label="Search clients" />
+        <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search name or email" className="h-11 w-full bg-card sm:h-9 sm:w-[260px]" aria-label="Search clients" />
         <F label="Plan" value={plan} set={setPlan} items={[["all", "All plans"], ["trial", "Trial"], ["simple", "Simple"], ["business", "Business"], ["business_yearly", "Business Yearly"], ["none", "No plan"]]} />
         <F label="Status" value={status} set={setStatus} items={[["all", "All statuses"], ["trialing", "Trial"], ["active", "Active"], ["past_due", "Payment problem"], ["canceled", "Canceled"], ["suspended", "Paused"]]} />
         <F label="Trial or paying" value={kind} set={setKind} items={[["all", "Trial and paying"], ["trial", "Trial only"], ["paying", "Paying only"]]} />
