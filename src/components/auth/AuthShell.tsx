@@ -1,7 +1,8 @@
 import { useState, type ReactNode } from "react";
+import { Check } from "lucide-react";
 import { GravityPantsLogo } from "@/components/GravityPantsLogo";
+import { ReelPhone } from "@/components/site/ReelPhone";
 import { lovable } from "@/integrations/lovable";
-import { cn } from "@/lib/utils";
 
 export function safeRedirect(r: unknown): string {
   if (typeof r !== "string") return "/app/ads";
@@ -14,17 +15,53 @@ export function safeRedirect(r: unknown): string {
   }
 }
 
-export function AuthShell({ title, subtitle, children }: { title: string; subtitle: string; children: ReactNode }) {
+const candleFrames = ["#1F2937", "#8C2F2B", "#EBDDC6"].map((background, i) => ({
+  background,
+  artwork: <img src={`/site-art/candle-${i + 1}.svg`} alt="" />,
+}));
+
+function AuthVisual() {
   return (
-    <main className="flex min-h-dvh items-start justify-center bg-canvas px-4 pb-16 pt-[12dvh]">
-      <div className="w-full max-w-[380px]">
-        <div className="flex flex-col items-center text-center">
-          <GravityPantsLogo size={56} />
-          <p className="mt-3 text-[16px] font-semibold tracking-[-0.01em]">Gravity Pants</p>
-          <h1 className="mt-6 text-[32px] font-bold tracking-[-0.02em]">{title}</h1>
-          <p className="mt-1 text-[15px] text-secondary-text">{subtitle}</p>
+    <div className="auth-visual" aria-hidden="true">
+      <div className="auth-tiles">
+        <span className="auth-tile auth-tile-one"><img src="/site-art/candle-1.svg" alt="" /></span>
+        <span className="auth-tile auth-tile-two"><img src="/site-art/candle-2.svg" alt="" /></span>
+        <span className="auth-tile auth-tile-three"><img src="/site-art/candle-3.svg" alt="" /></span>
+        <svg className="auth-arrow" width="90" height="48" viewBox="0 0 90 48" fill="none">
+          <path d="M4 40 C 30 10, 55 8, 80 18" stroke="var(--site-primary)" strokeWidth="2.5" strokeDasharray="1 7" strokeLinecap="round" />
+          <path d="M72 10 L 82 18 L 71 24" stroke="var(--site-primary)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        </svg>
+      </div>
+      <div className="auth-phone">
+        <ReelPhone size="medium" frames={candleFrames} headline={"Light up the\nlong nights."} subline="Winter scents · Shop now" />
+      </div>
+      <div className="auth-trial-card">
+        <b>Your free trial includes</b>
+        <span><Check size={15} strokeWidth={2.2} /> 7 days of Gravity Pants</span>
+        <span><Check size={15} strokeWidth={2.2} /> 3 exports in every format</span>
+        <span><Check size={15} strokeWidth={2.2} /> Every feature, including brand kit</span>
+      </div>
+    </div>
+  );
+}
+
+export function AuthShell({ eyebrow, title, subtitle, children }: { eyebrow?: string; title: string; subtitle: string; children: ReactNode }) {
+  return (
+    <main className="auth-page">
+      <div className="auth-form-side">
+        <a href="/" className="auth-brand">
+          <GravityPantsLogo size={30} />
+          <span>Gravity Pants</span>
+        </a>
+        <div className="auth-form-inner">
+          {eyebrow && <p className="auth-eyebrow">{eyebrow}</p>}
+          <h1 className="auth-title">{title}</h1>
+          <p className="auth-subtitle">{subtitle}</p>
+          <div className="auth-form-body">{children}</div>
         </div>
-        <div className="mt-8">{children}</div>
+      </div>
+      <div className="auth-visual-side">
+        <AuthVisual />
       </div>
     </main>
   );
@@ -48,9 +85,9 @@ export function GoogleButton({ redirectTo }: { redirectTo: string }) {
             setBusy(false);
           }
         }}
-        className="flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-border bg-card text-[15px] font-medium transition-colors hover:bg-control-fill/50 disabled:opacity-60"
+        className="auth-google"
       >
-        <svg width="16" height="16" viewBox="0 0 48 48" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
           <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z" />
           <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z" />
           <path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z" />
@@ -59,55 +96,63 @@ export function GoogleButton({ redirectTo }: { redirectTo: string }) {
         Continue with Google
       </button>
       {err && <p className="mt-2 text-[13px] text-destructive">{err}</p>}
-      <div className="my-5 flex items-center gap-3 text-[13px] text-secondary-text">
-        <span className="h-px flex-1 bg-border" />
-        or
-        <span className="h-px flex-1 bg-border" />
+      <div className="auth-divider">
+        <span />
+        or with email
+        <span />
       </div>
     </>
   );
 }
 
-type FieldDef = {
+export type FieldDef = {
   id: string;
   label: string;
   type: string;
   autoComplete: string;
   value: string;
+  placeholder?: string;
   onChange: (v: string) => void;
 };
 
 export function FieldGroup({ fields, error }: { fields: FieldDef[]; error?: string | null }) {
+  const [shown, setShown] = useState<Record<string, boolean>>({});
   return (
-    <div>
-      <div
-        className={cn(
-          "overflow-hidden rounded-sm bg-card",
-          error ? "outline outline-1 outline-destructive" : "outline outline-[0.5px] outline-border",
-        )}
-      >
-        {fields.map((f, i) => (
-          <div key={f.id} className={cn(i > 0 && "border-t border-border")}>
-            <label htmlFor={f.id} className="sr-only">
-              {f.label}
-            </label>
-            <input
-              id={f.id}
-              name={f.id}
-              type={f.type}
-              autoComplete={f.autoComplete}
-              required
-              placeholder={f.label}
-              value={f.value}
-              onChange={(e) => f.onChange(e.target.value)}
-              aria-invalid={!!error}
-              className="h-12 w-full bg-transparent px-4 text-[15px] placeholder:text-secondary-text focus-visible:outline-none"
-            />
+    <div className="auth-fields">
+      {fields.map((f) => {
+        const isPassword = f.type === "password";
+        const type = isPassword && shown[f.id] ? "text" : f.type;
+        return (
+          <div key={f.id} className="auth-field">
+            <label htmlFor={f.id}>{f.label}</label>
+            <div className="auth-input-wrap">
+              <input
+                id={f.id}
+                name={f.id}
+                type={type}
+                autoComplete={f.autoComplete}
+                required
+                placeholder={f.placeholder ?? f.label}
+                value={f.value}
+                onChange={(e) => f.onChange(e.target.value)}
+                aria-invalid={!!error}
+              />
+              {isPassword && (
+                <button
+                  type="button"
+                  className="auth-show"
+                  onClick={() => setShown((s) => ({ ...s, [f.id]: !s[f.id] }))}
+                  aria-label={shown[f.id] ? "Hide password" : "Show password"}
+                >
+                  {shown[f.id] ? "Hide" : "Show"}
+                </button>
+              )}
+            </div>
           </div>
-        ))}
-      </div>
+        );
+      })}
       {error && (
-        <p role="alert" className="mt-2 text-[13px] text-destructive">
+        <p role="alert" className="text-[13px] text-destructive">
           {error}
         </p>
       )}
