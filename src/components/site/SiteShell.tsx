@@ -32,7 +32,7 @@ function SiteHeader() {
     <header className="site-header relative z-50 border-b border-site-line bg-site-page/90 safe-top">
       <div className="mx-auto flex h-14 max-w-[1440px] items-center justify-between gap-3 px-5 md:h-[72px] md:gap-5 md:px-8 lg:gap-8 lg:px-16 xl:px-24">
         <Link to="/" onClick={() => setMenuOpen(false)} className="min-w-0 justify-self-start text-site-ink" aria-label="Gravity Pants home">
-          <GravityPantsLogo size={26} showWordmark />
+          <GravityPantsLogo size={26} showWordmark wordmarkSize={24} />
         </Link>
         <nav aria-label="Main" className="hidden items-center gap-4 whitespace-nowrap text-[15px] font-medium text-site-nav md:flex lg:gap-8">
           {nav.map((item) => <Link key={item.label} to={item.to} className="hover:text-site-primary">{item.label}</Link>)}
