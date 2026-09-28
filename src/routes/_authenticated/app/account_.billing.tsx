@@ -31,7 +31,6 @@ function BillingPage() {
   const manage = useManageBilling();
   const refresh = useRefreshBilling();
   const [thanks, setThanks] = useState(false);
-  const trialName = trialLabel(useSignupChoice());
 
   // After paying, the plan arrives a moment later — check a few times.
   useEffect(() => {
@@ -71,7 +70,7 @@ function BillingPage() {
 
       <section className="rounded-sm bg-card p-6 shadow-card">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h2 className="text-[17px] font-semibold">{billing ? (paid ? planName(billing.plan) : trialName) : " "}</h2>
+          <h2 className="text-[17px] font-semibold">{billing ? planName(billing.plan) : " "}</h2>
           {paid && plan && (
             <span className="text-[15px] font-semibold nums">
               {money(plan.amount_cents)} <span className="font-normal text-secondary-text">/ {plan.interval}</span>
@@ -80,14 +79,14 @@ function BillingPage() {
         </div>
         {billing && (
           <p className={billing.status === "past_due" && paid ? "mt-1 text-[14px] text-destructive" : "mt-1 text-[14px] text-secondary-text nums"}>
-            {paid ? statusLine(billing) : statusLine(billing).replace("Free trial", trialName)}
+            {statusLine(billing)}
           </p>
         )}
 
         {billing && (
           <dl className="mt-5 grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-[14px]">
             <dt className="text-secondary-text">Plan</dt>
-            <dd className="font-medium">{paid ? planName(billing.plan) : trialName}</dd>
+            <dd className="font-medium">{planName(billing.plan)}</dd>
             <dt className="text-secondary-text">{paid ? (billing.cancel_at_period_end || billing.status === "canceled" ? "Ends on" : "Renews on") : "Trial ends"}</dt>
             <dd className="nums">{longDate(paid ? billing.current_period_end : billing.trial_ends_at)}</dd>
             <dt className="text-secondary-text">Exports left</dt>
