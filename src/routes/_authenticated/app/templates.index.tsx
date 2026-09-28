@@ -1,4 +1,5 @@
-import { Pause, Play } from "lucide-react";
+import { Lock, Pause, Play } from "lucide-react";
+import { openUpgrade, usePlanAccess } from "@/lib/stillframe/plan";
 import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
@@ -50,16 +51,16 @@ function TemplatesPage() {
 
   return (
     <main className="mx-auto max-w-[1120px] px-4 pb-16 pt-6 sm:px-8 sm:pt-8">
-      <div className="flex items-center justify-between gap-4">
-        <Link to="/app/ads" className="-ml-1 inline-flex h-11 items-center gap-0.5 text-[14px] font-medium text-link focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-primary">
-          <ChevronLeft className="size-4" strokeWidth={1.7} /> Back
-        </Link>
+      <Link to="/app/ads" className="-ml-1 inline-flex h-11 items-center gap-0.5 text-[14px] text-link focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-primary">
+        <ChevronLeft className="size-4" strokeWidth={1.7} /> Back
+      </Link>
+      <h1 className="mt-2 text-[32px] font-bold leading-tight tracking-[-0.02em] sm:text-[40px]">Pick a cut.</h1>
+      <div className="mt-3 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+        <p className="max-w-[520px] text-[15px] leading-relaxed text-secondary-text">
+          Each template comes pre-timed with matched transitions and type. The Product Launch Kit is designed to reuse across your whole catalog.
+        </p>
         <StepBar step={1} />
       </div>
-      <h1 className="mt-4 text-[32px] font-bold leading-tight tracking-[-0.02em] sm:text-[40px]">Pick a cut.</h1>
-      <p className="mt-2 max-w-[560px] text-[16px] text-secondary-text">
-        Each template sets the pace, transitions and text for your ad. Pick one, add your photos, then change anything you like.
-      </p>
 
       {example && (
         <section className="mt-8">
@@ -105,45 +106,54 @@ function TemplatesPage() {
 
 function TemplateCard({ template: t, selected = false }: { template: Template; selected?: boolean }) {
   const reduced = usePrefersReducedMotion();
+  const plan = usePlanAccess();
   const [hover, setHover] = useState(false);
   const [tapPlay, setTapPlay] = useState(false);
   // Hover previews only with a real pointer; phones use the play button instead.
   const canHover = typeof window !== "undefined" && window.matchMedia("(hover: hover) and (min-width: 768px)").matches;
   const slides = templateSlides(t);
+  const locked = t.source === "system" && !plan.canUseTemplate(t.audience);
+  const isNew = Boolean(t.new_until && new Date(t.new_until) > new Date());
   return (
     <div className="relative">
     <Link
       to="/app/templates/$slug"
       params={{ slug: templateSlug(t) }}
+      onClick={(e) => { if (locked) { e.preventDefault(); openUpgrade("templates"); } }}
       onMouseEnter={() => canHover && setHover(true)}
       onMouseLeave={() => setHover(false)}
       onFocus={() => canHover && setHover(true)}
       onBlur={() => setHover(false)}
       className={cn(
-        "group block rounded-sm bg-card p-3 shadow-card outline-none transition-[transform,box-shadow] duration-200 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 md:motion-safe:hover:-translate-y-0.5 md:hover:shadow-popover",
+        "group flex h-full flex-col overflow-hidden rounded-sm bg-card shadow-card outline-none transition-[transform,box-shadow] duration-200 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 md:motion-safe:hover:-translate-y-0.5 md:hover:shadow-popover",
         selected && "ring-2 ring-primary",
       )}
     >
-      <div className="flex h-[196px] items-center justify-center rounded-sm bg-site-panel p-4">
-        <TemplatePreview template={t} playing={(hover && !reduced) || tapPlay} />
+      <div className="relative flex h-[196px] items-center justify-center bg-site-panel p-4">
+        <TemplatePreview template={t} playing={(hover && !reduced) || tapPlay} quiet className="shadow-popover" />
+        {isNew && <span className="absolute left-3 top-3 rounded-full bg-primary px-2 py-0.5 text-[11px] font-semibold text-primary-foreground">New</span>}
+        {locked && <span className="absolute right-3 top-3 flex size-7 items-center justify-center rounded-full bg-card/95 shadow-card" aria-label="Upgrade to use"><Lock className="size-3.5" strokeWidth={1.7} /></span>}
       </div>
-      <div className="px-1 pb-1 pt-3">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-col gap-1.5 px-[18px] pb-[18px] pt-4">
+        <div className="flex items-center justify-between gap-2">
           <h3 className="min-w-0 truncate text-[16px] font-semibold">{t.name}</h3>
-          {t.is_reusable && <span className="shrink-0 rounded-lg bg-control-fill px-2 py-0.5 text-[12px] font-medium">Reusable</span>}
+          {t.is_reusable && <span className="shrink-0 rounded-lg bg-control-fill px-2 py-0.5 text-[11px] font-semibold text-secondary-text">Reusable</span>}
         </div>
-        <p className="nums mt-0.5 text-[13px] text-secondary-text">{templateFormat(t)} · {slides.length} {slides.length === 1 ? "slide" : "slides"}</p>
-        {t.description && <p className="mt-1.5 text-[14px] text-secondary-text">{t.description}</p>}
+        <p className="nums text-[12px] text-secondary-text">{templateFormat(t)} · {slides.length} {slides.length === 1 ? "slide" : "slides"}{locked ? ` · ${audienceText(t.audience)}` : ""}</p>
+        {t.description && <p className="text-[13px] leading-snug">{t.description}</p>}
       </div>
     </Link>
     <button
       type="button"
       onClick={() => setTapPlay((p) => !p)}
       aria-label={tapPlay ? `Pause ${t.name} preview` : `Play ${t.name} preview`}
-      className="absolute top-[156px] right-5 flex size-11 items-center justify-center rounded-full bg-card/95 shadow-card md:hidden"
+      className="absolute top-[144px] right-3 flex size-11 items-center justify-center rounded-full bg-card/95 shadow-card md:hidden"
     >
       {tapPlay ? <Pause className="size-4" strokeWidth={1.7} /> : <Play className="size-4" strokeWidth={1.7} />}
     </button>
     </div>
   );
 }
+
+const PLAN_NAMES: Record<string, string> = { simple: "Simple", business: "Business", team: "Team" };
+const audienceText = (a: string[] | undefined) => `${(a ?? []).map((x) => PLAN_NAMES[x] ?? x).join(", ")} plans`;
