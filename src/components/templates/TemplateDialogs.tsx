@@ -136,14 +136,14 @@ export function StartFromDialog({
       <DialogContent className="max-h-[92dvh] w-[calc(100vw-24px)] overflow-y-auto rounded-sm sm:max-w-[560px]">
         <DialogHeader className="pr-6 text-left">
           <DialogTitle className="text-[19px]">Create your ad</DialogTitle>
-          <p className="text-[14px] text-secondary-text nums">{count} {count === 1 ? "photo is" : "photos are"} ready.{mine.length || shared.length ? " Start fresh or use a saved look." : " Start a new ad with your photos."}</p>
+          <p className="text-[14px] text-secondary-text nums">{count} {count === 1 ? "photo is" : "photos are"} ready.{any ? " Start fresh or use a ready-made look." : " Start a new ad with your photos."}</p>
         </DialogHeader>
         <Button onClick={() => onPick(null)} className="h-12 w-full text-[15px]">Start with my photos</Button>
 
-        {(mine.length > 0 || shared.length > 0) && (
+        {any && (
           <div className="space-y-4 border-t border-border pt-4">
             <p className="text-[13px] font-medium text-secondary-text">Or use a saved look</p>
-            {([ ["Your templates", mine], ["Shared with your team", shared] ] as const).map(([heading, list]) => list.length > 0 && (
+            {([ ["Your templates", mine], ["Shared with your team", shared], ["Ready-made templates", ready] ] as const).map(([heading, list]) => list.length > 0 && (
               <section key={heading}>
                 <h3 className="mb-2 text-[13px] font-semibold">{heading}</h3>
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
