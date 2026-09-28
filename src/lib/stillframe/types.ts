@@ -20,6 +20,8 @@ export type LogoSettings = {
   opacity?: "solid" | "soft";
   show_on?: "all" | "first_last" | "selected";
   positions?: Partial<Record<Format, LogoPosition | string>>;
+  /** updated_at of the brand kit last applied, so later kit edits flow into the ad. */
+  kit_stamp?: string | null;
 };
 
 export type EndCard = {
@@ -80,6 +82,7 @@ export type Project = {
   logo: LogoSettings;
   end_card: EndCard;
   is_template: boolean;
+  brand_kit_id?: string | null;
   deleted_at: string | null;
   thumbnail_url: string | null;
   created_at: string;
@@ -129,3 +132,18 @@ export type BrandKit = {
 };
 
 export const PACE_SECONDS: Record<Pace, number> = { relaxed: 3.5, standard: 2.5, fast: 1.5 };
+
+/** A named, shareable brand kit (brand_kits table). Logos are brand-assets paths. */
+export type NamedBrandKit = {
+  id: string;
+  workspace_id: string;
+  name: string;
+  logo_url: string | null;
+  logo_dark_url: string | null;
+  colors: string[];
+  headline_font: string | null;
+  subline_font: string | null;
+  is_default: boolean;
+  created_by: string | null;
+  updated_at: string;
+};
