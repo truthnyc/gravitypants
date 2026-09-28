@@ -262,6 +262,7 @@ export type Database = {
           monthly_exports: number | null
           name: string
           price_id: string
+          seats: number
           sort_order: number
         }
         Insert: {
@@ -271,6 +272,7 @@ export type Database = {
           monthly_exports?: number | null
           name: string
           price_id: string
+          seats?: number
           sort_order?: number
         }
         Update: {
@@ -280,6 +282,7 @@ export type Database = {
           monthly_exports?: number | null
           name?: string
           price_id?: string
+          seats?: number
           sort_order?: number
         }
         Relationships: []
@@ -453,6 +456,50 @@ export type Database = {
           },
         ]
       }
+      workspace_invites: {
+        Row: {
+          accepted_at: string | null
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          invited_by: string | null
+          role: string
+          token: string
+          workspace_id: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          created_at?: string
+          email: string
+          expires_at?: string
+          id?: string
+          invited_by?: string | null
+          role?: string
+          token?: string
+          workspace_id: string
+        }
+        Update: {
+          accepted_at?: string | null
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          invited_by?: string | null
+          role?: string
+          token?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_invites_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspace_members: {
         Row: {
           created_at: string
@@ -511,6 +558,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      accept_invite: { Args: { _token: string }; Returns: string }
       admin_storage_by_workspace: {
         Args: never
         Returns: {
@@ -526,11 +574,23 @@ export type Database = {
       export_status: { Args: { _ws: string }; Returns: Json }
       has_support_session: { Args: { _ws: string }; Returns: boolean }
       is_platform_admin: { Args: never; Returns: boolean }
+      is_workspace_admin: { Args: { _ws: string }; Returns: boolean }
       is_workspace_member: { Args: { _ws: string }; Returns: boolean }
       record_export: {
         Args: { _project: string; _stamp: string; _ws: string }
         Returns: boolean
       }
+      workspace_member_list: {
+        Args: { _ws: string }
+        Returns: {
+          created_at: string
+          display_name: string
+          email: string
+          role: string
+          user_id: string
+        }[]
+      }
+      workspace_seats: { Args: { _ws: string }; Returns: number }
     }
     Enums: {
       [_ in never]: never
