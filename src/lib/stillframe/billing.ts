@@ -15,8 +15,9 @@ export type Billing = {
   current_period_end: string | null;
   cancel_at_period_end: boolean;
   stripe_customer_id: string | null;
+  extra_exports?: number;
 };
-export type ExportStatus = { allowed: boolean; reason: "no_plan" | "limit_reached" | "payment_problem" | "no_access" | null; used?: number; limit?: number; resets_at?: string | null; watermark?: boolean };
+export type ExportStatus = { allowed: boolean; reason: "no_plan" | "limit_reached" | "payment_problem" | "no_access" | null; used?: number; limit?: number; resets_at?: string | null; watermark?: boolean; extras?: number };
 
 export const billingKey = ["billing"] as const;
 
