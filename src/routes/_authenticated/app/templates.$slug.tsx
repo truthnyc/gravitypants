@@ -19,6 +19,7 @@ import type { ProjectWithFrames } from "@/lib/stillframe/types";
 import { templateForExample } from "@/lib/site/example-template";
 import { isAcceptedImage, uploadMedia } from "@/lib/stillframe/media";
 import { cn } from "@/lib/utils";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 
 export const Route = createFileRoute("/_authenticated/app/templates/$slug")({
   head: () => ({
@@ -89,6 +90,13 @@ function CustomizeTemplate({ template: t, slug, fromAd }: { template: Template; 
   const [busy, setBusy] = useState<Record<number, boolean>>({});
   const [confirm, setConfirm] = useState<number | null>(null);
   const bulkInput = useRef<HTMLInputElement>(null);
+  const [sheet, setSheet] = useState(false);
+  const pb = usePlayback(slides, active);
+  const openButton = (cls: string) => (
+    <Button size="main" className={cn("min-h-12 w-full text-[16px] lg:min-h-10 lg:text-[14px]", cls)} disabled={create.isPending || Object.values(busy).some(Boolean)} onClick={() => void open()}>
+      {create.isPending ? "Creating…" : "Open in Editor"}
+    </Button>
+  );
 
   // Restore the saved draft for this person + template.
   useEffect(() => {
@@ -143,7 +151,7 @@ function CustomizeTemplate({ template: t, slug, fromAd }: { template: Template; 
   }
 
   return (
-    <main className="mx-auto max-w-[1120px] px-4 pb-16 pt-6 sm:px-8 sm:pt-8">
+    <main className="mx-auto max-w-[1120px] px-4 pb-48 pt-6 sm:px-8 sm:pt-8 md:pb-16">
       <div className="flex items-center justify-between gap-4">
         <Link to="/app/templates" className="-ml-1 inline-flex h-11 items-center gap-0.5 text-[14px] font-medium text-link">
           <ChevronLeft className="size-4" strokeWidth={1.7} /> Templates
@@ -181,28 +189,44 @@ function CustomizeTemplate({ template: t, slug, fromAd }: { template: Template; 
           </ol>
         </section>
 
-        <aside className="lg:sticky lg:top-20 lg:self-start">
-          <div className="flex rounded-lg bg-control-fill p-0.5" role="radiogroup" aria-label="Format">
-            {(["1:1", "9:16", "16:9"] as Aspect[]).map((f) => (
-              <button
-                key={f}
-                type="button"
-                role="radio"
-                aria-checked={draft.format === f}
-                onClick={() => setDraft((d) => ({ ...d, format: f }))}
-                className={cn("nums h-11 flex-1 rounded-lg text-[14px] font-medium lg:h-9", draft.format === f && "bg-card shadow-segment")}
-              >
-                {f}
-              </button>
-            ))}
+        <aside className="hidden md:block lg:sticky lg:top-20 lg:self-start">
+          <FormatSwitch value={draft.format} onChange={(f) => setDraft((d) => ({ ...d, format: f }))} />
+          <div className="mt-4 flex h-[420px] items-center justify-center rounded-sm bg-site-panel p-5">
+            <Stage slides={slides} values={draft.slides} format={draft.format} bg={bg} pb={pb} className={draft.format === "16:9" ? "w-full" : "h-full"} />
           </div>
-          <Preview slides={slides} values={draft.slides} format={draft.format} bg={bg} active={active} />
-          <Button size="main" className="mt-5 min-h-12 w-full text-[16px] lg:min-h-10 lg:text-[14px]" disabled={create.isPending || Object.values(busy).some(Boolean)} onClick={() => void open()}>
-            {create.isPending ? "Creating…" : "Open in Editor"}
-          </Button>
+          <div className="mt-3"><PlayControls pb={pb} /></div>
+          {openButton("mt-5")}
           <p className="mt-2 text-center text-[13px] text-secondary-text">Fine-tune timing, transitions and type in the timeline editor.</p>
         </aside>
       </div>
+
+      {/* Phones: preview lives in a sticky bottom bar; tap the thumbnail for a full-screen sheet. */}
+      <div className="fixed inset-x-0 bottom-0 z-30 bg-card px-4 pt-3 hairline-t md:hidden" style={{ paddingBottom: "max(12px, env(safe-area-inset-bottom))" }}>
+        <div className="flex items-center gap-3">
+          <button type="button" onClick={() => setSheet(true)} aria-label="Open full-screen preview" className="flex h-14 min-w-11 shrink-0 items-center justify-center">
+            <Stage slides={slides} values={draft.slides} format={draft.format} bg={bg} pb={pb} className={draft.format === "16:9" ? "w-[88px]" : "h-14"} />
+          </button>
+          <div className="min-w-0 flex-1">
+            <p className="nums truncate text-[14px] font-medium">Slide {pb.index + 1} of {slides.length}</p>
+            <p className="nums text-[13px] text-secondary-text">{clock(pb.time)} / {clock(pb.total)}</p>
+          </div>
+          <Button variant="secondary" size="icon" className="size-11 shrink-0 rounded-full" aria-label={pb.playing ? "Pause" : "Play"} onClick={pb.toggle}>
+            {pb.playing ? <Pause className="size-4" strokeWidth={1.7} /> : <Play className="size-4" strokeWidth={1.7} />}
+          </Button>
+        </div>
+        {openButton("mt-3")}
+      </div>
+
+      <Sheet open={sheet} onOpenChange={setSheet}>
+        <SheetContent side="bottom" className="flex h-dvh flex-col gap-4 bg-canvas px-4 pt-[max(16px,env(safe-area-inset-top))]" style={{ paddingBottom: "max(16px, env(safe-area-inset-bottom))" }}>
+          <SheetTitle className="text-[17px] font-semibold">Preview</SheetTitle>
+          <FormatSwitch value={draft.format} onChange={(f) => setDraft((d) => ({ ...d, format: f }))} />
+          <div className="flex min-h-0 flex-1 items-center justify-center rounded-sm bg-site-panel p-4">
+            <Stage slides={slides} values={draft.slides} format={draft.format} bg={bg} pb={pb} className={draft.format === "9:16" ? "h-full" : "w-full"} />
+          </div>
+          <PlayControls pb={pb} />
+        </SheetContent>
+      </Sheet>
 
       <AlertDialog open={confirm !== null} onOpenChange={(o) => !o && setConfirm(null)}>
         <AlertDialogContent>
@@ -282,13 +306,19 @@ function SlideRow({ index, slide, value, format, bg, active, busy, error, onFocu
           aria-label={`Slide ${index + 1} subline`}
           className="mt-1.5 h-11 w-full rounded-sm bg-control-fill px-3 text-[16px] placeholder:text-secondary-text lg:h-9 lg:text-[14px]"
         />
+        {value.photo && (
+          <button type="button" onClick={onRemove} className="-ml-1 h-11 px-1 text-[14px] font-medium text-destructive md:hidden">Remove photo</button>
+        )}
         {error && <p role="alert" className="mt-1 text-[12px] text-destructive">{error}</p>}
       </div>
     </li>
   );
 }
 
-function Preview({ slides, values, format, bg, active }: { slides: TemplateSlide[]; values: CustomSlide[]; format: Aspect; bg: string; active: number }) {
+type Playback = { playing: boolean; toggle: () => void; time: number; total: number; index: number; key: string };
+
+/** One shared clock for the side preview, the phone bottom bar and the full-screen sheet. */
+function usePlayback(slides: TemplateSlide[], active: number): Playback {
   const total = slides.reduce((s, x) => s + x.duration_sec, 0);
   const [playing, setPlaying] = useState(false);
   const [time, setTime] = useState(0);
@@ -315,39 +345,56 @@ function Preview({ slides, values, format, bg, active }: { slides: TemplateSlide
     index = slides.findIndex((s) => (acc += s.duration_sec) > time);
     if (index < 0) index = slides.length - 1;
   }
-  const slide = slides[index];
-  const value = values[index];
   // While editing, restart the text animation whenever the focused slide changes.
   const key = playing || time > 0 ? `p-${index}` : `e-${index}`;
+  return { playing, toggle: () => setPlaying((p) => !p), time, total, index, key };
+}
 
+function Stage({ slides, values, format, bg, pb, className }: { slides: TemplateSlide[]; values: CustomSlide[]; format: Aspect; bg: string; pb: Playback; className?: string }) {
+  const slide = slides[pb.index];
+  const value = values[pb.index];
   return (
-    <div className="mt-4">
-      <div className="flex h-[420px] items-center justify-center rounded-sm bg-site-panel p-5">
-        <div className={cn("relative overflow-hidden rounded-sm", format === "16:9" ? "w-full" : "h-full")} style={{ aspectRatio: RATIO[format], background: bg, maxHeight: "100%" }}>
-          {slide && (
-            <div key={key} className={cn("tpl-slide absolute inset-0", playing && index > 0 && `tpl-in-${slide.transition_in}`)} style={{ background: bg }}>
-              {value?.photo && (
-                <div className={cn("absolute inset-0", slide.photo_motion !== "none" && `tpl-photo-${slide.photo_motion}`)}>
-                  <MediaImage path={value.photo.path} alt="" className="h-full w-full object-cover" />
-                  <div className="absolute inset-0 bg-foreground/30" />
-                </div>
-              )}
-              <div className="tpl-text absolute inset-0 flex flex-col items-center justify-center px-[8%] text-center">
-                <p className={cn("tpl-headline font-bold leading-[1.05]", `tpl-text-${slide.text_animation}`, !value?.headline && "opacity-50")}>{value?.headline || slide.headline_placeholder}</p>
-                {(value?.subline || slide.subline_placeholder) && (
-                  <p className={cn("tpl-subline mt-[4%] leading-snug", `tpl-text-${slide.text_animation}`, !value?.subline && "opacity-50")} style={{ animationDelay: "120ms" }}>{value?.subline || slide.subline_placeholder}</p>
-                )}
-              </div>
+    <div className={cn("relative overflow-hidden rounded-sm", className)} style={{ aspectRatio: RATIO[format], background: bg, maxHeight: "100%" }}>
+      {slide && (
+        <div key={pb.key} className={cn("tpl-slide absolute inset-0", pb.playing && pb.index > 0 && `tpl-in-${slide.transition_in}`)} style={{ background: bg }}>
+          {value?.photo && (
+            <div className={cn("absolute inset-0", slide.photo_motion !== "none" && `tpl-photo-${slide.photo_motion}`)}>
+              <MediaImage path={value.photo.path} alt="" className="h-full w-full object-cover" />
+              <div className="absolute inset-0 bg-foreground/30" />
             </div>
           )}
+          <div className="tpl-text absolute inset-0 flex flex-col items-center justify-center px-[8%] text-center">
+            <p className={cn("tpl-headline font-bold leading-[1.05]", `tpl-text-${slide.text_animation}`, !value?.headline && "opacity-50")}>{value?.headline || slide.headline_placeholder}</p>
+            {(value?.subline || slide.subline_placeholder) && (
+              <p className={cn("tpl-subline mt-[4%] leading-snug", `tpl-text-${slide.text_animation}`, !value?.subline && "opacity-50")} style={{ animationDelay: "120ms" }}>{value?.subline || slide.subline_placeholder}</p>
+            )}
+          </div>
         </div>
-      </div>
-      <div className="mt-3 flex items-center gap-3">
-        <Button variant="secondary" size="icon" className="size-11 shrink-0 rounded-full lg:size-9" aria-label={playing ? "Pause" : "Play"} onClick={() => setPlaying((p) => !p)}>
-          {playing ? <Pause className="size-4" strokeWidth={1.7} /> : <Play className="size-4" strokeWidth={1.7} />}
-        </Button>
-        <span className="nums text-[13px] text-secondary-text">{clock(time)} / {clock(total)}</span>
-      </div>
+      )}
+    </div>
+  );
+}
+
+function PlayControls({ pb }: { pb: Playback }) {
+  return (
+    <div className="flex items-center gap-3">
+      <Button variant="secondary" size="icon" className="size-11 shrink-0 rounded-full lg:size-9" aria-label={pb.playing ? "Pause" : "Play"} onClick={pb.toggle}>
+        {pb.playing ? <Pause className="size-4" strokeWidth={1.7} /> : <Play className="size-4" strokeWidth={1.7} />}
+      </Button>
+      <span className="nums text-[13px] text-secondary-text">{clock(pb.time)} / {clock(pb.total)}</span>
+    </div>
+  );
+}
+
+function FormatSwitch({ value, onChange }: { value: Aspect; onChange: (f: Aspect) => void }) {
+  return (
+    <div className="flex rounded-lg bg-control-fill p-0.5" role="radiogroup" aria-label="Format">
+      {(["1:1", "9:16", "16:9"] as Aspect[]).map((f) => (
+        <button key={f} type="button" role="radio" aria-checked={value === f} onClick={() => onChange(f)}
+          className={cn("nums h-11 flex-1 rounded-lg text-[14px] font-medium lg:h-9", value === f && "bg-card shadow-segment")}>
+          {f}
+        </button>
+      ))}
     </div>
   );
 }
