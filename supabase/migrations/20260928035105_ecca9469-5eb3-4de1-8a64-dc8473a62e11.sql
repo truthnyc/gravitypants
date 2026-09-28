@@ -1,0 +1,1 @@
+DELETE FROM public.workspaces WHERE id = 'edbd80c2-0668-4174-a2fc-a39d8dce8725' AND name = 'Test workspace diagnosis';
