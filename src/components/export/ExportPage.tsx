@@ -3,6 +3,7 @@ import { HelpMenu } from "@/components/stillframe/HelpMenu";
 import { openUpgrade, usePlanAccess } from "@/lib/stillframe/plan";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
+import { KitAgainButton } from "@/components/templates/KitAgain";
 import { TRIAL, planById } from "@/lib/stillframe/plans-config";
 import { getSignupChoice } from "@/lib/stillframe/signup-choice";
 import { AlertCircle, Check, ChevronDown, ChevronLeft, Download, Film, Image as ImageIcon, LayoutGrid, Plus } from "lucide-react";
@@ -297,10 +298,11 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
 
   return (
     <div className="flex min-h-dvh flex-col bg-canvas">
-      <ExportHeader id={project.id} name={project.name} />
+      <ExportHeader id={project.id} name={project.name} templateId={project.template_id} />
       <main className="mx-auto grid w-full max-w-[1360px] flex-1 grid-cols-1 gap-6 px-4 pb-40 pt-6 sm:px-8 lg:grid-cols-[1fr_360px] lg:gap-8 lg:pb-16 lg:pt-8">
         <section className="min-w-0">
           <h1 className="text-[30px] font-bold leading-tight lg:text-[22px] lg:tracking-[-0.02em]">Where will this ad play?</h1>
+          <KitAgainButton adId={project.id} templateId={project.template_id} className="mt-3 lg:hidden" />
           <div className="mt-5 grid grid-cols-1 overflow-hidden rounded-sm border bg-card lg:grid-cols-4 lg:gap-4 lg:overflow-visible lg:border-0 lg:bg-transparent">
             {CHANNELS.map((c) => (
               <ChannelCard
@@ -448,7 +450,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
 
 /* ================================================================== header */
 
-function ExportHeader({ id, name }: { id: string; name: string }) {
+function ExportHeader({ id, name, templateId }: { id: string; name: string; templateId?: string | null | undefined }) {
   const done = (
     <span className="flex size-4 items-center justify-center rounded-full bg-toggle-on text-primary-foreground">
       <Check className="size-2.5" strokeWidth={2.5} />
@@ -477,7 +479,8 @@ function ExportHeader({ id, name }: { id: string; name: string }) {
           Export
         </span>
       </nav>
-      <div className="hidden justify-end lg:flex">
+      <div className="hidden justify-end gap-2 lg:flex">
+        <KitAgainButton adId={id} templateId={templateId} />
         <Button asChild variant="plain" size="header">
           <Link to="/app/ad/$id/edit" params={{ id }}>
             <ChevronLeft strokeWidth={1.7} /> Back to Edit

@@ -60,8 +60,10 @@ function YourAds() {
   const { data: projects, isLoading } = useProjects();
 
   const term = query.trim().toLowerCase();
+  const { data: templates = [] } = useTemplates();
+  const kitName = (id: string | null | undefined) => (id && templates.find((t) => t.id === id && t.is_reusable)?.name.toLowerCase()) || "";
   const visible = (projects ?? []).filter((project) =>
-    term ? project.name.toLowerCase().includes(term) : true,
+    term ? project.name.toLowerCase().includes(term) || kitName(project.template_id).includes(term) : true,
   );
   const isEmpty = !isLoading && (projects ?? []).length === 0;
 
