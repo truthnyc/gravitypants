@@ -44,6 +44,7 @@ import { Route as AuthenticatedAdminTemplatesIndexRouteImport } from './routes/_
 import { Route as AuthenticatedAdminTemplatesIdRouteImport } from './routes/_authenticated/admin/templates.$id'
 import { Route as AuthenticatedAppAccountBillingRouteImport } from './routes/_authenticated/app/account_.billing'
 import { Route as AuthenticatedAppAccountMembersRouteImport } from './routes/_authenticated/app/account_.members'
+import { Route as AuthenticatedAppAdminSplatRouteImport } from './routes/_authenticated/app/admin.$'
 import { Route as AuthenticatedAppTemplatesIndexRouteImport } from './routes/_authenticated/app/templates.index'
 import { Route as AuthenticatedAppTemplatesSlugRouteImport } from './routes/_authenticated/app/templates.$slug'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
@@ -235,6 +236,12 @@ const AuthenticatedAppAccountMembersRoute =
     path: '/account/members',
     getParentRoute: () => AuthenticatedAppRouteRoute,
   } as any)
+const AuthenticatedAppAdminSplatRoute =
+  AuthenticatedAppAdminSplatRouteImport.update({
+    id: '/admin/$',
+    path: '/admin/$',
+    getParentRoute: () => AuthenticatedAppRouteRoute,
+  } as any)
 const AuthenticatedAppTemplatesIndexRoute =
   AuthenticatedAppTemplatesIndexRouteImport.update({
     id: '/templates/',
@@ -316,6 +323,7 @@ export interface FileRoutesByFullPath {
   '/admin/templates/$id': typeof AuthenticatedAdminTemplatesIdRoute
   '/app/account/billing': typeof AuthenticatedAppAccountBillingRoute
   '/app/account/members': typeof AuthenticatedAppAccountMembersRoute
+  '/app/admin/$': typeof AuthenticatedAppAdminSplatRoute
   '/app/templates/$slug': typeof AuthenticatedAppTemplatesSlugRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -357,6 +365,7 @@ export interface FileRoutesByTo {
   '/admin/templates/$id': typeof AuthenticatedAdminTemplatesIdRoute
   '/app/account/billing': typeof AuthenticatedAppAccountBillingRoute
   '/app/account/members': typeof AuthenticatedAppAccountMembersRoute
+  '/app/admin/$': typeof AuthenticatedAppAdminSplatRoute
   '/app/templates/$slug': typeof AuthenticatedAppTemplatesSlugRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -403,6 +412,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/templates/$id': typeof AuthenticatedAdminTemplatesIdRoute
   '/_authenticated/app/account_/billing': typeof AuthenticatedAppAccountBillingRoute
   '/_authenticated/app/account_/members': typeof AuthenticatedAppAccountMembersRoute
+  '/_authenticated/app/admin/$': typeof AuthenticatedAppAdminSplatRoute
   '/_authenticated/app/templates/$slug': typeof AuthenticatedAppTemplatesSlugRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -449,6 +459,7 @@ export interface FileRouteTypes {
     | '/admin/templates/$id'
     | '/app/account/billing'
     | '/app/account/members'
+    | '/app/admin/$'
     | '/app/templates/$slug'
     | '/api/public/payments/webhook'
     | '/lovable/email/auth/preview'
@@ -490,6 +501,7 @@ export interface FileRouteTypes {
     | '/admin/templates/$id'
     | '/app/account/billing'
     | '/app/account/members'
+    | '/app/admin/$'
     | '/app/templates/$slug'
     | '/api/public/payments/webhook'
     | '/lovable/email/auth/preview'
@@ -535,6 +547,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/templates/$id'
     | '/_authenticated/app/account_/billing'
     | '/_authenticated/app/account_/members'
+    | '/_authenticated/app/admin/$'
     | '/_authenticated/app/templates/$slug'
     | '/api/public/payments/webhook'
     | '/lovable/email/auth/preview'
@@ -816,6 +829,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppAccountMembersRouteImport
       parentRoute: typeof AuthenticatedAppRouteRoute
     }
+    '/_authenticated/app/admin/$': {
+      id: '/_authenticated/app/admin/$'
+      path: '/admin/$'
+      fullPath: '/app/admin/$'
+      preLoaderRoute: typeof AuthenticatedAppAdminSplatRouteImport
+      parentRoute: typeof AuthenticatedAppRouteRoute
+    }
     '/_authenticated/app/templates/': {
       id: '/_authenticated/app/templates/'
       path: '/templates'
@@ -912,6 +932,7 @@ interface AuthenticatedAppRouteRouteChildren {
   AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
   AuthenticatedAppAccountBillingRoute: typeof AuthenticatedAppAccountBillingRoute
   AuthenticatedAppAccountMembersRoute: typeof AuthenticatedAppAccountMembersRoute
+  AuthenticatedAppAdminSplatRoute: typeof AuthenticatedAppAdminSplatRoute
   AuthenticatedAppTemplatesSlugRoute: typeof AuthenticatedAppTemplatesSlugRoute
   AuthenticatedAppTemplatesIndexRoute: typeof AuthenticatedAppTemplatesIndexRoute
   AuthenticatedAppAdIdEditRoute: typeof AuthenticatedAppAdIdEditRoute
@@ -926,6 +947,7 @@ const AuthenticatedAppRouteRouteChildren: AuthenticatedAppRouteRouteChildren = {
   AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
   AuthenticatedAppAccountBillingRoute: AuthenticatedAppAccountBillingRoute,
   AuthenticatedAppAccountMembersRoute: AuthenticatedAppAccountMembersRoute,
+  AuthenticatedAppAdminSplatRoute: AuthenticatedAppAdminSplatRoute,
   AuthenticatedAppTemplatesSlugRoute: AuthenticatedAppTemplatesSlugRoute,
   AuthenticatedAppTemplatesIndexRoute: AuthenticatedAppTemplatesIndexRoute,
   AuthenticatedAppAdIdEditRoute: AuthenticatedAppAdIdEditRoute,
