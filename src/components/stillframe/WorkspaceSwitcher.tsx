@@ -78,3 +78,42 @@ export function WorkspaceSwitcher({ className }: { className?: string }) {
     </DropdownMenu>
   );
 }
+
+/** Same switching, as a flat list — used inside the mobile menu. */
+export function WorkspaceList({ onSwitch }: { onSwitch?: () => void }) {
+  const { data: workspaces } = useMyWorkspaces();
+  const active = peekWorkspaceId();
+  if (!workspaces || workspaces.length < 2) return null;
+
+  async function switchTo(id: string) {
+    if (id === active) return;
+    const { data: auth } = await supabase.auth.getUser();
+    if (!auth.user || !workspaces?.some((w) => w.id === id)) return;
+    onSwitch?.();
+    rememberWorkspaceId(auth.user.id, id);
+    window.location.href = "/app/ads";
+  }
+
+  return (
+    <div className="px-4 pb-3">
+      <p className="pb-1 pt-3 text-[12px] text-secondary-text">Workspaces</p>
+      <div className="flex flex-col gap-2">
+        {workspaces.map((w) => (
+          <button
+            key={w.id}
+            onClick={() => void switchTo(w.id)}
+            className={cn(
+              "flex h-11 items-center justify-between gap-2 rounded-sm px-3 text-left text-[14px] outline outline-[0.5px] outline-border",
+              w.id === active ? "bg-control-fill font-medium" : "bg-card",
+            )}
+          >
+            <span className="min-w-0 truncate">{w.name}</span>
+            <span className="shrink-0 text-[12px] text-secondary-text">
+              {w.id === active ? "Current" : roleLabel(w.role)}
+            </span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
