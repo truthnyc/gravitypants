@@ -16,7 +16,7 @@ export function templateForExample(id: string): Template | null {
       frames: Array.from({ length: example.photos }, (_, index) => ({
         duration_sec: example.seconds / example.photos,
         transition_in: { type: index === 0 ? "cut" as const : "fade" as const, speed: "smooth" as const },
-        photo: { fit: "fill" as const, focus: { x: 0.5, y: 0.5 }, movement: "slow_zoom_in" as const, darken_for_text: index === 0 },
+        photo: { fit: "fill" as const, focus: { x: 0.5, y: 0.5 }, movement: "slow_zoom_in" as const, darken_for_text: false },
         headline: index === 0 ? { text: example.headline, size_px: 100, color: "#FFFFFF", animation: "rise" as const, position: "center" } : null,
         subline: index === 0 ? { text: example.sub, size_px: 48, color: "#FFFFFF", animation: "fade" as const, position: "bottom-center" } : null,
         logo_visible: true,

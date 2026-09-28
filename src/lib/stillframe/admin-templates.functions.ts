@@ -29,6 +29,8 @@ const slide = z.object({
   headline_placeholder: z.string().max(120),
   subline_placeholder: z.string().max(160),
   sample_photo: z.string().max(300).nullable().optional(),
+  photo_focus: z.object({ x: z.number().min(0).max(1), y: z.number().min(0).max(1) }).optional(),
+  photo_zoom: z.number().min(1).max(3).optional(),
 });
 const docSchema = z.object({
   name: z.string().trim().min(1, "Give the template a name.").max(60),
@@ -44,6 +46,9 @@ const docSchema = z.object({
     subline: z.object({ font: z.string().max(80).nullable(), weight: z.number().int().min(100).max(900).optional(), size_px: z.number().min(10).max(200), color: z.string().max(9) }),
     text_position: z.string().max(20),
     logo_position: z.string().max(20),
+    logo_path: z.string().max(300).nullable().optional(),
+    logo_size_pct: z.number().min(5).max(40).optional(),
+    logo_opacity: z.enum(["solid", "soft"]).optional(),
   }),
   slides: z.array(slide).min(1, "Add at least one slide.").max(10),
 });
@@ -103,8 +108,8 @@ export const adminTemplateCreate = createServerFn({ method: "POST" })
       is_reusable: false,
       featured: false,
       thumbnail_url: null,
-      style: { background_color: "#1D1D1F", headline: { font: null, weight: 700, size_px: 96, color: "#FFFFFF" }, subline: { font: null, size_px: 44, color: "#FFFFFF" }, text_position: "center", logo_position: "top-right" },
-      slides: [1, 2, 3].map((n) => ({ role: ["Hook", "Detail", "Offer"][n - 1]!, duration_sec: 2.5, transition_in: n === 1 ? "none" : "fade", text_animation: "rise-up", photo_motion: "none", headline_placeholder: "Your headline", subline_placeholder: "A short line", sample_photo: null })),
+      style: { background_color: "#1D1D1F", headline: { font: null, weight: 700, size_px: 96, color: "#FFFFFF" }, subline: { font: null, size_px: 44, color: "#FFFFFF" }, text_position: "center", logo_position: "top-right", logo_path: null, logo_size_pct: 16, logo_opacity: "solid" },
+      slides: [1, 2, 3].map((n) => ({ role: ["Hook", "Detail", "Offer"][n - 1]!, duration_sec: 2.5, transition_in: n === 1 ? "none" : "fade", text_animation: "rise-up", photo_motion: "none", headline_placeholder: "Your headline", subline_placeholder: "A short line", sample_photo: null, photo_focus: { x: 0.5, y: 0.5 }, photo_zoom: 1 })),
     };
     const { data: row, error } = await db
       .from("templates")
@@ -288,6 +293,9 @@ export const adminTemplateFromAd = createServerFn({ method: "POST" })
         subline: { font: s0.font_family ?? null, weight: Math.min(900, Math.max(100, Math.round((s0.font_weight ?? 500) / 100) * 100)), size_px: Math.min(200, Math.max(10, s0.size_px ?? 44)), color: hex(s0.color, "#FFFFFF") },
         text_position: String(h0.position ?? "center").slice(0, 20),
         logo_position: String(p.logo?.positions?.[format] ?? p.logo?.position ?? "top-right").slice(0, 20),
+        logo_path: null,
+        logo_size_pct: Math.min(40, Math.max(5, Number(p.logo?.size_pct ?? 16))),
+        logo_opacity: p.logo?.opacity === "soft" ? "soft" : "solid",
       },
       slides: frames.map((f, i) => ({
         role: `Slide ${i + 1}`,
@@ -298,6 +306,8 @@ export const adminTemplateFromAd = createServerFn({ method: "POST" })
         headline_placeholder: String(f.headline?.text ?? "").slice(0, 120) || "Your headline",
         subline_placeholder: String(f.subline?.text ?? "").slice(0, 160),
         sample_photo: null,
+        photo_focus: f.photo?.focus ?? { x: 0.5, y: 0.5 },
+        photo_zoom: Math.min(3, Math.max(1, Number(f.photo?.zoom ?? 1))),
       })),
     };
     const { data: last } = await db.from("templates").select("sort_order").eq("source", "system").order("sort_order", { ascending: false }).limit(1).maybeSingle();
@@ -313,7 +323,14 @@ export const adminTemplateFromAd = createServerFn({ method: "POST" })
       const { error: e } = await db.storage.from("media").copy(src, dest);
       return e ? s : { ...s, sample_photo: dest };
     }));
-    await db.from("templates").update({ slides }).eq("id", row.id);
+    let logoPath: string | null = null;
+    const sourceLogo = p.logo?.path ?? p.logo?.light_path ?? p.logo?.dark_path;
+    if (sourceLogo && typeof sourceLogo === "string" && !sourceLogo.includes(":")) {
+      const dest = `system/templates/${row.id}/logo-${crypto.randomUUID()}.${(sourceLogo.split(".").pop() || "png").slice(0, 5)}`;
+      const { error: logoError } = await db.storage.from("media").copy(sourceLogo, dest);
+      if (!logoError) logoPath = dest;
+    }
+    await db.from("templates").update({ slides, style: { ...doc.style, logo_path: logoPath } }).eq("id", row.id);
     await log(db, ctx.userId, "template_from_ad", `${doc.slug} ← ad ${p.id}`);
     await event(db, row.id, ctx.userId, "created_from_ad", 0);
     return { id: row.id as string };
