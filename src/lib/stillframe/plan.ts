@@ -3,12 +3,13 @@ import { useSyncExternalStore } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getWorkspaceId } from "./workspace";
 import { billingKey, fetchExportStatus, type ExportStatus } from "./billing";
+import { TRIAL } from "./plans-config";
 
 /** Every plan-gated feature. Add new gates here so the whole app checks plans in one place. */
 export type Feature = "export" | "gif" | "brand_kits" | "templates" | "team_sharing" | "priority_support";
 
-/** Free trial limit (also enforced in SQL export_status). */
-export const FREE_EXPORTS = 3;
+/** Free trial limit, from the shared plan config (also enforced in SQL export_status). */
+export const FREE_EXPORTS = TRIAL.exports;
 
 export type Entitlements = { paid: boolean; team: boolean; exports: ExportStatus | null };
 
