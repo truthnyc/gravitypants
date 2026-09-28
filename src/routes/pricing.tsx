@@ -76,7 +76,7 @@ function Pricing() {
           <div className="pr-grid">
             {PLANS.map((p) => {
               const pr = priceFor(p, billing);
-              const pop = p.id === "team";
+              const pop = p.id === "simple";
               return (
                   <article key={p.id} className={`pr-tier${pop ? " pop" : ""}`}>
                   <div className="pr-tier-top"><h3>{p.name}</h3><p>{p.tagline}</p></div>
@@ -94,19 +94,19 @@ function Pricing() {
         <section className="pr-compare">
           <h2 className="site-h2">Compare plans</h2>
           <table className="pr-cmp">
-            <thead><tr><th scope="col"><span className="sr-only">Feature</span></th>{cols.map((c) => <th key={c} scope="col">{c}</th>)}</tr></thead>
+            <thead><tr><th scope="col"><span className="sr-only">Feature</span></th>{cols.map((c) => <th key={c} scope="col" className={c === "Simple" ? "simple" : undefined}>{c}</th>)}</tr></thead>
             <tbody>
               {COMPARE.flatMap((g) => [
                 <tr key={g.group} className="grp"><th colSpan={5} scope="colgroup">{g.group}</th></tr>,
                 ...g.rows.map((r) => (
-                  <tr key={g.group + r.label}><th scope="row">{r.label}</th>{r.cells.map((c, i) => <td key={i}><CellView v={c} /></td>)}</tr>
+                  <tr key={g.group + r.label}><th scope="row">{r.label}</th>{r.cells.map((c, i) => <td key={i} className={i === 0 ? "simple" : undefined}><CellView v={c} /></td>)}</tr>
                 )),
               ])}
             </tbody>
           </table>
           <div className="pr-cmp-cards">
             {cols.map((c, i) => (
-              <div key={c} className="pr-cmp-card">
+              <div key={c} className={`pr-cmp-card${c === "Simple" ? " pop" : ""}`}>
                 <h3>{c}</h3>
                 {COMPARE.map((g) => (
                   <div key={g.group}>

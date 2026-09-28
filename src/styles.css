@@ -614,6 +614,8 @@ html:has(.features-page) { scroll-behavior: smooth; }
 .pr-cmp td .pr-tick { margin-inline:auto; display:block; }
 .pr-cmp small, .pr-cmp-card small { font-size:12px; color:var(--site-muted); }
 .pr-cmp tr.grp th { font-size:13px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--site-muted); padding:28px 0 10px; border-top:0; }
+.pr-cmp thead th.simple { color: var(--site-primary); }
+.pr-cmp tbody td.simple { background: var(--site-soft-blue); }
 .pr-cmp-cards { display:none; }
 .pr-faq { padding-block:120px; display:flex; gap:80px; }
 .pr-faq-head { width:360px; flex-shrink:0; display:flex; flex-direction:column; gap:16px; }
@@ -658,6 +660,7 @@ html:has(.features-page) { scroll-behavior: smooth; }
   .pr-cmp-card small { font-weight:600; letter-spacing:.06em; text-transform:uppercase; }
   .pr-cmp-card ul { margin-top:6px; }
   .pr-cmp-card li { display:flex; justify-content:space-between; gap:16px; padding:10px 0; border-top:1px solid var(--site-line); font-size:15px; }
+  .pr-cmp-card.pop { background:var(--site-page); box-shadow:0 0 0 2px var(--site-primary); }
   .pr-cmp-card li span:last-child { text-align:right; }
   .pr-faq { padding-block:72px; flex-direction:column; gap:20px; }
   .pr-faq-head { width:auto; }
