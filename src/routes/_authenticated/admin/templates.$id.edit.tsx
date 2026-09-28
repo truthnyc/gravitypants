@@ -63,7 +63,7 @@ function Builder({ row, refetch }: { row: any; refetch: () => void }) {
   const pb = useDocPlayback(doc);
   const [dragFrom, setDragFrom] = useState<number | null>(null);
   // Slug follows the name until someone types their own.
-  const [slugTouched, setSlugTouched] = useState(() => !!saved.slug && saved.slug !== slugify(saved.name));
+  const [slugTouched, setSlugTouched] = useState(() => !!saved.slug && !saved.slug.startsWith(slugify(saved.name)));
   const errors = [
     !doc.name.trim() && "Add a name.",
     !doc.slides.length && "Add at least one slide.",
