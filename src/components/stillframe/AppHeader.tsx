@@ -9,6 +9,8 @@ import { TrialPill } from "@/components/billing/BillingNotices";
 import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { useState } from "react";
+import { WorkspaceSwitcher, WorkspaceList } from "./WorkspaceSwitcher";
+
 
 const navItems = [
   { to: "/app/ads", label: "Your Ads" },
@@ -23,9 +25,14 @@ export function AppHeader() {
   return (
     <header className="sticky top-0 z-30 bg-card/90 backdrop-blur-xl hairline-b safe-top">
       <div className="mx-auto flex h-[60px] items-center gap-6 px-4 sm:px-6">
-        <Link to="/app/ads" className="flex items-center gap-2.5 rounded-lg" aria-label="Gravity Pants home">
+        <Link to="/app/ads" className="flex shrink-0 items-center gap-2.5 rounded-lg" aria-label="Gravity Pants home">
           <GravityPantsLogo size={26} showWordmark />
         </Link>
+
+        <div className="hidden min-w-0 sm:block">
+          <WorkspaceSwitcher />
+        </div>
+
 
         <nav className="hidden items-center gap-1 lg:flex">
           {navItems.map((item) => (
@@ -75,7 +82,9 @@ export function AppHeader() {
         <DrawerContent className="lg:hidden">
           <DrawerHeader><DrawerTitle>Menu</DrawerTitle></DrawerHeader>
           <nav className="grid px-4 pb-3">{navItems.map((item) => <Link key={item.to} to={item.to} onClick={() => setMenuOpen(false)} className="flex h-12 items-center hairline-b">{item.label}</Link>)}</nav>
+          <WorkspaceList onSwitch={() => setMenuOpen(false)} />
           <div className="flex items-center justify-between px-4 pb-6"><TrialPill /><UserMenu /></div>
+
         </DrawerContent>
       </Drawer>
     </header>
