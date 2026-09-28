@@ -67,7 +67,7 @@ export function Timeline({
   };
 
   return (
-    <footer className="flex h-[92px] shrink-0 items-center gap-4 bg-card px-5 hairline-t">
+    <footer className="hidden h-[92px] shrink-0 items-center gap-4 bg-card px-5 hairline-t lg:flex">
       <button
         type="button"
         onClick={onTogglePlay}
