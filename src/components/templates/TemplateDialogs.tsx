@@ -22,6 +22,7 @@ export function UpgradeNote({ team = false }: { team?: boolean }) {
 
 export function SaveTemplateDialog({ project, open, onOpenChange }: { project: ProjectWithFrames; open: boolean; onOpenChange: (o: boolean) => void }) {
   const { data: access } = useTemplateAccess();
+  const { data: isStaff = false } = useIsPlatformAdmin();
   const save = useSaveTemplate();
   const [name, setName] = useState(project.name);
   const [visibility, setVisibility] = useState<Template["visibility"]>("private");
