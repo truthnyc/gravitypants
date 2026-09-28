@@ -9,6 +9,8 @@ import { TrialPill } from "@/components/billing/BillingNotices";
 import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { useState } from "react";
+import { WorkspaceSwitcher } from "./WorkspaceSwitcher";
+
 
 const navItems = [
   { to: "/app/ads", label: "Your Ads" },
