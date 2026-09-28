@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { setWorkspaceId } from "@/lib/stillframe/workspace";
+import { rememberWorkspaceId } from "@/lib/stillframe/workspace";
 import { GravityPantsLogo } from "@/components/GravityPantsLogo";
 
 export const Route = createFileRoute("/invite/$token")({
@@ -40,7 +40,7 @@ function AcceptInvitePage() {
         );
         return;
       }
-      setWorkspaceId(data as unknown as string);
+      rememberWorkspaceId(session.session.user.id, data as unknown as string);
       window.location.href = "/app/ads";
     })();
     return () => {

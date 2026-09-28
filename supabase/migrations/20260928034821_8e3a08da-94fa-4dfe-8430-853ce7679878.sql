@@ -1,0 +1,2 @@
+CREATE POLICY "Creators read their workspaces" ON public.workspaces FOR SELECT TO authenticated USING (owner_id = auth.uid());
+CREATE POLICY "Creators join their new workspace as owner" ON public.workspace_members FOR INSERT TO authenticated WITH CHECK (user_id = auth.uid() AND role = 'owner' AND EXISTS (SELECT 1 FROM public.workspaces w WHERE w.id = workspace_id AND w.owner_id = auth.uid()) AND NOT EXISTS (SELECT 1 FROM public.workspace_members m WHERE m.workspace_id = workspace_members.workspace_id));

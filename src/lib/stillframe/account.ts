@@ -2,7 +2,7 @@ import { useQuery, useQueryClient, type QueryClient } from "@tanstack/react-quer
 import { useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { clearMediaCache } from "./media";
-import { setWorkspaceId } from "./workspace";
+import { forgetWorkspaceId, setWorkspaceId } from "./workspace";
 
 export type Me = { id: string; email: string; displayName: string | null; avatarPath: string | null };
 
@@ -28,10 +28,12 @@ export function initialsOf(me: Me | null | undefined) {
 }
 
 export async function signOutEverywhere(queryClient: QueryClient) {
+  const { data: auth } = await supabase.auth.getUser();
   await queryClient.cancelQueries();
   queryClient.clear();
   clearMediaCache();
   setWorkspaceId(null);
+  if (auth.user) forgetWorkspaceId(auth.user.id);
   await supabase.auth.signOut();
 }
 

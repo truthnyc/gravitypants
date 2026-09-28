@@ -1,5 +1,9 @@
 # Roadmap
 
+## Workspace creation error
+- [x] Allow creators to join a new workspace as its owner
+- [x] Keep the chosen workspace selected across page reloads, after verifying membership
+
 ## Team-only navigation
 - [x] Show team templates and Account Team tab only for active Team workspaces
 

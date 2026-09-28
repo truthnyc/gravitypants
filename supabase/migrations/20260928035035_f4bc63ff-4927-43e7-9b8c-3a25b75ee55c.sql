@@ -1,0 +1,1 @@
+DELETE FROM public.workspaces WHERE id IN ('e33ec849-bf2c-4922-8ede-a3d3e216ab25', '058bb412-4f9f-46ae-a7d7-a8143a2dbe99', 'f1becda2-61f0-4033-910e-5dcf0dd55eb0', 'c2950635-aea5-42db-8a01-c1fb10b3b5ef') AND name = 'Test workspace diagnosis';

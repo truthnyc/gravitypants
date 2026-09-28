@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { AccountTabs } from "@/components/billing/AccountTabs";
 import { inviteMember, resendInvite } from "@/lib/stillframe/team.functions";
 import { useBilling } from "@/lib/stillframe/billing";
-import { getWorkspaceId, setWorkspaceId } from "@/lib/stillframe/workspace";
+import { getWorkspaceId, rememberWorkspaceId } from "@/lib/stillframe/workspace";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/app/account_/members")({
@@ -103,7 +103,9 @@ function MembersPage() {
   };
 
   async function switchWorkspace(id: string) {
-    setWorkspaceId(id);
+    const { data: auth } = await supabase.auth.getUser();
+    if (!auth.user || !workspaces?.some((w) => w.id === id)) return;
+    rememberWorkspaceId(auth.user.id, id);
     window.location.href = "/app/ads";
   }
 
@@ -152,6 +154,7 @@ function MembersPage() {
     const uid = user.user?.id;
     if (!uid) {
       setCreating(false);
+      toast.error("Please sign in again to create a workspace.");
       return;
     }
     const { data: wsRow, error } = await supabase.from("workspaces").insert({ name: name.trim(), owner_id: uid }).select("id").single();
@@ -168,7 +171,7 @@ function MembersPage() {
     }
     await supabase.from("brand_kit").insert({ workspace_id: wsRow.id });
     toast.success("Team workspace created");
-    setWorkspaceId(wsRow.id);
+    rememberWorkspaceId(uid, wsRow.id);
     window.location.href = "/app/account/members";
   }
 
