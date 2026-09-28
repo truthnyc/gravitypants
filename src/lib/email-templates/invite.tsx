@@ -1,67 +1,51 @@
 import * as React from 'react'
-
-import {
-  Body,
-  Button,
-  Container,
-  Head,
-  Heading,
-  Html,
-  Link,
-  Preview,
-  Text,
-} from '@react-email/components'
-
+import { Body, Button, Container, Head, Heading, Html, Preview, Text } from '@react-email/components'
+import type { TemplateEntry } from './registry'
 import {
   EmailHeader,
   brandButton,
   brandContainer,
-  brandDarkModeCss,
   brandFooter,
   brandH1,
-  brandLink,
   brandMain,
   brandText,
 } from './brand'
 
-interface InviteEmailProps {
-  siteName: string
-  siteUrl: string
-  confirmationUrl: string
+interface Props {
+  inviterName?: string
+  workspaceName?: string
+  acceptUrl: string
 }
 
-export const InviteEmail = ({
-  siteName,
-  siteUrl,
-  confirmationUrl,
-}: InviteEmailProps) => (
+const Email = ({ inviterName, workspaceName, acceptUrl }: Props) => (
   <Html lang="en" dir="ltr">
-    <Head>
-      <style>{brandDarkModeCss}</style>
-    </Head>
-    <Preview>You've been invited to join {siteName}</Preview>
+    <Head />
+    <Preview>{inviterName || 'Someone'} invited you to join {workspaceName || 'a team'} on Gravity Pants</Preview>
     <Body style={brandMain}>
       <Container style={brandContainer}>
         <EmailHeader />
-        <Heading style={brandH1}>You've been invited</Heading>
+        <Heading style={brandH1}>You're invited</Heading>
         <Text style={brandText}>
-          You've been invited to join{' '}
-          <Link href={siteUrl} style={brandLink}>
-            <strong>{siteName}</strong>
-          </Link>
-          . Click the button below to accept the invitation and create your
-          account.
+          {inviterName || 'A teammate'} invited you to join <strong>{workspaceName || 'their team'}</strong> on
+          Gravity Pants. You'll share ads, brand kits, templates and the team's monthly exports.
         </Text>
-        <Button className="dm-btn" style={brandButton} href={confirmationUrl}>
-          Accept Invitation
+        <Button style={brandButton} href={acceptUrl}>
+          Accept Invite
         </Button>
+        <Text style={brandText}>
+          The link works for 7 days. Sign in (or create an account) with this email address to join.
+        </Text>
         <Text style={brandFooter}>
-          If you weren't expecting this invitation, you can safely ignore this
-          email.
+          Gravity Pants · You're getting this because someone invited you to their team.
         </Text>
       </Container>
     </Body>
   </Html>
 )
 
-export default InviteEmail
+export const template = {
+  component: Email,
+  subject: (d: Record<string, any>) => `Join ${d.workspaceName || 'a team'} on Gravity Pants`,
+  displayName: 'Team invite',
+  previewData: { inviterName: 'Jane', workspaceName: "Jane's ads", acceptUrl: 'https://gravitypants.com' },
+} satisfies TemplateEntry
