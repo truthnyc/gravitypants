@@ -277,7 +277,22 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
     if (!f) return;
     const p = f.photo ?? {};
     const photo = Object.fromEntries(
-      (["fit", "movement", "brightness", "darken_for_text", "background_color"] as const).filter((k) => p[k] !== undefined).map((k) => [k, p[k]]),
+      (
+        [
+          "fit",
+          "movement",
+          "movement_intensity",
+          "zoom_start",
+          "zoom_end",
+          "pan_x",
+          "pan_y",
+          "brightness",
+          "darken_for_text",
+          "background_color",
+        ] as const
+      )
+        .filter((k) => p[k] !== undefined)
+        .map((k) => [k, p[k]]),
     ) as FrameStyle["photo"];
     setStyleClip({
       transition_in: f.transition_in,
