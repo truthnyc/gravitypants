@@ -42,6 +42,7 @@ import { Route as ApiPublicTrialRemindersRouteImport } from './routes/api/public
 import { Route as AuthenticatedAdminClientsIdRouteImport } from './routes/_authenticated/admin/clients_.$id'
 import { Route as AuthenticatedAdminTemplatesIndexRouteImport } from './routes/_authenticated/admin/templates.index'
 import { Route as AuthenticatedAdminTemplatesIdRouteImport } from './routes/_authenticated/admin/templates.$id'
+import { Route as AuthenticatedAdminTemplatesNewRouteImport } from './routes/_authenticated/admin/templates.new'
 import { Route as AuthenticatedAppAccountBillingRouteImport } from './routes/_authenticated/app/account_.billing'
 import { Route as AuthenticatedAppAccountMembersRouteImport } from './routes/_authenticated/app/account_.members'
 import { Route as AuthenticatedAppAdminSplatRouteImport } from './routes/_authenticated/app/admin.$'
@@ -51,6 +52,7 @@ import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/publi
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
+import { Route as AuthenticatedAdminTemplatesIdEditRouteImport } from './routes/_authenticated/admin/templates.$id.edit'
 import { Route as AuthenticatedAppAdIdEditRouteImport } from './routes/_authenticated/app/ad.$id.edit'
 import { Route as AuthenticatedAppAdIdExportRouteImport } from './routes/_authenticated/app/ad.$id.export'
 
@@ -224,6 +226,12 @@ const AuthenticatedAdminTemplatesIdRoute =
     path: '/templates/$id',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminTemplatesNewRoute =
+  AuthenticatedAdminTemplatesNewRouteImport.update({
+    id: '/templates/new',
+    path: '/templates/new',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAppAccountBillingRoute =
   AuthenticatedAppAccountBillingRouteImport.update({
     id: '/account_/billing',
@@ -276,6 +284,12 @@ const LovableEmailTransactionalPreviewRoute =
     path: '/lovable/email/transactional/preview',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AuthenticatedAdminTemplatesIdEditRoute =
+  AuthenticatedAdminTemplatesIdEditRouteImport.update({
+    id: '/edit',
+    path: '/edit',
+    getParentRoute: () => AuthenticatedAdminTemplatesIdRoute,
+  } as any)
 const AuthenticatedAppAdIdEditRoute =
   AuthenticatedAppAdIdEditRouteImport.update({
     id: '/ad/$id/edit',
@@ -320,7 +334,8 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/app/': typeof AuthenticatedAppIndexRoute
   '/admin/clients/$id': typeof AuthenticatedAdminClientsIdRoute
-  '/admin/templates/$id': typeof AuthenticatedAdminTemplatesIdRoute
+  '/admin/templates/$id': typeof AuthenticatedAdminTemplatesIdRouteWithChildren
+  '/admin/templates/new': typeof AuthenticatedAdminTemplatesNewRoute
   '/app/account/billing': typeof AuthenticatedAppAccountBillingRoute
   '/app/account/members': typeof AuthenticatedAppAccountMembersRoute
   '/app/admin/$': typeof AuthenticatedAppAdminSplatRoute
@@ -331,6 +346,7 @@ export interface FileRoutesByFullPath {
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/admin/templates/': typeof AuthenticatedAdminTemplatesIndexRoute
   '/app/templates/': typeof AuthenticatedAppTemplatesIndexRoute
+  '/admin/templates/$id/edit': typeof AuthenticatedAdminTemplatesIdEditRoute
   '/app/ad/$id/edit': typeof AuthenticatedAppAdIdEditRoute
   '/app/ad/$id/export': typeof AuthenticatedAppAdIdExportRoute
 }
@@ -362,7 +378,8 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/app': typeof AuthenticatedAppIndexRoute
   '/admin/clients/$id': typeof AuthenticatedAdminClientsIdRoute
-  '/admin/templates/$id': typeof AuthenticatedAdminTemplatesIdRoute
+  '/admin/templates/$id': typeof AuthenticatedAdminTemplatesIdRouteWithChildren
+  '/admin/templates/new': typeof AuthenticatedAdminTemplatesNewRoute
   '/app/account/billing': typeof AuthenticatedAppAccountBillingRoute
   '/app/account/members': typeof AuthenticatedAppAccountMembersRoute
   '/app/admin/$': typeof AuthenticatedAppAdminSplatRoute
@@ -373,6 +390,7 @@ export interface FileRoutesByTo {
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/admin/templates': typeof AuthenticatedAdminTemplatesIndexRoute
   '/app/templates': typeof AuthenticatedAppTemplatesIndexRoute
+  '/admin/templates/$id/edit': typeof AuthenticatedAdminTemplatesIdEditRoute
   '/app/ad/$id/edit': typeof AuthenticatedAppAdIdEditRoute
   '/app/ad/$id/export': typeof AuthenticatedAppAdIdExportRoute
 }
@@ -409,7 +427,8 @@ export interface FileRoutesById {
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
   '/_authenticated/admin/clients_/$id': typeof AuthenticatedAdminClientsIdRoute
-  '/_authenticated/admin/templates/$id': typeof AuthenticatedAdminTemplatesIdRoute
+  '/_authenticated/admin/templates/$id': typeof AuthenticatedAdminTemplatesIdRouteWithChildren
+  '/_authenticated/admin/templates/new': typeof AuthenticatedAdminTemplatesNewRoute
   '/_authenticated/app/account_/billing': typeof AuthenticatedAppAccountBillingRoute
   '/_authenticated/app/account_/members': typeof AuthenticatedAppAccountMembersRoute
   '/_authenticated/app/admin/$': typeof AuthenticatedAppAdminSplatRoute
@@ -420,6 +439,7 @@ export interface FileRoutesById {
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/_authenticated/admin/templates/': typeof AuthenticatedAdminTemplatesIndexRoute
   '/_authenticated/app/templates/': typeof AuthenticatedAppTemplatesIndexRoute
+  '/_authenticated/admin/templates/$id/edit': typeof AuthenticatedAdminTemplatesIdEditRoute
   '/_authenticated/app/ad/$id/edit': typeof AuthenticatedAppAdIdEditRoute
   '/_authenticated/app/ad/$id/export': typeof AuthenticatedAppAdIdExportRoute
 }
@@ -457,6 +477,7 @@ export interface FileRouteTypes {
     | '/app/'
     | '/admin/clients/$id'
     | '/admin/templates/$id'
+    | '/admin/templates/new'
     | '/app/account/billing'
     | '/app/account/members'
     | '/app/admin/$'
@@ -467,6 +488,7 @@ export interface FileRouteTypes {
     | '/lovable/email/transactional/preview'
     | '/admin/templates/'
     | '/app/templates/'
+    | '/admin/templates/$id/edit'
     | '/app/ad/$id/edit'
     | '/app/ad/$id/export'
   fileRoutesByTo: FileRoutesByTo
@@ -499,6 +521,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/admin/clients/$id'
     | '/admin/templates/$id'
+    | '/admin/templates/new'
     | '/app/account/billing'
     | '/app/account/members'
     | '/app/admin/$'
@@ -509,6 +532,7 @@ export interface FileRouteTypes {
     | '/lovable/email/transactional/preview'
     | '/admin/templates'
     | '/app/templates'
+    | '/admin/templates/$id/edit'
     | '/app/ad/$id/edit'
     | '/app/ad/$id/export'
   id:
@@ -545,6 +569,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/'
     | '/_authenticated/admin/clients_/$id'
     | '/_authenticated/admin/templates/$id'
+    | '/_authenticated/admin/templates/new'
     | '/_authenticated/app/account_/billing'
     | '/_authenticated/app/account_/members'
     | '/_authenticated/app/admin/$'
@@ -555,6 +580,7 @@ export interface FileRouteTypes {
     | '/lovable/email/transactional/preview'
     | '/_authenticated/admin/templates/'
     | '/_authenticated/app/templates/'
+    | '/_authenticated/admin/templates/$id/edit'
     | '/_authenticated/app/ad/$id/edit'
     | '/_authenticated/app/ad/$id/export'
   fileRoutesById: FileRoutesById
@@ -815,6 +841,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminTemplatesIdRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/templates/new': {
+      id: '/_authenticated/admin/templates/new'
+      path: '/templates/new'
+      fullPath: '/admin/templates/new'
+      preLoaderRoute: typeof AuthenticatedAdminTemplatesNewRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/app/account_/billing': {
       id: '/_authenticated/app/account_/billing'
       path: '/account/billing'
@@ -878,6 +911,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailTransactionalPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin/templates/$id/edit': {
+      id: '/_authenticated/admin/templates/$id/edit'
+      path: '/edit'
+      fullPath: '/admin/templates/$id/edit'
+      preLoaderRoute: typeof AuthenticatedAdminTemplatesIdEditRouteImport
+      parentRoute: typeof AuthenticatedAdminTemplatesIdRoute
+    }
     '/_authenticated/app/ad/$id/edit': {
       id: '/_authenticated/app/ad/$id/edit'
       path: '/ad/$id/edit'
@@ -895,6 +935,21 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedAdminTemplatesIdRouteChildren {
+  AuthenticatedAdminTemplatesIdEditRoute: typeof AuthenticatedAdminTemplatesIdEditRoute
+}
+
+const AuthenticatedAdminTemplatesIdRouteChildren: AuthenticatedAdminTemplatesIdRouteChildren =
+  {
+    AuthenticatedAdminTemplatesIdEditRoute:
+      AuthenticatedAdminTemplatesIdEditRoute,
+  }
+
+const AuthenticatedAdminTemplatesIdRouteWithChildren =
+  AuthenticatedAdminTemplatesIdRoute._addFileChildren(
+    AuthenticatedAdminTemplatesIdRouteChildren,
+  )
+
 interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminAdminsRoute: typeof AuthenticatedAdminAdminsRoute
   AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
@@ -902,7 +957,8 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminExportsRoute: typeof AuthenticatedAdminExportsRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
   AuthenticatedAdminClientsIdRoute: typeof AuthenticatedAdminClientsIdRoute
-  AuthenticatedAdminTemplatesIdRoute: typeof AuthenticatedAdminTemplatesIdRoute
+  AuthenticatedAdminTemplatesIdRoute: typeof AuthenticatedAdminTemplatesIdRouteWithChildren
+  AuthenticatedAdminTemplatesNewRoute: typeof AuthenticatedAdminTemplatesNewRoute
   AuthenticatedAdminTemplatesIndexRoute: typeof AuthenticatedAdminTemplatesIndexRoute
 }
 
@@ -914,7 +970,9 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminExportsRoute: AuthenticatedAdminExportsRoute,
     AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
     AuthenticatedAdminClientsIdRoute: AuthenticatedAdminClientsIdRoute,
-    AuthenticatedAdminTemplatesIdRoute: AuthenticatedAdminTemplatesIdRoute,
+    AuthenticatedAdminTemplatesIdRoute:
+      AuthenticatedAdminTemplatesIdRouteWithChildren,
+    AuthenticatedAdminTemplatesNewRoute: AuthenticatedAdminTemplatesNewRoute,
     AuthenticatedAdminTemplatesIndexRoute:
       AuthenticatedAdminTemplatesIndexRoute,
   }
