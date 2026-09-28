@@ -84,7 +84,7 @@ function AdminTemplates() {
   const canDrag = filter === "all" && format === "all" && !q.trim();
 
   const refresh = () => qc.invalidateQueries({ queryKey: adminTemplatesKey }).then(() => qc.invalidateQueries({ queryKey: ["templates"] }));
-  async function run(id: string, action: "duplicate" | "unpublish" | "archive" | "restore" | "feature" | "unfeature" | "delete", done: string) {
+  async function run(id: string, action: "duplicate" | "publish" | "unpublish" | "archive" | "restore" | "feature" | "unfeature" | "delete", done: string) {
     try {
       const r = await act({ data: { id, action } });
       toast(done);
