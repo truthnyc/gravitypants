@@ -47,10 +47,7 @@ export const diagnoseBilling = createServerFn({ method: "POST" })
 
     try {
       const { gatewayText } = await import("@/lib/ai/gateway.server");
-      const answer = await gatewayText([
-        {
-          role: "system",
-          content:
+      const answer = await gatewayText(
             "You are the billing helper for Gravity Pants, an app that turns photos into video ads. " +
             "Plans: 7-day free trial (3 watermarked exports), Simple, Business, Business Yearly, Team, Team Yearly; extra-export packs of 5 never expire. " +
             "Plan changes and cancelling happen in Manage Billing (on Account > Billing). Paying for a new plan when one is active is blocked. " +
@@ -58,9 +55,8 @@ export const diagnoseBilling = createServerFn({ method: "POST" })
             "and give one clear next step the owner can take in the app. If the facts show something only support can fix (for example two active subscriptions, " +
             "or the app plan not matching the payment provider), say so and suggest emailing info@gravitypants.com. " +
             "Never invent facts. No emoji, no technical terms, no markdown headings. Keep it under 120 words.",
-        },
-        { role: "user", content: `Billing facts: ${facts}\n\nThe owner says: ${data.issue}` },
-      ]);
+        [{ role: "user", content: `Billing facts: ${facts}\n\nThe owner says: ${data.issue}` }],
+      );
       return { answer: answer.trim() || "I couldn't work this one out. Please email info@gravitypants.com." };
     } catch (e) {
       const { gatewayErrorMessage } = await import("@/lib/ai/gateway.server");

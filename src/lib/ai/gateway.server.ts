@@ -6,7 +6,7 @@ export const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1";
 export const DEFAULT_MODEL = "openai/gpt-6-astra";
 
 /** One-shot Responses call through the Lovable AI Gateway; streams, returns final text. */
-export async function gatewayText(messages: ModelMessage[], signal?: AbortSignal): Promise<string> {
+export async function gatewayText(system: string, messages: ModelMessage[], signal?: AbortSignal): Promise<string> {
   const apiKey = process.env["LOVABLE_API_KEY"];
   if (!apiKey) throw new Error("LOVABLE_API_KEY is not configured");
   let runId: string | undefined;
@@ -24,6 +24,7 @@ export async function gatewayText(messages: ModelMessage[], signal?: AbortSignal
   });
   const result = streamText({
     model: provider.responses(DEFAULT_MODEL),
+    system,
     messages,
     ...(signal ? { abortSignal: signal } : {}),
     providerOptions: {
