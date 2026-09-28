@@ -60,8 +60,7 @@ function Pricing() {
               const pr = priceFor(p, billing);
               const pop = p.id === "team";
               return (
-                <article key={p.id} className={`pr-tier${pop ? " pop" : ""}`}>
-                  {pop && <span className="pr-badge">Best value</span>}
+                  <article key={p.id} className={`pr-tier${pop ? " pop" : ""}`}>
                   <div className="pr-tier-top"><h3>{p.name}</h3><p>{p.tagline}</p></div>
                   <div className="pr-price"><b>{pr.price}</b><span>{pr.per}</span></div>
                   <span className="pr-note">{pr.note}</span>
