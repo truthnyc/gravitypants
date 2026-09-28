@@ -3,7 +3,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Archive, Copy, EyeOff, GripVertical, Lock, MoreHorizontal, Pencil, Play, Plus, RotateCcw, Search, Star, Trash2 } from "lucide-react";
+import { Archive, Eye, Copy, EyeOff, GripVertical, Lock, MoreHorizontal, Pencil, Play, Plus, RotateCcw, Search, Star, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { fmtDate, PageTitle } from "@/components/admin/AdminShell";
