@@ -31,11 +31,11 @@
 - Support editing: time-boxed `support_sessions` rows grant write RLS via `has_support_session()`; a trigger logs each write. Other workspaces' ads open read-only in the normal editor.
 - Export history lives in the `exports` table (status/error/bytes) for the admin Exports list; files themselves stay in storage.
 - Price→plan mapping lives only in `src/lib/stillframe/plan-map.ts` (webhook, portal, tests share it); the `workspace_billing_plan_check` constraint must list every plan there — a missing value silently drops paid plans.
-- Billing reads/actions use the active workspace (`peekWorkspaceId()`), and new subscriptions are refused server-side when one is already active — plan changes only via Manage Billing.
+- Billing uses `peekWorkspaceId()`, refuses duplicate subscriptions server-side, and switches via Manage Billing; `signup-choice.ts` stores only a per-user suggestion, never paid access.
 - Pre-release billing checks: `bun run test` (unit) and `bun run check:billing` (test-mode checkout per plan, portal, plan change, DB plan values).
 - AI calls go through `src/lib/ai/gateway.server.ts` (Responses, openai/gpt-6-astra, streamed, instructions via `system`); the billing helper is `diagnoseBilling` in `billing-help.functions.ts`, owners/admins only.
 - Brand kits: named kits live in `brand_kits` (logos in private `brand-assets` bucket, paths prefixed `brand-assets:` so `getMediaUrl` picks the bucket); ads link via `projects.brand_kit_id`; `effectiveKit()` merges the kit over the legacy `brand_kit` row, which now only holds workspace ad settings (placement, size, end card). Gating via SQL `brand_kits_enabled()` in RLS.
-- Templates: `templates` table (settings JSON, no photos; visibility private|team). Applying one builds a photo-less source ad and reuses `insertCopy` (same path as Duplicate with New Photos). Save needs a paid plan (`brand_kits_enabled`), team sharing needs `workspace_is_team()` — both enforced in RLS.
+- Templates: `templates` are photo-less styles; gallery examples map to them in `example-template.ts`, then reuse `insertCopy` so user photos remain private. Save needs `brand_kits_enabled`, sharing needs `workspace_is_team()` in RLS.
 
 - Plan gates: every feature check goes through `usePlanAccess().canUse(feature)` in `src/lib/stillframe/plan.ts`; blocked features call `openUpgrade()` (one shared dialog) instead of hiding — one place for plan rules.
 - Support: tickets in `support_tickets` via `submitTicket` server fn; priority set by SQL trigger from the plan (never the browser); each ticket emails help@gravitypants.com.
