@@ -4,11 +4,14 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { isAcceptedImage } from "@/lib/stillframe/media";
-import { useCreateAdFromPhotos, type UploadProgress } from "@/lib/stillframe/data";
+import { useCreateAdFromPhotos, useCreateAdFromTemplate, type Template, type UploadProgress } from "@/lib/stillframe/data";
+import { StartFromDialog } from "@/components/templates/TemplateDialogs";
 
 export function DropZone({ spacious = false }: { spacious?: boolean }) {
   const navigate = useNavigate();
   const createAd = useCreateAdFromPhotos();
+  const fromTemplate = useCreateAdFromTemplate();
+  const [pending, setPending] = useState<File[] | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
   const [uploads, setUploads] = useState<UploadProgress[]>([]);
@@ -19,8 +22,15 @@ export function DropZone({ spacious = false }: { spacious?: boolean }) {
       toast.error("Please choose JPG, PNG, HEIC or WebP photos");
       return;
     }
+    setPending(images);
+  }
+
+  async function create(images: File[], template: Template | null) {
+    setPending(null);
     try {
-      const id = await createAd.mutateAsync({ files: images, onProgress: setUploads });
+      const id = template
+        ? await fromTemplate.mutateAsync({ template, files: images, onProgress: setUploads })
+        : await createAd.mutateAsync({ files: images, onProgress: setUploads });
       setUploads([]);
       navigate({ to: "/ad/$id/edit", params: { id } });
     } catch {
@@ -63,10 +73,10 @@ export function DropZone({ spacious = false }: { spacious?: boolean }) {
         <Button
           className="mt-3 min-h-12 w-full text-[16px] sm:w-auto lg:mt-4 lg:min-h-10 lg:text-[14px]"
           size="main"
-          disabled={createAd.isPending}
+          disabled={(createAd.isPending || fromTemplate.isPending)}
           onClick={() => fileInput.current?.click()}
         >
-          {createAd.isPending ? "Uploading…" : "Choose Photos"}
+          {(createAd.isPending || fromTemplate.isPending) ? "Uploading…" : "Choose Photos"}
         </Button>
 
         {uploads.length > 0 && (
@@ -90,6 +100,13 @@ export function DropZone({ spacious = false }: { spacious?: boolean }) {
           </ul>
         )}
       </div>
+
+      <StartFromDialog
+        open={Boolean(pending)}
+        count={pending?.length ?? 0}
+        onCancel={() => setPending(null)}
+        onPick={(t) => pending && void create(pending, t)}
+      />
 
       <input
         ref={fileInput}

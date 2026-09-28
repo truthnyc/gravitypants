@@ -28,6 +28,7 @@ import {
 import { formatSeconds, type ProjectWithFrames } from "@/lib/stillframe/types";
 import { isAcceptedImage } from "@/lib/stillframe/media";
 import { FramePreview } from "./FramePreview";
+import { SaveTemplateDialog } from "@/components/templates/TemplateDialogs";
 
 export function AdCard({ project }: { project: ProjectWithFrames }) {
   const navigate = useNavigate();
@@ -39,6 +40,7 @@ export function AdCard({ project }: { project: ProjectWithFrames }) {
   const [renameOpen, setRenameOpen] = useState(false);
   const [draftName, setDraftName] = useState(project.name);
   const [actionsOpen, setActionsOpen] = useState(false);
+  const [templateOpen, setTemplateOpen] = useState(false);
 
   const previewFrames = project.frames.slice(0, 4);
   const meta = `${project.frames.length} ${project.frames.length === 1 ? "frame" : "frames"} · ${formatSeconds(
@@ -115,15 +117,8 @@ export function AdCard({ project }: { project: ProjectWithFrames }) {
             <DropdownMenuItem onSelect={() => fileInput.current?.click()}>
               Duplicate with New Photos…
             </DropdownMenuItem>
-            <DropdownMenuItem
-              onSelect={() =>
-                updateProject.mutate(
-                  { id: project.id, patch: { is_template: true } },
-                  { onSuccess: () => toast.success("Saved as template") },
-                )
-              }
-            >
-              Save as Template
+            <DropdownMenuItem onSelect={() => setTemplateOpen(true)}>
+              Save as Template…
             </DropdownMenuItem>
             <DropdownMenuItem
               onSelect={() => {
@@ -148,7 +143,7 @@ export function AdCard({ project }: { project: ProjectWithFrames }) {
           <div className="grid px-4 pb-6 text-left">
             <button className="flex h-12 items-center hairline-b" onClick={() => navigate({ to: "/ad/$id/edit", params: { id: project.id } })}>Open</button>
             <button className="flex h-12 items-center hairline-b" onClick={() => fileInput.current?.click()}>Duplicate with New Photos</button>
-            <button className="flex h-12 items-center hairline-b" onClick={() => { updateProject.mutate({ id: project.id, patch: { is_template: true } }, { onSuccess: () => toast.success("Saved as template") }); setActionsOpen(false); }}>Save as Template</button>
+            <button className="flex h-12 items-center hairline-b" onClick={() => { setActionsOpen(false); setTemplateOpen(true); }}>Save as Template</button>
             <button className="flex h-12 items-center hairline-b" onClick={() => { setDraftName(project.name); setActionsOpen(false); setRenameOpen(true); }}>Rename</button>
             <button className="flex h-12 items-center text-destructive" onClick={() => { setActionsOpen(false); handleTrash(); }}>Move to Trash</button>
           </div>
@@ -167,6 +162,8 @@ export function AdCard({ project }: { project: ProjectWithFrames }) {
           void handleReplacePhotos(files);
         }}
       />
+
+      {templateOpen && <SaveTemplateDialog project={project} open={templateOpen} onOpenChange={setTemplateOpen} />}
 
       <Dialog open={renameOpen} onOpenChange={setRenameOpen}>
         <DialogContent className="rounded-sm sm:max-w-[420px]">

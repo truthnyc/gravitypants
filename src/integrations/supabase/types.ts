@@ -461,6 +461,50 @@ export type Database = {
           },
         ]
       }
+      templates: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          name: string
+          settings: Json
+          thumbnail_url: string | null
+          updated_at: string
+          visibility: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          name?: string
+          settings?: Json
+          thumbnail_url?: string | null
+          updated_at?: string
+          visibility?: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          name?: string
+          settings?: Json
+          thumbnail_url?: string | null
+          updated_at?: string
+          visibility?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "templates_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspace_billing: {
         Row: {
           cancel_at_period_end: boolean
@@ -655,6 +699,7 @@ export type Database = {
         Args: { _kit: string; _ws: string }
         Returns: undefined
       }
+      workspace_is_team: { Args: { _ws: string }; Returns: boolean }
       workspace_member_list: {
         Args: { _ws: string }
         Returns: {
