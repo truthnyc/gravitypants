@@ -50,12 +50,13 @@ export function PlanCards({ compact = false }: { compact?: boolean }) {
   const paid = isPaid(billing);
 
   async function choose(p: Plan) {
+    // Switching plans happens in Manage Billing; call it first so the new tab isn't blocked.
+    if (paid) return void manage();
     const ws = await currentWorkspaceId();
     if (!ws) {
       void navigate({ to: "/signup", search: { redirect: "/pricing" } });
       return;
     }
-    if (paid) return void manage(); // switching plans happens in Manage Billing
     setCheckout({ priceId: p.price_id, ws });
   }
 
