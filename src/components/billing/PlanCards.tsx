@@ -1,12 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
 import { Check } from "lucide-react";
-import { EmbeddedCheckout, EmbeddedCheckoutProvider } from "@stripe/react-stripe-js";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { getStripe, getStripeEnvironment } from "@/lib/stripe";
-import { createCheckoutSession } from "@/lib/stillframe/billing.functions";
+import { CheckoutDialog, type CheckoutTarget } from "@/components/billing/CheckoutDialog";
 import { currentWorkspaceId, isPaid, money, useBilling, useManageBilling, usePlans, type Plan } from "@/lib/stillframe/billing";
 import { cn } from "@/lib/utils";
 
@@ -25,28 +21,12 @@ const CTA: Record<string, { label: string; variant: "plain" | "default" }> = {
   team_yearly: { label: "Choose Team Yearly", variant: "plain" },
 };
 
-function Checkout({ priceId, workspaceId }: { priceId: string; workspaceId: string }) {
-  const create = useServerFn(createCheckoutSession);
-  const fetchClientSecret = async () => {
-    const r = await create({
-       data: { priceId, workspaceId, returnUrl: `${window.location.origin}/app/account/billing?checkout=success`, environment: getStripeEnvironment() },
-    });
-    if ("error" in r) throw new Error(r.error);
-    return r.clientSecret;
-  };
-  return (
-    <EmbeddedCheckoutProvider stripe={getStripe()} options={{ fetchClientSecret }}>
-      <EmbeddedCheckout />
-    </EmbeddedCheckoutProvider>
-  );
-}
-
 export function PlanCards({ compact = false }: { compact?: boolean }) {
   const { data: plans } = usePlans();
   const { data: billing } = useBilling();
   const navigate = useNavigate();
   const manage = useManageBilling();
-  const [checkout, setCheckout] = useState<{ priceId: string; ws: string } | null>(null);
+  const [checkout, setCheckout] = useState<CheckoutTarget | null>(null);
   const paid = isPaid(billing);
 
   async function choose(p: Plan) {
@@ -100,12 +80,7 @@ export function PlanCards({ compact = false }: { compact?: boolean }) {
           );
         })}
       </div>
-      <Dialog open={!!checkout} onOpenChange={(o) => !o && setCheckout(null)}>
-        <DialogContent className="max-h-[90vh] max-w-[560px] overflow-y-auto">
-          <DialogTitle className="sr-only">Pay for your plan</DialogTitle>
-          {checkout && <Checkout priceId={checkout.priceId} workspaceId={checkout.ws} />}
-        </DialogContent>
-      </Dialog>
+      <CheckoutDialog checkout={checkout} onClose={() => setCheckout(null)} />
     </>
   );
 }
