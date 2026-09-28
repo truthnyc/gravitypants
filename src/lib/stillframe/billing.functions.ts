@@ -40,6 +40,13 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
         const found = await stripe.customers.search({ query: `metadata['workspaceId']:'${data.workspaceId}'`, limit: 1 });
         customerId = found.data[0]?.id ?? null;
       }
+      // Never start a second subscription: plan changes go through Manage Billing.
+      if (customerId) {
+        const live = await stripe.subscriptions.list({ customer: customerId, status: "all", limit: 20 });
+        if (live.data.some((s) => ["active", "trialing", "past_due", "unpaid"].includes(s.status))) {
+          return { error: "This workspace already has a plan. Use Manage Billing to switch plans." };
+        }
+      }
       if (!customerId) {
         const c = await stripe.customers.create({
           ...(u.user?.email ? { email: u.user.email } : {}),
@@ -90,6 +97,13 @@ export const createTopUpSession = createServerFn({ method: "POST" })
       if (!customerId) {
         const found = await stripe.customers.search({ query: `metadata['workspaceId']:'${data.workspaceId}'`, limit: 1 });
         customerId = found.data[0]?.id ?? null;
+      }
+      // Never start a second subscription: plan changes go through Manage Billing.
+      if (customerId) {
+        const live = await stripe.subscriptions.list({ customer: customerId, status: "all", limit: 20 });
+        if (live.data.some((s) => ["active", "trialing", "past_due", "unpaid"].includes(s.status))) {
+          return { error: "This workspace already has a plan. Use Manage Billing to switch plans." };
+        }
       }
       if (!customerId) {
         const c = await stripe.customers.create({

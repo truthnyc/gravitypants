@@ -1,3 +1,4 @@
+import { peekWorkspaceId } from "./workspace";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -37,6 +38,9 @@ export function usePlans() {
 export async function currentWorkspaceId(): Promise<string | null> {
   const { data } = await supabase.auth.getSession();
   if (!data.session) return null;
+  // Billing follows the workspace the user is working in (workspace switcher), not just their first one.
+  const active = peekWorkspaceId();
+  if (active) return active;
   const { data: ws } = await supabase.rpc("ensure_workspace");
   return (ws as string) ?? null;
 }
