@@ -64,6 +64,55 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
     }
   });
 
+/** One-time purchase: 5 extra exports that never expire. */
+export const createTopUpSession = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { workspaceId: string; returnUrl: string } & Env) => {
+    if (!idRe.test(d.workspaceId)) throw new Error("Invalid input");
+    return { ...d, environment: checkEnv(d.environment) };
+  })
+  .handler(async ({ data, context }): Promise<{ clientSecret: string } | { error: string }> => {
+    const { supabase, userId } = context;
+    const { data: member } = await supabase.rpc("is_workspace_member", { _ws: data.workspaceId });
+    if (!member) return { error: "You don't have access to this workspace." };
+    const { data: billing } = await supabase
+      .from("workspace_billing")
+      .select("stripe_customer_id")
+      .eq("workspace_id", data.workspaceId)
+      .maybeSingle();
+    const { data: u } = await supabase.auth.getUser();
+    try {
+      const stripe = createStripeClient(data.environment);
+      const prices = await stripe.prices.list({ lookup_keys: ["extra_exports_5"] });
+      const price = prices.data[0];
+      if (!price) return { error: "That pack isn't available." };
+      let customerId = billing?.stripe_customer_id ?? null;
+      if (!customerId) {
+        const found = await stripe.customers.search({ query: `metadata['workspaceId']:'${data.workspaceId}'`, limit: 1 });
+        customerId = found.data[0]?.id ?? null;
+      }
+      if (!customerId) {
+        const c = await stripe.customers.create({
+          ...(u.user?.email ? { email: u.user.email } : {}),
+          metadata: { userId, workspaceId: data.workspaceId },
+        });
+        customerId = c.id;
+      }
+      const session = await stripe.checkout.sessions.create({
+        line_items: [{ price: price.id, quantity: 1 }],
+        mode: "payment",
+        ui_mode: "embedded_page",
+        return_url: data.returnUrl,
+        customer: customerId,
+        metadata: { userId, workspaceId: data.workspaceId, topup: "extra_exports_5", managed_payments: "true" },
+        managed_payments: { enabled: true },
+      } as Stripe.Checkout.SessionCreateParams);
+      return { clientSecret: session.client_secret ?? "" };
+    } catch (e) {
+      return { error: getStripeErrorMessage(e) };
+    }
+  });
+
 const PORTAL_TAG = "stillframe_v1";
 
 /**

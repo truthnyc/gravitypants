@@ -103,6 +103,17 @@ async function handle(req: Request, env: StripeEnv) {
         const db = await admin();
         await db.from("workspace_billing").update({ stripe_customer_id: obj.customer, environment: env }).eq("workspace_id", ws);
       }
+      // One-time top-up pack: credit 5 extra exports once payment is final.
+      if (ws && obj.mode === "payment" && obj.metadata?.topup === "extra_exports_5" && obj.payment_status !== "unpaid") {
+        const db = await admin();
+        const { data: b } = await db.from("workspace_billing").select("extra_exports, last_topup_session").eq("workspace_id", ws).maybeSingle();
+        if (b && b.last_topup_session !== obj.id) {
+          await db
+            .from("workspace_billing")
+            .update({ extra_exports: (b.extra_exports ?? 0) + 5, last_topup_session: obj.id })
+            .eq("workspace_id", ws);
+        }
+      }
       break;
     }
     case "customer.subscription.created": {
