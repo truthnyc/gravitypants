@@ -12,3 +12,9 @@
 ## Outstanding
 - [ ] Publish (fixes email header on sent mail, activates lifecycle emails, syncs Team products to live)
 - [ ] Live-check checkout, export limits, Customer Portal after publish
+
+## Extra exports top-up (done)
+- [x] 5 extra exports · $12.50 one-time, never expire (product extra_exports_pack / extra_exports_5)
+- [x] workspace_billing.extra_exports + export_status/record_export spend extras after monthly limit
+- [x] Webhook credits 5 extras on completed one-time payment (idempotent)
+- [x] Top-up card on Account › Billing; extras shown on Export page; limit-reached sheet mentions top-up
