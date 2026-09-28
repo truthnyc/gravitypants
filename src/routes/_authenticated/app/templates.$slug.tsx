@@ -14,7 +14,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { MediaImage } from "@/components/stillframe/MediaImage";
 import { StepBar, templateBackground, templateFormat, templateSlides, type Aspect } from "@/components/templates/TemplatePreview";
-import { useCreateAdFromCustomization, useMyUserId, useProject, useTemplates, type CustomSlide, type ProjectWithFrames, type Template, type TemplateSlide } from "@/lib/stillframe/data";
+import { useCreateAdFromCustomization, useMyUserId, useProject, useTemplates, type CustomSlide, type Template, type TemplateSlide } from "@/lib/stillframe/data";
+import type { ProjectWithFrames } from "@/lib/stillframe/types";
 import { templateForExample } from "@/lib/site/example-template";
 import { isAcceptedImage, uploadMedia } from "@/lib/stillframe/media";
 import { cn } from "@/lib/utils";
