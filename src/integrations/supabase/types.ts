@@ -750,6 +750,8 @@ export type Database = {
       is_platform_admin: { Args: never; Returns: boolean }
       is_workspace_admin: { Args: { _ws: string }; Returns: boolean }
       is_workspace_member: { Args: { _ws: string }; Returns: boolean }
+      kit_shared: { Args: { _ws: string }; Returns: boolean }
+      kit_workspaces: { Args: { _ws: string }; Returns: string[] }
       record_export: {
         Args: { _project: string; _stamp: string; _ws: string }
         Returns: boolean
