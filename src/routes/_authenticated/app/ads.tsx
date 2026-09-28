@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { rememberSignupChoice } from "@/lib/stillframe/signup-choice";
 import { PLANS } from "@/lib/stillframe/plans-config";
+import { templateForExample } from "@/lib/site/example-template";
 
 export const Route = createFileRoute("/_authenticated/app/ads")({
   validateSearch: z.object({ welcome: z.string().optional(), template: z.string().optional(), plan: z.string().optional(), billing: z.string().optional() }),
