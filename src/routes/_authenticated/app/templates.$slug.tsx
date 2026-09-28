@@ -306,6 +306,9 @@ function SlideRow({ index, slide, value, format, bg, active, busy, error, onFocu
           aria-label={`Slide ${index + 1} subline`}
           className="mt-1.5 h-11 w-full rounded-sm bg-control-fill px-3 text-[16px] placeholder:text-secondary-text lg:h-9 lg:text-[14px]"
         />
+        {value.photo && (
+          <button type="button" onClick={onRemove} className="-ml-1 h-11 px-1 text-[14px] font-medium text-destructive md:hidden">Remove photo</button>
+        )}
         {error && <p role="alert" className="mt-1 text-[12px] text-destructive">{error}</p>}
       </div>
     </li>

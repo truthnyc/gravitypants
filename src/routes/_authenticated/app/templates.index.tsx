@@ -1,3 +1,4 @@
+import { Pause, Play } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
@@ -69,7 +70,7 @@ function TemplatesPage() {
         </section>
       )}
 
-      <div role="tablist" aria-label="Template collections" className="mt-8 flex max-w-full gap-1 overflow-x-auto rounded-lg bg-control-fill p-0.5 sm:inline-flex">
+      <div role="tablist" aria-label="Template collections" className="-mx-4 mt-8 flex max-w-[100vw] gap-2 overflow-x-auto px-4 [scrollbar-width:none] md:mx-0 md:inline-flex md:max-w-full md:gap-1 md:rounded-lg md:bg-control-fill md:p-0.5">
         {tabs.map(([id, label]) => (
           <button
             key={id}
@@ -77,7 +78,7 @@ function TemplatesPage() {
             type="button"
             aria-selected={tab === id}
             onClick={() => setTab(id)}
-            className={cn("h-11 shrink-0 whitespace-nowrap rounded-lg px-4 text-[14px] font-medium focus-visible:outline-2 focus-visible:outline-primary lg:h-9", tab === id ? "bg-card shadow-segment" : "text-secondary-text")}
+            className={cn("h-11 shrink-0 whitespace-nowrap rounded-full px-4 text-[15px] font-medium focus-visible:outline-2 focus-visible:outline-primary md:rounded-lg md:text-[14px] lg:h-9", tab === id ? "bg-foreground text-background md:bg-card md:text-foreground md:shadow-segment" : "bg-control-fill text-secondary-text md:bg-transparent")}
           >
             {label}
           </button>
@@ -105,22 +106,26 @@ function TemplatesPage() {
 function TemplateCard({ template: t, selected = false }: { template: Template; selected?: boolean }) {
   const reduced = usePrefersReducedMotion();
   const [hover, setHover] = useState(false);
+  const [tapPlay, setTapPlay] = useState(false);
+  // Hover previews only with a real pointer; phones use the play button instead.
+  const canHover = typeof window !== "undefined" && window.matchMedia("(hover: hover) and (min-width: 768px)").matches;
   const slides = templateSlides(t);
   return (
+    <div className="relative">
     <Link
       to="/app/templates/$slug"
       params={{ slug: templateSlug(t) }}
-      onMouseEnter={() => setHover(true)}
+      onMouseEnter={() => canHover && setHover(true)}
       onMouseLeave={() => setHover(false)}
-      onFocus={() => setHover(true)}
+      onFocus={() => canHover && setHover(true)}
       onBlur={() => setHover(false)}
       className={cn(
-        "group block rounded-sm bg-card p-3 shadow-card outline-none transition-[transform,box-shadow] duration-200 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 motion-safe:hover:-translate-y-0.5 hover:shadow-popover",
+        "group block rounded-sm bg-card p-3 shadow-card outline-none transition-[transform,box-shadow] duration-200 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 md:motion-safe:hover:-translate-y-0.5 md:hover:shadow-popover",
         selected && "ring-2 ring-primary",
       )}
     >
       <div className="flex h-[196px] items-center justify-center rounded-sm bg-site-panel p-4">
-        <TemplatePreview template={t} playing={hover && !reduced} />
+        <TemplatePreview template={t} playing={(hover && !reduced) || tapPlay} />
       </div>
       <div className="px-1 pb-1 pt-3">
         <div className="flex items-center gap-2">
@@ -131,5 +136,14 @@ function TemplateCard({ template: t, selected = false }: { template: Template; s
         {t.description && <p className="mt-1.5 text-[14px] text-secondary-text">{t.description}</p>}
       </div>
     </Link>
+    <button
+      type="button"
+      onClick={() => setTapPlay((p) => !p)}
+      aria-label={tapPlay ? `Pause ${t.name} preview` : `Play ${t.name} preview`}
+      className="absolute bottom-[calc(100%-196px-4px)] right-5 flex size-11 items-center justify-center rounded-full bg-card/95 shadow-card md:hidden"
+    >
+      {tapPlay ? <Pause className="size-4" strokeWidth={1.7} /> : <Play className="size-4" strokeWidth={1.7} />}
+    </button>
+    </div>
   );
 }
