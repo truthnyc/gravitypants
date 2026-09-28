@@ -52,7 +52,19 @@ const NEW_SUBLINE: TextSettings = {
 };
 const STYLE_KEYS = ["font_family", "font_weight", "size_px", "color", "animation", "position", "keep_under_headline"] as const;
 type FrameStyle = Pick<Frame, "transition_in"> & {
-  photo: Pick<PhotoSettings, "fit" | "movement" | "brightness" | "darken_for_text" | "background_color">;
+  photo: Pick<
+    PhotoSettings,
+    | "fit"
+    | "movement"
+    | "movement_intensity"
+    | "zoom_start"
+    | "zoom_end"
+    | "pan_x"
+    | "pan_y"
+    | "brightness"
+    | "darken_for_text"
+    | "background_color"
+  >;
   headline: Partial<TextSettings> | null;
   subline: Partial<TextSettings> | null;
 };
@@ -265,7 +277,22 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
     if (!f) return;
     const p = f.photo ?? {};
     const photo = Object.fromEntries(
-      (["fit", "movement", "brightness", "darken_for_text", "background_color"] as const).filter((k) => p[k] !== undefined).map((k) => [k, p[k]]),
+      (
+        [
+          "fit",
+          "movement",
+          "movement_intensity",
+          "zoom_start",
+          "zoom_end",
+          "pan_x",
+          "pan_y",
+          "brightness",
+          "darken_for_text",
+          "background_color",
+        ] as const
+      )
+        .filter((k) => p[k] !== undefined)
+        .map((k) => [k, p[k]]),
     ) as FrameStyle["photo"];
     setStyleClip({
       transition_in: f.transition_in,

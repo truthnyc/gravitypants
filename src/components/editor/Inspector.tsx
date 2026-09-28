@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { ChevronRight, Clock, Crop, Image as ImageIcon, Minus, Plus, Shapes, Sparkles, TextQuote, Type } from "lucide-react";
+import { ChevronRight, Clock, Crop, Image as ImageIcon, Minus, Plus, RefreshCw, Shapes, Sparkles, TextQuote, Type } from "lucide-react";
 import type { EditorDoc } from "@/lib/stillframe/data";
 import {
   PACE_SECONDS,
@@ -319,12 +319,24 @@ const MOVEMENTS: { value: NonNullable<PhotoSettings["movement"]>; label: string 
   { value: "slow_zoom_out", label: "Slow zoom out" },
   { value: "pan_left", label: "Pan left" },
   { value: "pan_right", label: "Pan right" },
+  { value: "custom", label: "Custom" },
+];
+const INTENSITIES: { value: NonNullable<PhotoSettings["movement_intensity"]>; label: string }[] = [
+  { value: "subtle", label: "Subtle" },
+  { value: "standard", label: "Standard" },
+  { value: "dramatic", label: "Dramatic" },
 ];
 const BG_COLORS = ["#000000", "#1D1D1F", "#FFFFFF", "#F1F3F0"];
 
 function PhotoPanel({ photo, adjusting, actions }: { photo: PhotoSettings; adjusting: boolean; actions: InspectorActions }) {
   const brightness = Math.round(Number(photo.brightness ?? 0) * 200);
   const fit = photo.fit ?? "fill";
+  const move = photo.movement ?? "none";
+  const zoomStart = Math.round(Number(photo.zoom_start ?? 1) * 100);
+  const zoomEnd = Math.round(Number(photo.zoom_end ?? 1) * 100);
+  const panX = Number(photo.pan_x ?? 0);
+  const panDir: "none" | "left" | "right" = panX === 0 ? "none" : panX < 0 ? "left" : "right";
+  const panAmount = Math.round(Math.abs(panX) * 100);
   return (
     <>
       <div className="flex items-center gap-3">
@@ -378,11 +390,22 @@ function PhotoPanel({ photo, adjusting, actions }: { photo: PhotoSettings; adjus
             <button
               key={m.value}
               type="button"
-              onClick={() => actions.onPhoto({ movement: m.value })}
-              aria-pressed={(photo.movement ?? "none") === m.value}
+              onClick={() =>
+                actions.onPhoto(
+                  m.value === "custom"
+                    ? {
+                        movement: "custom",
+                        zoom_start: photo.zoom_start ?? 1,
+                        zoom_end: photo.zoom_end ?? 1.1,
+                        pan_x: photo.pan_x ?? 0,
+                      }
+                    : { movement: m.value },
+                )
+              }
+              aria-pressed={move === m.value}
               className={cn(
                 "h-7 rounded-lg px-2.5 text-[12px] font-medium",
-                (photo.movement ?? "none") === m.value ? "bg-el-photo text-primary-foreground" : "bg-control-fill",
+                move === m.value ? "bg-el-photo text-primary-foreground" : "bg-control-fill",
               )}
             >
               {m.label}
@@ -390,6 +413,73 @@ function PhotoPanel({ photo, adjusting, actions }: { photo: PhotoSettings; adjus
           ))}
         </div>
       </Field>
+      {move !== "none" && move !== "custom" && (
+        <Field label="Amount">
+          <Segmented
+            value={photo.movement_intensity ?? "standard"}
+            options={INTENSITIES}
+            onChange={(v) => actions.onPhoto({ movement_intensity: v })}
+          />
+        </Field>
+      )}
+      {move === "custom" && (
+        <>
+          <Field label="Start size" value={`${zoomStart}%`}>
+            <ElementSlider
+              name="Start size"
+              color="var(--el-photo)"
+              min={100}
+              max={150}
+              value={zoomStart}
+              snap={(v) => (v <= 103 ? 100 : v)}
+              onChange={(v, k) => actions.onPhoto({ zoom_start: v / 100 }, k)}
+            />
+          </Field>
+          <Field label="End size" value={`${zoomEnd}%`}>
+            <ElementSlider
+              name="End size"
+              color="var(--el-photo)"
+              min={100}
+              max={150}
+              value={zoomEnd}
+              snap={(v) => (v <= 103 ? 100 : v)}
+              onChange={(v, k) => actions.onPhoto({ zoom_end: v / 100 }, k)}
+            />
+          </Field>
+          <Button
+            variant="default"
+            size="sm"
+            onClick={() => actions.onPhoto({ zoom_start: zoomEnd / 100, zoom_end: zoomStart / 100 })}
+          >
+            <RefreshCw strokeWidth={1.7} /> Reverse
+          </Button>
+          <Field label="Move sideways">
+            <Segmented
+              value={panDir}
+              options={[
+                { value: "none", label: "None" },
+                { value: "left", label: "Left" },
+                { value: "right", label: "Right" },
+              ]}
+              onChange={(v) =>
+                actions.onPhoto({ pan_x: v === "none" ? 0 : (v === "left" ? -1 : 1) * (panAmount / 100 || 0.5) })
+              }
+            />
+          </Field>
+          {panDir !== "none" && (
+            <Field label="Distance" value={`${panAmount}%`}>
+              <ElementSlider
+                name="Pan distance"
+                color="var(--el-photo)"
+                min={10}
+                max={100}
+                value={panAmount}
+                onChange={(v, k) => actions.onPhoto({ pan_x: (panDir === "left" ? -1 : 1) * (v / 100) }, k)}
+              />
+            </Field>
+          )}
+        </>
+      )}
       <Field label="Brightness" value={brightness > 0 ? `+${brightness}` : brightness}>
         <ElementSlider
           name="Brightness"
