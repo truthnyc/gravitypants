@@ -74,7 +74,18 @@ export function TemplatePreview({ template, playing, className, quiet = false }:
       {!playing && thumb && !thumb.startsWith("/") && <MediaImage path={thumb} alt="" className="absolute inset-0 h-full w-full object-cover" />}
       {playing && slide && (
         <div key={cycle} className={cn("tpl-slide absolute inset-0", `tpl-in-${cycle === 0 ? "none" : slide.transition_in}`)} style={{ background: bg }}>
-          <div className={cn("absolute inset-0", slide.photo_motion !== "none" && `tpl-photo-${slide.photo_motion}`)} style={{ background: "radial-gradient(120% 90% at 50% 30%, rgb(255 255 255 / 0.14), transparent 60%)" }} />
+          <div className={cn("absolute inset-0 overflow-hidden", slide.photo_motion !== "none" && `tpl-photo-${slide.photo_motion}`)} style={{ background: "radial-gradient(120% 90% at 50% 30%, rgb(255 255 255 / 0.14), transparent 60%)" }}>
+            {(() => {
+              const s = slide as TemplateSlide & { sample_photo?: string | null; photo_focus?: { x: number; y: number }; photo_zoom?: number };
+              if (!s.sample_photo) return null;
+              const f = s.photo_focus ?? { x: 0.5, y: 0.5 };
+              return (
+                <div className="absolute inset-0" style={{ transform: `scale(${s.photo_zoom ?? 1})`, transformOrigin: `${f.x * 100}% ${f.y * 100}%` }}>
+                  <MediaImage path={s.sample_photo} alt="" className="h-full w-full object-cover" style={{ objectPosition: `${f.x * 100}% ${f.y * 100}%` }} />
+                </div>
+              );
+            })()}
+          </div>
           <div className="tpl-text absolute inset-0 flex flex-col items-center justify-center px-[8%] text-center">
             <p className={cn("tpl-headline font-bold leading-[1.05]", `tpl-text-${slide.text_animation}`)}>{slide.headline_placeholder}</p>
             {slide.subline_placeholder && <p className={cn("tpl-subline mt-[4%] leading-snug", `tpl-text-${slide.text_animation}`)} style={{ animationDelay: "120ms" }}>{slide.subline_placeholder}</p>}
