@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { MediaImage } from "@/components/stillframe/MediaImage";
 import { StepBar, templateBackground, templateFormat, templateSlides, type Aspect } from "@/components/templates/TemplatePreview";
-import { useCreateAdFromCustomization, useMyUserId, useTemplates, type CustomSlide, type Template, type TemplateSlide } from "@/lib/stillframe/data";
+import { useCreateAdFromCustomization, useMyUserId, useProject, useTemplates, type CustomSlide, type ProjectWithFrames, type Template, type TemplateSlide } from "@/lib/stillframe/data";
 import { templateForExample } from "@/lib/site/example-template";
 import { isAcceptedImage, uploadMedia } from "@/lib/stillframe/media";
 import { cn } from "@/lib/utils";
@@ -30,6 +30,7 @@ export const Route = createFileRoute("/_authenticated/app/templates/$slug")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
+  validateSearch: (s: Record<string, unknown>): { from?: string } => (typeof s["from"] === "string" ? { from: s["from"] } : {}),
   component: Customize,
 });
 
@@ -43,11 +44,13 @@ const clock = (s: number) => `${Math.floor(s / 60)}:${(s % 60).toFixed(1).padSta
 
 function Customize() {
   const { slug } = Route.useParams();
+  const { from } = Route.useSearch();
+  const { data: fromAd, isLoading: fromLoading } = useProject(from);
   const { data: templates = [], isLoading } = useTemplates();
   const example = slug.startsWith("example-") ? templateForExample(slug.slice(8)) : null;
   const t: Template | null = templates.find((x) => x.slug === slug || x.id === slug) ?? example;
 
-  if (isLoading && !example) return <main className="px-4 py-10 sm:px-8"><p className="text-[13px] text-secondary-text">Loading…</p></main>;
+  if ((isLoading && !example) || (from && fromLoading)) return <main className="px-4 py-10 sm:px-8"><p className="text-[13px] text-secondary-text">Loading…</p></main>;
   if (!t) {
     return (
       <main className="mx-auto max-w-[720px] px-4 py-10 sm:px-8">
@@ -57,12 +60,12 @@ function Customize() {
       </main>
     );
   }
-  return <CustomizeTemplate key={t.id} template={t} slug={slug} />;
+  return <CustomizeTemplate key={`${t.id}-${from ?? ""}`} template={t} slug={slug} fromAd={from ? fromAd ?? null : null} />;
 }
 
 type Draft = { format: Aspect; slides: CustomSlide[] };
 
-function CustomizeTemplate({ template: t, slug }: { template: Template; slug: string }) {
+function CustomizeTemplate({ template: t, slug, fromAd }: { template: Template; slug: string; fromAd: ProjectWithFrames | null }) {
   const navigate = useNavigate();
   const { data: userId } = useMyUserId();
   const slides = useMemo(() => templateSlides(t), [t]);
@@ -70,7 +73,14 @@ function CustomizeTemplate({ template: t, slug }: { template: Template; slug: st
   const create = useCreateAdFromCustomization();
   const storageKey = userId ? `gravity-pants:customize:${userId}:${slug}` : null;
 
-  const blank = (): Draft => ({ format: templateFormat(t), slides: slides.map(() => ({ photo: null, headline: "", subline: "" })) });
+  // "Make another from this kit": same text as the ad, empty photo slots for the next product.
+  const blank = (): Draft => {
+    const frames = fromAd ? [...fromAd.frames].sort((a, b) => a.sort_order - b.sort_order) : [];
+    return {
+      format: (fromAd?.primary_format as Aspect | undefined) ?? templateFormat(t),
+      slides: slides.map((_, i) => ({ photo: null, headline: frames[i]?.headline?.text ?? "", subline: frames[i]?.subline?.text ?? "" })),
+    };
+  };
   const [draft, setDraft] = useState<Draft>(blank);
   const [loaded, setLoaded] = useState(false);
   const [active, setActive] = useState(0);
@@ -82,6 +92,7 @@ function CustomizeTemplate({ template: t, slug }: { template: Template; slug: st
   // Restore the saved draft for this person + template.
   useEffect(() => {
     if (!storageKey) return;
+    if (fromAd) { setLoaded(true); return; }
     try {
       const saved = JSON.parse(localStorage.getItem(storageKey) ?? "null") as Draft | null;
       if (saved?.slides?.length === slides.length) setDraft(saved);

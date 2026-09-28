@@ -3,7 +3,7 @@ import { z } from "zod";
 import { AdCard } from "@/components/stillframe/AdCard";
 import { DropZone } from "@/components/stillframe/DropZone";
 import { useSearch } from "@/components/stillframe/search-context";
-import { useProjects } from "@/lib/stillframe/data";
+import { useProjects, useTemplates } from "@/lib/stillframe/data";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { rememberSignupChoice } from "@/lib/stillframe/signup-choice";
