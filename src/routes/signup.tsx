@@ -73,6 +73,7 @@ function SignUp() {
       setEmailError("That email is already in use. Sign in instead?");
     } else {
       if (choice && data.user) rememberSignupChoice(data.user.id, choice);
+      sessionStorage.setItem("gravity-pants:welcome", "1");
       if (data.session) navigate({ to: "/app/ads", replace: true });
       else setSent(true);
     }

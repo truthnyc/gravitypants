@@ -60,8 +60,13 @@ function SignIn() {
     const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
     setBusy(false);
     if (error) setError(plainAuthError(error.message));
-    else if (!keepSignedIn) sessionStorage.setItem("gravity-pants:signout-on-close", "1");
-    else sessionStorage.removeItem("gravity-pants:signout-on-close");
+    else if (!keepSignedIn) {
+      localStorage.setItem("gravity-pants:session-only", "1");
+      sessionStorage.setItem("gravity-pants:session-only", "1");
+    } else {
+      localStorage.removeItem("gravity-pants:session-only");
+      sessionStorage.removeItem("gravity-pants:session-only");
+    }
   }
 
   async function forgot() {
