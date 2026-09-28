@@ -544,6 +544,7 @@ export type Database = {
           style: Json
           thumbnail_url: string | null
           updated_at: string
+          updated_by: string | null
           version: number
           visibility: string
           workspace_id: string | null
@@ -570,6 +571,7 @@ export type Database = {
           style?: Json
           thumbnail_url?: string | null
           updated_at?: string
+          updated_by?: string | null
           version?: number
           visibility?: string
           workspace_id?: string | null
@@ -596,6 +598,7 @@ export type Database = {
           style?: Json
           thumbnail_url?: string | null
           updated_at?: string
+          updated_by?: string | null
           version?: number
           visibility?: string
           workspace_id?: string | null

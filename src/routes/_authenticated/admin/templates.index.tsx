@@ -3,7 +3,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Archive, Copy, EyeOff, GripVertical, Lock, MoreHorizontal, Pencil, Play, Plus, RotateCcw, Search, Star, Trash2 } from "lucide-react";
+import { Archive, Eye, Copy, EyeOff, GripVertical, Lock, MoreHorizontal, Pencil, Play, Plus, RotateCcw, Search, Star, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { fmtDate, PageTitle } from "@/components/admin/AdminShell";
@@ -84,7 +84,7 @@ function AdminTemplates() {
   const canDrag = filter === "all" && format === "all" && !q.trim();
 
   const refresh = () => qc.invalidateQueries({ queryKey: adminTemplatesKey }).then(() => qc.invalidateQueries({ queryKey: ["templates"] }));
-  async function run(id: string, action: "duplicate" | "unpublish" | "archive" | "restore" | "feature" | "unfeature" | "delete", done: string) {
+  async function run(id: string, action: "duplicate" | "publish" | "unpublish" | "archive" | "restore" | "feature" | "unfeature" | "delete", done: string) {
     try {
       const r = await act({ data: { id, action } });
       toast(done);
@@ -222,13 +222,17 @@ function AdminTemplates() {
                         <DropdownMenuItem onSelect={() => void run(r.id, "duplicate", "Duplicated as a draft")}><Copy className="size-4" strokeWidth={1.7} /> Duplicate</DropdownMenuItem>
                         {r.status === "published" && <DropdownMenuItem onSelect={() => void navigate({ to: "/app/templates/$slug", params: { slug: r.slug } })}><Play className="size-4" strokeWidth={1.7} /> Preview</DropdownMenuItem>}
                         <DropdownMenuSeparator />
-                        {r.status === "published" && <DropdownMenuItem onSelect={() => void run(r.id, "unpublish", "Unpublished")}><EyeOff className="size-4" strokeWidth={1.7} /> Unpublish</DropdownMenuItem>}
+                        {r.status === "published" ? (
+                          <DropdownMenuItem onSelect={() => void run(r.id, "unpublish", "Unpublished")}><EyeOff className="size-4" strokeWidth={1.7} /> Unpublish</DropdownMenuItem>
+                        ) : r.status === "draft" ? (
+                          <DropdownMenuItem onSelect={() => { if (confirm(`Publish \u201c${r.name}\u201d for ${r.audience?.length ? audienceLabel(r.audience) : "all users"}?`)) void run(r.id, "publish", "Published"); }}><Eye className="size-4" strokeWidth={1.7} /> Publish</DropdownMenuItem>
+                        ) : null}
                         {r.status !== "archived" ? (
                           <DropdownMenuItem onSelect={() => void run(r.id, "archive", "Archived")}><Archive className="size-4" strokeWidth={1.7} /> Archive</DropdownMenuItem>
                         ) : (
                           <DropdownMenuItem onSelect={() => void run(r.id, "restore", "Restored as a draft")}><RotateCcw className="size-4" strokeWidth={1.7} /> Restore</DropdownMenuItem>
                         )}
-                        {r.status !== "published" && (
+                        {r.status === "draft" && !r.version && !r.published_at && (
                           <DropdownMenuItem className="text-destructive" onSelect={() => { if (confirm(`Delete \u201c${r.name}\u201d? This can't be undone.`)) void run(r.id, "delete", "Deleted"); }}>
                             <Trash2 className="size-4" strokeWidth={1.7} /> Delete
                           </DropdownMenuItem>
