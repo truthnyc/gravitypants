@@ -21,6 +21,7 @@ import { MediaImage } from "@/components/stillframe/MediaImage";
 import {
   useBrandKits,
   useCanEditKits,
+  useMyUserId,
   useDeleteBrandKit,
   useKitsEnabled,
   useSaveBrandKit,
@@ -99,7 +100,7 @@ export function BrandKitsSection() {
               key={k.id}
               kit={k}
               canEdit={canEdit}
-              canDelete={isAdmin || kit.created_by === me}
+              canDelete={isAdmin || k.created_by === me}
               canSetDefault={isAdmin}
               onEdit={() => setEditing({ id: k.id, draft: toDraft(k) })}
               onDuplicate={() =>
