@@ -726,6 +726,7 @@ export type Database = {
     }
     Functions: {
       accept_invite: { Args: { _token: string }; Returns: string }
+      accept_my_invites: { Args: never; Returns: string }
       admin_storage_by_workspace: {
         Args: never
         Returns: {
