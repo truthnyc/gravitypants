@@ -730,3 +730,6 @@ html:has(.features-page) { scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) {
   .auth-visual *, .auth-visual { animation: none !important; transition: none !important; }
 }
+.auth-tile-one { background: #1F2937; }
+.auth-tile-two { background: #8C2F2B; }
+.auth-tile-three { background: #EBDDC6; }
