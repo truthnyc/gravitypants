@@ -67,10 +67,10 @@ export function AuthShell({ eyebrow, title, subtitle, children, mode = "signup",
           <span>Gravity Pants</span>
         </a>
         <div className="auth-form-inner">
-          {beforeForm}
           {eyebrow && <p className="auth-eyebrow">{eyebrow}</p>}
           <h1 className="auth-title">{title}</h1>
           <p className="auth-subtitle">{subtitle}</p>
+          {beforeForm}
           <div className="auth-form-body">{children}</div>
         </div>
       </div>
