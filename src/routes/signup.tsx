@@ -92,9 +92,11 @@ function SignUp() {
     }
   }
 
+  const joining = target.startsWith("/invite/");
+
   if (sent) {
     return (
-      <AuthShell title="Check your email" subtitle={`We sent a link to ${email}. Open it to finish your account and start your free trial.`}>
+      <AuthShell title="Check your email" subtitle={joining ? `We sent a link to ${email}. Open it to finish your account and join your team.` : `We sent a link to ${email}. Open it to finish your account and start your free trial.`}>
         <p className="text-[15px]">
           <Link to="/signin" className="auth-link">Back to sign in</Link>
         </p>
@@ -104,10 +106,10 @@ function SignUp() {
 
   return (
     <AuthShell
-      eyebrow="7-day free trial"
-      title={"Your first reel is\nthree photos away."}
-      subtitle="Create your account and make a video ad in minutes. No editing skills needed."
-      beforeForm={choice && <div className="auth-plan-chip">Selected: {planById(choice.plan).name} · ${choice.billing === "yearly" ? planById(choice.plan).yearly?.toLocaleString() : planById(choice.plan).monthly}/{choice.billing === "yearly" ? "year" : "month"} · <Link to="/pricing">Change</Link></div>}
+      eyebrow={joining ? "Team invite" : "7-day free trial"}
+      title={joining ? "Join your team\non Gravity Pants." : "Your first reel is\nthree photos away."}
+      subtitle={joining ? "Create your account with the email your invite was sent to. You'll see your team's ads, brand kits and templates right away." : "Create your account and make a video ad in minutes. No editing skills needed."}
+      beforeForm={!joining && choice && <div className="auth-plan-chip">Selected: {planById(choice.plan).name} · ${choice.billing === "yearly" ? planById(choice.plan).yearly?.toLocaleString() : planById(choice.plan).monthly}/{choice.billing === "yearly" ? "year" : "month"} · <Link to="/pricing">Change</Link></div>}
     >
       <GoogleButton redirectTo={target} onStart={() => sessionStorage.setItem("gravity-pants:welcome", "1")} />
       <form onSubmit={submit} noValidate>
@@ -120,7 +122,7 @@ function SignUp() {
           ]}
         />
         <Button type="submit" variant="site" disabled={busy || !name || !email || !password} className="auth-submit">
-          {busy ? "Creating…" : <>Start free trial <ArrowRight size={17} strokeWidth={1.7} /></>}
+          {busy ? "Creating…" : <>{joining ? "Join the team" : "Start free trial"} <ArrowRight size={17} strokeWidth={1.7} /></>}
         </Button>
       </form>
       <p className="auth-legal">
