@@ -88,22 +88,35 @@ function TemplatesPage() {
   );
 }
 
-function Group({ title, list, empty, canEdit, showShare, onDelete }: { title: string; list: Template[]; empty: string; canEdit: (t: Template) => boolean; showShare: boolean; onDelete: (t: Template) => void }) {
+const VISIBILITY_LABEL: Record<Template["visibility"], string> = {
+  private: "Only me",
+  team: "Shared with team",
+  global: "Ready-made for everyone",
+};
+
+function Group({ title, note, list, empty, canEdit, showShare, options, onDelete }: { title: string; note?: string; list: Template[]; empty: string; canEdit: (t: Template) => boolean; showShare: boolean; options?: readonly Template["visibility"][]; onDelete: (t: Template) => void }) {
   return (
     <section>
       <h2 className="text-[17px] font-semibold">{title}</h2>
+      {note && <p className="mt-0.5 text-[13px] text-secondary-text">{note}</p>}
       {list.length ? (
         <div className="mt-3 space-y-3">
-          {list.map((t) => <Row key={t.id} t={t} editable={canEdit(t)} showShare={showShare} onDelete={() => onDelete(t)} />)}
+          {list.map((t) => <Row key={t.id} t={t} editable={canEdit(t)} showShare={showShare} options={options} onDelete={() => onDelete(t)} />)}
         </div>
       ) : (
-        <p className="mt-3 rounded-sm border border-dashed border-placeholder-border p-6 text-center text-[13px] text-secondary-text">{empty}</p>
+        <div className="mt-3 rounded-sm border border-dashed border-placeholder-border p-6 text-center">
+          <p className="text-[14px] font-medium">{empty}</p>
+          <p className="mx-auto mt-1 max-w-[420px] text-[13px] text-secondary-text">
+            Open an ad's "…" menu and choose "Save as Template". Next time you drop photos, you can start from it.
+          </p>
+          <Link to="/app/ads" className="mt-3 inline-flex h-11 items-center rounded-lg bg-control-fill px-4 text-[14px] font-medium lg:h-9">Go to your ads</Link>
+        </div>
       )}
     </section>
   );
 }
 
-function Row({ t, editable, showShare, onDelete }: { t: Template; editable: boolean; showShare: boolean; onDelete: () => void }) {
+function Row({ t, editable, showShare, options = ["private", "team"], onDelete }: { t: Template; editable: boolean; showShare: boolean; options?: readonly Template["visibility"][]; onDelete: () => void }) {
   const update = useUpdateTemplate();
   const [name, setName] = useState(t.name);
   return (
