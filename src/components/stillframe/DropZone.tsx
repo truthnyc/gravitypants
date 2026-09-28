@@ -42,8 +42,8 @@ export function DropZone({ spacious = false }: { spacious?: boolean }) {
         void startFromFiles(Array.from(event.dataTransfer.files));
       }}
       className={cn(
-        "flex items-center gap-8 rounded-sm border-2 border-dashed bg-card px-10 transition-colors",
-        spacious ? "min-h-[260px]" : "min-h-[200px]",
+        "grid grid-cols-[auto_minmax(0,1fr)] items-center gap-5 rounded-sm border-2 border-dashed bg-card px-4 transition-colors sm:gap-8 sm:px-8 lg:flex lg:px-10",
+        spacious ? "min-h-[150px] lg:min-h-[260px]" : "min-h-[140px] lg:min-h-[200px]",
         dragging ? "border-primary" : "border-placeholder-border",
       )}
     >
@@ -51,17 +51,17 @@ export function DropZone({ spacious = false }: { spacious?: boolean }) {
         {["-8deg", "4deg", "-3deg"].map((rotation, index) => (
           <div
             key={rotation}
-            className="h-[76px] w-[58px] rounded-sm bg-inspector shadow-card"
+            className="h-[62px] w-[44px] rounded-sm bg-inspector shadow-card sm:h-[76px] sm:w-[58px]"
             style={{ transform: `rotate(${rotation})`, marginLeft: index ? -14 : 0 }}
           />
         ))}
       </div>
 
-      <div className="min-w-0 flex-1 py-8">
-        <h2 className="text-[28px] font-bold tracking-[-0.02em]">New ad from photos</h2>
-        <p className="mt-1 text-[15px] text-secondary-text">Drop photos here, or</p>
+      <div className="min-w-0 flex-1 py-5 lg:py-8">
+        <h2 className="text-[20px] font-bold lg:text-[28px]">New ad from photos</h2>
+        <p className="mt-1 hidden text-[15px] text-secondary-text lg:block">Drop photos here, or</p>
         <Button
-          className="mt-4"
+          className="mt-3 min-h-12 w-full text-[16px] sm:w-auto lg:mt-4 lg:min-h-10 lg:text-[14px]"
           size="main"
           disabled={createAd.isPending}
           onClick={() => fileInput.current?.click()}

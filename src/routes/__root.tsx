@@ -81,7 +81,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { title: "Gravity Pants" },
       {
         name: "description",
@@ -147,7 +147,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <SearchProvider>
         <PaymentTestModeBanner />
-        <div className="min-h-screen bg-canvas">
+        <div className="min-h-dvh bg-canvas">
                     {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
           <Outlet />
         </div>

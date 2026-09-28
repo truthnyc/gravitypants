@@ -34,23 +34,24 @@ function YourAds() {
   const isEmpty = !isLoading && (projects ?? []).length === 0;
 
   return (
-    <main className="px-8 py-10 lg:px-16">
-      <div className={isEmpty ? "mx-auto max-w-[860px] py-16" : ""}>
+    <main className="px-4 py-7 sm:px-8 sm:py-10 lg:px-16">
+      <h1 className="mb-6 text-[36px] font-bold leading-none lg:hidden">Your ads</h1>
+      <div className={isEmpty ? "mx-auto max-w-[860px] py-4 lg:py-16" : ""}>
         <DropZone spacious={isEmpty} />
       </div>
 
       {!isEmpty && (
         <section className="mt-12">
-          <h2 className="text-[22px] font-bold tracking-[-0.02em]">Your ads</h2>
+          <h2 className="hidden text-[22px] font-bold tracking-[-0.02em] lg:block">Your ads</h2>
 
           {isLoading ? (
-            <div className="mt-5 grid grid-cols-3 gap-6 xl:grid-cols-4">
+            <div className="mt-5 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3 lg:gap-6 xl:grid-cols-4">
               {[0, 1, 2, 3].map((key) => (
                 <div key={key} className="h-[252px] animate-pulse rounded-sm bg-card shadow-card" />
               ))}
             </div>
           ) : visible.length ? (
-            <div className="mt-5 grid grid-cols-3 gap-6 xl:grid-cols-4">
+            <div className="mt-5 grid grid-cols-2 gap-x-3 gap-y-7 sm:gap-x-5 lg:grid-cols-3 lg:gap-6 xl:grid-cols-4">
               {visible.map((project) => (
                 <AdCard key={project.id} project={project} />
               ))}
