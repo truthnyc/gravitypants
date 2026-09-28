@@ -1,4 +1,5 @@
 import { createFileRoute, Outlet, redirect, useRouterState } from "@tanstack/react-router";
+import { UpgradeDialog } from "@/components/billing/UpgradeDialog";
 import { AppHeader } from "@/components/stillframe/AppHeader";
 import { PaymentProblemBanner } from "@/components/billing/BillingNotices";
 import { supabase } from "@/integrations/supabase/client";
@@ -34,6 +35,7 @@ function Layout() {
       <PaymentProblemBanner />
       {!pathname.startsWith("/ad/") && <AppHeader />}
       <Outlet />
+      <UpgradeDialog />
     </>
   );
 }

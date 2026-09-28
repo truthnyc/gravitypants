@@ -1,4 +1,5 @@
 import { getWorkspaceId } from "@/lib/stillframe/workspace";
+import { openUpgrade, usePlanAccess } from "@/lib/stillframe/plan";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { AlertCircle, Check, ChevronDown, ChevronLeft, Download, Film, Image as ImageIcon, LayoutGrid, Plus } from "lucide-react";
@@ -65,7 +66,9 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
   const [selected, setSelected] = useState<Set<string>>(() => new Set(project.formats.map((f) => DEFAULT_CHANNEL[f])));
   const [custom, setCustom] = useState({ on: false, w: 1200, h: 628 });
   const [mp4, setMp4] = useState(true);
+  const { canUse, isSuccess: accessReady } = usePlanAccess();
   const [gif, setGif] = useState(true);
+  useEffect(() => { if (accessReady && !canUse("gif")) setGif(false); }, [accessReady]); // eslint-disable-line react-hooks/exhaustive-deps
   const [fps, setFps] = useState(30);
   const [gSize, setGSize] = useState<GifSize>("full");
   const [gColors, setGColors] = useState<GifColors>("best");
@@ -354,7 +357,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
           <Group label="Save as">
             <div className="grid grid-cols-2 gap-2">
               <PickCard on={mp4} onClick={() => setMp4((v) => !v)} icon={<Film className="size-4" strokeWidth={1.7} />} title="Video MP4" sub="With motion" />
-              <PickCard on={gif} onClick={() => setGif((v) => !v)} icon={<ImageIcon className="size-4" strokeWidth={1.7} />} title="Animated GIF" sub="Plays anywhere, no sound" />
+              <PickCard on={gif} onClick={() => (gif || canUse("gif") ? setGif((v) => !v) : openUpgrade("gif"))} icon={<ImageIcon className="size-4" strokeWidth={1.7} />} title="Animated GIF" sub="Plays anywhere, no sound" />
             </div>
           </Group>
 
