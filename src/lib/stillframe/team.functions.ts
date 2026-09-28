@@ -35,6 +35,8 @@ export const inviteMember = createServerFn({ method: "POST" })
       .select("token")
       .single();
     if (error) {
+      if (error.message.includes("another team"))
+        return { error: "That person already belongs to another team. Someone can only be on one team at a time." };
       if (error.message.includes("No seats left")) return { error: "No seats left on this plan. Remove someone or upgrade first." };
       return { error: "Couldn't create the invite. Only owners and admins can invite people." };
     }

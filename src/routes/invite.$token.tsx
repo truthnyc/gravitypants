@@ -40,6 +40,10 @@ function AcceptInvitePage() {
             `This invite was sent to a different email address. You're signed in as ${session.session.user.email ?? "another account"} — sign out and open the link again with the invited email.`,
           );
           setShowSignOut(true);
+        } else if (msg.includes("another team")) {
+          setError(
+            "You're already part of another team. Someone can only belong to one team at a time — ask that team's owner to remove you first, then open this link again.",
+          );
         } else if (msg.includes("full") || msg.includes("No seats")) {
           setError("This team is full — ask the owner to free up a seat.");
         } else if (msg.includes("expired")) {
