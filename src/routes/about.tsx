@@ -19,15 +19,15 @@ export const Route = createFileRoute("/about")({
 const values = [
   {
     h: "Photos in, reels out",
-    p: "You already have the photos. You take them every day. We think the distance between a good photo and a good video ad should be measured in minutes, not evenings.",
+    p: "You already have the photos. Turning them into a useful video ad should take a few minutes, not a free evening.",
   },
   {
     h: "No timeline anxiety",
-    p: "Most video tools hand you a timeline and wish you luck. We hand you a finished reel and let you tap anything to change it. Zero instruction, zero intimidation.",
+    p: "Most video tools begin with an empty timeline. Gravity Pants starts with a reel you can play, then lets you tap the parts you want to change.",
   },
   {
     h: "Your brand, remembered",
-    p: "Set your logo, colors and fonts once. Every ad starts with them. Work with a team? Share the kit, share templates, everyone stays on brand.",
+    p: "Save your logo, colors and fonts once. Use the same brand kit and templates across your team, so each ad starts with the right look.",
   },
   {
     h: "Small team, real people",
@@ -47,7 +47,7 @@ function AboutPage() {
       <section className="mx-auto max-w-[1248px] px-5 pb-16 pt-16 md:px-8 md:pt-24 lg:px-16 xl:px-24">
         <p className="text-[15px] font-semibold text-site-eyebrow">About</p>
         <h1 className="mt-3 max-w-[820px] text-[40px] font-semibold leading-[1.05] tracking-[-0.03em] text-site-ink md:text-[64px] md:tracking-[-0.035em]">Video ads shouldn't need a video team.</h1>
-        <p className="mt-5 max-w-[620px] text-[17px] leading-[1.45] text-site-secondary md:text-[21px]">Gravity Pants started with a simple observation: small businesses take great photos every day, then pay agencies to turn them into the videos their customers actually see. We built a tool that closes that gap.</p>
+        <p className="mt-5 max-w-[620px] text-[17px] leading-[1.45] text-site-secondary md:text-[21px]">Small businesses already take good product photos. We built Gravity Pants so they can turn those photos into video ads without hiring an editor or learning video software.</p>
       </section>
 
       <section className="mx-auto max-w-[1248px] px-5 pb-16 md:px-8 lg:px-16 xl:px-24">
@@ -75,8 +75,8 @@ function AboutPage() {
 
       <section className="mx-auto max-w-[1248px] px-5 pb-24 md:px-8 lg:px-16 xl:px-24">
         <div className="rounded-[24px] bg-site-panel p-8 text-center md:p-16">
-          <h2 className="mx-auto max-w-[640px] text-[32px] font-semibold leading-[1.1] tracking-[-0.03em] text-site-ink md:text-[48px] md:tracking-[-0.035em]">Your next ad is three photos away.</h2>
-          <p className="mx-auto mt-4 max-w-[480px] text-[17px] leading-[1.45] text-site-secondary">Start with a 7-day free trial. Every feature, three exports, watermarked.</p>
+          <h2 className="mx-auto max-w-[640px] text-[32px] font-semibold leading-[1.1] tracking-[-0.03em] text-site-ink md:text-[48px] md:tracking-[-0.035em]">Try it with photos you already have.</h2>
+          <p className="mx-auto mt-4 max-w-[480px] text-[17px] leading-[1.45] text-site-secondary">The 7-day free trial includes every feature and three watermarked exports.</p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Button asChild variant="site" size="site"><Link to="/signup">Start free trial</Link></Button>
             <Button asChild variant="siteSecondary" size="site"><Link to="/examples">Browse the gallery</Link></Button>

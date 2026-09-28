@@ -11,7 +11,7 @@ export const TRIAL = {
   days: 7,
   exports: 3, // in total, not per month
   watermark: true,
-  blurb: "3 exports, every feature to try, watermarked. Pick a plan when you’re ready.",
+  blurb: "Try every feature and make 3 watermarked exports. Choose a paid plan only if you want to continue.",
 } as const;
 
 export const YEARLY_LABEL = "Save 17%";
@@ -34,7 +34,7 @@ export const PLANS: PlanConfig[] = [
   {
     id: "simple",
     name: "Simple",
-    tagline: "For small shops posting now and then.",
+    tagline: "For businesses making a few ads each month.",
     seats: 1,
     monthlyExports: 10,
     sharedExports: false,
@@ -46,7 +46,7 @@ export const PLANS: PlanConfig[] = [
   {
     id: "business",
     name: "Business",
-    tagline: "For brands posting every week.",
+    tagline: "For businesses making ads every week.",
     seats: 1,
     monthlyExports: 50,
     sharedExports: false,
@@ -58,7 +58,7 @@ export const PLANS: PlanConfig[] = [
   {
     id: "team",
     name: "Team",
-    tagline: "For agencies and marketing teams.",
+    tagline: "For teams working across shared ads and brands.",
     seats: 4,
     monthlyExports: 150,
     sharedExports: true,

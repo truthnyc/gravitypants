@@ -12,29 +12,29 @@ export const POSTS: BlogPost[] = [
   {
     slug: "photos-beat-nothing-video-beats-photos",
     title: "Photos beat nothing. Video beats photos.",
-    dek: "Feeds reward movement. Here's why a reel made from stills outperforms the stills themselves.",
+    dek: "A little movement can make the product photos you already have work harder in a busy feed.",
     date: "September 22, 2026",
     minutes: 4,
     tag: "Why video",
     body: [
       {
         p: [
-          "You already know the feeling: you post a photo of today's special, the new arrival, the finished job — and it does fine. Then the shop down the street posts a 15-second reel of the same thing and it does five times better.",
-          "That's not because their photo was worse. It's because feeds are built to reward movement. A still frame gets a glance; a moving one gets a thumb to stop. And a stopped thumb is the whole game.",
+          "You post a photo of today's special, a new arrival or a finished job. It does fine. Then another business posts a short reel of something similar and gets much more attention.",
+          "The difference may be movement. A photo is easy to pass, while a moving image gives people another reason to stop and look.",
         ],
       },
       {
         h: "You don't need footage to get motion",
         p: [
-          "The common objection is \"I don't have video.\" You don't need it. Three well-shot photos — a wide, a detail, a close-up — contain everything a short ad needs. Add rhythm, text and a bit of timing, and the stills do the moving.",
-          "That's the entire idea behind Gravity Pants: the camera roll you already have is the raw material. Pick three photos, tap the words to change them, and export a reel that looks like you hired someone.",
+          "You do not need video footage. Three clear photos, such as a wide shot, a detail and a close-up, are enough for a short ad. Movement, words and timing do the rest.",
+          "That is the idea behind Gravity Pants. Choose a few photos you already have, change the words and download a finished reel.",
         ],
       },
       {
         h: "What the movement buys you",
         p: [
-          "Motion buys attention. Text over motion buys comprehension. A consistent brand — the same logo, colors and fonts every time — buys memory. Attention times comprehension times memory is, roughly, a customer.",
-          "One reel, three formats: a vertical cut for stories and TikTok, a square for feed posts, a wide one for anywhere else. Make it once; it works everywhere.",
+          "Movement can catch someone's attention. Words explain what they are looking at. Using the same logo, colors and fonts helps them recognize your business the next time they see it.",
+          "The same reel can be exported three ways: vertical for Reels, Stories and TikTok, square for feeds and wide for banners or YouTube.",
         ],
       },
     ],
@@ -42,7 +42,7 @@ export const POSTS: BlogPost[] = [
   {
     slug: "three-photos-one-ad",
     title: "The three-photo rule: how to shoot for a reel you haven't made yet",
-    dek: "A wide, a detail, a close-up. Shoot in that order and every tool — including this one — has what it needs.",
+    dek: "Take one wide photo, one detail and one close-up. That is usually enough for a useful product reel.",
     date: "September 15, 2026",
     minutes: 3,
     tag: "Craft",
@@ -73,7 +73,7 @@ export const POSTS: BlogPost[] = [
       {
         h: "That's it",
         p: [
-          "Wide, detail, close-up. If you shoot those three every time, you'll never open an editor wondering whether you have enough. You'll always have exactly enough — and making the reel takes minutes instead of an evening.",
+          "Wide, detail, close-up. If you take those three each time, you can start editing without wondering whether you have enough material.",
         ],
       },
     ],
@@ -81,22 +81,22 @@ export const POSTS: BlogPost[] = [
   {
     slug: "why-tap-anything",
     title: "Why we built an editor with no timeline",
-    dek: "Most tools hand you a timeline and wish you luck. We think the editing room should feel like tapping a label and typing over it.",
+    dek: "Traditional video timelines are useful for editors. Most small businesses need a simpler place to start.",
     date: "September 8, 2026",
     minutes: 4,
     tag: "Product",
     body: [
       {
         p: [
-          "Ask someone who doesn't edit video why they don't, and you'll hear about the timeline. The tracks, the keyframes, the little diamond buttons. Video software was built for people who cut video for a living, and it shows.",
-          "But the job a small business has isn't \"edit video.\" It's \"turn these three photos into something that moves, with our name on it, before lunch.\" Those are different jobs, and they deserve different tools.",
+          "Traditional video editors start with a timeline full of tracks, keyframes and unfamiliar controls. That makes sense for people who edit video every day, but it is more than many small businesses need.",
+          "Most small businesses have a simpler job: turn a few photos into a short ad with their name on it. We built Gravity Pants for that job.",
         ],
       },
       {
         h: "Tap anything, change everything",
         p: [
-          "So we built the opposite of a timeline. You start with a finished reel — photos in, motion applied, text placed. Nothing is blank. From there, the whole screen is tappable: tap the headline to rewrite it, tap a photo to swap it, tap the words to change how they move.",
-          "There's no way to break it, because there's nothing to break. You can't delete a keyframe you didn't know existed. You can't mis-place a logo; the brand kit already knows where it goes.",
+          "Instead of starting with an empty timeline, you start with a reel that already plays. Your photos have movement and the words are in place. Tap the headline to rewrite it, tap a photo to replace it or tap the words to change how they move.",
+          "You do not need to manage hidden tracks or keyframes. The brand kit also keeps your logo in a consistent place.",
         ],
       },
       {
@@ -107,7 +107,7 @@ export const POSTS: BlogPost[] = [
       },
       {
         p: [
-          "We think that's what software for everyone else should feel like: a finished thing you adjust, not an empty thing you build.",
+          "We want the editor to give you a useful starting point, then make every change easy to find.",
         ],
       },
     ],

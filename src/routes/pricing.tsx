@@ -56,8 +56,8 @@ function Pricing() {
       <div className="pricing-page">
         <section className="pr-hero">
           <span className="site-eyebrow">Pricing</span>
-          <h1>Start free.<br /><span>Grow when you’re ready.</span></h1>
-          <p className="site-lede">Every plan makes reels in all three formats, as MP4 and GIF. Try everything free for {TRIAL.days} days.</p>
+          <h1>Start with a free trial.<br /><span>Choose a plan later.</span></h1>
+          <p className="site-lede">Your trial includes every feature and {TRIAL.exports} watermarked exports. Paid plans add more exports and remove the watermark.</p>
           <div role="group" aria-label="Billing period" className="pr-switch">
             {(["monthly", "yearly"] as const).map((b) => (
               <button key={b} className={billing === b ? "on" : ""} aria-pressed={billing === b} onClick={() => setBilling(b)}>
@@ -135,8 +135,8 @@ function Pricing() {
 
         <section className="pr-cta">
           <div>
-            <h2 className="site-h2">Your next ad is three photos away.</h2>
-            <p className="site-lede">Start free and make your first reel in the next few minutes.</p>
+            <h2 className="site-h2">Try Gravity Pants before you pay.</h2>
+            <p className="site-lede">You get {TRIAL.days} days, every feature and {TRIAL.exports} exports to see if it works for you.</p>
             <div className="pr-cta-actions"><Link to="/signup" className="pr-btn pri big">Start free</Link><Link to="/examples" className="pr-btn sec big white">See examples</Link></div>
           </div>
         </section>

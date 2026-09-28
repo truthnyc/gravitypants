@@ -108,7 +108,7 @@ function SignUp() {
     <AuthShell
       eyebrow={joining ? "Team invite" : "7-day free trial"}
       title={joining ? "Join your team\non Gravity Pants." : "Your first reel is\nthree photos away."}
-      subtitle={joining ? "Create your account with the email your invite was sent to. You'll see your team's ads, brand kits and templates right away." : "Create your account and make a video ad in minutes. No editing skills needed."}
+      subtitle={joining ? "Use the email address that received the invite. After you sign up, you can open the team's ads, brand kits and templates." : "Create an account, add a few photos and make your first video ad. You do not need video editing experience."}
       beforeForm={!joining && choice && <div className="auth-plan-chip">Selected: {planById(choice.plan).name} · ${choice.billing === "yearly" ? planById(choice.plan).yearly?.toLocaleString() : planById(choice.plan).monthly}/{choice.billing === "yearly" ? "year" : "month"} · <Link to="/pricing">Change</Link></div>}
     >
       <GoogleButton redirectTo={target} onStart={() => sessionStorage.setItem("gravity-pants:welcome", "1")} />
