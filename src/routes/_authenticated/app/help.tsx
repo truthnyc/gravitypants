@@ -22,7 +22,7 @@ const FAQ = [
   ["What does the free trial include?", "7 days and 3 exports, with a small Gravity Pants mark on each file."],
   ["How long are my files kept?", "Finished exports stay under Previous exports for 30 days."],
   ["How do I change or cancel my plan?", "Go to Account › Billing and press Manage Billing."],
-  ["Can I share with my team?", "On the Team plan, up to 3 people share brand kits, templates and 150 exports a month."],
+  ["Can I share with my team?", "On the Team plan, you and up to 3 teammates share brand kits, templates and 150 exports a month."],
 ] as const;
 
 function HelpPage() {
