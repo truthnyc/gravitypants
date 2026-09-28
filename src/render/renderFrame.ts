@@ -18,6 +18,8 @@ export type RenderOptions = {
   images?: Map<string, HTMLImageElement>;
   /** Brand Kit look for the end card (first color, body font, fallback end card settings). */
   brand?: BrandStyle | undefined;
+  /** Free-trial exports carry a small "Made with Gravity Pants" mark. */
+  watermark?: boolean;
 };
 
 export type BrandStyle = { color?: string | null; font?: string | null; endCard?: EndCard | null };
@@ -437,7 +439,7 @@ export function renderAt(
   frames: Frame[],
   format: Format,
   timeSec: number,
-  { width: W, height: H, showGuides, images, brand }: RenderOptions,
+  { width: W, height: H, showGuides, images, brand, watermark }: RenderOptions,
 ) {
   ctx.save();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -498,6 +500,27 @@ export function renderAt(
     drawEndCard(ctx, project, endCard.cta, brand, W, H, images);
     ctx.restore();
   }
+
+  if (watermark) {
+    const label = "Made with Gravity Pants";
+    const fs = Math.max(12, Math.round(W * 0.032));
+    ctx.save();
+    ctx.font = `600 ${fs}px ${DEFAULT_FONT}, sans-serif`;
+    const bw = ctx.measureText(label).width + fs * 1.4;
+    const bh = fs * 1.9;
+    const x = (W - bw) / 2;
+    const y = H - bh - H * 0.04;
+    ctx.fillStyle = "rgba(0,0,0,0.45)";
+    ctx.beginPath();
+    ctx.roundRect(x, y, bw, bh, bh / 2);
+    ctx.fill();
+    ctx.fillStyle = "rgba(255,255,255,0.95)";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(label, W / 2, y + bh / 2 + fs * 0.05);
+    ctx.restore();
+  }
+
 
   if (showGuides) {
     const s = safeRect(format, W, H);

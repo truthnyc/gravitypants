@@ -17,6 +17,8 @@ export type RenderInput = {
   format: Format;
   width: number;
   height: number;
+  /** Free-trial exports carry a small mark. */
+  watermark?: boolean;
 };
 
 type Progress = (p: number) => void;
@@ -50,6 +52,7 @@ function draw(ctx: CanvasRenderingContext2D, input: RenderInput, t: number) {
     height: input.height,
     images: input.images,
     brand: input.brand,
+    watermark: input.watermark,
   });
 }
 
