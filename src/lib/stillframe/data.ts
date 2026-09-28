@@ -1,3 +1,4 @@
+import type { Format } from "./types";
 import { getWorkspaceId } from "./workspace";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -762,5 +763,31 @@ export function useTemplateAccess() {
         userId: auth.user?.id ?? null,
       };
     },
+  });
+}
+
+export type CustomSlide = { photo: UploadedPhoto | null; headline: string; subline: string };
+
+/** New ad from a customized template: one frame per slide, typed text only (never placeholders). */
+export function useCreateAdFromCustomization() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ template, format, slides }: { template: Template; format: Format; slides: CustomSlide[] }) => {
+      const source = sourceFromTemplate(template, slides.length);
+      source.primary_format = format;
+      source.formats = Array.from(new Set([format, ...source.formats]));
+      source.frames = source.frames.map((f, i) => {
+        const s = slides[i]!;
+        const style = template.settings.frames[Math.min(i, template.settings.frames.length - 1)];
+        return {
+          ...f,
+          headline: s.headline.trim() ? { ...(style?.headline ?? f.headline ?? {}), text: s.headline.trim() } : null,
+          subline: s.subline.trim() ? { ...(style?.subline ?? f.subline ?? {}), text: s.subline.trim() } : null,
+        };
+      });
+      const photos = slides.map((s) => s.photo) as UploadedPhoto[];
+      return insertCopy(source, template.name, photos);
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: projectKeys.all }),
   });
 }
