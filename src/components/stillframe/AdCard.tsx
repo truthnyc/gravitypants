@@ -1,3 +1,4 @@
+import { useMakeGlobalTemplate } from "@/components/admin/MakeGlobalTemplate";
 import { useKit } from "@/components/templates/KitAgain";
 import { useRef, useState } from "react";
 import { guard, usePlanAccess } from "@/lib/stillframe/plan";
@@ -35,6 +36,7 @@ import { SaveTemplateDialog } from "@/components/templates/TemplateDialogs";
 export function AdCard({ project }: { project: ProjectWithFrames }) {
   const kit = useKit(project.template_id);
   const navigate = useNavigate();
+  const globalTpl = useMakeGlobalTemplate();
   const duplicate = useDuplicateProject();
   const duplicateWithPhotos = useDuplicateWithNewPhotos();
   const setTrashed = useSetTrashed();
@@ -126,6 +128,9 @@ export function AdCard({ project }: { project: ProjectWithFrames }) {
             <DropdownMenuItem onSelect={() => guard(canUse("templates"), "templates", () => setTemplateOpen(true))}>
               Save as Template…
             </DropdownMenuItem>
+            {globalTpl.isAdmin && (
+              <DropdownMenuItem onSelect={() => void globalTpl.run(project.id)}>Make global template</DropdownMenuItem>
+            )}
             <DropdownMenuItem
               onSelect={() => {
                 setDraftName(project.name);
@@ -150,6 +155,7 @@ export function AdCard({ project }: { project: ProjectWithFrames }) {
             <button className="flex h-12 items-center hairline-b" onClick={() => navigate({ to: "/app/ad/$id/edit", params: { id: project.id } })}>Open</button>
             <button className="flex h-12 items-center hairline-b" onClick={() => fileInput.current?.click()}>Duplicate with New Photos</button>
             <button className="flex h-12 items-center hairline-b" onClick={() => { setActionsOpen(false); guard(canUse("templates"), "templates", () => setTemplateOpen(true)); }}>Save as Template</button>
+            {globalTpl.isAdmin && <button className="flex h-12 items-center hairline-b" onClick={() => { setActionsOpen(false); void globalTpl.run(project.id); }}>Make global template</button>}
             <button className="flex h-12 items-center hairline-b" onClick={() => { setDraftName(project.name); setActionsOpen(false); setRenameOpen(true); }}>Rename</button>
             <button className="flex h-12 items-center text-destructive" onClick={() => { setActionsOpen(false); handleTrash(); }}>Move to Trash</button>
           </div>

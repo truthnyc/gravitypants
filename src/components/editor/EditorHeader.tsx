@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { HelpMenu } from "@/components/stillframe/HelpMenu";
 import { Link } from "@tanstack/react-router";
-import { Check, ChevronLeft, ChevronRight, LayoutGrid, Play, Square, Undo2 } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, LayoutGrid, MoreHorizontal, Play, Square, Undo2 } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useMakeGlobalTemplate } from "@/components/admin/MakeGlobalTemplate";
 import { Button } from "@/components/ui/button";
 import { KitAgainButton } from "@/components/templates/KitAgain";
 import type { SaveStatus } from "./use-editor";
@@ -92,6 +94,7 @@ export function EditorHeader({
           <Undo2 strokeWidth={1.7} />
         </Button>
         <KitAgainButton adId={id} templateId={templateId} className="hidden xl:inline-flex" />
+        <StaffMenu adId={id} />
         <Button variant="plain" size="header" className="hidden lg:inline-flex" onClick={onPlayVideo}>
           {playing ? <Square strokeWidth={1.7} /> : <Play strokeWidth={1.7} />}
           {playing ? "Stop" : "Play Video"}
@@ -109,5 +112,21 @@ export function EditorHeader({
         )}
       </div>
     </header>
+  );
+}
+
+/** ••• menu with staff-only actions; hidden for everyone else. */
+function StaffMenu({ adId }: { adId: string }) {
+  const g = useMakeGlobalTemplate();
+  if (!g.isAdmin) return null;
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" aria-label="More options"><MoreHorizontal strokeWidth={1.7} /></Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-[220px] rounded-sm shadow-popover">
+        <DropdownMenuItem onSelect={() => void g.run(adId)}>Make global template</DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

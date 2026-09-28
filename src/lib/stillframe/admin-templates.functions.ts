@@ -253,3 +253,68 @@ export const adminTemplateHistory = createServerFn({ method: "GET" })
     }
     return ((rows ?? []) as any[]).map((r) => ({ id: r.id as string, action: r.action as string, version: r.version as number | null, at: r.created_at as string, who: emails.get(r.user_id) ?? "Staff" }));
   });
+
+/** Staff: turn any ad into a new system template draft (structure + text as placeholders + first photos as samples). */
+export const adminTemplateFromAd = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ projectId: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const ctx = context as any as Ctx;
+    const db = await adminDb(ctx);
+    const { data: p } = await db.from("projects").select("*").eq("id", data.projectId).maybeSingle();
+    if (!p) throw new Error("That ad doesn't exist.");
+    const { data: fr } = await db.from("frames").select("*").eq("project_id", p.id).order("sort_order");
+    const frames = ((fr ?? []) as any[]).slice(0, 10);
+    if (!frames.length) throw new Error("That ad has no slides yet.");
+    const TR: Record<string, string> = { cut: "cut", fade: "fade", slide: "slide", wipe: "swipe-left", zoom: "zoom", dip_black: "fade" };
+    const TA: Record<string, string> = { none: "none", rise: "rise-up", fade: "fade-in", typewriter: "typewriter", pop: "zoom" };
+    const PM: Record<string, string> = { slow_zoom_in: "slow-zoom-in", pan_left: "pan", pan_right: "pan" };
+    const hex = (c: any, d: string) => (typeof c === "string" && /^#[0-9a-fA-F]{6}$/.test(c) ? c.toUpperCase() : d);
+    const h0 = frames.find((f) => f.headline)?.headline ?? {};
+    const s0 = frames.find((f) => f.subline)?.subline ?? {};
+    const format = (["9:16", "1:1", "16:9"].includes(p.primary_format) ? p.primary_format : "9:16") as TemplateDoc["format"];
+    const baseName = `${p.name || "Untitled"} template`.slice(0, 60);
+    const doc: TemplateDoc = {
+      name: baseName,
+      slug: `${slugify(baseName)}-${crypto.randomUUID().slice(0, 4)}`,
+      description: "",
+      format,
+      is_reusable: false,
+      featured: false,
+      thumbnail_url: null,
+      style: {
+        background_color: hex(frames[0].photo?.background_color, "#1D1D1F"),
+        headline: { font: h0.font_family ?? null, weight: Math.min(900, Math.max(100, Math.round((h0.font_weight ?? 700) / 100) * 100)), size_px: Math.min(300, Math.max(12, h0.size_px ?? 96)), color: hex(h0.color, "#FFFFFF") },
+        subline: { font: s0.font_family ?? null, weight: Math.min(900, Math.max(100, Math.round((s0.font_weight ?? 500) / 100) * 100)), size_px: Math.min(200, Math.max(10, s0.size_px ?? 44)), color: hex(s0.color, "#FFFFFF") },
+        text_position: String(h0.position ?? "center").slice(0, 20),
+        logo_position: String(p.logo?.positions?.[format] ?? p.logo?.position ?? "top-right").slice(0, 20),
+      },
+      slides: frames.map((f, i) => ({
+        role: `Slide ${i + 1}`,
+        duration_sec: Math.min(10, Math.max(0.5, Math.round(Number(f.duration_sec) * 10) / 10)),
+        transition_in: (i === 0 ? "none" : TR[f.transition_in?.type] ?? "fade") as any,
+        text_animation: (TA[f.headline?.animation ?? "none"] ?? "none") as any,
+        photo_motion: (PM[f.photo?.movement] ?? "none") as any,
+        headline_placeholder: String(f.headline?.text ?? "").slice(0, 120) || "Your headline",
+        subline_placeholder: String(f.subline?.text ?? "").slice(0, 160),
+        sample_photo: null,
+      })),
+    };
+    const { data: last } = await db.from("templates").select("sort_order").eq("source", "system").order("sort_order", { ascending: false }).limit(1).maybeSingle();
+    const { data: row, error } = await db.from("templates")
+      .insert({ ...live(doc), source: "system", workspace_id: null, created_by: null, updated_by: ctx.userId, visibility: "global", status: "draft", version: 0, sort_order: (last?.sort_order ?? 0) + 1 })
+      .select("id").single();
+    if (error) throw friendly(error);
+    // Copy the ad's photos into staff-owned template storage so the customer's files stay private.
+    const slides = await Promise.all(doc.slides.map(async (s, i) => {
+      const src = frames[i].photo?.path as string | undefined;
+      if (!src || src.includes(":")) return s;
+      const dest = `system/templates/${row.id}/${crypto.randomUUID()}.${(src.split(".").pop() || "jpg").slice(0, 5)}`;
+      const { error: e } = await db.storage.from("media").copy(src, dest);
+      return e ? s : { ...s, sample_photo: dest };
+    }));
+    await db.from("templates").update({ slides }).eq("id", row.id);
+    await log(db, ctx.userId, "template_from_ad", `${doc.slug} ← ad ${p.id}`);
+    await event(db, row.id, ctx.userId, "created_from_ad", 0);
+    return { id: row.id as string };
+  });
