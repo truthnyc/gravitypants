@@ -331,6 +331,12 @@ const BG_COLORS = ["#000000", "#1D1D1F", "#FFFFFF", "#F1F3F0"];
 function PhotoPanel({ photo, adjusting, actions }: { photo: PhotoSettings; adjusting: boolean; actions: InspectorActions }) {
   const brightness = Math.round(Number(photo.brightness ?? 0) * 200);
   const fit = photo.fit ?? "fill";
+  const move = photo.movement ?? "none";
+  const zoomStart = Math.round(Number(photo.zoom_start ?? 1) * 100);
+  const zoomEnd = Math.round(Number(photo.zoom_end ?? 1) * 100);
+  const panX = Number(photo.pan_x ?? 0);
+  const panDir: "none" | "left" | "right" = panX === 0 ? "none" : panX < 0 ? "left" : "right";
+  const panAmount = Math.round(Math.abs(panX) * 100);
   return (
     <>
       <div className="flex items-center gap-3">
