@@ -124,7 +124,7 @@ export const FAQ = [
   { q: "Can I try it before paying?", a: `Yes. Every account starts with a ${TRIAL.days}-day free trial: ${TRIAL.exports} exports with every feature, watermarked. Choose a plan when you’re ready to remove the watermark and export more.` },
   { q: "What kind of photos work best?", a: "Clear product photos with some space around the product work best. Phone photos are fine: three to five of them make a good reel." },
   { q: "Which formats can I export?", a: "Every reel exports as 9:16 for Reels, Stories and TikTok, 1:1 for feeds and 16:9 for banners and YouTube, as MP4 or GIF." },
-  { q: "Can I cancel anytime?", a: "[Your cancellation policy, e.g. cancel from your account settings and keep access until the end of the billing period.]" },
-  { q: "Do I own the reels I make?", a: "[Your terms on ownership and usage rights.]" },
-  { q: "Do you offer discounts?", a: "[Education, nonprofit or startup discounts, if any.]" },
+  { q: "Can I cancel anytime?", a: "Yes. Cancel from Account → Billing in the app whenever you like. You keep full access until the end of the period you've already paid for, and we don't charge you again." },
+  { q: "Do I own the reels I make?", a: "Yes. Every reel you export is yours to use wherever you like, forever — including reels made during the free trial. We never claim any rights over your photos or your finished videos." },
+  { q: "Do you offer discounts?", a: "Yearly billing already saves you 17% on Business and Team. If you're a nonprofit or a school, write to info@gravitypants.com and we'll see what we can do." },
 ];

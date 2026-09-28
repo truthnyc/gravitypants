@@ -51,17 +51,19 @@ function SiteHeader() {
   );
 }
 
-const columns = [
-  { label: "Product", links: [["Features", "/features"], ["Examples", "/examples"], ["Pricing", "/pricing"], ["Templates", "/features"]] },
-  { label: "Company", links: [["About", "/"], ["Blog", "/"], ["Contact", "mailto:info@gravitypants.com"]] },
-  { label: "Help", links: [["Help center", "/signin"], ["Privacy", "/"], ["Terms", "/"]] },
-] as const;
+type FooterLink = { label: string; to: string; mailto?: boolean };
+const columns: { label: string; links: FooterLink[] }[] = [
+  { label: "Product", links: [{ label: "Features", to: "/features" }, { label: "Pricing", to: "/pricing" }, { label: "Templates", to: "/features" }] },
+  { label: "Examples", links: [{ label: "Gallery", to: "/examples" }, { label: "Submit your reel", to: "mailto:info@gravitypants.com?subject=Submit%20my%20reel", mailto: true }] },
+  { label: "Company", links: [{ label: "About", to: "/" }, { label: "Blog", to: "/" }, { label: "Contact", to: "mailto:info@gravitypants.com", mailto: true }] },
+  { label: "Help", links: [{ label: "Help center", to: "/help" }, { label: "Privacy", to: "/privacy" }, { label: "Terms", to: "/terms" }] },
+];
 
 function SiteFooter() {
   return <footer className="mt-auto border-t border-site-line bg-site-page px-5 pb-10 pt-14 text-site-ink md:px-8 lg:px-16 xl:px-24">
     <div className="mx-auto flex max-w-[1248px] flex-col gap-10 lg:flex-row lg:gap-20">
       <div className="max-w-[320px] shrink-0"><GravityPantsLogo size={28} showWordmark /><p className="mt-3 text-[14px] leading-normal text-site-muted">Photos in. Reels out. Video ads for everyone who has better things to do than edit video.</p></div>
-      <div className="grid flex-1 grid-cols-2 gap-6 sm:grid-cols-3">{columns.map((column) => <div key={column.label} className="flex flex-col gap-3 text-[14px]"><span className="font-semibold">{column.label}</span>{column.links.map(([label, to]) => to === "mailto:info@gravitypants.com" ? <a key={label} href={to} className="text-site-muted hover:text-site-primary">{label}</a> : <Link key={label} to={to} className="text-site-muted hover:text-site-primary">{label}</Link>)}</div>)}</div>
+      <div className="grid flex-1 grid-cols-2 gap-6 sm:grid-cols-4">{columns.map((column) => <div key={column.label} className="flex flex-col gap-3 text-[14px]"><span className="font-semibold">{column.label}</span>{column.links.map((link) => link.mailto ? <a key={link.label} href={link.to} className="text-site-muted hover:text-site-primary">{link.label}</a> : <Link key={link.label} to={link.to as "/"} className="text-site-muted hover:text-site-primary">{link.label}</Link>)}</div>)}</div>
     </div>
     <p className="mx-auto mt-12 max-w-[1248px] text-[13px] text-site-muted">© 2026 Gravity Pants. All rights reserved.</p>
   </footer>;
