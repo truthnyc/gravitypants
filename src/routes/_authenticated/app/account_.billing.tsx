@@ -6,6 +6,8 @@ import { AccountTabs } from "@/components/billing/AccountTabs";
 import { TopUpCard } from "@/components/billing/TopUp";
 import { BillingHelp } from "@/components/billing/BillingHelp";
 import { type ExportStatus, isPaid, money, planName, statusLine, useBilling, useExportStatus, useManageBilling, usePlans, useRefreshBilling } from "@/lib/stillframe/billing";
+import { useMyWorkspaces } from "@/components/stillframe/WorkspaceSwitcher";
+import { peekWorkspaceId } from "@/lib/stillframe/workspace";
 
 export const Route = createFileRoute("/_authenticated/app/account_/billing")({
   validateSearch: z.object({ checkout: z.string().optional() }),
@@ -49,6 +51,9 @@ function BillingPage() {
   const plan = plans?.find((p) => p.id === billing?.plan);
   const paid = isPaid(billing);
   const limited = paid && status?.limit != null;
+  const { data: myWorkspaces } = useMyWorkspaces();
+  const myRole = myWorkspaces?.find((w) => w.id === peekWorkspaceId())?.role;
+  const canManage = myRole === "owner" || myRole === "admin";
 
   return (
     <main className="mx-auto flex max-w-[640px] flex-col gap-5 px-4 py-6 sm:px-8 sm:py-10">
@@ -114,20 +119,24 @@ function BillingPage() {
           </div>
         )}
 
-        <div className="mt-6 flex flex-wrap gap-2">
-          <Button asChild variant={paid ? "plain" : "default"}>
-            <Link to="/pricing">{paid ? "Change Plan" : "Pick a Plan"}</Link>
-          </Button>
-          {billing?.stripe_customer_id && (
-            <Button variant="plain" onClick={() => void manage().then(() => refetch())}>
-              Manage Billing
+        {canManage ? (
+          <div className="mt-6 flex flex-wrap gap-2">
+            <Button asChild variant={paid ? "plain" : "default"}>
+              <Link to="/pricing">{paid ? "Change Plan" : "Pick a Plan"}</Link>
             </Button>
-          )}
-        </div>
+            {billing?.stripe_customer_id && (
+              <Button variant="plain" onClick={() => void manage().then(() => refetch())}>
+                Manage Billing
+              </Button>
+            )}
+          </div>
+        ) : (
+          <p className="mt-6 text-[13px] text-secondary-text">Only the workspace owner or an admin can change the plan or billing.</p>
+        )}
       </section>
 
-      <TopUpCard extras={status?.extras ?? billing?.extra_exports} />
-      <BillingHelp />
+      {canManage && <TopUpCard extras={status?.extras ?? billing?.extra_exports} />}
+      {canManage && <BillingHelp />}
     </main>
   );
 }
