@@ -1,0 +1,1 @@
+update public.plans set seats = 4 where id in ('team','team_yearly');

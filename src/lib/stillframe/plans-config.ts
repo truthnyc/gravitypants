@@ -59,13 +59,13 @@ export const PLANS: PlanConfig[] = [
     id: "team",
     name: "Team",
     tagline: "For agencies and marketing teams.",
-    seats: 3,
+    seats: 4,
     monthlyExports: 150,
     sharedExports: true,
     monthly: 175,
     yearly: 1750,
     team: true,
-    features: ["Everything in Business", "3 seats", "150 exports a month, shared", "Shared brand kits", "Shared templates", "Priority support"],
+    features: ["Everything in Business", "You + 3 teammates", "150 exports a month, shared", "Shared brand kits", "Shared templates", "Priority support"],
   },
 ];
 

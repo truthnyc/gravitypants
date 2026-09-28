@@ -14,8 +14,8 @@ const FEATURE: Record<string, string[]> = {
   simple: ["10 exports every month", "1 seat"],
   business: ["50 exports every month", "1 seat"],
   business_yearly: ["50 exports every month", "1 seat"],
-  team: ["150 shared exports every month", "3 seats", "Shared brand kits and templates", "Priority support"],
-  team_yearly: ["150 shared exports every month", "3 seats", "Shared brand kits and templates", "Priority support"],
+  team: ["150 shared exports every month", "You + 3 teammates", "Shared brand kits and templates", "Priority support"],
+  team_yearly: ["150 shared exports every month", "You + 3 teammates", "Shared brand kits and templates", "Priority support"],
 };
 const CTA: Record<string, { label: string; variant: "plain" | "default" }> = {
   simple: { label: "Choose Simple", variant: "plain" },
