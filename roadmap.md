@@ -1,8 +1,15 @@
-# Responsive app roadmap
+# Roadmap
 
-- [x] Global mobile viewport, safe areas, touch sizes, and no horizontal scrolling
-- [x] Responsive Your Ads header, uploader, grid, cards, and action sheet
-- [x] Responsive editor header, preview controls, frame strip, toolbar, and inspector sheet
-- [x] Responsive export channel list, controls, quality sheet, and sticky action bar
-- [x] Responsive supporting authenticated, auth, billing, and admin screens
-- [x] Verify 375px, 390px, 430px, phone landscape, tablet, and unchanged desktop
+## Plans & pricing overhaul
+- [ ] Create Team plan in payments (team_monthly $175, team_yearly $1750)
+- [ ] Update plans table: simple 10 exports, business 50, business_yearly 50, team 150 shared
+- [ ] Trial: 7 days, 3 exports, watermarked exports
+- [ ] Watermark rendering in renderAt for trial workspaces
+- [ ] Update pricing page + PlanCards (4 plans, feature lists)
+
+## Team workspaces
+- [ ] workspace_invites table + RLS + grants
+- [ ] Members settings page: list, Change role, Remove, Invite by email, pending invites (Resend/Cancel)
+- [ ] Invite email with accept link; accept flow after sign-in
+- [ ] Create team workspace gated to Team plan (upgrade message → /pricing)
+- [ ] Mobile-friendly, existing design tokens
