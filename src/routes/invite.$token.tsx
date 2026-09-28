@@ -21,6 +21,7 @@ function AcceptInvitePage() {
   const { token } = Route.useParams();
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
+  const [showSignOut, setShowSignOut] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
