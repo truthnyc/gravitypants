@@ -63,12 +63,41 @@
   --color-el-logo: var(--el-logo);
   --color-el-timing: var(--el-timing);
 
+  /* public site (scoped to SiteShell; app tokens above remain unchanged) */
+  --font-site: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", system-ui, sans-serif;
+  --color-site-page: var(--site-page);
+  --color-site-ink: var(--site-ink);
+  --color-site-secondary: var(--site-secondary);
+  --color-site-muted: var(--site-muted);
+  --color-site-nav: var(--site-nav);
+  --color-site-panel: var(--site-panel);
+  --color-site-inner: var(--site-inner);
+  --color-site-soft-blue: var(--site-soft-blue);
+  --color-site-eyebrow: var(--site-eyebrow);
+  --color-site-primary: var(--site-primary);
+  --color-site-primary-hover: var(--site-primary-hover);
+  --color-site-on-primary: var(--site-on-primary);
+  --color-site-line: var(--site-line);
+
   --shadow-card: 0 0 0 0.5px rgb(0 0 0 / 0.08), 0 4px 16px rgb(0 0 0 / 0.04);
   --shadow-popover: 0 24px 60px rgb(0 0 0 / 0.22);
   --shadow-segment: 0 0 0 0.5px rgb(0 0 0 / 0.06), 0 1px 3px rgb(0 0 0 / 0.1);
 }
 
 :root {
+  --site-page: #ffffff;
+  --site-ink: #1d1d1f;
+  --site-secondary: #57575c;
+  --site-muted: #6e6e73;
+  --site-nav: #424245;
+  --site-panel: #f5f5f7;
+  --site-inner: #ededf0;
+  --site-soft-blue: #eef4fb;
+  --site-eyebrow: #0058b0;
+  --site-primary: #0071e3;
+  --site-primary-hover: #0062c4;
+  --site-on-primary: #ffffff;
+  --site-line: #f0f0f2;
   --success-soft: rgba(52, 199, 89, 0.16);
   --success-text: #1b6b2f;
   --warning-soft: #fff4e5;
@@ -190,6 +219,73 @@
 
 @utility ring-focus {
   box-shadow: var(--focus-ring);
+}
+
+@utility site-h1 {
+  font-size: clamp(3.625rem, 8rem, 7.25rem);
+  font-weight: 600;
+  line-height: 0.98;
+  letter-spacing: -0.045em;
+}
+
+@utility site-h2 {
+  font-size: 4rem;
+  font-weight: 600;
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+}
+
+@utility site-lede {
+  color: var(--site-secondary);
+  font-size: 21px;
+  line-height: 1.45;
+}
+
+@utility site-eyebrow {
+  color: var(--site-eyebrow);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+@utility site-card {
+  background: var(--site-panel);
+  border-radius: 24px;
+  box-shadow: none;
+}
+
+.site-phone { position: relative; flex-shrink: 0; padding: 6px; border-radius: 32px; background: var(--site-panel); box-shadow: 0 0 0 1px var(--site-inner), 0 40px 80px -30px color-mix(in oklab, var(--site-ink) 20%, transparent); }
+.site-phone-small { width: 180px; height: 324px; }
+.site-phone-medium { width: 250px; height: 450px; }
+.site-phone-large { width: 340px; height: 640px; }
+.site-phone-screen { position: relative; width: 100%; height: 100%; overflow: hidden; border-radius: 23px; background: var(--site-ink); }
+.site-phone-frame { position: absolute; inset: 0; opacity: 0; }
+.site-phone-art { position: absolute; inset: 0; animation: site-drift 9s ease-in-out infinite alternate; }
+.site-phone-art > svg, .site-phone-art > img { width: 100%; height: 100%; object-fit: cover; }
+.site-frame-1 { animation: site-show-1 9s infinite; }
+.site-frame-2 { animation: site-show-2 9s infinite; }
+.site-frame-3 { animation: site-show-3 9s infinite; }
+.site-phone-bars { position: absolute; z-index: 2; top: 10px; left: 10px; right: 10px; display: flex; gap: 4px; }
+.site-phone-bars span { flex: 1; height: 3px; overflow: hidden; border-radius: 2px; background: color-mix(in oklab, var(--site-on-primary) 35%, transparent); }
+.site-phone-bars i { display: block; width: 0; height: 100%; background: var(--site-on-primary); }
+.site-fill-1 { animation: site-fill-1 9s linear infinite; }
+.site-fill-2 { animation: site-fill-2 9s linear infinite; }
+.site-fill-3 { animation: site-fill-3 9s linear infinite; }
+.site-phone-copy { position: absolute; z-index: 2; left: 14px; right: 14px; bottom: 18px; color: var(--site-on-primary); animation: site-rise 9s ease-out infinite; }
+.site-phone-copy b { display: block; font-size: 24px; font-weight: 700; line-height: 1.04; white-space: pre-line; }
+.site-phone-copy span { display: block; margin-top: 6px; font-size: 11px; font-weight: 500; opacity: .92; }
+.site-phone-brand { position: absolute; z-index: 2; top: 24px; right: 12px; display: flex; align-items: center; min-height: 18px; padding: 0 7px; border-radius: 4px; background: var(--site-page); color: var(--site-ink); font-size: 8px; font-weight: 800; }
+@keyframes site-show-1 { 0%,30%,100% { opacity: 1 } 34%,96% { opacity: 0 } }
+@keyframes site-show-2 { 0%,30%,67%,100% { opacity: 0 } 34%,63% { opacity: 1 } }
+@keyframes site-show-3 { 0%,63%,100% { opacity: 0 } 67%,96% { opacity: 1 } }
+@keyframes site-fill-1 { 0% { width: 0 } 33%,100% { width: 100% } }
+@keyframes site-fill-2 { 0%,33% { width: 0 } 66%,100% { width: 100% } }
+@keyframes site-fill-3 { 0%,66% { width: 0 } 100% { width: 100% } }
+@keyframes site-drift { from { transform: scale(1.14) translateY(4px) } to { transform: scale(1) translateY(0) } }
+@keyframes site-rise { 0% { opacity: 0; transform: translateY(14px) } 6%,92% { opacity: 1; transform: translateY(0) } 100% { opacity: 0 } }
+@media (prefers-reduced-motion: reduce) {
+  .site-phone *, .site-phone { animation: none !important; transition: none !important; }
+  .site-frame-1, .site-phone-copy { opacity: 1; }
+  .site-phone-bars i { width: 100%; }
 }
 
 /* Transition tile previews (play on hover) */

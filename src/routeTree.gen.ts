@@ -9,11 +9,15 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as ExamplesRouteImport } from './routes/examples'
+import { Route as FeaturesRouteImport } from './routes/features'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as ResetRouteImport } from './routes/reset'
 import { Route as SigninRouteImport } from './routes/signin'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as AuthenticatedAppRouteRouteImport } from './routes/_authenticated/app/route'
 import { Route as InviteTokenRouteImport } from './routes/invite.$token'
 import { Route as AuthenticatedAppAccountRouteImport } from './routes/_authenticated/app/account'
 import { Route as AuthenticatedAppAdminRouteRouteImport } from './routes/_authenticated/app/admin/route'
@@ -38,8 +42,23 @@ import { Route as AuthenticatedAppAdIdEditRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAppAdIdExportRouteImport } from './routes/_authenticated/app/ad.$id.export'
 import { Route as AuthenticatedAppAdminClientsIdRouteImport } from './routes/_authenticated/app/admin/clients_.$id'
 
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExamplesRoute = ExamplesRouteImport.update({
+  id: '/examples',
+  path: '/examples',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeaturesRoute = FeaturesRouteImport.update({
+  id: '/features',
+  path: '/features',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PricingRoute = PricingRouteImport.update({
@@ -62,42 +81,47 @@ const SignupRoute = SignupRouteImport.update({
   path: '/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAppRouteRoute = AuthenticatedAppRouteRouteImport.update({
+  id: '/app',
+  path: '/app',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const InviteTokenRoute = InviteTokenRouteImport.update({
   id: '/invite/$token',
   path: '/invite/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAppAccountRoute = AuthenticatedAppAccountRouteImport.update({
-  id: '/app/account',
-  path: '/app/account',
-  getParentRoute: () => AuthenticatedRouteRoute,
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => AuthenticatedAppRouteRoute,
 } as any)
 const AuthenticatedAppAdminRouteRoute =
   AuthenticatedAppAdminRouteRouteImport.update({
-    id: '/app/admin',
-    path: '/app/admin',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/admin',
+    path: '/admin',
+    getParentRoute: () => AuthenticatedAppRouteRoute,
   } as any)
 const AuthenticatedAppAdsRoute = AuthenticatedAppAdsRouteImport.update({
-  id: '/app/ads',
-  path: '/app/ads',
-  getParentRoute: () => AuthenticatedRouteRoute,
+  id: '/ads',
+  path: '/ads',
+  getParentRoute: () => AuthenticatedAppRouteRoute,
 } as any)
 const AuthenticatedAppBrandRoute = AuthenticatedAppBrandRouteImport.update({
-  id: '/app/brand',
-  path: '/app/brand',
-  getParentRoute: () => AuthenticatedRouteRoute,
+  id: '/brand',
+  path: '/brand',
+  getParentRoute: () => AuthenticatedAppRouteRoute,
 } as any)
 const AuthenticatedAppHelpRoute = AuthenticatedAppHelpRouteImport.update({
-  id: '/app/help',
-  path: '/app/help',
-  getParentRoute: () => AuthenticatedRouteRoute,
+  id: '/help',
+  path: '/help',
+  getParentRoute: () => AuthenticatedAppRouteRoute,
 } as any)
 const AuthenticatedAppTemplatesRoute =
   AuthenticatedAppTemplatesRouteImport.update({
-    id: '/app/templates',
-    path: '/app/templates',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/templates',
+    path: '/templates',
+    getParentRoute: () => AuthenticatedAppRouteRoute,
   } as any)
 const ApiPublicCleanupExportsRoute = ApiPublicCleanupExportsRouteImport.update({
   id: '/api/public/cleanup-exports',
@@ -111,15 +135,15 @@ const ApiPublicTrialRemindersRoute = ApiPublicTrialRemindersRouteImport.update({
 } as any)
 const AuthenticatedAppAccountBillingRoute =
   AuthenticatedAppAccountBillingRouteImport.update({
-    id: '/app/account_/billing',
-    path: '/app/account/billing',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/account_/billing',
+    path: '/account/billing',
+    getParentRoute: () => AuthenticatedAppRouteRoute,
   } as any)
 const AuthenticatedAppAccountMembersRoute =
   AuthenticatedAppAccountMembersRouteImport.update({
-    id: '/app/account_/members',
-    path: '/app/account/members',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/account_/members',
+    path: '/account/members',
+    getParentRoute: () => AuthenticatedAppRouteRoute,
   } as any)
 const AuthenticatedAppAdminIndexRoute =
   AuthenticatedAppAdminIndexRouteImport.update({
@@ -175,15 +199,15 @@ const LovableEmailTransactionalPreviewRoute =
   } as any)
 const AuthenticatedAppAdIdEditRoute =
   AuthenticatedAppAdIdEditRouteImport.update({
-    id: '/app/ad/$id/edit',
-    path: '/app/ad/$id/edit',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/ad/$id/edit',
+    path: '/ad/$id/edit',
+    getParentRoute: () => AuthenticatedAppRouteRoute,
   } as any)
 const AuthenticatedAppAdIdExportRoute =
   AuthenticatedAppAdIdExportRouteImport.update({
-    id: '/app/ad/$id/export',
-    path: '/app/ad/$id/export',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/ad/$id/export',
+    path: '/ad/$id/export',
+    getParentRoute: () => AuthenticatedAppRouteRoute,
   } as any)
 const AuthenticatedAppAdminClientsIdRoute =
   AuthenticatedAppAdminClientsIdRouteImport.update({
@@ -193,11 +217,14 @@ const AuthenticatedAppAdminClientsIdRoute =
   } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof AuthenticatedRouteRouteWithChildren
+  '/': typeof IndexRoute
+  '/examples': typeof ExamplesRoute
+  '/features': typeof FeaturesRoute
   '/pricing': typeof PricingRoute
   '/reset': typeof ResetRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
+  '/app': typeof AuthenticatedAppRouteRouteWithChildren
   '/invite/$token': typeof InviteTokenRoute
   '/app/admin': typeof AuthenticatedAppAdminRouteRouteWithChildren
   '/app/account': typeof AuthenticatedAppAccountRoute
@@ -223,11 +250,14 @@ export interface FileRoutesByFullPath {
   '/app/admin/clients/$id': typeof AuthenticatedAppAdminClientsIdRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof AuthenticatedRouteRouteWithChildren
+  '/': typeof IndexRoute
+  '/examples': typeof ExamplesRoute
+  '/features': typeof FeaturesRoute
   '/pricing': typeof PricingRoute
   '/reset': typeof ResetRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
+  '/app': typeof AuthenticatedAppRouteRouteWithChildren
   '/invite/$token': typeof InviteTokenRoute
   '/app/account': typeof AuthenticatedAppAccountRoute
   '/app/ads': typeof AuthenticatedAppAdsRoute
@@ -253,11 +283,15 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/examples': typeof ExamplesRoute
+  '/features': typeof FeaturesRoute
   '/pricing': typeof PricingRoute
   '/reset': typeof ResetRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
+  '/_authenticated/app': typeof AuthenticatedAppRouteRouteWithChildren
   '/invite/$token': typeof InviteTokenRoute
   '/_authenticated/app/admin': typeof AuthenticatedAppAdminRouteRouteWithChildren
   '/_authenticated/app/account': typeof AuthenticatedAppAccountRoute
@@ -286,10 +320,13 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/examples'
+    | '/features'
     | '/pricing'
     | '/reset'
     | '/signin'
     | '/signup'
+    | '/app'
     | '/invite/$token'
     | '/app/admin'
     | '/app/account'
@@ -316,10 +353,13 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/examples'
+    | '/features'
     | '/pricing'
     | '/reset'
     | '/signin'
     | '/signup'
+    | '/app'
     | '/invite/$token'
     | '/app/account'
     | '/app/ads'
@@ -344,11 +384,15 @@ export interface FileRouteTypes {
     | '/app/admin/clients/$id'
   id:
     | '__root__'
+    | '/'
     | '/_authenticated'
+    | '/examples'
+    | '/features'
     | '/pricing'
     | '/reset'
     | '/signin'
     | '/signup'
+    | '/_authenticated/app'
     | '/invite/$token'
     | '/_authenticated/app/admin'
     | '/_authenticated/app/account'
@@ -375,7 +419,10 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  ExamplesRoute: typeof ExamplesRoute
+  FeaturesRoute: typeof FeaturesRoute
   PricingRoute: typeof PricingRoute
   ResetRoute: typeof ResetRoute
   SigninRoute: typeof SigninRoute
@@ -391,11 +438,32 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/examples': {
+      id: '/examples'
+      path: '/examples'
+      fullPath: '/examples'
+      preLoaderRoute: typeof ExamplesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/features': {
+      id: '/features'
+      path: '/features'
+      fullPath: '/features'
+      preLoaderRoute: typeof FeaturesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pricing': {
@@ -426,6 +494,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignupRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/app': {
+      id: '/_authenticated/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AuthenticatedAppRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/invite/$token': {
       id: '/invite/$token'
       path: '/invite/$token'
@@ -435,45 +510,45 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/app/account': {
       id: '/_authenticated/app/account'
-      path: '/app/account'
+      path: '/account'
       fullPath: '/app/account'
       preLoaderRoute: typeof AuthenticatedAppAccountRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAppRouteRoute
     }
     '/_authenticated/app/admin': {
       id: '/_authenticated/app/admin'
-      path: '/app/admin'
+      path: '/admin'
       fullPath: '/app/admin'
       preLoaderRoute: typeof AuthenticatedAppAdminRouteRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAppRouteRoute
     }
     '/_authenticated/app/ads': {
       id: '/_authenticated/app/ads'
-      path: '/app/ads'
+      path: '/ads'
       fullPath: '/app/ads'
       preLoaderRoute: typeof AuthenticatedAppAdsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAppRouteRoute
     }
     '/_authenticated/app/brand': {
       id: '/_authenticated/app/brand'
-      path: '/app/brand'
+      path: '/brand'
       fullPath: '/app/brand'
       preLoaderRoute: typeof AuthenticatedAppBrandRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAppRouteRoute
     }
     '/_authenticated/app/help': {
       id: '/_authenticated/app/help'
-      path: '/app/help'
+      path: '/help'
       fullPath: '/app/help'
       preLoaderRoute: typeof AuthenticatedAppHelpRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAppRouteRoute
     }
     '/_authenticated/app/templates': {
       id: '/_authenticated/app/templates'
-      path: '/app/templates'
+      path: '/templates'
       fullPath: '/app/templates'
       preLoaderRoute: typeof AuthenticatedAppTemplatesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAppRouteRoute
     }
     '/api/public/cleanup-exports': {
       id: '/api/public/cleanup-exports'
@@ -491,17 +566,17 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/app/account_/billing': {
       id: '/_authenticated/app/account_/billing'
-      path: '/app/account/billing'
+      path: '/account/billing'
       fullPath: '/app/account/billing'
       preLoaderRoute: typeof AuthenticatedAppAccountBillingRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAppRouteRoute
     }
     '/_authenticated/app/account_/members': {
       id: '/_authenticated/app/account_/members'
-      path: '/app/account/members'
+      path: '/account/members'
       fullPath: '/app/account/members'
       preLoaderRoute: typeof AuthenticatedAppAccountMembersRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAppRouteRoute
     }
     '/_authenticated/app/admin/': {
       id: '/_authenticated/app/admin/'
@@ -568,17 +643,17 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/app/ad/$id/edit': {
       id: '/_authenticated/app/ad/$id/edit'
-      path: '/app/ad/$id/edit'
+      path: '/ad/$id/edit'
       fullPath: '/app/ad/$id/edit'
       preLoaderRoute: typeof AuthenticatedAppAdIdEditRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAppRouteRoute
     }
     '/_authenticated/app/ad/$id/export': {
       id: '/_authenticated/app/ad/$id/export'
-      path: '/app/ad/$id/export'
+      path: '/ad/$id/export'
       fullPath: '/app/ad/$id/export'
       preLoaderRoute: typeof AuthenticatedAppAdIdExportRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAppRouteRoute
     }
     '/_authenticated/app/admin/clients_/$id': {
       id: '/_authenticated/app/admin/clients_/$id'
@@ -614,7 +689,7 @@ const AuthenticatedAppAdminRouteRouteWithChildren =
     AuthenticatedAppAdminRouteRouteChildren,
   )
 
-interface AuthenticatedRouteRouteChildren {
+interface AuthenticatedAppRouteRouteChildren {
   AuthenticatedAppAdminRouteRoute: typeof AuthenticatedAppAdminRouteRouteWithChildren
   AuthenticatedAppAccountRoute: typeof AuthenticatedAppAccountRoute
   AuthenticatedAppAdsRoute: typeof AuthenticatedAppAdsRoute
@@ -627,7 +702,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAppAdIdExportRoute: typeof AuthenticatedAppAdIdExportRoute
 }
 
-const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+const AuthenticatedAppRouteRouteChildren: AuthenticatedAppRouteRouteChildren = {
   AuthenticatedAppAdminRouteRoute: AuthenticatedAppAdminRouteRouteWithChildren,
   AuthenticatedAppAccountRoute: AuthenticatedAppAccountRoute,
   AuthenticatedAppAdsRoute: AuthenticatedAppAdsRoute,
@@ -640,11 +715,27 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAppAdIdExportRoute: AuthenticatedAppAdIdExportRoute,
 }
 
+const AuthenticatedAppRouteRouteWithChildren =
+  AuthenticatedAppRouteRoute._addFileChildren(
+    AuthenticatedAppRouteRouteChildren,
+  )
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAppRouteRoute: typeof AuthenticatedAppRouteRouteWithChildren
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAppRouteRoute: AuthenticatedAppRouteRouteWithChildren,
+}
+
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  ExamplesRoute: ExamplesRoute,
+  FeaturesRoute: FeaturesRoute,
   PricingRoute: PricingRoute,
   ResetRoute: ResetRoute,
   SigninRoute: SigninRoute,
