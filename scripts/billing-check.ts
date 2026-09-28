@@ -60,7 +60,7 @@ async function main() {
     // 2. Manage Billing opens and lets people switch to every plan.
     await step("manage billing", async () => {
       const cfgId = await ensurePortalConfig(stripe);
-      const cfg = await stripe.billingPortal.configurations.retrieve(cfgId);
+      const cfg = await stripe.billingPortal.configurations.retrieve(cfgId, { expand: ["features.subscription_update.products"] });
       const offered = new Set((cfg.features.subscription_update.products ?? []).flatMap((p) => p.prices));
       const missing = PLAN_PRICE_KEYS.filter((k) => !offered.has(prices.get(k) ?? ""));
       if (missing.length) throw new Error(`plan switching is missing: ${missing.join(", ")}`);
