@@ -341,14 +341,14 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
 
           <Group label="Save as">
             <div className="grid grid-cols-2 gap-2">
-              <PickCard on={mp4} onClick={() => setMp4((v) => !v)} icon={<Film className="size-4" strokeWidth={1.7} />} title="Video MP4" sub="With motion" />
+              <PickCard on={mp4} onClick={() => setMp4((v) => !v)} icon={<Film className="size-4" strokeWidth={1.7} />} title="Video" sub="MP4 · with motion" />
               <PickCard on={gif} onClick={() => setGif((v) => !v)} icon={<ImageIcon className="size-4" strokeWidth={1.7} />} title="Animated GIF" sub="Plays anywhere, no sound" />
             </div>
           </Group>
 
           {mp4 && (
             <Group label="Video motion">
-              <Seg value={fps} onChange={setFps} options={[{ v: 30, l: "Standard", s: "30 fps" }, { v: 60, l: "Smooth", s: "60 fps" }, { v: 24, l: "Film", s: "24 fps" }]} />
+              <Seg value={fps} onChange={setFps} options={[{ v: 30, l: "Standard", s: "30 fps" }, { v: 60, l: "Extra smooth", s: "60 fps" }, { v: 24, l: "Film look", s: "24 fps" }]} />
             </Group>
           )}
 
@@ -434,7 +434,7 @@ function ExportHeader({ id, name }: { id: string; name: string }) {
             <LayoutGrid className="hidden lg:block" strokeWidth={1.7} /><ChevronLeft className="lg:hidden" strokeWidth={1.7} />
           </Link>
         </Button>
-        <div className="min-w-0 px-1"><span className="block truncate text-[17px] font-semibold lg:text-[15px]">Export</span><span className="block truncate text-[13px] text-secondary-text lg:hidden">{name} · Step 3 of 3</span></div>
+        <div className="min-w-0 px-1"><span className="block truncate text-[17px] font-semibold lg:hidden">Export</span><span className="hidden truncate text-[15px] font-semibold lg:block">{name}</span><span className="block truncate text-[13px] text-secondary-text lg:hidden">{name} · Step 3 of 3</span></div>
       </div>
       <nav className="hidden h-8 items-center rounded-lg bg-control-fill p-0.5 text-[13px] font-medium lg:flex" aria-label="Steps">
         <Link to="/" className="flex h-7 items-center gap-1.5 rounded-lg px-3 text-secondary-text">
