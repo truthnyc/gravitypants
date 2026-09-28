@@ -29,6 +29,7 @@ function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [keepSignedIn, setKeepSignedIn] = useState(true);
   const [resetSent, setResetSent] = useState(false);
@@ -57,6 +58,7 @@ function SignIn() {
     e.preventDefault();
     setBusy(true);
     setError(null);
+    setEmailError(null);
     if (!keepSignedIn) {
       localStorage.setItem("gravity-pants:session-only", "1");
       sessionStorage.setItem("gravity-pants:session-only", "1");
@@ -70,8 +72,8 @@ function SignIn() {
   }
 
   async function forgot() {
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) { setError("Enter your email above first, then choose Forgot password."); return; }
-    setBusy(true); setError(null);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) { setEmailError("Enter your email above first, then choose Forgot password."); return; }
+    setBusy(true); setError(null); setEmailError(null);
     const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo: window.location.origin + "/reset" });
     setBusy(false);
     if (error) setError(plainAuthError(error.message));
@@ -85,7 +87,7 @@ function SignIn() {
         <FieldGroup
           error={error}
           fields={[
-            { id: "email", label: "Email", type: "email", autoComplete: "email", value: email, placeholder: "you@yourbrand.com", onChange: setEmail },
+            { id: "email", label: "Email", type: "email", autoComplete: "email", value: email, placeholder: "you@yourbrand.com", onChange: (value) => { setEmail(value); setEmailError(null); }, error: emailError },
             { id: "password", label: "Password", type: "password", autoComplete: "current-password", value: password, placeholder: "Your password", onChange: setPassword },
           ]}
         />

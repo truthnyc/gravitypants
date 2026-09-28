@@ -159,7 +159,7 @@ export function FieldGroup({ fields, error }: { fields: FieldDef[]; error?: stri
                 placeholder={f.placeholder ?? f.label}
                 value={f.value}
                 onChange={(e) => f.onChange(e.target.value)}
-                aria-invalid={!!f.error || !!error}
+                aria-invalid={!!f.error}
                 aria-describedby={f.error ? `${f.id}-error` : undefined}
               />
               {isPassword && (
