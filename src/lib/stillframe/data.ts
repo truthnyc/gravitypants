@@ -573,15 +573,12 @@ export function templateFromProject(p: ProjectWithFrames): TemplateSettings {
       headline: f.headline,
       subline: f.subline,
       logo_visible: f.logo_visible,
-      photo: {
-        fit: f.photo.fit,
-        focus: f.photo.focus,
-        zoom: f.photo.zoom,
-        movement: f.photo.movement,
-        brightness: f.photo.brightness,
-        darken_for_text: f.photo.darken_for_text,
-        background_color: f.photo.background_color,
-      },
+      // Photo style only — the picture itself is never saved.
+      photo: Object.fromEntries(
+        (["fit", "focus", "zoom", "movement", "brightness", "darken_for_text", "background_color"] as const)
+          .filter((k) => f.photo[k] !== undefined)
+          .map((k) => [k, f.photo[k]]),
+      ) as Frame["photo"],
     })),
   };
 }
