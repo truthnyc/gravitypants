@@ -63,7 +63,7 @@ export const inviteMember = createServerFn({ method: "POST" })
 /** Resends the email for a pending invite. */
 export const resendInvite = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { inviteId: string; origin: string }) => d)
+  .inputValidator((d: { inviteId: string }) => d)
   .handler(async ({ data, context }): Promise<{ ok: true } | { error: string }> => {
     const { supabase } = context;
     const { data: inv } = await supabase
@@ -79,7 +79,7 @@ export const resendInvite = createServerFn({ method: "POST" })
       await sendTemplateEmail("invite", inv.email, {
         templateData: {
           workspaceName: ws?.name ?? undefined,
-          acceptUrl: `${data.origin}/invite/${inv.token}`,
+          acceptUrl: `${SITE_ORIGIN}/invite/${inv.token}`,
         },
         idempotencyKey: `invite-resend-${inv.token}-${Date.now()}`,
       });
