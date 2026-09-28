@@ -63,7 +63,7 @@ function SiteFooter() {
   return <footer className="mt-auto border-t border-site-line bg-site-page px-5 pb-10 pt-14 text-site-ink md:px-8 lg:px-16 xl:px-24">
     <div className="mx-auto flex max-w-[1248px] flex-col gap-10 lg:flex-row lg:gap-20">
       <div className="max-w-[320px] shrink-0"><GravityPantsLogo size={28} showWordmark /><p className="mt-3 text-[14px] leading-normal text-site-muted">Photos in. Reels out. Video ads for everyone who has better things to do than edit video.</p></div>
-      <div className="grid flex-1 grid-cols-2 gap-6 sm:grid-cols-4">{columns.map((column) => <div key={column.label} className="flex flex-col gap-3 text-[14px]"><span className="font-semibold">{column.label}</span>{column.links.map(([label, to]) => to.startsWith("mailto:") ? <a key={label} href={to} className="text-site-muted hover:text-site-primary">{label}</a> : <Link key={label} to={to} className="text-site-muted hover:text-site-primary">{label}</Link>)}</div>)}</div>
+      <div className="grid flex-1 grid-cols-2 gap-6 sm:grid-cols-4">{columns.map((column) => <div key={column.label} className="flex flex-col gap-3 text-[14px]"><span className="font-semibold">{column.label}</span>{column.links.map((link) => link.mailto ? <a key={link.label} href={link.to} className="text-site-muted hover:text-site-primary">{link.label}</a> : <Link key={link.label} to={link.to as "/"} className="text-site-muted hover:text-site-primary">{link.label}</Link>)}</div>)}</div>
     </div>
     <p className="mx-auto mt-12 max-w-[1248px] text-[13px] text-site-muted">© 2026 Gravity Pants. All rights reserved.</p>
   </footer>;
