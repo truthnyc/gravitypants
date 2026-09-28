@@ -7,3 +7,7 @@ export function getWorkspaceId(): string {
 export function setWorkspaceId(id: string | null) {
   current = id;
 }
+/** Active workspace if the sign-in gate has set one, else null. */
+export function peekWorkspaceId(): string | null {
+  return current;
+}

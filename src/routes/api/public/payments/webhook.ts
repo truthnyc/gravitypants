@@ -1,27 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { type StripeEnv, verifyWebhook } from "@/lib/stripe.server";
-
-const PLAN_BY_PRICE: Record<string, string> = {
-  simple_monthly: "simple",
-  business_monthly: "business",
-  business_yearly: "business_yearly",
-  team_monthly: "team",
-  team_yearly: "team_yearly",
-};
-
-function mapStatus(s: string): string {
-  if (s === "active" || s === "trialing") return "active";
-  if (s === "past_due" || s === "unpaid" || s === "incomplete") return "past_due";
-  return "canceled";
-}
-
-const PLAN_NAMES: Record<string, string> = {
-  simple: "Simple",
-  business: "Business",
-  business_yearly: "Business Yearly",
-  team: "Team",
-  team_yearly: "Team Yearly",
-};
+import { PLAN_BY_PRICE, PLAN_NAMES, mapStatus } from "@/lib/stillframe/plan-map";
 
 const iso = (sec?: number | null) => (sec ? new Date(sec * 1000).toISOString() : null);
 

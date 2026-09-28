@@ -1,3 +1,4 @@
+import { peekWorkspaceId } from "./workspace";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -37,6 +38,9 @@ export function usePlans() {
 export async function currentWorkspaceId(): Promise<string | null> {
   const { data } = await supabase.auth.getSession();
   if (!data.session) return null;
+  // Billing follows the workspace the user is working in (workspace switcher), not just their first one.
+  const active = peekWorkspaceId();
+  if (active) return active;
   const { data: ws } = await supabase.rpc("ensure_workspace");
   return (ws as string) ?? null;
 }
@@ -50,6 +54,8 @@ export function useBilling() {
       const { data } = await supabase.from("workspace_billing").select("*").eq("workspace_id", ws).maybeSingle();
       return (data as Billing | null) ?? null;
     },
+    // Coming back from Manage Billing (another tab) shows the new plan right away.
+    refetchOnWindowFocus: "always",
   });
 }
 
@@ -57,6 +63,7 @@ export function useExportStatus() {
   return useQuery({
     queryKey: [...billingKey, "export"],
     queryFn: fetchExportStatus,
+    refetchOnWindowFocus: "always",
   });
 }
 

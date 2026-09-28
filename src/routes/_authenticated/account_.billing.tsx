@@ -4,7 +4,8 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { AccountTabs } from "@/components/billing/AccountTabs";
 import { TopUpCard } from "@/components/billing/TopUp";
-import { isPaid, money, planName, statusLine, useBilling, useExportStatus, useManageBilling, usePlans, useRefreshBilling } from "@/lib/stillframe/billing";
+import { BillingHelp } from "@/components/billing/BillingHelp";
+import { type ExportStatus, isPaid, money, planName, statusLine, useBilling, useExportStatus, useManageBilling, usePlans, useRefreshBilling } from "@/lib/stillframe/billing";
 
 export const Route = createFileRoute("/_authenticated/account_/billing")({
   validateSearch: z.object({ checkout: z.string().optional() }),
@@ -82,18 +83,27 @@ function BillingPage() {
           </p>
         )}
 
-        {limited && status && (
+        {billing && (
+          <dl className="mt-5 grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-[14px]">
+            <dt className="text-secondary-text">Plan</dt>
+            <dd className="font-medium">{paid ? planName(billing.plan) : "Free trial"}</dd>
+            <dt className="text-secondary-text">{paid ? (billing.cancel_at_period_end || billing.status === "canceled" ? "Ends on" : "Renews on") : "Trial ends"}</dt>
+            <dd className="nums">{longDate(paid ? billing.current_period_end : billing.trial_ends_at)}</dd>
+            <dt className="text-secondary-text">Exports left</dt>
+            <dd className="nums">{exportsLeft(status)}</dd>
+          </dl>
+        )}
+
+        {status?.limit != null && (
           <div className="mt-5">
             <p className="text-[14px] nums">
-              {status.used} of {status.limit} exports used this month
+              {status.used ?? 0} of {status.limit} exports used {limited ? "this month" : "in your trial"}
             </p>
             <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-control-fill">
               <div className="h-full rounded-full bg-primary" style={{ width: `${Math.min(100, ((status.used ?? 0) / (status.limit || 1)) * 100)}%` }} />
             </div>
-            {status.resets_at && (
-              <p className="mt-1.5 text-[12px] text-secondary-text nums">
-                Resets on {new Date(status.resets_at).toLocaleDateString(undefined, { day: "numeric", month: "short" })}
-              </p>
+            {limited && status.resets_at && (
+              <p className="mt-1.5 text-[12px] text-secondary-text nums">Resets on {longDate(status.resets_at)}</p>
             )}
           </div>
         )}
@@ -111,6 +121,19 @@ function BillingPage() {
       </section>
 
       <TopUpCard extras={status?.extras ?? billing?.extra_exports} />
+      <BillingHelp />
     </main>
   );
+}
+
+function longDate(s: string | null | undefined) {
+  return s ? new Date(s).toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" }) : "—";
+}
+
+function exportsLeft(st: ExportStatus | null | undefined): string {
+  if (!st) return "—";
+  const extras = st.extras ?? 0;
+  const extra = extras > 0 ? ` + ${extras} extra` : "";
+  if (st.limit == null) return st.allowed ? `Unlimited${extra}` : extras > 0 ? `${extras} extra` : "None — pick a plan";
+  return `${Math.max(0, st.limit - (st.used ?? 0))} of ${st.limit}${extra}`;
 }
