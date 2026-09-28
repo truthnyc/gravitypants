@@ -41,7 +41,7 @@ function Layout() {
 function Paused() {
   const signOut = useSignOut();
   return (
-    <main className="flex min-h-screen items-center justify-center px-8">
+    <main className="flex min-h-dvh items-center justify-center px-4 sm:px-8">
       <div className="max-w-[400px] rounded-sm bg-card p-10 text-center shadow-card">
         <h1 className="text-[22px] font-bold tracking-[-0.02em]">Your account is paused</h1>
         <p className="mt-2 text-[14px] text-secondary-text">Please contact support at info@gravitypants.com.</p>

@@ -16,7 +16,7 @@ export function safeRedirect(r: unknown): string {
 
 export function AuthShell({ title, subtitle, children }: { title: string; subtitle: string; children: ReactNode }) {
   return (
-    <main className="flex min-h-screen items-start justify-center bg-canvas px-4 pt-[12vh] pb-16">
+    <main className="flex min-h-dvh items-start justify-center bg-canvas px-4 pb-16 pt-[12dvh]">
       <div className="w-full max-w-[380px]">
         <div className="flex flex-col items-center text-center">
           <GravityPantsLogo size={56} />
