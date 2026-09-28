@@ -447,7 +447,7 @@ export type KitDraft = Pick<NamedBrandKit, "name" | "logo_url" | "logo_dark_url"
 export function useSaveBrandKit() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, draft }: { id?: string; draft: KitDraft }) => {
+    mutationFn: async ({ id, draft }: { id?: string | undefined; draft: KitDraft }) => {
       if (id) {
         const { error } = await supabase.from("brand_kits").update(draft).eq("id", id);
         if (error) throw error;
