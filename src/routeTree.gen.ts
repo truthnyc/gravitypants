@@ -32,7 +32,6 @@ import { Route as AuthenticatedAppAdminRouteRouteImport } from './routes/_authen
 import { Route as AuthenticatedAppAdsRouteImport } from './routes/_authenticated/app/ads'
 import { Route as AuthenticatedAppBrandRouteImport } from './routes/_authenticated/app/brand'
 import { Route as AuthenticatedAppHelpRouteImport } from './routes/_authenticated/app/help'
-import { Route as AuthenticatedAppTemplatesRouteImport } from './routes/_authenticated/app/templates'
 import { Route as ApiPublicCleanupExportsRouteImport } from './routes/api/public/cleanup-exports'
 import { Route as ApiPublicTrialRemindersRouteImport } from './routes/api/public/trial-reminders'
 import { Route as AuthenticatedAppAccountBillingRouteImport } from './routes/_authenticated/app/account_.billing'
@@ -42,6 +41,8 @@ import { Route as AuthenticatedAppAdminAdminsRouteImport } from './routes/_authe
 import { Route as AuthenticatedAppAdminAuditRouteImport } from './routes/_authenticated/app/admin/audit'
 import { Route as AuthenticatedAppAdminClientsRouteImport } from './routes/_authenticated/app/admin/clients'
 import { Route as AuthenticatedAppAdminExportsRouteImport } from './routes/_authenticated/app/admin/exports'
+import { Route as AuthenticatedAppTemplatesIndexRouteImport } from './routes/_authenticated/app/templates.index'
+import { Route as AuthenticatedAppTemplatesSlugRouteImport } from './routes/_authenticated/app/templates.$slug'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
@@ -165,12 +166,6 @@ const AuthenticatedAppHelpRoute = AuthenticatedAppHelpRouteImport.update({
   path: '/help',
   getParentRoute: () => AuthenticatedAppRouteRoute,
 } as any)
-const AuthenticatedAppTemplatesRoute =
-  AuthenticatedAppTemplatesRouteImport.update({
-    id: '/templates',
-    path: '/templates',
-    getParentRoute: () => AuthenticatedAppRouteRoute,
-  } as any)
 const ApiPublicCleanupExportsRoute = ApiPublicCleanupExportsRouteImport.update({
   id: '/api/public/cleanup-exports',
   path: '/api/public/cleanup-exports',
@@ -222,6 +217,18 @@ const AuthenticatedAppAdminExportsRoute =
     id: '/exports',
     path: '/exports',
     getParentRoute: () => AuthenticatedAppAdminRouteRoute,
+  } as any)
+const AuthenticatedAppTemplatesIndexRoute =
+  AuthenticatedAppTemplatesIndexRouteImport.update({
+    id: '/templates/',
+    path: '/templates/',
+    getParentRoute: () => AuthenticatedAppRouteRoute,
+  } as any)
+const AuthenticatedAppTemplatesSlugRoute =
+  AuthenticatedAppTemplatesSlugRouteImport.update({
+    id: '/templates/$slug',
+    path: '/templates/$slug',
+    getParentRoute: () => AuthenticatedAppRouteRoute,
   } as any)
 const ApiPublicPaymentsWebhookRoute =
   ApiPublicPaymentsWebhookRouteImport.update({
@@ -286,7 +293,6 @@ export interface FileRoutesByFullPath {
   '/app/ads': typeof AuthenticatedAppAdsRoute
   '/app/brand': typeof AuthenticatedAppBrandRoute
   '/app/help': typeof AuthenticatedAppHelpRoute
-  '/app/templates': typeof AuthenticatedAppTemplatesRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
   '/api/public/trial-reminders': typeof ApiPublicTrialRemindersRoute
   '/app/': typeof AuthenticatedAppIndexRoute
@@ -296,11 +302,13 @@ export interface FileRoutesByFullPath {
   '/app/admin/audit': typeof AuthenticatedAppAdminAuditRoute
   '/app/admin/clients': typeof AuthenticatedAppAdminClientsRoute
   '/app/admin/exports': typeof AuthenticatedAppAdminExportsRoute
+  '/app/templates/$slug': typeof AuthenticatedAppTemplatesSlugRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/app/admin/': typeof AuthenticatedAppAdminIndexRoute
+  '/app/templates/': typeof AuthenticatedAppTemplatesIndexRoute
   '/app/ad/$id/edit': typeof AuthenticatedAppAdIdEditRoute
   '/app/ad/$id/export': typeof AuthenticatedAppAdIdExportRoute
   '/app/admin/clients/$id': typeof AuthenticatedAppAdminClientsIdRoute
@@ -324,7 +332,6 @@ export interface FileRoutesByTo {
   '/app/ads': typeof AuthenticatedAppAdsRoute
   '/app/brand': typeof AuthenticatedAppBrandRoute
   '/app/help': typeof AuthenticatedAppHelpRoute
-  '/app/templates': typeof AuthenticatedAppTemplatesRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
   '/api/public/trial-reminders': typeof ApiPublicTrialRemindersRoute
   '/app': typeof AuthenticatedAppIndexRoute
@@ -334,11 +341,13 @@ export interface FileRoutesByTo {
   '/app/admin/audit': typeof AuthenticatedAppAdminAuditRoute
   '/app/admin/clients': typeof AuthenticatedAppAdminClientsRoute
   '/app/admin/exports': typeof AuthenticatedAppAdminExportsRoute
+  '/app/templates/$slug': typeof AuthenticatedAppTemplatesSlugRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/app/admin': typeof AuthenticatedAppAdminIndexRoute
+  '/app/templates': typeof AuthenticatedAppTemplatesIndexRoute
   '/app/ad/$id/edit': typeof AuthenticatedAppAdIdEditRoute
   '/app/ad/$id/export': typeof AuthenticatedAppAdIdExportRoute
   '/app/admin/clients/$id': typeof AuthenticatedAppAdminClientsIdRoute
@@ -367,7 +376,6 @@ export interface FileRoutesById {
   '/_authenticated/app/ads': typeof AuthenticatedAppAdsRoute
   '/_authenticated/app/brand': typeof AuthenticatedAppBrandRoute
   '/_authenticated/app/help': typeof AuthenticatedAppHelpRoute
-  '/_authenticated/app/templates': typeof AuthenticatedAppTemplatesRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
   '/api/public/trial-reminders': typeof ApiPublicTrialRemindersRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
@@ -377,11 +385,13 @@ export interface FileRoutesById {
   '/_authenticated/app/admin/audit': typeof AuthenticatedAppAdminAuditRoute
   '/_authenticated/app/admin/clients': typeof AuthenticatedAppAdminClientsRoute
   '/_authenticated/app/admin/exports': typeof AuthenticatedAppAdminExportsRoute
+  '/_authenticated/app/templates/$slug': typeof AuthenticatedAppTemplatesSlugRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/_authenticated/app/admin/': typeof AuthenticatedAppAdminIndexRoute
+  '/_authenticated/app/templates/': typeof AuthenticatedAppTemplatesIndexRoute
   '/_authenticated/app/ad/$id/edit': typeof AuthenticatedAppAdIdEditRoute
   '/_authenticated/app/ad/$id/export': typeof AuthenticatedAppAdIdExportRoute
   '/_authenticated/app/admin/clients_/$id': typeof AuthenticatedAppAdminClientsIdRoute
@@ -410,7 +420,6 @@ export interface FileRouteTypes {
     | '/app/ads'
     | '/app/brand'
     | '/app/help'
-    | '/app/templates'
     | '/api/public/cleanup-exports'
     | '/api/public/trial-reminders'
     | '/app/'
@@ -420,11 +429,13 @@ export interface FileRouteTypes {
     | '/app/admin/audit'
     | '/app/admin/clients'
     | '/app/admin/exports'
+    | '/app/templates/$slug'
     | '/api/public/payments/webhook'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/transactional/preview'
     | '/app/admin/'
+    | '/app/templates/'
     | '/app/ad/$id/edit'
     | '/app/ad/$id/export'
     | '/app/admin/clients/$id'
@@ -448,7 +459,6 @@ export interface FileRouteTypes {
     | '/app/ads'
     | '/app/brand'
     | '/app/help'
-    | '/app/templates'
     | '/api/public/cleanup-exports'
     | '/api/public/trial-reminders'
     | '/app'
@@ -458,11 +468,13 @@ export interface FileRouteTypes {
     | '/app/admin/audit'
     | '/app/admin/clients'
     | '/app/admin/exports'
+    | '/app/templates/$slug'
     | '/api/public/payments/webhook'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/transactional/preview'
     | '/app/admin'
+    | '/app/templates'
     | '/app/ad/$id/edit'
     | '/app/ad/$id/export'
     | '/app/admin/clients/$id'
@@ -490,7 +502,6 @@ export interface FileRouteTypes {
     | '/_authenticated/app/ads'
     | '/_authenticated/app/brand'
     | '/_authenticated/app/help'
-    | '/_authenticated/app/templates'
     | '/api/public/cleanup-exports'
     | '/api/public/trial-reminders'
     | '/_authenticated/app/'
@@ -500,11 +511,13 @@ export interface FileRouteTypes {
     | '/_authenticated/app/admin/audit'
     | '/_authenticated/app/admin/clients'
     | '/_authenticated/app/admin/exports'
+    | '/_authenticated/app/templates/$slug'
     | '/api/public/payments/webhook'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/transactional/preview'
     | '/_authenticated/app/admin/'
+    | '/_authenticated/app/templates/'
     | '/_authenticated/app/ad/$id/edit'
     | '/_authenticated/app/ad/$id/export'
     | '/_authenticated/app/admin/clients_/$id'
@@ -696,13 +709,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppHelpRouteImport
       parentRoute: typeof AuthenticatedAppRouteRoute
     }
-    '/_authenticated/app/templates': {
-      id: '/_authenticated/app/templates'
-      path: '/templates'
-      fullPath: '/app/templates'
-      preLoaderRoute: typeof AuthenticatedAppTemplatesRouteImport
-      parentRoute: typeof AuthenticatedAppRouteRoute
-    }
     '/api/public/cleanup-exports': {
       id: '/api/public/cleanup-exports'
       path: '/api/public/cleanup-exports'
@@ -765,6 +771,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/admin/exports'
       preLoaderRoute: typeof AuthenticatedAppAdminExportsRouteImport
       parentRoute: typeof AuthenticatedAppAdminRouteRoute
+    }
+    '/_authenticated/app/templates/': {
+      id: '/_authenticated/app/templates/'
+      path: '/templates'
+      fullPath: '/app/templates/'
+      preLoaderRoute: typeof AuthenticatedAppTemplatesIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRouteRoute
+    }
+    '/_authenticated/app/templates/$slug': {
+      id: '/_authenticated/app/templates/$slug'
+      path: '/templates/$slug'
+      fullPath: '/app/templates/$slug'
+      preLoaderRoute: typeof AuthenticatedAppTemplatesSlugRouteImport
+      parentRoute: typeof AuthenticatedAppRouteRoute
     }
     '/api/public/payments/webhook': {
       id: '/api/public/payments/webhook'
@@ -848,10 +868,11 @@ interface AuthenticatedAppRouteRouteChildren {
   AuthenticatedAppAdsRoute: typeof AuthenticatedAppAdsRoute
   AuthenticatedAppBrandRoute: typeof AuthenticatedAppBrandRoute
   AuthenticatedAppHelpRoute: typeof AuthenticatedAppHelpRoute
-  AuthenticatedAppTemplatesRoute: typeof AuthenticatedAppTemplatesRoute
   AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
   AuthenticatedAppAccountBillingRoute: typeof AuthenticatedAppAccountBillingRoute
   AuthenticatedAppAccountMembersRoute: typeof AuthenticatedAppAccountMembersRoute
+  AuthenticatedAppTemplatesSlugRoute: typeof AuthenticatedAppTemplatesSlugRoute
+  AuthenticatedAppTemplatesIndexRoute: typeof AuthenticatedAppTemplatesIndexRoute
   AuthenticatedAppAdIdEditRoute: typeof AuthenticatedAppAdIdEditRoute
   AuthenticatedAppAdIdExportRoute: typeof AuthenticatedAppAdIdExportRoute
 }
@@ -862,10 +883,11 @@ const AuthenticatedAppRouteRouteChildren: AuthenticatedAppRouteRouteChildren = {
   AuthenticatedAppAdsRoute: AuthenticatedAppAdsRoute,
   AuthenticatedAppBrandRoute: AuthenticatedAppBrandRoute,
   AuthenticatedAppHelpRoute: AuthenticatedAppHelpRoute,
-  AuthenticatedAppTemplatesRoute: AuthenticatedAppTemplatesRoute,
   AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
   AuthenticatedAppAccountBillingRoute: AuthenticatedAppAccountBillingRoute,
   AuthenticatedAppAccountMembersRoute: AuthenticatedAppAccountMembersRoute,
+  AuthenticatedAppTemplatesSlugRoute: AuthenticatedAppTemplatesSlugRoute,
+  AuthenticatedAppTemplatesIndexRoute: AuthenticatedAppTemplatesIndexRoute,
   AuthenticatedAppAdIdEditRoute: AuthenticatedAppAdIdEditRoute,
   AuthenticatedAppAdIdExportRoute: AuthenticatedAppAdIdExportRoute,
 }

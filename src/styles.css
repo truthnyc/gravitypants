@@ -801,3 +801,28 @@ html:has(.features-page) { scroll-behavior: smooth; }
   .auth-reel-row { animation: none; }
   .auth-tile-one, .auth-tile-two, .auth-tile-three { animation: none; opacity: 1; }
 }
+
+/* Template card previews (hover-play; disabled under reduced motion by the component) */
+.tpl-text { container-type: size; color: #fff; }
+.tpl-headline { font-size: clamp(8px, 11cqmin, 40px); }
+.tpl-subline { font-size: clamp(6px, 6cqmin, 20px); opacity: .85; }
+.tpl-in-fade { animation: tpl-fade .35s ease-out both; }
+.tpl-in-slide { animation: tpl-slide .4s cubic-bezier(.2,.8,.2,1) both; }
+.tpl-in-swipe-left { animation: tpl-swipe .4s cubic-bezier(.2,.8,.2,1) both; }
+.tpl-in-zoom { animation: tpl-zoom .3s ease-out both; }
+.tpl-photo-slow-zoom-in { animation: tpl-kb 3s linear both; }
+.tpl-photo-pan { animation: tpl-pan 3s linear both; }
+.tpl-text-rise-up { animation: tpl-rise .45s ease-out both; }
+.tpl-text-fade-in { animation: tpl-fade .5s ease-out both; }
+.tpl-text-zoom { animation: tpl-pop .3s cubic-bezier(.2,1.4,.4,1) both; }
+.tpl-text-typewriter { animation: tpl-type .9s steps(18) both; white-space: nowrap; overflow: hidden; }
+@keyframes tpl-fade { from { opacity: 0 } to { opacity: 1 } }
+@keyframes tpl-slide { from { transform: translateX(100%) } to { transform: none } }
+@keyframes tpl-swipe { from { clip-path: inset(0 0 0 100%) } to { clip-path: inset(0) } }
+@keyframes tpl-zoom { from { transform: scale(1.25); opacity: 0 } to { transform: none; opacity: 1 } }
+@keyframes tpl-kb { from { transform: scale(1) } to { transform: scale(1.12) } }
+@keyframes tpl-pan { from { transform: scale(1.1) translateX(4%) } to { transform: scale(1.1) translateX(-4%) } }
+@keyframes tpl-rise { from { transform: translateY(30%); opacity: 0 } to { transform: none; opacity: 1 } }
+@keyframes tpl-pop { from { transform: scale(.6); opacity: 0 } to { transform: none; opacity: 1 } }
+@keyframes tpl-type { from { clip-path: inset(0 100% 0 0) } to { clip-path: inset(0) } }
+@media (prefers-reduced-motion: reduce) { .tpl-slide, .tpl-slide * { animation: none !important; } }

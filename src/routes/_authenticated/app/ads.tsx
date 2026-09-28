@@ -8,7 +8,6 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { rememberSignupChoice } from "@/lib/stillframe/signup-choice";
 import { PLANS } from "@/lib/stillframe/plans-config";
-import { templateForExample } from "@/lib/site/example-template";
 
 export const Route = createFileRoute("/_authenticated/app/ads")({
   validateSearch: z.object({ welcome: z.string().optional(), template: z.string().optional(), plan: z.string().optional(), billing: z.string().optional() }),
@@ -39,7 +38,12 @@ function YourAds() {
   useEffect(() => {
     const first = search.welcome === "1" || sessionStorage.getItem("gravity-pants:welcome") === "1";
     if (first) { setWelcome(true); sessionStorage.removeItem("gravity-pants:welcome"); }
-    if (search.template && templateForExample(search.template)) sessionStorage.setItem("gravity-pants:example", search.template);
+    if (search.template) {
+      // Website "Use this style" lands on the template picker with that style preselected.
+      sessionStorage.removeItem("gravity-pants:example");
+      void navigate({ to: "/app/templates", search: { template: search.template }, replace: true });
+      return;
+    }
     const pending = sessionStorage.getItem("gravity-pants:pending-plan");
     if (pending || search.plan) void supabase.auth.getUser().then(({ data }) => {
       if (!data.user) return;
