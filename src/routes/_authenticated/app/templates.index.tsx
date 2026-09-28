@@ -137,7 +137,6 @@ function TemplateCard({ template: t, selected = false }: { template: Template; s
       <div className="flex flex-col gap-1.5 px-[18px] pb-[18px] pt-4">
         <div className="flex items-center justify-between gap-2">
           <h3 className="min-w-0 truncate text-[16px] font-semibold">{t.name}</h3>
-          {t.is_reusable && <span className="shrink-0 rounded-lg bg-control-fill px-2 py-0.5 text-[11px] font-semibold text-secondary-text">Reusable</span>}
         </div>
         <p className="nums text-[12px] text-secondary-text">{templateFormat(t)} · {slides.length} {slides.length === 1 ? "slide" : "slides"}{locked ? ` · ${audienceText(t.audience)}` : ""}</p>
         {t.description && <p className="text-[13px] leading-snug">{t.description}</p>}
