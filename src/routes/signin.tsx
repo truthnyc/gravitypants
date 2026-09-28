@@ -4,6 +4,9 @@ import { z } from "zod";
 import { ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthShell, FieldGroup, GoogleButton, plainAuthError, safeRedirect } from "@/components/auth/AuthShell";
+import { Button } from "@/components/ui/button";
+import { rememberSignupChoice } from "@/lib/stillframe/signup-choice";
+import { PLANS } from "@/lib/stillframe/plans-config";
 
 export const Route = createFileRoute("/signin")({
   validateSearch: z.object({ redirect: z.string().optional() }),
@@ -27,18 +30,25 @@ function SignIn() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [keepSignedIn, setKeepSignedIn] = useState(true);
+  const [resetSent, setResetSent] = useState(false);
   const target = typeof window === "undefined" ? "/app/ads" : safeRedirect(redirect);
 
   // Already signed in (or returning from Google): go on.
   useEffect(() => {
-    const go = () => {
+    const go = (userId?: string) => {
+      try {
+        const pending = JSON.parse(sessionStorage.getItem("gravity-pants:pending-plan") ?? "null");
+        if (userId && PLANS.some((p) => p.id === pending?.plan) && ["monthly", "yearly"].includes(pending.billing)) rememberSignupChoice(userId, pending);
+        sessionStorage.removeItem("gravity-pants:pending-plan");
+      } catch { /* Invalid old selection. */ }
       const saved = sessionStorage.getItem("sf-after-signin");
       sessionStorage.removeItem("sf-after-signin");
       navigate({ to: saved ? safeRedirect(saved) : target, replace: true });
     };
-    supabase.auth.getSession().then(({ data }) => data.session && go());
+    supabase.auth.getSession().then(({ data }) => data.session && go(data.session.user.id));
     const { data } = supabase.auth.onAuthStateChange((e, s) => {
-      if (e === "SIGNED_IN" && s) go();
+      if (e === "SIGNED_IN" && s) go(s.user.id);
     });
     return () => data.subscription.unsubscribe();
   }, [navigate, target]);
@@ -50,28 +60,38 @@ function SignIn() {
     const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
     setBusy(false);
     if (error) setError(plainAuthError(error.message));
+    else if (!keepSignedIn) sessionStorage.setItem("gravity-pants:signout-on-close", "1");
+    else sessionStorage.removeItem("gravity-pants:signout-on-close");
+  }
+
+  async function forgot() {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) { setError("Enter your email above first, then choose Forgot password."); return; }
+    setBusy(true); setError(null);
+    const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo: window.location.origin + "/reset" });
+    setBusy(false);
+    if (error) setError(plainAuthError(error.message));
+    else setResetSent(true);
   }
 
   return (
-    <AuthShell title="Welcome back." subtitle="Sign in to keep making reels from your photos.">
+    <AuthShell mode="signin" title="Welcome back." subtitle="Sign in to keep making reels.">
       <GoogleButton redirectTo={target} />
       <form onSubmit={submit} noValidate>
         <FieldGroup
           error={error}
           fields={[
-            { id: "email", label: "Work email", type: "email", autoComplete: "email", value: email, placeholder: "you@yourbrand.com", onChange: setEmail },
+            { id: "email", label: "Email", type: "email", autoComplete: "email", value: email, placeholder: "you@yourbrand.com", onChange: setEmail },
             { id: "password", label: "Password", type: "password", autoComplete: "current-password", value: password, placeholder: "Your password", onChange: setPassword },
           ]}
         />
-        <button type="submit" disabled={busy || !email || !password} className="auth-submit">
+        <div className="auth-options"><label><input type="checkbox" checked={keepSignedIn} onChange={(e) => setKeepSignedIn(e.target.checked)} /> Keep me signed in</label><Button type="button" variant="link" className="auth-link" onClick={() => void forgot()} disabled={busy}>Forgot password?</Button></div>
+        {resetSent && <p role="status" className="auth-reset-sent">If that email has an account, a reset link is on its way.</p>}
+        <Button type="submit" variant="site" disabled={busy || !email || !password} className="auth-submit">
           {busy ? "Signing in…" : <>Sign in <ArrowRight size={17} strokeWidth={1.7} /></>}
-        </button>
+        </Button>
       </form>
       <p className="auth-switch">
-        <Link to="/reset" className="auth-link">Forgot password?</Link>
-      </p>
-      <p className="auth-switch">
-        New here? <Link to="/signup" search={{ redirect }} className="auth-link">Start your free trial</Link>
+        New to Gravity Pants? <Link to="/signup" search={{ redirect }} className="auth-link">Start your free trial</Link>
       </p>
     </AuthShell>
   );
