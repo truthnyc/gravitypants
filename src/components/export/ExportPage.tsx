@@ -1,7 +1,7 @@
 import { getWorkspaceId } from "@/lib/stillframe/workspace";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { AlertCircle, Check, ChevronDown, ChevronLeft, Download, Film, Image as ImageIcon, LayoutGrid } from "lucide-react";
+import { AlertCircle, Check, ChevronDown, ChevronLeft, Download, Film, Image as ImageIcon, LayoutGrid, Plus } from "lucide-react";
 import { zipSync } from "fflate";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,7 @@ import { ExportCancelled, exportGif, exportMp4, isOutOfMemory, killFFmpeg, type 
 import { cn } from "@/lib/utils";
 import { fetchExportStatus, useExportStatus, useRefreshBilling } from "@/lib/stillframe/billing";
 import { PlanCards } from "@/components/billing/PlanCards";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 
 type GifSize = "full" | "half" | "small";
 type Target = { key: string; name: string; slug: string; format: Format; width: number; height: number };
@@ -68,6 +69,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
   const [gColors, setGColors] = useState<GifColors>("best");
   const [gFps, setGFps] = useState(25);
   const [gLoop, setGLoop] = useState<"forever" | "once">("forever");
+  const [gifSheet, setGifSheet] = useState(false);
 
   const targets: Target[] = useMemo(() => {
     const list: Target[] = CHANNELS.filter((c) => selected.has(c.id)).map((c) => ({
@@ -277,12 +279,12 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
     });
 
   return (
-    <div className="flex min-h-screen flex-col bg-canvas">
+    <div className="flex min-h-dvh flex-col bg-canvas">
       <ExportHeader id={project.id} name={project.name} />
-      <main className="mx-auto grid w-full max-w-[1360px] flex-1 grid-cols-[1fr_360px] gap-8 px-8 pb-16 pt-8">
+      <main className="mx-auto grid w-full max-w-[1360px] flex-1 grid-cols-1 gap-6 px-4 pb-40 pt-6 sm:px-8 lg:grid-cols-[1fr_360px] lg:gap-8 lg:pb-16 lg:pt-8">
         <section className="min-w-0">
-          <h1 className="text-[22px] font-bold tracking-[-0.02em]">Where will this ad play?</h1>
-          <div className="mt-5 grid grid-cols-4 gap-4">
+          <h1 className="text-[30px] font-bold leading-tight lg:text-[22px] lg:tracking-[-0.02em]">Where will this ad play?</h1>
+          <div className="mt-5 grid grid-cols-1 overflow-hidden rounded-sm border bg-card lg:grid-cols-4 lg:gap-4 lg:overflow-visible lg:border-0 lg:bg-transparent">
             {CHANNELS.map((c) => (
               <ChannelCard
                 key={c.id}
@@ -319,11 +321,11 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
             </div>
           )}
 
-          <PreviousExports projectId={project.id} version={historyVersion} />
+          <div className="hidden lg:block"><PreviousExports projectId={project.id} version={historyVersion} /></div>
         </section>
 
-        <aside className="space-y-4">
-          <div className="rounded-sm bg-card p-5 shadow-card">
+        <aside className="space-y-5 lg:space-y-4">
+          <div className="hidden rounded-sm bg-card p-5 shadow-card lg:block">
             <div className="text-[30px] font-bold leading-none tracking-[-0.02em] nums">
               {files.length} {files.length === 1 ? "file" : "files"}
             </div>
@@ -339,19 +341,19 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
 
           <Group label="Save as">
             <div className="grid grid-cols-2 gap-2">
-              <PickCard on={mp4} onClick={() => setMp4((v) => !v)} icon={<Film className="size-4" strokeWidth={1.7} />} title="Video" sub="MP4 · with motion" />
+              <PickCard on={mp4} onClick={() => setMp4((v) => !v)} icon={<Film className="size-4" strokeWidth={1.7} />} title="Video MP4" sub="With motion" />
               <PickCard on={gif} onClick={() => setGif((v) => !v)} icon={<ImageIcon className="size-4" strokeWidth={1.7} />} title="Animated GIF" sub="Plays anywhere, no sound" />
             </div>
           </Group>
 
           {mp4 && (
             <Group label="Video motion">
-              <Seg value={fps} onChange={setFps} options={[{ v: 30, l: "Standard", s: "30 fps" }, { v: 60, l: "Extra smooth", s: "60 fps" }, { v: 24, l: "Film look", s: "24 fps" }]} />
+              <Seg value={fps} onChange={setFps} options={[{ v: 30, l: "Standard", s: "30 fps" }, { v: 60, l: "Smooth", s: "60 fps" }, { v: 24, l: "Film", s: "24 fps" }]} />
             </Group>
           )}
 
           {gif && (
-            <Group label="GIF quality">
+            <Group label="GIF quality" className="hidden lg:block">
               <div className="space-y-3">
                 <Sub label="Size">
                   <Seg value={gSize} onChange={setGSize} options={[{ v: "full", l: "Full", s: "same as video" }, { v: "half", l: "Half" }, { v: "small", l: "Small", s: "480 px wide" }]} />
@@ -370,7 +372,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
             </Group>
           )}
 
-          {exportStatus && !exportStatus.allowed ? (
+          <div className="hidden lg:block">{exportStatus && !exportStatus.allowed ? (
             <Button size="main" className="w-full" onClick={() => setPlanSheet(exportStatus.reason ?? "no_plan")}>
               Choose a Plan to Export
             </Button>
@@ -379,9 +381,21 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
               {!images || !fontsReady ? "Getting ready…" : `Export ${files.length} ${files.length === 1 ? "File" : "Files"}`}
             </Button>
           )}
-          {blocked && <p className="text-center text-[12px] text-destructive">Add a photo to every frame to export.</p>}
+          {blocked && <p className="text-center text-[12px] text-destructive">Add a photo to every frame to export.</p>}</div>
+          {gif && <button type="button" className="flex h-14 w-full items-center justify-between rounded-sm bg-card px-4 text-left shadow-card lg:hidden" onClick={() => setGifSheet(true)}><span><span className="block text-[14px] font-semibold">GIF quality</span><span className="text-[12px] text-secondary-text">{gSize === "full" ? "Full size" : gSize === "half" ? "Half size" : "480 px wide"} · {gColors} · {gFps} fps · {gLoop}</span></span><ChevronDown className="size-5 -rotate-90 text-icon" strokeWidth={1.7} /></button>}
         </aside>
+        <div className="lg:hidden"><PreviousExports projectId={project.id} version={historyVersion} /></div>
       </main>
+
+      <div className="fixed inset-x-0 bottom-0 z-30 bg-card px-4 pt-3 shadow-popover safe-bottom hairline-t lg:hidden">
+        <div className="mb-3 grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-3"><strong className="text-[22px] nums">{files.length} {files.length === 1 ? "file" : "files"}</strong><span className="truncate text-[13px] text-secondary-text nums">{videos} videos + {gifs} GIFs · {formatSeconds(seconds)} sec</span></div>
+        {exportStatus && !exportStatus.allowed ? <Button size="main" className="mb-3 min-h-12 w-full text-[16px]" onClick={() => setPlanSheet(exportStatus.reason ?? "no_plan")}>Choose a Plan to Export</Button> : <Button size="main" className="mb-3 min-h-12 w-full text-[16px]" disabled={!files.length || blocked || !images || !fontsReady || running} onClick={() => void start()}><Download strokeWidth={1.7} />{!images || !fontsReady ? "Getting ready…" : `Export ${files.length} ${files.length === 1 ? "File" : "Files"}`}</Button>}
+        {blocked && <p className="pb-2 text-center text-[12px] text-destructive">Add a photo to every frame to export.</p>}
+      </div>
+
+      <Drawer open={gifSheet} onOpenChange={setGifSheet} shouldScaleBackground={false}>
+        <DrawerContent className="lg:hidden"><DrawerHeader className="grid grid-cols-[1fr_auto] items-center text-left"><DrawerTitle>GIF quality</DrawerTitle><button type="button" className="font-semibold text-link" onClick={() => setGifSheet(false)}>Done</button></DrawerHeader><div className="space-y-5 overflow-y-auto px-4 pb-6"><Sub label="Size"><Seg value={gSize} onChange={setGSize} options={[{ v: "full", l: "Full", s: "same as video" }, { v: "half", l: "Half" }, { v: "small", l: "Small", s: "480 px wide" }]} /></Sub><Sub label="Colors"><Seg value={gColors} onChange={setGColors} options={[{ v: "best", l: "Best", s: "smooth gradients" }, { v: "balanced", l: "Balanced" }, { v: "smallest", l: "Smallest file" }]} /></Sub><Sub label="Frame rate"><Seg value={gFps} onChange={setGFps} options={[{ v: 25, l: "Smooth", s: "25 fps" }, { v: 15, l: "Light", s: "15 fps" }, { v: 10, l: "Minimal", s: "10 fps" }]} /></Sub><Sub label="Loop"><Seg value={gLoop} onChange={setGLoop} options={[{ v: "forever", l: "Forever" }, { v: "once", l: "Once" }]} /></Sub><p className="text-[12px] text-secondary-text">Full-size GIFs are large files. Pick a smaller size for email.</p></div></DrawerContent>
+      </Drawer>
 
       <Dialog open={!!planSheet} onOpenChange={(o) => !o && setPlanSheet(null)}>
         <DialogContent className="max-w-[900px]">
@@ -413,16 +427,16 @@ function ExportHeader({ id, name }: { id: string; name: string }) {
     </span>
   );
   return (
-    <header className="grid h-[60px] shrink-0 grid-cols-[1fr_auto_1fr] items-center gap-4 bg-card px-4 hairline-b">
+    <header className="grid shrink-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 bg-card px-2 hairline-b safe-top lg:h-[60px] lg:grid-cols-[1fr_auto_1fr] lg:gap-4 lg:px-4">
       <div className="flex min-w-0 items-center gap-2">
         <Button asChild variant="ghost" size="icon" aria-label="Back to Your Ads">
           <Link to="/">
-            <LayoutGrid strokeWidth={1.7} />
+            <LayoutGrid className="hidden lg:block" strokeWidth={1.7} /><ChevronLeft className="lg:hidden" strokeWidth={1.7} />
           </Link>
         </Button>
-        <span className="truncate px-1 text-[15px] font-semibold">{name}</span>
+        <div className="min-w-0 px-1"><span className="block truncate text-[17px] font-semibold lg:text-[15px]">Export</span><span className="block truncate text-[13px] text-secondary-text lg:hidden">{name} · Step 3 of 3</span></div>
       </div>
-      <nav className="flex h-8 items-center rounded-lg bg-control-fill p-0.5 text-[13px] font-medium" aria-label="Steps">
+      <nav className="hidden h-8 items-center rounded-lg bg-control-fill p-0.5 text-[13px] font-medium lg:flex" aria-label="Steps">
         <Link to="/" className="flex h-7 items-center gap-1.5 rounded-lg px-3 text-secondary-text">
           {done} Photos
         </Link>
@@ -434,7 +448,7 @@ function ExportHeader({ id, name }: { id: string; name: string }) {
           Export
         </span>
       </nav>
-      <div className="flex justify-end">
+      <div className="hidden justify-end lg:flex">
         <Button asChild variant="plain" size="header">
           <Link to="/ad/$id/edit" params={{ id }}>
             <ChevronLeft strokeWidth={1.7} /> Back to Edit
@@ -478,18 +492,16 @@ function ChannelCard(props: {
       type="button"
       onClick={onClick}
       aria-pressed={selected}
-      className={cn("relative flex flex-col rounded-sm bg-card p-3 text-left shadow-card", selected && "ring-2 ring-primary")}
+      className={cn("relative grid min-h-[108px] grid-cols-[52px_minmax(0,1fr)_44px] items-center gap-3 px-4 text-left hairline-b last:border-b-0 lg:flex lg:min-h-0 lg:flex-col lg:rounded-sm lg:bg-card lg:p-3 lg:shadow-card", selected && "lg:ring-2 lg:ring-primary")}
     >
-      <span className={cn("absolute right-2 top-2 flex size-5 items-center justify-center rounded-full", selected ? "bg-primary text-primary-foreground" : "border border-secondary-text/30")}>
+      <span className={cn("order-3 flex size-11 items-center justify-center justify-self-end rounded-full lg:absolute lg:right-2 lg:top-2 lg:size-5", selected ? "bg-primary text-primary-foreground" : "border-2 border-placeholder-border")}>
         {selected && <Check className="size-3" strokeWidth={2.5} />}
       </span>
-      <div className="flex h-[128px] items-center justify-center">
-        <MiniRender {...props} width={w} />
+      <div className="order-1 flex h-[72px] w-[52px] items-center justify-center lg:h-[128px] lg:w-auto">
+        <span className="lg:hidden"><MiniRender {...props} width={format === "9:16" ? 28 : format === "1:1" ? 42 : 48} /></span>
+        <span className="hidden lg:block"><MiniRender {...props} width={w} /></span>
       </div>
-      <span className="mt-3 text-[13px] font-semibold leading-tight">{name}</span>
-      <span className="mt-0.5 text-[12px] text-secondary-text nums">
-        {format} · {size.width} × {size.height}
-      </span>
+      <span className="order-2 min-w-0 lg:contents"><span className="block text-[16px] font-semibold leading-tight lg:mt-3 lg:text-[13px]">{name}</span><span className="mt-1 block text-[13px] text-secondary-text nums lg:mt-0.5 lg:text-[12px]">{format} · {size.width} × {size.height}</span></span>
     </button>
   );
 }
@@ -514,18 +526,16 @@ function CustomCard({ value, onChange }: { value: { on: boolean; w: number; h: n
       aria-pressed={value.on}
       onClick={() => onChange({ ...value, on: !value.on })}
       onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && e.target === e.currentTarget && onChange({ ...value, on: !value.on })}
-      className={cn("relative flex cursor-pointer flex-col rounded-sm border-2 border-dashed border-secondary-text/30 p-3", value.on && "border-solid border-primary bg-card")}
+      className={cn("relative grid min-h-[108px] cursor-pointer grid-cols-[52px_minmax(0,1fr)_44px] items-center gap-3 px-4 lg:flex lg:min-h-0 lg:flex-col lg:rounded-sm lg:border-2 lg:border-dashed lg:border-secondary-text/30 lg:p-3", value.on && "lg:border-solid lg:border-primary lg:bg-card")}
     >
-      <span className={cn("absolute right-2 top-2 flex size-5 items-center justify-center rounded-full", value.on ? "bg-primary text-primary-foreground" : "border border-secondary-text/30")}>
+      <span className={cn("order-3 flex size-11 items-center justify-center justify-self-end rounded-full lg:absolute lg:right-2 lg:top-2 lg:size-5", value.on ? "bg-primary text-primary-foreground" : "border-2 border-placeholder-border")}> 
         {value.on && <Check className="size-3" strokeWidth={2.5} />}
       </span>
-      <div className="flex h-[128px] items-center justify-center gap-1.5 text-[13px] text-secondary-text">
+      <div className="order-3 hidden h-[128px] items-center justify-center gap-1.5 text-[13px] text-secondary-text lg:flex">
         {input("w", "Width in pixels")} × {input("h", "Height in pixels")}
       </div>
-      <span className="mt-3 text-[13px] font-semibold">Custom size</span>
-      <span className="mt-0.5 text-[12px] text-secondary-text nums">
-        Uses {nearestFormat(value.w || 1, value.h || 1)} layout
-      </span>
+      <span className="order-1 flex size-11 items-center justify-center text-icon lg:hidden"><Plus strokeWidth={1.7} /></span>
+      <span className="order-2 min-w-0 lg:contents"><span className="block text-[16px] font-semibold lg:mt-3 lg:text-[13px]">Custom size</span><span className="mt-0.5 block text-[13px] text-secondary-text nums lg:text-[12px]">{value.on ? `${value.w} × ${value.h}` : "Any width × height"}</span></span>
     </div>
   );
 }
@@ -534,9 +544,9 @@ function IssueThumb({ project, frames, index, images, brand }: { project: Projec
   return <MiniRender project={project} frames={frames} brand={brand} images={images} format="1:1" width={36} index={index} />;
 }
 
-function Group({ label, children }: { label: string; children: React.ReactNode }) {
+function Group({ label, children, className }: { label: string; children: React.ReactNode; className?: string }) {
   return (
-    <div className="rounded-sm bg-card p-4 shadow-card">
+    <div className={cn("rounded-sm bg-card p-4 shadow-card", className)}>
       <div className="mb-2.5 text-[12px] font-medium text-secondary-text">{label}</div>
       {children}
     </div>
@@ -561,7 +571,7 @@ function Seg<T extends string | number>({ value, onChange, options }: { value: T
           type="button"
           aria-pressed={value === o.v}
           onClick={() => onChange(o.v)}
-          className={cn("flex min-h-8 flex-1 flex-col items-center justify-center rounded-lg px-1.5 py-1 text-[12px] font-medium leading-tight", value === o.v && "bg-card shadow-segment")}
+          className={cn("flex min-h-11 flex-1 flex-col items-center justify-center rounded-lg px-1.5 py-1 text-[13px] font-medium leading-tight lg:min-h-8 lg:text-[12px]", value === o.v && "bg-card shadow-segment")}
         >
           {o.l}
           {o.s && <span className="text-[10px] font-normal text-secondary-text nums">{o.s}</span>}
@@ -573,7 +583,7 @@ function Seg<T extends string | number>({ value, onChange, options }: { value: T
 
 function PickCard({ on, onClick, icon, title, sub }: { on: boolean; onClick: () => void; icon: React.ReactNode; title: string; sub: string }) {
   return (
-    <button type="button" aria-pressed={on} onClick={onClick} className={cn("relative rounded-sm bg-control-fill p-3 text-left", on && "bg-card ring-2 ring-primary")}>
+    <button type="button" aria-pressed={on} onClick={onClick} className={cn("relative min-h-16 rounded-sm bg-control-fill p-3 text-left", on && "bg-card ring-2 ring-primary")}>
       <span className={cn("absolute right-2 top-2 flex size-4 items-center justify-center rounded-full", on ? "bg-primary text-primary-foreground" : "border border-secondary-text/30")}>
         {on && <Check className="size-2.5" strokeWidth={2.5} />}
       </span>

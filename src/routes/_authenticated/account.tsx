@@ -108,13 +108,13 @@ function AccountPage() {
   }
 
   return (
-    <main className="mx-auto flex max-w-[640px] flex-col gap-5 px-8 py-10">
+    <main className="mx-auto flex max-w-[640px] flex-col gap-5 px-4 py-6 sm:px-8 sm:py-10">
       <h1 className="text-[28px] font-bold tracking-[-0.02em]">Account</h1>
       <AccountTabs />
 
 
       <Card title="Profile">
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-3 sm:gap-4">
           <Avatar me={me} size={56} />
           <Button variant="plain" size="sm" onClick={() => fileRef.current?.click()}>Change Photo</Button>
           {me?.avatarPath && (
@@ -123,14 +123,14 @@ function AccountPage() {
           <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && void onAvatar(e.target.files[0])} />
         </div>
         <label htmlFor="display-name" className="mt-5 block text-[13px] font-medium">Name</label>
-        <div className="mt-1.5 flex gap-2">
+        <div className="mt-1.5 flex flex-col gap-2 sm:flex-row">
           <input id="display-name" className={inputCls} value={name} placeholder="Optional" onChange={(e) => setName(e.target.value)} maxLength={80} />
           <Button onClick={() => void saveProfile({ display_name: name.trim() || null })}>Save</Button>
         </div>
       </Card>
 
       <Card title="Email" hint="We'll send a link to confirm the change.">
-        <div className="flex gap-2">
+        <div className="flex flex-col gap-2 sm:flex-row">
           <label htmlFor="acc-email" className="sr-only">Email</label>
           <input id="acc-email" type="email" autoComplete="email" className={inputCls} value={email} onChange={(e) => setEmail(e.target.value)} />
           <Button disabled={!email || email === me?.email} onClick={() => void changeEmail()}>Change</Button>

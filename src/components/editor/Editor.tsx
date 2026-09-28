@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Copy, Trash2 } from "lucide-react";
+import { Copy, Pause, Play, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { framePayloadFromPhoto, logoFromBrandKit, useBrandKit, useUpdateBrandKit, type EditorDoc } from "@/lib/stillframe/data";
@@ -23,8 +23,10 @@ import { FrameRail } from "./FrameRail";
 import { Inspector, type InspectorActions } from "./Inspector";
 import { Stage } from "./Stage";
 import { Timeline } from "./Timeline";
-import { useAutosave, useEditorDoc, useRenderAssets, type ElementKey } from "./use-editor";
+import { ELEMENT_META, useAutosave, useEditorDoc, useRenderAssets, type ElementKey } from "./use-editor";
 import { cn } from "@/lib/utils";
+import { Drawer, DrawerContent, DrawerTitle } from "@/components/ui/drawer";
+import { MobileFrameStrip, MobileToolBar } from "./MobileEditorControls";
 
 const NEW_HEADLINE: TextSettings = {
   text: "",
@@ -73,6 +75,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
   const [uploading, setUploading] = useState(false);
   const [adjusting, setAdjusting] = useState(false);
   const [styleClip, setStyleClip] = useState<FrameStyle | null>(null);
+  const [mobileSheetOpen, setMobileSheetOpen] = useState(false);
   const replaceRef = useRef<HTMLInputElement>(null);
   const replaceAt = useRef(0);
   const { data: kit } = useBrandKit();
@@ -420,7 +423,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
   if (!frame) return null;
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-canvas">
+    <div className="flex h-full min-h-[calc(100dvh-31px)] flex-col overflow-hidden bg-canvas">
       <EditorHeader
         id={doc.project.id}
         name={doc.project.name}
@@ -433,8 +436,8 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
         exportDisabled={exportDisabled}
       />
       {banner}
-      <div className={cn("flex min-h-0 flex-1", readOnly && "pointer-events-none select-none")} aria-readonly={readOnly || undefined}>
-        <FrameRail
+      <div className={cn("flex min-h-0 flex-1 flex-col lg:flex-row", readOnly && "pointer-events-none select-none")} aria-readonly={readOnly || undefined}>
+        <div className="hidden lg:block"><FrameRail
           doc={doc}
           format={format}
           frameIndex={idx}
@@ -454,7 +457,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
           onCopyStyle={copyStyle}
           onPasteStyle={pasteStyle}
           onDelete={(i) => deleteFrame(i)}
-        />
+        /></div>
         <input
           ref={replaceRef}
           type="file"
@@ -467,8 +470,8 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
           }}
         />
 
-        <main className="flex min-w-0 flex-1 flex-col px-8 pb-4 pt-4">
-          <div className="flex items-center gap-2">
+        <main className="flex min-h-0 min-w-0 flex-1 flex-col px-3 py-2 sm:px-8 sm:py-4 lg:pb-4 lg:pt-4">
+          <div className="hidden items-center gap-2 lg:flex">
             <span className="text-[13px] font-semibold nums">
               Frame {idx + 1} of {frames.length}
             </span>
@@ -480,7 +483,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
             </Button>
           </div>
 
-          <div className="min-h-0 flex-1 py-8">
+          <div className={cn("min-h-0 flex-1 py-2 sm:py-4 lg:py-8", mobileSheetOpen && "max-h-[34dvh]")}>
             <Stage
               doc={doc}
               brand={brand}
@@ -491,7 +494,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
               selected={selected}
               images={images}
               version={version}
-              onSelect={setSelected}
+              onSelect={(el) => { setSelected(el); if (window.matchMedia("(max-width: 1023px)").matches) setMobileSheetOpen(true); }}
               onMove={moveElement}
               onText={setText}
               adjusting={adjusting && selected === "photo"}
@@ -502,7 +505,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
             />
           </div>
 
-          <div className="flex items-end justify-center gap-4">
+          <div className="hidden items-end justify-center gap-4 lg:flex">
             {ALL_FORMATS.map((f) => {
               const s = FORMAT_SIZE[f];
               const included = doc.project.formats.includes(f);
@@ -537,6 +540,10 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
               );
             })}
           </div>
+          <div className="flex shrink-0 items-center justify-center gap-3 pb-2 lg:hidden">
+            <Button size="icon" className="size-12 rounded-full bg-foreground text-background" onClick={togglePlay} aria-label={playing ? "Pause" : "Play"}>{playing ? <Pause className="size-5" fill="currentColor" /> : <Play className="ml-0.5 size-5" fill="currentColor" />}</Button>
+            <div className="flex rounded-lg bg-control-fill p-0.5">{ALL_FORMATS.map((f) => <button key={f} type="button" onClick={() => setFormat(f)} aria-pressed={format === f} className={cn("h-11 rounded-lg px-4 text-[15px] font-medium nums", format === f && "bg-card shadow-segment")}>{f}</button>)}</div>
+          </div>
         </main>
 
         <Inspector
@@ -555,6 +562,19 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
           actions={actions}
         />
       </div>
+
+      <MobileFrameStrip doc={doc} format={format} frameIndex={idx} images={images} version={version} uploading={uploading} onSelect={selectFrame} onReorder={reorder} onAddFiles={addFiles} />
+      <MobileToolBar selected={selected} onSelect={(el) => { setSelected(el); if (el !== "photo") setAdjusting(false); setMobileSheetOpen(true); }} />
+
+      <Drawer open={mobileSheetOpen} onOpenChange={setMobileSheetOpen} shouldScaleBackground={false}>
+        <DrawerContent className="h-[60dvh] lg:hidden">
+          <DrawerTitle className="sr-only">Edit {selected}</DrawerTitle>
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+            <div className="flex h-12 shrink-0 items-center justify-between px-4"><span className="font-semibold">{ELEMENT_META[selected].label} <span className="ml-2 font-normal text-secondary-text nums">Frame {idx + 1}</span></span><button type="button" onClick={() => setMobileSheetOpen(false)} className="font-semibold text-link">Done</button></div>
+            <Inspector mobile doc={doc} endSeconds={endSeconds} frame={frame} frameIndex={idx} format={format} selected={selected} kit={kit} adjusting={adjusting} onSelect={(el) => { setSelected(el); if (el !== "photo") setAdjusting(false); }} actions={actions} />
+          </div>
+        </DrawerContent>
+      </Drawer>
 
       <Timeline
         frames={frames}

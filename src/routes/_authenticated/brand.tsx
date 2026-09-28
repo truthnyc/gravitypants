@@ -54,7 +54,7 @@ function Card({ title, hint, children }: { title: string; hint?: string; childre
 function BrandKitPage() {
   const { data: kit, isLoading } = useBrandKit();
   if (isLoading || !kit) {
-    return <main className="mx-auto max-w-[960px] px-8 py-10 text-[13px] text-secondary-text">Loading your Brand Kit…</main>;
+    return <main className="mx-auto max-w-[960px] px-4 py-6 text-[13px] text-secondary-text sm:px-8 sm:py-10">Loading your Brand Kit…</main>;
   }
   return <BrandKitEditor kit={kit} />;
 }
@@ -64,7 +64,7 @@ function BrandKitEditor({ kit }: { kit: BrandKit }) {
   const save = (patch: Partial<BrandKit>) => update.mutate(patch);
 
   return (
-    <main className="mx-auto max-w-[960px] space-y-5 px-8 pb-16 pt-8">
+    <main className="mx-auto max-w-[960px] space-y-5 px-4 pb-16 pt-6 sm:px-8 sm:pt-8">
       <div>
         <h1 className="text-[22px] font-bold tracking-[-0.02em]">Brand Kit</h1>
         <p className="mt-1 text-[14px] text-secondary-text">New ads start with these logos, colors and fonts.</p>
@@ -142,7 +142,7 @@ function LogosCard({ kit, save }: SaveProps) {
                   type="button"
                   aria-label="Remove logo"
                   onClick={() => save({ logos: kit.logos.filter((l) => l.id !== logo.id) })}
-                  className="text-icon opacity-0 transition-opacity group-hover:opacity-100"
+                  className="text-icon lg:opacity-0 lg:transition-opacity lg:group-hover:opacity-100"
                 >
                   <Trash2 className="size-3.5" strokeWidth={1.7} />
                 </button>

@@ -103,6 +103,7 @@
 
   html {
     background-color: var(--canvas);
+    overflow-x: hidden;
   }
 
   body {
@@ -112,11 +113,64 @@
       -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    min-width: 0;
+    overflow-x: hidden;
+  }
+
+  @media (max-width: 1023px) {
+    button,
+    a,
+    [role="button"],
+    [role="radio"],
+    [role="checkbox"] {
+      min-height: 44px;
+      min-width: 44px;
+    }
+
+    input,
+    textarea,
+    select {
+      font-size: 16px;
+    }
   }
 
   :focus-visible {
     outline: none;
     box-shadow: var(--focus-ring);
+  }
+}
+
+@utility safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+@utility safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+@media (max-width: 1023px) and (orientation: landscape) {
+  .mobile-frame-strip {
+    gap: 0.75rem;
+    padding-block: 0.25rem;
+  }
+  .mobile-frame-item {
+    width: 44px;
+  }
+  .mobile-frame-thumb,
+  .mobile-frame-add {
+    width: 44px;
+    height: 56px;
+  }
+  .mobile-tool-bar {
+    padding-top: 0.125rem;
+  }
+  .mobile-tool-bar button {
+    flex-direction: row;
+    gap: 0.25rem;
+  }
+  .mobile-tool-bar button > span:first-child {
+    width: 28px;
+    height: 28px;
   }
 }
 

@@ -84,6 +84,7 @@ export function Inspector({
   onSelect,
   actions,
   endSeconds = 0,
+  mobile = false,
 }: {
   endSeconds?: number;
   doc: EditorDoc;
@@ -95,6 +96,7 @@ export function Inspector({
   adjusting: boolean;
   onSelect: (el: ElementKey) => void;
   actions: InspectorActions;
+  mobile?: boolean;
 }) {
   const hasLogo = Boolean(doc.project.logo.path || doc.project.logo.light_path || doc.project.logo.dark_path);
   const values: Record<ElementKey, string> = {
@@ -110,8 +112,8 @@ export function Inspector({
   const colors = kit?.colors.length ? kit.colors : TEXT_COLORS;
 
   return (
-    <aside className="flex w-[344px] shrink-0 flex-col overflow-y-auto bg-inspector p-4">
-      <div className="grid grid-cols-3 gap-2">
+    <aside className={cn("flex shrink-0 flex-col overflow-y-auto bg-inspector p-4", mobile ? "h-full w-full" : "hidden w-[344px] lg:flex")}>
+      <div className={cn(mobile ? "flex gap-2 overflow-x-auto pb-1" : "grid grid-cols-3 gap-2")}>
         {(Object.keys(ELEMENT_META) as ElementKey[]).map((el) => {
           const m = ELEMENT_META[el];
           const Icon = ICONS[el];
@@ -121,20 +123,20 @@ export function Inspector({
               key={el}
               type="button"
               onClick={() => onSelect(el)}
-              className="flex flex-col items-start gap-1.5 rounded-sm bg-card p-2.5 text-left shadow-card transition-shadow"
+              className={cn("flex shrink-0 rounded-sm bg-card text-left shadow-card transition-shadow", mobile ? "h-11 flex-row items-center gap-2 px-3" : "flex-col items-start gap-1.5 p-2.5")}
               style={active ? { boxShadow: `0 0 0 2px ${m.color}`, background: `color-mix(in srgb, ${m.color} 7%, var(--card))` } : undefined}
             >
               <span className="flex size-[22px] items-center justify-center rounded-full" style={{ background: m.color }}>
                 <Icon className="size-3 text-primary-foreground" strokeWidth={1.7} />
               </span>
               <span className="text-[13px] font-semibold leading-none">{m.label}</span>
-              <span className="w-full truncate text-[12px] leading-tight text-secondary-text nums">{values[el]}</span>
+              {!mobile && <span className="w-full truncate text-[12px] leading-tight text-secondary-text nums">{values[el]}</span>}
             </button>
           );
         })}
       </div>
 
-      <div className="mt-5 flex items-center gap-2">
+      <div className="mt-4 flex items-center gap-2">
         <span className="size-2 rounded-full" style={{ background: meta.color }} />
         <span className="text-[15px] font-semibold">{meta.label}</span>
         <span className="ml-auto text-[12px] text-secondary-text nums">{scope}</span>
@@ -321,7 +323,7 @@ function PhotoPanel({ photo, adjusting, actions }: { photo: PhotoSettings; adjus
                 type="button"
                 aria-label={`Background ${c}`}
                 onClick={() => actions.onPhoto({ background_color: c })}
-                className={cn("size-7 rounded-full border border-border", (photo.background_color ?? "").toUpperCase() === c && "ring-2 ring-primary ring-offset-2")}
+                className={cn("size-8 rounded-full border border-border lg:size-7", (photo.background_color ?? "").toUpperCase() === c && "ring-2 ring-primary ring-offset-2")}
                 style={{ background: c }}
               />
             ))}
@@ -372,7 +374,7 @@ function PhotoPanel({ photo, adjusting, actions }: { photo: PhotoSettings; adjus
 
 function CustomColor({ onPick }: { onPick: (c: string) => void }) {
   return (
-    <label className="relative flex size-7 cursor-pointer items-center justify-center rounded-full border border-dashed border-placeholder-border text-icon" aria-label="Custom color">
+    <label className="relative flex size-8 cursor-pointer items-center justify-center rounded-full border border-dashed border-placeholder-border text-icon lg:size-7" aria-label="Custom color">
       <Plus className="size-3.5" strokeWidth={1.7} />
       <input type="color" className="absolute inset-0 cursor-pointer opacity-0" onChange={(e) => onPick(e.target.value.toUpperCase())} />
     </label>
@@ -463,7 +465,7 @@ function TextPanel({
               type="button"
               aria-label={`Color ${c}`}
               onClick={() => onChange({ color: c })}
-              className={cn("size-7 rounded-full border border-border", current === c && "ring-2 ring-offset-2")}
+              className={cn("size-8 rounded-full border border-border lg:size-7", current === c && "ring-2 ring-offset-2")}
               style={{ background: c, ["--tw-ring-color" as string]: color }}
             />
           ))}

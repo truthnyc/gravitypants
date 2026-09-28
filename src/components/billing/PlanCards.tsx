@@ -57,12 +57,12 @@ export function PlanCards({ compact = false }: { compact?: boolean }) {
 
   return (
     <>
-      <div className={cn("grid grid-cols-3", compact ? "gap-3" : "gap-5")}>
+      <div className={cn("grid grid-cols-1 lg:grid-cols-3", compact ? "gap-3" : "gap-5")}>
         {(plans ?? []).map((p) => {
           const current = paid && billing?.plan === p.id;
           const cta = CTA[p.id] ?? { label: `Choose ${p.name}`, variant: "plain" as const };
           return (
-            <div key={p.id} className={cn("flex flex-col rounded-sm bg-card shadow-card", compact ? "p-5" : "p-7")}>
+            <div key={p.id} className={cn("flex flex-col rounded-sm bg-card shadow-card", compact ? "p-5" : "p-5 sm:p-7")}>
               <div className="flex items-center gap-2">
                 <h3 className="text-[17px] font-semibold">{p.name}</h3>
                 {p.interval === "year" && (

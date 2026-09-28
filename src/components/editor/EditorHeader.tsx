@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Check, ChevronRight, LayoutGrid, Play, Square, Undo2 } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, LayoutGrid, Play, Square, Undo2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { SaveStatus } from "./use-editor";
 
@@ -28,11 +28,11 @@ export function EditorHeader({
   const [editing, setEditing] = useState(false);
 
   return (
-    <header className="grid h-[60px] shrink-0 grid-cols-[1fr_auto_1fr] items-center gap-4 bg-card px-4 hairline-b">
+    <header className="grid shrink-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 bg-card px-2 hairline-b safe-top lg:h-[60px] lg:grid-cols-[1fr_auto_1fr] lg:gap-4 lg:px-4">
       <div className="flex min-w-0 items-center gap-2">
         <Button asChild variant="ghost" size="icon" aria-label="Back to Your Ads">
           <Link to="/">
-            <LayoutGrid strokeWidth={1.7} />
+            <LayoutGrid className="hidden lg:block" strokeWidth={1.7} /><ChevronLeft className="lg:hidden" strokeWidth={1.7} />
           </Link>
         </Button>
         {editing ? (
@@ -40,7 +40,7 @@ export function EditorHeader({
             autoFocus
             defaultValue={name}
             aria-label="Ad name"
-            className="h-8 w-56 rounded-sm border bg-card px-2 text-[15px] font-semibold"
+            className="h-11 min-w-0 flex-1 rounded-sm border bg-card px-2 text-[16px] font-semibold lg:h-8 lg:w-56 lg:flex-none lg:text-[15px]"
             onBlur={(e) => {
               const v = e.currentTarget.value.trim();
               if (v && v !== name) onRename(v);
@@ -52,11 +52,9 @@ export function EditorHeader({
             }}
           />
         ) : (
-          <button type="button" onClick={() => setEditing(true)} className="truncate rounded-sm px-1 text-[15px] font-semibold hover:bg-control-fill" title="Rename">
-            {name}
-          </button>
+          <div className="min-w-0"><button type="button" onClick={() => setEditing(true)} className="block min-h-0 max-w-full truncate rounded-sm px-1 text-left text-[16px] font-semibold lg:text-[15px]" title="Rename">{name}</button><span className="flex items-center gap-1 px-1 text-[12px] text-secondary-text lg:hidden">{status === "saved" && <Check className="size-3.5 text-success-text" strokeWidth={1.7} />}{status === "saving" ? "Saving…" : status === "error" ? "Not saved" : "Saved"} · Step 2 of 3</span></div>
         )}
-        <span className="flex shrink-0 items-center gap-1 text-[12px] text-secondary-text">
+        <span className="hidden shrink-0 items-center gap-1 text-[12px] text-secondary-text lg:flex">
           {status === "saving" && "Saving…"}
           {status === "saved" && (
             <>
@@ -67,7 +65,7 @@ export function EditorHeader({
         </span>
       </div>
 
-      <nav className="flex h-8 items-center rounded-lg bg-control-fill p-0.5 text-[13px] font-medium" aria-label="Steps">
+      <nav className="hidden h-8 items-center rounded-lg bg-control-fill p-0.5 text-[13px] font-medium lg:flex" aria-label="Steps">
         <Link to="/" className="flex h-7 items-center gap-1.5 rounded-lg px-3 text-secondary-text">
           <span className="flex size-4 items-center justify-center rounded-full bg-toggle-on text-primary-foreground">
             <Check className="size-2.5" strokeWidth={2.5} />
@@ -84,22 +82,22 @@ export function EditorHeader({
         </Link>
       </nav>
 
-      <div className="flex items-center justify-end gap-2">
+      <div className="flex items-center justify-end gap-1 lg:gap-2">
         <Button variant="ghost" size="icon" onClick={onUndo} disabled={!canUndo} aria-label="Undo">
           <Undo2 strokeWidth={1.7} />
         </Button>
-        <Button variant="plain" size="header" onClick={onPlayVideo}>
+        <Button variant="plain" size="header" className="hidden lg:inline-flex" onClick={onPlayVideo}>
           {playing ? <Square strokeWidth={1.7} /> : <Play strokeWidth={1.7} />}
           {playing ? "Stop" : "Play Video"}
         </Button>
         {exportDisabled ? (
-          <Button size="header" disabled>
-            Next: Export <ChevronRight strokeWidth={1.7} />
+          <Button size="header" className="h-11 px-4 lg:h-[34px] lg:px-3.5" disabled>
+            <span className="lg:hidden">Export</span><span className="hidden lg:inline">Next: Export</span> <ChevronRight strokeWidth={1.7} />
           </Button>
         ) : (
-          <Button asChild size="header">
+          <Button asChild size="header" className="h-11 px-4 lg:h-[34px] lg:px-3.5">
             <Link to="/ad/$id/export" params={{ id }}>
-              Next: Export <ChevronRight strokeWidth={1.7} />
+              <span className="lg:hidden">Export</span><span className="hidden lg:inline">Next: Export</span> <ChevronRight strokeWidth={1.7} />
             </Link>
           </Button>
         )}

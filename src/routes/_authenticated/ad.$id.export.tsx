@@ -20,10 +20,10 @@ export const Route = createFileRoute("/_authenticated/ad/$id/export")({
 function ExportRoute() {
   const { id } = Route.useParams();
   const { data, isLoading } = useProject(id);
-  if (isLoading) return <div className="h-screen bg-canvas" aria-busy="true" />;
+  if (isLoading) return <div className="h-dvh bg-canvas" aria-busy="true" />;
   if (!data || !data.frames.length) {
     return (
-      <main className="flex h-screen items-center justify-center px-8">
+      <main className="flex h-dvh items-center justify-center px-4 sm:px-8">
         <div className="max-w-[400px] rounded-sm bg-card p-10 text-center shadow-card">
           <h1 className="text-[22px] font-bold tracking-[-0.02em]">This ad isn't available</h1>
           <p className="mt-2 text-[14px] text-secondary-text">It may have been moved to the trash.</p>

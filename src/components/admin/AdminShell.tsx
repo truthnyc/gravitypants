@@ -12,16 +12,16 @@ const NAV = [
 
 export function AdminShell({ children }: { children: ReactNode }) {
   return (
-    <div className="mx-auto flex w-full max-w-[1320px] gap-8 px-8 py-8">
-      <nav aria-label="Admin" className="w-[200px] shrink-0">
-        <div className="mb-3 px-3 text-[12px] font-semibold uppercase tracking-[0.06em] text-secondary-text">Admin</div>
-        <ul className="space-y-0.5">
+    <div className="mx-auto flex w-full max-w-[1320px] flex-col gap-5 px-4 py-6 sm:px-8 lg:flex-row lg:gap-8 lg:py-8">
+      <nav aria-label="Admin" className="min-w-0 shrink-0 lg:w-[200px]">
+        <div className="mb-2 px-1 text-[12px] font-semibold uppercase tracking-[0.06em] text-secondary-text lg:mb-3 lg:px-3">Admin</div>
+        <ul className="flex gap-1 overflow-x-auto pb-1 lg:block lg:space-y-0.5">
           {NAV.map((n) => (
-            <li key={n.to}>
+            <li key={n.to} className="shrink-0">
               <Link
                 to={n.to}
                 activeOptions={{ exact: "exact" in n }}
-                className="flex h-9 items-center gap-2.5 rounded-lg px-3 text-[14px] text-foreground hover:bg-control-fill data-[status=active]:bg-card data-[status=active]:font-semibold data-[status=active]:shadow-card"
+                className="flex h-11 items-center gap-2.5 rounded-lg px-3 text-[14px] text-foreground data-[status=active]:bg-card data-[status=active]:font-semibold data-[status=active]:shadow-card lg:h-9 lg:hover:bg-control-fill"
               >
                 <n.icon className="size-4" strokeWidth={1.7} />
                 {n.label}
@@ -37,9 +37,9 @@ export function AdminShell({ children }: { children: ReactNode }) {
 
 export function PageTitle({ title, sub, right }: { title: string; sub?: string | undefined; right?: ReactNode }) {
   return (
-    <div className="mb-6 flex items-end justify-between gap-4">
+    <div className="mb-6 flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-end">
       <div>
-        <h1 className="text-[28px] font-bold tracking-[-0.02em]">{title}</h1>
+        <h1 className="text-[26px] font-bold tracking-[-0.02em] sm:text-[28px]">{title}</h1>
         {sub && <p className="mt-1 text-[14px] text-secondary-text">{sub}</p>}
       </div>
       {right}
@@ -48,7 +48,7 @@ export function PageTitle({ title, sub, right }: { title: string; sub?: string |
 }
 
 export function Card({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <section className={`rounded-sm bg-card p-5 shadow-card ${className}`}>{children}</section>;
+  return <section className={`overflow-x-auto rounded-sm bg-card p-4 shadow-card sm:p-5 ${className}`}>{children}</section>;
 }
 
 export const fmtDate = (s: string | null | undefined) => (s ? new Date(s).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" }) : "—");
