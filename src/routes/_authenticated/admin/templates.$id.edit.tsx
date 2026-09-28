@@ -189,7 +189,7 @@ function Builder({ row, refetch }: { row: any; refetch: () => void }) {
             </div>
             <div className="mt-5 flex flex-wrap gap-8">
               <PosGrid title="Text position" value={doc.style.text_position} onChange={(v) => setStyle({ text_position: v })} />
-              <PosGrid title="Logo position" note="user's brand kit logo" value={doc.style.logo_position} onChange={(v) => setStyle({ logo_position: v })} only={(a) => !a.startsWith("middle") && a !== "center"} />
+              <PosGrid title="Logo position" note="template default" value={doc.style.logo_position} onChange={(v) => setStyle({ logo_position: v })} only={(a) => !a.startsWith("middle") && a !== "center"} />
             </div>
             <LogoEditor style={doc.style} onChange={setStyle} upload={uploadImage} />
           </Panel>

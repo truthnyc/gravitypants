@@ -325,10 +325,18 @@ export const adminTemplateFromAd = createServerFn({ method: "POST" })
     }));
     let logoPath: string | null = null;
     const sourceLogo = p.logo?.path ?? p.logo?.light_path ?? p.logo?.dark_path;
-    if (sourceLogo && typeof sourceLogo === "string" && !sourceLogo.includes(":")) {
+    if (sourceLogo && typeof sourceLogo === "string") {
       const dest = `system/templates/${row.id}/logo-${crypto.randomUUID()}.${(sourceLogo.split(".").pop() || "png").slice(0, 5)}`;
-      const { error: logoError } = await db.storage.from("media").copy(sourceLogo, dest);
-      if (!logoError) logoPath = dest;
+      if (sourceLogo.startsWith("brand-assets:")) {
+        const { data: logoFile } = await db.storage.from("brand-assets").download(sourceLogo.slice("brand-assets:".length));
+        if (logoFile) {
+          const { error: logoError } = await db.storage.from("media").upload(dest, logoFile, { contentType: logoFile.type || "image/png", upsert: false });
+          if (!logoError) logoPath = dest;
+        }
+      } else {
+        const { error: logoError } = await db.storage.from("media").copy(sourceLogo, dest);
+        if (!logoError) logoPath = dest;
+      }
     }
     await db.from("templates").update({ slides, style: { ...doc.style, logo_path: logoPath } }).eq("id", row.id);
     await log(db, ctx.userId, "template_from_ad", `${doc.slug} ← ad ${p.id}`);
