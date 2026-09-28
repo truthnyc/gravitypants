@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { guard, usePlanAccess } from "@/lib/stillframe/plan";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { MoreHorizontal } from "lucide-react";
 import { toast } from "sonner";
@@ -41,6 +42,7 @@ export function AdCard({ project }: { project: ProjectWithFrames }) {
   const [draftName, setDraftName] = useState(project.name);
   const [actionsOpen, setActionsOpen] = useState(false);
   const [templateOpen, setTemplateOpen] = useState(false);
+  const { canUse } = usePlanAccess();
 
   const previewFrames = project.frames.slice(0, 4);
   const meta = `${project.frames.length} ${project.frames.length === 1 ? "frame" : "frames"} · ${formatSeconds(
@@ -117,7 +119,7 @@ export function AdCard({ project }: { project: ProjectWithFrames }) {
             <DropdownMenuItem onSelect={() => fileInput.current?.click()}>
               Duplicate with New Photos…
             </DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => setTemplateOpen(true)}>
+            <DropdownMenuItem onSelect={() => guard(canUse("templates"), "templates", () => setTemplateOpen(true))}>
               Save as Template…
             </DropdownMenuItem>
             <DropdownMenuItem
@@ -143,7 +145,7 @@ export function AdCard({ project }: { project: ProjectWithFrames }) {
           <div className="grid px-4 pb-6 text-left">
             <button className="flex h-12 items-center hairline-b" onClick={() => navigate({ to: "/ad/$id/edit", params: { id: project.id } })}>Open</button>
             <button className="flex h-12 items-center hairline-b" onClick={() => fileInput.current?.click()}>Duplicate with New Photos</button>
-            <button className="flex h-12 items-center hairline-b" onClick={() => { setActionsOpen(false); setTemplateOpen(true); }}>Save as Template</button>
+            <button className="flex h-12 items-center hairline-b" onClick={() => { setActionsOpen(false); guard(canUse("templates"), "templates", () => setTemplateOpen(true)); }}>Save as Template</button>
             <button className="flex h-12 items-center hairline-b" onClick={() => { setDraftName(project.name); setActionsOpen(false); setRenameOpen(true); }}>Rename</button>
             <button className="flex h-12 items-center text-destructive" onClick={() => { setActionsOpen(false); handleTrash(); }}>Move to Trash</button>
           </div>

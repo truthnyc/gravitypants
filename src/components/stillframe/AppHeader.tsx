@@ -4,6 +4,7 @@ import { GravityPantsLogo } from "@/components/GravityPantsLogo";
 import { cn } from "@/lib/utils";
 import { useSearch } from "./search-context";
 import { UserMenu } from "./UserMenu";
+import { HelpMenu } from "./HelpMenu";
 import { TrialPill } from "@/components/billing/BillingNotices";
 import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
@@ -59,8 +60,9 @@ export function AppHeader() {
             )}
           />
         </div>
-        <div className="hidden lg:contents"><TrialPill /><UserMenu /></div>
+        <div className="hidden lg:contents"><TrialPill /><HelpMenu /><UserMenu /></div>
         <Button variant="ghost" size="icon" className="ml-auto lg:hidden" aria-label="Search" onClick={() => setSearchOpen(true)}><Search strokeWidth={1.7} /></Button>
+        <div className="lg:hidden"><HelpMenu /></div>
         <Button variant="ghost" size="icon" className="lg:hidden" aria-label="Menu" onClick={() => setMenuOpen(true)}><Menu strokeWidth={1.7} /></Button>
       </div>
       <Drawer open={searchOpen} onOpenChange={setSearchOpen} shouldScaleBackground={false}>

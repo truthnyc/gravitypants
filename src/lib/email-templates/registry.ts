@@ -16,6 +16,7 @@ import { template as planStarted } from './plan-started'
 import { template as paymentFailed } from './payment-failed'
 import { template as planCancelled } from './plan-cancelled'
 import { template as invite } from './team-invite'
+import { template as supportTicket } from './support-ticket'
 
 /**
  * Template registry — maps template names to their React Email components.
@@ -29,4 +30,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'payment-failed': paymentFailed,
   'plan-cancelled': planCancelled,
   invite,
+  'support-ticket': supportTicket,
 }
