@@ -1,5 +1,8 @@
 # Roadmap
 
+## Team-only navigation
+- [ ] Show team templates and Account Team tab only for active Team workspaces
+
 ## New ad flow
 - [x] Make the post-photo choice clear: one primary fresh-ad action, with saved looks grouped only when available
 

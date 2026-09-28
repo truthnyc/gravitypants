@@ -38,7 +38,7 @@ function TemplatesPage() {
   const [deleting, setDeleting] = useState<Template | null>(null);
   const remove = useDeleteTemplate();
   const mine = templates.filter((t) => t.created_by === access?.userId);
-  const team = templates.filter((t) => t.created_by !== access?.userId);
+  const team = templates.filter((t) => t.visibility === "team" && t.created_by !== access?.userId);
 
   return (
     <main className="mx-auto max-w-[960px] space-y-6 px-4 pb-16 pt-6 sm:px-8 sm:pt-8">
@@ -52,11 +52,10 @@ function TemplatesPage() {
         <p className="text-[13px] text-secondary-text">Loading…</p>
       ) : (
         <>
-          <Group title="My templates" list={mine} empty="No templates yet." canEdit={() => true} team={Boolean(access?.team)} showShare={Boolean(access?.isTeamWorkspace)} onDelete={setDeleting} />
-          {access?.isTeamWorkspace && (
-            <Group title="Team templates" list={team} empty="Nobody has shared a template yet." canEdit={() => isAdmin} team={Boolean(access?.team)} showShare onDelete={setDeleting} />
+          <Group title="My templates" list={mine} empty="No templates yet." canEdit={() => true} showShare={Boolean(access?.team)} onDelete={setDeleting} />
+          {access?.team && (
+            <Group title="Team templates" list={team} empty="Nobody has shared a template yet." canEdit={() => isAdmin} showShare onDelete={setDeleting} />
           )}
-          {access?.paid && !access.team && access.isTeamWorkspace && <UpgradeNote team />}
         </>
       )}
 
@@ -74,13 +73,13 @@ function TemplatesPage() {
   );
 }
 
-function Group({ title, list, empty, canEdit, team, showShare, onDelete }: { title: string; list: Template[]; empty: string; canEdit: (t: Template) => boolean; team: boolean; showShare: boolean; onDelete: (t: Template) => void }) {
+function Group({ title, list, empty, canEdit, showShare, onDelete }: { title: string; list: Template[]; empty: string; canEdit: (t: Template) => boolean; showShare: boolean; onDelete: (t: Template) => void }) {
   return (
     <section>
       <h2 className="text-[17px] font-semibold">{title}</h2>
       {list.length ? (
         <div className="mt-3 space-y-3">
-          {list.map((t) => <Row key={t.id} t={t} editable={canEdit(t)} team={team} showShare={showShare} onDelete={() => onDelete(t)} />)}
+          {list.map((t) => <Row key={t.id} t={t} editable={canEdit(t)} showShare={showShare} onDelete={() => onDelete(t)} />)}
         </div>
       ) : (
         <p className="mt-3 rounded-sm border border-dashed border-placeholder-border p-6 text-center text-[13px] text-secondary-text">{empty}</p>
@@ -89,7 +88,7 @@ function Group({ title, list, empty, canEdit, team, showShare, onDelete }: { tit
   );
 }
 
-function Row({ t, editable, team, showShare, onDelete }: { t: Template; editable: boolean; team: boolean; showShare: boolean; onDelete: () => void }) {
+function Row({ t, editable, showShare, onDelete }: { t: Template; editable: boolean; showShare: boolean; onDelete: () => void }) {
   const update = useUpdateTemplate();
   const [name, setName] = useState(t.name);
   return (
@@ -122,8 +121,6 @@ function Row({ t, editable, team, showShare, onDelete }: { t: Template; editable
                   key={v}
                   type="button"
                   aria-pressed={t.visibility === v}
-                  disabled={v === "team" && !team}
-                  title={v === "team" && !team ? "Sharing needs the Team plan" : undefined}
                   onClick={() => v !== t.visibility && update.mutate({ id: t.id, patch: { visibility: v } }, { onError: fail })}
                   className={cn("h-11 flex-1 rounded-lg px-3 text-[13px] font-medium disabled:opacity-40 lg:h-8", t.visibility === v && "bg-card shadow-segment")}
                 >
