@@ -47,7 +47,8 @@ function ClientPage() {
   const support = useServerFn(adminSupport);
 
   if (error) return <p className="text-destructive">Couldn't load this client.</p>;
-  if (!data) return <div aria-busy="true" className="h-96" />;
+  if (data === undefined) return <div aria-busy="true" className="h-96" />;
+  if (!data || !data.client) return <p className="text-secondary-text">This client no longer exists. <Link to="/app/admin/clients" className="text-primary">Back to Clients</Link></p>;
   const { client: c } = data;
   const supporting = !!data.supportUntil && new Date(data.supportUntil) > new Date();
   const stripeUrl = c.stripeCustomerId ? `https://dashboard.stripe.com/${c.environment === "live" ? "" : "test/"}customers/${c.stripeCustomerId}` : null;

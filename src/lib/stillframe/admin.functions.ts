@@ -137,7 +137,7 @@ export const adminClient = createServerFn({ method: "POST" })
     const ctx = context as any as Ctx;
     const db = await adminDb(ctx);
     const client = (await clientRows(db)).find((c) => c.id === data.id);
-    if (!client) throw new Response("Not found", { status: 404 });
+    if (!client) return null;
     const users = await allUsers(db);
     const [{ data: mem }, { data: ads }, { data: usage }, { data: exps }, { data: sess }] = await Promise.all([
       db.from("workspace_members").select("user_id, role").eq("workspace_id", data.id),
