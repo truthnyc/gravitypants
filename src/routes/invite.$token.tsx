@@ -63,7 +63,20 @@ function AcceptInvitePage() {
       {error ? (
         <>
           <p className="max-w-[420px] text-[15px] text-secondary-text">{error}</p>
-          <a href="/app/ads" className="text-[15px] font-medium text-primary">Go to your ads</a>
+          {showSignOut ? (
+            <button
+              type="button"
+              className="text-[15px] font-medium text-primary"
+              onClick={async () => {
+                await supabase.auth.signOut();
+                window.location.href = `/signup?redirect=${encodeURIComponent(`/invite/${token}`)}`;
+              }}
+            >
+              Sign out and continue
+            </button>
+          ) : (
+            <a href="/app/ads" className="text-[15px] font-medium text-primary">Go to your ads</a>
+          )}
         </>
       ) : (
         <p className="text-[15px] text-secondary-text">Joining your team…</p>
