@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { AdCard } from "@/components/stillframe/AdCard";
 import { DropZone } from "@/components/stillframe/DropZone";
 import { useSearch } from "@/components/stillframe/search-context";
@@ -35,7 +35,10 @@ function YourAds() {
 
   return (
     <main className="px-4 py-7 sm:px-8 sm:py-10 lg:px-16">
-      <h1 className="mb-6 text-[36px] font-bold leading-none lg:hidden">Your ads</h1>
+      <div className="mb-6 flex items-end justify-between lg:mb-4 lg:justify-end">
+        <h1 className="text-[36px] font-bold leading-none lg:hidden">Your ads</h1>
+        <Link to="/templates" className="flex h-11 items-center text-[14px] font-medium text-link">Templates</Link>
+      </div>
       <div className={isEmpty ? "mx-auto max-w-[860px] py-4 lg:py-16" : ""}>
         <DropZone spacious={isEmpty} />
       </div>

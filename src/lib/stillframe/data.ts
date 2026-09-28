@@ -606,7 +606,7 @@ export function useSaveTemplate() {
         workspace_id: getWorkspaceId(),
         name,
         visibility,
-        thumbnail_url: project.thumbnail_url,
+        thumbnail_url: project.thumbnail_url ?? project.frames[0]?.photo.path ?? null,
         settings: templateFromProject(project) as never,
       });
       if (error) throw error;
