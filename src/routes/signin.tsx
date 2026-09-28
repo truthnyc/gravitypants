@@ -89,7 +89,7 @@ function SignIn() {
   }
 
   return (
-    <AuthShell mode="signin" title="Welcome back." subtitle="Sign in to keep making reels.">
+    <AuthShell mode="signin" title="Welcome back." subtitle="Sign in to open your ads and keep working.">
       <GoogleButton redirectTo={target} />
       <form onSubmit={submit} noValidate>
         <FieldGroup
