@@ -46,15 +46,16 @@ export function SaveTemplateDialog({ project, open, onOpenChange }: { project: P
               />
             </label>
             <p className="text-[12px] text-secondary-text">Keeps frames, timing, transitions, text styles, logo and formats. Photos aren't saved.</p>
-            {access?.team && (
+            {(access?.team || isStaff) && (
               <div className="space-y-1.5">
                 <span className="text-[12px] text-secondary-text">Who can use it?</span>
                 <div className="flex rounded-lg bg-control-fill p-0.5">
                   {(
                     [
-                      ["private", "Only me"],
-                      ["team", `Everyone in ${access.name}`],
-                    ] as const
+                      ["private", "Only me"] as const,
+                      ...(access?.team ? [["team", `Everyone in ${access.name}`] as const] : []),
+                      ...(isStaff ? [["global", "Everyone on Gravity Pants"] as const] : []),
+                    ]
                   ).map(([v, label]) => (
                     <button
                       key={v}
