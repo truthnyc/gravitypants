@@ -94,7 +94,7 @@ function Pricing() {
                 {COMPARE.map((g) => (
                   <div key={g.group}>
                     <small>{g.group}</small>
-                    <ul>{g.rows.map((r) => <li key={r.label}><span>{r.label}</span><span><CellView v={r.cells[i]} /></span></li>)}</ul>
+                    <ul>{g.rows.map((r) => <li key={r.label}><span>{r.label}</span><span><CellView v={r.cells[i] ?? ""} /></span></li>)}</ul>
                   </div>
                 ))}
               </div>
