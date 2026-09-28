@@ -734,12 +734,15 @@ export type Database = {
           workspace_id: string
         }[]
       }
+      billing_covered: { Args: { _src: string }; Returns: string[] }
+      billing_source: { Args: { _ws: string }; Returns: string }
       brand_kits_enabled: { Args: { _ws: string }; Returns: boolean }
       can_save_export: {
         Args: { _stamp: string; _ws: string }
         Returns: boolean
       }
       delete_workspace: { Args: { _ws: string }; Returns: undefined }
+      effective_billing: { Args: { _ws: string }; Returns: Json }
       ensure_workspace: { Args: never; Returns: string }
       export_status: { Args: { _ws: string }; Returns: Json }
       has_support_session: { Args: { _ws: string }; Returns: boolean }
