@@ -595,6 +595,11 @@ export type Template = {
   visibility: "private" | "team" | "global";
   settings: TemplateSettings;
   updated_at: string;
+  status?: "draft" | "published" | "archived";
+  featured?: boolean;
+  audience?: string[];
+  new_until?: string | null;
+  version?: number;
 };
 
 export const templatesKey = ["templates"] as const;
@@ -650,7 +655,9 @@ export function useTemplates() {
         .order("sort_order", { ascending: true })
         .order("updated_at", { ascending: false });
       if (error) throw error;
-      return (data ?? []) as unknown as Template[];
+      // Staff can read drafts; customers' pickers only ever list published ready-made ones. Featured first.
+      const list = ((data ?? []) as unknown as Template[]).filter((t) => t.source !== "system" || (t.status ?? "published") === "published");
+      return [...list.filter((t) => t.featured), ...list.filter((t) => !t.featured)];
     },
   });
 }
