@@ -58,10 +58,14 @@ function SignUp() {
     if (password.length < 8) return setPasswordError("Please use a password with at least 8 characters.");
     setBusy(true);
     setError(null);
+    const confirmation = new URL("/app/ads", window.location.origin);
+    confirmation.searchParams.set("welcome", "1");
+    if (template && templateForExample(template)) confirmation.searchParams.set("template", template);
+    if (choice) { confirmation.searchParams.set("plan", choice.plan); confirmation.searchParams.set("billing", choice.billing); }
     const { data, error } = await supabase.auth.signUp({
       email: email.trim(),
       password,
-      options: { data: { full_name: name.trim() }, emailRedirectTo: window.location.origin + "/app/ads" },
+      options: { data: { full_name: name.trim() }, emailRedirectTo: confirmation.toString() },
     });
     setBusy(false);
     if (error) {
