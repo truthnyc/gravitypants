@@ -91,6 +91,8 @@ export type Project = {
   end_card: EndCard;
   is_template: boolean;
   brand_kit_id?: string | null;
+  /** Reusable template kit this ad was made from. */
+  template_id?: string | null;
   deleted_at: string | null;
   thumbnail_url: string | null;
   created_at: string;
