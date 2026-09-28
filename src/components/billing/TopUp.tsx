@@ -24,7 +24,7 @@ function TopUpCheckout({ workspaceId }: { workspaceId: string }) {
 }
 
 /** One-time pack of 5 extra exports that never expire. */
-export function TopUpCard({ extras }: { extras?: number }) {
+export function TopUpCard({ extras }: { extras?: number | undefined }) {
   const [open, setOpen] = useState<string | null>(null);
   return (
     <section className="rounded-sm bg-card p-6 shadow-card">
