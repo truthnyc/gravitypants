@@ -96,9 +96,7 @@ function AdminTemplates() {
   }
   async function newTemplate() {
     try {
-      const { id } = await create();
-      await refresh();
-      void navigate({ to: "/admin/templates/$id/edit", params: { id } });
+      void navigate({ to: "/admin/templates/new" });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "That didn't work");
     }
