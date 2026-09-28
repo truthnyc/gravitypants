@@ -321,7 +321,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
             </div>
           )}
 
-          <PreviousExports projectId={project.id} version={historyVersion} />
+          <div className="hidden lg:block"><PreviousExports projectId={project.id} version={historyVersion} /></div>
         </section>
 
         <aside className="space-y-5 lg:space-y-4">
@@ -384,6 +384,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
           {blocked && <p className="text-center text-[12px] text-destructive">Add a photo to every frame to export.</p>}</div>
           {gif && <button type="button" className="flex h-14 w-full items-center justify-between rounded-sm bg-card px-4 text-left shadow-card lg:hidden" onClick={() => setGifSheet(true)}><span><span className="block text-[14px] font-semibold">GIF quality</span><span className="text-[12px] text-secondary-text">{gSize === "full" ? "Full size" : gSize === "half" ? "Half size" : "480 px wide"} · {gColors} · {gFps} fps · {gLoop}</span></span><ChevronDown className="size-5 -rotate-90 text-icon" strokeWidth={1.7} /></button>}
         </aside>
+        <div className="lg:hidden"><PreviousExports projectId={project.id} version={historyVersion} /></div>
       </main>
 
       <div className="fixed inset-x-0 bottom-0 z-30 bg-card px-4 pt-3 shadow-popover safe-bottom hairline-t lg:hidden">

@@ -158,7 +158,7 @@ export function AdCard({ project }: { project: ProjectWithFrames }) {
       <input
         ref={fileInput}
         type="file"
-        accept="image/jpeg,image/png,image/webp,image/heic"
+        accept="image/*"
         multiple
         className="hidden"
         onChange={(event) => {
