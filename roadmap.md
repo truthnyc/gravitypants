@@ -1,5 +1,8 @@
 # Roadmap
 
+## New ad flow
+- [ ] Make the post-photo choice clear: one primary fresh-ad action, with saved looks grouped only when available
+
 ## Plans & team workspaces
 - [x] Team plan in payments: team_monthly $175/mo, team_yearly $1,750/yr
 - [x] plans table: simple 10 exports, business 50, team 150 shared, seats column
