@@ -7,6 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { FontPicker } from "@/components/stillframe/FontPicker";
 import { MediaImage } from "@/components/stillframe/MediaImage";
 import { ElementSlider } from "@/components/editor/Inspector";
+import { BrandKitsSection } from "@/components/brand/BrandKits";
 import { useBrandKit, useUpdateBrandKit } from "@/lib/stillframe/data";
 import { loadFont } from "@/lib/stillframe/fonts";
 import { uploadMedia } from "@/lib/stillframe/media";
@@ -67,13 +68,10 @@ function BrandKitEditor({ kit }: { kit: BrandKit }) {
     <main className="mx-auto max-w-[960px] space-y-5 px-4 pb-16 pt-6 sm:px-8 sm:pt-8">
       <div>
         <h1 className="text-[22px] font-bold tracking-[-0.02em]">Brand Kit</h1>
-        <p className="mt-1 text-[14px] text-secondary-text">New ads start with these logos, colors and fonts.</p>
+        <p className="mt-1 text-[14px] text-secondary-text">Save logos, colors and fonts as kits. New ads start with your default kit.</p>
       </div>
-      <LogosCard kit={kit} save={save} />
-      <div className="grid gap-5 md:grid-cols-2">
-        <ColorsCard kit={kit} save={save} />
-        <FontsCard kit={kit} save={save} />
-      </div>
+      <BrandKitsSection />
+      <h2 className="pt-4 text-[17px] font-semibold">Every ad</h2>
       <PlacementCard kit={kit} save={save} />
       <EndCardCard kit={kit} save={save} />
     </main>
@@ -81,177 +79,6 @@ function BrandKitEditor({ kit }: { kit: BrandKit }) {
 }
 
 type SaveProps = { kit: BrandKit; save: (p: Partial<BrandKit>) => void };
-
-function LogosCard({ kit, save }: SaveProps) {
-  const fileRef = useRef<HTMLInputElement>(null);
-  const target = useRef<BrandLogoRole>("primary");
-  const [busy, setBusy] = useState<BrandLogoRole | null>(null);
-
-  const pick = (role: BrandLogoRole) => {
-    target.current = role;
-    fileRef.current?.click();
-  };
-  const upload = async (file: File) => {
-    if (!/\.(png|svg|webp)$/i.test(file.name)) {
-      toast.error("Choose a PNG or SVG with a see-through background.");
-      return;
-    }
-    const role = target.current;
-    setBusy(role);
-    try {
-      const up = await uploadMedia(file, "logo");
-      const logo: BrandLogo = { id: crypto.randomUUID(), path: up.path, name: file.name, role };
-      const logos = role === "other" ? [...kit.logos, logo] : [...kit.logos.filter((l) => l.role !== role), logo];
-      save({ logos });
-    } catch {
-      toast.error("That logo couldn't be uploaded. Try again.");
-    } finally {
-      setBusy(null);
-    }
-  };
-  const tiles: { role: BrandLogoRole; logo: BrandLogo | undefined }[] = [
-    ...SLOTS.map((role) => ({ role, logo: kit.logos.find((l) => l.role === role) })),
-    ...kit.logos.filter((l) => l.role === "other").map((logo) => ({ role: "other" as const, logo })),
-  ];
-
-  return (
-    <Card title="Logos" hint="PNG or SVG with a see-through background.">
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-        {tiles.map(({ role, logo }, i) => (
-          <div key={logo?.id ?? `${role}-${i}`} className="group">
-            <button
-              type="button"
-              onClick={() => pick(role)}
-              className={cn(
-                "relative flex h-[120px] w-full items-center justify-center rounded-sm",
-                role === "reversed" ? "bg-foreground" : "bg-control-fill",
-                !logo && "border border-dashed border-placeholder-border",
-              )}
-              aria-label={logo ? `Replace ${ROLE_LABEL[role]}` : `Add ${ROLE_LABEL[role]}`}
-            >
-              {logo ? (
-                <MediaImage path={logo.path} alt={logo.name} className="max-h-[70%] max-w-[75%] object-contain" />
-              ) : (
-                <Plus className={cn("size-5", role === "reversed" ? "text-background" : "text-icon", busy === role && "animate-pulse")} strokeWidth={1.7} />
-              )}
-            </button>
-            <div className="mt-2 flex items-center gap-1">
-              <span className="flex-1 text-[12px] text-secondary-text">{ROLE_LABEL[role]}</span>
-              {logo && (
-                <button
-                  type="button"
-                  aria-label="Remove logo"
-                  onClick={() => save({ logos: kit.logos.filter((l) => l.id !== logo.id) })}
-                  className="text-icon lg:opacity-0 lg:transition-opacity lg:group-hover:opacity-100"
-                >
-                  <Trash2 className="size-3.5" strokeWidth={1.7} />
-                </button>
-              )}
-            </div>
-          </div>
-        ))}
-        <button
-          type="button"
-          onClick={() => pick("other")}
-          className="flex h-[120px] items-center justify-center gap-1.5 rounded-sm border border-dashed border-placeholder-border text-[13px] font-medium text-link"
-        >
-          <Plus className="size-4" strokeWidth={1.7} /> Add version
-        </button>
-      </div>
-      <input
-        ref={fileRef}
-        type="file"
-        accept="image/png,image/svg+xml,image/webp"
-        className="hidden"
-        onChange={(e) => {
-          const f = e.target.files?.[0];
-          e.target.value = "";
-          if (f) void upload(f);
-        }}
-      />
-    </Card>
-  );
-}
-
-function ColorsCard({ kit, save }: SaveProps) {
-  const [draft, setDraft] = useState("#0071E3");
-  return (
-    <Card title="Colors" hint="Shown as swatches for text in the editor.">
-      <div className="flex flex-wrap gap-4">
-        {kit.colors.map((c) => (
-          <div key={c} className="group relative flex flex-col items-center gap-1.5">
-            <span className="size-12 rounded-full border border-border" style={{ background: c }} />
-            <span className="text-[11px] text-secondary-text nums">{c.toUpperCase()}</span>
-            <button
-              type="button"
-              aria-label={`Remove ${c}`}
-              onClick={() => save({ colors: kit.colors.filter((x) => x !== c) })}
-              className="absolute -right-1 -top-1 flex size-5 items-center justify-center rounded-full bg-card opacity-0 shadow-segment transition-opacity group-hover:opacity-100"
-            >
-              <X className="size-3" strokeWidth={1.7} />
-            </button>
-          </div>
-        ))}
-        <div className="flex flex-col items-center gap-1.5">
-          <label className="relative flex size-12 cursor-pointer items-center justify-center rounded-full border border-dashed border-placeholder-border text-icon" aria-label="Add a color">
-            <Plus className="size-4" strokeWidth={1.7} />
-            <input
-              type="color"
-              value={draft}
-              className="absolute inset-0 cursor-pointer opacity-0"
-              onChange={(e) => setDraft(e.target.value)}
-              onBlur={(e) => {
-                const c = e.target.value.toUpperCase();
-                if (!kit.colors.map((x) => x.toUpperCase()).includes(c)) save({ colors: [...kit.colors, c] });
-              }}
-            />
-          </label>
-          <span className="text-[11px] text-secondary-text">Add</span>
-        </div>
-      </div>
-    </Card>
-  );
-}
-
-function FontsCard({ kit, save }: SaveProps) {
-  const [weights, setWeights] = useState({ headline: 700, body: 500 });
-  const row = (label: string, key: "headline_font" | "body_font", wk: "headline" | "body") => {
-    const family = kit[key] ?? DEFAULT_FONT;
-    return (
-      <div className="flex items-center gap-4">
-        <span className="flex size-14 shrink-0 items-center justify-center rounded-sm bg-control-fill text-[26px]" style={{ fontFamily: `"${family}"`, fontWeight: weights[wk] }}>
-          Aa
-        </span>
-        <div className="min-w-0 flex-1">
-          <div className="text-[12px] text-secondary-text">{label}</div>
-          <FontPicker
-            title={label}
-            family={family}
-            weight={weights[wk]}
-            side="bottom"
-            onChange={(f, w) => {
-              setWeights((s) => ({ ...s, [wk]: w }));
-              void loadFont(f, w);
-              if (f !== kit[key]) save({ [key]: f });
-            }}
-          >
-            <button type="button" className="truncate text-[15px] font-medium text-link" style={{ fontFamily: `"${family}"` }}>
-              {family}
-            </button>
-          </FontPicker>
-        </div>
-      </div>
-    );
-  };
-  return (
-    <Card title="Fonts" hint="New headlines and sublines start with these.">
-      <div className="space-y-4">
-        {row("Headline font", "headline_font", "headline")}
-        {row("Body font", "body_font", "body")}
-      </div>
-    </Card>
-  );
-}
 
 function PlacementCard({ kit, save }: SaveProps) {
   const [size, setSize] = useState(kit.logo_size_pct ?? 16);
