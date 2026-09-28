@@ -2,8 +2,10 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+/** Invite links always point at the public site, never the preview/origin the sender happens to be on. */
+const SITE_ORIGIN = "https://gravitypants.com";
 
-type InviteInput = { workspaceId: string; email: string; role: "admin" | "editor"; origin: string };
+type InviteInput = { workspaceId: string; email: string; role: "admin" | "editor" };
 
 /** Invites someone to a workspace and emails them the accept link. RLS enforces admin-only. */
 export const inviteMember = createServerFn({ method: "POST" })
@@ -47,7 +49,7 @@ export const inviteMember = createServerFn({ method: "POST" })
         templateData: {
           inviterName: prof?.display_name ?? undefined,
           workspaceName: ws?.name ?? undefined,
-          acceptUrl: `${data.origin}/invite/${inv.token}`,
+          acceptUrl: `${SITE_ORIGIN}/invite/${inv.token}`,
         },
         idempotencyKey: `invite-${inv.token}`,
       });
@@ -61,7 +63,7 @@ export const inviteMember = createServerFn({ method: "POST" })
 /** Resends the email for a pending invite. */
 export const resendInvite = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { inviteId: string; origin: string }) => d)
+  .inputValidator((d: { inviteId: string }) => d)
   .handler(async ({ data, context }): Promise<{ ok: true } | { error: string }> => {
     const { supabase } = context;
     const { data: inv } = await supabase
@@ -77,7 +79,7 @@ export const resendInvite = createServerFn({ method: "POST" })
       await sendTemplateEmail("invite", inv.email, {
         templateData: {
           workspaceName: ws?.name ?? undefined,
-          acceptUrl: `${data.origin}/invite/${inv.token}`,
+          acceptUrl: `${SITE_ORIGIN}/invite/${inv.token}`,
         },
         idempotencyKey: `invite-resend-${inv.token}-${Date.now()}`,
       });
