@@ -1,3 +1,4 @@
+import { useMakeGlobalTemplate } from "@/components/admin/MakeGlobalTemplate";
 import { useKit } from "@/components/templates/KitAgain";
 import { useRef, useState } from "react";
 import { guard, usePlanAccess } from "@/lib/stillframe/plan";
@@ -35,6 +36,7 @@ import { SaveTemplateDialog } from "@/components/templates/TemplateDialogs";
 export function AdCard({ project }: { project: ProjectWithFrames }) {
   const kit = useKit(project.template_id);
   const navigate = useNavigate();
+  const globalTpl = useMakeGlobalTemplate();
   const duplicate = useDuplicateProject();
   const duplicateWithPhotos = useDuplicateWithNewPhotos();
   const setTrashed = useSetTrashed();

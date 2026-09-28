@@ -594,7 +594,7 @@ function Radio({ on }: { on: boolean }) {
 }
 
 const ACTION_LABEL: Record<string, string> = {
-  created: "Created", saved_draft: "Saved draft", published: "Published", publish: "Published", unpublish: "Unpublished",
+  created: "Created", created_from_ad: "Created from an ad", saved_draft: "Saved draft", published: "Published", publish: "Published", unpublish: "Unpublished",
   archive: "Archived", restore: "Restored", feature: "Featured", unfeature: "Unfeatured", duplicated: "Created as a copy",
 };
 
