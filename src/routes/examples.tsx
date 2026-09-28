@@ -22,6 +22,7 @@ function GalleryReel({ example }: { example: GalleryExample }) {
 
 function GalleryCard({ example }: { example: GalleryExample }) {
   return <article className="examples-card">
+    <Link to="/signup" search={{ template: example.id }} className="examples-mobile-card-link" aria-label={`Use ${example.name} style`} />
     <div className="examples-card-media"><GalleryReel example={example} /></div>
     <div className="examples-card-info"><div><h3>{example.name}</h3><p className="examples-card-meta-desktop">{categoryLabel[example.category]} · {formatLabel[example.format]} · {example.photos} photos · {example.seconds} sec</p><p className="examples-card-meta-mobile">{categoryLabel[example.category]} · {formatLabel[example.format]}</p></div>
       <Button asChild variant="siteSecondary" size="site" className="examples-use-style"><Link to="/signup" search={{ template: example.id }}>Use style</Link></Button>
