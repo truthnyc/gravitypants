@@ -138,7 +138,7 @@ function Row({ t, editable, showShare, options = ["private", "team"], onDelete }
         ) : (
           <p className="truncate text-[14px] font-semibold">{t.name}</p>
         )}
-        <p className="mt-1 text-[12px] text-secondary-text nums">{t.settings.frame_count} frames · {t.visibility === "team" ? "Shared with team" : "Only me"}</p>
+        <p className="mt-1 text-[12px] text-secondary-text nums">{t.settings.frame_count} frames · {VISIBILITY_LABEL[t.visibility]}</p>
       </div>
       {editable && (
         <div className="flex w-full items-center gap-2 sm:w-auto">
