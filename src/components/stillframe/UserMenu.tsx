@@ -64,7 +64,7 @@ export function UserMenu() {
         </DropdownMenuItem>
         {adm?.admin && (
           <DropdownMenuItem asChild>
-            <Link to="/app/admin">Admin</Link>
+            <Link to="/admin">Admin</Link>
           </DropdownMenuItem>
         )}
         <DropdownMenuSeparator />

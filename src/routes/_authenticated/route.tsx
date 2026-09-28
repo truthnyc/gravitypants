@@ -43,7 +43,7 @@ export const Route = createFileRoute("/_authenticated")({
 function Layout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { suspended } = Route.useRouteContext();
-  if (suspended && !pathname.startsWith("/app/admin")) return <Paused />;
+  if (suspended && !pathname.startsWith("/admin")) return <Paused />;
   return (
     <>
       <PaymentProblemBanner />

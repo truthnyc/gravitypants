@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card, fmtDateTime, PageTitle } from "@/components/admin/AdminShell";
 import { adminAudit } from "@/lib/stillframe/admin.functions";
 
-export const Route = createFileRoute("/_authenticated/app/admin/audit")({
+export const Route = createFileRoute("/_authenticated/admin/audit")({
   head: () => ({ meta: [
     { title: "Admin Audit Log — Gravity Pants" },
     { name: "description", content: "Private Gravity Pants administrator activity." },
