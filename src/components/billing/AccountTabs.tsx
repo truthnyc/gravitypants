@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
+import { usePlanAccess } from "@/lib/stillframe/plan";
 
 const tabs = [
   { to: "/app/account", label: "Profile" },
@@ -8,9 +9,10 @@ const tabs = [
 ] as const;
 
 export function AccountTabs() {
+  const { data: access } = usePlanAccess();
   return (
     <nav className="flex gap-1 rounded-lg bg-control-fill p-1" aria-label="Account sections">
-      {tabs.map((t) => (
+      {tabs.filter((t) => t.label !== "Team" || access?.team).map((t) => (
         <Link
           key={t.to}
           to={t.to}

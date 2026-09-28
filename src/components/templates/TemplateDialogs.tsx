@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { openUpgrade } from "@/lib/stillframe/plan";
 import { Link } from "@tanstack/react-router";
 import { LayoutTemplate } from "lucide-react";
 import { toast } from "sonner";
@@ -46,7 +45,7 @@ export function SaveTemplateDialog({ project, open, onOpenChange }: { project: P
               />
             </label>
             <p className="text-[12px] text-secondary-text">Keeps frames, timing, transitions, text styles, logo and formats. Photos aren't saved.</p>
-            {access?.isTeamWorkspace && (
+            {access?.team && (
               <div className="space-y-1.5">
                 <span className="text-[12px] text-secondary-text">Who can use it?</span>
                 <div className="flex rounded-lg bg-control-fill p-0.5">
@@ -59,7 +58,7 @@ export function SaveTemplateDialog({ project, open, onOpenChange }: { project: P
                     <button
                       key={v}
                       type="button"
-                      onClick={() => (v === "team" && !access.team ? openUpgrade("team_sharing") : setVisibility(v))}
+                      onClick={() => setVisibility(v)}
                       aria-pressed={visibility === v}
                       className={cn("h-11 min-w-0 flex-1 truncate rounded-lg px-2 text-[13px] font-medium lg:h-8", visibility === v && "bg-card shadow-segment")}
                     >
@@ -67,7 +66,6 @@ export function SaveTemplateDialog({ project, open, onOpenChange }: { project: P
                     </button>
                   ))}
                 </div>
-                {visibility === "team" && !access.team && <UpgradeNote team />}
               </div>
             )}
           </>
@@ -126,7 +124,7 @@ export function StartFromDialog({
   const { data: access } = useTemplateAccess();
   const { data: templates = [] } = useTemplates();
   const mine = access?.paid ? templates.filter((t) => t.created_by === access.userId) : [];
-  const shared = access?.paid && access.isTeamWorkspace
+  const shared = access?.team
     ? templates.filter((t) => t.visibility === "team" && t.created_by !== access.userId)
     : [];
 
