@@ -25,7 +25,7 @@ const Email = ({ name }: Props) => (
         <Heading style={brandH1}>Your free trial has ended</Heading>
         <Text style={brandText}>{name ? `Hi ${name}` : 'Hi there'}</Text>
         <Text style={brandText}>
-          Your 15-day free trial of Gravity Pants is over. Nothing is lost — your ads, photos and
+          Your 7-day free trial of Gravity Pants is over. Nothing is lost — your ads, photos and
           brand kit are all still here, and you can keep editing and previewing for free.
         </Text>
         <Text style={brandText}>
