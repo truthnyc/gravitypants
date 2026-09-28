@@ -3,7 +3,7 @@ import { UpgradeDialog } from "@/components/billing/UpgradeDialog";
 import { AppHeader } from "@/components/stillframe/AppHeader";
 import { PaymentProblemBanner } from "@/components/billing/BillingNotices";
 import { supabase } from "@/integrations/supabase/client";
-import { preferredWorkspaceId, setWorkspaceId } from "@/lib/stillframe/workspace";
+import { preferredWorkspaceId, rememberWorkspaceId, setWorkspaceId } from "@/lib/stillframe/workspace";
 import { Button } from "@/components/ui/button";
 import { useSignOut } from "@/lib/stillframe/account";
 import { sendWelcomeEmail } from "@/lib/stillframe/welcome.functions";
@@ -19,6 +19,9 @@ export const Route = createFileRoute("/_authenticated")({
     if (error || !data.user) {
       throw redirect({ to: "/signin", search: { redirect: location.href } });
     }
+    // Join any teams this email was invited to, even if the invite link was lost during sign-up.
+    const { data: joined } = await supabase.rpc("accept_my_invites" as never);
+    if (joined) rememberWorkspaceId(data.user.id, joined as unknown as string);
     const { data: ws, error: wsError } = await supabase.rpc("ensure_workspace");
     if (wsError || !ws) throw wsError ?? new Error("No workspace");
     const preferred = preferredWorkspaceId(data.user.id);
