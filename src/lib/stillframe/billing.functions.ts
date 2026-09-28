@@ -20,8 +20,8 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }): Promise<{ clientSecret: string } | { error: string }> => {
     const { supabase, userId } = context;
-    const { data: member } = await supabase.rpc("is_workspace_member", { _ws: data.workspaceId });
-    if (!member) return { error: "You don't have access to this workspace." };
+    const { data: member } = await supabase.rpc("is_workspace_admin", { _ws: data.workspaceId });
+    if (!member) return { error: "Only the workspace owner or an admin can change billing." };
     const { data: plan } = await supabase.from("plans").select("price_id").eq("price_id", data.priceId).maybeSingle();
     if (!plan) return { error: "That plan isn't available." };
     const { data: billing } = await supabase
@@ -81,8 +81,8 @@ export const createTopUpSession = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }): Promise<{ clientSecret: string } | { error: string }> => {
     const { supabase, userId } = context;
-    const { data: member } = await supabase.rpc("is_workspace_member", { _ws: data.workspaceId });
-    if (!member) return { error: "You don't have access to this workspace." };
+    const { data: member } = await supabase.rpc("is_workspace_admin", { _ws: data.workspaceId });
+    if (!member) return { error: "Only the workspace owner or an admin can change billing." };
     const { data: billing } = await supabase
       .from("workspace_billing")
       .select("stripe_customer_id")
@@ -128,6 +128,8 @@ export const createPortalSession = createServerFn({ method: "POST" })
     return { ...d, environment: checkEnv(d.environment) };
   })
   .handler(async ({ data, context }): Promise<{ url: string } | { error: string }> => {
+    const { data: isAdmin } = await context.supabase.rpc("is_workspace_admin", { _ws: data.workspaceId });
+    if (!isAdmin) return { error: "Only the workspace owner or an admin can change billing." };
     const { data: billing } = await context.supabase
       .from("workspace_billing")
       .select("stripe_customer_id")
