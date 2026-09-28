@@ -28,6 +28,6 @@
 - [ ] Publish so the live site gets these fixes
 
 ## Public website foundation
-- [ ] Public shell and routes at /, /features, /examples, /pricing
-- [ ] Move app pages to /app and update internal navigation/auth return paths
-- [ ] Add reference-based site tokens and reusable ReelPhone; verify public and app flows
+- [x] Public shell and routes at /, /features, /examples, /pricing
+- [x] Move app pages to /app and update internal navigation/auth return paths
+- [x] Add reference-based site tokens and reusable ReelPhone; verify public and app flows
