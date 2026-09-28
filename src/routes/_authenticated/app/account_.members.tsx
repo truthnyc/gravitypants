@@ -231,7 +231,7 @@ function MembersPage() {
           </div>
         )}
         <div className="mt-4">
-          {isTeamPlan ? (
+          {current && current.role !== "owner" ? null : isTeamPlan ? (
             <Button variant="plain" onClick={() => void createTeamWorkspace()} disabled={creating}>
               {creating ? "Creating…" : "Create Team Workspace"}
             </Button>
