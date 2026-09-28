@@ -135,7 +135,7 @@ export function StartFromDialog({
       <DialogContent className="max-h-[92dvh] w-[calc(100vw-24px)] overflow-y-auto rounded-sm sm:max-w-[560px]">
         <DialogHeader className="pr-6 text-left">
           <DialogTitle className="text-[19px]">Create your ad</DialogTitle>
-          <p className="text-[14px] text-secondary-text nums">{count} {count === 1 ? "photo is" : "photos are"} ready. Start fresh or use a saved look.</p>
+          <p className="text-[14px] text-secondary-text nums">{count} {count === 1 ? "photo is" : "photos are"} ready.{mine.length || shared.length ? " Start fresh or use a saved look." : " Start a new ad with your photos."}</p>
         </DialogHeader>
         <Button onClick={() => onPick(null)} className="h-12 w-full text-[15px]">Start with my photos</Button>
 
