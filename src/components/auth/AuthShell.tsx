@@ -1,8 +1,10 @@
 import { useState, type ReactNode } from "react";
 import { Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { GravityPantsLogo } from "@/components/GravityPantsLogo";
 import { ReelPhone } from "@/components/site/ReelPhone";
 import { lovable } from "@/integrations/lovable";
+import { galleryExamples } from "@/lib/site/examples";
 
 export function safeRedirect(r: unknown): string {
   if (typeof r !== "string") return "/app/ads";
@@ -20,7 +22,18 @@ const candleFrames = ["#1F2937", "#8C2F2B", "#EBDDC6"].map((background, i) => ({
   artwork: <img src={`/site-art/candle-${i + 1}.svg`} alt="" />,
 }));
 
-function AuthVisual() {
+function AuthVisual({ mode }: { mode: "signup" | "signin" }) {
+  if (mode === "signin") {
+    const reels = ["fashion", "coffee", "candle", "skincare", "plants", "sneaker"];
+    return <div className="auth-visual auth-reels" aria-hidden="true">
+      {[false, true].map((reverse) => <div className={`auth-reel-row${reverse ? " auth-reel-reverse" : ""}`} key={String(reverse)}>
+        {[...reels, ...reels].map((id, i) => {
+          const example = galleryExamples.find((item) => item.id === id);
+          return example ? <ReelPhone key={`${id}-${i}`} size="small" frames={example.frames.map((src) => ({ background: "var(--site-ink)", artwork: <img src={src} alt="" /> }))} headline={example.headline} subline={example.sub} /> : null;
+        })}
+      </div>)}
+    </div>;
+  }
   return (
     <div className="auth-visual" aria-hidden="true">
       <div className="auth-tiles">
@@ -45,15 +58,16 @@ function AuthVisual() {
   );
 }
 
-export function AuthShell({ eyebrow, title, subtitle, children }: { eyebrow?: string; title: string; subtitle: string; children: ReactNode }) {
+export function AuthShell({ eyebrow, title, subtitle, children, mode = "signup", beforeForm }: { eyebrow?: string; title: string; subtitle: string; children: ReactNode; mode?: "signup" | "signin"; beforeForm?: ReactNode }) {
   return (
-    <main className="auth-page">
+    <main className={`auth-page auth-page-${mode}`}>
       <div className="auth-form-side">
         <a href="/" className="auth-brand">
           <GravityPantsLogo size={30} />
           <span>Gravity Pants</span>
         </a>
         <div className="auth-form-inner">
+          {beforeForm}
           {eyebrow && <p className="auth-eyebrow">{eyebrow}</p>}
           <h1 className="auth-title">{title}</h1>
           <p className="auth-subtitle">{subtitle}</p>
@@ -61,7 +75,7 @@ export function AuthShell({ eyebrow, title, subtitle, children }: { eyebrow?: st
         </div>
       </div>
       <div className="auth-visual-side">
-        <AuthVisual />
+        <AuthVisual mode={mode} />
       </div>
     </main>
   );
@@ -72,15 +86,21 @@ export function GoogleButton({ redirectTo }: { redirectTo: string }) {
   const [err, setErr] = useState<string | null>(null);
   return (
     <>
-      <button
+      <Button
         type="button"
+        variant="siteSecondary"
         disabled={busy}
         onClick={async () => {
           setBusy(true);
           setErr(null);
           sessionStorage.setItem("sf-after-signin", redirectTo);
-          const res = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin + "/signin" });
-          if (res.error) {
+          try {
+            const res = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin + "/signin" });
+            if (res.error) {
+              setErr("Google sign-in didn't work. Please try again.");
+              setBusy(false);
+            }
+          } catch {
             setErr("Google sign-in didn't work. Please try again.");
             setBusy(false);
           }
@@ -94,7 +114,7 @@ export function GoogleButton({ redirectTo }: { redirectTo: string }) {
           <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z" />
         </svg>
         Continue with Google
-      </button>
+      </Button>
       {err && <p className="mt-2 text-[13px] text-destructive">{err}</p>}
       <div className="auth-divider">
         <span />
@@ -112,6 +132,7 @@ export type FieldDef = {
   autoComplete: string;
   value: string;
   placeholder?: string;
+  error?: string | null;
   onChange: (v: string) => void;
 };
 
@@ -135,19 +156,22 @@ export function FieldGroup({ fields, error }: { fields: FieldDef[]; error?: stri
                 placeholder={f.placeholder ?? f.label}
                 value={f.value}
                 onChange={(e) => f.onChange(e.target.value)}
-                aria-invalid={!!error}
+                aria-invalid={!!f.error || !!error}
+                aria-describedby={f.error ? `${f.id}-error` : undefined}
               />
               {isPassword && (
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
                   className="auth-show"
                   onClick={() => setShown((s) => ({ ...s, [f.id]: !s[f.id] }))}
                   aria-label={shown[f.id] ? "Hide password" : "Show password"}
                 >
                   {shown[f.id] ? "Hide" : "Show"}
-                </button>
+                </Button>
               )}
             </div>
+            {f.error && <p role="alert" id={`${f.id}-error`} className="auth-field-error">{f.error}</p>}
           </div>
         );
       })}
@@ -162,10 +186,10 @@ export function FieldGroup({ fields, error }: { fields: FieldDef[]; error?: stri
 
 export function plainAuthError(message: string): string {
   const m = message.toLowerCase();
-  if (m.includes("invalid login")) return "That password doesn't match this email.";
+  if (m.includes("invalid login")) return "Wrong email or password.";
   if (m.includes("email not confirmed")) return "Please confirm your email first. Check your inbox for the link.";
-  if (m.includes("already registered")) return "There's already an account with this email. Try signing in.";
-  if (m.includes("password") && (m.includes("least") || m.includes("short"))) return "Please use a password with at least 6 characters.";
+  if (m.includes("already registered") || m.includes("user already exists")) return "That email is already in use. Sign in instead?";
+  if (m.includes("password") && (m.includes("least") || m.includes("short"))) return "Please use a password with at least 8 characters.";
   if (m.includes("weak") || m.includes("pwned")) return "That password is too easy to guess. Please pick another.";
   if (m.includes("rate")) return "Too many tries. Please wait a minute and try again.";
   return "Something went wrong. Please try again.";
