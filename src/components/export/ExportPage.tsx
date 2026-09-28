@@ -341,14 +341,14 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
 
           <Group label="Save as">
             <div className="grid grid-cols-2 gap-2">
-              <PickCard on={mp4} onClick={() => setMp4((v) => !v)} icon={<Film className="size-4" strokeWidth={1.7} />} title="Video" sub="MP4 · with motion" />
+              <PickCard on={mp4} onClick={() => setMp4((v) => !v)} icon={<Film className="size-4" strokeWidth={1.7} />} title="Video MP4" sub="With motion" />
               <PickCard on={gif} onClick={() => setGif((v) => !v)} icon={<ImageIcon className="size-4" strokeWidth={1.7} />} title="Animated GIF" sub="Plays anywhere, no sound" />
             </div>
           </Group>
 
           {mp4 && (
             <Group label="Video motion">
-              <Seg value={fps} onChange={setFps} options={[{ v: 30, l: "Standard", s: "30 fps" }, { v: 60, l: "Extra smooth", s: "60 fps" }, { v: 24, l: "Film look", s: "24 fps" }]} />
+              <Seg value={fps} onChange={setFps} options={[{ v: 30, l: "Standard", s: "30 fps" }, { v: 60, l: "Smooth", s: "60 fps" }, { v: 24, l: "Film", s: "24 fps" }]} />
             </Group>
           )}
 
