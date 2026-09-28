@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { MediaImage } from "@/components/stillframe/MediaImage";
-import { useSaveTemplate, useTemplateAccess, useTemplates, type Template } from "@/lib/stillframe/data";
+import { useIsPlatformAdmin, useSaveTemplate, useTemplateAccess, useTemplates, type Template } from "@/lib/stillframe/data";
 import type { ProjectWithFrames } from "@/lib/stillframe/types";
 import { cn } from "@/lib/utils";
 
