@@ -24,6 +24,24 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
     if (!member) return { error: "Only the workspace owner or an admin can change billing." };
     const { data: plan } = await supabase.from("plans").select("price_id").eq("price_id", data.priceId).maybeSingle();
     if (!plan) return { error: "That plan isn't available." };
+    // Teammates are covered by the team they joined: never let them buy a second plan.
+    const { data: joined } = await supabase
+      .from("workspace_members")
+      .select("workspace_id, role")
+      .eq("user_id", userId)
+      .neq("role", "owner");
+    const joinedIds = (joined ?? []).map((m) => m.workspace_id);
+    if (joinedIds.length) {
+      const { data: paid } = await supabase
+        .from("workspace_billing")
+        .select("workspace_id, plan, status, current_period_end")
+        .in("workspace_id", joinedIds)
+        .not("plan", "in", "(trial,none)");
+      const covered = (paid ?? []).some(
+        (b) => b.status !== "canceled" || (b.current_period_end && new Date(b.current_period_end) > new Date()),
+      );
+      if (covered) return { error: "You're already on a team's paid plan, so you don't need to buy one. Switch to your team's workspace next to the logo." };
+    }
     const { data: billing } = await supabase
       .from("workspace_billing")
       .select("stripe_customer_id")
