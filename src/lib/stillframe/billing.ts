@@ -54,6 +54,8 @@ export function useBilling() {
       const { data } = await supabase.from("workspace_billing").select("*").eq("workspace_id", ws).maybeSingle();
       return (data as Billing | null) ?? null;
     },
+    // Coming back from Manage Billing (another tab) shows the new plan right away.
+    refetchOnWindowFocus: "always",
   });
 }
 
@@ -61,6 +63,7 @@ export function useExportStatus() {
   return useQuery({
     queryKey: [...billingKey, "export"],
     queryFn: fetchExportStatus,
+    refetchOnWindowFocus: "always",
   });
 }
 
