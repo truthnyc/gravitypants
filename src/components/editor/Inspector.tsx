@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { ChevronRight, Clock, Crop, Image as ImageIcon, Minus, Plus, Shapes, Sparkles, TextQuote, Type } from "lucide-react";
+import { ChevronRight, Clock, Crop, Image as ImageIcon, Minus, Plus, RefreshCw, Shapes, Sparkles, TextQuote, Type } from "lucide-react";
 import type { EditorDoc } from "@/lib/stillframe/data";
 import {
   PACE_SECONDS,
