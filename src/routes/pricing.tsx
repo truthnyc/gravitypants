@@ -99,7 +99,7 @@ function Pricing() {
               {COMPARE.flatMap((g) => [
                 <tr key={g.group} className="grp"><th colSpan={5} scope="colgroup">{g.group}</th></tr>,
                 ...g.rows.map((r) => (
-                  <tr key={g.group + r.label}><th scope="row">{r.label}</th>{r.cells.map((c, i) => <td key={i} className={i === 0 ? "simple" : undefined}><CellView v={c} /></td>)}</tr>
+                  <tr key={g.group + r.label}><th scope="row">{r.label}</th>{r.cells.map((c, i) => <td key={i} className={i === 1 ? "simple" : undefined}><CellView v={c} /></td>)}</tr>
                 )),
               ])}
             </tbody>
