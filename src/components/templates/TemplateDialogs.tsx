@@ -123,10 +123,13 @@ export function StartFromDialog({
 }) {
   const { data: access } = useTemplateAccess();
   const { data: templates = [] } = useTemplates();
-  const mine = access?.paid ? templates.filter((t) => t.created_by === access.userId) : [];
+  const ready = templates.filter((t) => t.visibility === "global");
+  const own = templates.filter((t) => t.visibility !== "global");
+  const mine = access?.paid ? own.filter((t) => t.created_by === access.userId) : [];
   const shared = access?.team
-    ? templates.filter((t) => t.visibility === "team" && t.created_by !== access.userId)
+    ? own.filter((t) => t.visibility === "team" && t.created_by !== access.userId)
     : [];
+  const any = mine.length > 0 || shared.length > 0 || ready.length > 0;
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onCancel()}>
