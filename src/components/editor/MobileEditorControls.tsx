@@ -1,7 +1,6 @@
 import { useRef, useState } from "react";
 import { Clock, Image as ImageIcon, Plus, Shapes, Sparkles, TextQuote, Type } from "lucide-react";
 import type { EditorDoc } from "@/lib/stillframe/data";
-import { ACCEPTED_IMAGE_TYPES } from "@/lib/stillframe/media";
 import type { Format } from "@/lib/stillframe/types";
 import { FrameThumb } from "./FrameThumb";
 import { ELEMENT_META, type ElementKey } from "./use-editor";

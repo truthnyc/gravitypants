@@ -497,7 +497,8 @@ function ChannelCard(props: {
         {selected && <Check className="size-3" strokeWidth={2.5} />}
       </span>
       <div className="order-1 flex h-[72px] w-[52px] items-center justify-center lg:h-[128px] lg:w-auto">
-        <MiniRender {...props} width={format === "9:16" ? 28 : format === "1:1" ? 42 : 48} />
+        <span className="lg:hidden"><MiniRender {...props} width={format === "9:16" ? 28 : format === "1:1" ? 42 : 48} /></span>
+        <span className="hidden lg:block"><MiniRender {...props} width={w} /></span>
       </div>
       <span className="order-2 min-w-0 lg:contents"><span className="block text-[16px] font-semibold leading-tight lg:mt-3 lg:text-[13px]">{name}</span><span className="mt-1 block text-[13px] text-secondary-text nums lg:mt-0.5 lg:text-[12px]">{format} · {size.width} × {size.height}</span></span>
     </button>
@@ -581,7 +582,7 @@ function Seg<T extends string | number>({ value, onChange, options }: { value: T
 
 function PickCard({ on, onClick, icon, title, sub }: { on: boolean; onClick: () => void; icon: React.ReactNode; title: string; sub: string }) {
   return (
-    <button type="button" aria-pressed={on} onClick={onClick} className={cn("relative rounded-sm bg-control-fill p-3 text-left", on && "bg-card ring-2 ring-primary")}>
+    <button type="button" aria-pressed={on} onClick={onClick} className={cn("relative min-h-16 rounded-sm bg-control-fill p-3 text-left", on && "bg-card ring-2 ring-primary")}>
       <span className={cn("absolute right-2 top-2 flex size-4 items-center justify-center rounded-full", on ? "bg-primary text-primary-foreground" : "border border-secondary-text/30")}>
         {on && <Check className="size-2.5" strokeWidth={2.5} />}
       </span>
