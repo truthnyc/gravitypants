@@ -19,7 +19,7 @@ import { POPULAR, WEIGHT_NAMES } from "@/lib/stillframe/fonts";
 import { ANCHORS } from "@/render/renderFrame";
 import type { Format } from "@/lib/stillframe/types";
 import { cn } from "@/lib/utils";
-import { adminTemplatesKey, audienceLabel, TemplateThumb } from "./templates.index";
+import { adminTemplatesKey, audienceLabel, TemplateThumb } from "@/components/admin/TemplateAdminBits";
 
 export const Route = createFileRoute("/_authenticated/app/admin/templates/$id")({
   head: () => ({ meta: [

@@ -7,9 +7,9 @@ import { Archive, Copy, EyeOff, GripVertical, Lock, MoreHorizontal, Pencil, Play
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { fmtDate, PageTitle } from "@/components/admin/AdminShell";
-import { MediaImage } from "@/components/stillframe/MediaImage";
+import { adminTemplatesKey, audienceLabel, TemplateThumb } from "@/components/admin/TemplateAdminBits";
 import { adminTemplateAction, adminTemplateCreate, adminTemplateList, adminTemplateReorder } from "@/lib/stillframe/admin-templates.functions";
-import { docDuration, PLAN_AUDIENCE } from "@/lib/stillframe/template-doc";
+import { docDuration } from "@/lib/stillframe/template-doc";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/app/admin/templates/")({
@@ -28,14 +28,6 @@ export const Route = createFileRoute("/_authenticated/app/admin/templates/")({
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type Row = any;
 type Filter = "all" | "published" | "draft" | "archived";
-export const adminTemplatesKey = ["admin", "templates"] as const;
-const RATIO: Record<string, [number, number]> = { "9:16": [20, 36], "1:1": [34, 34], "16:9": [40, 23] };
-
-export function audienceLabel(a: string[] | null | undefined) {
-  if (!a?.length) return "All users";
-  return PLAN_AUDIENCE.filter(([k]) => a.includes(k)).map(([, l]) => l).join(", ");
-}
-
 function Updated({ at }: { at: string }) {
   const d = new Date(at);
   const today = new Date();
@@ -44,20 +36,6 @@ function Updated({ at }: { at: string }) {
   if (same(d, today)) return <>Today, {d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })}</>;
   if (same(d, y)) return <>Yesterday</>;
   return <>{fmtDate(at)}</>;
-}
-
-export function TemplateThumb({ row, size = 48 }: { row: Row; size?: number }) {
-  const [w, h] = RATIO[row.format ?? "9:16"] ?? [20, 36];
-  const k = size / 48;
-  const thumb: string | null = row.draft?.thumbnail_url ?? row.thumbnail_url;
-  const bg = row.draft?.style?.background_color ?? row.style?.background_color ?? "#1D1D1F";
-  return (
-    <div className="flex shrink-0 items-center justify-center rounded-sm bg-canvas" style={{ width: size, height: size }}>
-      <span className="relative block overflow-hidden rounded-[2px]" style={{ width: w * k, height: h * k, background: bg }}>
-        {thumb && !thumb.startsWith("/") && <MediaImage path={thumb} alt="" className="absolute inset-0 h-full w-full object-cover" />}
-      </span>
-    </div>
-  );
 }
 
 function StatusPill({ status }: { status: string }) {
