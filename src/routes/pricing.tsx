@@ -3,7 +3,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Check, Clock } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
-import { COMPARE, FAQ, PLANS, TRIAL, YEARLY_LABEL, priceFor, signupHref, type Billing } from "@/lib/stillframe/plans-config";
+import { CheckoutDialog, type CheckoutTarget } from "@/components/billing/CheckoutDialog";
+import { currentWorkspaceId } from "@/lib/stillframe/billing";
+import { COMPARE, FAQ, PLANS, TRIAL, YEARLY_LABEL, priceFor, signupHref, type Billing, type PlanConfig } from "@/lib/stillframe/plans-config";
 
 export const Route = createFileRoute("/pricing")({
   head: () => ({
@@ -31,7 +33,19 @@ function CellView({ v }: { v: string | boolean }) {
 function Pricing() {
   const [billing, setBilling] = useState<Billing>("monthly");
   const [open, setOpen] = useState<number | null>(0);
+  const [checkout, setCheckout] = useState<CheckoutTarget | null>(null);
   const cols = ["Free trial", ...PLANS.map((p) => p.name)];
+
+  // Signed-in users pay right away and the workspace switches to the plan; visitors sign up first.
+  async function choose(p: PlanConfig) {
+    const ws = await currentWorkspaceId();
+    if (!ws) {
+      window.location.href = signupHref(p, billing);
+      return;
+    }
+    const key = billing === "yearly" && p.yearly != null ? `${p.id}_yearly` : `${p.id}_monthly`;
+    setCheckout({ priceId: key, ws });
+  }
 
   return (
     <SiteShell>
@@ -64,7 +78,7 @@ function Pricing() {
                   <div className="pr-tier-top"><h3>{p.name}</h3><p>{p.tagline}</p></div>
                   <div className="pr-price"><b>{pr.price}</b><span>{pr.per}</span></div>
                   <span className="pr-note">{pr.note}</span>
-                  <a href={signupHref(p, billing)} className={`pr-btn ${pop ? "pri" : "sec"} full`}>Choose {p.name}</a>
+                  <button type="button" onClick={() => void choose(p)} className={`pr-btn ${pop ? "pri" : "sec"} full`}>Choose {p.name}</button>
                   <ul>{p.features.map((f) => <li key={f}><Tick /><span>{f}</span></li>)}</ul>
                 </article>
               );
@@ -123,6 +137,7 @@ function Pricing() {
           </div>
         </section>
       </div>
+      <CheckoutDialog checkout={checkout} onClose={() => setCheckout(null)} />
     </SiteShell>
   );
 }

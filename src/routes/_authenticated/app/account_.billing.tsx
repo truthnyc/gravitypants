@@ -6,8 +6,6 @@ import { AccountTabs } from "@/components/billing/AccountTabs";
 import { TopUpCard } from "@/components/billing/TopUp";
 import { BillingHelp } from "@/components/billing/BillingHelp";
 import { type ExportStatus, isPaid, money, planName, statusLine, useBilling, useExportStatus, useManageBilling, usePlans, useRefreshBilling } from "@/lib/stillframe/billing";
-import { trialLabel } from "@/lib/stillframe/signup-choice";
-import { useSignupChoice } from "@/lib/stillframe/use-signup-choice";
 
 export const Route = createFileRoute("/_authenticated/app/account_/billing")({
   validateSearch: z.object({ checkout: z.string().optional() }),
