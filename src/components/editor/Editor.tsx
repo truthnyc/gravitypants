@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Copy, Trash2 } from "lucide-react";
+import { Copy, Pause, Play, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { framePayloadFromPhoto, logoFromBrandKit, useBrandKit, useUpdateBrandKit, type EditorDoc } from "@/lib/stillframe/data";
@@ -23,11 +23,10 @@ import { FrameRail } from "./FrameRail";
 import { Inspector, type InspectorActions } from "./Inspector";
 import { Stage } from "./Stage";
 import { Timeline } from "./Timeline";
-import { useAutosave, useEditorDoc, useRenderAssets, type ElementKey } from "./use-editor";
+import { ELEMENT_META, useAutosave, useEditorDoc, useRenderAssets, type ElementKey } from "./use-editor";
 import { cn } from "@/lib/utils";
 import { Drawer, DrawerContent, DrawerTitle } from "@/components/ui/drawer";
 import { MobileFrameStrip, MobileToolBar } from "./MobileEditorControls";
-import { Play, Pause } from "lucide-react";
 
 const NEW_HEADLINE: TextSettings = {
   text: "",

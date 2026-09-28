@@ -1,7 +1,7 @@
 import { getWorkspaceId } from "@/lib/stillframe/workspace";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { AlertCircle, Check, ChevronDown, ChevronLeft, Download, Film, Image as ImageIcon, LayoutGrid } from "lucide-react";
+import { AlertCircle, Check, ChevronDown, ChevronLeft, Download, Film, Image as ImageIcon, LayoutGrid, Plus } from "lucide-react";
 import { zipSync } from "fflate";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,7 @@ import { ExportCancelled, exportGif, exportMp4, isOutOfMemory, killFFmpeg, type 
 import { cn } from "@/lib/utils";
 import { fetchExportStatus, useExportStatus, useRefreshBilling } from "@/lib/stillframe/billing";
 import { PlanCards } from "@/components/billing/PlanCards";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 
 type GifSize = "full" | "half" | "small";
 type Target = { key: string; name: string; slug: string; format: Format; width: number; height: number };
@@ -68,6 +69,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
   const [gColors, setGColors] = useState<GifColors>("best");
   const [gFps, setGFps] = useState(25);
   const [gLoop, setGLoop] = useState<"forever" | "once">("forever");
+  const [gifSheet, setGifSheet] = useState(false);
 
   const targets: Target[] = useMemo(() => {
     const list: Target[] = CHANNELS.filter((c) => selected.has(c.id)).map((c) => ({
@@ -277,12 +279,12 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
     });
 
   return (
-    <div className="flex min-h-screen flex-col bg-canvas">
+    <div className="flex min-h-dvh flex-col bg-canvas">
       <ExportHeader id={project.id} name={project.name} />
-      <main className="mx-auto grid w-full max-w-[1360px] flex-1 grid-cols-[1fr_360px] gap-8 px-8 pb-16 pt-8">
+      <main className="mx-auto grid w-full max-w-[1360px] flex-1 grid-cols-1 gap-6 px-4 pb-40 pt-6 sm:px-8 lg:grid-cols-[1fr_360px] lg:gap-8 lg:pb-16 lg:pt-8">
         <section className="min-w-0">
-          <h1 className="text-[22px] font-bold tracking-[-0.02em]">Where will this ad play?</h1>
-          <div className="mt-5 grid grid-cols-4 gap-4">
+          <h1 className="text-[30px] font-bold leading-tight lg:text-[22px] lg:tracking-[-0.02em]">Where will this ad play?</h1>
+          <div className="mt-5 grid grid-cols-1 overflow-hidden rounded-sm border bg-card lg:grid-cols-4 lg:gap-4 lg:overflow-visible lg:border-0 lg:bg-transparent">
             {CHANNELS.map((c) => (
               <ChannelCard
                 key={c.id}
@@ -322,8 +324,8 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
           <PreviousExports projectId={project.id} version={historyVersion} />
         </section>
 
-        <aside className="space-y-4">
-          <div className="rounded-sm bg-card p-5 shadow-card">
+        <aside className="space-y-5 lg:space-y-4">
+          <div className="hidden rounded-sm bg-card p-5 shadow-card lg:block">
             <div className="text-[30px] font-bold leading-none tracking-[-0.02em] nums">
               {files.length} {files.length === 1 ? "file" : "files"}
             </div>
@@ -351,7 +353,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
           )}
 
           {gif && (
-            <Group label="GIF quality">
+            <Group label="GIF quality" className="hidden lg:block">
               <div className="space-y-3">
                 <Sub label="Size">
                   <Seg value={gSize} onChange={setGSize} options={[{ v: "full", l: "Full", s: "same as video" }, { v: "half", l: "Half" }, { v: "small", l: "Small", s: "480 px wide" }]} />
@@ -370,7 +372,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
             </Group>
           )}
 
-          {exportStatus && !exportStatus.allowed ? (
+          <div className="hidden lg:block">{exportStatus && !exportStatus.allowed ? (
             <Button size="main" className="w-full" onClick={() => setPlanSheet(exportStatus.reason ?? "no_plan")}>
               Choose a Plan to Export
             </Button>
@@ -379,9 +381,20 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
               {!images || !fontsReady ? "Getting ready…" : `Export ${files.length} ${files.length === 1 ? "File" : "Files"}`}
             </Button>
           )}
-          {blocked && <p className="text-center text-[12px] text-destructive">Add a photo to every frame to export.</p>}
+          {blocked && <p className="text-center text-[12px] text-destructive">Add a photo to every frame to export.</p>}</div>
+          {gif && <button type="button" className="flex h-14 w-full items-center justify-between rounded-sm bg-card px-4 text-left shadow-card lg:hidden" onClick={() => setGifSheet(true)}><span><span className="block text-[14px] font-semibold">GIF quality</span><span className="text-[12px] text-secondary-text">{gSize === "full" ? "Full size" : gSize === "half" ? "Half size" : "480 px wide"} · {gColors} · {gFps} fps · {gLoop}</span></span><ChevronDown className="size-5 -rotate-90 text-icon" strokeWidth={1.7} /></button>}
         </aside>
       </main>
+
+      <div className="fixed inset-x-0 bottom-0 z-30 bg-card px-4 pt-3 shadow-popover safe-bottom hairline-t lg:hidden">
+        <div className="mb-3 grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-3"><strong className="text-[22px] nums">{files.length} {files.length === 1 ? "file" : "files"}</strong><span className="truncate text-[13px] text-secondary-text nums">{videos} videos + {gifs} GIFs · {formatSeconds(seconds)} sec</span></div>
+        {exportStatus && !exportStatus.allowed ? <Button size="main" className="mb-3 min-h-12 w-full text-[16px]" onClick={() => setPlanSheet(exportStatus.reason ?? "no_plan")}>Choose a Plan to Export</Button> : <Button size="main" className="mb-3 min-h-12 w-full text-[16px]" disabled={!files.length || blocked || !images || !fontsReady || running} onClick={() => void start()}><Download strokeWidth={1.7} />{!images || !fontsReady ? "Getting ready…" : `Export ${files.length} ${files.length === 1 ? "File" : "Files"}`}</Button>}
+        {blocked && <p className="pb-2 text-center text-[12px] text-destructive">Add a photo to every frame to export.</p>}
+      </div>
+
+      <Drawer open={gifSheet} onOpenChange={setGifSheet} shouldScaleBackground={false}>
+        <DrawerContent className="lg:hidden"><DrawerHeader className="grid grid-cols-[1fr_auto] items-center text-left"><DrawerTitle>GIF quality</DrawerTitle><button type="button" className="font-semibold text-link" onClick={() => setGifSheet(false)}>Done</button></DrawerHeader><div className="space-y-5 overflow-y-auto px-4 pb-6"><Sub label="Size"><Seg value={gSize} onChange={setGSize} options={[{ v: "full", l: "Full", s: "same as video" }, { v: "half", l: "Half" }, { v: "small", l: "Small", s: "480 px wide" }]} /></Sub><Sub label="Colors"><Seg value={gColors} onChange={setGColors} options={[{ v: "best", l: "Best", s: "smooth gradients" }, { v: "balanced", l: "Balanced" }, { v: "smallest", l: "Smallest file" }]} /></Sub><Sub label="Frame rate"><Seg value={gFps} onChange={setGFps} options={[{ v: 25, l: "Smooth", s: "25 fps" }, { v: 15, l: "Light", s: "15 fps" }, { v: 10, l: "Minimal", s: "10 fps" }]} /></Sub><Sub label="Loop"><Seg value={gLoop} onChange={setGLoop} options={[{ v: "forever", l: "Forever" }, { v: "once", l: "Once" }]} /></Sub><p className="text-[12px] text-secondary-text">Full-size GIFs are large files. Pick a smaller size for email.</p></div></DrawerContent>
+      </Drawer>
 
       <Dialog open={!!planSheet} onOpenChange={(o) => !o && setPlanSheet(null)}>
         <DialogContent className="max-w-[900px]">
