@@ -154,11 +154,15 @@ export const createPortalSession = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<{ url: string } | { error: string }> => {
     const { data: isAdmin } = await context.supabase.rpc("is_workspace_admin", { _ws: data.workspaceId });
     if (!isAdmin) return { error: "Only the workspace owner or an admin can change billing." };
+    const { data: source } = await context.supabase.rpc("billing_source" as never, { _ws: data.workspaceId } as never);
+    // Manage the subscription that actually covers this workspace, even when another one pays for it.
+    const payer = (source as string | null) ?? data.workspaceId;
     const { data: billing } = await context.supabase
       .from("workspace_billing")
       .select("stripe_customer_id")
-      .eq("workspace_id", data.workspaceId)
+      .eq("workspace_id", payer)
       .maybeSingle();
+
     if (!billing?.stripe_customer_id) return { error: "There's no billing to manage yet. Pick a plan first." };
     try {
       const stripe = createStripeClient(data.environment);
