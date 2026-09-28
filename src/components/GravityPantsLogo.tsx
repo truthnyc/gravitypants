@@ -13,9 +13,11 @@ const WORDMARK_STYLE = {
 export function GravityPantsLogo({
   size = 26,
   showWordmark = false,
+  wordmarkSize,
 }: {
   size?: number;
   showWordmark?: boolean;
+  wordmarkSize?: number;
 }) {
   const maskId = useId();
   return (
@@ -51,7 +53,7 @@ export function GravityPantsLogo({
           </g>
         </g>
       </svg>
-      {showWordmark && <span style={WORDMARK_STYLE}>Gravity Pants</span>}
+      {showWordmark && <span style={wordmarkSize ? { ...WORDMARK_STYLE, fontSize: wordmarkSize } : WORDMARK_STYLE}>Gravity Pants</span>}
     </span>
   );
 }
