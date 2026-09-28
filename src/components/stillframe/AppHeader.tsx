@@ -23,9 +23,14 @@ export function AppHeader() {
   return (
     <header className="sticky top-0 z-30 bg-card/90 backdrop-blur-xl hairline-b safe-top">
       <div className="mx-auto flex h-[60px] items-center gap-6 px-4 sm:px-6">
-        <Link to="/app/ads" className="flex items-center gap-2.5 rounded-lg" aria-label="Gravity Pants home">
+        <Link to="/app/ads" className="flex shrink-0 items-center gap-2.5 rounded-lg" aria-label="Gravity Pants home">
           <GravityPantsLogo size={26} showWordmark />
         </Link>
+
+        <div className="hidden min-w-0 sm:block">
+          <WorkspaceSwitcher />
+        </div>
+
 
         <nav className="hidden items-center gap-1 lg:flex">
           {navItems.map((item) => (
