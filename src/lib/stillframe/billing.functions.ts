@@ -107,11 +107,15 @@ export const createTopUpSession = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const { data: member } = await supabase.rpc("is_workspace_admin", { _ws: data.workspaceId });
     if (!member) return { error: "Only the workspace owner or an admin can change billing." };
+    // Extra exports belong to the plan that covers this workspace, so the pack is shared.
+    const { data: source } = await supabase.rpc("billing_source" as never, { _ws: data.workspaceId } as never);
+    const payer = (source as string | null) ?? data.workspaceId;
     const { data: billing } = await supabase
       .from("workspace_billing")
       .select("stripe_customer_id")
-      .eq("workspace_id", data.workspaceId)
+      .eq("workspace_id", payer)
       .maybeSingle();
+
     const { data: u } = await supabase.auth.getUser();
     try {
       const stripe = createStripeClient(data.environment);
