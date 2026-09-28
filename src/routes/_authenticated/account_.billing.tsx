@@ -4,7 +4,8 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { AccountTabs } from "@/components/billing/AccountTabs";
 import { TopUpCard } from "@/components/billing/TopUp";
-import { isPaid, money, planName, statusLine, useBilling, useExportStatus, useManageBilling, usePlans, useRefreshBilling } from "@/lib/stillframe/billing";
+import { BillingHelp } from "@/components/billing/BillingHelp";
+import { type ExportStatus, isPaid, money, planName, statusLine, useBilling, useExportStatus, useManageBilling, usePlans, useRefreshBilling } from "@/lib/stillframe/billing";
 
 export const Route = createFileRoute("/_authenticated/account_/billing")({
   validateSearch: z.object({ checkout: z.string().optional() }),
@@ -120,6 +121,19 @@ function BillingPage() {
       </section>
 
       <TopUpCard extras={status?.extras ?? billing?.extra_exports} />
+      <BillingHelp />
     </main>
   );
+}
+
+function longDate(s: string | null | undefined) {
+  return s ? new Date(s).toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" }) : "—";
+}
+
+function exportsLeft(st: ExportStatus | null | undefined): string {
+  if (!st) return "—";
+  const extras = st.extras ?? 0;
+  const extra = extras > 0 ? ` + ${extras} extra` : "";
+  if (st.limit == null) return st.allowed ? `Unlimited${extra}` : extras > 0 ? `${extras} extra` : "None — pick a plan";
+  return `${Math.max(0, st.limit - (st.used ?? 0))} of ${st.limit}${extra}`;
 }
