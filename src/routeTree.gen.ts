@@ -19,6 +19,7 @@ import { Route as SigninRouteImport } from './routes/signin'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as AuthenticatedAppRouteRouteImport } from './routes/_authenticated/app/route'
 import { Route as InviteTokenRouteImport } from './routes/invite.$token'
+import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app/index'
 import { Route as AuthenticatedAppAccountRouteImport } from './routes/_authenticated/app/account'
 import { Route as AuthenticatedAppAdminRouteRouteImport } from './routes/_authenticated/app/admin/route'
 import { Route as AuthenticatedAppAdsRouteImport } from './routes/_authenticated/app/ads'
@@ -90,6 +91,11 @@ const InviteTokenRoute = InviteTokenRouteImport.update({
   id: '/invite/$token',
   path: '/invite/$token',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAppIndexRoute = AuthenticatedAppIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAppRouteRoute,
 } as any)
 const AuthenticatedAppAccountRoute = AuthenticatedAppAccountRouteImport.update({
   id: '/account',
@@ -234,6 +240,7 @@ export interface FileRoutesByFullPath {
   '/app/templates': typeof AuthenticatedAppTemplatesRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
   '/api/public/trial-reminders': typeof ApiPublicTrialRemindersRoute
+  '/app/': typeof AuthenticatedAppIndexRoute
   '/app/account/billing': typeof AuthenticatedAppAccountBillingRoute
   '/app/account/members': typeof AuthenticatedAppAccountMembersRoute
   '/app/admin/admins': typeof AuthenticatedAppAdminAdminsRoute
@@ -257,7 +264,6 @@ export interface FileRoutesByTo {
   '/reset': typeof ResetRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
-  '/app': typeof AuthenticatedAppRouteRouteWithChildren
   '/invite/$token': typeof InviteTokenRoute
   '/app/account': typeof AuthenticatedAppAccountRoute
   '/app/ads': typeof AuthenticatedAppAdsRoute
@@ -266,6 +272,7 @@ export interface FileRoutesByTo {
   '/app/templates': typeof AuthenticatedAppTemplatesRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
   '/api/public/trial-reminders': typeof ApiPublicTrialRemindersRoute
+  '/app': typeof AuthenticatedAppIndexRoute
   '/app/account/billing': typeof AuthenticatedAppAccountBillingRoute
   '/app/account/members': typeof AuthenticatedAppAccountMembersRoute
   '/app/admin/admins': typeof AuthenticatedAppAdminAdminsRoute
@@ -301,6 +308,7 @@ export interface FileRoutesById {
   '/_authenticated/app/templates': typeof AuthenticatedAppTemplatesRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
   '/api/public/trial-reminders': typeof ApiPublicTrialRemindersRoute
+  '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
   '/_authenticated/app/account_/billing': typeof AuthenticatedAppAccountBillingRoute
   '/_authenticated/app/account_/members': typeof AuthenticatedAppAccountMembersRoute
   '/_authenticated/app/admin/admins': typeof AuthenticatedAppAdminAdminsRoute
@@ -336,6 +344,7 @@ export interface FileRouteTypes {
     | '/app/templates'
     | '/api/public/cleanup-exports'
     | '/api/public/trial-reminders'
+    | '/app/'
     | '/app/account/billing'
     | '/app/account/members'
     | '/app/admin/admins'
@@ -359,7 +368,6 @@ export interface FileRouteTypes {
     | '/reset'
     | '/signin'
     | '/signup'
-    | '/app'
     | '/invite/$token'
     | '/app/account'
     | '/app/ads'
@@ -368,6 +376,7 @@ export interface FileRouteTypes {
     | '/app/templates'
     | '/api/public/cleanup-exports'
     | '/api/public/trial-reminders'
+    | '/app'
     | '/app/account/billing'
     | '/app/account/members'
     | '/app/admin/admins'
@@ -402,6 +411,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/templates'
     | '/api/public/cleanup-exports'
     | '/api/public/trial-reminders'
+    | '/_authenticated/app/'
     | '/_authenticated/app/account_/billing'
     | '/_authenticated/app/account_/members'
     | '/_authenticated/app/admin/admins'
@@ -507,6 +517,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/invite/$token'
       preLoaderRoute: typeof InviteTokenRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/app/': {
+      id: '/_authenticated/app/'
+      path: '/'
+      fullPath: '/app/'
+      preLoaderRoute: typeof AuthenticatedAppIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRouteRoute
     }
     '/_authenticated/app/account': {
       id: '/_authenticated/app/account'
@@ -696,6 +713,7 @@ interface AuthenticatedAppRouteRouteChildren {
   AuthenticatedAppBrandRoute: typeof AuthenticatedAppBrandRoute
   AuthenticatedAppHelpRoute: typeof AuthenticatedAppHelpRoute
   AuthenticatedAppTemplatesRoute: typeof AuthenticatedAppTemplatesRoute
+  AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
   AuthenticatedAppAccountBillingRoute: typeof AuthenticatedAppAccountBillingRoute
   AuthenticatedAppAccountMembersRoute: typeof AuthenticatedAppAccountMembersRoute
   AuthenticatedAppAdIdEditRoute: typeof AuthenticatedAppAdIdEditRoute
@@ -709,6 +727,7 @@ const AuthenticatedAppRouteRouteChildren: AuthenticatedAppRouteRouteChildren = {
   AuthenticatedAppBrandRoute: AuthenticatedAppBrandRoute,
   AuthenticatedAppHelpRoute: AuthenticatedAppHelpRoute,
   AuthenticatedAppTemplatesRoute: AuthenticatedAppTemplatesRoute,
+  AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
   AuthenticatedAppAccountBillingRoute: AuthenticatedAppAccountBillingRoute,
   AuthenticatedAppAccountMembersRoute: AuthenticatedAppAccountMembersRoute,
   AuthenticatedAppAdIdEditRoute: AuthenticatedAppAdIdEditRoute,
