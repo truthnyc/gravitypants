@@ -94,7 +94,7 @@ export function DropZone({ spacious = false }: { spacious?: boolean }) {
       <input
         ref={fileInput}
         type="file"
-        accept="image/jpeg,image/png,image/webp,image/heic"
+        accept="image/*"
         multiple
         className="hidden"
         onChange={(event) => {

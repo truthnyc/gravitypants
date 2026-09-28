@@ -49,7 +49,7 @@ function BillingPage() {
   const limited = paid && status?.limit != null;
 
   return (
-    <main className="mx-auto flex max-w-[640px] flex-col gap-5 px-8 py-10">
+    <main className="mx-auto flex max-w-[640px] flex-col gap-5 px-4 py-6 sm:px-8 sm:py-10">
       <h1 className="text-[28px] font-bold tracking-[-0.02em]">Account</h1>
       <AccountTabs />
 
@@ -59,7 +59,7 @@ function BillingPage() {
           <p className="mt-1 text-[14px] text-secondary-text">
             Your plan is active and exporting is unlocked. A receipt is on its way to your inbox.
           </p>
-          <div className="mt-4 flex gap-2">
+          <div className="mt-4 flex flex-wrap gap-2">
             <Button asChild><Link to="/">Go to Your Ads</Link></Button>
             <Button variant="plain" onClick={() => setThanks(false)}>Close</Button>
           </div>
@@ -67,7 +67,7 @@ function BillingPage() {
       )}
 
       <section className="rounded-sm bg-card p-6 shadow-card">
-        <div className="flex items-baseline justify-between">
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
           <h2 className="text-[17px] font-semibold">{billing ? (paid ? planName(billing.plan) : "Free trial") : " "}</h2>
           {paid && plan && (
             <span className="text-[15px] font-semibold nums">
@@ -97,7 +97,7 @@ function BillingPage() {
           </div>
         )}
 
-        <div className="mt-6 flex gap-2">
+        <div className="mt-6 flex flex-wrap gap-2">
           <Button asChild variant={paid ? "plain" : "default"}>
             <Link to="/pricing">{paid ? "Change Plan" : "Pick a Plan"}</Link>
           </Button>

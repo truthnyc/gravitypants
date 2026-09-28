@@ -12,15 +12,18 @@ const ICONS: Record<ElementKey, typeof Type> = { photo: ImageIcon, headline: Typ
 export function MobileFrameStrip({ doc, format, frameIndex, images, version, uploading, onSelect, onReorder, onAddFiles }: { doc: EditorDoc; format: Format; frameIndex: number; images: Map<string, HTMLImageElement>; version: number; uploading: boolean; onSelect: (i: number) => void; onReorder: (from: number, to: number) => void; onAddFiles: (files: File[]) => void }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const hold = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const active = useRef<number | null>(null);
+  const moved = useRef(false);
   const [dragging, setDragging] = useState<number | null>(null);
   const clear = () => { if (hold.current) clearTimeout(hold.current); hold.current = null; };
+  const stop = () => { clear(); active.current = null; setDragging(null); };
   return <nav aria-label="Frames" className="flex shrink-0 gap-3 overflow-x-auto bg-rail px-4 py-3 hairline-t hairline-b lg:hidden">
-    {doc.frames.map((frame, i) => <button key={frame.id} type="button" aria-label={`Frame ${i + 1}`} onClick={() => onSelect(i)} onPointerDown={() => { clear(); hold.current = setTimeout(() => setDragging(i), 450); }} onPointerUp={() => { clear(); setDragging(null); }} onPointerCancel={() => { clear(); setDragging(null); }} onPointerEnter={() => { if (dragging !== null && dragging !== i) { onReorder(dragging, i); setDragging(i); } }} className="w-[58px] shrink-0 touch-pan-x">
+    {doc.frames.map((frame, i) => <button key={frame.id} data-frame-index={i} type="button" aria-label={`Frame ${i + 1}`} onClick={(e) => { if (moved.current) { e.preventDefault(); moved.current = false; return; } onSelect(i); }} onPointerDown={(e) => { clear(); moved.current = false; e.currentTarget.setPointerCapture(e.pointerId); hold.current = setTimeout(() => { active.current = i; setDragging(i); navigator.vibrate?.(20); }, 450); }} onPointerMove={(e) => { if (active.current === null) return; e.preventDefault(); const hit = document.elementFromPoint(e.clientX, e.clientY)?.closest<HTMLElement>("[data-frame-index]"); const to = Number(hit?.dataset.frameIndex); if (Number.isInteger(to) && to !== active.current) { onReorder(active.current, to); active.current = to; setDragging(to); moved.current = true; } }} onPointerUp={stop} onPointerCancel={stop} className="w-[58px] shrink-0 touch-pan-x select-none">
       <span className={cn("relative block h-[100px] w-[56px] overflow-hidden rounded-sm bg-control-fill", i === frameIndex && "ring-2 ring-primary ring-offset-2 ring-offset-rail", dragging === i && "opacity-60")}><FrameThumb doc={doc} index={i} format={format} images={images} version={version} width={112} className="h-full w-full" /><span className="absolute left-1 top-1 flex size-5 items-center justify-center rounded-full bg-foreground/75 text-[11px] font-semibold text-background nums">{i + 1}</span></span>
       <span className="mt-1 block text-center text-[13px] text-secondary-text nums">{frame.duration_sec.toFixed(1)}s</span>
     </button>)}
     <button type="button" onClick={() => inputRef.current?.click()} disabled={uploading} className="flex h-[100px] w-[56px] shrink-0 items-center justify-center rounded-sm border-2 border-dashed border-placeholder-border text-icon" aria-label="Add photos"><Plus className={cn("size-6", uploading && "animate-pulse")} strokeWidth={1.7} /></button>
-    <input ref={inputRef} type="file" accept={ACCEPTED_IMAGE_TYPES.join(",")} multiple className="hidden" onChange={(e) => { const files = Array.from(e.target.files ?? []); e.target.value = ""; if (files.length) onAddFiles(files); }} />
+    <input ref={inputRef} type="file" accept="image/*" multiple className="hidden" onChange={(e) => { const files = Array.from(e.target.files ?? []); e.target.value = ""; if (files.length) onAddFiles(files); }} />
   </nav>;
 }
 

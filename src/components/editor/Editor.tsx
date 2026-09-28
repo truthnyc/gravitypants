@@ -494,7 +494,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
               selected={selected}
               images={images}
               version={version}
-              onSelect={(el) => { setSelected(el); setMobileSheetOpen(true); }}
+              onSelect={(el) => { setSelected(el); if (window.matchMedia("(max-width: 1023px)").matches) setMobileSheetOpen(true); }}
               onMove={moveElement}
               onText={setText}
               adjusting={adjusting && selected === "photo"}
