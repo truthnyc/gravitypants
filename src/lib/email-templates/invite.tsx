@@ -39,25 +39,23 @@ export const InviteEmail = ({
     <Head>
       <style>{brandDarkModeCss}</style>
     </Head>
-    <Preview>You've been invited to join {siteName}</Preview>
+    <Preview>You've been invited to {siteName}</Preview>
     <Body style={brandMain}>
       <Container style={brandContainer}>
         <EmailHeader />
         <Heading style={brandH1}>You've been invited</Heading>
         <Text style={brandText}>
-          You've been invited to join{' '}
+          You've been invited to{' '}
           <Link href={siteUrl} style={brandLink}>
             <strong>{siteName}</strong>
           </Link>
-          . Click the button below to accept the invitation and create your
-          account.
+          . Click the button below to accept the invite and set up your account:
         </Text>
         <Button className="dm-btn" style={brandButton} href={confirmationUrl}>
-          Accept Invitation
+          Accept Invite
         </Button>
         <Text style={brandFooter}>
-          If you weren't expecting this invitation, you can safely ignore this
-          email.
+          If you weren't expecting this invite, you can safely ignore this email.
         </Text>
       </Container>
     </Body>

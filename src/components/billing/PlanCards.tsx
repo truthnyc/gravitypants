@@ -10,15 +10,19 @@ import { createCheckoutSession } from "@/lib/stillframe/billing.functions";
 import { currentWorkspaceId, isPaid, money, useBilling, useManageBilling, usePlans, type Plan } from "@/lib/stillframe/billing";
 import { cn } from "@/lib/utils";
 
-const FEATURE: Record<string, string> = {
-  simple: "2 exports every month",
-  business: "Unlimited exports",
-  business_yearly: "Unlimited exports",
+const FEATURE: Record<string, string[]> = {
+  simple: ["10 exports every month", "1 seat"],
+  business: ["50 exports every month", "1 seat"],
+  business_yearly: ["50 exports every month", "1 seat"],
+  team: ["150 shared exports every month", "3 seats", "Shared brand kits and templates", "Priority support"],
+  team_yearly: ["150 shared exports every month", "3 seats", "Shared brand kits and templates", "Priority support"],
 };
 const CTA: Record<string, { label: string; variant: "plain" | "default" }> = {
   simple: { label: "Choose Simple", variant: "plain" },
   business: { label: "Choose Business", variant: "default" },
   business_yearly: { label: "Choose Yearly", variant: "plain" },
+  team: { label: "Choose Team", variant: "plain" },
+  team_yearly: { label: "Choose Team Yearly", variant: "plain" },
 };
 
 function Checkout({ priceId, workspaceId }: { priceId: string; workspaceId: string }) {
@@ -57,7 +61,7 @@ export function PlanCards({ compact = false }: { compact?: boolean }) {
 
   return (
     <>
-      <div className={cn("grid grid-cols-1 lg:grid-cols-3", compact ? "gap-3" : "gap-5")}>
+      <div className={cn("grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3", compact ? "gap-3" : "gap-5")}>
         {(plans ?? []).map((p) => {
           const current = paid && billing?.plan === p.id;
           const cta = CTA[p.id] ?? { label: `Choose ${p.name}`, variant: "plain" as const };
@@ -74,10 +78,14 @@ export function PlanCards({ compact = false }: { compact?: boolean }) {
                 <span className="text-[14px] text-secondary-text">/ {p.interval}</span>
               </div>
               <div className="my-4 hairline-b" />
-              <p className="flex items-center gap-2 text-[14px]">
-                <Check className="size-4 text-primary" strokeWidth={1.7} />
-                {FEATURE[p.id] ?? ""}
-              </p>
+              <div className="space-y-2">
+                {(FEATURE[p.id] ?? []).map((f) => (
+                  <p key={f} className="flex items-center gap-2 text-[14px]">
+                    <Check className="size-4 shrink-0 text-primary" strokeWidth={1.7} />
+                    {f}
+                  </p>
+                ))}
+              </div>
               <div className="flex-1" />
               <Button
                 variant={current ? "plain" : cta.variant}

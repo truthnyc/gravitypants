@@ -5,10 +5,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { getStripeEnvironment } from "@/lib/stripe";
 import { createPortalSession } from "./billing.functions";
 
-export type Plan = { id: string; name: string; price_id: string; amount_cents: number; interval: string; monthly_exports: number | null; sort_order: number };
+export type Plan = { id: string; name: string; price_id: string; amount_cents: number; interval: string; monthly_exports: number | null; sort_order: number; seats?: number };
 export type Billing = {
   workspace_id: string;
-  plan: "trial" | "simple" | "business" | "business_yearly" | "none";
+  plan: "trial" | "simple" | "business" | "business_yearly" | "team" | "team_yearly" | "none";
   status: "trialing" | "active" | "past_due" | "canceled";
   trial_ends_at: string;
   current_period_start: string | null;
@@ -16,7 +16,7 @@ export type Billing = {
   cancel_at_period_end: boolean;
   stripe_customer_id: string | null;
 };
-export type ExportStatus = { allowed: boolean; reason: "no_plan" | "limit_reached" | "payment_problem" | "no_access" | null; used?: number; limit?: number; resets_at?: string | null };
+export type ExportStatus = { allowed: boolean; reason: "no_plan" | "limit_reached" | "payment_problem" | "no_access" | null; used?: number; limit?: number; resets_at?: string | null; watermark?: boolean };
 
 export const billingKey = ["billing"] as const;
 
@@ -75,7 +75,19 @@ export const trialDaysLeft = (b: Billing) => Math.max(0, Math.ceil((new Date(b.t
 const shortDate = (s: string | null) => (s ? new Date(s).toLocaleDateString(undefined, { day: "numeric", month: "short" }) : "");
 
 export function planName(id: string) {
-  return id === "simple" ? "Simple" : id === "business" ? "Business" : id === "business_yearly" ? "Business Yearly" : id === "trial" ? "Free trial" : "No plan";
+  return id === "simple"
+    ? "Simple"
+    : id === "business"
+      ? "Business"
+      : id === "business_yearly"
+        ? "Business Yearly"
+        : id === "team"
+          ? "Team"
+          : id === "team_yearly"
+            ? "Team Yearly"
+            : id === "trial"
+              ? "Free trial"
+              : "No plan";
 }
 
 export function statusLine(b: Billing): string {

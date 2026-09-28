@@ -1,15 +1,14 @@
 # Roadmap
 
-## Plans & pricing overhaul
-- [ ] Create Team plan in payments (team_monthly $175, team_yearly $1750)
-- [ ] Update plans table: simple 10 exports, business 50, business_yearly 50, team 150 shared
-- [ ] Trial: 7 days, 3 exports, watermarked exports
-- [ ] Watermark rendering in renderAt for trial workspaces
-- [ ] Update pricing page + PlanCards (4 plans, feature lists)
+## Plans & team workspaces
+- [x] Team plan in payments: team_monthly $175/mo, team_yearly $1,750/yr
+- [x] plans table: simple 10 exports, business 50, team 150 shared, seats column
+- [x] 7-day trial (3 exports, watermarked) — export_status, watermark in renderAt + ExportPage
+- [x] Trial copy updated (pricing, welcome/trial-ended emails)
+- [x] Team page (Account › Team): workspace list/switch, members, roles, remove, invite by email, pending invites resend/cancel
+- [x] Invite email template + accept flow at /invite/$token
+- [x] Create team workspace gated to Team plan
 
-## Team workspaces
-- [ ] workspace_invites table + RLS + grants
-- [ ] Members settings page: list, Change role, Remove, Invite by email, pending invites (Resend/Cancel)
-- [ ] Invite email with accept link; accept flow after sign-in
-- [ ] Create team workspace gated to Team plan (upgrade message → /pricing)
-- [ ] Mobile-friendly, existing design tokens
+## Outstanding
+- [ ] Publish (fixes email header on sent mail, activates lifecycle emails, syncs Team products to live)
+- [ ] Live-check checkout, export limits, Customer Portal after publish
