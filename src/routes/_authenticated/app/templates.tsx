@@ -34,12 +34,15 @@ const fail = (e: unknown) => toast.error(e instanceof Error && e.message ? e.mes
 function TemplatesPage() {
   const { data: access } = useTemplateAccess();
   const { data: isAdmin = false } = useCanEditKits();
+  const { data: isStaff = false } = useIsPlatformAdmin();
   const { data: me } = useMyUserId();
   const { data: templates = [], isLoading } = useTemplates();
   const [deleting, setDeleting] = useState<Template | null>(null);
   const remove = useDeleteTemplate();
-  const mine = templates.filter((t) => t.created_by === access?.userId);
-  const team = templates.filter((t) => t.visibility === "team" && t.created_by !== access?.userId);
+  const global = templates.filter((t) => t.visibility === "global");
+  const own = templates.filter((t) => t.visibility !== "global");
+  const mine = own.filter((t) => t.created_by === access?.userId);
+  const team = own.filter((t) => t.visibility === "team" && t.created_by !== access?.userId);
 
   return (
     <main className="mx-auto max-w-[960px] space-y-6 px-4 pb-16 pt-6 sm:px-8 sm:pt-8">
@@ -56,6 +59,17 @@ function TemplatesPage() {
           <Group title="My templates" list={mine} empty="No templates yet." canEdit={() => true} showShare={Boolean(access?.team)} onDelete={setDeleting} />
           {access?.team && (
             <Group title="Team templates" list={team} empty="Nobody has shared a template yet." canEdit={(t) => isAdmin || t.created_by === me} showShare onDelete={setDeleting} />
+          )}
+          {(global.length > 0 || isStaff) && (
+            <Group
+              title="Ready-made templates"
+              note="Made by Gravity Pants. Anyone can start an ad from these."
+              list={global}
+              empty="No ready-made templates yet."
+              canEdit={() => isStaff}
+              showShare={isStaff}
+              onDelete={setDeleting}
+            />
           )}
         </>
       )}
