@@ -81,7 +81,7 @@ export function AuthShell({ eyebrow, title, subtitle, children, mode = "signup",
   );
 }
 
-export function GoogleButton({ redirectTo }: { redirectTo: string }) {
+export function GoogleButton({ redirectTo, onStart }: { redirectTo: string; onStart?: () => void }) {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   return (
@@ -93,6 +93,7 @@ export function GoogleButton({ redirectTo }: { redirectTo: string }) {
         onClick={async () => {
           setBusy(true);
           setErr(null);
+          onStart?.();
           sessionStorage.setItem("sf-after-signin", redirectTo);
           try {
             const res = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin + "/signin" });

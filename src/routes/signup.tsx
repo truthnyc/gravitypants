@@ -96,7 +96,7 @@ function SignUp() {
       subtitle="Create your account and make a video ad in minutes. No editing skills needed."
       beforeForm={choice && <div className="auth-plan-chip">Selected: {planById(choice.plan).name} · ${choice.billing === "yearly" ? planById(choice.plan).yearly?.toLocaleString() : planById(choice.plan).monthly}/{choice.billing === "yearly" ? "year" : "month"} · <Link to="/pricing">Change</Link></div>}
     >
-      <GoogleButton redirectTo={target} />
+      <GoogleButton redirectTo={target} onStart={() => sessionStorage.setItem("gravity-pants:welcome", "1")} />
       <form onSubmit={submit} noValidate>
         <FieldGroup
           error={error}
