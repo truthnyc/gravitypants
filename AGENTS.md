@@ -30,3 +30,7 @@
 - Admin: `/admin` under `_authenticated/admin/` gated by `checkAdmin`; every admin read/action is a server fn in `src/lib/stillframe/admin.functions.ts` that checks `is_platform_admin()` before using the service-role client, and logs to `admin_audit_log` — never trust hidden buttons.
 - Support editing: time-boxed `support_sessions` rows grant write RLS via `has_support_session()`; a trigger logs each write. Other workspaces' ads open read-only in the normal editor.
 - Export history lives in the `exports` table (status/error/bytes) for the admin Exports list; files themselves stay in storage.
+- Price→plan mapping lives only in `src/lib/stillframe/plan-map.ts` (webhook, portal, tests share it); the `workspace_billing_plan_check` constraint must list every plan there — a missing value silently drops paid plans.
+- Billing reads/actions use the active workspace (`peekWorkspaceId()`), and new subscriptions are refused server-side when one is already active — plan changes only via Manage Billing.
+- Pre-release billing checks: `bun run test` (unit) and `bun run check:billing` (test-mode checkout per plan, portal, plan change, DB plan values).
+- AI calls go through `src/lib/ai/gateway.server.ts` (Responses, openai/gpt-6-astra, streamed, instructions via `system`); the billing helper is `diagnoseBilling` in `billing-help.functions.ts`, owners/admins only.

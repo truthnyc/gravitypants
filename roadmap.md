@@ -18,3 +18,11 @@
 - [x] workspace_billing.extra_exports + export_status/record_export spend extras after monthly limit
 - [x] Webhook credits 5 extras on completed one-time payment (idempotent)
 - [x] Top-up card on Account › Billing; extras shown on Export page; limit-reached sheet mentions top-up
+
+## Billing reliability
+- [x] Team plans saved correctly (database fix); duplicate test subscriptions removed
+- [x] Block buying a second plan; billing follows the active workspace
+- [x] Automated billing checks (unit + test-mode end-to-end)
+- [x] Billing helper (AI) on Account › Billing
+- [x] Billing page shows plan, renewal date, exports left; refreshes when you return from Manage Billing
+- [ ] Publish so the live site gets these fixes
