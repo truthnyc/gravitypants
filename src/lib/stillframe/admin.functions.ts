@@ -87,7 +87,7 @@ export type AdminClient = Awaited<ReturnType<typeof clientRows>>[number];
 export const checkAdmin = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data } = await (context as any).supabase.rpc("is_platform_admin");
+    const { data } = await (context as any).supabase.rpc("has_role", { _user_id: (context as any).userId, _role: "admin" });
     return { admin: data === true };
   });
 
@@ -326,10 +326,13 @@ export const adminAdmins = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const db = await adminDb(context as any);
     const users = await allUsers(db);
-    const { data } = await db.from("profiles").select("user_id, display_name").eq("is_platform_admin", true);
-    return ((data ?? []) as any[]).map((p) => {
-      const u = users.find((x) => x.id === p.user_id);
-      return { userId: p.user_id as string, email: u?.email ?? "", name: p.display_name as string | null, lastSignIn: u?.last_sign_in_at ?? null };
+    const { data: roles } = await db.from("user_roles").select("user_id").eq("role", "admin");
+    const ids = ((roles ?? []) as any[]).map((r) => r.user_id as string);
+    const { data } = ids.length ? await db.from("profiles").select("user_id, display_name").in("user_id", ids) : { data: [] };
+    return ids.map((id) => {
+      const u = users.find((x) => x.id === id);
+      const p = ((data ?? []) as any[]).find((x) => x.user_id === id);
+      return { userId: id, email: u?.email ?? "", name: (p?.display_name ?? null) as string | null, lastSignIn: u?.last_sign_in_at ?? null };
     });
   });
 
@@ -343,10 +346,12 @@ export const adminSetAdmin = createServerFn({ method: "POST" })
     const u = data.userId ? users.find((x) => x.id === data.userId) : users.find((x) => x.email.toLowerCase() === data.email?.toLowerCase());
     if (!u) throw new Error("No account uses that email. They need to sign up first.");
     if (!data.grant) {
-      const { count } = await db.from("profiles").select("user_id", { count: "exact", head: true }).eq("is_platform_admin", true);
+      const { count } = await db.from("user_roles").select("id", { count: "exact", head: true }).eq("role", "admin");
       if ((count ?? 0) <= 1) throw new Error("You can't remove the last admin.");
+      await db.from("user_roles").delete().eq("user_id", u.id).eq("role", "admin");
+    } else {
+      await db.from("user_roles").upsert({ user_id: u.id, role: "admin" }, { onConflict: "user_id,role" });
     }
-    await db.from("profiles").upsert({ user_id: u.id, is_platform_admin: data.grant }, { onConflict: "user_id" });
     await log(db, ctx.userId, data.grant ? "grant_admin" : "revoke_admin", null, u.email);
     return { ok: true };
   });
