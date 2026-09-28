@@ -49,9 +49,24 @@ async function syncSubscription(sub: any, env: StripeEnv, deleted = false) {
     const { data } = await db.from("workspace_billing").select("workspace_id").eq("stripe_customer_id", customer).maybeSingle();
     ws = data?.workspace_id;
   }
+  if (!ws && customer) {
+    // Portal changes or events racing checkout.session.completed: the Stripe
+    // customer was created with metadata.workspaceId, so read it from there.
+    try {
+      const { createStripeClient } = await import("@/lib/stripe.server");
+      const c: any = await createStripeClient(env).customers.retrieve(customer);
+      const candidate = !c?.deleted ? (c?.metadata?.workspaceId as string | undefined) : undefined;
+      if (candidate) {
+        const { data } = await db.from("workspace_billing").select("workspace_id").eq("workspace_id", candidate).maybeSingle();
+        ws = data?.workspace_id;
+      }
+    } catch (e) {
+      console.error("Customer lookup failed", customer, e);
+    }
+  }
   if (!ws) {
-    console.error("Subscription without workspace", sub.id);
-    return undefined;
+    // Throw so the webhook answers 400 and Stripe retries instead of dropping the sync.
+    throw new Error(`Subscription without workspace ${sub.id}`);
   }
   const item = sub.items?.data?.[0];
   const key = item?.price?.lookup_key || item?.price?.metadata?.lovable_external_id || "";
