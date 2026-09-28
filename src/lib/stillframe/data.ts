@@ -588,7 +588,20 @@ export function templateFromProject(p: ProjectWithFrames): TemplateSettings {
       logo_visible: f.logo_visible,
       // Photo style only — the picture itself is never saved.
       photo: Object.fromEntries(
-        (["fit", "focus", "zoom", "movement", "brightness", "darken_for_text", "background_color"] as const)
+        ([
+          "fit",
+          "focus",
+          "zoom",
+          "movement",
+          "movement_intensity",
+          "zoom_start",
+          "zoom_end",
+          "pan_x",
+          "pan_y",
+          "brightness",
+          "darken_for_text",
+          "background_color",
+        ] as const)
           .filter((k) => f.photo[k] !== undefined)
           .map((k) => [k, f.photo[k]]),
       ) as Frame["photo"],

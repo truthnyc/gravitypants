@@ -292,13 +292,29 @@ function drawPhoto(
 
   const e = easeInOut(clamp(u));
   const mv = photo.movement ?? "none";
+  const intensity = photo.movement_intensity ?? "standard";
+  const zoomTravel = intensity === "subtle" ? 0.04 : intensity === "dramatic" ? 0.14 : 0.08;
+  const panTravel = intensity === "subtle" ? 0.03 : intensity === "dramatic" ? 0.1 : 0.06;
   let zoom = 1;
   let pan = 0;
-  if (mv === "slow_zoom_in") zoom = 1 + 0.08 * e;
-  if (mv === "slow_zoom_out") zoom = 1.08 - 0.08 * e;
+  let panV = 0;
+  if (mv === "slow_zoom_in") zoom = 1 + zoomTravel * e;
+  if (mv === "slow_zoom_out") zoom = 1 + zoomTravel - zoomTravel * e;
   if (mv === "pan_left" || mv === "pan_right") {
-    zoom = 1.07;
-    pan = (mv === "pan_left" ? -1 : 1) * 0.06 * W * (e - 0.5);
+    zoom = 1 + panTravel + 0.01;
+    pan = (mv === "pan_left" ? -1 : 1) * panTravel * W * (e - 0.5);
+  }
+  if (mv === "custom") {
+    const zs = Math.max(1, Math.min(1.5, Number(photo.zoom_start ?? 1)));
+    const ze = Math.max(1, Math.min(1.5, Number(photo.zoom_end ?? 1)));
+    const px = Math.max(-1, Math.min(1, Number(photo.pan_x ?? 0)));
+    const py = Math.max(-1, Math.min(1, Number(photo.pan_y ?? 0)));
+    const travel = 0.12;
+    // headroom so panning never reveals the background edge
+    const pad = Math.max(Math.abs(px), Math.abs(py)) * (travel + 0.01);
+    zoom = zs + (ze - zs) * e + pad;
+    pan = px * travel * W * (e - 0.5);
+    panV = py * travel * H * (e - 0.5);
   }
 
   const iw = img.naturalWidth;
@@ -321,7 +337,7 @@ function drawPhoto(
   }
   const b = Number(photo.brightness ?? 0);
   if (b) ctx.filter = `brightness(${1 + b})`;
-  ctx.drawImage(img, x + pan, y, dw, dh);
+  ctx.drawImage(img, x + pan, y + panV, dw, dh);
   ctx.filter = "none";
 }
 
