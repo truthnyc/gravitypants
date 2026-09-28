@@ -517,36 +517,60 @@ export type Database = {
       templates: {
         Row: {
           created_at: string
-          created_by: string
+          created_by: string | null
+          description: string | null
+          format: string | null
           id: string
+          is_reusable: boolean
           name: string
           settings: Json
+          slides: Json
+          slug: string | null
+          sort_order: number
+          source: string
+          style: Json
           thumbnail_url: string | null
           updated_at: string
           visibility: string
-          workspace_id: string
+          workspace_id: string | null
         }
         Insert: {
           created_at?: string
-          created_by?: string
+          created_by?: string | null
+          description?: string | null
+          format?: string | null
           id?: string
+          is_reusable?: boolean
           name?: string
           settings?: Json
+          slides?: Json
+          slug?: string | null
+          sort_order?: number
+          source?: string
+          style?: Json
           thumbnail_url?: string | null
           updated_at?: string
           visibility?: string
-          workspace_id: string
+          workspace_id?: string | null
         }
         Update: {
           created_at?: string
-          created_by?: string
+          created_by?: string | null
+          description?: string | null
+          format?: string | null
           id?: string
+          is_reusable?: boolean
           name?: string
           settings?: Json
+          slides?: Json
+          slug?: string | null
+          sort_order?: number
+          source?: string
+          style?: Json
           thumbnail_url?: string | null
           updated_at?: string
           visibility?: string
-          workspace_id?: string
+          workspace_id?: string | null
         }
         Relationships: [
           {

@@ -102,7 +102,9 @@ export function SaveTemplateDialog({ project, open, onOpenChange }: { project: P
 export function TemplateThumb({ template, className }: { template: Template; className?: string }) {
   return (
     <div className={cn("flex items-center justify-center overflow-hidden rounded-sm bg-inspector", className)}>
-      {template.thumbnail_url ? (
+      {template.thumbnail_url?.startsWith("/") ? (
+        <img src={template.thumbnail_url} alt="" className="h-full w-full object-contain" />
+      ) : template.thumbnail_url ? (
         <MediaImage path={template.thumbnail_url} alt="" className="h-full w-full object-cover" />
       ) : (
         <LayoutTemplate className="size-6 text-icon" strokeWidth={1.7} />
@@ -125,8 +127,8 @@ export function StartFromDialog({
 }) {
   const { data: access } = useTemplateAccess();
   const { data: templates = [] } = useTemplates();
-  const ready = templates.filter((t) => t.visibility === "global");
-  const own = templates.filter((t) => t.visibility !== "global");
+  const ready = templates.filter((t) => t.visibility === "global" || t.source === "system");
+  const own = templates.filter((t) => t.visibility !== "global" && t.source !== "system");
   const mine = access?.paid ? own.filter((t) => t.created_by === access.userId) : [];
   const shared = access?.team
     ? own.filter((t) => t.visibility === "team" && t.created_by !== access.userId)
