@@ -423,7 +423,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
   if (!frame) return null;
 
   return (
-    <div className="flex h-full min-h-[calc(100dvh-31px)] flex-col overflow-hidden bg-canvas">
+    <div className="flex h-full flex-col overflow-hidden bg-canvas">
       <EditorHeader
         id={doc.project.id}
         name={doc.project.name}
