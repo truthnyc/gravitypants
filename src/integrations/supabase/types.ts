@@ -743,6 +743,7 @@ export type Database = {
       ensure_workspace: { Args: never; Returns: string }
       export_status: { Args: { _ws: string }; Returns: Json }
       has_support_session: { Args: { _ws: string }; Returns: boolean }
+      in_other_team: { Args: { _uid: string; _ws: string }; Returns: string }
       is_platform_admin: { Args: never; Returns: boolean }
       is_workspace_admin: { Args: { _ws: string }; Returns: boolean }
       is_workspace_member: { Args: { _ws: string }; Returns: boolean }
