@@ -739,6 +739,7 @@ export type Database = {
         Args: { _stamp: string; _ws: string }
         Returns: boolean
       }
+      delete_workspace: { Args: { _ws: string }; Returns: undefined }
       ensure_workspace: { Args: never; Returns: string }
       export_status: { Args: { _ws: string }; Returns: Json }
       has_support_session: { Args: { _ws: string }; Returns: boolean }

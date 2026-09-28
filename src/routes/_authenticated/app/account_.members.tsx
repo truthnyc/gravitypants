@@ -162,6 +162,39 @@ function MembersPage() {
     window.location.href = "/app/account/members";
   }
 
+  async function renameWorkspace() {
+    if (!current) return;
+    const name = window.prompt("New workspace name", current.name)?.trim();
+    if (!name || name === current.name) return;
+    const { error } = await supabase.from("workspaces").update({ name }).eq("id", ws);
+    if (error) toast.error("Couldn't rename the workspace.");
+    else {
+      toast.success("Workspace renamed");
+      refresh();
+    }
+  }
+
+  async function deleteWorkspace() {
+    if (!current) return;
+    const typed = window.prompt(
+      `This permanently deletes “${current.name}” with all its ads, photos, brand kits and templates, for everyone in it. Type the workspace name to confirm.`,
+    );
+    if (typed?.trim() !== current.name) {
+      if (typed != null) toast.error("The name didn't match, so nothing was deleted.");
+      return;
+    }
+    const { error } = await supabase.rpc("delete_workspace" as never, { _ws: ws } as never);
+    if (error) {
+      toast.error(error.message.includes("paid plan") || error.message.includes("only workspace") ? error.message + "." : "Couldn't delete the workspace.");
+      return;
+    }
+    const { data: auth } = await supabase.auth.getUser();
+    const next = workspaces?.find((w) => w.id !== ws);
+    if (auth.user && next) rememberWorkspaceId(auth.user.id, next.id);
+    toast.success("Workspace deleted");
+    window.location.href = "/app/ads";
+  }
+
   const seats = billing?.plan === "team" || billing?.plan === "team_yearly" ? 4 : 1;
 
   return (
@@ -189,6 +222,14 @@ function MembersPage() {
             </button>
           ))}
         </div>
+        {current && (isAdmin || current.role === "owner") && (
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Button variant="plain" onClick={() => void renameWorkspace()}>Rename “{current.name}”</Button>
+            {current.role === "owner" && (workspaces?.length ?? 0) > 1 && (
+              <Button variant="plain" className="text-destructive" onClick={() => void deleteWorkspace()}>Delete workspace</Button>
+            )}
+          </div>
+        )}
         <div className="mt-4">
           {isTeamPlan ? (
             <Button variant="plain" onClick={() => void createTeamWorkspace()} disabled={creating}>
