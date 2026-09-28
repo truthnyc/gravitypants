@@ -19,17 +19,31 @@ export function useMyWorkspaces() {
     queryKey: ["my-workspaces"],
     staleTime: 60_000,
     queryFn: async (): Promise<Workspace[]> => {
+      const { data: auth } = await supabase.auth.getUser();
+      const uid = auth.user?.id;
+      if (!uid) return [];
+      // Members of shared workspaces can read their teammates' rows too, so keep only our own.
       const { data, error } = await supabase
         .from("workspace_members")
         .select("workspace_id, role, workspaces(name)")
+        .eq("user_id", uid)
         .order("created_at");
       if (error) throw error;
-      return (data ?? []).map((r) => ({
-        id: r.workspace_id as string,
-        role: r.role as string,
-        name: (r.workspaces as unknown as { name: string } | null)?.name ?? "Workspace",
-      }));
+      const seen = new Set<string>();
+      const rows: Workspace[] = [];
+      for (const r of data ?? []) {
+        const id = r.workspace_id as string;
+        if (seen.has(id)) continue;
+        seen.add(id);
+        rows.push({
+          id,
+          role: r.role as string,
+          name: (r.workspaces as unknown as { name: string } | null)?.name ?? "Workspace",
+        });
+      }
+      return rows;
     },
+
   });
 }
 
