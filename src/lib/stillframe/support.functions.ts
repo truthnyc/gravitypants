@@ -52,7 +52,7 @@ export const submitTicket = createServerFn({ method: "POST" })
           fromEmail: u.user?.email ?? "",
           workspaceName: ws?.name ?? "",
           planName: b?.plan ?? "",
-          adUrl: data.adId ? `${data.origin}/ad/${data.adId}/edit` : undefined,
+           adUrl: data.adId ? `${data.origin}/app/ad/${data.adId}/edit` : undefined,
           attachmentUrl,
           ticketId: t.id,
         },

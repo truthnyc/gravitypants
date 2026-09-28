@@ -31,7 +31,7 @@ const Email = ({ name }: Props) => (
         <Text style={brandText}>
           Please update your card to keep exporting your videos and GIFs without interruption.
         </Text>
-        <Button style={brandButton} href="https://gravitypants.com/account/billing">
+        <Button style={brandButton} href="https://gravitypants.com/app/account/billing">
           Update Your Card
         </Button>
         <Text style={brandFooter}>

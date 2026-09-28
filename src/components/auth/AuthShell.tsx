@@ -4,13 +4,13 @@ import { lovable } from "@/integrations/lovable";
 import { cn } from "@/lib/utils";
 
 export function safeRedirect(r: unknown): string {
-  if (typeof r !== "string") return "/";
+  if (typeof r !== "string") return "/app/ads";
   try {
     const u = new URL(r, window.location.origin);
-    if (u.origin !== window.location.origin) return "/";
+    if (u.origin !== window.location.origin) return "/app/ads";
     return u.pathname + u.search + u.hash;
   } catch {
-    return "/";
+    return "/app/ads";
   }
 }
 

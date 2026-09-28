@@ -31,14 +31,14 @@ function SiteHeader() {
   const action = signedIn ? { to: "/app/ads" as const, label: "Open app" } : { to: "/signup" as const, label: "Start free" };
   return (
     <header className="site-header relative z-50 border-b border-site-line bg-site-page/90 safe-top">
-      <div className="mx-auto grid h-14 max-w-[1440px] grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-5 md:h-[72px] md:gap-10 md:px-8 lg:px-16 xl:px-24">
+      <div className="mx-auto flex h-14 max-w-[1440px] items-center justify-between gap-3 px-5 md:h-[72px] md:gap-5 md:px-8 lg:gap-8 lg:px-16 xl:px-24">
         <Link to="/" onClick={() => setMenuOpen(false)} className="min-w-0 justify-self-start text-site-ink" aria-label="Gravity Pants home">
           <GravityPantsLogo size={26} showWordmark />
         </Link>
-        <nav aria-label="Main" className="hidden items-center gap-5 whitespace-nowrap text-[15px] font-medium text-site-nav md:flex lg:gap-8">
+        <nav aria-label="Main" className="hidden items-center gap-4 whitespace-nowrap text-[15px] font-medium text-site-nav md:flex lg:gap-8">
           {nav.map((item) => <Link key={item.label} to={item.to} className="hover:text-site-primary">{item.label}</Link>)}
         </nav>
-        <div className="flex items-center gap-1.5 md:ml-auto md:gap-3">
+        <div className="flex shrink-0 items-center gap-1.5 md:ml-auto md:gap-3">
           {!signedIn && <Link to="/signin" className="hidden px-3 text-[15px] font-medium text-site-ink md:inline-flex">Sign in</Link>}
           <Button asChild variant="site" size="siteHeader"><Link to={action.to} onClick={() => setMenuOpen(false)}>{action.label}</Link></Button>
           <Button variant="ghost" size="icon" className="h-11 w-11 md:hidden" aria-label={menuOpen ? "Close menu" : "Open menu"} aria-expanded={menuOpen} onClick={() => setMenuOpen((v) => !v)}>{menuOpen ? <X size={22} strokeWidth={1.7} /> : <Menu size={22} strokeWidth={1.7} />}</Button>

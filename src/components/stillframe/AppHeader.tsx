@@ -33,7 +33,7 @@ export function AppHeader() {
               key={item.to}
               to={item.to}
               className="rounded-lg px-3 py-1.5 text-[14px] font-medium text-foreground transition-colors hover:bg-control-fill/60"
-              activeOptions={{ exact: item.to === "/" }}
+              activeOptions={{ exact: item.to === "/app/ads" }}
               activeProps={{ className: "bg-control-fill hover:bg-control-fill" }}
             >
               {item.label}

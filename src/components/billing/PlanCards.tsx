@@ -29,7 +29,7 @@ function Checkout({ priceId, workspaceId }: { priceId: string; workspaceId: stri
   const create = useServerFn(createCheckoutSession);
   const fetchClientSecret = async () => {
     const r = await create({
-      data: { priceId, workspaceId, returnUrl: `${window.location.origin}/account/billing?checkout=success`, environment: getStripeEnvironment() },
+       data: { priceId, workspaceId, returnUrl: `${window.location.origin}/app/account/billing?checkout=success`, environment: getStripeEnvironment() },
     });
     if ("error" in r) throw new Error(r.error);
     return r.clientSecret;

@@ -121,7 +121,7 @@ export function useManageBilling() {
     const ws = await currentWorkspaceId();
     if (!ws) { tab?.close(); return; }
     try {
-      const r = await portal({ data: { workspaceId: ws, returnUrl: `${window.location.origin}/account/billing`, environment: getStripeEnvironment() } });
+       const r = await portal({ data: { workspaceId: ws, returnUrl: `${window.location.origin}/app/account/billing`, environment: getStripeEnvironment() } });
       if ("error" in r) throw new Error(r.error);
       if (tab) tab.location.href = r.url;
       else (window.top ?? window).location.href = r.url;
