@@ -2,6 +2,19 @@ import { supabase } from "@/integrations/supabase/client";
 import { getWorkspaceId } from "./workspace";
 
 export const MEDIA_BUCKET = "media";
+export const BRAND_BUCKET = "brand-assets";
+/** Paths stored with this prefix live in the brand-assets bucket; everything else is in media. */
+export const BRAND_PREFIX = "brand-assets:";
+
+/** Uploads a brand kit logo (images only, max 5 MB) and returns its stored path. */
+export async function uploadBrandAsset(file: File): Promise<string> {
+  if (!file.type.startsWith("image/")) throw new Error("Choose an image file (PNG, SVG, JPG or WebP).");
+  if (file.size > 5 * 1024 * 1024) throw new Error("That image is over 5 MB. Choose a smaller one.");
+  const key = `${getWorkspaceId()}/${crypto.randomUUID()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "-")}`;
+  const { error } = await supabase.storage.from(BRAND_BUCKET).upload(key, file, { cacheControl: "3600", upsert: false, contentType: file.type });
+  if (error) throw new Error("That logo couldn't be uploaded. Try again.");
+  return BRAND_PREFIX + key;
+}
 
 export function clearMediaCache() {
   signedUrlCache.clear();
@@ -14,7 +27,8 @@ export async function getMediaUrl(path: string): Promise<string | null> {
   const cached = signedUrlCache.get(path);
   if (cached && cached.expires > Date.now()) return cached.url;
 
-  const { data, error } = await supabase.storage.from(MEDIA_BUCKET).createSignedUrl(path, 3600);
+  const [bucket, key] = path.startsWith(BRAND_PREFIX) ? [BRAND_BUCKET, path.slice(BRAND_PREFIX.length)] : [MEDIA_BUCKET, path];
+  const { data, error } = await supabase.storage.from(bucket).createSignedUrl(key, 3600);
   if (error || !data) return null;
   signedUrlCache.set(path, { url: data.signedUrl, expires: Date.now() + 50 * 60 * 1000 });
   return data.signedUrl;

@@ -6,6 +6,7 @@ import {
   TEXT_COLORS,
   formatSeconds,
   type BrandKit,
+  type NamedBrandKit,
   type Format,
   type Frame,
   type LogoSettings,
@@ -24,6 +25,7 @@ import { FontPicker } from "@/components/stillframe/FontPicker";
 import { MediaImage } from "@/components/stillframe/MediaImage";
 import { ELEMENT_META, type ElementKey } from "./use-editor";
 import { cn } from "@/lib/utils";
+import { Link } from "@tanstack/react-router";
 
 const ICONS: Record<ElementKey, typeof Type> = {
   photo: ImageIcon,
@@ -59,6 +61,7 @@ export function fileName(path?: string | null) {
 }
 
 export type InspectorActions = {
+  onKit: (id: string | null) => void;
   onPhoto: (patch: Partial<PhotoSettings>, key?: string) => void;
   onText: (el: "headline" | "subline", patch: Partial<TextSettings>, key?: string) => void;
   onLogo: (patch: Partial<LogoSettings>, key?: string) => void;
@@ -80,6 +83,8 @@ export function Inspector({
   format,
   selected,
   kit,
+  kits = [],
+  kitId = null,
   adjusting,
   onSelect,
   actions,
@@ -93,6 +98,8 @@ export function Inspector({
   format: Format;
   selected: ElementKey;
   kit: BrandKit | null | undefined;
+  kits?: NamedBrandKit[];
+  kitId?: string | null;
   adjusting: boolean;
   onSelect: (el: ElementKey) => void;
   actions: InspectorActions;
@@ -109,10 +116,11 @@ export function Inspector({
   };
   const meta = ELEMENT_META[selected];
   const scope = selected === "logo" ? "Whole video" : selected === "transition" ? `Into frame ${frameIndex + 1}` : `Frame ${frameIndex + 1}`;
-  const colors = kit?.colors.length ? kit.colors : TEXT_COLORS;
+  const colors = [...new Set([...(kit?.colors ?? []), ...TEXT_COLORS].map((c) => c.toUpperCase()))];
 
   return (
     <aside className={cn("flex shrink-0 flex-col overflow-y-auto bg-inspector p-4", mobile ? "h-full w-full" : "hidden w-[344px] lg:flex")}>
+      <BrandKitRow kits={kits} kitId={kitId} onKit={actions.onKit} />
       <div className={cn(mobile ? "flex gap-2 overflow-x-auto pb-1" : "grid grid-cols-3 gap-2")}>
         {(Object.keys(ELEMENT_META) as ElementKey[]).map((el) => {
           const m = ELEMENT_META[el];
@@ -154,6 +162,32 @@ export function Inspector({
         {selected === "transition" && <TransitionPanel frames={doc.frames} frame={frame} first={frameIndex === 0} actions={actions} />}
       </div>
     </aside>
+  );
+}
+
+/* ---------------- Brand kit */
+
+function BrandKitRow({ kits, kitId, onKit }: { kits: NamedBrandKit[]; kitId: string | null; onKit: (id: string | null) => void }) {
+  const current = kits.find((k) => k.id === kitId);
+  return (
+    <div className="mb-3 flex items-center gap-3 rounded-sm bg-card px-3 py-2 shadow-card">
+      <span className="text-[13px] font-semibold">Brand kit</span>
+      {kits.length ? (
+        <select
+          aria-label="Brand kit"
+          value={current?.id ?? ""}
+          onChange={(e) => onKit(e.target.value || null)}
+          className="ml-auto h-11 min-w-0 max-w-[60%] truncate rounded-sm bg-control-fill px-2 text-[16px] lg:h-8 lg:text-[13px]"
+        >
+          <option value="">None</option>
+          {kits.map((k) => (
+            <option key={k.id} value={k.id}>{k.name}</option>
+          ))}
+        </select>
+      ) : (
+        <Link to="/brand" className="ml-auto flex h-11 items-center text-[13px] font-medium text-link lg:h-8">Create a brand kit</Link>
+      )}
+    </div>
   );
 }
 

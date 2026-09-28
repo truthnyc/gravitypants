@@ -3,7 +3,8 @@ import { toast } from "sonner";
 import { Copy, Pause, Play, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { framePayloadFromPhoto, logoFromBrandKit, useBrandKit, useUpdateBrandKit, type EditorDoc } from "@/lib/stillframe/data";
+import { effectiveKit, framePayloadFromPhoto, useBrandKit, useBrandKits, type EditorDoc } from "@/lib/stillframe/data";
+import type { NamedBrandKit } from "@/lib/stillframe/types";
 import { ACCEPTED_IMAGE_TYPES, uploadMedia } from "@/lib/stillframe/media";
 import { registerCustomFonts } from "@/lib/stillframe/fonts";
 import {
@@ -78,8 +79,38 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
   const [mobileSheetOpen, setMobileSheetOpen] = useState(false);
   const replaceRef = useRef<HTMLInputElement>(null);
   const replaceAt = useRef(0);
-  const { data: kit } = useBrandKit();
-  const updateKit = useUpdateBrandKit();
+  const { data: settings } = useBrandKit();
+  const { data: kits } = useBrandKits();
+  const named = kits?.find((k) => k.id === doc.project.brand_kit_id) ?? null;
+  const kit = useMemo(() => (settings ? effectiveKit(settings, named) : settings), [settings, named]);
+
+  /** Puts a kit's logo, fonts and colors on the ad; null keeps the ad as it is but unlinks it. */
+  const applyKit = useCallback(
+    (k: NamedBrandKit | null) =>
+      apply((d) => {
+        if (!k) return { ...d, project: { ...d.project, brand_kit_id: null, logo: { ...d.project.logo, kit_stamp: null } } };
+        const hasLogo = Boolean(k.logo_url || k.logo_dark_url);
+        const logo = {
+          ...d.project.logo,
+          ...(hasLogo ? { path: k.logo_url ?? k.logo_dark_url, dark_path: k.logo_url ?? null, light_path: k.logo_dark_url ?? null } : {}),
+          kit_stamp: k.updated_at,
+        };
+        const font = (t: TextSettings | null, family: string | null) => (t && family ? { ...t, font_family: family } : t);
+        return {
+          ...d,
+          project: { ...d.project, brand_kit_id: k.id, logo },
+          frames: d.frames.map((f) => ({ ...f, headline: font(f.headline, k.headline_font), subline: font(f.subline, k.subline_font) })),
+        };
+      }),
+    [apply],
+  );
+
+  // Later edits to the chosen kit flow into this ad the next time it's open.
+  useEffect(() => {
+    if (readOnly || !named) return;
+    if (doc.project.logo.kit_stamp !== named.updated_at) applyKit(named);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [named?.id, named?.updated_at]);
   const brand = useMemo<BrandStyle>(
     () => ({ color: kit?.colors[0] ?? null, font: kit?.body_font ?? null, endCard: kit?.end_card ?? null }),
     [kit?.colors, kit?.body_font, kit?.end_card],
@@ -276,11 +307,8 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
   const addLogo = async (file: File) => {
     try {
       const up = await uploadMedia(file, "logo");
-      const logos = [...(kit?.logos ?? []), { id: crypto.randomUUID(), path: up.path, name: file.name, role: "primary" as const }];
-      await updateKit.mutateAsync({ logos });
-      const next = logoFromBrandKit(kit ? { ...kit, logos } : null, doc.project.logo);
-      updateLogo({ path: up.path, dark_path: next.dark_path ?? up.path, light_path: next.light_path ?? null });
-      toast("Logo added to your Brand Kit");
+      updateLogo({ path: up.path, dark_path: up.path, light_path: doc.project.logo.light_path ?? null });
+      toast("Logo added to this ad");
     } catch {
       toast.error("That logo couldn't be uploaded. Try again.");
     }
@@ -345,6 +373,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
   updateTextRef.current = updateText;
 
   const actions: InspectorActions = {
+    onKit: (id) => applyKit(kits?.find((k) => k.id === id) ?? null),
     onPhoto: updatePhoto,
     onText: updateText,
     onLogo: updateLogo,
@@ -553,7 +582,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
           frameIndex={idx}
           format={format}
           selected={selected}
-          kit={kit}
+          kit={kit} kits={kits ?? []} kitId={doc.project.brand_kit_id ?? null}
           adjusting={adjusting}
           onSelect={(el) => {
             setSelected(el);
@@ -571,7 +600,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
           <DrawerTitle className="sr-only">Edit {selected}</DrawerTitle>
           <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
             <div className="flex h-12 shrink-0 items-center justify-between px-4"><span className="font-semibold">{ELEMENT_META[selected].label} <span className="ml-2 font-normal text-secondary-text nums">Frame {idx + 1}</span></span><button type="button" onClick={() => setMobileSheetOpen(false)} className="font-semibold text-link">Done</button></div>
-            <Inspector mobile doc={doc} endSeconds={endSeconds} frame={frame} frameIndex={idx} format={format} selected={selected} kit={kit} adjusting={adjusting} onSelect={(el) => { setSelected(el); if (el !== "photo") setAdjusting(false); }} actions={actions} />
+            <Inspector mobile doc={doc} endSeconds={endSeconds} frame={frame} frameIndex={idx} format={format} selected={selected} kit={kit} kits={kits ?? []} kitId={doc.project.brand_kit_id ?? null} adjusting={adjusting} onSelect={(el) => { setSelected(el); if (el !== "photo") setAdjusting(false); }} actions={actions} />
           </div>
         </DrawerContent>
       </Drawer>

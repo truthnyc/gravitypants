@@ -122,6 +122,59 @@ export type Database = {
         }
         Relationships: []
       }
+      brand_kits: {
+        Row: {
+          colors: string[]
+          created_at: string
+          created_by: string | null
+          headline_font: string | null
+          id: string
+          is_default: boolean
+          logo_dark_url: string | null
+          logo_url: string | null
+          name: string
+          subline_font: string | null
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          colors?: string[]
+          created_at?: string
+          created_by?: string | null
+          headline_font?: string | null
+          id?: string
+          is_default?: boolean
+          logo_dark_url?: string | null
+          logo_url?: string | null
+          name?: string
+          subline_font?: string | null
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          colors?: string[]
+          created_at?: string
+          created_by?: string | null
+          headline_font?: string | null
+          id?: string
+          is_default?: boolean
+          logo_dark_url?: string | null
+          logo_url?: string | null
+          name?: string
+          subline_font?: string | null
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_kits_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       export_usage: {
         Row: {
           created_at: string
@@ -313,6 +366,7 @@ export type Database = {
       }
       projects: {
         Row: {
+          brand_kit_id: string | null
           created_at: string
           deleted_at: string | null
           end_card: Json
@@ -328,6 +382,7 @@ export type Database = {
           workspace_id: string
         }
         Insert: {
+          brand_kit_id?: string | null
           created_at?: string
           deleted_at?: string | null
           end_card?: Json
@@ -343,6 +398,7 @@ export type Database = {
           workspace_id: string
         }
         Update: {
+          brand_kit_id?: string | null
           created_at?: string
           deleted_at?: string | null
           end_card?: Json
@@ -357,7 +413,15 @@ export type Database = {
           updated_at?: string
           workspace_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "projects_brand_kit_id_fkey"
+            columns: ["brand_kit_id"]
+            isOneToOne: false
+            referencedRelation: "brand_kits"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       support_sessions: {
         Row: {
@@ -572,6 +636,7 @@ export type Database = {
           workspace_id: string
         }[]
       }
+      brand_kits_enabled: { Args: { _ws: string }; Returns: boolean }
       can_save_export: {
         Args: { _stamp: string; _ws: string }
         Returns: boolean
@@ -585,6 +650,10 @@ export type Database = {
       record_export: {
         Args: { _project: string; _stamp: string; _ws: string }
         Returns: boolean
+      }
+      set_default_brand_kit: {
+        Args: { _kit: string; _ws: string }
+        Returns: undefined
       }
       workspace_member_list: {
         Args: { _ws: string }

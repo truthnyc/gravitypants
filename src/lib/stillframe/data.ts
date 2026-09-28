@@ -7,6 +7,7 @@ import {
   
   PACE_SECONDS,
   type BrandKit,
+  type NamedBrandKit,
   type Frame,
   type LogoSettings,
   type Project,
@@ -184,7 +185,8 @@ export function useCreateAdFromPhotos() {
       onProgress?: (items: UploadProgress[]) => void;
     }) => {
       const uploaded = await uploadAll(files, onProgress);
-      const kit = await fetchBrandKit();
+      const [settings, named] = await Promise.all([fetchBrandKit(), fetchDefaultKit()]);
+      const kit = settings ? effectiveKit(settings, named) : null;
 
       const { data: project, error } = await supabase
         .from("projects")
@@ -194,8 +196,9 @@ export function useCreateAdFromPhotos() {
           primary_format: "9:16",
           formats: ["9:16"],
           pace: "standard",
-          logo: logoFromBrandKit(kit),
+          logo: { ...logoFromBrandKit(kit), kit_stamp: named?.updated_at ?? null },
           end_card: kit?.end_card ?? {},
+          brand_kit_id: named?.id ?? null,
         })
         .select("id")
         .single();
@@ -209,6 +212,7 @@ export function useCreateAdFromPhotos() {
               font_family: kit.headline_font ?? undefined,
               color: kit.colors[0] ?? "#FFFFFF",
             });
+            if (!kit.headline_font) delete (payload.headline as { font_family?: string }).font_family;
           }
           return { ...payload, project_id: project.id };
         }),
@@ -232,6 +236,7 @@ async function insertCopy(source: ProjectWithFrames, name: string, photos?: Uplo
       pace: source.pace,
       logo: source.logo,
       end_card: source.end_card,
+      brand_kit_id: source.brand_kit_id ?? null,
       thumbnail_url: photos ? null : source.thumbnail_url,
     })
     .select("id")
@@ -316,7 +321,7 @@ export function totalSeconds(frames: Frame[]) {
 
 export type EditorDoc = { project: Project; frames: Frame[] };
 
-const PROJECT_SAVE_FIELDS = ["name", "formats", "primary_format", "pace", "logo", "end_card"] as const;
+const PROJECT_SAVE_FIELDS = ["name", "formats", "primary_format", "pace", "logo", "end_card", "brand_kit_id"] as const;
 
 /** Persists the difference between two editor snapshots (project fields, changed/new frames, removed frames). */
 export async function saveEditorDoc(prev: EditorDoc, next: EditorDoc) {
@@ -413,3 +418,119 @@ export function logoFromBrandKit(kit: BrandKit | null | undefined, base: LogoSet
 }
 
 export const paceSeconds = PACE_SECONDS;
+
+/* ---------------- Named brand kits (shareable) */
+
+export const brandKitsKey = ["brand-kits"] as const;
+
+export async function fetchBrandKits(): Promise<NamedBrandKit[]> {
+  const { data, error } = await supabase
+    .from("brand_kits")
+    .select("*")
+    .eq("workspace_id", getWorkspaceId())
+    .order("created_at", { ascending: true });
+  if (error) throw error;
+  return (data ?? []).map((r) => ({ ...(r as unknown as NamedBrandKit), colors: (r.colors as string[]) ?? [] }));
+}
+
+async function fetchDefaultKit(): Promise<NamedBrandKit | null> {
+  const kits = await fetchBrandKits().catch(() => []);
+  return kits.find((k) => k.is_default) ?? null;
+}
+
+export function useBrandKits() {
+  return useQuery({ queryKey: [...brandKitsKey, getWorkspaceId()], queryFn: fetchBrandKits });
+}
+
+export type KitDraft = Pick<NamedBrandKit, "name" | "logo_url" | "logo_dark_url" | "colors" | "headline_font" | "subline_font">;
+
+export function useSaveBrandKit() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, draft }: { id?: string | undefined; draft: KitDraft }) => {
+      if (id) {
+        const { error } = await supabase.from("brand_kits").update(draft).eq("id", id);
+        if (error) throw error;
+        return id;
+      }
+      const ws = getWorkspaceId();
+      const existing = await fetchBrandKits();
+      const { data, error } = await supabase
+        .from("brand_kits")
+        .insert({ ...draft, workspace_id: ws, is_default: existing.length === 0 })
+        .select("id")
+        .single();
+      if (error) throw error;
+      return data.id as string;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: brandKitsKey }),
+  });
+}
+
+export function useDeleteBrandKit() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("brand_kits").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: brandKitsKey }),
+  });
+}
+
+export function useSetDefaultKit() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string | null) => {
+      const { error } = await supabase.rpc("set_default_brand_kit", { _ws: getWorkspaceId(), _kit: id as string });
+      if (error) throw error;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: brandKitsKey }),
+  });
+}
+
+/** Whether this workspace's plan includes brand kits (Simple, Business, Team). */
+export function useKitsEnabled() {
+  return useQuery({
+    queryKey: ["brand-kits-enabled", getWorkspaceId()],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("brand_kits_enabled", { _ws: getWorkspaceId() });
+      if (error) return false;
+      return Boolean(data);
+    },
+  });
+}
+
+/** Owners and admins may change kits; editors can only use them. */
+export function useCanEditKits() {
+  return useQuery({
+    queryKey: ["workspace-role", getWorkspaceId()],
+    queryFn: async () => {
+      const { data: auth } = await supabase.auth.getUser();
+      if (!auth.user) return false;
+      const { data } = await supabase
+        .from("workspace_members")
+        .select("role")
+        .eq("workspace_id", getWorkspaceId())
+        .eq("user_id", auth.user.id)
+        .maybeSingle();
+      if (data) return data.role === "owner" || data.role === "admin";
+      const { data: admin } = await supabase.rpc("is_platform_admin");
+      return Boolean(admin);
+    },
+  });
+}
+
+/** Workspace ad settings (end card, logo size/placement) combined with the ad's chosen kit. */
+export function effectiveKit(settings: BrandKit, named: NamedBrandKit | null | undefined): BrandKit {
+  const logos: BrandKit["logos"] = [];
+  if (named?.logo_url) logos.push({ id: "kit-logo", path: named.logo_url, name: "Logo", role: "primary" });
+  if (named?.logo_dark_url) logos.push({ id: "kit-logo-dark", path: named.logo_dark_url, name: "Logo for dark photos", role: "reversed" });
+  return {
+    ...settings,
+    logos,
+    colors: named?.colors ?? [],
+    headline_font: named?.headline_font ?? null,
+    body_font: named?.subline_font ?? null,
+  };
+}
