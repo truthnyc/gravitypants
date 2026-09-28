@@ -146,6 +146,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
   const { data: exportStatus } = useExportStatus();
   const refreshBilling = useRefreshBilling();
   const [planSheet, setPlanSheet] = useState<string | null>(null);
+  const watermark = useRef(false);
 
   const start = async () => {
     if (!images || !files.length) return;
@@ -157,6 +158,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
         setPlanSheet(st.reason ?? "no_plan");
         return;
       }
+      watermark.current = !!st.watermark;
     } catch {
       toast.error("Couldn't check your plan. Please try again.");
       return;
@@ -211,7 +213,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
     for (const [key, job] of jobs) {
       if (ac.signal.aborted) break;
       set(key, { status: "working" });
-      const input: RenderInput = { project, frames, brand, images, format: job.format, width: job.width, height: job.height };
+      const input: RenderInput = { project, frames, brand, images, format: job.format, width: job.width, height: job.height, watermark: watermark.current };
       const onProgress = (p: number) => set(key, { progress: p });
       try {
         let blob: Blob;
