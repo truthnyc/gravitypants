@@ -39,3 +39,5 @@
 
 - Plan gates: every feature check goes through `usePlanAccess().canUse(feature)` in `src/lib/stillframe/plan.ts`; blocked features call `openUpgrade()` (one shared dialog) instead of hiding — one place for plan rules.
 - Support: tickets in `support_tickets` via `submitTicket` server fn; priority set by SQL trigger from the plan (never the browser); each ticket emails help@gravitypants.com.
+
+- Public home reference artwork lives in `public/site-art` and its page-specific styling in `src/styles.css`; this keeps the marketing visuals reusable without changing the `/app` editor.
