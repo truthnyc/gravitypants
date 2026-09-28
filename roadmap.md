@@ -34,3 +34,6 @@
 
 ## Public home page
 - [x] Rebuild desktop and mobile reference sections and interactions; verify responsive flow
+
+## Public features page
+- [ ] Rebuild reference sections, mobile layouts, jump links, and animations; verify at phone and desktop widths
