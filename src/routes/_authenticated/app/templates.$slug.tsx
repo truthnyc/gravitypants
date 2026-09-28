@@ -76,10 +76,24 @@ function Customize() {
       </main>
     );
   }
-  return <CustomizeTemplate key={`${t.id}-${from ?? ""}`} template={t} slug={slug} fromAd={from ? fromAd ?? null : null} />;
+  return <PinnedCustomize template={t} slug={slug} from={from} fromAd={from ? fromAd ?? null : null} />;
 }
 
-type Draft = { format: Aspect; slides: CustomSlide[] };
+/** A customization in progress keeps the template version it started with, even if staff publish a newer one. */
+function PinnedCustomize({ template, slug, from, fromAd }: { template: Template; slug: string; from?: string | undefined; fromAd: ProjectWithFrames | null }) {
+  const { data: userId } = useMyUserId();
+  const pinned = useMemo(() => {
+    if (!userId || from) return template;
+    try {
+      const saved = JSON.parse(localStorage.getItem(`gravity-pants:customize:${userId}:${slug}`) ?? "null") as Draft | null;
+      return saved?.template && saved.template.id === template.id ? saved.template : template;
+    } catch { return template; }
+  }, [userId, from, slug, template]);
+  if (!userId) return null;
+  return <CustomizeTemplate key={`${pinned.id}-${from ?? ""}`} template={pinned} slug={slug} fromAd={fromAd} />;
+}
+
+type Draft = { format: Aspect; slides: CustomSlide[]; template?: Template };
 
 function CustomizeTemplate({ template: t, slug, fromAd }: { template: Template; slug: string; fromAd: ProjectWithFrames | null }) {
   const navigate = useNavigate();
@@ -124,7 +138,7 @@ function CustomizeTemplate({ template: t, slug, fromAd }: { template: Template; 
   }, [storageKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (storageKey && loaded) localStorage.setItem(storageKey, JSON.stringify(draft));
+    if (storageKey && loaded) localStorage.setItem(storageKey, JSON.stringify({ ...draft, template: t }));
   }, [draft, storageKey, loaded]);
 
   const setSlide = (i: number, patch: Partial<CustomSlide>) =>
