@@ -46,7 +46,15 @@ function SignUp() {
   useEffect(() => {
     if (template && templateForExample(template)) sessionStorage.setItem("gravity-pants:example", template);
     if (choice) sessionStorage.setItem("gravity-pants:pending-plan", JSON.stringify(choice));
-    supabase.auth.getSession().then(({ data }) => { if (data.session) navigate({ to: "/app/ads", replace: true }); });
+    const go = (userId: string) => {
+      if (choice) rememberSignupChoice(userId, choice);
+      void navigate({ to: "/app/ads", replace: true });
+    };
+    void supabase.auth.getSession().then(({ data }) => { if (data.session) go(data.session.user.id); });
+    const { data } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_IN" && session) go(session.user.id);
+    });
+    return () => data.subscription.unsubscribe();
   }, [template, plan, billing, navigate]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function submit(e: React.FormEvent) {
