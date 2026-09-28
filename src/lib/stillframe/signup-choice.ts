@@ -16,3 +16,9 @@ export function getSignupChoice(userId: string): SignupChoice | null {
   } catch { /* Ignore invalid old preferences. */ }
   return null;
 }
+/** Label for a trial account: "Business (trial)" if a plan was picked at sign-up, else "Free trial". */
+export function trialLabel(choice: SignupChoice | null): string {
+  if (!choice) return "Free trial";
+  const plan = PLANS.find((p) => p.id === choice.plan);
+  return plan ? `${plan.name} (trial)` : "Free trial";
+}
