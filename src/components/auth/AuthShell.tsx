@@ -98,10 +98,12 @@ export function GoogleButton({ redirectTo, onStart }: { redirectTo: string; onSt
           try {
             const res = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin + "/signin" });
             if (res.error) {
+              sessionStorage.removeItem("gravity-pants:welcome");
               setErr("Google sign-in didn't work. Please try again.");
               setBusy(false);
             }
           } catch {
+            sessionStorage.removeItem("gravity-pants:welcome");
             setErr("Google sign-in didn't work. Please try again.");
             setBusy(false);
           }

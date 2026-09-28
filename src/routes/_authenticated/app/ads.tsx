@@ -25,6 +25,8 @@ export const Route = createFileRoute("/_authenticated/app/ads")({
         property: "og:description",
         content: "Turn still photos into short video ads and animated GIFs for social channels.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: YourAds,
