@@ -52,7 +52,7 @@ function draw(ctx: CanvasRenderingContext2D, input: RenderInput, t: number) {
     height: input.height,
     images: input.images,
     brand: input.brand,
-    watermark: input.watermark,
+    watermark: input.watermark ?? false,
   });
 }
 

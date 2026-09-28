@@ -45,7 +45,7 @@ const Email = ({ inviterName, workspaceName, acceptUrl }: Props) => (
 
 export const template = {
   component: Email,
-  subject: (d: Record<string, any>) => `Join ${d.workspaceName || 'a team'} on Gravity Pants`,
+  subject: (d: Record<string, any>) => `Join ${d['workspaceName'] || 'a team'} on Gravity Pants`,
   displayName: 'Team invite',
   previewData: { inviterName: 'Jane', workspaceName: "Jane's ads", acceptUrl: 'https://gravitypants.com' },
 } satisfies TemplateEntry
