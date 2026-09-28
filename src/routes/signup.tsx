@@ -48,7 +48,8 @@ function SignUp() {
     if (choice) sessionStorage.setItem("gravity-pants:pending-plan", JSON.stringify(choice));
     const go = (userId: string) => {
       if (choice) rememberSignupChoice(userId, choice);
-      void navigate({ to: "/app/ads", replace: true });
+      if (target.startsWith("/invite/")) window.location.href = target;
+      else void navigate({ to: "/app/ads", replace: true });
     };
     void supabase.auth.getSession().then(({ data }) => { if (data.session) go(data.session.user.id); });
     const { data } = supabase.auth.onAuthStateChange((event, session) => {
@@ -66,7 +67,7 @@ function SignUp() {
     if (password.length < 8) return setPasswordError("Please use a password with at least 8 characters.");
     setBusy(true);
     setError(null);
-    const confirmation = new URL("/app/ads", window.location.origin);
+    const confirmation = new URL(target.startsWith("/invite/") ? target : "/app/ads", window.location.origin);
     confirmation.searchParams.set("welcome", "1");
     if (template && templateForExample(template)) confirmation.searchParams.set("template", template);
     if (choice) { confirmation.searchParams.set("plan", choice.plan); confirmation.searchParams.set("billing", choice.billing); }
@@ -86,7 +87,7 @@ function SignUp() {
     } else {
       if (choice && data.user) rememberSignupChoice(data.user.id, choice);
       sessionStorage.setItem("gravity-pants:welcome", "1");
-      if (data.session) navigate({ to: "/app/ads", replace: true });
+      if (data.session) { if (target.startsWith("/invite/")) window.location.href = target; else navigate({ to: "/app/ads", replace: true }); }
       else setSent(true);
     }
   }

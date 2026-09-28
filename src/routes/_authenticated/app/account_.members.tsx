@@ -175,7 +175,7 @@ function MembersPage() {
     window.location.href = "/app/account/members";
   }
 
-  const seats = billing?.plan === "team" || billing?.plan === "team_yearly" ? 3 : 1;
+  const seats = billing?.plan === "team" || billing?.plan === "team_yearly" ? 4 : 1;
 
   return (
     <main className="mx-auto flex max-w-[640px] flex-col gap-5 px-4 py-6 sm:px-8 sm:py-10">
@@ -185,7 +185,7 @@ function MembersPage() {
       <section className="rounded-sm bg-card p-6 shadow-card">
         <h2 className="text-[17px] font-semibold">Workspace</h2>
         <p className="mt-0.5 text-[13px] text-secondary-text">
-          {isTeamPlan ? `Your Team plan includes ${seats} seats with shared ads, brand kits and templates.` : "Team workspaces with shared ads and brand kits are part of the Team plan."}
+          {isTeamPlan ? `Your Team plan lets you invite ${seats - 1} teammates with shared ads, brand kits and templates.` : "Team workspaces with shared ads and brand kits are part of the Team plan."}
         </p>
         <div className="mt-4 flex flex-col gap-2">
           {(workspaces ?? []).map((w) => (
