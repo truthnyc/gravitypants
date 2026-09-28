@@ -1,5 +1,10 @@
 # Roadmap
 
+## Auth pages
+- [ ] Match uploaded desktop/mobile sign-up and sign-in layouts
+- [ ] Connect signup welcome, selected plan, example style, reset, and sign-in controls
+- [ ] Verify desktop/mobile views and auth flow
+
 ## Workspace creation error
 - [x] Allow creators to join a new workspace as its owner
 - [x] Keep the chosen workspace selected across page reloads, after verifying membership
