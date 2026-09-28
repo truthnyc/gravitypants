@@ -113,7 +113,7 @@ export const createTopUpSession = createServerFn({ method: "POST" })
     }
   });
 
-const PORTAL_TAG = "stillframe_v1";
+const PORTAL_TAG = "gravitypants_v2"; // bump when the plan list changes so the portal offers every plan
 
 /**
  * Billing portal rules: switch plans immediately with a fair-share (prorated) charge or credit,

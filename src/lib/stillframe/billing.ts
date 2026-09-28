@@ -108,15 +108,16 @@ export function money(cents: number) {
 export function useManageBilling() {
   const portal = useServerFn(createPortalSession);
   return async () => {
-    const ws = await currentWorkspaceId();
-    if (!ws) return;
-    // Open the tab synchronously-ish so pop-up blockers allow it.
+    // Open the tab before any await so pop-up blockers allow it.
     const tab = window.open("", "_blank");
+    if (tab) tab.document.title = "Opening billing…";
+    const ws = await currentWorkspaceId();
+    if (!ws) { tab?.close(); return; }
     try {
       const r = await portal({ data: { workspaceId: ws, returnUrl: `${window.location.origin}/account/billing`, environment: getStripeEnvironment() } });
       if ("error" in r) throw new Error(r.error);
       if (tab) tab.location.href = r.url;
-      else window.location.href = r.url;
+      else (window.top ?? window).location.href = r.url;
     } catch (e) {
       tab?.close();
       toast.error(e instanceof Error ? e.message : "Couldn't open billing.");
