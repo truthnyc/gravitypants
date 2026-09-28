@@ -3,7 +3,8 @@ import { HelpMenu } from "@/components/stillframe/HelpMenu";
 import { openUpgrade, usePlanAccess } from "@/lib/stillframe/plan";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { TRIAL } from "@/lib/stillframe/plans-config";
+import { TRIAL, planById } from "@/lib/stillframe/plans-config";
+import { getSignupChoice } from "@/lib/stillframe/signup-choice";
 import { AlertCircle, Check, ChevronDown, ChevronLeft, Download, Film, Image as ImageIcon, LayoutGrid, Plus } from "lucide-react";
 import { zipSync } from "fflate";
 import { toast } from "sonner";
@@ -153,6 +154,13 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
   const { data: exportStatus } = useExportStatus();
   const refreshBilling = useRefreshBilling();
   const [planSheet, setPlanSheet] = useState<string | null>(null);
+  const [preferredPlan, setPreferredPlan] = useState<string | null>(null);
+  useEffect(() => { void supabase.auth.getUser().then(({ data }) => {
+    if (data.user) {
+      const choice = getSignupChoice(data.user.id);
+      setPreferredPlan(choice ? `${planById(choice.plan).name} ${choice.billing}` : null);
+    }
+  }); }, []);
   const watermark = useRef(false);
 
   const start = async () => {
@@ -423,7 +431,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
                 ? "Your monthly exports are used up. Buy a top-up of 5 extra exports for $12.50 on the Billing page — they never expire — or move up a plan."
                 : planSheet === "payment_problem"
                   ? "We couldn't take your last payment. Update your card in Manage Billing to keep exporting."
-                  : `Your free trial has ended or its ${TRIAL.exports} exports are used. Your ads are safe — choose a plan to keep exporting without a watermark.`}
+                   : `Your free trial has ended or its ${TRIAL.exports} exports are used. Your ads are safe — choose a plan to keep exporting without a watermark.${preferredPlan ? ` You selected ${preferredPlan} when you joined.` : ""}`}
             </DialogDescription>
           </DialogHeader>
           <PlanCards compact />
