@@ -12,7 +12,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { TemplateThumb, UpgradeNote } from "@/components/templates/TemplateDialogs";
-import { useCanEditKits, useDeleteTemplate, useTemplateAccess, useTemplates, useUpdateTemplate, type Template } from "@/lib/stillframe/data";
+import { useCanEditKits, useMyUserId, useDeleteTemplate, useTemplateAccess, useTemplates, useUpdateTemplate, type Template } from "@/lib/stillframe/data";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/app/templates")({
