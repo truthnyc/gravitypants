@@ -61,6 +61,15 @@ function Builder({ row, refetch }: { row: any; refetch: () => void }) {
   const [previewFormat, setPreviewFormat] = useState<Format>(saved.format);
   const dirty = JSON.stringify(doc) !== JSON.stringify(saved);
   const pb = useDocPlayback(doc);
+  const [dragFrom, setDragFrom] = useState<number | null>(null);
+  // Slug follows the name until someone types their own.
+  const [slugTouched, setSlugTouched] = useState(() => !!saved.slug && saved.slug !== slugify(saved.name));
+  const errors = [
+    !doc.name.trim() && "Add a name.",
+    !doc.slides.length && "Add at least one slide.",
+    doc.slides.some((s) => !(s.duration_sec >= 0.5 && s.duration_sec <= 10)) && "Every slide needs a duration between 0.5 and 10 seconds.",
+  ].filter(Boolean) as string[];
+  const blocker = useBlocker({ shouldBlockFn: () => dirty && !busy, withResolver: true, enableBeforeUnload: false });
 
   useEffect(() => setPreviewFormat(doc.format), [doc.format]);
   useEffect(() => {
@@ -73,13 +82,15 @@ function Builder({ row, refetch }: { row: any; refetch: () => void }) {
   const set = (p: Partial<TemplateDoc>) => setDoc((d) => ({ ...d, ...p }));
   const setStyle = (p: Partial<TemplateDoc["style"]>) => setDoc((d) => ({ ...d, style: { ...d.style, ...p } }));
   const setSlide = (i: number, p: Partial<DocSlide>) => setDoc((d) => ({ ...d, slides: d.slides.map((s, j) => (j === i ? { ...s, ...p } : s)) }));
-  const moveSlide = (i: number, by: number) =>
+  const moveSlide = (i: number, by: number) => moveTo(i, i + by);
+  const moveTo = (from: number, to: number) =>
     setDoc((d) => {
       const s = [...d.slides];
-      const [x] = s.splice(i, 1);
-      s.splice(Math.max(0, Math.min(s.length, i + by)), 0, x!);
+      const [x] = s.splice(from, 1);
+      s.splice(Math.max(0, Math.min(s.length, to)), 0, x!);
       return { ...d, slides: s };
     });
+  const check = () => { if (errors.length) { toast.error(errors[0]!); return false; } return true; };
 
   const refresh = async () => {
     await qc.invalidateQueries({ queryKey: adminTemplatesKey });
