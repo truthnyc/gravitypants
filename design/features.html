@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gravity Pants — Features</title>
+<!--
+  Gravity Pants — design reference for Lovable.
+  Features page, desktop layout (1440px). Jump links scroll to sections. Each section alternates text/media sides.
+  Placeholders in [square brackets] must be replaced with real content before launch.
+  Drawn "reels" are stand-ins: replace with real exported MP4s (<video autoplay muted loop playsinline>).
+-->
+<style>
+body{margin:0;background:#fff;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",system-ui,sans-serif;-webkit-font-smoothing:antialiased;color:#1D1D1F}
+*{box-sizing:border-box}
+a{color:#0066CC;text-decoration:none}a:hover{color:#004C99}
+h1,h2,h3,p{margin:0}
+.wrap{width:1440px;padding:0 96px}
+.btn{height:48px;padding:0 24px;border-radius:24px;font-size:17px;font-weight:400;display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap;border:0;cursor:pointer}
+.btn.pri{background:#0071E3;color:#fff}.btn.pri:hover{background:#0062C4;color:#fff}
+.btn.sec{background:rgba(120,124,112,.14);color:#1D1D1F}.btn.sec:hover{color:#1D1D1F;background:rgba(120,124,112,.22)}
+.btn.inv{background:#fff;color:#0058B0}.btn.inv:hover{color:#004C99}
+.eyebrow{font-size:15px;font-weight:600;color:#0058B0;letter-spacing:.01em}
+.h2{font-size:64px;font-weight:600;letter-spacing:-.035em;line-height:1.04}
+.lede{font-size:21px;line-height:1.45;color:#57575C}
+.card{background:#F5F5F7;border-radius:24px;box-shadow:none;overflow:hidden;position:relative}
+.ic{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.slot{height:56px;border-radius:12px;border:1.5px dashed #C5C9C0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;color:#6E6E73}
+
+/* reel phone */
+.phone{position:relative;background:#F5F5F7;padding:6px;border-radius:32px;box-shadow:0 0 0 1px #E3E3E8,0 40px 80px -30px rgba(0,0,0,.2);flex-shrink:0}
+.scr{position:relative;width:100%;height:100%;border-radius:23px;overflow:hidden;background:#222}
+.fr{position:absolute;left:0;top:0;right:0;bottom:0;opacity:0}
+.fr svg{position:absolute;left:0;top:0;width:100%;height:100%;animation:drift 9s ease-in-out infinite alternate}
+.f1{animation:show1 9s infinite}.f2{animation:show2 9s infinite}.f3{animation:show3 9s infinite}
+.bars{position:absolute;left:10px;right:10px;top:10px;display:flex;gap:4px;z-index:2}
+.bars span{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.35);overflow:hidden}
+.bars i{display:block;height:100%;background:#fff;width:0}
+.b1{animation:fill1 9s linear infinite}.b2{animation:fill2 9s linear infinite}.b3{animation:fill3 9s linear infinite}
+.copy{position:absolute;left:14px;right:14px;bottom:18px;z-index:2;color:#fff;animation:rise 9s ease-out infinite}
+.copy b{display:block;font-weight:700;letter-spacing:-.025em;line-height:1.04}
+.copy span{display:block;font-weight:500;opacity:.92;margin-top:6px}
+.brand{position:absolute;top:24px;right:12px;z-index:2;height:18px;padding:0 7px;border-radius:4px;background:rgba(255,255,255,.92);color:#1D1D1F;font-size:8px;font-weight:800;letter-spacing:.14em;display:flex;align-items:center}
+@keyframes show1{0%{opacity:1}30%{opacity:1}34%{opacity:0}96%{opacity:0}100%{opacity:1}}
+@keyframes show2{0%{opacity:0}30%{opacity:0}34%{opacity:1}63%{opacity:1}67%{opacity:0}100%{opacity:0}}
+@keyframes show3{0%{opacity:0}63%{opacity:0}67%{opacity:1}96%{opacity:1}100%{opacity:0}}
+@keyframes fill1{0%{width:0}33%{width:100%}100%{width:100%}}
+@keyframes fill2{0%{width:0}33%{width:0}66%{width:100%}100%{width:100%}}
+@keyframes fill3{0%{width:0}66%{width:0}100%{width:100%}}
+@keyframes drift{0%{transform:scale(1.14) translateY(4px)}100%{transform:scale(1) translateY(0)}}
+@keyframes rise{0%{opacity:0;transform:translateY(14px)}6%{opacity:1;transform:translateY(0)}92%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(0)}}
+
+/* hero falling photos */
+.drop{position:absolute;border-radius:14px;overflow:hidden;box-shadow:0 24px 50px rgba(0,0,0,.18)}
+.dr1{animation:fall1 6s cubic-bezier(.3,1.35,.55,1) infinite}
+.dr2{animation:fall2 6s cubic-bezier(.3,1.35,.55,1) infinite}
+.dr3{animation:fall3 6s cubic-bezier(.3,1.35,.55,1) infinite}
+@keyframes fall1{0%{transform:translateY(-120px) rotate(-22deg);opacity:0}12%{opacity:1}28%{transform:translateY(0) rotate(-9deg)}100%{transform:translateY(0) rotate(-9deg);opacity:1}}
+@keyframes fall2{0%,10%{transform:translateY(-140px) rotate(18deg);opacity:0}22%{opacity:1}38%{transform:translateY(0) rotate(7deg)}100%{transform:translateY(0) rotate(7deg);opacity:1}}
+@keyframes fall3{0%,20%{transform:translateY(-160px) rotate(-14deg);opacity:0}32%{opacity:1}48%{transform:translateY(0) rotate(-3deg)}100%{transform:translateY(0) rotate(-3deg);opacity:1}}
+.orbit{animation:spin 14s linear infinite;transform-origin:50% 50%}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pulse{animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+
+.feat h3{font-size:24px;font-weight:600;letter-spacing:-.02em}
+.feat p{font-size:16px;line-height:1.5;color:#57575C}
+.chip{height:32px;padding:0 14px;border-radius:16px;background:#fff;font-size:14px;font-weight:500;display:inline-flex;align-items:center;gap:6px;color:#1D1D1F}
+.fcol a{color:#57575C;font-size:14px}.fcol a:hover{color:#1D1D1F}
+
+
+/* examples wall */
+.marquee{animation:slide 70s linear infinite}
+.marquee:hover{animation-play-state:paused}
+@keyframes slide{to{transform:translateX(-50%)}}
+/* stills-to-story */
+.still-in{animation:stillin 9s ease-in-out infinite}
+.s2{animation-delay:3s}.s3{animation-delay:6s}
+@keyframes stillin{0%,30%{box-shadow:0 0 0 3px #0071E3;transform:scale(1.04)}36%,100%{box-shadow:none;transform:scale(1)}}
+/* spotlight tabs */
+.tab{height:40px;padding:0 18px;border-radius:20px;font-size:15px;font-weight:500;color:#424245;background:transparent;border:0;cursor:pointer;font-family:inherit}
+.tab:hover{color:#1D1D1F}
+.tab.on{background:#fff;color:#1D1D1F;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.spot-copy{width:440px;flex-shrink:0;padding:56px;display:flex;flex-direction:column;justify-content:center;gap:20px}
+.spot-copy h3{font-size:36px;font-weight:600;letter-spacing:-.025em;line-height:1.1}
+.spot-copy p{font-size:18px;line-height:1.55;color:#57575C}
+.spot-media{flex-grow:1;display:flex;align-items:center;justify-content:center;gap:40px;background:#EDEDF0;margin:16px;border-radius:18px}
+.more{font-size:16px;font-weight:500;display:inline-flex;align-items:center;gap:6px}
+.grow{animation:grow 4s ease-in-out infinite alternate}
+@keyframes grow{from{width:30%}to{width:62%}}
+.blink{animation:sel 2.4s ease-in-out infinite}
+@keyframes sel{0%,100%{outline-color:#7D3BD6}50%{outline-color:rgba(125,59,214,.35)}}
+.playhead{animation:play 8s linear infinite}
+@keyframes play{from{left:0}to{left:100%}}
+
+
+/* features page */
+.jump{height:40px;padding:0 16px;border-radius:20px;font-size:15px;font-weight:500;color:#424245;display:flex;align-items:center}
+.jump:hover{background:#fff;color:#1D1D1F}
+.split{height:680px;flex-shrink:0;display:flex;align-items:center;gap:72px;padding:0 96px}
+.split.rev{flex-direction:row-reverse}
+.split-copy{width:460px;flex-shrink:0;display:flex;flex-direction:column;gap:18px}
+.split-copy h2{font-size:48px;font-weight:600;letter-spacing:-.03em;line-height:1.06}
+.split-copy p{font-size:19px;line-height:1.5;color:#57575C}
+.ticks{margin:8px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px}
+.ticks li{font-size:16px;display:flex;align-items:center;gap:10px}
+.ticks li::before{content:"\2713";width:20px;height:20px;border-radius:10px;background:#0071E3;color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.split-media{flex-grow:1;height:540px;display:flex;align-items:center;justify-content:center;gap:20px}
+.el{display:flex;flex-direction:column;gap:6px;padding:14px;border-radius:12px;background:#fff;min-width:0}
+.el i{display:block;width:24px;height:24px;border-radius:6px}
+.el b{font-size:15px}.el small{font-size:12px;color:#57575C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.el.sel{box-shadow:0 0 0 2px #7D3BD6;background:#F7F2FF}
+.pp{border-radius:3px;background:#fff;box-shadow:0 0 0 .5px rgba(0,0,0,.1)}.pp.on{background:#7D3BD6;box-shadow:none}
+.font-row{height:40px;border-radius:8px;display:flex;align-items:center;padding:0 10px;font-size:17px}
+.font-row.on{background:#0071E3;color:#fff}
+.fontcard{width:190px;height:110px;border-radius:18px;background:#fff;display:flex;flex-direction:column;justify-content:center;padding:0 20px}
+.fontcard small{font-size:13px;color:#57575C}
+.fmt{display:flex;flex-direction:column;align-items:center;gap:8px;padding-bottom:60px}
+.fmt span{display:block;border-radius:12px;background:#1D2A3A;position:relative}
+.fmt b{position:absolute;left:12px;bottom:12px;right:12px;color:#fff;font-size:15px;line-height:1.05}
+.fmt small{font-size:13px;color:#57575C}
+.on-chip{background:#EEF4FB;color:#0058B0}
+.prog{animation:prog 3s ease-in-out infinite}
+@keyframes prog{from{width:0}to{width:100%}}
+.lib{height:96px;border-radius:10px;display:flex;align-items:center;justify-content:center;gap:4px}
+.lib i{display:block;width:24px;height:44px;border-radius:4px}
+.mi{height:34px;padding:0 10px;border-radius:7px;font-size:13px;display:flex;align-items:center}
+.mi.hi{background:#0071E3;color:#fff}
+.drop-in{animation:dropin 5s cubic-bezier(.3,1.35,.55,1) infinite}
+.d2{animation-delay:.3s}.d3{animation-delay:.6s}
+@keyframes dropin{0%{transform:translateY(-40px);opacity:0}16%{transform:translateY(0);opacity:1}90%{opacity:1}100%{opacity:0}}
+.list{display:flex;flex-direction:column;gap:10px}
+.list b{font-size:17px;font-weight:600;margin-bottom:4px}
+.list span{font-size:15px;color:#57575C}
+
+@media (prefers-reduced-motion: reduce){*{animation:none !important}.f1{opacity:1}.bars i{width:100%}}
+
+[hidden]{display:none !important}
+</style>
+</head>
+<body>
+
+
+<div style="width:1440px;min-height:100vh;display:flex;flex-direction:column;background:#fff;overflow:hidden">
+
+<!-- NAV -->
+<header style="height:72px;flex-shrink:0;display:flex;align-items:center;gap:40px;padding:0 96px;background:rgba(255,255,255,.9);border-bottom:1px solid #F0F0F2">
+  <a href="/" style="display:flex;align-items:center;gap:10px;color:#1D1D1F">
+    <svg viewBox="0 0 24 24" style="width:30px;height:30px" aria-hidden="true"><rect width="24" height="24" rx="5.4" fill="#0071E3"></rect><g transform="translate(0.75 1.65) scale(0.9)"><circle cx="11" cy="13" r="7" fill="#fff"></circle><path d="M9.95 10.3 14.2 13 9.95 15.7Z" fill="#0071E3" stroke="#0071E3" stroke-width="1" stroke-linejoin="round"></path><circle cx="19" cy="5" r="2" fill="#fff"></circle></g></svg>
+    <span style="font-size:19px;font-weight:600;letter-spacing:-.015em">Gravity Pants</span>
+  </a>
+  <nav aria-label="Main" style="display:flex;gap:32px;font-size:15px;font-weight:500">
+    <a href="#how" style="color:#424245">How it works</a>
+    <a href="/examples" style="color:#424245">Examples</a>
+    <a href="/features" aria-current="page" style="color:#1D1D1F;font-weight:600">Features</a>
+    <a href="#customers" style="color:#424245">Customers</a>
+    <a href="/pricing" style="color:#424245">Pricing</a>
+  </nav>
+  <div style="margin-left:auto;display:flex;align-items:center;gap:12px">
+    <a href="#signin" style="font-size:15px;font-weight:500;color:#1D1D1F;padding:0 12px">Sign in</a>
+    <a class="btn pri" href="#start" style="height:40px;font-size:15px;padding:0 18px">Start free</a>
+  </div>
+</header>
+
+<!-- FEATURES HERO -->
+<section style="height:600px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;padding:0 96px;text-align:center">
+  <span class="eyebrow">Features</span>
+  <h1 style="font-size:88px;font-weight:600;letter-spacing:-.045em;line-height:1">Everything you need.<br><span style="color:#0071E3">Nothing to learn.</span></h1>
+  <p class="lede" style="max-width:640px">Gravity Pants does one thing: it turns your photos into video ads. Here’s everything that makes that fast.</p>
+  <nav aria-label="Jump to" style="display:flex;gap:8px;padding:4px;border-radius:24px;background:#F5F5F7;margin-top:12px">
+    <a class="jump" href="#create">Create</a><a class="jump" href="#edit">Edit</a><a class="jump" href="#text">Text</a><a class="jump" href="#brand">Brand</a><a class="jump" href="#motion">Motion</a><a class="jump" href="#formats">Formats</a><a class="jump" href="#export">Export</a><a class="jump" href="#manage">Manage</a>
+  </nav>
+</section>
+
+<!-- CREATE -->
+<section id="create" class="split">
+  <div class="split-copy">
+    <span class="eyebrow">Create</span>
+    <h2>Drop photos. Get a reel.</h2>
+    <p>Drag your product photos in, or choose them from your computer. Each one becomes a frame, already in order and already timed.</p>
+    <ul class="ticks"><li>Works with the photos you already have</li><li>Add more photos at any time</li><li>Duplicate or delete a frame in one click</li></ul>
+  </div>
+  <div class="card split-media">
+    <div style="width:420px;height:260px;border-radius:18px;background:#fff;border:2px dashed #C5C9C0;display:flex;align-items:center;justify-content:center;gap:28px">
+      <div style="display:flex;align-items:flex-end;gap:8px"><span class="drop-in d1" style="width:58px;height:104px;border-radius:6px;background:#C9B8A3;display:block"></span><span class="drop-in d2" style="width:58px;height:104px;border-radius:6px;background:#2F3A33;display:block"></span><span class="drop-in d3" style="width:58px;height:104px;border-radius:6px;background:#8C2F2B;display:block"></span></div>
+      <div style="display:flex;flex-direction:column;gap:10px;align-items:flex-start"><b style="font-size:20px;letter-spacing:-.02em">New ad from photos</b><span style="font-size:13px;color:#57575C">Drop photos here, or</span><span style="height:34px;padding:0 14px;border-radius:17px;background:#0071E3;color:#fff;font-size:14px;display:flex;align-items:center">Choose Photos</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- EDIT -->
+<section id="edit" class="split rev">
+  <div class="split-copy">
+    <span class="eyebrow">Edit</span>
+    <h2>Six things to tap. That’s the whole editor.</h2>
+    <p>Every frame is made of the same simple parts. Tap one on the frame or in the side panel and only its settings appear.</p>
+    <ul class="ticks"><li>Photo, headline, subline and logo</li><li>Timing and transition for each frame</li><li>Undo anything, and your work saves as you go</li></ul>
+  </div>
+  <div class="card split-media">
+    <div style="display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:12px;width:480px">
+      <span class="el"><i style="background:#0071E3"></i><b>Photo</b><small>bottle.jpg</small></span>
+      <span class="el sel"><i style="background:#7D3BD6"></i><b>Headline</b><small>New season…</small></span>
+      <span class="el"><i style="background:#0B7A6F"></i><b>Subline</b><small>[Your product…]</small></span>
+      <span class="el"><i style="background:#B25200"></i><b>Logo</b><small>Top right</small></span>
+      <span class="el"><i style="background:#48484A"></i><b>Timing</b><small>2.5 seconds</small></span>
+      <span class="el"><i style="background:#48484A"></i><b>Transition</b><small>Fade</small></span>
+    </div>
+  </div>
+</section>
+
+<!-- TEXT -->
+<section id="text" class="split">
+  <div class="split-copy">
+    <span class="eyebrow">Text</span>
+    <h2>Words that look designed.</h2>
+    <p>Size, color and position with simple controls, plus the whole Google Fonts library to search and preview right on your ad.</p>
+    <ul class="ticks"><li>Nine-point position grid, no nudging</li><li>Size slider and brand color swatches</li><li>“Same on all frames” keeps every frame consistent</li></ul>
+  </div>
+  <div class="card split-media" style="gap:28px">
+    <div style="width:240px;border-radius:18px;background:#fff;padding:18px;display:flex;flex-direction:column;gap:14px">
+      <span style="font-size:13px;color:#57575C">Position</span>
+      <div style="display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:4px;width:96px;height:96px;padding:5px;border-radius:8px;background:#F5F5F7">
+        <span class="pp"></span><span class="pp"></span><span class="pp"></span><span class="pp"></span><span class="pp"></span><span class="pp"></span><span class="pp on"></span><span class="pp"></span><span class="pp"></span>
+      </div>
+      <span style="font-size:13px;color:#57575C">Color</span>
+      <div style="display:flex;gap:8px"><span style="width:26px;height:26px;border-radius:13px;background:#fff;box-shadow:0 0 0 .5px rgba(0,0,0,.25),0 0 0 3px #fff,0 0 0 4.5px #7D3BD6"></span><span style="width:26px;height:26px;border-radius:13px;background:#1D1D1F"></span><span style="width:26px;height:26px;border-radius:13px;background:#D4502A"></span></div>
+    </div>
+    <div style="width:260px;border-radius:18px;background:#fff;padding:14px;display:flex;flex-direction:column;gap:4px">
+      <span style="height:34px;border-radius:8px;background:#F5F5F7;display:flex;align-items:center;padding:0 10px;font-size:13px;color:#6E6E73">Search Google Fonts</span>
+      <span class="font-row" style="font-family:Georgia,serif">Playfair-style serif</span>
+      <span class="font-row on" style="font-weight:800;letter-spacing:-.02em">Bold grotesk</span>
+      <span class="font-row" style="font-family:'Courier New',monospace">Mono type</span>
+      <span class="font-row" style="font-style:italic">Elegant italic</span>
+    </div>
+  </div>
+</section>
+
+<!-- BRAND -->
+<section id="brand" class="split rev">
+  <div class="split-copy">
+    <span class="eyebrow">Brand kit</span>
+    <h2>On brand, without thinking about it.</h2>
+    <p>Save your logo, colors and fonts once. Every new ad starts with them in place, so a whole month of reels looks like one campaign.</p>
+    <ul class="ticks"><li>Logo placed automatically</li><li>Brand colors in every color picker</li><li>Headline and subline fonts set once</li></ul>
+  </div>
+  <div class="card split-media" style="flex-direction:column;gap:24px">
+    <div style="display:flex;align-items:center;gap:16px"><span style="width:100px;height:100px;border-radius:24px;background:#1D1D1F;color:#fff;font-size:13px;font-weight:800;letter-spacing:.16em;display:flex;align-items:center;justify-content:center">LOGO</span><span style="width:64px;height:64px;border-radius:32px;background:#D4502A"></span><span style="width:64px;height:64px;border-radius:32px;background:#1D2A3A"></span><span style="width:64px;height:64px;border-radius:32px;background:#E4B363"></span></div>
+    <div style="display:flex;gap:14px"><span class="fontcard"><b style="font-size:36px;letter-spacing:-.03em">Aa</b><small>Headline · Bold</small></span><span class="fontcard"><span style="font-size:36px;font-family:Georgia,serif">Aa</span><small>Subline · Regular</small></span></div>
+  </div>
+</section>
+
+<!-- MOTION -->
+<section id="motion" class="split">
+  <div class="split-copy">
+    <span class="eyebrow">Motion &amp; timing</span>
+    <h2>Smooth by default.</h2>
+    <p>Pick a transition between frames and an animation for your words. Give each frame its own length, then press play to see the real thing.</p>
+    <ul class="ticks"><li>Fade, Slide and Zoom transitions</li><li>Rise-up text animation</li><li>Per-frame timing with live playback</li></ul>
+  </div>
+  <div class="card split-media" style="flex-direction:column;align-items:stretch;padding:0 56px;gap:20px">
+    <div style="display:flex;gap:8px"><span class="chip">Fade</span><span class="chip">Slide</span><span class="chip" style="background:#0071E3;color:#fff">Zoom</span><span class="chip">Rise up</span></div>
+    <div style="position:relative;display:flex;gap:4px;align-items:center">
+      <span style="flex:3.5;height:64px;border-radius:10px;background:#C9B8A3;box-shadow:0 0 0 2px #0071E3;color:#fff;font-size:13px;font-weight:600;display:flex;align-items:center;padding-left:12px">1 · 3.5s</span>
+      <span class="chip" style="height:26px;font-size:11px;padding:0 8px">Fade</span>
+      <span style="flex:1.5;height:64px;border-radius:10px;background:#2F3A33;color:#fff;font-size:13px;font-weight:600;display:flex;align-items:center;padding-left:10px">2 · 1.5s</span>
+      <span class="chip" style="height:26px;font-size:11px;padding:0 8px">Zoom</span>
+      <span style="flex:3;height:64px;border-radius:10px;background:#8C2F2B;color:#fff;font-size:13px;font-weight:600;display:flex;align-items:center;padding-left:12px">3 · 3s</span>
+      <span class="playhead" style="position:absolute;top:-8px;bottom:-8px;width:2px;border-radius:1px;background:#0071E3"></span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px"><span style="width:40px;height:40px;border-radius:20px;background:#1D1D1F;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M8 5v14l11-7z" fill="#fff"></path></svg></span><span style="font-size:14px;font-variant-numeric:tabular-nums"><b>0:02.4</b> <span style="color:#57575C">/ 0:08</span></span></div>
+  </div>
+</section>
+
+<!-- FORMATS -->
+<section id="formats" class="split rev">
+  <div class="split-copy">
+    <span class="eyebrow">Formats</span>
+    <h2>One design, every screen.</h2>
+    <p>Switch between Story, feed and banner layouts while you edit. Your words and logo adapt to each shape, so nothing gets cropped awkwardly.</p>
+    <ul class="ticks"><li>9:16 for Reels, Stories and TikTok</li><li>1:1 for feeds</li><li>16:9 for banners and YouTube</li></ul>
+  </div>
+  <div class="card split-media" style="gap:20px;align-items:flex-end;padding-bottom:0">
+    <div class="fmt"><span style="width:124px;height:220px"><b>New season.<br>New color.</b></span><small>9:16</small></div>
+    <div class="fmt"><span style="width:170px;height:170px"><b>New season.<br>New color.</b></span><small>1:1</small></div>
+    <div class="fmt"><span style="width:240px;height:135px"><b>New season. New color.</b></span><small>16:9</small></div>
+  </div>
+</section>
+
+<!-- EXPORT -->
+<section id="export" class="split">
+  <div class="split-copy">
+    <span class="eyebrow">Export</span>
+    <h2>Ready where it’s going.</h2>
+    <p>Export every format together, as MP4 for ads and social or GIF for email and the web. One click, one download.</p>
+    <ul class="ticks"><li>MP4 and GIF</li><li>All three sizes at once</li><li>Sized for Stories, feeds and banners</li></ul>
+  </div>
+  <div class="card split-media" style="flex-direction:column;gap:14px">
+    <div style="width:380px;border-radius:18px;background:#fff;padding:20px;display:flex;flex-direction:column;gap:14px">
+      <b style="font-size:17px">Export “Spring Launch”</b>
+      <div style="display:flex;gap:8px"><span class="chip on-chip">9:16</span><span class="chip on-chip">1:1</span><span class="chip on-chip">16:9</span></div>
+      <div style="display:flex;gap:8px"><span class="chip on-chip">MP4</span><span class="chip on-chip">GIF</span></div>
+      <span style="height:6px;border-radius:3px;background:#E3E3E8;position:relative;overflow:hidden"><span class="prog" style="position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:#0071E3"></span></span>
+      <span style="height:44px;border-radius:22px;background:#0071E3;color:#fff;font-size:15px;display:flex;align-items:center;justify-content:center">Export 6 files</span>
+    </div>
+  </div>
+</section>
+
+<!-- MANAGE -->
+<section id="manage" class="split rev">
+  <div class="split-copy">
+    <span class="eyebrow">Manage</span>
+    <h2>Make one. Make fifty.</h2>
+    <p>All your ads live in one place. Found a reel that works? Duplicate it with new photos and keep the words, timing and style, or save it as a template.</p>
+    <ul class="ticks"><li>Duplicate with new photos</li><li>Save as template</li><li>Rename, duplicate and tidy up in one menu</li></ul>
+  </div>
+  <div class="card split-media" style="gap:24px">
+    <div style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:12px;width:280px">
+      <span class="lib" style="background:#fff"><i style="background:#C9B8A3"></i><i style="background:#2F3A33"></i><i style="background:#8C2F2B"></i></span>
+      <span class="lib" style="background:#fff;box-shadow:0 0 0 2px #0071E3"><i style="background:#B8860B"></i><i style="background:#3A2E1F"></i><i style="background:#E6D5B8"></i></span>
+      <span class="lib" style="background:#fff"><i style="background:#234A33"></i><i style="background:#0F2A1C"></i></span>
+      <span class="lib" style="background:#fff"><i style="background:#4B3BD6"></i><i style="background:#1E1760"></i><i style="background:#8F84F0"></i></span>
+    </div>
+    <div style="width:240px;border-radius:12px;background:rgba(255,255,255,.98);box-shadow:0 18px 40px rgba(0,0,0,.14);padding:6px;display:flex;flex-direction:column">
+      <span class="mi">Open</span><span class="mi hi">Duplicate with New Photos…</span><span class="mi">Save as Template</span><span class="mi">Rename</span>
+    </div>
+  </div>
+</section>
+
+<!-- ALL FEATURES -->
+<section style="height:760px;flex-shrink:0;display:flex;flex-direction:column;gap:48px;padding:120px 96px 0;background:#F5F5F7">
+  <h2 class="h2">All features</h2>
+  <div style="display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));gap:28px 40px">
+    <div class="list"><b>Create</b><span>Drag-and-drop photos</span><span>Automatic frames &amp; timing</span><span>Add, duplicate, delete frames</span></div>
+    <div class="list"><b>Edit</b><span>Photo, headline, subline, logo</span><span>Tap-to-select elements</span><span>Undo and auto-save</span></div>
+    <div class="list"><b>Text</b><span>Google Fonts picker</span><span>Size, color, nine-point position</span><span>Same on all frames</span></div>
+    <div class="list"><b>Brand</b><span>Brand kit: logo, colors, fonts</span><span>Brand colors in every picker</span></div>
+    <div class="list"><b>Motion</b><span>Fade, Slide, Zoom transitions</span><span>Rise-up text animation</span><span>Per-frame timing, live playback</span></div>
+    <div class="list"><b>Formats</b><span>9:16, 1:1, 16:9</span><span>Adaptive layouts</span></div>
+    <div class="list"><b>Export</b><span>MP4 and GIF</span><span>All sizes in one click</span></div>
+    <div class="list"><b>Manage</b><span>Your ads library</span><span>Duplicate with new photos</span><span>Save as template</span></div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="start" style="height:640px;flex-shrink:0;padding:40px 96px 80px">
+  <div style="height:100%;border-radius:32px;background:#F5F5F7;color:#1D1D1F;position:relative;overflow:hidden;display:flex;align-items:center;padding:0 96px">
+    <svg class="orbit" viewBox="0 0 600 600" style="position:absolute;right:-80px;top:-60px;width:640px;height:640px" aria-hidden="true"><circle cx="300" cy="300" r="280" fill="none" stroke="#D2D2D7" stroke-width="1.5" stroke-dasharray="2 10"></circle><circle cx="300" cy="20" r="18" fill="#0071E3"></circle></svg>
+    <svg viewBox="0 0 24 24" style="position:absolute;right:200px;top:150px;width:220px;height:220px" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#0071E3"></circle><path d="M9.6 7.8 16.4 12 9.6 16.2Z" fill="#fff" stroke="#fff" stroke-width="1.2" stroke-linejoin="round"></path></svg>
+    <div style="display:flex;flex-direction:column;gap:28px;max-width:640px;position:relative">
+      <h2 class="h2" style="font-size:76px">Your next ad is three photos away.</h2>
+      <p style="font-size:21px;line-height:1.45;color:#57575C">Start free and make your first reel in the next few minutes.</p>
+      <div style="display:flex;gap:12px"><a class="btn pri" href="#signup" style="height:56px;padding:0 30px;font-size:18px">Start free</a><a class="btn sec" href="/pricing" style="height:56px;padding:0 26px;font-size:18px;background:#fff">See pricing</a></div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer style="flex-grow:1;display:flex;flex-direction:column;gap:48px;padding:56px 96px;border-top:.5px solid rgba(0,0,0,.1)">
+  <div style="display:flex;gap:80px">
+    <div style="width:320px;display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <svg viewBox="0 0 24 24" style="width:28px;height:28px" aria-hidden="true"><rect width="24" height="24" rx="5.4" fill="#0071E3"></rect><g transform="translate(0.75 1.65) scale(0.9)"><circle cx="11" cy="13" r="7" fill="#fff"></circle><path d="M9.95 10.3 14.2 13 9.95 15.7Z" fill="#0071E3" stroke="#0071E3" stroke-width="1" stroke-linejoin="round"></path><circle cx="19" cy="5" r="2" fill="#fff"></circle></g></svg>
+        <span style="font-size:18px;font-weight:600;letter-spacing:-.015em">Gravity Pants</span>
+      </div>
+      <p style="font-size:14px;line-height:1.5;color:#6E6E73">Photos in. Reels out. Video ads for everyone who has better things to do than edit video.</p>
+    </div>
+    <div class="fcol" style="flex-grow:1;display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));gap:24px">
+      <div style="display:flex;flex-direction:column;gap:12px"><span style="font-size:14px;font-weight:600">Product</span><a href="#features">Features</a><a href="#examples">Examples</a><a href="/pricing">Pricing</a><a href="#templates">Templates</a></div>
+      <div style="display:flex;flex-direction:column;gap:12px"><span style="font-size:14px;font-weight:600">Customers</span><a href="#stories">Stories</a><a href="/examples">Gallery</a><a href="#agencies">For agencies</a></div>
+      <div style="display:flex;flex-direction:column;gap:12px"><span style="font-size:14px;font-weight:600">Company</span><a href="#about">About</a><a href="#blog">Blog</a><a href="#contact">Contact</a></div>
+      <div style="display:flex;flex-direction:column;gap:12px"><span style="font-size:14px;font-weight:600">Help</span><a href="#help">Help center</a><a href="#privacy">Privacy</a><a href="#terms">Terms</a></div>
+    </div>
+  </div>
+  <p style="font-size:13px;color:#6E6E73">© 2026 Gravity Pants. All rights reserved.</p>
+</footer>
+
+</div>
+
+<script>
+
+</script>
+</body>
+</html>
