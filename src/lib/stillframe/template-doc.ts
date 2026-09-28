@@ -3,13 +3,20 @@ import type { Frame, Format, ProjectWithFrames } from "./types";
 import { DEFAULT_LOGO } from "./types";
 import type { Template, TemplateSettings, TemplateSlide } from "./data";
 
-export type DocSlide = TemplateSlide & { sample_photo?: string | null };
+export type DocSlide = TemplateSlide & {
+  sample_photo?: string | null;
+  photo_focus?: { x: number; y: number };
+  photo_zoom?: number;
+};
 export type DocStyle = {
   background_color: string;
   headline: { font: string | null; weight: number; size_px: number; color: string };
   subline: { font: string | null; weight?: number; size_px: number; color: string };
   text_position: string;
   logo_position: string;
+  logo_path?: string | null;
+  logo_size_pct?: number;
+  logo_opacity?: "solid" | "soft";
 };
 export type TemplateDoc = {
   name: string;
@@ -47,6 +54,9 @@ export const DEFAULT_STYLE: DocStyle = {
   subline: { font: null, size_px: 44, color: "#FFFFFF" },
   text_position: "center",
   logo_position: "top-right",
+  logo_path: null,
+  logo_size_pct: 16,
+  logo_opacity: "solid",
 };
 
 export const blankSlide = (n: number): DocSlide => ({
@@ -58,6 +68,8 @@ export const blankSlide = (n: number): DocSlide => ({
   headline_placeholder: "Your headline",
   subline_placeholder: "A short line",
   sample_photo: null,
+  photo_focus: { x: 0.5, y: 0.5 },
+  photo_zoom: 1,
 });
 
 type Row = Template & { draft?: TemplateDoc | null; featured?: boolean };
@@ -80,6 +92,9 @@ export function docFromRow(t: Row): TemplateDoc {
       subline: { ...DEFAULT_STYLE.subline, ...(s.subline ?? {}) },
       text_position: hy(s.text_position, "center"),
       logo_position: hy(s.logo_position, "top-right"),
+      logo_path: s.logo_path ?? null,
+      logo_size_pct: s.logo_size_pct ?? 16,
+      logo_opacity: s.logo_opacity ?? "solid",
     },
     slides: (t.slides ?? []).map((x) => ({ ...x })),
   };
@@ -102,10 +117,11 @@ export function framesFromDoc(doc: TemplateDoc, { samples = false } = {}): Frame
     transition_in: { type: i === 0 ? "cut" : TR[s.transition_in], speed: s.transition_in === "cut" ? "quick" : "smooth" },
     photo: {
       fit: "fill",
-      focus: { x: 0.5, y: 0.5 },
+      focus: s.photo_focus ?? { x: 0.5, y: 0.5 },
+      zoom: s.photo_zoom ?? 1,
       movement: PM[s.photo_motion],
       brightness: 0,
-      darken_for_text: true,
+      darken_for_text: false,
       background_color: st.background_color,
       ...(samples && s.sample_photo ? { path: s.sample_photo } : {}),
     },
@@ -140,7 +156,7 @@ export function settingsFromDoc(doc: TemplateDoc): TemplateSettings {
     formats: [doc.format],
     primary_format: doc.format,
     pace: "standard",
-    logo: { positions: { [doc.format]: doc.style.logo_position } },
+    logo: { path: doc.style.logo_path ?? null, size_pct: doc.style.logo_size_pct ?? 16, opacity: doc.style.logo_opacity ?? "solid", positions: { [doc.format]: doc.style.logo_position } },
     end_card: {},
     frame_count: doc.slides.length,
     frames: framesFromDoc(doc).map(({ id: _i, project_id: _p, sort_order: _s, ...f }) => f),
@@ -157,7 +173,7 @@ export function previewProject(doc: TemplateDoc): ProjectWithFrames {
     primary_format: doc.format,
     formats: [doc.format],
     pace: "standard",
-    logo: { ...DEFAULT_LOGO, positions: { "9:16": doc.style.logo_position, "1:1": doc.style.logo_position, "16:9": doc.style.logo_position } },
+    logo: { ...DEFAULT_LOGO, path: doc.style.logo_path ?? null, size_pct: doc.style.logo_size_pct ?? 16, opacity: doc.style.logo_opacity ?? "solid", positions: { "9:16": doc.style.logo_position, "1:1": doc.style.logo_position, "16:9": doc.style.logo_position } },
     end_card: {},
     is_template: false,
     deleted_at: null,

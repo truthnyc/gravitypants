@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type PointerEvent as RPointerEvent, type ReactNode } from "react";
 import { createFileRoute, Link, useBlocker } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { ChevronDown, ChevronLeft, ChevronUp, CircleCheck, Copy, GripVertical, History, ImagePlus, Minus, Pause, Play, Plus, Sparkles, Trash2, X } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronUp, CircleCheck, Copy, GripVertical, History, ImagePlus, Minus, Pause, Play, Plus, RotateCcw, Sparkles, Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -189,8 +189,9 @@ function Builder({ row, refetch }: { row: any; refetch: () => void }) {
             </div>
             <div className="mt-5 flex flex-wrap gap-8">
               <PosGrid title="Text position" value={doc.style.text_position} onChange={(v) => setStyle({ text_position: v })} />
-              <PosGrid title="Logo position" note="user's brand kit logo" value={doc.style.logo_position} onChange={(v) => setStyle({ logo_position: v })} only={(a) => !a.startsWith("middle") && a !== "center"} />
+              <PosGrid title="Logo position" note="template default" value={doc.style.logo_position} onChange={(v) => setStyle({ logo_position: v })} only={(a) => !a.startsWith("middle") && a !== "center"} />
             </div>
+            <LogoEditor style={doc.style} onChange={setStyle} upload={uploadImage} />
           </Panel>
 
           <Panel n={3} title="Slides" aside={<span className="nums">{doc.slides.length} of max {MAX_SLIDES} · {docDuration(doc).toFixed(1)} s total</span>}>
@@ -208,6 +209,7 @@ function Builder({ row, refetch }: { row: any; refetch: () => void }) {
                   onDuplicate={() => { if (doc.slides.length < MAX_SLIDES) setDoc((d) => ({ ...d, slides: [...d.slides.slice(0, i + 1), { ...s }, ...d.slides.slice(i + 1)] })); }}
                   onDelete={() => { if (doc.slides.length > 1) setDoc((d) => ({ ...d, slides: d.slides.filter((_, j) => j !== i) })); }}
                   upload={uploadImage}
+                  format={doc.format}
                   dragging={dragFrom === i}
                   onDragStart={() => setDragFrom(i)}
                   onDragEnd={() => setDragFrom(null)}
@@ -396,9 +398,10 @@ function PosGrid({ title, note, value, onChange, only = () => true }: { title: s
   );
 }
 
-function SlideCard({ index, slide: s, count, open, onToggle, onChange, onMove, onDuplicate, onDelete, upload, dragging, onDragStart, onDragEnd, onDrop }: {
+function SlideCard({ index, slide: s, count, open, onToggle, onChange, onMove, onDuplicate, onDelete, upload, format, dragging, onDragStart, onDragEnd, onDrop }: {
   index: number; slide: DocSlide; count: number; open: boolean; onToggle: () => void; onChange: (p: Partial<DocSlide>) => void;
   onMove: (by: number) => void; onDuplicate: () => void; onDelete: () => void; upload: (f: File) => Promise<string>;
+  format: Format;
   dragging: boolean; onDragStart: () => void; onDragEnd: () => void; onDrop: () => void;
 }) {
   const file = useRef<HTMLInputElement>(null);
@@ -407,7 +410,7 @@ function SlideCard({ index, slide: s, count, open, onToggle, onChange, onMove, o
   const pick = async (f: File | undefined) => {
     if (!f) return;
     setBusy(true);
-    try { onChange({ sample_photo: await upload(f) }); } catch (e) { toast.error(e instanceof Error ? e.message : "Upload failed"); } finally { setBusy(false); }
+    try { onChange({ sample_photo: await upload(f), photo_focus: { x: 0.5, y: 0.5 }, photo_zoom: 1 }); } catch (e) { toast.error(e instanceof Error ? e.message : "Upload failed"); } finally { setBusy(false); }
   };
   return (
     <li className={cn("rounded-sm shadow-card", open && "ring-2 ring-primary", dragging && "opacity-50")} onDragOver={(e) => e.preventDefault()} onDrop={onDrop}>
@@ -459,13 +462,13 @@ function SlideCard({ index, slide: s, count, open, onToggle, onChange, onMove, o
             <span className="text-[12px] font-medium text-secondary-text">Sample photo <span className="font-normal">· previews only</span></span>
             <div className="flex min-h-[84px] items-center gap-3 rounded-sm border border-dashed border-placeholder-border p-2">
               {s.sample_photo ? (
-                <>
-                  <MediaImage path={s.sample_photo} alt="" className="h-16 w-12 shrink-0 rounded-sm object-cover" />
-                  <div className="flex flex-col items-start text-[12px]">
+                <div className="w-full space-y-2">
+                  <PhotoCrop slide={s} format={format} onChange={onChange} />
+                  <div className="flex items-center gap-3 text-[12px]">
                     <button type="button" className="text-link" onClick={() => file.current?.click()}>Replace</button>
-                    <button type="button" className="text-destructive" onClick={() => onChange({ sample_photo: null })}>Remove</button>
+                    <button type="button" className="text-destructive" onClick={() => onChange({ sample_photo: null, photo_focus: { x: 0.5, y: 0.5 }, photo_zoom: 1 })}>Remove</button>
                   </div>
-                </>
+                </div>
               ) : (
                 <button type="button" onClick={() => file.current?.click()} className="flex w-full items-center justify-center gap-1.5 text-[13px] text-secondary-text">
                   <ImagePlus className="size-4" strokeWidth={1.7} /> {busy ? "Uploading…" : "Add sample photo"}
@@ -477,6 +480,81 @@ function SlideCard({ index, slide: s, count, open, onToggle, onChange, onMove, o
         </div>
       )}
     </li>
+  );
+}
+
+function PhotoCrop({ slide, format, onChange }: { slide: DocSlide; format: Format; onChange: (p: Partial<DocSlide>) => void }) {
+  const [drag, setDrag] = useState<{ x: number; y: number; fx: number; fy: number } | null>(null);
+  const focus = slide.photo_focus ?? { x: 0.5, y: 0.5 };
+  const zoom = slide.photo_zoom ?? 1;
+  const doc = useMemo<TemplateDoc>(() => ({
+    name: "Crop preview", slug: "", description: "", format, is_reusable: false, featured: false, thumbnail_url: null,
+    style: { ...DEFAULT_CROP_STYLE }, slides: [{ ...slide, headline_placeholder: "", subline_placeholder: "", transition_in: "none", text_animation: "none", photo_motion: "none" }],
+  }), [format, slide]);
+  const move = (e: RPointerEvent<HTMLDivElement>) => {
+    if (!drag) return;
+    const r = e.currentTarget.getBoundingClientRect();
+    onChange({ photo_focus: { x: Math.min(1, Math.max(0, drag.fx - (e.clientX - drag.x) / (r.width * zoom * 1.4))), y: Math.min(1, Math.max(0, drag.fy - (e.clientY - drag.y) / (r.height * zoom * 1.4))) } });
+  };
+  return (
+    <div className="space-y-2">
+      <div
+        className="relative mx-auto cursor-move touch-none overflow-hidden rounded-sm ring-1 ring-border"
+        onPointerDown={(e) => { e.currentTarget.setPointerCapture(e.pointerId); setDrag({ x: e.clientX, y: e.clientY, fx: focus.x, fy: focus.y }); }}
+        onPointerMove={move}
+        onPointerUp={() => setDrag(null)}
+        onPointerCancel={() => setDrag(null)}
+      >
+        <TemplateCanvas doc={doc} format={format} time={0.2} width={format === "9:16" ? 104 : format === "1:1" ? 144 : 180} className="block" />
+        <span className="pointer-events-none absolute inset-x-0 bottom-1 text-center text-[10px] font-medium text-background drop-shadow">Drag to position</span>
+      </div>
+      <div className="flex items-center gap-2">
+        <span className="text-[11px] text-secondary-text">Zoom</span>
+        <input className="min-w-0 flex-1 accent-[var(--primary)]" type="range" min={100} max={300} value={Math.round(zoom * 100)} aria-label="Sample photo zoom" onChange={(e) => onChange({ photo_zoom: Number(e.target.value) / 100 })} />
+        <span className="nums w-9 text-right text-[11px]">{zoom.toFixed(1)}×</span>
+        <IconBtn label="Reset crop" onClick={() => onChange({ photo_focus: { x: 0.5, y: 0.5 }, photo_zoom: 1 })}><RotateCcw className="size-3.5" strokeWidth={1.7} /></IconBtn>
+      </div>
+    </div>
+  );
+}
+
+const DEFAULT_CROP_STYLE: TemplateDoc["style"] = {
+  background_color: "#1D1D1F", headline: { font: null, weight: 700, size_px: 96, color: "#FFFFFF" },
+  subline: { font: null, size_px: 44, color: "#FFFFFF" }, text_position: "center", logo_position: "top-right",
+  logo_path: null, logo_size_pct: 16, logo_opacity: "solid",
+};
+
+function LogoEditor({ style, onChange, upload }: { style: TemplateDoc["style"]; onChange: (p: Partial<TemplateDoc["style"]>) => void; upload: (f: File) => Promise<string> }) {
+  const file = useRef<HTMLInputElement>(null);
+  const [busy, setBusy] = useState(false);
+  const pick = async (f: File | undefined) => {
+    if (!f) return;
+    setBusy(true);
+    try { onChange({ logo_path: await upload(f) }); } catch (e) { toast.error(e instanceof Error ? e.message : "Logo upload failed"); } finally { setBusy(false); }
+  };
+  const size = style.logo_size_pct ?? 16;
+  return (
+    <div className="mt-5 border-t border-border pt-4">
+      <p className="text-[12px] font-medium text-secondary-text">Template logo <span className="font-normal">· customers can replace it</span></p>
+      <div className="mt-2 grid gap-4 sm:grid-cols-[180px_1fr]">
+        <div className="flex min-h-[84px] items-center justify-center rounded-sm border border-dashed border-placeholder-border p-3">
+          {style.logo_path ? <MediaImage path={style.logo_path} alt="Template logo" className="max-h-14 max-w-[140px] object-contain" /> : <span className="text-[12px] text-secondary-text">No logo</span>}
+        </div>
+        <div className="space-y-3">
+          <div className="flex flex-wrap gap-2">
+            <Button variant="secondary" size="header" disabled={busy} onClick={() => file.current?.click()}><ImagePlus className="size-4" strokeWidth={1.7} />{style.logo_path ? "Replace logo" : "Add logo"}</Button>
+            {style.logo_path && <Button variant="ghost" size="header" onClick={() => onChange({ logo_path: null })}><X className="size-4" strokeWidth={1.7} />Remove</Button>}
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="w-10 text-[12px] text-secondary-text">Size</span>
+            <input type="range" min={5} max={40} value={size} aria-label="Template logo size" className="min-w-0 flex-1 accent-[var(--primary)]" onChange={(e) => onChange({ logo_size_pct: Number(e.target.value) })} />
+            <span className="nums w-9 text-right text-[12px]">{size}%</span>
+          </div>
+          <Seg value={style.logo_opacity ?? "solid"} options={["solid", "soft"]} onChange={(v) => onChange({ logo_opacity: v })} small />
+        </div>
+      </div>
+      <input ref={file} type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; void pick(f); }} />
+    </div>
   );
 }
 

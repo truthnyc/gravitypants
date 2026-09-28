@@ -10,11 +10,11 @@ export function useDocAssets(doc: TemplateDoc) {
   const project = useMemo(() => previewProject(doc), [doc]);
   const [images, setImages] = useState(() => new Map<string, HTMLImageElement>());
   const [ready, setReady] = useState(0);
-  const key = doc.slides.map((s) => s.sample_photo ?? "").join("|");
+  const key = [...doc.slides.map((s) => s.sample_photo ?? ""), doc.style.logo_path ?? ""].join("|");
   const fontKey = `${doc.style.headline.font}|${doc.style.headline.weight}|${doc.style.subline.font}`;
   useEffect(() => {
     let live = true;
-    const paths = doc.slides.map((s) => s.sample_photo).filter(Boolean) as string[];
+    const paths = [...doc.slides.map((s) => s.sample_photo), doc.style.logo_path].filter(Boolean) as string[];
     void Promise.all([loadImages(paths), ensureFonts(project.frames)]).then(([m]) => {
       if (!live) return;
       setImages(m);
@@ -45,7 +45,7 @@ export function TemplateCanvas({ doc, format, time, width, className }: { doc: T
 /** Still of one slide as a JPEG data URL, for the template card thumbnail. */
 export async function renderThumbnail(doc: TemplateDoc, slide = 0): Promise<string> {
   const project = previewProject(doc);
-  const paths = doc.slides.map((s) => s.sample_photo).filter(Boolean) as string[];
+  const paths = [...doc.slides.map((s) => s.sample_photo), doc.style.logo_path].filter(Boolean) as string[];
   const [images] = await Promise.all([loadImages(paths), ensureFonts(project.frames)]);
   const size = FORMAT_SIZE[doc.format];
   const k = 540 / size.width;

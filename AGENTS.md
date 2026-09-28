@@ -36,7 +36,7 @@
 - AI calls go through `src/lib/ai/gateway.server.ts` (Responses, openai/gpt-6-astra, streamed, instructions via `system`); the billing helper is `diagnoseBilling` in `billing-help.functions.ts`, owners/admins only.
 - Brand kits: named kits live in `brand_kits` (logos in private `brand-assets` bucket, paths prefixed `brand-assets:` so `getMediaUrl` picks the bucket); ads link via `projects.brand_kit_id`; `effectiveKit()` merges the kit over the legacy `brand_kit` row, which now only holds workspace ad settings (placement, size, end card). Gating via SQL `brand_kits_enabled()` in RLS.
 - Templates: `templates` are photo-less styles; gallery examples map to them in `example-template.ts`, then reuse `insertCopy` so user photos remain private. Save needs `brand_kits_enabled`, sharing needs `workspace_is_team()` in RLS.
-- Admin templates: ready-made (source system) templates are edited only via `admin-templates.functions.ts` (status/version/audience/featured/new_until; published edits wait in `draft` until Publish, which rebuilds `settings` with `settingsFromDoc` in `template-doc.ts`); builder preview draws via renderAt; plan limits via `usePlanAccess().canUseTemplate()`.
+- Admin templates: system templates use versioned drafts, JSON crop/logo settings copied into ads, renderAt previews, and central plan gates.
 
 - Plan gates: every feature check goes through `usePlanAccess().canUse(feature)` in `src/lib/stillframe/plan.ts`; blocked features call `openUpgrade()` (one shared dialog) instead of hiding — one place for plan rules.
 - Support: tickets in `support_tickets` via `submitTicket` server fn; priority set by SQL trigger from the plan (never the browser); each ticket emails help@gravitypants.com.

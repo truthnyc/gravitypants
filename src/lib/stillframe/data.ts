@@ -152,7 +152,7 @@ export function framePayloadFromPhoto(photo: UploadedPhoto, index: number) {
       focus: { x: 0.5, y: 0.5 },
       movement: "none",
       brightness: 0,
-      darken_for_text: index === 0,
+      darken_for_text: false,
       background_color: null,
     },
     transition_in: { type: index === 0 ? "cut" : "fade", speed: "smooth" },
