@@ -22,7 +22,11 @@ export async function gatewayText(system: string, messages: ModelMessage[], sign
       return res;
     },
   });
+  let streamError: unknown;
   const result = streamText({
+    onError: ({ error }) => {
+      streamError = error;
+    },
     model: provider.responses(DEFAULT_MODEL),
     system,
     messages,
@@ -37,7 +41,11 @@ export async function gatewayText(system: string, messages: ModelMessage[], sign
       },
     },
   });
-  return await result.text;
+  try {
+    return await result.text;
+  } catch (e) {
+    throw streamError ?? e;
+  }
 }
 
 /** Map gateway failures to a short message the app can show. */
