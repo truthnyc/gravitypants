@@ -515,6 +515,15 @@ export function useMyUserId() {
   return useQuery({ queryKey: ["my-user-id"], queryFn: async () => (await supabase.auth.getUser()).data.user?.id ?? null, staleTime: Infinity });
 }
 
+/** True for Gravity Pants staff, who maintain the ready-made templates everyone sees. */
+export function useIsPlatformAdmin() {
+  return useQuery({
+    queryKey: ["is-platform-admin"],
+    queryFn: async () => Boolean((await supabase.rpc("is_platform_admin")).data),
+    staleTime: Infinity,
+  });
+}
+
 export function useCanEditKits() {
   return useQuery({
     queryKey: ["workspace-role", getWorkspaceId()],
