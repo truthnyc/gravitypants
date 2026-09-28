@@ -33,4 +33,4 @@
 - [x] Add reference-based site tokens and reusable ReelPhone; verify public and app flows
 
 ## Public home page
-- [ ] Rebuild desktop and mobile reference sections and interactions; verify responsive flow
+- [x] Rebuild desktop and mobile reference sections and interactions; verify responsive flow
