@@ -567,10 +567,27 @@ export type TemplateSettings = Pick<Project, "formats" | "primary_format" | "pac
   frame_count: number;
   frames: TemplateFrame[];
 };
+export type TemplateSlide = {
+  role: string;
+  duration_sec: number;
+  transition_in: "none" | "fade" | "slide" | "swipe-left" | "zoom" | "cut";
+  text_animation: "none" | "rise-up" | "fade-in" | "typewriter" | "zoom";
+  photo_motion: "none" | "slow-zoom-in" | "pan";
+  headline_placeholder: string;
+  subline_placeholder: string;
+};
 export type Template = {
   id: string;
-  workspace_id: string;
-  created_by: string;
+  slug?: string | null;
+  description?: string | null;
+  format?: "9:16" | "1:1" | "16:9" | null;
+  is_reusable?: boolean;
+  source?: "system" | "user" | "team";
+  sort_order?: number;
+  style?: Record<string, unknown>;
+  slides?: TemplateSlide[];
+  workspace_id: string | null;
+  created_by: string | null;
   name: string;
   thumbnail_url: string | null;
   visibility: "private" | "team" | "global";
@@ -627,7 +644,8 @@ export function useTemplates() {
       const { data, error } = await supabase
         .from("templates")
         .select("*")
-        .or(`workspace_id.eq.${ws},visibility.eq.global`)
+        .or(`workspace_id.eq.${ws},visibility.eq.global,source.eq.system`)
+        .order("sort_order", { ascending: true })
         .order("updated_at", { ascending: false });
       if (error) throw error;
       return (data ?? []) as unknown as Template[];
@@ -643,6 +661,7 @@ export function useSaveTemplate() {
         workspace_id: getWorkspaceId(),
         name,
         visibility,
+        source: visibility === "team" ? "team" : "user",
         thumbnail_url: project.thumbnail_url ?? project.frames[0]?.photo.path ?? null,
         settings: templateFromProject(project) as never,
       });

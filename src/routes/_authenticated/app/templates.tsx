@@ -39,8 +39,8 @@ function TemplatesPage() {
   const { data: templates = [], isLoading } = useTemplates();
   const [deleting, setDeleting] = useState<Template | null>(null);
   const remove = useDeleteTemplate();
-  const global = templates.filter((t) => t.visibility === "global");
-  const own = templates.filter((t) => t.visibility !== "global");
+  const global = templates.filter((t) => t.visibility === "global" || t.source === "system");
+  const own = templates.filter((t) => t.visibility !== "global" && t.source !== "system");
   const mine = own.filter((t) => t.created_by === access?.userId);
   const team = own.filter((t) => t.visibility === "team" && t.created_by !== access?.userId);
 
