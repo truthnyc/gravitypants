@@ -21,7 +21,7 @@ import type { Format } from "@/lib/stillframe/types";
 import { cn } from "@/lib/utils";
 import { adminTemplatesKey, audienceLabel, TemplateThumb } from "@/components/admin/TemplateAdminBits";
 
-export const Route = createFileRoute("/_authenticated/admin/templates/$id")({
+export const Route = createFileRoute("/_authenticated/admin/templates/$id/edit")({
   head: () => ({ meta: [
     { title: "Template builder — Gravity Pants Admin" },
     { name: "description", content: "Edit a ready-made Gravity Pants template." },

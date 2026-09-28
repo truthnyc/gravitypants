@@ -89,7 +89,7 @@ function AdminTemplates() {
       const r = await act({ data: { id, action } });
       toast(done);
       await refresh();
-      if (action === "duplicate" && r.id) void navigate({ to: "/admin/templates/$id", params: { id: r.id } });
+      if (action === "duplicate" && r.id) void navigate({ to: "/admin/templates/$id/edit", params: { id: r.id } });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "That didn't work");
     }
@@ -98,7 +98,7 @@ function AdminTemplates() {
     try {
       const { id } = await create();
       await refresh();
-      void navigate({ to: "/admin/templates/$id", params: { id } });
+      void navigate({ to: "/admin/templates/$id/edit", params: { id } });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "That didn't work");
     }
@@ -188,7 +188,7 @@ function AdminTemplates() {
                   <td className={cn("w-[60px] px-1", archived && "opacity-50")}><TemplateThumb row={r} /></td>
                   <td className={cn("px-3", archived && "opacity-50")}>
                     <div className="flex items-center gap-2">
-                      <Link to="/admin/templates/$id" params={{ id: r.id }} className="text-[14px] font-semibold hover:underline">{r.name}</Link>
+                      <Link to="/admin/templates/$id/edit" params={{ id: r.id }} className="text-[14px] font-semibold hover:underline">{r.name}</Link>
                       {r.is_reusable && <span className="inline-flex h-5 items-center rounded-full bg-primary/10 px-2 text-[11px] font-semibold text-primary">Reusable</span>}
                       {r.draft && r.status === "published" && <span className="inline-flex h-5 items-center rounded-full bg-warning-soft px-2 text-[11px] font-semibold text-warning-text">Unpublished edits</span>}
                     </div>
@@ -218,7 +218,7 @@ function AdminTemplates() {
                         <button type="button" aria-label={`More for ${r.name}`} className="flex size-9 items-center justify-center rounded-lg hover:bg-control-fill"><MoreHorizontal className="size-4" strokeWidth={1.7} /></button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-44">
-                        <DropdownMenuItem onSelect={() => void navigate({ to: "/admin/templates/$id", params: { id: r.id } })}><Pencil className="size-4" strokeWidth={1.7} /> Edit</DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => void navigate({ to: "/admin/templates/$id/edit", params: { id: r.id } })}><Pencil className="size-4" strokeWidth={1.7} /> Edit</DropdownMenuItem>
                         <DropdownMenuItem onSelect={() => void run(r.id, "duplicate", "Duplicated as a draft")}><Copy className="size-4" strokeWidth={1.7} /> Duplicate</DropdownMenuItem>
                         {r.status === "published" && <DropdownMenuItem onSelect={() => void navigate({ to: "/app/templates/$slug", params: { slug: r.slug } })}><Play className="size-4" strokeWidth={1.7} /> Preview</DropdownMenuItem>}
                         <DropdownMenuSeparator />
