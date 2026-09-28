@@ -406,6 +406,8 @@ export type Database = {
           current_period_end: string | null
           current_period_start: string | null
           environment: string
+          extra_exports: number
+          last_topup_session: string | null
           plan: string
           status: string
           stripe_customer_id: string | null
@@ -422,6 +424,8 @@ export type Database = {
           current_period_end?: string | null
           current_period_start?: string | null
           environment?: string
+          extra_exports?: number
+          last_topup_session?: string | null
           plan?: string
           status?: string
           stripe_customer_id?: string | null
@@ -438,6 +442,8 @@ export type Database = {
           current_period_end?: string | null
           current_period_start?: string | null
           environment?: string
+          extra_exports?: number
+          last_topup_session?: string | null
           plan?: string
           status?: string
           stripe_customer_id?: string | null
