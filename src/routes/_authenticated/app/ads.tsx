@@ -39,7 +39,12 @@ function YourAds() {
   useEffect(() => {
     const first = search.welcome === "1" || sessionStorage.getItem("gravity-pants:welcome") === "1";
     if (first) { setWelcome(true); sessionStorage.removeItem("gravity-pants:welcome"); }
-    if (search.template && templateForExample(search.template)) sessionStorage.setItem("gravity-pants:example", search.template);
+    if (search.template) {
+      // Website "Use this style" lands on the template picker with that style preselected.
+      sessionStorage.removeItem("gravity-pants:example");
+      void navigate({ to: "/app/templates", search: { template: search.template }, replace: true });
+      return;
+    }
     const pending = sessionStorage.getItem("gravity-pants:pending-plan");
     if (pending || search.plan) void supabase.auth.getUser().then(({ data }) => {
       if (!data.user) return;

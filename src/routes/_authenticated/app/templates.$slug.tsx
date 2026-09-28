@@ -12,8 +12,7 @@ import {
   AlertDialogFooter,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { TemplatePreview, templateFormat, templateSlides, usePrefersReducedMotion } from "@/components/templates/TemplatePreview";
-import { StepBar } from "./templates.index";
+import { StepBar, TemplatePreview, templateFormat, templateSlides, usePrefersReducedMotion } from "@/components/templates/TemplatePreview";
 import {
   useCanEditKits,
   useCreateAdFromTemplate,

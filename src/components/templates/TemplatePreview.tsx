@@ -89,3 +89,17 @@ export function TemplatePreview({ template, playing, className }: { template: Te
     </div>
   );
 }
+
+export const templateSlug = (t: Template) => t.slug ?? t.id;
+
+export function StepBar({ step }: { step: 1 | 2 }) {
+  return (
+    <div className="flex items-center gap-3">
+      <span className="nums text-[13px] font-medium text-secondary-text">Step {step} of 2</span>
+      <div className="flex gap-1.5" aria-hidden="true">
+        {[1, 2].map((n) => <span key={n} className={cn("h-1 w-8 rounded-lg", n <= step ? "bg-primary" : "bg-control-fill")} />)}
+      </div>
+    </div>
+  );
+}
+

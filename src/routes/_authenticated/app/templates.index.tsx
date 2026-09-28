@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
 import { ChevronLeft } from "lucide-react";
-import { TemplatePreview, templateFormat, templateSlides, usePrefersReducedMotion } from "@/components/templates/TemplatePreview";
+import { StepBar, TemplatePreview, templateFormat, templateSlug, templateSlides, usePrefersReducedMotion } from "@/components/templates/TemplatePreview";
 import { useTemplateAccess, useTemplates, type Template } from "@/lib/stillframe/data";
 import { templateForExample } from "@/lib/site/example-template";
 import { cn } from "@/lib/utils";
@@ -22,21 +22,8 @@ export const Route = createFileRoute("/_authenticated/app/templates/")({
   component: TemplatesPage,
 });
 
-export const templateSlug = (t: Template) => t.slug ?? t.id;
-
 type Tab = "system" | "mine" | "team";
 const EMPTY = "Templates you save will appear here. Open an ad → ••• → Save as Template.";
-
-export function StepBar({ step }: { step: 1 | 2 }) {
-  return (
-    <div className="flex items-center gap-3">
-      <span className="nums text-[13px] font-medium text-secondary-text">Step {step} of 2</span>
-      <div className="flex gap-1.5" aria-hidden="true">
-        {[1, 2].map((n) => <span key={n} className={cn("h-1 w-8 rounded-lg", n <= step ? "bg-primary" : "bg-control-fill")} />)}
-      </div>
-    </div>
-  );
-}
 
 function TemplatesPage() {
   const search = Route.useSearch();

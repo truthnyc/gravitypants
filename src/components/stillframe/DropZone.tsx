@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -83,6 +83,14 @@ export function DropZone({ spacious = false }: { spacious?: boolean }) {
           onClick={() => fileInput.current?.click()}
         >
           {(createAd.isPending || fromTemplate.isPending) ? "Uploading…" : "Choose Photos"}
+        </Button>
+        <Button
+          asChild
+          variant="secondary"
+          className="mt-2 min-h-12 w-full text-[16px] sm:ml-2 sm:mt-3 sm:w-auto lg:mt-4 lg:min-h-10 lg:text-[14px]"
+          size="main"
+        >
+          <Link to="/app/templates">Start from a template</Link>
         </Button>
 
         {uploads.length > 0 && (
