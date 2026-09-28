@@ -6,6 +6,7 @@ import {
   TEXT_COLORS,
   formatSeconds,
   type BrandKit,
+  type NamedBrandKit,
   type Format,
   type Frame,
   type LogoSettings,
@@ -24,6 +25,7 @@ import { FontPicker } from "@/components/stillframe/FontPicker";
 import { MediaImage } from "@/components/stillframe/MediaImage";
 import { ELEMENT_META, type ElementKey } from "./use-editor";
 import { cn } from "@/lib/utils";
+import { Link } from "@tanstack/react-router";
 
 const ICONS: Record<ElementKey, typeof Type> = {
   photo: ImageIcon,

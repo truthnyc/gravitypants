@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { supabase } from "@/integrations/supabase/client";
-import { useBrandKit } from "@/lib/stillframe/data";
+import { effectiveKit, useBrandKit, useBrandKits } from "@/lib/stillframe/data";
 import { MEDIA_BUCKET } from "@/lib/stillframe/media";
 import { registerCustomFonts } from "@/lib/stillframe/fonts";
 import { CHANNELS, DEFAULT_CHANNEL, nearestFormat, slugify } from "@/lib/stillframe/channels";
@@ -38,7 +38,9 @@ function gifSize(w: number, h: number, size: GifSize) {
 /* ================================================================== page */
 
 export function ExportPage({ project, frames }: { project: Project; frames: Frame[] }) {
-  const { data: kit } = useBrandKit();
+  const { data: settings } = useBrandKit();
+  const { data: kits } = useBrandKits();
+  const kit = useMemo(() => (settings ? effectiveKit(settings, kits?.find((k) => k.id === project.brand_kit_id)) : settings), [settings, kits, project.brand_kit_id]);
   const brand = useMemo<BrandStyle>(
     () => ({ color: kit?.colors[0] ?? null, font: kit?.body_font ?? null, endCard: kit?.end_card ?? null }),
     [kit?.colors, kit?.body_font, kit?.end_card],
