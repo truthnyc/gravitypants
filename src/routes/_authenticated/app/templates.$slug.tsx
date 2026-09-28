@@ -248,7 +248,6 @@ function SlideRow({ index, slide, value, format, bg, active, busy, error, onFocu
           </div>
         )}
         <input ref={input} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (f) onFile(f); }} />
-        {!value.photo && !busy && <span className="sr-only" style={{ background: bg }} />}
       </div>
       <div className="min-w-0 flex-1">
         <p className="nums text-[12px] text-secondary-text">
@@ -282,6 +281,7 @@ function Preview({ slides, values, format, bg, active }: { slides: TemplateSlide
   const [playing, setPlaying] = useState(false);
   const [time, setTime] = useState(0);
   const last = useRef(0);
+  useEffect(() => { setPlaying(false); setTime(0); }, [active]);
 
   useEffect(() => {
     if (!playing) return;
