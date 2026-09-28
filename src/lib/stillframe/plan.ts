@@ -11,7 +11,7 @@ export type Feature = "export" | "gif" | "brand_kits" | "templates" | "team_shar
 /** Free trial limit, from the shared plan config (also enforced in SQL export_status). */
 export const FREE_EXPORTS = TRIAL.exports;
 
-export type Entitlements = { paid: boolean; team: boolean; exports: ExportStatus | null; tier?: string | null; admin?: boolean };
+export type Entitlements = { paid: boolean; team: boolean; exports: ExportStatus | null; tier?: string | null; admin?: boolean; trial?: boolean };
 
 /** Plan family ("simple" | "business" | "team") that the active workspace is paying for, or null. */
 export function planTier(b: { plan?: string; status?: string; comp_plan?: string | null; comp_until?: string | null; current_period_end?: string | null } | null): string | null {
@@ -22,10 +22,16 @@ export function planTier(b: { plan?: string; status?: string; comp_plan?: string
   return live && ["simple", "business", "team"].includes(p) ? p : null;
 }
 
+/** Active free trial (no paid plan yet). */
+export function isTrial(b: { plan?: string; status?: string; trial_ends_at?: string | null } | null): boolean {
+  return !!b && b.plan === "trial" && b.status === "trialing" && !!b.trial_ends_at && new Date(b.trial_ends_at) > new Date();
+}
+
 /** Ready-made templates can be limited to plans; an empty audience means everyone. */
 export function canUseAudience(e: Entitlements | undefined, audience: string[] | null | undefined): boolean {
   if (!audience?.length || !e) return true;
-  return Boolean(e.admin) || (e.tier != null && audience.includes(e.tier));
+  // Free-trial accounts get every feature, so plan-limited templates are open to them too.
+  return Boolean(e.admin) || Boolean(e.trial) || (e.tier != null && audience.includes(e.tier));
 }
 
 export function canUseWith(e: Entitlements | undefined, f: Feature): boolean {
@@ -58,7 +64,7 @@ export function usePlanAccess() {
         supabase.rpc("effective_billing", { _ws: ws }),
         supabase.rpc("is_platform_admin"),
       ]);
-      return { paid: Boolean(paid), team: Boolean(team), exports, tier: planTier(billing as never), admin: Boolean(admin) };
+      return { paid: Boolean(paid), team: Boolean(team), exports, tier: planTier(billing as never), admin: Boolean(admin), trial: isTrial(billing as never) };
     },
     refetchOnWindowFocus: "always",
   });

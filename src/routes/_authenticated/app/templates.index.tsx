@@ -156,4 +156,4 @@ function TemplateCard({ template: t, selected = false }: { template: Template; s
 }
 
 const PLAN_NAMES: Record<string, string> = { simple: "Simple", business: "Business", team: "Team" };
-const audienceText = (a: string[] | undefined) => `${(a ?? []).map((x) => PLAN_NAMES[x] ?? x).join(", ")} plans`;
+const audienceText = (a: string[] | undefined) => `Available on ${(a ?? []).map((x) => PLAN_NAMES[x] ?? x).join(" or ")}`;
