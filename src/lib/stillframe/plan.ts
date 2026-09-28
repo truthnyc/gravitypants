@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useSyncExternalStore } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { getWorkspaceId } from "./workspace";
+import { peekWorkspaceId } from "./workspace";
 import { billingKey, fetchExportStatus, type ExportStatus } from "./billing";
 import { TRIAL } from "./plans-config";
 
@@ -30,10 +30,12 @@ export function canUseWith(e: Entitlements | undefined, f: Feature): boolean {
 
 /** Plan checks for the active workspace. Server/RLS enforce the same rules; this only drives the UI. */
 export function usePlanAccess() {
+  const wsId = peekWorkspaceId();
   const q = useQuery({
-    queryKey: [...billingKey, "entitlements", getWorkspaceId()],
+    queryKey: [...billingKey, "entitlements", wsId],
+    enabled: !!wsId,
     queryFn: async (): Promise<Entitlements> => {
-      const ws = getWorkspaceId();
+      const ws = wsId as string;
       const [{ data: paid }, { data: team }, exports] = await Promise.all([
         supabase.rpc("brand_kits_enabled", { _ws: ws }),
         supabase.rpc("workspace_is_team", { _ws: ws }),
