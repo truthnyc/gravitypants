@@ -30,6 +30,7 @@ function SignIn() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [keepSignedIn, setKeepSignedIn] = useState(true);
   const [resetSent, setResetSent] = useState(false);
@@ -59,6 +60,7 @@ function SignIn() {
     setBusy(true);
     setError(null);
     setEmailError(null);
+    setPasswordError(null);
     if (!keepSignedIn) {
       localStorage.setItem("gravity-pants:session-only", "1");
       sessionStorage.setItem("gravity-pants:session-only", "1");
@@ -68,7 +70,13 @@ function SignIn() {
     }
     const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
     setBusy(false);
-    if (error) { setError(plainAuthError(error.message)); localStorage.removeItem("gravity-pants:session-only"); sessionStorage.removeItem("gravity-pants:session-only"); }
+    if (error) {
+      const message = plainAuthError(error.message);
+      if (message === "Wrong email or password.") setPasswordError(message);
+      else setError(message);
+      localStorage.removeItem("gravity-pants:session-only");
+      sessionStorage.removeItem("gravity-pants:session-only");
+    }
   }
 
   async function forgot() {
@@ -88,7 +96,7 @@ function SignIn() {
           error={error}
           fields={[
             { id: "email", label: "Email", type: "email", autoComplete: "email", value: email, placeholder: "you@yourbrand.com", onChange: (value) => { setEmail(value); setEmailError(null); }, error: emailError },
-            { id: "password", label: "Password", type: "password", autoComplete: "current-password", value: password, placeholder: "Your password", onChange: setPassword },
+            { id: "password", label: "Password", type: "password", autoComplete: "current-password", value: password, placeholder: "Your password", onChange: (value) => { setPassword(value); setPasswordError(null); }, error: passwordError },
           ]}
         />
         <div className="auth-options"><label><input type="checkbox" checked={keepSignedIn} onChange={(e) => setKeepSignedIn(e.target.checked)} /> Keep me signed in</label><Button type="button" variant="link" className="auth-link" onClick={() => void forgot()} disabled={busy}>Forgot password?</Button></div>
