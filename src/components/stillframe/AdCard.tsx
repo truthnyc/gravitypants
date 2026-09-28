@@ -42,6 +42,7 @@ export function AdCard({ project }: { project: ProjectWithFrames }) {
   const [draftName, setDraftName] = useState(project.name);
   const [actionsOpen, setActionsOpen] = useState(false);
   const [templateOpen, setTemplateOpen] = useState(false);
+  const { canUse } = usePlanAccess();
 
   const previewFrames = project.frames.slice(0, 4);
   const meta = `${project.frames.length} ${project.frames.length === 1 ? "frame" : "frames"} · ${formatSeconds(
