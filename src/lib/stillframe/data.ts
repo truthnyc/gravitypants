@@ -534,3 +534,180 @@ export function effectiveKit(settings: BrandKit, named: NamedBrandKit | null | u
     body_font: named?.subline_font ?? null,
   };
 }
+
+/* ---------------- Templates (no photos; private or shared with the team) */
+
+export type TemplateFrame = Pick<Frame, "duration_sec" | "transition_in" | "headline" | "subline" | "logo_visible"> & {
+  photo: Pick<Frame["photo"], "fit" | "focus" | "zoom" | "movement" | "brightness" | "darken_for_text" | "background_color">;
+};
+export type TemplateSettings = Pick<Project, "formats" | "primary_format" | "pace" | "logo" | "end_card"> & {
+  brand_kit_id?: string | null;
+  frame_count: number;
+  frames: TemplateFrame[];
+};
+export type Template = {
+  id: string;
+  workspace_id: string;
+  created_by: string;
+  name: string;
+  thumbnail_url: string | null;
+  visibility: "private" | "team";
+  settings: TemplateSettings;
+  updated_at: string;
+};
+
+export const templatesKey = ["templates"] as const;
+
+export function templateFromProject(p: ProjectWithFrames): TemplateSettings {
+  return {
+    formats: p.formats,
+    primary_format: p.primary_format,
+    pace: p.pace,
+    logo: p.logo,
+    end_card: p.end_card,
+    brand_kit_id: p.brand_kit_id ?? null,
+    frame_count: p.frames.length,
+    frames: p.frames.map((f) => ({
+      duration_sec: f.duration_sec,
+      transition_in: f.transition_in,
+      headline: f.headline,
+      subline: f.subline,
+      logo_visible: f.logo_visible,
+      photo: {
+        fit: f.photo.fit,
+        focus: f.photo.focus,
+        zoom: f.photo.zoom,
+        movement: f.photo.movement,
+        brightness: f.photo.brightness,
+        darken_for_text: f.photo.darken_for_text,
+        background_color: f.photo.background_color,
+      },
+    })),
+  };
+}
+
+export function useTemplates() {
+  return useQuery({
+    queryKey: [...templatesKey, getWorkspaceId()],
+    queryFn: async (): Promise<Template[]> => {
+      const { data, error } = await supabase
+        .from("templates")
+        .select("*")
+        .eq("workspace_id", getWorkspaceId())
+        .order("updated_at", { ascending: false });
+      if (error) throw error;
+      return (data ?? []) as unknown as Template[];
+    },
+  });
+}
+
+export function useSaveTemplate() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ project, name, visibility }: { project: ProjectWithFrames; name: string; visibility: Template["visibility"] }) => {
+      const { error } = await supabase.from("templates").insert({
+        workspace_id: getWorkspaceId(),
+        name,
+        visibility,
+        thumbnail_url: project.thumbnail_url,
+        settings: templateFromProject(project) as never,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: templatesKey }),
+  });
+}
+
+export function useUpdateTemplate() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, patch }: { id: string; patch: Partial<Pick<Template, "name" | "visibility">> }) => {
+      const { data, error } = await supabase.from("templates").update(patch).eq("id", id).select("id");
+      if (error) throw error;
+      if (!data?.length) throw new Error("Only the person who made this template, or an owner or admin, can change it.");
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: templatesKey }),
+  });
+}
+
+export function useDeleteTemplate() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { data, error } = await supabase.from("templates").delete().eq("id", id).select("id");
+      if (error) throw error;
+      if (!data?.length) throw new Error("Only the person who made this template, or an owner or admin, can delete it.");
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: templatesKey }),
+  });
+}
+
+/** Builds a photo-less source ad from a template, stretched or trimmed to the photo count. */
+function sourceFromTemplate(t: Template, count: number): ProjectWithFrames {
+  const s = t.settings;
+  const styles = s.frames.length ? s.frames : [framePayloadFromPhoto({ assetId: "", path: "", url: null, width: 0, height: 0, name: "" }, 0) as unknown as TemplateFrame];
+  const now = new Date().toISOString();
+  return {
+    id: "",
+    workspace_id: getWorkspaceId(),
+    name: t.name,
+    primary_format: s.primary_format,
+    formats: s.formats,
+    pace: s.pace,
+    logo: { ...DEFAULT_LOGO, ...s.logo },
+    end_card: s.end_card ?? {},
+    brand_kit_id: s.brand_kit_id ?? null,
+    is_template: false,
+    deleted_at: null,
+    thumbnail_url: null,
+    created_at: now,
+    updated_at: now,
+    frames: Array.from({ length: count }, (_, i) => {
+      const f = styles[Math.min(i, styles.length - 1)]!;
+      return {
+        ...f,
+        id: "",
+        project_id: "",
+        sort_order: i,
+        transition_in: i === 0 ? { ...f.transition_in, type: "cut" } : f.transition_in,
+        photo: { ...f.photo },
+      } as Frame;
+    }),
+  };
+}
+
+/** New ad from photos + a template — same path as Duplicate with New Photos. */
+export function useCreateAdFromTemplate() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ template, files, onProgress }: { template: Template; files: File[]; onProgress?: (items: UploadProgress[]) => void }) => {
+      const uploaded = await uploadAll(files, onProgress);
+      return insertCopy(sourceFromTemplate(template, uploaded.length), "Untitled ad", uploaded);
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: projectKeys.all }),
+  });
+}
+
+/** Workspace name and what its plan allows for templates. */
+export function useTemplateAccess() {
+  return useQuery({
+    queryKey: ["template-access", getWorkspaceId()],
+    queryFn: async () => {
+      const ws = getWorkspaceId();
+      const [{ data: w }, { data: paid }, { data: team }, { data: auth }] = await Promise.all([
+        supabase.from("workspaces").select("name").eq("id", ws).maybeSingle(),
+        supabase.rpc("brand_kits_enabled", { _ws: ws }),
+        supabase.rpc("workspace_is_team", { _ws: ws }),
+        supabase.auth.getUser(),
+      ]);
+      const { count } = await supabase.from("workspace_members").select("user_id", { count: "exact", head: true }).eq("workspace_id", ws);
+      return {
+        name: (w?.name as string) ?? "your workspace",
+        paid: Boolean(paid),
+        team: Boolean(team),
+        isTeamWorkspace: Boolean(team) || (count ?? 1) > 1,
+        userId: auth.user?.id ?? null,
+      };
+    },
+  });
+}
