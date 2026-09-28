@@ -144,7 +144,7 @@ function Row({ t, editable, showShare, options = ["private", "team"], onDelete }
         <div className="flex w-full items-center gap-2 sm:w-auto">
           {showShare && (
             <div className="flex flex-1 rounded-lg bg-control-fill p-0.5 sm:flex-none">
-              {(["private", "team"] as const).map((v) => (
+              {options.map((v) => (
                 <button
                   key={v}
                   type="button"
