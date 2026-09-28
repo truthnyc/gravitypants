@@ -103,6 +103,7 @@
 
   html {
     background-color: var(--canvas);
+    overflow-x: hidden;
   }
 
   body {
@@ -112,12 +113,38 @@
       -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    min-width: 0;
+    overflow-x: hidden;
+  }
+
+  @media (max-width: 1023px) {
+    button,
+    a,
+    [role="button"],
+    [role="radio"],
+    [role="checkbox"] {
+      min-height: 44px;
+    }
+
+    input,
+    textarea,
+    select {
+      font-size: 16px;
+    }
   }
 
   :focus-visible {
     outline: none;
     box-shadow: var(--focus-ring);
   }
+}
+
+@utility safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+@utility safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 /* numbers and times always align */
