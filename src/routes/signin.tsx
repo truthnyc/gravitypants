@@ -1,8 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { z } from "zod";
+import { ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
 import { AuthShell, FieldGroup, GoogleButton, plainAuthError, safeRedirect } from "@/components/auth/AuthShell";
 
 export const Route = createFileRoute("/signin")({
@@ -53,25 +53,26 @@ function SignIn() {
   }
 
   return (
-    <AuthShell title="Welcome back" subtitle="Sign in to see your ads.">
+    <AuthShell title="Welcome back." subtitle="Sign in to keep making reels from your photos.">
       <GoogleButton redirectTo={target} />
       <form onSubmit={submit} noValidate>
         <FieldGroup
           error={error}
           fields={[
-            { id: "email", label: "Email", type: "email", autoComplete: "email", value: email, onChange: setEmail },
-            { id: "password", label: "Password", type: "password", autoComplete: "current-password", value: password, onChange: setPassword },
+            { id: "email", label: "Work email", type: "email", autoComplete: "email", value: email, placeholder: "you@yourbrand.com", onChange: setEmail },
+            { id: "password", label: "Password", type: "password", autoComplete: "current-password", value: password, placeholder: "Your password", onChange: setPassword },
           ]}
         />
-        <Button type="submit" disabled={busy || !email || !password} className="mt-4 h-11 w-full text-[15px]">
-          {busy ? "Signing In…" : "Sign In"}
-        </Button>
+        <button type="submit" disabled={busy || !email || !password} className="auth-submit">
+          {busy ? "Signing in…" : <>Sign in <ArrowRight size={17} strokeWidth={1.7} /></>}
+        </button>
       </form>
-      <div className="mt-5 flex flex-col items-center gap-2 text-[14px]">
-        <Link to="/reset" className="text-primary hover:underline">Forgot password?</Link>
-        <Link to="/signup" search={{ redirect }} className="text-primary hover:underline">New here? Create an account</Link>
-        <Link to="/pricing" className="text-primary hover:underline">See plans and pricing</Link>
-      </div>
+      <p className="auth-switch">
+        <Link to="/reset" className="auth-link">Forgot password?</Link>
+      </p>
+      <p className="auth-switch">
+        New here? <Link to="/signup" search={{ redirect }} className="auth-link">Start your free trial</Link>
+      </p>
     </AuthShell>
   );
 }
