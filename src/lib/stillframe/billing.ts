@@ -56,8 +56,10 @@ export function useBilling() {
     queryFn: async () => {
       const ws = await currentWorkspaceId();
       if (!ws) return null;
-      const { data } = await supabase.from("workspace_billing").select("*").eq("workspace_id", ws).maybeSingle();
-      return (data as Billing | null) ?? null;
+      // The plan a workspace runs on: its own, or the one its owner already pays for elsewhere.
+      const { data } = await supabase.rpc("effective_billing" as never, { _ws: ws } as never);
+      return (data as unknown as Billing | null) ?? null;
+
     },
     // Coming back from Manage Billing (another tab) shows the new plan right away.
     refetchOnWindowFocus: "always",
