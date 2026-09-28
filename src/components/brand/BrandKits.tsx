@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { openUpgrade } from "@/lib/stillframe/plan";
 import { Link } from "@tanstack/react-router";
 import { Copy, MoreHorizontal, Pencil, Plus, Star, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
@@ -61,9 +62,10 @@ export function BrandKitsSection() {
         <p className="mt-1 max-w-[520px] text-[14px] text-secondary-text">
           Save your logos, colors and fonts as kits and put them on any ad in one tap. On the Team plan everyone in your team shares them.
         </p>
-        <Button asChild className="mt-4">
-          <Link to="/pricing">See plans</Link>
-        </Button>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Button className="h-11 lg:h-9" onClick={() => openUpgrade("brand_kits")}><Plus strokeWidth={1.7} /> New kit</Button>
+          <Button asChild variant="plain" className="h-11 lg:h-9"><Link to="/pricing">See plans</Link></Button>
+        </div>
       </section>
     );
   }

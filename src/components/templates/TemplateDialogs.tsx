@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { openUpgrade } from "@/lib/stillframe/plan";
 import { Link } from "@tanstack/react-router";
 import { LayoutTemplate } from "lucide-react";
 import { toast } from "sonner";
@@ -58,7 +59,7 @@ export function SaveTemplateDialog({ project, open, onOpenChange }: { project: P
                     <button
                       key={v}
                       type="button"
-                      onClick={() => setVisibility(v)}
+                      onClick={() => (v === "team" && !access.team ? openUpgrade("team_sharing") : setVisibility(v))}
                       aria-pressed={visibility === v}
                       className={cn("h-11 min-w-0 flex-1 truncate rounded-lg px-2 text-[13px] font-medium lg:h-8", visibility === v && "bg-card shadow-segment")}
                     >

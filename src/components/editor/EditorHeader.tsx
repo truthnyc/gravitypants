@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { HelpMenu } from "@/components/stillframe/HelpMenu";
 import { Link } from "@tanstack/react-router";
 import { Check, ChevronLeft, ChevronRight, LayoutGrid, Play, Square, Undo2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,7 @@ export function EditorHeader({
             <LayoutGrid className="hidden lg:block" strokeWidth={1.7} /><ChevronLeft className="lg:hidden" strokeWidth={1.7} />
           </Link>
         </Button>
+        <HelpMenu />
         {editing ? (
           <input
             autoFocus
