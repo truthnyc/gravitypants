@@ -53,9 +53,9 @@ function SiteHeader() {
 
 type FooterLink = { label: string; to: string; mailto?: boolean };
 const columns: { label: string; links: FooterLink[] }[] = [
-  { label: "Product", links: [{ label: "Features", to: "/features" }, { label: "Pricing", to: "/pricing" }, { label: "Templates", to: "/features" }] },
+  { label: "Product", links: [{ label: "Features", to: "/features" }, { label: "Pricing", to: "/pricing" }, { label: "Templates", to: "/features" }, { label: "Blog", to: "/blog" }] },
   { label: "Examples", links: [{ label: "Gallery", to: "/examples" }, { label: "Submit your reel", to: "mailto:info@gravitypants.com?subject=Submit%20my%20reel", mailto: true }] },
-  { label: "Company", links: [{ label: "About", to: "/" }, { label: "Blog", to: "/" }, { label: "Contact", to: "mailto:info@gravitypants.com", mailto: true }] },
+  { label: "Company", links: [{ label: "About", to: "/about" }, { label: "Contact", to: "mailto:info@gravitypants.com", mailto: true }] },
   { label: "Help", links: [{ label: "Help center", to: "/help" }, { label: "Privacy", to: "/privacy" }, { label: "Terms", to: "/terms" }] },
 ];
 
