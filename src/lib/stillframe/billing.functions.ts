@@ -74,7 +74,7 @@ async function ensurePortalConfig(stripe: ReturnType<typeof createStripeClient>)
   const existing = await stripe.billingPortal.configurations.list({ active: true, limit: 100 });
   const found = existing.data.find((c) => c.metadata?.["tag"] === PORTAL_TAG);
   if (found) return found.id;
-  const prices = await stripe.prices.list({ lookup_keys: ["simple_monthly", "business_monthly", "business_yearly"], limit: 10 });
+  const prices = await stripe.prices.list({ lookup_keys: ["simple_monthly", "business_monthly", "business_yearly", "team_monthly", "team_yearly"], limit: 10 });
   const byProduct = new Map<string, string[]>();
   for (const p of prices.data) {
     const prod = typeof p.product === "string" ? p.product : p.product.id;

@@ -5,6 +5,8 @@ const PLAN_BY_PRICE: Record<string, string> = {
   simple_monthly: "simple",
   business_monthly: "business",
   business_yearly: "business_yearly",
+  team_monthly: "team",
+  team_yearly: "team_yearly",
 };
 
 function mapStatus(s: string): string {
@@ -17,6 +19,8 @@ const PLAN_NAMES: Record<string, string> = {
   simple: "Simple",
   business: "Business",
   business_yearly: "Business Yearly",
+  team: "Team",
+  team_yearly: "Team Yearly",
 };
 
 const iso = (sec?: number | null) => (sec ? new Date(sec * 1000).toISOString() : null);
