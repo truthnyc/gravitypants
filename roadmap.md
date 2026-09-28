@@ -1,5 +1,10 @@
 # Roadmap
 
+## Auth pages
+- [x] Match uploaded desktop/mobile sign-up and sign-in layouts
+- [x] Connect signup welcome, selected plan, example style, reset, and sign-in controls
+- [ ] Verify signed-in first-ad flow (blocked: no matching preview auth account for requester)
+
 ## Workspace creation error
 - [x] Allow creators to join a new workspace as its owner
 - [x] Keep the chosen workspace selected across page reloads, after verifying membership

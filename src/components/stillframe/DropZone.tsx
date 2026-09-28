@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { isAcceptedImage } from "@/lib/stillframe/media";
 import { useCreateAdFromPhotos, useCreateAdFromTemplate, type Template, type UploadProgress } from "@/lib/stillframe/data";
 import { StartFromDialog } from "@/components/templates/TemplateDialogs";
+import { templateForExample } from "@/lib/site/example-template";
 
 export function DropZone({ spacious = false }: { spacious?: boolean }) {
   const navigate = useNavigate();
@@ -22,7 +23,12 @@ export function DropZone({ spacious = false }: { spacious?: boolean }) {
       toast.error("Please choose JPG, PNG, HEIC or WebP photos");
       return;
     }
-    setPending(images);
+    const exampleId = sessionStorage.getItem("gravity-pants:example");
+    const example = exampleId ? templateForExample(exampleId) : null;
+    if (example) {
+      sessionStorage.removeItem("gravity-pants:example");
+      void create(images, example);
+    } else setPending(images);
   }
 
   async function create(images: File[], template: Template | null) {

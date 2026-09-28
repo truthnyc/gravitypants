@@ -11,6 +11,10 @@ import { sendWelcomeEmail } from "@/lib/stillframe/welcome.functions";
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
   beforeLoad: async ({ location }) => {
+    if (localStorage.getItem("gravity-pants:session-only") && !sessionStorage.getItem("gravity-pants:session-only")) {
+      await supabase.auth.signOut();
+      localStorage.removeItem("gravity-pants:session-only");
+    }
     const { data, error } = await supabase.auth.getUser();
     if (error || !data.user) {
       throw redirect({ to: "/signin", search: { redirect: location.href } });
