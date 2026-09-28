@@ -31,3 +31,6 @@
 - [x] Public shell and routes at /, /features, /examples, /pricing
 - [x] Move app pages to /app and update internal navigation/auth return paths
 - [x] Add reference-based site tokens and reusable ReelPhone; verify public and app flows
+
+## Public home page
+- [ ] Rebuild desktop and mobile reference sections and interactions; verify responsive flow
