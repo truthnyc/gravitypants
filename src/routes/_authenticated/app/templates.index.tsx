@@ -140,7 +140,7 @@ function TemplateCard({ template: t, selected = false }: { template: Template; s
       type="button"
       onClick={() => setTapPlay((p) => !p)}
       aria-label={tapPlay ? `Pause ${t.name} preview` : `Play ${t.name} preview`}
-      className="absolute bottom-[calc(100%-196px-4px)] right-5 flex size-11 items-center justify-center rounded-full bg-card/95 shadow-card md:hidden"
+      className="absolute top-[156px] right-5 flex size-11 items-center justify-center rounded-full bg-card/95 shadow-card md:hidden"
     >
       {tapPlay ? <Pause className="size-4" strokeWidth={1.7} /> : <Play className="size-4" strokeWidth={1.7} />}
     </button>
