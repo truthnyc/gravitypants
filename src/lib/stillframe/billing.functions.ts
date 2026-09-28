@@ -124,13 +124,13 @@ export const createTopUpSession = createServerFn({ method: "POST" })
       if (!price) return { error: "That pack isn't available." };
       let customerId = billing?.stripe_customer_id ?? null;
       if (!customerId) {
-        const found = await stripe.customers.search({ query: `metadata['workspaceId']:'${data.workspaceId}'`, limit: 1 });
+        const found = await stripe.customers.search({ query: `metadata['workspaceId']:'${payer}'`, limit: 1 });
         customerId = found.data[0]?.id ?? null;
       }
       if (!customerId) {
         const c = await stripe.customers.create({
           ...(u.user?.email ? { email: u.user.email } : {}),
-          metadata: { userId, workspaceId: data.workspaceId },
+          metadata: { userId, workspaceId: payer },
         });
         customerId = c.id;
       }
@@ -140,7 +140,7 @@ export const createTopUpSession = createServerFn({ method: "POST" })
         ui_mode: "embedded_page",
         return_url: data.returnUrl,
         customer: customerId,
-        metadata: { userId, workspaceId: data.workspaceId, topup: "extra_exports_5", managed_payments: "true" },
+        metadata: { userId, workspaceId: payer, topup: "extra_exports_5", managed_payments: "true" },
         managed_payments: { enabled: true },
       } as Stripe.Checkout.SessionCreateParams);
       return { clientSecret: session.client_secret ?? "" };
