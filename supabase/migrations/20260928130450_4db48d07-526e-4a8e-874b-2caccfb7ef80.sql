@@ -1,0 +1,1 @@
+revoke execute on function public.guard_project_trash() from public, anon, authenticated;

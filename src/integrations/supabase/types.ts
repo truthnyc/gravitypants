@@ -47,6 +47,7 @@ export type Database = {
       assets: {
         Row: {
           created_at: string
+          created_by: string | null
           height: number | null
           id: string
           kind: string
@@ -57,6 +58,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          created_by?: string | null
           height?: number | null
           id?: string
           kind?: string
@@ -67,6 +69,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          created_by?: string | null
           height?: number | null
           id?: string
           kind?: string
@@ -368,6 +371,7 @@ export type Database = {
         Row: {
           brand_kit_id: string | null
           created_at: string
+          created_by: string | null
           deleted_at: string | null
           end_card: Json
           formats: string[]
@@ -384,6 +388,7 @@ export type Database = {
         Insert: {
           brand_kit_id?: string | null
           created_at?: string
+          created_by?: string | null
           deleted_at?: string | null
           end_card?: Json
           formats?: string[]
@@ -400,6 +405,7 @@ export type Database = {
         Update: {
           brand_kit_id?: string | null
           created_at?: string
+          created_by?: string | null
           deleted_at?: string | null
           end_card?: Json
           formats?: string[]

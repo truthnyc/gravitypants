@@ -21,6 +21,7 @@ import { MediaImage } from "@/components/stillframe/MediaImage";
 import {
   useBrandKits,
   useCanEditKits,
+  useMyUserId,
   useDeleteBrandKit,
   useKitsEnabled,
   useSaveBrandKit,
@@ -45,7 +46,9 @@ const toDraft = (k: NamedBrandKit): KitDraft => ({
 
 export function BrandKitsSection() {
   const { data: enabled, isLoading: loadingPlan } = useKitsEnabled();
-  const { data: canEdit = false } = useCanEditKits();
+  const { data: isAdmin = false } = useCanEditKits();
+  const { data: me } = useMyUserId();
+  const canEdit = true;
   const { data: kits = [], isLoading } = useBrandKits();
   const save = useSaveBrandKit();
   const remove = useDeleteBrandKit();
@@ -82,7 +85,7 @@ export function BrandKitsSection() {
           </Button>
         )}
       </div>
-      {!canEdit && <p className="mt-1 text-[13px] text-secondary-text">You can use these kits on your ads. Owners and admins can change them.</p>}
+      
 
       {isLoading ? (
         <p className="mt-4 text-[13px] text-secondary-text">Loading…</p>
@@ -97,6 +100,8 @@ export function BrandKitsSection() {
               key={k.id}
               kit={k}
               canEdit={canEdit}
+              canDelete={isAdmin || k.created_by === me}
+              canSetDefault={isAdmin}
               onEdit={() => setEditing({ id: k.id, draft: toDraft(k) })}
               onDuplicate={() =>
                 save.mutate({ draft: { ...toDraft(k), name: `${k.name} copy` } }, { onSuccess: () => toast("Kit duplicated"), onError: fail })
@@ -150,6 +155,8 @@ export function BrandKitsSection() {
 function KitCard({
   kit,
   canEdit,
+  canDelete,
+  canSetDefault,
   onEdit,
   onDuplicate,
   onDefault,
@@ -157,6 +164,8 @@ function KitCard({
 }: {
   kit: NamedBrandKit;
   canEdit: boolean;
+  canDelete: boolean;
+  canSetDefault: boolean;
   onEdit: () => void;
   onDuplicate: () => void;
   onDefault: () => void;
@@ -194,8 +203,8 @@ function KitCard({
               <DropdownMenuContent align="end">
                 <DropdownMenuItem onSelect={onEdit}><Pencil strokeWidth={1.7} /> Edit</DropdownMenuItem>
                 <DropdownMenuItem onSelect={onDuplicate}><Copy strokeWidth={1.7} /> Duplicate</DropdownMenuItem>
-                {!kit.is_default && <DropdownMenuItem onSelect={onDefault}><Star strokeWidth={1.7} /> Set as default</DropdownMenuItem>}
-                <DropdownMenuItem onSelect={onDelete} className="text-destructive"><Trash2 strokeWidth={1.7} /> Delete</DropdownMenuItem>
+                {!kit.is_default && canSetDefault && <DropdownMenuItem onSelect={onDefault}><Star strokeWidth={1.7} /> Set as default</DropdownMenuItem>}
+                {canDelete && <DropdownMenuItem onSelect={onDelete} className="text-destructive"><Trash2 strokeWidth={1.7} /> Delete</DropdownMenuItem>}
               </DropdownMenuContent>
             </DropdownMenu>
           )}

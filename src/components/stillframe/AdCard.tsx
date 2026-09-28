@@ -74,6 +74,7 @@ export function AdCard({ project }: { project: ProjectWithFrames }) {
               onClick: () => setTrashed.mutate({ id: project.id, trashed: false }),
             },
           }),
+        onError: () => toast("Only the person who made this ad or a team admin can delete it."),
       },
     );
   }

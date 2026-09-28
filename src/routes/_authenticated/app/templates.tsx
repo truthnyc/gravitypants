@@ -12,7 +12,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { TemplateThumb, UpgradeNote } from "@/components/templates/TemplateDialogs";
-import { useCanEditKits, useDeleteTemplate, useTemplateAccess, useTemplates, useUpdateTemplate, type Template } from "@/lib/stillframe/data";
+import { useCanEditKits, useMyUserId, useDeleteTemplate, useTemplateAccess, useTemplates, useUpdateTemplate, type Template } from "@/lib/stillframe/data";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/app/templates")({
@@ -34,6 +34,7 @@ const fail = (e: unknown) => toast.error(e instanceof Error && e.message ? e.mes
 function TemplatesPage() {
   const { data: access } = useTemplateAccess();
   const { data: isAdmin = false } = useCanEditKits();
+  const { data: me } = useMyUserId();
   const { data: templates = [], isLoading } = useTemplates();
   const [deleting, setDeleting] = useState<Template | null>(null);
   const remove = useDeleteTemplate();
@@ -54,7 +55,7 @@ function TemplatesPage() {
         <>
           <Group title="My templates" list={mine} empty="No templates yet." canEdit={() => true} showShare={Boolean(access?.team)} onDelete={setDeleting} />
           {access?.team && (
-            <Group title="Team templates" list={team} empty="Nobody has shared a template yet." canEdit={() => isAdmin} showShare onDelete={setDeleting} />
+            <Group title="Team templates" list={team} empty="Nobody has shared a template yet." canEdit={(t) => isAdmin || t.created_by === me} showShare onDelete={setDeleting} />
           )}
         </>
       )}
