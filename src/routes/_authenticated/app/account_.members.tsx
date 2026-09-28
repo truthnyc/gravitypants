@@ -31,23 +31,8 @@ const inputCls =
 type Member = { user_id: string; role: string; email: string; display_name: string | null };
 type Invite = { id: string; email: string; role: string; expires_at: string };
 
-function useWorkspaces() {
-  return useQuery({
-    queryKey: ["my-workspaces"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("workspace_members")
-        .select("workspace_id, role, workspaces(name)")
-        .order("created_at");
-      if (error) throw error;
-      return (data ?? []).map((r) => ({
-        id: r.workspace_id as string,
-        role: r.role as string,
-        name: (r.workspaces as unknown as { name: string } | null)?.name ?? "Workspace",
-      }));
-    },
-  });
-}
+const useWorkspaces = useMyWorkspaces;
+
 
 function useMembers(ws: string) {
   return useQuery({
