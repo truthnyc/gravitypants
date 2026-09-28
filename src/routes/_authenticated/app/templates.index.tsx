@@ -132,7 +132,7 @@ function TemplateCard({ template: t, selected = false }: { template: Template; s
         selected && "ring-2 ring-primary",
       )}
     >
-      <div className="flex h-[196px] items-center justify-center rounded-sm bg-[var(--site-panel,#F5F5F7)] p-4">
+      <div className="flex h-[196px] items-center justify-center rounded-sm bg-site-panel p-4">
         <TemplatePreview template={t} playing={hover && !reduced} />
       </div>
       <div className="px-1 pb-1 pt-3">
