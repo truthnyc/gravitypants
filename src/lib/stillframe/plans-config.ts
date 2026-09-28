@@ -93,7 +93,7 @@ type Cell = string | boolean;
 export type CompareRow = { label: string; cells: [Cell, Cell, Cell, Cell] }; // trial, simple, business, team
 export type CompareGroup = { group: string; rows: CompareRow[] };
 
-const [S, B, T] = PLANS;
+const S = planById("simple"), B = planById("business"), T = planById("team");
 const priceCell = (p: PlanConfig) => (p.yearly ? `${usd(p.monthly)} / month|or ${usd(p.yearly)} / year` : `${usd(p.monthly)} / month`);
 
 export const COMPARE: CompareGroup[] = [
