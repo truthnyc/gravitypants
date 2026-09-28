@@ -339,6 +339,11 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
                 {Math.max(0, exportStatus.limit - (exportStatus.used ?? 0))} of {exportStatus.limit} exports left{exportStatus.watermark ? " in your free trial" : " this month"}
               </p>
             )}
+            {!!exportStatus?.extras && exportStatus.extras > 0 && (
+              <p className="mt-1 text-[13px] text-secondary-text nums">
+                Plus {exportStatus.extras} extra {exportStatus.extras === 1 ? "export" : "exports"} that never expire
+              </p>
+            )}
             {exportStatus?.watermark && (
               <p className="mt-1 text-[13px] text-secondary-text">Trial exports carry a small Gravity Pants mark. Pick a plan to remove it.</p>
             )}
@@ -408,7 +413,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
             <DialogTitle>{planSheet === "limit_reached" ? "You've used this month's exports" : planSheet === "payment_problem" ? "There's a problem with your payment" : "Pick a plan to export"}</DialogTitle>
             <DialogDescription>
               {planSheet === "limit_reached"
-                ? "Simple includes 2 exports a month. Move to Business for unlimited exports."
+                ? "Your monthly exports are used up. Buy a top-up of 5 extra exports for $12.50 on the Billing page — they never expire — or move up a plan."
                 : planSheet === "payment_problem"
                   ? "We couldn't take your last payment. Update your card in Manage Billing to keep exporting."
                   : "Your free trial lets you build and preview. Pick a plan to export your videos and GIFs."}
