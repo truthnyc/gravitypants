@@ -152,7 +152,7 @@ function Row({ t, editable, showShare, options = ["private", "team"], onDelete }
                   onClick={() => v !== t.visibility && update.mutate({ id: t.id, patch: { visibility: v } }, { onError: fail })}
                   className={cn("h-11 flex-1 rounded-lg px-3 text-[13px] font-medium disabled:opacity-40 lg:h-8", t.visibility === v && "bg-card shadow-segment")}
                 >
-                  {v === "private" ? "Only me" : "Team"}
+                  {v === "private" ? "Only me" : v === "team" ? "Team" : "Everyone"}
                 </button>
               ))}
             </div>
