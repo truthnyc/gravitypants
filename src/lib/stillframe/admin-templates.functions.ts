@@ -16,6 +16,10 @@ async function adminDb(ctx: Ctx) {
 const log = (db: any, admin: string, action: string, target: string) =>
   db.from("admin_audit_log").insert({ admin_user_id: admin, action, workspace_id: null, target });
 
+/** Per-template history shown on the builder's History panel. */
+const event = (db: any, templateId: string, userId: string, action: string, version: number | null) =>
+  db.from("template_events").insert({ template_id: templateId, user_id: userId, action, version });
+
 const slide = z.object({
   role: z.string().max(40),
   duration_sec: z.number().min(0.5).max(15),
@@ -109,6 +113,7 @@ export const adminTemplateCreate = createServerFn({ method: "POST" })
       .single();
     if (error) throw friendly(error);
     await log(db, ctx.userId, "template_create", doc.slug);
+    await event(db, row.id, ctx.userId, "created", 0);
     return { id: row.id as string };
   });
 
@@ -118,7 +123,7 @@ export const adminTemplateSave = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const ctx = context as any as Ctx;
     const db = await adminDb(ctx);
-    const { data: row } = await db.from("templates").select("status").eq("id", data.id).eq("source", "system").maybeSingle();
+    const { data: row } = await db.from("templates").select("status, version").eq("id", data.id).eq("source", "system").maybeSingle();
     if (!row) throw new Error("That template doesn't exist.");
     const doc = data.doc as TemplateDoc;
     // Published templates keep serving the live version; edits wait in `draft` until Publish.
@@ -126,6 +131,7 @@ export const adminTemplateSave = createServerFn({ method: "POST" })
     const { error } = await db.from("templates").update({ ...patch, updated_by: ctx.userId }).eq("id", data.id);
     if (error) throw friendly(error);
     await log(db, ctx.userId, "template_save_draft", doc.slug);
+    await event(db, data.id, ctx.userId, "saved_draft", (row as any).version ?? null);
     return { ok: true };
   });
 
@@ -156,6 +162,7 @@ export const adminTemplatePublish = createServerFn({ method: "POST" })
       .eq("id", data.id);
     if (error) throw friendly(error);
     await log(db, ctx.userId, "template_publish", `${doc.slug} v${(row.version ?? 0) + 1}`);
+    await event(db, data.id, ctx.userId, "published", (row.version ?? 0) + 1);
     return { ok: true };
   });
 
@@ -200,6 +207,7 @@ export const adminTemplateAction = createServerFn({ method: "POST" })
       await db.from("templates").update({ ...patch, ...by }).eq("id", data.id);
     }
     await log(db, ctx.userId, `template_${data.action}`, row.slug);
+    if (data.action !== "delete") await event(db, data.action === "duplicate" && result.id ? result.id : data.id, ctx.userId, data.action === "duplicate" ? "duplicated" : data.action, data.action === "publish" ? (row.version ?? 0) + 1 : row.version ?? null);
     return result;
   });
 
@@ -229,4 +237,19 @@ export const adminTemplateUpload = createServerFn({ method: "POST" })
     const { error } = await db.storage.from("media").upload(path, bytes, { contentType: m[1], upsert: false });
     if (error) throw new Error("That image couldn't be uploaded.");
     return { path };
+  });
+
+export const adminTemplateHistory = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ id: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const db = await adminDb(context as any);
+    const { data: rows } = await db.from("template_events").select("id, user_id, action, version, created_at").eq("template_id", data.id).order("created_at", { ascending: false }).limit(200);
+    const ids = [...new Set(((rows ?? []) as any[]).map((r) => r.user_id).filter(Boolean))];
+    const emails = new Map<string, string>();
+    for (const id of ids) {
+      const { data: u } = await db.auth.admin.getUserById(id);
+      if (u?.user?.email) emails.set(id, u.user.email);
+    }
+    return ((rows ?? []) as any[]).map((r) => ({ id: r.id as string, action: r.action as string, version: r.version as number | null, at: r.created_at as string, who: emails.get(r.user_id) ?? "Staff" }));
   });

@@ -521,6 +521,41 @@ export type Database = {
           },
         ]
       }
+      template_events: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          template_id: string
+          user_id: string | null
+          version: number | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          template_id: string
+          user_id?: string | null
+          version?: number | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          template_id?: string
+          user_id?: string | null
+          version?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "template_events_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       templates: {
         Row: {
           audience: string[]

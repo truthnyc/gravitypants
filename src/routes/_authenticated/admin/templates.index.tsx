@@ -74,10 +74,10 @@ function AdminTemplates() {
     return [...list.filter((r) => r.status !== "archived"), ...list.filter((r) => r.status === "archived")];
   }, [rows, order]);
 
-  const count = (f: Filter) => (f === "all" ? rows.length : rows.filter((r: Row) => r.status === f).length);
+  const count = (f: Filter) => (f === "all" ? rows.filter((r: Row) => r.status !== "archived").length : rows.filter((r: Row) => r.status === f).length);
   const shown = ordered.filter(
     (r) =>
-      (filter === "all" || r.status === filter) &&
+      (filter === "all" ? r.status !== "archived" : r.status === filter) &&
       (format === "all" || r.format === format) &&
       (!q.trim() || `${r.name} ${r.slug}`.toLowerCase().includes(q.trim().toLowerCase())),
   );

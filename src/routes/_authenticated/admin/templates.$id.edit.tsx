@@ -10,7 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { MediaImage } from "@/components/stillframe/MediaImage";
 import { TemplateCanvas, clock, renderThumbnail, useDocPlayback } from "@/components/admin/TemplateCanvas";
-import { adminTemplateGet, adminTemplatePublish, adminTemplateSave, adminTemplateUpload } from "@/lib/stillframe/admin-templates.functions";
+import { adminTemplateHistory, adminTemplateGet, adminTemplatePublish, adminTemplateSave, adminTemplateUpload } from "@/lib/stillframe/admin-templates.functions";
 import {
   blankSlide, docDuration, docFromRow, label, MAX_SLIDES, PHOTO_MOTIONS, PLAN_AUDIENCE, slugify, TEXT_ANIMS, TRANSITIONS,
   type DocSlide, type TemplateDoc,
@@ -61,6 +61,7 @@ function Builder({ row, refetch }: { row: any; refetch: () => void }) {
   const [previewFormat, setPreviewFormat] = useState<Format>(saved.format);
   const dirty = JSON.stringify(doc) !== JSON.stringify(saved);
   const pb = useDocPlayback(doc);
+  const [history, setHistory] = useState(false);
   const [dragFrom, setDragFrom] = useState<number | null>(null);
   // Slug follows the name until someone types their own.
   const [slugTouched, setSlugTouched] = useState(() => !!saved.slug && !saved.slug.startsWith("untitled-") && saved.slug !== slugify(saved.name));
@@ -147,7 +148,7 @@ function Builder({ row, refetch }: { row: any; refetch: () => void }) {
           <span className="inline-flex items-center gap-1.5 text-[13px] text-warning-text"><span className="size-1.5 rounded-full bg-warning-text" />Draft not published yet</span>
         ) : null}
         <div className="ml-auto flex items-center gap-2">
-          <Link to="/admin/audit" className="inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-[14px] hover:bg-control-fill"><History className="size-4" strokeWidth={1.7} /> History</Link>
+          <button type="button" onClick={() => setHistory(true)} className="inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-[14px] hover:bg-control-fill"><History className="size-4" strokeWidth={1.7} /> History</button>
           <Button variant="secondary" size="header" disabled={busy || (!dirty && status !== "draft")} onClick={() => void saveDraft()}>Save draft</Button>
           <Button size="header" disabled={busy} onClick={() => { if (check()) setPublishing(true); }}>Publish…</Button>
         </div>
@@ -280,6 +281,7 @@ function Builder({ row, refetch }: { row: any; refetch: () => void }) {
         </DialogContent>
       </Dialog>
 
+      <HistoryDialog id={row.id} open={history} onOpenChange={setHistory} />
       <PublishDialog open={publishing} onOpenChange={setPublishing} row={row} doc={doc} busy={busy} onPublish={doPublish} />
     </div>
   );
@@ -579,7 +581,7 @@ function PublishDialog({ open, onOpenChange, row, doc, busy, onPublish }: {
           </p>
           <Button variant="secondary" size="header" onClick={() => onOpenChange(false)}>Cancel</Button>
           <Button size="header" disabled={busy || invalid} onClick={() => onPublish({ audience, newBadge, featured })}>
-            {limited ? "Publish to these plans" : "Publish to all users"}
+            {limited ? `Publish to ${plans.length} ${plans.length === 1 ? "plan" : "plans"}` : "Publish to all users"}
           </Button>
         </div>
       </DialogContent>
@@ -589,4 +591,32 @@ function PublishDialog({ open, onOpenChange, row, doc, busy, onPublish }: {
 
 function Radio({ on }: { on: boolean }) {
   return <span className={cn("mt-0.5 flex size-[18px] shrink-0 items-center justify-center rounded-full border", on ? "border-primary bg-primary" : "border-placeholder-border")}>{on && <span className="size-1.5 rounded-full bg-primary-foreground" />}</span>;
+}
+
+const ACTION_LABEL: Record<string, string> = {
+  created: "Created", saved_draft: "Saved draft", published: "Published", publish: "Published", unpublish: "Unpublished",
+  archive: "Archived", restore: "Restored", feature: "Featured", unfeature: "Unfeatured", duplicated: "Created as a copy",
+};
+
+function HistoryDialog({ id, open, onOpenChange }: { id: string; open: boolean; onOpenChange: (o: boolean) => void }) {
+  const get = useServerFn(adminTemplateHistory);
+  const { data = [], isLoading } = useQuery({ queryKey: [...adminTemplatesKey, id, "history"], queryFn: () => get({ data: { id } }), enabled: open });
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-[520px]">
+        <DialogTitle className="text-[17px] font-semibold">History</DialogTitle>
+        <DialogDescription className="text-[13px] text-secondary-text">Every change staff made to this template.</DialogDescription>
+        <ol className="max-h-[60vh] overflow-y-auto">
+          {isLoading && <li className="py-3 text-[13px] text-secondary-text">Loading…</li>}
+          {!isLoading && !data.length && <li className="py-3 text-[13px] text-secondary-text">No history yet.</li>}
+          {data.map((e) => (
+            <li key={e.id} className="flex items-baseline justify-between gap-3 border-b border-border/60 py-2.5 text-[13px]">
+              <span><b className="font-semibold">{ACTION_LABEL[e.action] ?? e.action}</b>{e.version ? <span className="nums text-secondary-text"> · v{e.version}</span> : null}<span className="block text-[12px] text-secondary-text">{e.who}</span></span>
+              <span className="nums shrink-0 text-[12px] text-secondary-text">{new Date(e.at).toLocaleString(undefined, { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" })}</span>
+            </li>
+          ))}
+        </ol>
+      </DialogContent>
+    </Dialog>
+  );
 }
