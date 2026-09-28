@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Card, fmtDateTime, PageTitle } from "@/components/admin/AdminShell";
 import { adminAdmins, adminSetAdmin } from "@/lib/stillframe/admin.functions";
 
-export const Route = createFileRoute("/_authenticated/app/admin/admins")({
+export const Route = createFileRoute("/_authenticated/admin/admins")({
   head: () => ({ meta: [
     { title: "Admins — Gravity Pants" },
     { name: "description", content: "Private Gravity Pants administrator list." },

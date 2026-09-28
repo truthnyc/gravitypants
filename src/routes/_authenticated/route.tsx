@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet, redirect, useRouterState } from "@tanstack/react-router";
+import { createFileRoute, notFound, Outlet, redirect, useRouterState } from "@tanstack/react-router";
 import { UpgradeDialog } from "@/components/billing/UpgradeDialog";
 import { AppHeader } from "@/components/stillframe/AppHeader";
 import { PaymentProblemBanner } from "@/components/billing/BillingNotices";
@@ -17,6 +17,8 @@ export const Route = createFileRoute("/_authenticated")({
     }
     const { data, error } = await supabase.auth.getUser();
     if (error || !data.user) {
+      // Staff area stays hidden: signed-out visitors see "not found", not a sign-in prompt.
+      if (location.pathname === "/admin" || location.pathname.startsWith("/admin/")) throw notFound();
       throw redirect({ to: "/signin", search: { redirect: location.href } });
     }
     // Join any teams this email was invited to, even if the invite link was lost during sign-up.
@@ -43,11 +45,11 @@ export const Route = createFileRoute("/_authenticated")({
 function Layout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { suspended } = Route.useRouteContext();
-  if (suspended && !pathname.startsWith("/app/admin")) return <Paused />;
+  if (suspended && !pathname.startsWith("/admin")) return <Paused />;
   return (
     <>
       <PaymentProblemBanner />
-      {!pathname.startsWith("/app/ad/") && <AppHeader />}
+      {!pathname.startsWith("/app/ad/") && !pathname.startsWith("/admin") && <AppHeader />}
       <Outlet />
       <UpgradeDialog />
     </>

@@ -43,3 +43,4 @@
 
 - Public home reference artwork lives in `public/site-art` and its page-specific styling in `src/styles.css`; this keeps the marketing visuals reusable without changing the `/app` editor.
 - Reusable kits: ads made from an `is_reusable` template store `projects.template_id`; `KitAgain.tsx` (useKit/KitAgainButton) drives the label, search and "Make another" (`/app/templates/$slug?from=<ad>` prefills text, no photos) from one place.
+- Staff role: `user_roles` (enum app_role, admin) checked via `has_role()`; `is_platform_admin()` wraps it; staff area at `/admin` (`_authenticated/admin/`) 404s non-admins — roles never live on profiles.

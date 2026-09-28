@@ -348,21 +348,18 @@ export type Database = {
           avatar_url: string | null
           created_at: string
           display_name: string | null
-          is_platform_admin: boolean
           user_id: string
         }
         Insert: {
           avatar_url?: string | null
           created_at?: string
           display_name?: string | null
-          is_platform_admin?: boolean
           user_id: string
         }
         Update: {
           avatar_url?: string | null
           created_at?: string
           display_name?: string | null
-          is_platform_admin?: boolean
           user_id?: string
         }
         Relationships: []
@@ -613,6 +610,27 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       workspace_billing: {
         Row: {
           cancel_at_period_end: boolean
@@ -800,6 +818,13 @@ export type Database = {
       effective_billing: { Args: { _ws: string }; Returns: Json }
       ensure_workspace: { Args: never; Returns: string }
       export_status: { Args: { _ws: string }; Returns: Json }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       has_support_session: { Args: { _ws: string }; Returns: boolean }
       in_other_team: { Args: { _uid: string; _ws: string }; Returns: string }
       is_platform_admin: { Args: never; Returns: boolean }
@@ -829,7 +854,7 @@ export type Database = {
       workspace_seats: { Args: { _ws: string }; Returns: number }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -956,6 +981,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin"],
+    },
   },
 } as const

@@ -21,7 +21,7 @@ import type { Format } from "@/lib/stillframe/types";
 import { cn } from "@/lib/utils";
 import { adminTemplatesKey, audienceLabel, TemplateThumb } from "@/components/admin/TemplateAdminBits";
 
-export const Route = createFileRoute("/_authenticated/app/admin/templates/$id")({
+export const Route = createFileRoute("/_authenticated/admin/templates/$id")({
   head: () => ({ meta: [
     { title: "Template builder — Gravity Pants Admin" },
     { name: "description", content: "Edit a ready-made Gravity Pants template." },
@@ -123,7 +123,7 @@ function Builder({ row, refetch }: { row: any; refetch: () => void }) {
   return (
     <div className="-mt-2">
       <header className="sticky top-14 z-20 -mx-4 mb-5 flex flex-wrap items-center gap-x-3 gap-y-2 bg-canvas/95 px-4 py-3 backdrop-blur hairline-b sm:-mx-0 sm:px-0">
-        <Link to="/app/admin/templates" className="inline-flex h-9 items-center gap-0.5 text-[14px] text-link"><ChevronLeft className="size-4" strokeWidth={1.7} /> Templates</Link>
+        <Link to="/admin/templates" className="inline-flex h-9 items-center gap-0.5 text-[14px] text-link"><ChevronLeft className="size-4" strokeWidth={1.7} /> Templates</Link>
         <span className="text-secondary-text">/</span>
         <h1 className="min-w-0 truncate text-[18px] font-semibold">{doc.name || "Untitled"}</h1>
         <span className={cn("inline-flex h-[22px] items-center gap-1.5 rounded-full px-2.5 text-[12px] font-medium", status === "published" ? "bg-success-soft text-success-text" : "bg-control-fill text-secondary-text")}>
@@ -135,7 +135,7 @@ function Builder({ row, refetch }: { row: any; refetch: () => void }) {
           <span className="inline-flex items-center gap-1.5 text-[13px] text-warning-text"><span className="size-1.5 rounded-full bg-warning-text" />Draft not published yet</span>
         ) : null}
         <div className="ml-auto flex items-center gap-2">
-          <Link to="/app/admin/audit" className="inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-[14px] hover:bg-control-fill"><History className="size-4" strokeWidth={1.7} /> History</Link>
+          <Link to="/admin/audit" className="inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-[14px] hover:bg-control-fill"><History className="size-4" strokeWidth={1.7} /> History</Link>
           <Button variant="secondary" size="header" disabled={busy || (!dirty && status !== "draft")} onClick={() => void saveDraft()}>Save draft</Button>
           <Button size="header" disabled={busy} onClick={() => setPublishing(true)}>Publish…</Button>
         </div>

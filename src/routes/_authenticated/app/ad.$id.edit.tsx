@@ -57,7 +57,7 @@ function EditPage() {
         banner={
           <div role="status" className="flex h-8 shrink-0 items-center justify-center gap-3 bg-foreground text-[13px] text-background">
             {support ? "Support editing — every change is logged" : "Viewing as admin — read only"}
-            <Link to="/app/admin/clients/$id" params={{ id: project.workspace_id }} className="underline">Back to client</Link>
+            <Link to="/admin/clients/$id" params={{ id: project.workspace_id }} className="underline">Back to client</Link>
           </div>
         }
       />

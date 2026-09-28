@@ -1,37 +1,50 @@
 import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import { FileClock, LayoutDashboard, LayoutTemplate, ShieldCheck, Users, Video } from "lucide-react";
+import { ChevronLeft, FileClock, LayoutDashboard, LayoutTemplate, ShieldCheck, Users, Video } from "lucide-react";
 
 const NAV = [
-  { to: "/app/admin", label: "Overview", icon: LayoutDashboard, exact: true },
-  { to: "/app/admin/clients", label: "Clients", icon: Users },
-  { to: "/app/admin/templates", label: "Templates", icon: LayoutTemplate },
-  { to: "/app/admin/exports", label: "Exports", icon: Video },
-  { to: "/app/admin/admins", label: "Admins", icon: ShieldCheck },
-  { to: "/app/admin/audit", label: "Audit Log", icon: FileClock },
+  { to: "/admin", label: "Overview", icon: LayoutDashboard, exact: true },
+  { to: "/admin/clients", label: "Clients", icon: Users },
+  { to: "/admin/templates", label: "Templates", icon: LayoutTemplate },
+  { to: "/admin/exports", label: "Exports", icon: Video },
+  { to: "/admin/admins", label: "Admins", icon: ShieldCheck },
+  { to: "/admin/audit", label: "Audit Log", icon: FileClock },
 ] as const;
 
 export function AdminShell({ children }: { children: ReactNode }) {
   return (
-    <div className="mx-auto flex w-full max-w-[1320px] flex-col gap-5 px-4 py-6 sm:px-8 lg:flex-row lg:gap-8 lg:py-8">
-      <nav aria-label="Admin" className="min-w-0 shrink-0 lg:w-[200px]">
-        <div className="mb-2 px-1 text-[12px] font-semibold uppercase tracking-[0.06em] text-secondary-text lg:mb-3 lg:px-3">Admin</div>
-        <ul className="flex gap-1 overflow-x-auto pb-1 lg:block lg:space-y-0.5">
-          {NAV.map((n) => (
-            <li key={n.to} className="shrink-0">
-              <Link
-                to={n.to}
-                activeOptions={{ exact: "exact" in n }}
-                className="flex h-11 items-center gap-2.5 rounded-lg px-3 text-[14px] text-foreground data-[status=active]:bg-card data-[status=active]:font-semibold data-[status=active]:shadow-card lg:h-9 lg:hover:bg-control-fill"
-              >
-                <n.icon className="size-4" strokeWidth={1.7} />
-                {n.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </nav>
-      <main className="min-w-0 flex-1">{children}</main>
+    <div className="min-h-dvh bg-canvas">
+      <header className="sticky top-0 z-30 border-b border-border bg-card/90 backdrop-blur">
+        <div className="mx-auto flex h-14 w-full max-w-[1320px] items-center justify-between px-4 sm:px-8">
+          <div className="flex items-center gap-2 text-[15px] font-semibold">
+            <ShieldCheck className="size-4 text-primary" strokeWidth={1.7} />
+            Gravity Pants Admin
+          </div>
+          <Link to="/app/ads" className="inline-flex h-11 items-center gap-1 rounded-lg px-3 text-[14px] font-medium text-primary hover:bg-control-fill">
+            <ChevronLeft className="size-4" strokeWidth={1.7} />
+            Back to app
+          </Link>
+        </div>
+      </header>
+      <div className="mx-auto flex w-full max-w-[1320px] flex-col gap-5 px-4 py-6 sm:px-8 lg:flex-row lg:gap-8 lg:py-8">
+        <nav aria-label="Admin" className="min-w-0 shrink-0 lg:w-[200px]">
+          <ul className="flex gap-1 overflow-x-auto pb-1 lg:block lg:space-y-0.5">
+            {NAV.map((n) => (
+              <li key={n.to} className="shrink-0">
+                <Link
+                  to={n.to}
+                  activeOptions={{ exact: "exact" in n }}
+                  className="flex h-11 items-center gap-2.5 rounded-lg px-3 text-[14px] text-foreground data-[status=active]:bg-card data-[status=active]:font-semibold data-[status=active]:shadow-card lg:h-9 lg:hover:bg-control-fill"
+                >
+                  <n.icon className="size-4" strokeWidth={1.7} />
+                  {n.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+        <main className="min-w-0 flex-1">{children}</main>
+      </div>
     </div>
   );
 }

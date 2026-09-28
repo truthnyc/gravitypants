@@ -13,7 +13,7 @@ import { Card, fmtBytes, fmtDate, fmtDateTime, fmtMoney, Pill, planLabel, status
 import { MediaImage } from "@/components/stillframe/MediaImage";
 import { adminAction, adminClient, adminSupport } from "@/lib/stillframe/admin.functions";
 
-export const Route = createFileRoute("/_authenticated/app/admin/clients_/$id")({
+export const Route = createFileRoute("/_authenticated/admin/clients_/$id")({
   head: () => ({ meta: [
     { title: "Admin Client — Gravity Pants" },
     { name: "description", content: "Private Gravity Pants client details." },
@@ -48,7 +48,7 @@ function ClientPage() {
 
   if (error) return <p className="text-destructive">Couldn't load this client.</p>;
   if (data === undefined) return <div aria-busy="true" className="h-96" />;
-  if (!data || !data.client) return <p className="text-secondary-text">This client no longer exists. <Link to="/app/admin/clients" className="text-primary">Back to Clients</Link></p>;
+  if (!data || !data.client) return <p className="text-secondary-text">This client no longer exists. <Link to="/admin/clients" className="text-primary">Back to Clients</Link></p>;
   const { client: c } = data;
   const supporting = !!data.supportUntil && new Date(data.supportUntil) > new Date();
   const stripeUrl = c.stripeCustomerId ? `https://dashboard.stripe.com/${c.environment === "live" ? "" : "test/"}customers/${c.stripeCustomerId}` : null;
@@ -61,7 +61,7 @@ function ClientPage() {
 
   return (
     <>
-      <Link to="/app/admin/clients" className="mb-3 inline-flex items-center gap-1 text-[13px] text-secondary-text hover:text-foreground">
+      <Link to="/admin/clients" className="mb-3 inline-flex items-center gap-1 text-[13px] text-secondary-text hover:text-foreground">
         <ChevronLeft className="size-4" strokeWidth={1.7} /> Clients
       </Link>
       <div className="mb-6 flex flex-col items-start justify-between gap-4 lg:flex-row">
@@ -222,7 +222,7 @@ function ActionDialog({ act, name, id, onClose, onDone }: { act: Act; name: stri
       if (act === "support") await support({ data: { id, start: true, reason } });
       else await action({ data: { id, action: act, reason, days, plan, until, confirmName } });
       toast(act === "support" ? "Support editing on for 60 minutes" : `${TITLES[act]} done`);
-      if (act === "delete") navigate({ to: "/app/admin/clients" });
+      if (act === "delete") navigate({ to: "/admin/clients" });
       onDone();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "That didn't work");
