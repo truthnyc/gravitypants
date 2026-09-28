@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Admin — Publish template</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+body{margin:0;background:#F1F3F0;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",system-ui,sans-serif;-webkit-font-smoothing:antialiased;color:#1D1D1F}
+*{box-sizing:border-box}
+button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:pointer}
+a{color:#0066CC;text-decoration:none}
+.ic{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.ghost{background:#fff;border-radius:4px;box-shadow:0 0 0 .5px rgba(0,0,0,.08)}
+.opt{display:flex;gap:12px;padding:14px;border-radius:6px;box-shadow:inset 0 0 0 .5px rgba(0,0,0,.16);text-align:left;width:100%}
+.opt.on{box-shadow:inset 0 0 0 1.5px #0071E3;background:#F5F9FF}
+.rad{width:18px;height:18px;border-radius:9px;box-shadow:inset 0 0 0 1.5px #C5C9C0;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center}
+.opt.on .rad{box-shadow:inset 0 0 0 5px #0071E3}
+.opt b{font-size:14px;font-weight:600;display:block}
+.opt span.d{font-size:13px;color:#57575C;display:block;margin-top:2px}
+.cb{display:inline-flex;align-items:center;gap:7px;font-size:13px;color:#9A9D96}
+.cb i{width:16px;height:16px;border-radius:3px;box-shadow:inset 0 0 0 1.5px #D6D9D2;display:block}
+.sw{width:40px;height:24px;border-radius:12px;background:#34C759;position:relative;flex-shrink:0}
+.sw span{position:absolute;top:2px;left:18px;width:20px;height:20px;border-radius:10px;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.btn{height:36px;padding:0 16px;border-radius:4px;font-size:14px;font-weight:500;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+</style>
+</head>
+<body>
+
+
+<div style="width:1440px;height:900px;position:relative;overflow:hidden;background:#F1F3F0">
+  <!-- builder behind, simplified -->
+  <div aria-hidden="true" style="position:absolute;inset:0;filter:blur(3px)">
+    <div style="height:52px;background:#fff;border-bottom:.5px solid rgba(0,0,0,.1)"></div>
+    <div style="height:64px;background:rgba(255,255,255,.7);display:flex;align-items:center;padding:0 36px;gap:12px"><span style="font-size:17px;font-weight:600">Product Launch Kit</span><span style="margin-left:auto;width:90px;height:34px;border-radius:4px;background:#fff"></span><span style="width:90px;height:34px;border-radius:4px;background:#0071E3"></span></div>
+    <div style="display:flex;gap:24px;padding:24px 36px">
+      <div style="flex:1;display:flex;flex-direction:column;gap:16px"><div class="ghost" style="height:240px"></div><div class="ghost" style="height:220px"></div><div class="ghost" style="height:300px"></div></div>
+      <div class="ghost" style="width:400px;height:680px;display:flex;justify-content:center;padding-top:60px"><div style="width:260px;height:462px;border-radius:6px;background:linear-gradient(160deg,#9DB09A,#1F2A22)"></div></div>
+    </div>
+  </div>
+  <div style="position:absolute;inset:0;background:rgba(29,29,31,.36)"></div>
+
+  <div role="dialog" aria-labelledby="pt" style="position:absolute;left:440px;top:110px;width:560px;background:#fff;border-radius:10px;box-shadow:0 30px 80px rgba(0,0,0,.28),0 0 0 .5px rgba(0,0,0,.1);overflow:hidden">
+    <div style="padding:22px 24px 0;display:flex;gap:14px;align-items:flex-start">
+      <div style="width:44px;height:44px;border-radius:6px;background:#F1F3F0;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span style="width:22px;height:38px;border-radius:2px;background:linear-gradient(160deg,#9DB09A,#1F2A22)"></span></div>
+      <div style="flex:1">
+        <h2 id="pt" style="margin:0;font-size:19px;font-weight:700;letter-spacing:-.01em">Publish “Product Launch Kit”</h2>
+        <p style="margin:6px 0 0;font-size:13px;color:#57575C;line-height:1.45">Version 4 · 9:16 · 4 slides · 10.4 s. Ads people already made from earlier versions won’t change.</p>
+      </div>
+      <a href="admin-builder.html" aria-label="Close" style="width:30px;height:30px;border-radius:15px;display:flex;align-items:center;justify-content:center;color:#6E6E73;margin:-4px -6px 0 0"><svg class="ic" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M6 6l12 12M18 6 6 18"></path></svg></a>
+    </div>
+
+    <div style="padding:20px 24px;display:flex;flex-direction:column;gap:10px">
+      <div style="font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#6E6E73">Who can use it</div>
+      <button class="opt on" aria-pressed="true"><span class="rad"></span><span><b>All users</b><span class="d">Every account, including free trials. Shown under the “Gravity Pants” tab.</span></span></button>
+      <button class="opt" aria-pressed="false"><span class="rad"></span><span style="flex:1"><b>Only these plans</b><span class="d">Others see it with a lock and an upgrade prompt.</span>
+        <span style="display:flex;gap:18px;margin-top:10px"><span class="cb"><i></i>Simple</span><span class="cb"><i></i>Business</span><span class="cb"><i></i>Team</span></span></span></button>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 2px 4px;margin-top:6px;border-top:.5px solid rgba(0,0,0,.1)">
+        <span><span style="font-size:14px;font-weight:500">Show a “New” badge</span><span style="display:block;font-size:12px;color:#6E6E73;margin-top:2px">On the template card for 14 days</span></span>
+        <span class="sw" aria-pressed="true"><span></span></span>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:4px 2px">
+        <span style="font-size:14px;font-weight:500">Featured <span style="font-size:12px;color:#6E6E73;font-weight:400">· pinned first in the picker</span></span>
+        <span class="sw" aria-pressed="true"><span></span></span>
+      </div>
+    </div>
+
+    <div style="padding:14px 24px;background:#F7F8F5;border-top:.5px solid rgba(0,0,0,.08);display:flex;align-items:center;gap:10px">
+      <span style="font-size:12px;color:#57575C;display:flex;align-items:center;gap:6px"><svg class="ic" viewBox="0 0 24 24" style="width:14px;height:14px;color:#1A8F3C"><circle cx="12" cy="12" r="9"></circle><path d="m8 12 3 3 5-6"></path></svg>Appears in the “Gravity Pants” tab right away.</span>
+      <a class="btn" href="admin-builder.html" style="margin-left:auto;color:#1D1D1F;background:#fff;box-shadow:0 0 0 .5px rgba(0,0,0,.14)">Cancel</a>
+      <a class="btn" href="admin-templates.html" style="background:#0071E3;color:#fff">Publish to all users</a>
+    </div>
+  </div>
+
+  <div style="position:absolute;left:440px;top:640px;width:560px;display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:8px;background:rgba(255,255,255,.92);box-shadow:0 8px 24px rgba(0,0,0,.12)">
+    <span style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#6E6E73;white-space:nowrap">What users get</span>
+    <span style="font-size:13px;color:#424245">Card in <b>Pick a cut.</b> → “Gravity Pants” tab, with a <span style="height:18px;padding:0 6px;border-radius:9px;background:#0071E3;color:#fff;font-size:10px;font-weight:600;display:inline-flex;align-items:center">New</span> badge</span>
+  </div>
+</div>
+
+
+</body>
+</html>

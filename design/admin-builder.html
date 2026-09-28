@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Admin — Template builder</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+body{margin:0;background:#F1F3F0;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",system-ui,sans-serif;-webkit-font-smoothing:antialiased;color:#1D1D1F}
+*{box-sizing:border-box}
+button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:pointer}
+input,select,textarea{font:inherit;color:inherit}
+a{color:#0066CC;text-decoration:none}
+.ic{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.btn{height:34px;padding:0 14px;border-radius:4px;font-size:14px;font-weight:500;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn.pri{background:#0071E3;color:#fff}
+.btn.sec{background:#fff;box-shadow:0 0 0 .5px rgba(0,0,0,.14)}
+.btn.ghost{color:#424245}
+.panel{background:#fff;border-radius:4px;box-shadow:0 0 0 .5px rgba(0,0,0,.08)}
+.ph{display:flex;align-items:center;gap:10px;padding:16px 20px 0}
+.ph h2{margin:0;font-size:15px;font-weight:600}
+.ph .n{width:22px;height:22px;border-radius:11px;background:#1D1D1F;color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center}
+.ph small{font-size:12px;color:#6E6E73;margin-left:auto}
+.pb{padding:14px 20px 20px;display:grid;grid-template-columns:1fr 1fr;gap:14px 16px}
+.f{display:flex;flex-direction:column;gap:6px;min-width:0}
+.f.full{grid-column:1 / -1}
+.f label,.lab{font-size:12px;font-weight:500;color:#57575C}
+.inp{height:36px;border-radius:4px;background:#F7F8F5;box-shadow:inset 0 0 0 .5px rgba(0,0,0,.14);display:flex;align-items:center;padding:0 10px;font-size:14px;gap:6px;min-width:0;white-space:nowrap;overflow:hidden}
+.inp.focus{box-shadow:inset 0 0 0 1.5px #0071E3,0 0 0 3px rgba(0,113,227,.15);background:#fff}
+.inp .pre{color:#9A9D96}
+.inp .chev{margin-left:auto;width:12px;height:12px;color:#6E6E73}
+.hint{font-size:11px;color:#6E6E73}
+.seg{display:flex;padding:2px;gap:2px;border-radius:5px;background:rgba(120,124,112,.13);height:36px}
+.seg button{flex:1;border-radius:3px;font-size:13px;font-weight:500;color:#424245}
+.seg button.on{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.12);color:#1D1D1F;font-weight:600}
+.tg{display:flex;align-items:center;justify-content:space-between;gap:12px;height:36px;font-size:14px}
+.sw{width:40px;height:24px;border-radius:12px;background:#D6D9D2;position:relative;flex-shrink:0}
+.sw span{position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:10px;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.sw.on{background:#34C759}.sw.on span{left:18px}
+.swatch{width:22px;height:22px;border-radius:4px;box-shadow:inset 0 0 0 .5px rgba(0,0,0,.2);flex-shrink:0}
+.grid9{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;width:72px;height:72px;padding:4px;border-radius:4px;background:#ECEEEA}
+.grid9 i{border-radius:2px;background:#fff;box-shadow:0 0 0 .5px rgba(0,0,0,.1);display:block}
+.grid9 i.on{background:#0071E3;box-shadow:none}
+.slide{border-radius:4px;box-shadow:0 0 0 .5px rgba(0,0,0,.12);background:#fff}
+.slide.open{box-shadow:0 0 0 1.5px #0071E3}
+.sh{display:flex;align-items:center;gap:10px;height:56px;padding:0 10px 0 6px}
+.sh .grip{color:#B0B3AC;width:20px;display:flex;justify-content:center}
+.sh .no{width:22px;height:22px;border-radius:4px;background:#1D1D1F;color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center}
+.sh .mini{width:22px;height:39px;border-radius:2px;flex-shrink:0}
+.sh .t{font-size:14px;font-weight:600}
+.sh .s{font-size:12px;color:#6E6E73;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sh .acts{margin-left:auto;display:flex;gap:2px;color:#6E6E73}
+.sh .acts button{width:30px;height:30px;border-radius:4px;display:flex;align-items:center;justify-content:center}
+.sh .acts .ic{width:15px;height:15px}
+.sb{padding:4px 16px 16px 44px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px 14px;border-top:.5px solid rgba(0,0,0,.08);padding-top:14px}
+.step{display:flex;align-items:center;height:36px;border-radius:4px;box-shadow:inset 0 0 0 .5px rgba(0,0,0,.14);background:#F7F8F5;overflow:hidden}
+.step button{width:32px;height:100%;color:#424245;font-size:16px}
+.step span{flex:1;text-align:center;font-size:14px;font-variant-numeric:tabular-nums;font-weight:500}
+.drop{height:82px;border-radius:4px;border:1.5px dashed #C5C9C0;display:flex;align-items:center;gap:12px;padding:0 12px;font-size:13px;color:#57575C}
+/* preview */
+.pv{position:relative;width:260px;height:462px;border-radius:6px;overflow:hidden;background:#1F2A22;box-shadow:0 22px 50px rgba(0,0,0,.22)}
+.sl{position:absolute;inset:0;opacity:0}
+.sl .ph1{position:absolute;inset:0;animation:kz 10.4s linear infinite}
+.sl .cp{position:absolute;left:20px;right:20px;bottom:54px;color:#fff}
+.sl .cp b{display:block;font-size:26px;line-height:1.05;letter-spacing:-.02em;font-weight:700;text-shadow:0 1px 12px rgba(0,0,0,.25)}
+.sl .cp span{display:block;margin-top:8px;font-size:12px;opacity:.92}
+.s1{animation:v1 10.4s infinite}.s2{animation:v2 10.4s infinite}.s3{animation:v3 10.4s infinite}.s4{animation:v4 10.4s infinite}
+@keyframes v1{0%,22.5%{opacity:1}23.1%,99.4%{opacity:0}100%{opacity:1}}
+@keyframes v2{0%,22.5%{opacity:0}25%,47.5%{opacity:1}48.1%,100%{opacity:0}}
+@keyframes v3{0%,48%{opacity:0;transform:translateX(100%)}50.5%,72.5%{opacity:1;transform:translateX(0)}73.1%,100%{opacity:0;transform:translateX(0)}}
+@keyframes v4{0%,72.6%{opacity:0}75.5%,99.4%{opacity:1}100%{opacity:0}}
+.s1 .cp{animation:r1 10.4s infinite}.s2 .cp{animation:r2 10.4s infinite}.s3 .cp{animation:r3 10.4s infinite}.s4 .cp{animation:r4 10.4s infinite}
+@keyframes r1{0%{transform:translateY(18px);opacity:0}5%,100%{transform:none;opacity:1}}
+@keyframes r2{0%,23.1%{transform:translateY(18px);opacity:0}28%,100%{transform:none;opacity:1}}
+@keyframes r3{0%,50%{transform:translateY(18px);opacity:0}55%,100%{transform:none;opacity:1}}
+@keyframes r4{0%,73.1%{transform:translateY(18px);opacity:0}78%,100%{transform:none;opacity:1}}
+@keyframes kz{0%{transform:scale(1)}100%{transform:scale(1.08)}}
+.logo{position:absolute;top:22px;right:18px;width:48px;height:18px;border-radius:3px;background:rgba(255,255,255,.95);color:#1D1D1F;font-size:7px;font-weight:800;letter-spacing:.14em;display:flex;align-items:center;justify-content:center;z-index:3}
+.bars{position:absolute;top:10px;left:10px;right:10px;display:flex;gap:4px;z-index:3}
+.bars i{height:2px;border-radius:1px;background:rgba(255,255,255,.35);position:relative;overflow:hidden;display:block}
+.bars i::after{content:"";position:absolute;inset:0;background:#fff;transform-origin:left;transform:scaleX(0)}
+.bars i:nth-child(1)::after{animation:b1 10.4s linear infinite}
+.bars i:nth-child(2)::after{animation:b2 10.4s linear infinite}
+.bars i:nth-child(3)::after{animation:b3 10.4s linear infinite}
+.bars i:nth-child(4)::after{animation:b4 10.4s linear infinite}
+@keyframes b1{0%{transform:scaleX(0)}23.08%,100%{transform:scaleX(1)}}
+@keyframes b2{0%,23.08%{transform:scaleX(0)}48.08%,100%{transform:scaleX(1)}}
+@keyframes b3{0%,48.08%{transform:scaleX(0)}73.08%,100%{transform:scaleX(1)}}
+@keyframes b4{0%,73.08%{transform:scaleX(0)}100%{transform:scaleX(1)}}
+.tl{position:relative;display:flex;gap:3px;height:38px}
+.tl div{border-radius:3px;display:flex;flex-direction:column;justify-content:center;padding:0 8px;font-size:11px;color:#fff;font-weight:600;overflow:hidden;white-space:nowrap}
+.tl div small{font-weight:400;opacity:.8;font-size:10px}
+.ph-head{position:absolute;top:-6px;bottom:-6px;width:2px;background:#FF3B30;border-radius:1px;animation:ph 10.4s linear infinite}
+.ph-head::before{content:"";position:absolute;top:-4px;left:-4px;width:10px;height:10px;border-radius:5px;background:#FF3B30}
+@keyframes ph{0%{left:0}100%{left:100%}}
+@media (prefers-reduced-motion:reduce){.sl,.sl .cp,.sl .ph1,.bars i::after,.ph-head{animation:none!important}.s1{opacity:1}}
+</style>
+</head>
+<body>
+
+
+<div style="width:1440px;height:1640px;display:flex;flex-direction:column;background:#F1F3F0">
+  <header style="height:52px;flex-shrink:0;display:flex;align-items:center;gap:10px;padding:0 20px;background:#fff;border-bottom:.5px solid rgba(0,0,0,.1)">
+    <svg width="24" height="24" viewBox="0 0 24 24"><rect width="24" height="24" rx="5.4" fill="#0071E3"></rect><g transform="translate(0.75 1.65) scale(0.9)"><circle cx="11" cy="13" r="7" fill="#fff"></circle><path d="M9.95 10.3 14.2 13 9.95 15.7Z" fill="#0071E3" stroke="#0071E3" stroke-width="1" stroke-linejoin="round"></path><circle cx="19" cy="5" r="2" fill="#fff"></circle></g></svg>
+    <span style="font-size:15px;font-weight:600">Gravity Pants</span>
+    <span style="height:20px;padding:0 7px;border-radius:10px;background:#1D1D1F;color:#fff;letter-spacing:.06em;font-size:10px;font-weight:600;display:inline-flex;align-items:center">ADMIN</span>
+    <a href="#" style="margin-left:auto;font-size:13px">Back to app</a>
+    <span style="width:30px;height:30px;border-radius:15px;background:#D8DBD4;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;margin-left:12px">[AB]</span>
+  </header>
+
+  <div style="height:64px;flex-shrink:0;display:flex;align-items:center;gap:12px;padding:0 36px;background:rgba(255,255,255,.7);border-bottom:.5px solid rgba(0,0,0,.08)">
+    <a href="admin-templates.html" style="font-size:14px;display:flex;align-items:center;gap:2px"><svg class="ic" viewBox="0 0 24 24" style="width:15px;height:15px"><path d="m15 6-6 6 6 6"></path></svg>Templates</a>
+    <span style="color:#C5C9C0">/</span>
+    <span style="font-size:17px;font-weight:600">Product Launch Kit</span>
+    <span style="height:22px;padding:0 9px;border-radius:11px;background:#E7F6EC;color:#1A7F37;font-size:12px;font-weight:500;display:inline-flex;align-items:center;gap:6px"><i style="width:6px;height:6px;border-radius:3px;background:#1A8F3C;display:block"></i>Published · v3</span>
+    <span style="font-size:12px;color:#8A5A00;display:flex;align-items:center;gap:5px"><i style="width:6px;height:6px;border-radius:3px;background:#D4A017;display:block"></i>Unsaved changes</span>
+    <span style="margin-left:auto"></span>
+    <button class="btn ghost"><svg class="ic" viewBox="0 0 24 24" style="width:15px;height:15px"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>History</button>
+    <button class="btn sec">Save draft</button>
+    <a class="btn pri" href="admin-publish.html">Publish…</a>
+  </div>
+
+  <div style="flex-grow:1;display:flex;gap:24px;padding:24px 36px 36px;align-items:flex-start;min-height:0">
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:16px">
+
+      <section class="panel">
+        <div class="ph"><span class="n">1</span><h2>Basics</h2></div>
+        <div class="pb">
+          <div class="f"><label>Name</label><div class="inp focus">Product Launch Kit</div></div>
+          <div class="f"><label>Slug</label><div class="inp"><span class="pre">/templates/</span>product-launch-kit</div></div>
+          <div class="f full"><label>Description</label><div class="inp" style="height:auto;min-height:36px;padding:9px 10px;white-space:normal">A reusable vertical product story: hook, benefit, proof and offer.</div><span class="hint" style="text-align:right">67 / 120</span></div>
+          <div class="f"><label>Format</label><div class="seg"><button class="on">9:16</button><button>1:1</button><button>16:9</button></div></div>
+          <div class="f" style="justify-content:flex-end;gap:2px">
+            <div class="tg"><span>Reusable kit <span class="hint">· “Make another from this kit”</span></span><span class="sw on"><span></span></span></div>
+            <div class="tg"><span>Featured <span class="hint">· pinned first</span></span><span class="sw on"><span></span></span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="ph"><span class="n">2</span><h2>Style</h2><small>Applies to every slide</small></div>
+        <div class="pb" style="grid-template-columns:repeat(4,1fr)">
+          <div class="f"><label>Background</label><div class="inp"><span class="swatch" style="background:#1F2A22"></span>#1F2A22</div></div>
+          <div class="f"><label>Headline font</label><div class="inp">Inter · Bold<svg class="ic chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"></path></svg></div></div>
+          <div class="f"><label>Headline size</label><div class="inp">96 px</div></div>
+          <div class="f"><label>Headline color</label><div class="inp"><span class="swatch" style="background:#fff"></span>#FFFFFF</div></div>
+          <div class="f"></div>
+          <div class="f"><label>Subline font</label><div class="inp">Inter · Regular<svg class="ic chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"></path></svg></div></div>
+          <div class="f"><label>Subline size</label><div class="inp">40 px</div></div>
+          <div class="f"><label>Subline color</label><div class="inp"><span class="swatch" style="background:#F2F2EE"></span>#F2F2EE</div></div>
+          <div class="f full" style="flex-direction:row;gap:40px;margin-top:4px">
+            <div style="display:flex;gap:14px;align-items:center"><div class="grid9"><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i></i><i></i></div><div><div class="lab">Text position</div><div class="hint">Bottom left</div></div></div>
+            <div style="display:flex;gap:14px;align-items:center"><div class="grid9"><i></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div><div class="lab">Logo position</div><div class="hint">Top right · user’s brand kit logo</div></div></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="ph"><span class="n">3</span><h2>Slides</h2><small>4 of max 10 · 10.4 s total</small></div>
+        <div style="padding:14px 20px 20px;display:flex;flex-direction:column;gap:8px">
+
+          <div class="slide open">
+            <div class="sh">
+              <span class="grip"><svg class="ic" viewBox="0 0 24 24" style="width:16px;height:16px"><circle cx="9" cy="6" r="1" fill="currentColor"></circle><circle cx="15" cy="6" r="1" fill="currentColor"></circle><circle cx="9" cy="12" r="1" fill="currentColor"></circle><circle cx="15" cy="12" r="1" fill="currentColor"></circle><circle cx="9" cy="18" r="1" fill="currentColor"></circle><circle cx="15" cy="18" r="1" fill="currentColor"></circle></svg></span>
+              <span class="no" style="background:#0071E3">1</span>
+              <div style="min-width:0"><div class="t">Hook</div><div class="s">2.4s · No transition · Rise up · Slow zoom in</div></div>
+              <div class="acts"><button aria-label="Duplicate"><svg class="ic" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"></rect><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"></path></svg></button><button aria-label="Delete"><svg class="ic" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"></path></svg></button><button aria-label="Collapse"><svg class="ic" viewBox="0 0 24 24"><path d="m6 15 6-6 6 6"></path></svg></button></div>
+            </div>
+            <div class="sb">
+              <div class="f"><label>Role label</label><div class="inp">Hook</div></div>
+              <div class="f"><label>Duration</label><div class="step"><button>−</button><span>2.4 s</span><button>+</button></div></div>
+              <div class="f"><label>Transition in</label><div class="inp">None<svg class="ic chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"></path></svg></div></div>
+              <div class="f"><label>Text animation</label><div class="inp">Rise up<svg class="ic chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"></path></svg></div></div>
+              <div class="f"><label>Photo motion</label><div class="inp">Slow zoom in<svg class="ic chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"></path></svg></div></div>
+              <div class="f"></div>
+              <div class="f" style="grid-column:span 2"><label>Headline placeholder</label><div class="inp" style="font-weight:600">Meet [product name]</div></div>
+              <div class="f" style="grid-row:span 2"><label>Sample photo <span class="hint">· previews only</span></label><div class="drop" style="height:116px"><span style="width:52px;height:92px;border-radius:3px;background:linear-gradient(160deg,#9DB09A,#3E5446);flex-shrink:0"></span><span>launch-hook.jpg<br><a href="#">Replace</a> · <a href="#" style="color:#C0392B">Remove</a></span></div></div>
+              <div class="f" style="grid-column:span 2"><label>Subline placeholder</label><div class="inp">A short, specific promise</div></div>
+            </div>
+          </div>
+
+          <div class="slide"><div class="sh">
+            <span class="grip"><svg class="ic" viewBox="0 0 24 24" style="width:16px;height:16px"><circle cx="9" cy="6" r="1" fill="currentColor"></circle><circle cx="15" cy="6" r="1" fill="currentColor"></circle><circle cx="9" cy="12" r="1" fill="currentColor"></circle><circle cx="15" cy="12" r="1" fill="currentColor"></circle><circle cx="9" cy="18" r="1" fill="currentColor"></circle><circle cx="15" cy="18" r="1" fill="currentColor"></circle></svg></span>
+            <span class="no">2</span><span class="mini" style="background:linear-gradient(160deg,#C9B8A3,#7A6552)"></span>
+            <div style="min-width:0"><div class="t">Benefit</div><div class="s">2.6s · Fade · Rise up · “Your strongest benefit”</div></div>
+            <div class="acts"><button aria-label="Duplicate"><svg class="ic" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"></rect><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"></path></svg></button><button aria-label="Delete"><svg class="ic" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"></path></svg></button><button aria-label="Expand"><svg class="ic" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"></path></svg></button></div>
+          </div></div>
+          <div class="slide"><div class="sh">
+            <span class="grip"><svg class="ic" viewBox="0 0 24 24" style="width:16px;height:16px"><circle cx="9" cy="6" r="1" fill="currentColor"></circle><circle cx="15" cy="6" r="1" fill="currentColor"></circle><circle cx="9" cy="12" r="1" fill="currentColor"></circle><circle cx="15" cy="12" r="1" fill="currentColor"></circle><circle cx="9" cy="18" r="1" fill="currentColor"></circle><circle cx="15" cy="18" r="1" fill="currentColor"></circle></svg></span>
+            <span class="no">3</span><span class="mini" style="background:linear-gradient(160deg,#8FA3B8,#2F3F52)"></span>
+            <div style="min-width:0"><div class="t">Proof</div><div class="s">2.6s · Swipe left · Rise up · “Show the detail”</div></div>
+            <div class="acts"><button aria-label="Duplicate"><svg class="ic" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"></rect><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"></path></svg></button><button aria-label="Delete"><svg class="ic" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"></path></svg></button><button aria-label="Expand"><svg class="ic" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"></path></svg></button></div>
+          </div></div>
+          <div class="slide"><div class="sh">
+            <span class="grip"><svg class="ic" viewBox="0 0 24 24" style="width:16px;height:16px"><circle cx="9" cy="6" r="1" fill="currentColor"></circle><circle cx="15" cy="6" r="1" fill="currentColor"></circle><circle cx="9" cy="12" r="1" fill="currentColor"></circle><circle cx="15" cy="12" r="1" fill="currentColor"></circle><circle cx="9" cy="18" r="1" fill="currentColor"></circle><circle cx="15" cy="18" r="1" fill="currentColor"></circle></svg></span>
+            <span class="no">4</span><span class="mini" style="background:linear-gradient(160deg,#D9A48C,#8C3F2B)"></span>
+            <div style="min-width:0"><div class="t">Offer</div><div class="s">2.8s · Fade · Rise up · “Your offer goes here”</div></div>
+            <div class="acts"><button aria-label="Duplicate"><svg class="ic" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"></rect><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"></path></svg></button><button aria-label="Delete"><svg class="ic" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"></path></svg></button><button aria-label="Expand"><svg class="ic" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"></path></svg></button></div>
+          </div></div>
+
+          <button style="height:48px;border-radius:4px;border:1.5px dashed #C5C9C0;display:flex;align-items:center;justify-content:center;gap:6px;font-size:14px;font-weight:500;color:#0066CC"><svg class="ic" viewBox="0 0 24 24" style="width:15px;height:15px"><path d="M12 5v14M5 12h14"></path></svg>Add slide</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="ph"><span class="n">4</span><h2>Thumbnail</h2><small>Shown on the template card</small></div>
+        <div style="padding:14px 20px 20px;display:flex;align-items:center;gap:16px">
+          <div style="width:92px;height:92px;border-radius:4px;background:#F1F3F0;display:flex;align-items:center;justify-content:center"><span style="width:44px;height:78px;border-radius:3px;background:linear-gradient(160deg,#9DB09A,#3E5446);position:relative"><b style="position:absolute;left:5px;bottom:10px;font-size:6px;color:#fff;line-height:1.1">Meet [product name]</b></span></div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;gap:8px"><button class="btn sec"><svg class="ic" viewBox="0 0 24 24" style="width:15px;height:15px"><path d="M12 16V4M7 9l5-5 5 5M5 20h14"></path></svg>Upload image</button><button class="btn sec"><svg class="ic" viewBox="0 0 24 24" style="width:15px;height:15px"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"></path><circle cx="12" cy="12" r="3"></circle></svg>Generate from preview</button></div>
+            <span class="hint">Generated from slide 1 · 1080 × 1920 · Sep 28</span>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <aside class="panel" style="width:400px;flex-shrink:0;position:sticky;top:24px;padding:18px 20px 22px;display:flex;flex-direction:column;align-items:center;gap:16px">
+      <div style="width:100%;display:flex;align-items:center;justify-content:space-between"><h2 style="margin:0;font-size:15px;font-weight:600">Preview</h2><div class="seg" style="width:170px;height:30px"><button class="on">9:16</button><button>1:1</button><button>16:9</button></div></div>
+      <div class="pv">
+        <div class="bars"><i style="flex:2.4"></i><i style="flex:2.6"></i><i style="flex:2.6"></i><i style="flex:2.8"></i></div>
+        <div class="logo">LOGO</div>
+        <div class="sl s1"><div class="ph1" style="background:linear-gradient(160deg,#9DB09A 0%,#5C7563 45%,#1F2A22 100%)"></div><div class="cp"><b>Meet [product name]</b><span>A short, specific promise</span></div></div>
+        <div class="sl s2"><div class="ph1" style="background:linear-gradient(160deg,#C9B8A3 0%,#7A6552 55%,#2B2119 100%)"></div><div class="cp"><b>Your strongest benefit</b><span>Explain why it matters in one line</span></div></div>
+        <div class="sl s3"><div class="ph1" style="background:linear-gradient(160deg,#8FA3B8 0%,#4A5E73 50%,#1B2530 100%)"></div><div class="cp"><b>Show the detail</b><span>Material, result, feature or proof</span></div></div>
+        <div class="sl s4"><div class="ph1" style="background:linear-gradient(160deg,#D9A48C 0%,#A85A3E 50%,#3E1D14 100%)"></div><div class="cp"><b>Your offer goes here</b><span>Shop now · yourstore.com</span></div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <button aria-label="Pause" style="width:40px;height:40px;border-radius:20px;background:#1D1D1F;color:#fff;display:flex;align-items:center;justify-content:center"><svg class="ic" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M8 5v14M16 5v14" stroke-width="3"></path></svg></button>
+        <span style="font-size:14px;font-variant-numeric:tabular-nums;color:#424245"><b style="color:#1D1D1F">0:03.1</b> / 0:10.4</span>
+      </div>
+      <div style="width:100%;padding:0 2px">
+        <div class="tl">
+          <div style="flex:2.4;background:#3E5446">1 Hook<small>2.4s</small></div>
+          <div style="flex:2.6;background:#7A6552">2 Benefit<small>2.6s</small></div>
+          <div style="flex:2.6;background:#4A5E73">3 Proof<small>2.6s</small></div>
+          <div style="flex:2.8;background:#A85A3E">4 Offer<small>2.8s</small></div>
+          <span class="ph-head"></span>
+        </div>
+      </div>
+      <p style="margin:0;font-size:12px;color:#6E6E73;text-align:center;line-height:1.45">Plays with sample photos and placeholder text.<br>Users never see placeholders in their exports.</p>
+    </aside>
+  </div>
+</div>
+
+
+</body>
+</html>

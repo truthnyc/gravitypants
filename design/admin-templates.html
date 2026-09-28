@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Admin — Template manager</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+body{margin:0;background:#F1F3F0;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",system-ui,sans-serif;-webkit-font-smoothing:antialiased;color:#1D1D1F}
+*{box-sizing:border-box}
+button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:pointer}
+input,select{font:inherit;color:inherit}
+a{color:#0066CC;text-decoration:none}
+.ic{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.side a{display:flex;align-items:center;gap:10px;height:34px;padding:0 10px;border-radius:4px;font-size:14px;color:#424245}
+.side a.on{background:#fff;color:#1D1D1F;font-weight:600;box-shadow:0 0 0 .5px rgba(0,0,0,.08)}
+.side .grp{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#6E6E73;padding:14px 10px 6px}
+.btn{height:34px;padding:0 14px;border-radius:4px;font-size:14px;font-weight:500;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn.pri{background:#0071E3;color:#fff}
+.btn.sec{background:#fff;box-shadow:0 0 0 .5px rgba(0,0,0,.14)}
+.chip{height:30px;padding:0 12px;border-radius:15px;font-size:13px;font-weight:500;display:inline-flex;align-items:center;gap:6px;color:#424245}
+.chip b{font-weight:600;color:#6E6E73;font-size:12px}
+.chip.on{background:#1D1D1F;color:#fff}
+.chip.on b{color:rgba(255,255,255,.7)}
+.sel{height:32px;padding:0 10px 0 12px;border-radius:4px;background:#fff;box-shadow:0 0 0 .5px rgba(0,0,0,.14);font-size:13px;display:inline-flex;align-items:center;gap:8px}
+table{width:100%;border-collapse:collapse}
+th{font-size:12px;font-weight:500;color:#6E6E73;text-align:left;padding:0 12px;height:36px;border-bottom:.5px solid rgba(0,0,0,.1);white-space:nowrap}
+td{padding:0 12px;height:66px;border-bottom:.5px solid rgba(0,0,0,.07);font-size:13px;vertical-align:middle;white-space:nowrap}
+tr.dim td{opacity:.5}
+tr.hl td{background:#F5F9FF}
+.grip{color:#B0B3AC;cursor:grab;width:18px}
+.th{width:48px;height:48px;border-radius:4px;background:#F1F3F0;display:flex;align-items:center;justify-content:center}
+.th span{display:block;border-radius:2px;position:relative}
+.nm{font-size:14px;font-weight:600}
+.slug{font-size:12px;color:#6E6E73;margin-top:2px}
+.tag{height:20px;padding:0 7px;border-radius:10px;font-size:11px;font-weight:600;display:inline-flex;align-items:center}
+.pill{height:22px;padding:0 9px;border-radius:11px;font-size:12px;font-weight:500;display:inline-flex;align-items:center;gap:6px}
+.pill i{width:6px;height:6px;border-radius:3px;display:block}
+.pub{background:#E7F6EC;color:#1A7F37}.pub i{background:#1A8F3C}
+.dra{background:#FFF4DE;color:#8A5A00}.dra i{background:#D4A017}
+.arc{background:#EDEEEB;color:#6E6E73}.arc i{background:#9A9D96}
+.star{color:#C7CAC3}.star.on{color:#F5A623}
+.more{width:30px;height:30px;border-radius:4px;display:flex;align-items:center;justify-content:center;color:#6E6E73}
+.menu{position:absolute;right:18px;top:40px;width:196px;background:#fff;border-radius:6px;box-shadow:0 12px 32px rgba(0,0,0,.16),0 0 0 .5px rgba(0,0,0,.1);padding:5px;z-index:5}
+.menu button,.menu a{width:100%;height:32px;border-radius:4px;display:flex;align-items:center;gap:10px;padding:0 10px;font-size:13px;text-align:left}
+.menu button:hover,.menu a:hover,.menu .hv{background:#F1F3F0}
+.menu hr{border:0;border-top:.5px solid rgba(0,0,0,.1);margin:4px 2px}
+.menu .ic{width:15px;height:15px;color:#6E6E73}
+</style>
+</head>
+<body>
+
+
+<div style="width:1440px;height:900px;display:flex;flex-direction:column;background:#F1F3F0;overflow:hidden">
+  <header style="height:52px;flex-shrink:0;display:flex;align-items:center;gap:10px;padding:0 20px;background:#fff;border-bottom:.5px solid rgba(0,0,0,.1)">
+    <svg width="24" height="24" viewBox="0 0 24 24"><rect width="24" height="24" rx="5.4" fill="#0071E3"></rect><g transform="translate(0.75 1.65) scale(0.9)"><circle cx="11" cy="13" r="7" fill="#fff"></circle><path d="M9.95 10.3 14.2 13 9.95 15.7Z" fill="#0071E3" stroke="#0071E3" stroke-width="1" stroke-linejoin="round"></path><circle cx="19" cy="5" r="2" fill="#fff"></circle></g></svg>
+    <span style="font-size:15px;font-weight:600">Gravity Pants</span>
+    <span class="tag" style="background:#1D1D1F;color:#fff;letter-spacing:.06em;font-size:10px">ADMIN</span>
+    <a href="#" style="margin-left:auto;font-size:13px;display:flex;align-items:center;gap:4px"><svg class="ic" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="m15 6-6 6 6 6"></path></svg>Back to app</a>
+    <span style="width:30px;height:30px;border-radius:15px;background:#D8DBD4;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;margin-left:12px">[AB]</span>
+  </header>
+  <div style="flex-grow:1;display:flex;min-height:0">
+    <nav class="side" style="width:220px;flex-shrink:0;padding:12px 12px;border-right:.5px solid rgba(0,0,0,.08)">
+      <div class="grp">Content</div>
+      <a class="on" href="#"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1.5"></rect><rect x="14" y="3" width="7" height="5" rx="1.5"></rect><rect x="14" y="12" width="7" height="9" rx="1.5"></rect><rect x="3" y="16" width="7" height="5" rx="1.5"></rect></svg>Templates</a>
+      <a href="#" style="color:#9A9D96"><svg class="ic" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>Music <span style="margin-left:auto;font-size:11px">Soon</span></a>
+      <a href="#" style="color:#9A9D96"><svg class="ic" viewBox="0 0 24 24"><path d="M4 7V5h16v2M12 5v14M9 19h6"></path></svg>Fonts <span style="margin-left:auto;font-size:11px">Soon</span></a>
+      <div class="grp">People</div>
+      <a href="#"><svg class="ic" viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"></circle><path d="M2 21a7 7 0 0 1 14 0M17 11a3 3 0 1 0 0-6M22 21a5 5 0 0 0-5-5"></path></svg>Users</a>
+      <a href="#"><svg class="ic" viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"></path></svg>Admins</a>
+    </nav>
+
+    <main style="flex-grow:1;padding:28px 36px;display:flex;flex-direction:column;gap:18px;min-width:0">
+      <div style="display:flex;align-items:flex-end;gap:16px">
+        <div>
+          <div style="font-size:12px;color:#6E6E73;margin-bottom:4px">Content › Templates</div>
+          <h1 style="margin:0;font-size:28px;font-weight:700;letter-spacing:-.02em">Templates</h1>
+          <p style="margin:6px 0 0;font-size:14px;color:#57575C">Global templates appear for every user under the “Gravity Pants” tab. Drag rows to set their order.</p>
+        </div>
+        <a class="btn pri" href="admin-builder.html" style="margin-left:auto"><svg class="ic" viewBox="0 0 24 24" style="width:15px;height:15px"><path d="M12 5v14M5 12h14"></path></svg>New template</a>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:6px">
+        <button class="chip on">All <b>8</b></button>
+        <button class="chip">Published <b>6</b></button>
+        <button class="chip">Drafts <b>1</b></button>
+        <button class="chip">Archived <b>1</b></button>
+        <span style="margin-left:auto"></span>
+        <button class="sel">All formats<svg class="ic" viewBox="0 0 24 24" style="width:12px;height:12px;color:#6E6E73"><path d="m6 9 6 6 6-6"></path></svg></button>
+        <div class="sel" style="width:240px;color:#6E6E73"><svg class="ic" viewBox="0 0 24 24" style="width:14px;height:14px"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>Search templates</div>
+      </div>
+
+      <div style="background:#fff;border-radius:4px;box-shadow:0 0 0 .5px rgba(0,0,0,.08);position:relative">
+        <table>
+          <thead><tr>
+            <th style="width:36px"></th><th style="width:72px"></th><th>Name</th><th>Format</th><th>Slides</th><th>Status</th><th>Audience</th><th style="text-align:center">Featured</th><th>Updated</th><th style="width:52px"></th>
+          </tr></thead>
+          <tbody>
+            <tr class="hl">
+              <td class="grip"><svg class="ic" viewBox="0 0 24 24" style="width:16px;height:16px"><circle cx="9" cy="6" r="1" fill="currentColor"></circle><circle cx="15" cy="6" r="1" fill="currentColor"></circle><circle cx="9" cy="12" r="1" fill="currentColor"></circle><circle cx="15" cy="12" r="1" fill="currentColor"></circle><circle cx="9" cy="18" r="1" fill="currentColor"></circle><circle cx="15" cy="18" r="1" fill="currentColor"></circle></svg></td>
+              <td><div class="th"><span style="width:24px;height:42px;background:#1F2A22"></span></div></td>
+              <td><div style="display:flex;align-items:center;gap:8px"><span class="nm">Product Launch Kit</span><span class="tag" style="background:#EEF4FB;color:#0058B0">Reusable</span></div><div class="slug">/product-launch-kit · v3</div></td>
+              <td>9:16</td><td>4 · 10.4s</td>
+              <td><span class="pill pub"><i></i>Published</span></td>
+              <td>All users</td>
+              <td style="text-align:center"><svg class="ic star on" viewBox="0 0 24 24" style="fill:currentColor"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2-5.5-2.9-5.5 2.9 1-6.2L3 9.6l6.2-.9z"></path></svg></td>
+              <td style="color:#6E6E73">Today, 10:42</td>
+              <td><button class="more" style="background:#EDEEEB;color:#1D1D1F" aria-label="More"><svg class="ic" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1" fill="currentColor"></circle><circle cx="12" cy="12" r="1" fill="currentColor"></circle><circle cx="19" cy="12" r="1" fill="currentColor"></circle></svg></button></td>
+            </tr>
+            <tr>
+              <td class="grip"><svg class="ic" viewBox="0 0 24 24" style="width:16px;height:16px"><circle cx="9" cy="6" r="1" fill="currentColor"></circle><circle cx="15" cy="6" r="1" fill="currentColor"></circle><circle cx="9" cy="12" r="1" fill="currentColor"></circle><circle cx="15" cy="12" r="1" fill="currentColor"></circle><circle cx="9" cy="18" r="1" fill="currentColor"></circle><circle cx="15" cy="18" r="1" fill="currentColor"></circle></svg></td>
+              <td><div class="th"><span style="width:36px;height:36px;background:#C0392B"></span></div></td>
+              <td><div class="nm">Flash Sale</div><div class="slug">/flash-sale · v2</div></td>
+              <td>1:1</td><td>4 · 8.0s</td>
+              <td><span class="pill pub"><i></i>Published</span></td>
+              <td>All users</td>
+              <td style="text-align:center"><svg class="ic star" viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2-5.5-2.9-5.5 2.9 1-6.2L3 9.6l6.2-.9z"></path></svg></td>
+              <td style="color:#6E6E73">Sep 24</td>
+              <td><button class="more" aria-label="More"><svg class="ic" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1" fill="currentColor"></circle><circle cx="12" cy="12" r="1" fill="currentColor"></circle><circle cx="19" cy="12" r="1" fill="currentColor"></circle></svg></button></td>
+            </tr>
+            <tr>
+              <td class="grip"><svg class="ic" viewBox="0 0 24 24" style="width:16px;height:16px"><circle cx="9" cy="6" r="1" fill="currentColor"></circle><circle cx="15" cy="6" r="1" fill="currentColor"></circle><circle cx="9" cy="12" r="1" fill="currentColor"></circle><circle cx="15" cy="12" r="1" fill="currentColor"></circle><circle cx="9" cy="18" r="1" fill="currentColor"></circle><circle cx="15" cy="18" r="1" fill="currentColor"></circle></svg></td>
+              <td><div class="th"><span style="width:36px;height:36px;background:#4A3F36"></span></div></td>
+              <td><div class="nm">Product Spotlight</div><div class="slug">/product-spotlight · v1</div></td>
+              <td>1:1</td><td>3 · 10.5s</td>
+              <td><span class="pill pub"><i></i>Published</span></td>
+              <td><span style="display:inline-flex;align-items:center;gap:5px"><svg class="ic" viewBox="0 0 24 24" style="width:13px;height:13px;color:#6E6E73"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg>Business, Team</span></td>
+              <td style="text-align:center"><svg class="ic star" viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2-5.5-2.9-5.5 2.9 1-6.2L3 9.6l6.2-.9z"></path></svg></td>
+              <td style="color:#6E6E73">Sep 19</td>
+              <td><button class="more" aria-label="More"><svg class="ic" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1" fill="currentColor"></circle><circle cx="12" cy="12" r="1" fill="currentColor"></circle><circle cx="19" cy="12" r="1" fill="currentColor"></circle></svg></button></td>
+            </tr>
+            <tr>
+              <td class="grip"><svg class="ic" viewBox="0 0 24 24" style="width:16px;height:16px"><circle cx="9" cy="6" r="1" fill="currentColor"></circle><circle cx="15" cy="6" r="1" fill="currentColor"></circle><circle cx="9" cy="12" r="1" fill="currentColor"></circle><circle cx="15" cy="12" r="1" fill="currentColor"></circle><circle cx="9" cy="18" r="1" fill="currentColor"></circle><circle cx="15" cy="18" r="1" fill="currentColor"></circle></svg></td>
+              <td><div class="th"><span style="width:24px;height:42px;background:#141A2E"></span></div></td>
+              <td><div class="nm">Story Teaser</div><div class="slug">/story-teaser · v1</div></td>
+              <td>9:16</td><td>3 · 9.0s</td>
+              <td><span class="pill pub"><i></i>Published</span></td>
+              <td>All users</td>
+              <td style="text-align:center"><svg class="ic star" viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2-5.5-2.9-5.5 2.9 1-6.2L3 9.6l6.2-.9z"></path></svg></td>
+              <td style="color:#6E6E73">Sep 12</td>
+              <td><button class="more" aria-label="More"><svg class="ic" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1" fill="currentColor"></circle><circle cx="12" cy="12" r="1" fill="currentColor"></circle><circle cx="19" cy="12" r="1" fill="currentColor"></circle></svg></button></td>
+            </tr>
+            <tr>
+              <td class="grip"><svg class="ic" viewBox="0 0 24 24" style="width:16px;height:16px"><circle cx="9" cy="6" r="1" fill="currentColor"></circle><circle cx="15" cy="6" r="1" fill="currentColor"></circle><circle cx="9" cy="12" r="1" fill="currentColor"></circle><circle cx="15" cy="12" r="1" fill="currentColor"></circle><circle cx="9" cy="18" r="1" fill="currentColor"></circle><circle cx="15" cy="18" r="1" fill="currentColor"></circle></svg></td>
+              <td><div class="th"><span style="width:42px;height:24px;background:#234A33"></span></div></td>
+              <td><div class="nm">New Arrival</div><div class="slug">/new-arrival · v1</div></td>
+              <td>16:9</td><td>3 · 9.0s</td>
+              <td><span class="pill pub"><i></i>Published</span></td>
+              <td>All users</td>
+              <td style="text-align:center"><svg class="ic star" viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2-5.5-2.9-5.5 2.9 1-6.2L3 9.6l6.2-.9z"></path></svg></td>
+              <td style="color:#6E6E73">Sep 12</td>
+              <td><button class="more" aria-label="More"><svg class="ic" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1" fill="currentColor"></circle><circle cx="12" cy="12" r="1" fill="currentColor"></circle><circle cx="19" cy="12" r="1" fill="currentColor"></circle></svg></button></td>
+            </tr>
+            <tr>
+              <td class="grip"><svg class="ic" viewBox="0 0 24 24" style="width:16px;height:16px"><circle cx="9" cy="6" r="1" fill="currentColor"></circle><circle cx="15" cy="6" r="1" fill="currentColor"></circle><circle cx="9" cy="12" r="1" fill="currentColor"></circle><circle cx="15" cy="12" r="1" fill="currentColor"></circle><circle cx="9" cy="18" r="1" fill="currentColor"></circle><circle cx="15" cy="18" r="1" fill="currentColor"></circle></svg></td>
+              <td><div class="th"><span style="width:24px;height:42px;background:#4B3BD6"></span></div></td>
+              <td><div class="nm">Event Promo</div><div class="slug">/event-promo · v1</div></td>
+              <td>9:16</td><td>3 · 7.5s</td>
+              <td><span class="pill pub"><i></i>Published</span></td>
+              <td>All users</td>
+              <td style="text-align:center"><svg class="ic star" viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2-5.5-2.9-5.5 2.9 1-6.2L3 9.6l6.2-.9z"></path></svg></td>
+              <td style="color:#6E6E73">Sep 12</td>
+              <td><button class="more" aria-label="More"><svg class="ic" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1" fill="currentColor"></circle><circle cx="12" cy="12" r="1" fill="currentColor"></circle><circle cx="19" cy="12" r="1" fill="currentColor"></circle></svg></button></td>
+            </tr>
+            <tr>
+              <td class="grip"><svg class="ic" viewBox="0 0 24 24" style="width:16px;height:16px"><circle cx="9" cy="6" r="1" fill="currentColor"></circle><circle cx="15" cy="6" r="1" fill="currentColor"></circle><circle cx="9" cy="12" r="1" fill="currentColor"></circle><circle cx="15" cy="12" r="1" fill="currentColor"></circle><circle cx="9" cy="18" r="1" fill="currentColor"></circle><circle cx="15" cy="18" r="1" fill="currentColor"></circle></svg></td>
+              <td><div class="th"><span style="width:24px;height:42px;background:#7A2E3B"></span></div></td>
+              <td><div class="nm">Holiday Gift Guide</div><div class="slug">/holiday-gift-guide · not published</div></td>
+              <td>9:16</td><td>5 · 12.5s</td>
+              <td><span class="pill dra"><i></i>Draft</span></td>
+              <td style="color:#6E6E73">—</td>
+              <td style="text-align:center"><svg class="ic star" viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2-5.5-2.9-5.5 2.9 1-6.2L3 9.6l6.2-.9z"></path></svg></td>
+              <td style="color:#6E6E73">Yesterday</td>
+              <td><button class="more" aria-label="More"><svg class="ic" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1" fill="currentColor"></circle><circle cx="12" cy="12" r="1" fill="currentColor"></circle><circle cx="19" cy="12" r="1" fill="currentColor"></circle></svg></button></td>
+            </tr>
+            <tr class="dim">
+              <td class="grip"></td>
+              <td><div class="th"><span style="width:36px;height:36px;background:#E0A030"></span></div></td>
+              <td><div class="nm">Summer Sale 2025</div><div class="slug">/summer-sale-2025 · v4</div></td>
+              <td>1:1</td><td>4 · 8.0s</td>
+              <td><span class="pill arc"><i></i>Archived</span></td>
+              <td>All users</td>
+              <td style="text-align:center"><svg class="ic star" viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2-5.5-2.9-5.5 2.9 1-6.2L3 9.6l6.2-.9z"></path></svg></td>
+              <td style="color:#6E6E73">Aug 30</td>
+              <td><button class="more" aria-label="More"><svg class="ic" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1" fill="currentColor"></circle><circle cx="12" cy="12" r="1" fill="currentColor"></circle><circle cx="19" cy="12" r="1" fill="currentColor"></circle></svg></button></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="menu" style="top:84px">
+          <a class="hv" href="admin-builder.html" style="color:inherit"><svg class="ic" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"></path></svg>Edit</a>
+          <button><svg class="ic" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"></rect><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"></path></svg>Duplicate</button>
+          <button><svg class="ic" viewBox="0 0 24 24"><path d="M7 4.5v15l12-7.5z"></path></svg>Preview</button>
+          <hr>
+          <button><svg class="ic" viewBox="0 0 24 24"><path d="M3 3l18 18M10.6 5.1A10 10 0 0 1 12 5c5 0 9 4.5 10 7a13 13 0 0 1-3 4M6.6 6.6C4.4 8 2.8 10 2 12c1 2.5 5 7 10 7 1.6 0 3-.4 4.3-1"></path></svg>Unpublish</button>
+          <button><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="4" rx="1"></rect><path d="M5 8v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8M10 12h4"></path></svg>Archive</button>
+        </div>
+      </div>
+      <div style="font-size:12px;color:#6E6E73">Order here = order users see. Featured templates are pinned first. Archived templates are hidden from users; ads already made from them are not affected.</div>
+    </main>
+  </div>
+</div>
+
+
+</body>
+</html>
