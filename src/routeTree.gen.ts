@@ -18,7 +18,9 @@ import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedBrandRouteImport } from './routes/_authenticated/brand'
+import { Route as InviteTokenRouteImport } from './routes/invite.$token'
 import { Route as AuthenticatedAccountBillingRouteImport } from './routes/_authenticated/account_.billing'
+import { Route as AuthenticatedAccountMembersRouteImport } from './routes/_authenticated/account_.members'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedAdminAdminsRouteImport } from './routes/_authenticated/admin/admins'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin/audit'
@@ -78,10 +80,21 @@ const AuthenticatedBrandRoute = AuthenticatedBrandRouteImport.update({
   path: '/brand',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const InviteTokenRoute = InviteTokenRouteImport.update({
+  id: '/invite/$token',
+  path: '/invite/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAccountBillingRoute =
   AuthenticatedAccountBillingRouteImport.update({
     id: '/account_/billing',
     path: '/account/billing',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAccountMembersRoute =
+  AuthenticatedAccountMembersRouteImport.update({
+    id: '/account_/members',
+    path: '/account/members',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
@@ -170,7 +183,9 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/account': typeof AuthenticatedAccountRoute
   '/brand': typeof AuthenticatedBrandRoute
+  '/invite/$token': typeof InviteTokenRoute
   '/account/billing': typeof AuthenticatedAccountBillingRoute
+  '/account/members': typeof AuthenticatedAccountMembersRoute
   '/admin/admins': typeof AuthenticatedAdminAdminsRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/clients': typeof AuthenticatedAdminClientsRoute
@@ -193,8 +208,10 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/account': typeof AuthenticatedAccountRoute
   '/brand': typeof AuthenticatedBrandRoute
+  '/invite/$token': typeof InviteTokenRoute
   '/': typeof AuthenticatedIndexRoute
   '/account/billing': typeof AuthenticatedAccountBillingRoute
+  '/account/members': typeof AuthenticatedAccountMembersRoute
   '/admin/admins': typeof AuthenticatedAdminAdminsRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/clients': typeof AuthenticatedAdminClientsRoute
@@ -220,8 +237,10 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/_authenticated/brand': typeof AuthenticatedBrandRoute
+  '/invite/$token': typeof InviteTokenRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/account_/billing': typeof AuthenticatedAccountBillingRoute
+  '/_authenticated/account_/members': typeof AuthenticatedAccountMembersRoute
   '/_authenticated/admin/admins': typeof AuthenticatedAdminAdminsRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/admin/clients': typeof AuthenticatedAdminClientsRoute
@@ -248,7 +267,9 @@ export interface FileRouteTypes {
     | '/admin'
     | '/account'
     | '/brand'
+    | '/invite/$token'
     | '/account/billing'
+    | '/account/members'
     | '/admin/admins'
     | '/admin/audit'
     | '/admin/clients'
@@ -271,8 +292,10 @@ export interface FileRouteTypes {
     | '/signup'
     | '/account'
     | '/brand'
+    | '/invite/$token'
     | '/'
     | '/account/billing'
+    | '/account/members'
     | '/admin/admins'
     | '/admin/audit'
     | '/admin/clients'
@@ -297,8 +320,10 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/account'
     | '/_authenticated/brand'
+    | '/invite/$token'
     | '/_authenticated/'
     | '/_authenticated/account_/billing'
+    | '/_authenticated/account_/members'
     | '/_authenticated/admin/admins'
     | '/_authenticated/admin/audit'
     | '/_authenticated/admin/clients'
@@ -321,6 +346,7 @@ export interface RootRouteChildren {
   ResetRoute: typeof ResetRoute
   SigninRoute: typeof SigninRoute
   SignupRoute: typeof SignupRoute
+  InviteTokenRoute: typeof InviteTokenRoute
   ApiPublicCleanupExportsRoute: typeof ApiPublicCleanupExportsRoute
   ApiPublicTrialRemindersRoute: typeof ApiPublicTrialRemindersRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
@@ -394,11 +420,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedBrandRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/invite/$token': {
+      id: '/invite/$token'
+      path: '/invite/$token'
+      fullPath: '/invite/$token'
+      preLoaderRoute: typeof InviteTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/account_/billing': {
       id: '/_authenticated/account_/billing'
       path: '/account/billing'
       fullPath: '/account/billing'
       preLoaderRoute: typeof AuthenticatedAccountBillingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/account_/members': {
+      id: '/_authenticated/account_/members'
+      path: '/account/members'
+      fullPath: '/account/members'
+      preLoaderRoute: typeof AuthenticatedAccountMembersRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin/': {
@@ -532,6 +572,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedBrandRoute: typeof AuthenticatedBrandRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedAccountBillingRoute: typeof AuthenticatedAccountBillingRoute
+  AuthenticatedAccountMembersRoute: typeof AuthenticatedAccountMembersRoute
   AuthenticatedAdIdEditRoute: typeof AuthenticatedAdIdEditRoute
   AuthenticatedAdIdExportRoute: typeof AuthenticatedAdIdExportRoute
 }
@@ -542,6 +583,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedBrandRoute: AuthenticatedBrandRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedAccountBillingRoute: AuthenticatedAccountBillingRoute,
+  AuthenticatedAccountMembersRoute: AuthenticatedAccountMembersRoute,
   AuthenticatedAdIdEditRoute: AuthenticatedAdIdEditRoute,
   AuthenticatedAdIdExportRoute: AuthenticatedAdIdExportRoute,
 }
@@ -555,6 +597,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetRoute: ResetRoute,
   SigninRoute: SigninRoute,
   SignupRoute: SignupRoute,
+  InviteTokenRoute: InviteTokenRoute,
   ApiPublicCleanupExportsRoute: ApiPublicCleanupExportsRoute,
   ApiPublicTrialRemindersRoute: ApiPublicTrialRemindersRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,

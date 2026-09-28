@@ -11,7 +11,7 @@ import { useBilling } from "@/lib/stillframe/billing";
 import { getWorkspaceId, setWorkspaceId } from "@/lib/stillframe/workspace";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/_authenticated/account/members")({
+export const Route = createFileRoute("/_authenticated/account_/members")({
   head: () => ({
     meta: [
       { title: "Team — Gravity Pants" },
