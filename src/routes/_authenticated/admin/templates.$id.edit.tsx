@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useBlocker } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -98,6 +98,7 @@ function Builder({ row, refetch }: { row: any; refetch: () => void }) {
     refetch();
   };
   async function saveDraft() {
+    if (!check()) return;
     setBusy(true);
     try {
       await save({ data: { id: row.id, doc: { ...doc, slug: slugify(doc.slug || doc.name) } } });
@@ -148,7 +149,7 @@ function Builder({ row, refetch }: { row: any; refetch: () => void }) {
         <div className="ml-auto flex items-center gap-2">
           <Link to="/admin/audit" className="inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-[14px] hover:bg-control-fill"><History className="size-4" strokeWidth={1.7} /> History</Link>
           <Button variant="secondary" size="header" disabled={busy || (!dirty && status !== "draft")} onClick={() => void saveDraft()}>Save draft</Button>
-          <Button size="header" disabled={busy} onClick={() => setPublishing(true)}>Publish…</Button>
+          <Button size="header" disabled={busy} onClick={() => { if (check()) setPublishing(true); }}>Publish…</Button>
         </div>
       </header>
 
@@ -156,11 +157,11 @@ function Builder({ row, refetch }: { row: any; refetch: () => void }) {
         <div className="min-w-0 space-y-4">
           <Panel n={1} title="Basics">
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Name"><input className={inp} value={doc.name} maxLength={60} onChange={(e) => set({ name: e.target.value })} /></Field>
+              <Field label="Name"><input className={inp} value={doc.name} maxLength={60} onChange={(e) => set(slugTouched ? { name: e.target.value } : { name: e.target.value, slug: slugify(e.target.value) })} /></Field>
               <Field label="Slug">
                 <div className={cn(inp, "flex items-center gap-1")}>
                   <span className="text-secondary-text">/templates/</span>
-                  <input className="min-w-0 flex-1 bg-transparent outline-none" value={doc.slug} maxLength={60} onChange={(e) => set({ slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-") })} />
+                  <input className="min-w-0 flex-1 bg-transparent outline-none" value={doc.slug} maxLength={60} onChange={(e) => { setSlugTouched(true); set({ slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-") }); }} />
                 </div>
               </Field>
               <Field label="Description" className="sm:col-span-2" hint={`${doc.description.length} / 120`}>
@@ -206,6 +207,10 @@ function Builder({ row, refetch }: { row: any; refetch: () => void }) {
                   onDuplicate={() => { if (doc.slides.length < MAX_SLIDES) setDoc((d) => ({ ...d, slides: [...d.slides.slice(0, i + 1), { ...s }, ...d.slides.slice(i + 1)] })); }}
                   onDelete={() => { if (doc.slides.length > 1) setDoc((d) => ({ ...d, slides: d.slides.filter((_, j) => j !== i) })); }}
                   upload={uploadImage}
+                  dragging={dragFrom === i}
+                  onDragStart={() => setDragFrom(i)}
+                  onDragEnd={() => setDragFrom(null)}
+                  onDrop={() => { if (dragFrom !== null && dragFrom !== i) { moveTo(dragFrom, i); setOpen(i); } setDragFrom(null); }}
                 />
               ))}
             </ol>
@@ -253,6 +258,27 @@ function Builder({ row, refetch }: { row: any; refetch: () => void }) {
           </section>
         </aside>
       </div>
+
+      <div className="sticky bottom-0 z-20 -mx-4 mt-6 flex items-center gap-3 bg-canvas/95 px-4 py-3 backdrop-blur hairline-t sm:-mx-0 sm:px-0">
+        <span className={cn("text-[13px]", errors.length ? "text-destructive" : "text-secondary-text")}>
+          {errors[0] ?? (dirty ? "Unsaved changes" : "All changes saved")}
+        </span>
+        <div className="ml-auto flex gap-2">
+          <Button variant="secondary" size="header" disabled={busy || (!dirty && status !== "draft")} onClick={() => void saveDraft()}>Save draft</Button>
+          <Button size="header" disabled={busy} onClick={() => { if (check()) setPublishing(true); }}>Publish…</Button>
+        </div>
+      </div>
+
+      <Dialog open={blocker.status === "blocked"} onOpenChange={(o) => { if (!o) blocker.reset?.(); }}>
+        <DialogContent className="max-w-[420px]">
+          <DialogTitle className="text-[17px] font-semibold">Leave without saving?</DialogTitle>
+          <DialogDescription className="text-[14px] text-secondary-text">Your changes to this template will be lost.</DialogDescription>
+          <div className="mt-2 flex justify-end gap-2">
+            <Button variant="secondary" size="header" onClick={() => blocker.reset?.()}>Keep editing</Button>
+            <Button variant="destructive" size="header" onClick={() => blocker.proceed?.()}>Leave</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <PublishDialog open={publishing} onOpenChange={setPublishing} row={row} doc={doc} busy={busy} onPublish={doPublish} />
     </div>
@@ -368,9 +394,10 @@ function PosGrid({ title, note, value, onChange, only = () => true }: { title: s
   );
 }
 
-function SlideCard({ index, slide: s, count, open, onToggle, onChange, onMove, onDuplicate, onDelete, upload }: {
+function SlideCard({ index, slide: s, count, open, onToggle, onChange, onMove, onDuplicate, onDelete, upload, dragging, onDragStart, onDragEnd, onDrop }: {
   index: number; slide: DocSlide; count: number; open: boolean; onToggle: () => void; onChange: (p: Partial<DocSlide>) => void;
   onMove: (by: number) => void; onDuplicate: () => void; onDelete: () => void; upload: (f: File) => Promise<string>;
+  dragging: boolean; onDragStart: () => void; onDragEnd: () => void; onDrop: () => void;
 }) {
   const file = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
@@ -381,9 +408,9 @@ function SlideCard({ index, slide: s, count, open, onToggle, onChange, onMove, o
     try { onChange({ sample_photo: await upload(f) }); } catch (e) { toast.error(e instanceof Error ? e.message : "Upload failed"); } finally { setBusy(false); }
   };
   return (
-    <li className={cn("rounded-sm shadow-card", open && "ring-2 ring-primary")}>
+    <li className={cn("rounded-sm shadow-card", open && "ring-2 ring-primary", dragging && "opacity-50")} onDragOver={(e) => e.preventDefault()} onDrop={onDrop}>
       <div className="flex items-center gap-2 px-3 py-2.5">
-        <GripVertical className="size-4 text-icon" strokeWidth={1.7} aria-hidden />
+        <span draggable onDragStart={onDragStart} onDragEnd={onDragEnd} className="cursor-grab" title="Drag to reorder"><GripVertical className="size-4 text-icon" strokeWidth={1.7} aria-hidden /></span>
         <button type="button" onClick={onToggle} className="flex min-w-0 flex-1 items-center gap-3 text-left" aria-expanded={open}>
           <span className={cn("nums flex size-[22px] shrink-0 items-center justify-center rounded-sm text-[11px] font-semibold", open ? "bg-primary text-primary-foreground" : "bg-control-fill")}>{index + 1}</span>
           <span className="min-w-0">
@@ -403,7 +430,7 @@ function SlideCard({ index, slide: s, count, open, onToggle, onChange, onMove, o
             <div className={cn(inp, "flex items-center justify-between px-1")}>
               <button type="button" aria-label="Shorter" onClick={() => onChange({ duration_sec: Math.max(0.5, Math.round((s.duration_sec - 0.1) * 10) / 10) })} className="flex size-7 items-center justify-center"><Minus className="size-3.5" strokeWidth={1.7} /></button>
               <span className="nums">{s.duration_sec.toFixed(1)} s</span>
-              <button type="button" aria-label="Longer" onClick={() => onChange({ duration_sec: Math.min(15, Math.round((s.duration_sec + 0.1) * 10) / 10) })} className="flex size-7 items-center justify-center"><Plus className="size-3.5" strokeWidth={1.7} /></button>
+              <button type="button" aria-label="Longer" onClick={() => onChange({ duration_sec: Math.min(10, Math.round((s.duration_sec + 0.1) * 10) / 10) })} className="flex size-7 items-center justify-center"><Plus className="size-3.5" strokeWidth={1.7} /></button>
             </div>
           </Field>
           <Field label="Transition in">
