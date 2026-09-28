@@ -146,7 +146,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <SearchProvider>
-        <div className="flex min-h-dvh flex-col">
+        <div className="flex h-dvh min-h-dvh flex-col">
           <PaymentTestModeBanner />
           <div className="min-h-0 flex-1 bg-canvas">
             {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}

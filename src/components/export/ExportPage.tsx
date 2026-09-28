@@ -434,7 +434,7 @@ function ExportHeader({ id, name }: { id: string; name: string }) {
             <LayoutGrid className="hidden lg:block" strokeWidth={1.7} /><ChevronLeft className="lg:hidden" strokeWidth={1.7} />
           </Link>
         </Button>
-        <div className="min-w-0 px-1"><span className="block truncate text-[17px] font-semibold lg:text-[15px]">Export</span><span className="block truncate text-[13px] text-secondary-text lg:hidden">{name} · Step 3 of 3</span></div>
+        <div className="min-w-0 px-1"><span className="block truncate text-[17px] font-semibold lg:hidden">Export</span><span className="hidden truncate text-[15px] font-semibold lg:block">{name}</span><span className="block truncate text-[13px] text-secondary-text lg:hidden">{name} · Step 3 of 3</span></div>
       </div>
       <nav className="hidden h-8 items-center rounded-lg bg-control-fill p-0.5 text-[13px] font-medium lg:flex" aria-label="Steps">
         <Link to="/" className="flex h-7 items-center gap-1.5 rounded-lg px-3 text-secondary-text">
@@ -471,7 +471,7 @@ function MiniRender({ project, frames, brand, images, format, width, index = 0 }
     if (!ctx || !images) return;
     renderAt(ctx, project, frames, format, restTime(frames, index), { width: W, height: H, images, brand });
   }, [project, frames, brand, images, format, W, H, index]);
-  return <canvas ref={ref} width={W} height={H} className="rounded-[2px] bg-control-fill" style={{ width, height: H / 2 }} />;
+  return <canvas ref={ref} width={W} height={H} className="max-w-full rounded-[2px] bg-control-fill" style={{ width, height: H / 2 }} />;
 }
 
 function ChannelCard(props: {
@@ -499,7 +499,7 @@ function ChannelCard(props: {
       </span>
       <div className="order-1 flex h-[72px] w-[52px] items-center justify-center lg:h-[128px] lg:w-auto">
         <span className="lg:hidden"><MiniRender {...props} width={format === "9:16" ? 28 : format === "1:1" ? 42 : 48} /></span>
-        <span className="hidden lg:block"><MiniRender {...props} width={w} /></span>
+        <span className="hidden max-w-full lg:block"><MiniRender {...props} width={w} /></span>
       </div>
       <span className="order-2 min-w-0 lg:contents"><span className="block text-[16px] font-semibold leading-tight lg:mt-3 lg:text-[13px]">{name}</span><span className="mt-1 block text-[13px] text-secondary-text nums lg:mt-0.5 lg:text-[12px]">{format} · {size.width} × {size.height}</span></span>
     </button>

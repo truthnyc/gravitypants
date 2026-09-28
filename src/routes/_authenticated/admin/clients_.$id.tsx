@@ -13,7 +13,18 @@ import { Card, fmtBytes, fmtDate, fmtDateTime, fmtMoney, Pill, planLabel, status
 import { MediaImage } from "@/components/stillframe/MediaImage";
 import { adminAction, adminClient, adminSupport } from "@/lib/stillframe/admin.functions";
 
-export const Route = createFileRoute("/_authenticated/admin/clients_/$id")({ component: ClientPage });
+export const Route = createFileRoute("/_authenticated/admin/clients_/$id")({
+  head: () => ({ meta: [
+    { title: "Admin Client — Gravity Pants" },
+    { name: "description", content: "Private Gravity Pants client details." },
+    { property: "og:title", content: "Admin Client — Gravity Pants" },
+    { property: "og:description", content: "Private Gravity Pants client details." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+    { name: "robots", content: "noindex" },
+  ] }),
+  component: ClientPage,
+});
 
 type Act = "extend_trial" | "comp_plan" | "end_comp" | "reset_exports" | "suspend" | "unsuspend" | "delete" | "support";
 const TITLES: Record<Act, string> = {
@@ -52,16 +63,16 @@ function ClientPage() {
       <Link to="/admin/clients" className="mb-3 inline-flex items-center gap-1 text-[13px] text-secondary-text hover:text-foreground">
         <ChevronLeft className="size-4" strokeWidth={1.7} /> Clients
       </Link>
-      <div className="mb-6 flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-[28px] font-bold tracking-[-0.02em]">{c.name}</h1>
-          <div className="mt-1 flex items-center gap-2 text-[14px] text-secondary-text">
+      <div className="mb-6 flex flex-col items-start justify-between gap-4 lg:flex-row">
+        <div className="min-w-0 max-w-full">
+          <h1 className="break-words text-[28px] font-bold tracking-[-0.02em]">{c.name}</h1>
+          <div className="mt-1 flex flex-wrap items-center gap-2 break-all text-[14px] text-secondary-text">
             {c.ownerEmail}
             <Pill tone="accent">{planLabel(c.plan)}{c.comp ? " · free" : ""}</Pill>
             <Pill tone={statusTone(c.status)}>{statusLabel(c.status)}</Pill>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex max-w-full flex-wrap items-center gap-2">
           <Button variant="plain" size="header" onClick={() => document.getElementById("ads")?.scrollIntoView({ behavior: "smooth" })}>View Their Ads</Button>
           {supporting ? (
             <Button size="header" onClick={() => void endSupport()}>End Support · until {new Date(data.supportUntil!).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })}</Button>
@@ -89,7 +100,7 @@ function ClientPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Card>
           <h2 className="mb-2 text-[15px] font-semibold">Members</h2>
           <ul className="divide-y divide-border text-[14px]">
@@ -128,7 +139,7 @@ function ClientPage() {
             </ul>
           )}
         </Card>
-        <Card className="col-span-2">
+        <Card className="lg:col-span-2">
           <h2 className="mb-2 text-[15px] font-semibold">Usage</h2>
           <div className="flex gap-10 text-[14px]">
             <div><div className="text-secondary-text">Storage used</div><div className="text-[22px] font-bold nums">{fmtBytes(c.storageBytes)}</div></div>
@@ -162,7 +173,7 @@ function ClientPage() {
       </div>
 
       <h2 id="ads" className="mb-3 mt-8 text-[17px] font-semibold">Ads · {data.ads.length}</h2>
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
         {data.ads.map((a) => (
           <Link key={a.id} to="/ad/$id/edit" params={{ id: a.id }} className="overflow-hidden rounded-sm bg-card shadow-card hover:ring-2 hover:ring-primary">
             <div className="flex aspect-square items-center justify-center bg-control-fill">
