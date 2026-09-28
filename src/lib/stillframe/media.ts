@@ -10,9 +10,16 @@ export const BRAND_PREFIX = "brand-assets:";
 export async function uploadBrandAsset(file: File): Promise<string> {
   if (!file.type.startsWith("image/")) throw new Error("Choose an image file (PNG, SVG, JPG or WebP).");
   if (file.size > 5 * 1024 * 1024) throw new Error("That image is over 5 MB. Choose a smaller one.");
-  const key = `${getWorkspaceId()}/${crypto.randomUUID()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "-")}`;
+  const extByType: Record<string, string> = { "image/png": "png", "image/jpeg": "jpg", "image/webp": "webp", "image/svg+xml": "svg", "image/gif": "gif" };
+  const ext = extByType[file.type];
+  if (!ext) throw new Error("Choose a PNG, SVG, JPG, WebP or GIF image.");
+  const base = file.name.replace(/\.[^.]*$/, "").replace(/[^a-zA-Z0-9_-]/g, "-").slice(0, 60) || "logo";
+  const key = `${getWorkspaceId()}/${crypto.randomUUID()}-${base}.${ext}`;
   const { error } = await supabase.storage.from(BRAND_BUCKET).upload(key, file, { cacheControl: "3600", upsert: false, contentType: file.type });
-  if (error) throw new Error("That logo couldn't be uploaded. Try again.");
+  if (error) {
+    console.error("Brand logo upload failed", error);
+    throw new Error("That logo couldn't be uploaded. Try again.");
+  }
   return BRAND_PREFIX + key;
 }
 
