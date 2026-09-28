@@ -51,12 +51,13 @@ function SiteHeader() {
   );
 }
 
-const columns = [
-  { label: "Product", links: [["Features", "/features"], ["Pricing", "/pricing"], ["Templates", "/features"]] },
-  { label: "Examples", links: [["Gallery", "/examples"], ["Submit your reel", "mailto:info@gravitypants.com?subject=Submit%20my%20reel"]] },
-  { label: "Company", links: [["About", "/"], ["Blog", "/"], ["Contact", "mailto:info@gravitypants.com"]] },
-  { label: "Help", links: [["Help center", "/help"], ["Privacy", "/privacy"], ["Terms", "/terms"]] },
-] as const;
+type FooterLink = { label: string; to: string; mailto?: boolean };
+const columns: { label: string; links: FooterLink[] }[] = [
+  { label: "Product", links: [{ label: "Features", to: "/features" }, { label: "Pricing", to: "/pricing" }, { label: "Templates", to: "/features" }] },
+  { label: "Examples", links: [{ label: "Gallery", to: "/examples" }, { label: "Submit your reel", to: "mailto:info@gravitypants.com?subject=Submit%20my%20reel", mailto: true }] },
+  { label: "Company", links: [{ label: "About", to: "/" }, { label: "Blog", to: "/" }, { label: "Contact", to: "mailto:info@gravitypants.com", mailto: true }] },
+  { label: "Help", links: [{ label: "Help center", to: "/help" }, { label: "Privacy", to: "/privacy" }, { label: "Terms", to: "/terms" }] },
+];
 
 function SiteFooter() {
   return <footer className="mt-auto border-t border-site-line bg-site-page px-5 pb-10 pt-14 text-site-ink md:px-8 lg:px-16 xl:px-24">

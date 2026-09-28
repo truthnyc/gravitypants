@@ -35,7 +35,7 @@ function HelpPage() {
         <p className="mt-5 max-w-[620px] text-[17px] leading-[1.45] text-site-secondary md:text-[21px]">Quick answers about plans, exports and getting started. Can't find what you need? Write to us — a person replies.</p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
           <Button asChild variant="site" size="site"><a href="mailto:help@gravitypants.com">Contact support</a></Button>
-          <Button asChild variant="siteSec" size="site"><Link to="/pricing">See pricing</Link></Button>
+          <Button asChild variant="siteSecondary" size="site"><Link to="/pricing">See pricing</Link></Button>
         </div>
       </section>
 
