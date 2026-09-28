@@ -42,11 +42,17 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
       );
       if (covered) return { error: "You're already on a team's paid plan, so you don't need to buy one. Switch to your team's workspace next to the logo." };
     }
+    // A plan the person already pays for covers every workspace they own: never sell a second one.
+    const { data: source } = await supabase.rpc("billing_source" as never, { _ws: data.workspaceId } as never);
+    if (source && source !== data.workspaceId) {
+      return { error: "Your plan already covers this workspace, so there's nothing to buy. Open Manage Billing to change it." };
+    }
     const { data: billing } = await supabase
       .from("workspace_billing")
       .select("stripe_customer_id")
       .eq("workspace_id", data.workspaceId)
       .maybeSingle();
+
     const { data: u } = await supabase.auth.getUser();
     try {
       const stripe = createStripeClient(data.environment);
