@@ -42,11 +42,17 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
       );
       if (covered) return { error: "You're already on a team's paid plan, so you don't need to buy one. Switch to your team's workspace next to the logo." };
     }
+    // A plan the person already pays for covers every workspace they own: never sell a second one.
+    const { data: source } = await supabase.rpc("billing_source" as never, { _ws: data.workspaceId } as never);
+    if (source && source !== data.workspaceId) {
+      return { error: "Your plan already covers this workspace, so there's nothing to buy. Open Manage Billing to change it." };
+    }
     const { data: billing } = await supabase
       .from("workspace_billing")
       .select("stripe_customer_id")
       .eq("workspace_id", data.workspaceId)
       .maybeSingle();
+
     const { data: u } = await supabase.auth.getUser();
     try {
       const stripe = createStripeClient(data.environment);
@@ -101,11 +107,15 @@ export const createTopUpSession = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const { data: member } = await supabase.rpc("is_workspace_admin", { _ws: data.workspaceId });
     if (!member) return { error: "Only the workspace owner or an admin can change billing." };
+    // Extra exports belong to the plan that covers this workspace, so the pack is shared.
+    const { data: source } = await supabase.rpc("billing_source" as never, { _ws: data.workspaceId } as never);
+    const payer = (source as string | null) ?? data.workspaceId;
     const { data: billing } = await supabase
       .from("workspace_billing")
       .select("stripe_customer_id")
-      .eq("workspace_id", data.workspaceId)
+      .eq("workspace_id", payer)
       .maybeSingle();
+
     const { data: u } = await supabase.auth.getUser();
     try {
       const stripe = createStripeClient(data.environment);
@@ -114,13 +124,13 @@ export const createTopUpSession = createServerFn({ method: "POST" })
       if (!price) return { error: "That pack isn't available." };
       let customerId = billing?.stripe_customer_id ?? null;
       if (!customerId) {
-        const found = await stripe.customers.search({ query: `metadata['workspaceId']:'${data.workspaceId}'`, limit: 1 });
+        const found = await stripe.customers.search({ query: `metadata['workspaceId']:'${payer}'`, limit: 1 });
         customerId = found.data[0]?.id ?? null;
       }
       if (!customerId) {
         const c = await stripe.customers.create({
           ...(u.user?.email ? { email: u.user.email } : {}),
-          metadata: { userId, workspaceId: data.workspaceId },
+          metadata: { userId, workspaceId: payer },
         });
         customerId = c.id;
       }
@@ -130,7 +140,7 @@ export const createTopUpSession = createServerFn({ method: "POST" })
         ui_mode: "embedded_page",
         return_url: data.returnUrl,
         customer: customerId,
-        metadata: { userId, workspaceId: data.workspaceId, topup: "extra_exports_5", managed_payments: "true" },
+        metadata: { userId, workspaceId: payer, topup: "extra_exports_5", managed_payments: "true" },
         managed_payments: { enabled: true },
       } as Stripe.Checkout.SessionCreateParams);
       return { clientSecret: session.client_secret ?? "" };
@@ -148,11 +158,15 @@ export const createPortalSession = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<{ url: string } | { error: string }> => {
     const { data: isAdmin } = await context.supabase.rpc("is_workspace_admin", { _ws: data.workspaceId });
     if (!isAdmin) return { error: "Only the workspace owner or an admin can change billing." };
+    const { data: source } = await context.supabase.rpc("billing_source" as never, { _ws: data.workspaceId } as never);
+    // Manage the subscription that actually covers this workspace, even when another one pays for it.
+    const payer = (source as string | null) ?? data.workspaceId;
     const { data: billing } = await context.supabase
       .from("workspace_billing")
       .select("stripe_customer_id")
-      .eq("workspace_id", data.workspaceId)
+      .eq("workspace_id", payer)
       .maybeSingle();
+
     if (!billing?.stripe_customer_id) return { error: "There's no billing to manage yet. Pick a plan first." };
     try {
       const stripe = createStripeClient(data.environment);

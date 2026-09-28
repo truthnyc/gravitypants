@@ -17,7 +17,12 @@ export type Billing = {
   cancel_at_period_end: boolean;
   stripe_customer_id: string | null;
   extra_exports?: number;
+  /** Set when this workspace runs on a plan paid for by another workspace of the same owner. */
+  inherited?: boolean;
+  source_workspace_id?: string;
+  source_workspace_name?: string | null;
 };
+
 export type ExportStatus = { allowed: boolean; reason: "no_plan" | "limit_reached" | "payment_problem" | "no_access" | null; used?: number; limit?: number; resets_at?: string | null; watermark?: boolean; extras?: number };
 
 export const billingKey = ["billing"] as const;
@@ -51,8 +56,10 @@ export function useBilling() {
     queryFn: async () => {
       const ws = await currentWorkspaceId();
       if (!ws) return null;
-      const { data } = await supabase.from("workspace_billing").select("*").eq("workspace_id", ws).maybeSingle();
-      return (data as Billing | null) ?? null;
+      // The plan a workspace runs on: its own, or the one its owner already pays for elsewhere.
+      const { data } = await supabase.rpc("effective_billing" as never, { _ws: ws } as never);
+      return (data as unknown as Billing | null) ?? null;
+
     },
     // Coming back from Manage Billing (another tab) shows the new plan right away.
     refetchOnWindowFocus: "always",

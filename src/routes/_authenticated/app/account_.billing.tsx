@@ -82,6 +82,12 @@ function BillingPage() {
             {statusLine(billing)}
           </p>
         )}
+        {billing?.inherited && (
+          <p className="mt-2 text-[13px] text-secondary-text">
+            Covered by your plan on “{billing.source_workspace_name}”. Exports are shared across all your workspaces.
+          </p>
+        )}
+
 
         {billing && (
           <dl className="mt-5 grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-[14px]">
