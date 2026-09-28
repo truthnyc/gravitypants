@@ -502,6 +502,11 @@ export function useKitsEnabled() {
 }
 
 /** Owners and admins may change kits; editors can only use them. */
+/** The signed-in user's id (for "made by me" checks). */
+export function useMyUserId() {
+  return useQuery({ queryKey: ["my-user-id"], queryFn: async () => (await supabase.auth.getUser()).data.user?.id ?? null, staleTime: Infinity });
+}
+
 export function useCanEditKits() {
   return useQuery({
     queryKey: ["workspace-role", getWorkspaceId()],
