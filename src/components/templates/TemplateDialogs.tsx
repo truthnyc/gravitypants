@@ -111,7 +111,7 @@ export function TemplateThumb({ template, className }: { template: Template; cla
   );
 }
 
-/** "Start from" after choosing photos: Blank or a template. */
+/** Choose a fresh ad or an existing look after choosing photos. */
 export function StartFromDialog({
   open,
   count,
@@ -125,66 +125,38 @@ export function StartFromDialog({
 }) {
   const { data: access } = useTemplateAccess();
   const { data: templates = [] } = useTemplates();
-  const [tab, setTab] = useState<"mine" | "team">("mine");
-  const list = templates.filter((t) => (tab === "mine" ? t.created_by === access?.userId : t.visibility === "team"));
+  const mine = access?.paid ? templates.filter((t) => t.created_by === access.userId) : [];
+  const shared = access?.paid && access.isTeamWorkspace
+    ? templates.filter((t) => t.visibility === "team" && t.created_by !== access.userId)
+    : [];
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onCancel()}>
       <DialogContent className="max-h-[92dvh] w-[calc(100vw-24px)] overflow-y-auto rounded-sm sm:max-w-[560px]">
-        <DialogHeader>
-          <DialogTitle className="text-[17px]">Start from</DialogTitle>
+        <DialogHeader className="pr-6 text-left">
+          <DialogTitle className="text-[19px]">Create your ad</DialogTitle>
+          <p className="text-[14px] text-secondary-text nums">{count} {count === 1 ? "photo is" : "photos are"} ready.{mine.length || shared.length ? " Start fresh or use a saved look." : " Start a new ad with your photos."}</p>
         </DialogHeader>
-        <p className="-mt-2 text-[13px] text-secondary-text nums">{count} {count === 1 ? "photo" : "photos"} ready</p>
+        <Button onClick={() => onPick(null)} className="h-12 w-full text-[15px]">Start with my photos</Button>
 
-        <button
-          type="button"
-          onClick={() => onPick(null)}
-          className="flex min-h-14 items-center gap-3 rounded-sm bg-card p-3 text-left shadow-card"
-        >
-          <span className="flex size-10 items-center justify-center rounded-sm border border-dashed border-placeholder-border text-[12px] text-secondary-text">+</span>
-          <span>
-            <span className="block text-[14px] font-semibold">Blank</span>
-            <span className="block text-[12px] text-secondary-text">Your photos with the default look</span>
-          </span>
-        </button>
-
-        <div className="flex rounded-lg bg-control-fill p-0.5">
-          {(
-            [
-              ["mine", "My templates"],
-              ["team", "Team templates"],
-            ] as const
-          ).map(([v, label]) => (
-            <button
-              key={v}
-              type="button"
-              onClick={() => setTab(v)}
-              aria-pressed={tab === v}
-              className={cn("h-11 flex-1 rounded-lg text-[13px] font-medium lg:h-8", tab === v && "bg-card shadow-segment")}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-
-        {access && !access.paid ? (
-          <UpgradeNote />
-        ) : tab === "team" && access && !access.team && !list.length ? (
-          <UpgradeNote team />
-        ) : list.length ? (
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-            {list.map((t) => (
-              <button key={t.id} type="button" onClick={() => onPick(t)} className="rounded-sm bg-card p-2 text-left shadow-card">
-                <TemplateThumb template={t} className="aspect-square w-full" />
-                <span className="mt-2 block truncate text-[13px] font-semibold">{t.name}</span>
-                <span className="block text-[11px] text-secondary-text nums">{t.settings.frame_count} frames</span>
-              </button>
+        {(mine.length > 0 || shared.length > 0) && (
+          <div className="space-y-4 border-t border-border pt-4">
+            <p className="text-[13px] font-medium text-secondary-text">Or use a saved look</p>
+            {([ ["Your templates", mine], ["Shared with your team", shared] ] as const).map(([heading, list]) => list.length > 0 && (
+              <section key={heading}>
+                <h3 className="mb-2 text-[13px] font-semibold">{heading}</h3>
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                  {list.map((t) => (
+                    <Button key={t.id} type="button" variant="outline" onClick={() => onPick(t)} className="h-auto min-w-0 flex-col items-stretch gap-0 whitespace-normal rounded-sm p-2 text-left">
+                      <TemplateThumb template={t} className="aspect-square w-full" />
+                      <span className="mt-2 block w-full truncate text-[13px] font-semibold">{t.name}</span>
+                      <span className="block w-full text-[11px] font-normal text-secondary-text nums">{t.settings.frame_count} frames</span>
+                    </Button>
+                  ))}
+                </div>
+              </section>
             ))}
           </div>
-        ) : (
-          <p className="py-4 text-center text-[13px] text-secondary-text">
-            {tab === "mine" ? "No templates yet. Use \"Save as Template\" on any ad." : "No team templates yet."}
-          </p>
         )}
       </DialogContent>
     </Dialog>
