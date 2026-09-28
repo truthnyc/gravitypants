@@ -426,16 +426,16 @@ function ExportHeader({ id, name }: { id: string; name: string }) {
     </span>
   );
   return (
-    <header className="grid h-[60px] shrink-0 grid-cols-[1fr_auto_1fr] items-center gap-4 bg-card px-4 hairline-b">
+    <header className="grid shrink-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 bg-card px-2 hairline-b safe-top lg:h-[60px] lg:grid-cols-[1fr_auto_1fr] lg:gap-4 lg:px-4">
       <div className="flex min-w-0 items-center gap-2">
         <Button asChild variant="ghost" size="icon" aria-label="Back to Your Ads">
           <Link to="/">
-            <LayoutGrid strokeWidth={1.7} />
+            <LayoutGrid className="hidden lg:block" strokeWidth={1.7} /><ChevronLeft className="lg:hidden" strokeWidth={1.7} />
           </Link>
         </Button>
-        <span className="truncate px-1 text-[15px] font-semibold">{name}</span>
+        <div className="min-w-0 px-1"><span className="block truncate text-[17px] font-semibold lg:text-[15px]">Export</span><span className="block truncate text-[13px] text-secondary-text lg:hidden">{name} · Step 3 of 3</span></div>
       </div>
-      <nav className="flex h-8 items-center rounded-lg bg-control-fill p-0.5 text-[13px] font-medium" aria-label="Steps">
+      <nav className="hidden h-8 items-center rounded-lg bg-control-fill p-0.5 text-[13px] font-medium lg:flex" aria-label="Steps">
         <Link to="/" className="flex h-7 items-center gap-1.5 rounded-lg px-3 text-secondary-text">
           {done} Photos
         </Link>
@@ -447,7 +447,7 @@ function ExportHeader({ id, name }: { id: string; name: string }) {
           Export
         </span>
       </nav>
-      <div className="flex justify-end">
+      <div className="hidden justify-end lg:flex">
         <Button asChild variant="plain" size="header">
           <Link to="/ad/$id/edit" params={{ id }}>
             <ChevronLeft strokeWidth={1.7} /> Back to Edit
@@ -491,18 +491,15 @@ function ChannelCard(props: {
       type="button"
       onClick={onClick}
       aria-pressed={selected}
-      className={cn("relative flex flex-col rounded-sm bg-card p-3 text-left shadow-card", selected && "ring-2 ring-primary")}
+      className={cn("relative grid min-h-[108px] grid-cols-[52px_minmax(0,1fr)_44px] items-center gap-3 px-4 text-left hairline-b last:border-b-0 lg:flex lg:min-h-0 lg:flex-col lg:rounded-sm lg:bg-card lg:p-3 lg:shadow-card", selected && "lg:ring-2 lg:ring-primary")}
     >
-      <span className={cn("absolute right-2 top-2 flex size-5 items-center justify-center rounded-full", selected ? "bg-primary text-primary-foreground" : "border border-secondary-text/30")}>
+      <span className={cn("order-3 flex size-11 items-center justify-center justify-self-end rounded-full lg:absolute lg:right-2 lg:top-2 lg:size-5", selected ? "bg-primary text-primary-foreground" : "border-2 border-placeholder-border")}>
         {selected && <Check className="size-3" strokeWidth={2.5} />}
       </span>
-      <div className="flex h-[128px] items-center justify-center">
-        <MiniRender {...props} width={w} />
+      <div className="order-1 flex h-[72px] w-[52px] items-center justify-center lg:h-[128px] lg:w-auto">
+        <MiniRender {...props} width={format === "9:16" ? 28 : format === "1:1" ? 42 : 48} />
       </div>
-      <span className="mt-3 text-[13px] font-semibold leading-tight">{name}</span>
-      <span className="mt-0.5 text-[12px] text-secondary-text nums">
-        {format} · {size.width} × {size.height}
-      </span>
+      <span className="order-2 min-w-0 lg:contents"><span className="block text-[16px] font-semibold leading-tight lg:mt-3 lg:text-[13px]">{name}</span><span className="mt-1 block text-[13px] text-secondary-text nums lg:mt-0.5 lg:text-[12px]">{format} · {size.width} × {size.height}</span></span>
     </button>
   );
 }
@@ -527,18 +524,16 @@ function CustomCard({ value, onChange }: { value: { on: boolean; w: number; h: n
       aria-pressed={value.on}
       onClick={() => onChange({ ...value, on: !value.on })}
       onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && e.target === e.currentTarget && onChange({ ...value, on: !value.on })}
-      className={cn("relative flex cursor-pointer flex-col rounded-sm border-2 border-dashed border-secondary-text/30 p-3", value.on && "border-solid border-primary bg-card")}
+      className={cn("relative grid min-h-[108px] cursor-pointer grid-cols-[52px_minmax(0,1fr)_44px] items-center gap-3 px-4 lg:flex lg:min-h-0 lg:flex-col lg:rounded-sm lg:border-2 lg:border-dashed lg:border-secondary-text/30 lg:p-3", value.on && "lg:border-solid lg:border-primary lg:bg-card")}
     >
-      <span className={cn("absolute right-2 top-2 flex size-5 items-center justify-center rounded-full", value.on ? "bg-primary text-primary-foreground" : "border border-secondary-text/30")}>
+      <span className={cn("order-3 flex size-11 items-center justify-center justify-self-end rounded-full lg:absolute lg:right-2 lg:top-2 lg:size-5", value.on ? "bg-primary text-primary-foreground" : "border-2 border-placeholder-border")}> 
         {value.on && <Check className="size-3" strokeWidth={2.5} />}
       </span>
-      <div className="flex h-[128px] items-center justify-center gap-1.5 text-[13px] text-secondary-text">
+      <div className="order-3 hidden h-[128px] items-center justify-center gap-1.5 text-[13px] text-secondary-text lg:flex">
         {input("w", "Width in pixels")} × {input("h", "Height in pixels")}
       </div>
-      <span className="mt-3 text-[13px] font-semibold">Custom size</span>
-      <span className="mt-0.5 text-[12px] text-secondary-text nums">
-        Uses {nearestFormat(value.w || 1, value.h || 1)} layout
-      </span>
+      <span className="order-1 flex size-11 items-center justify-center text-icon lg:hidden"><Plus strokeWidth={1.7} /></span>
+      <span className="order-2 min-w-0 lg:contents"><span className="block text-[16px] font-semibold lg:mt-3 lg:text-[13px]">Custom size</span><span className="mt-0.5 block text-[13px] text-secondary-text nums lg:text-[12px]">{value.on ? `${value.w} × ${value.h}` : "Any width × height"}</span></span>
     </div>
   );
 }
@@ -547,9 +542,9 @@ function IssueThumb({ project, frames, index, images, brand }: { project: Projec
   return <MiniRender project={project} frames={frames} brand={brand} images={images} format="1:1" width={36} index={index} />;
 }
 
-function Group({ label, children }: { label: string; children: React.ReactNode }) {
+function Group({ label, children, className }: { label: string; children: React.ReactNode; className?: string }) {
   return (
-    <div className="rounded-sm bg-card p-4 shadow-card">
+    <div className={cn("rounded-sm bg-card p-4 shadow-card", className)}>
       <div className="mb-2.5 text-[12px] font-medium text-secondary-text">{label}</div>
       {children}
     </div>
@@ -574,7 +569,7 @@ function Seg<T extends string | number>({ value, onChange, options }: { value: T
           type="button"
           aria-pressed={value === o.v}
           onClick={() => onChange(o.v)}
-          className={cn("flex min-h-8 flex-1 flex-col items-center justify-center rounded-lg px-1.5 py-1 text-[12px] font-medium leading-tight", value === o.v && "bg-card shadow-segment")}
+          className={cn("flex min-h-11 flex-1 flex-col items-center justify-center rounded-lg px-1.5 py-1 text-[13px] font-medium leading-tight lg:min-h-8 lg:text-[12px]", value === o.v && "bg-card shadow-segment")}
         >
           {o.l}
           {o.s && <span className="text-[10px] font-normal text-secondary-text nums">{o.s}</span>}
