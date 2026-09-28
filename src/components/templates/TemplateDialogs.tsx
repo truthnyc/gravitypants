@@ -76,7 +76,7 @@ export function SaveTemplateDialog({ project, open, onOpenChange }: { project: P
           <Button variant="plain" onClick={() => onOpenChange(false)}>Cancel</Button>
           {access?.paid && (
             <Button
-              disabled={!name.trim() || save.isPending || (visibility === "team" && !access.team)}
+              disabled={!name.trim() || save.isPending || (visibility === "team" && !access.team) || (visibility === "global" && !isStaff)}
               onClick={() =>
                 save.mutate(
                   { project, name: name.trim(), visibility },
