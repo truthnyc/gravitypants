@@ -41,3 +41,4 @@
 - Support: tickets in `support_tickets` via `submitTicket` server fn; priority set by SQL trigger from the plan (never the browser); each ticket emails help@gravitypants.com.
 
 - Public home reference artwork lives in `public/site-art` and its page-specific styling in `src/styles.css`; this keeps the marketing visuals reusable without changing the `/app` editor.
+- Reusable kits: ads made from an `is_reusable` template store `projects.template_id`; `KitAgain.tsx` (useKit/KitAgainButton) drives the label, search and "Make another" (`/app/templates/$slug?from=<ad>` prefills text, no photos) from one place.

@@ -1,3 +1,4 @@
+import { useKit } from "@/components/templates/KitAgain";
 import { useRef, useState } from "react";
 import { guard, usePlanAccess } from "@/lib/stillframe/plan";
 import { Link, useNavigate } from "@tanstack/react-router";
@@ -32,6 +33,7 @@ import { FramePreview } from "./FramePreview";
 import { SaveTemplateDialog } from "@/components/templates/TemplateDialogs";
 
 export function AdCard({ project }: { project: ProjectWithFrames }) {
+  const kit = useKit(project.template_id);
   const navigate = useNavigate();
   const duplicate = useDuplicateProject();
   const duplicateWithPhotos = useDuplicateWithNewPhotos();
@@ -98,6 +100,7 @@ export function AdCard({ project }: { project: ProjectWithFrames }) {
         </div>
         <div className="px-0.5 pt-2.5 pr-10 lg:px-1 lg:pt-3">
           <p className="truncate text-[16px] font-semibold lg:text-[14px]">{project.name}</p>
+          {kit && <span className="mt-1 inline-flex max-w-full truncate rounded-lg bg-control-fill px-2 py-0.5 text-[12px] font-medium text-secondary-text">{kit.name}</span>}
           <p className="nums mt-0.5 truncate text-[13px] text-secondary-text lg:text-[12px]">{meta}<span className="hidden lg:inline"> · {project.formats.join(", ")}</span></p>
         </div>
       </Link>

@@ -238,6 +238,7 @@ async function insertCopy(source: ProjectWithFrames, name: string, photos?: Uplo
       logo: source.logo,
       end_card: source.end_card,
       brand_kit_id: source.brand_kit_id ?? null,
+      template_id: source.template_id ?? null,
       thumbnail_url: photos ? null : source.thumbnail_url,
     })
     .select("id")
@@ -663,6 +664,7 @@ export function useSaveTemplate() {
         name,
         visibility,
         source: visibility === "team" ? "team" : "user",
+        format: project.primary_format,
         thumbnail_url: project.thumbnail_url ?? project.frames[0]?.photo.path ?? null,
         settings: templateFromProject(project) as never,
       });
@@ -711,6 +713,7 @@ function sourceFromTemplate(t: Template, count: number): ProjectWithFrames {
     logo: { ...DEFAULT_LOGO, ...s.logo },
     end_card: s.end_card ?? {},
     brand_kit_id: s.brand_kit_id ?? null,
+    template_id: t.is_reusable && !t.id.startsWith("example") ? t.id : null,
     is_template: false,
     deleted_at: null,
     thumbnail_url: null,

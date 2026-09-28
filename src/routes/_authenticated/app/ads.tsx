@@ -3,7 +3,7 @@ import { z } from "zod";
 import { AdCard } from "@/components/stillframe/AdCard";
 import { DropZone } from "@/components/stillframe/DropZone";
 import { useSearch } from "@/components/stillframe/search-context";
-import { useProjects } from "@/lib/stillframe/data";
+import { useProjects, useTemplates } from "@/lib/stillframe/data";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { rememberSignupChoice } from "@/lib/stillframe/signup-choice";
@@ -60,8 +60,10 @@ function YourAds() {
   const { data: projects, isLoading } = useProjects();
 
   const term = query.trim().toLowerCase();
+  const { data: templates = [] } = useTemplates();
+  const kitName = (id: string | null | undefined) => (id && templates.find((t) => t.id === id && t.is_reusable)?.name.toLowerCase()) || "";
   const visible = (projects ?? []).filter((project) =>
-    term ? project.name.toLowerCase().includes(term) : true,
+    term ? project.name.toLowerCase().includes(term) || kitName(project.template_id).includes(term) : true,
   );
   const isEmpty = !isLoading && (projects ?? []).length === 0;
 

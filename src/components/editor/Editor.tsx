@@ -483,6 +483,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
       <EditorHeader
         id={doc.project.id}
         name={doc.project.name}
+        templateId={doc.project.template_id}
         status={status}
         canUndo={canUndo}
         playing={playing}

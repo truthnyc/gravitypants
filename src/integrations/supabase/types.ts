@@ -381,6 +381,7 @@ export type Database = {
           name: string
           pace: string
           primary_format: string
+          template_id: string | null
           thumbnail_url: string | null
           updated_at: string
           workspace_id: string
@@ -398,6 +399,7 @@ export type Database = {
           name?: string
           pace?: string
           primary_format?: string
+          template_id?: string | null
           thumbnail_url?: string | null
           updated_at?: string
           workspace_id: string
@@ -415,6 +417,7 @@ export type Database = {
           name?: string
           pace?: string
           primary_format?: string
+          template_id?: string | null
           thumbnail_url?: string | null
           updated_at?: string
           workspace_id?: string
@@ -425,6 +428,13 @@ export type Database = {
             columns: ["brand_kit_id"]
             isOneToOne: false
             referencedRelation: "brand_kits"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "projects_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "templates"
             referencedColumns: ["id"]
           },
         ]

@@ -3,6 +3,7 @@ import { HelpMenu } from "@/components/stillframe/HelpMenu";
 import { Link } from "@tanstack/react-router";
 import { Check, ChevronLeft, ChevronRight, LayoutGrid, Play, Square, Undo2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { KitAgainButton } from "@/components/templates/KitAgain";
 import type { SaveStatus } from "./use-editor";
 
 export function EditorHeader({
@@ -15,6 +16,7 @@ export function EditorHeader({
   onUndo,
   onPlayVideo,
   exportDisabled = false,
+  templateId,
 }: {
   id: string;
   name: string;
@@ -25,6 +27,7 @@ export function EditorHeader({
   onUndo: () => void;
   onPlayVideo: () => void;
   exportDisabled?: boolean;
+  templateId?: string | null | undefined;
 }) {
   const [editing, setEditing] = useState(false);
 
@@ -88,6 +91,7 @@ export function EditorHeader({
         <Button variant="ghost" size="icon" onClick={onUndo} disabled={!canUndo} aria-label="Undo">
           <Undo2 strokeWidth={1.7} />
         </Button>
+        <KitAgainButton adId={id} templateId={templateId} className="hidden xl:inline-flex" />
         <Button variant="plain" size="header" className="hidden lg:inline-flex" onClick={onPlayVideo}>
           {playing ? <Square strokeWidth={1.7} /> : <Play strokeWidth={1.7} />}
           {playing ? "Stop" : "Play Video"}
