@@ -60,7 +60,7 @@ export function AdCard({ project }: { project: ProjectWithFrames }) {
     if (!images.length) return;
     const id = await duplicateWithPhotos.mutateAsync({ project, files: images });
     toast.success("Copy created with your new photos");
-    navigate({ to: "/ad/$id/edit", params: { id } });
+    navigate({ to: "/app/ad/$id/edit", params: { id } });
   }
 
   function handleTrash() {
@@ -81,7 +81,7 @@ export function AdCard({ project }: { project: ProjectWithFrames }) {
   return (
     <div className="group relative">
       <Link
-        to="/ad/$id/edit"
+        to="/app/ad/$id/edit"
         params={{ id: project.id }}
         className="block rounded-sm lg:bg-card lg:p-3 lg:shadow-card lg:transition-shadow lg:hover:shadow-popover/20"
         aria-label={`Open ${project.name}`}
@@ -112,7 +112,7 @@ export function AdCard({ project }: { project: ProjectWithFrames }) {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-[230px] rounded-sm shadow-popover">
-            <DropdownMenuItem onSelect={() => navigate({ to: "/ad/$id/edit", params: { id: project.id } })}>
+            <DropdownMenuItem onSelect={() => navigate({ to: "/app/ad/$id/edit", params: { id: project.id } })}>
               Open
             </DropdownMenuItem>
             <DropdownMenuItem onSelect={() => void handleDuplicate()}>Duplicate</DropdownMenuItem>
@@ -143,7 +143,7 @@ export function AdCard({ project }: { project: ProjectWithFrames }) {
         <DrawerContent className="lg:hidden">
           <DrawerHeader><DrawerTitle>{project.name}</DrawerTitle></DrawerHeader>
           <div className="grid px-4 pb-6 text-left">
-            <button className="flex h-12 items-center hairline-b" onClick={() => navigate({ to: "/ad/$id/edit", params: { id: project.id } })}>Open</button>
+            <button className="flex h-12 items-center hairline-b" onClick={() => navigate({ to: "/app/ad/$id/edit", params: { id: project.id } })}>Open</button>
             <button className="flex h-12 items-center hairline-b" onClick={() => fileInput.current?.click()}>Duplicate with New Photos</button>
             <button className="flex h-12 items-center hairline-b" onClick={() => { setActionsOpen(false); guard(canUse("templates"), "templates", () => setTemplateOpen(true)); }}>Save as Template</button>
             <button className="flex h-12 items-center hairline-b" onClick={() => { setDraftName(project.name); setActionsOpen(false); setRenameOpen(true); }}>Rename</button>

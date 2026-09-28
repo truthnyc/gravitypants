@@ -27,7 +27,7 @@ function SignUp() {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
-  const target = typeof window === "undefined" ? "/" : safeRedirect(redirect);
+  const target = typeof window === "undefined" ? "/app/ads" : safeRedirect(redirect);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -37,7 +37,7 @@ function SignUp() {
     const { error } = await supabase.auth.signUp({
       email: email.trim(),
       password,
-      options: { emailRedirectTo: window.location.origin + "/" },
+      options: { emailRedirectTo: window.location.origin + "/app/ads" },
     });
     setBusy(false);
     if (error) setError(plainAuthError(error.message));

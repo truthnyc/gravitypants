@@ -26,3 +26,8 @@
 - [x] Billing helper (AI) on Account › Billing
 - [x] Billing page shows plan, renewal date, exports left; refreshes when you return from Manage Billing
 - [ ] Publish so the live site gets these fixes
+
+## Public website foundation
+- [ ] Public shell and routes at /, /features, /examples, /pricing
+- [ ] Move app pages to /app and update internal navigation/auth return paths
+- [ ] Add reference-based site tokens and reusable ReelPhone; verify public and app flows

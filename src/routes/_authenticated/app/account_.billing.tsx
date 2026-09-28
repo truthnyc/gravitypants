@@ -7,7 +7,7 @@ import { TopUpCard } from "@/components/billing/TopUp";
 import { BillingHelp } from "@/components/billing/BillingHelp";
 import { type ExportStatus, isPaid, money, planName, statusLine, useBilling, useExportStatus, useManageBilling, usePlans, useRefreshBilling } from "@/lib/stillframe/billing";
 
-export const Route = createFileRoute("/_authenticated/account_/billing")({
+export const Route = createFileRoute("/_authenticated/app/account_/billing")({
   validateSearch: z.object({ checkout: z.string().optional() }),
   head: () => ({
     meta: [
@@ -36,7 +36,7 @@ function BillingPage() {
   useEffect(() => {
     if (checkout !== "success") return;
     setThanks(true);
-    void navigate({ to: "/account/billing", search: {}, replace: true });
+    void navigate({ to: "/app/account/billing", search: {}, replace: true });
     let n = 0;
     const t = setInterval(() => {
       n++;
@@ -62,7 +62,7 @@ function BillingPage() {
             Your plan is active and exporting is unlocked. A receipt is on its way to your inbox.
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
-            <Button asChild><Link to="/">Go to Your Ads</Link></Button>
+            <Button asChild><Link to="/app/ads">Go to Your Ads</Link></Button>
             <Button variant="plain" onClick={() => setThanks(false)}>Close</Button>
           </div>
         </section>

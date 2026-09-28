@@ -185,7 +185,7 @@ function BrandKitRow({ kits, kitId, onKit }: { kits: NamedBrandKit[]; kitId: str
           ))}
         </select>
       ) : (
-        <Link to="/brand" className="ml-auto flex h-11 items-center text-[13px] font-medium text-link lg:h-8">Create a brand kit</Link>
+        <Link to="/app/brand" className="ml-auto flex h-11 items-center text-[13px] font-medium text-link lg:h-8">Create a brand kit</Link>
       )}
     </div>
   );

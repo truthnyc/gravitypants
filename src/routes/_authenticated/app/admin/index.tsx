@@ -5,7 +5,7 @@ import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, X
 import { Card, fmtDate, fmtMoney, PageTitle } from "@/components/admin/AdminShell";
 import { adminOverview } from "@/lib/stillframe/admin.functions";
 
-export const Route = createFileRoute("/_authenticated/admin/")({
+export const Route = createFileRoute("/_authenticated/app/admin/")({
   head: () => ({ meta: [
     { title: "Admin Overview — Gravity Pants" },
     { name: "description", content: "Private overview of Gravity Pants clients and activity." },
@@ -76,7 +76,7 @@ function ClientList({ title, rows }: { title: string; rows: { id: string; name: 
         <ul className="divide-y divide-border">
           {rows.map((r) => (
             <li key={r.id}>
-              <Link to="/admin/clients/$id" params={{ id: r.id }} className="flex items-center justify-between gap-3 py-2.5 hover:text-primary">
+              <Link to="/app/admin/clients/$id" params={{ id: r.id }} className="flex items-center justify-between gap-3 py-2.5 hover:text-primary">
                 <span className="min-w-0">
                   <span className="block truncate text-[14px] font-medium">{r.name}</span>
                   <span className="block truncate text-[13px] text-secondary-text">{r.email}</span>

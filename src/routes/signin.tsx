@@ -27,7 +27,7 @@ function SignIn() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const target = typeof window === "undefined" ? "/" : safeRedirect(redirect);
+  const target = typeof window === "undefined" ? "/app/ads" : safeRedirect(redirect);
 
   // Already signed in (or returning from Google): go on.
   useEffect(() => {

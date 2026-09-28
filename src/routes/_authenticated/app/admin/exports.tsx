@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card, fmtBytes, fmtDateTime, PageTitle, Pill } from "@/components/admin/AdminShell";
 import { adminExports } from "@/lib/stillframe/admin.functions";
 
-export const Route = createFileRoute("/_authenticated/admin/exports")({
+export const Route = createFileRoute("/_authenticated/app/admin/exports")({
   head: () => ({ meta: [
     { title: "Admin Exports — Gravity Pants" },
     { name: "description", content: "Private Gravity Pants export history." },
@@ -38,7 +38,7 @@ function Exports() {
           <tbody>
             {rows.map((e) => (
               <tr key={e.id} className={`hairline-b last:border-0 ${e.status === "failed" ? "bg-destructive/5" : ""}`}>
-                <td className="px-4 py-3"><Link to="/admin/clients/$id" params={{ id: e.workspaceId }} className="hover:text-primary">{e.client}</Link></td>
+                <td className="px-4 py-3"><Link to="/app/admin/clients/$id" params={{ id: e.workspaceId }} className="hover:text-primary">{e.client}</Link></td>
                 <td className="px-4 py-3">{e.ad}</td>
                 <td className="px-4 py-3">{e.channels.join(", ")}</td>
                 <td className="px-4 py-3">{e.formats.join(", ")}</td>

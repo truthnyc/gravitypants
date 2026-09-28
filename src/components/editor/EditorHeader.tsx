@@ -32,7 +32,7 @@ export function EditorHeader({
     <header className="grid shrink-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 bg-card px-2 hairline-b safe-top lg:h-[60px] lg:grid-cols-[1fr_auto_1fr] lg:gap-4 lg:px-4">
       <div className="flex min-w-0 items-center gap-2">
         <Button asChild variant="ghost" size="icon" aria-label="Back to Your Ads">
-          <Link to="/">
+          <Link to="/app/ads">
             <LayoutGrid className="hidden lg:block" strokeWidth={1.7} /><ChevronLeft className="lg:hidden" strokeWidth={1.7} />
           </Link>
         </Button>
@@ -68,7 +68,7 @@ export function EditorHeader({
       </div>
 
       <nav className="hidden h-8 items-center rounded-lg bg-control-fill p-0.5 text-[13px] font-medium lg:flex" aria-label="Steps">
-        <Link to="/" className="flex h-7 items-center gap-1.5 rounded-lg px-3 text-secondary-text">
+        <Link to="/app/ads" className="flex h-7 items-center gap-1.5 rounded-lg px-3 text-secondary-text">
           <span className="flex size-4 items-center justify-center rounded-full bg-toggle-on text-primary-foreground">
             <Check className="size-2.5" strokeWidth={2.5} />
           </span>
@@ -78,7 +78,7 @@ export function EditorHeader({
           <span className="flex size-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground nums">2</span>
           Edit
         </span>
-        <Link to="/ad/$id/export" params={{ id }} className="flex h-7 items-center gap-1.5 rounded-lg px-3 text-secondary-text">
+        <Link to="/app/ad/$id/export" params={{ id }} className="flex h-7 items-center gap-1.5 rounded-lg px-3 text-secondary-text">
           <span className="flex size-4 items-center justify-center rounded-full border border-secondary-text/50 text-[10px] nums">3</span>
           Export
         </Link>
@@ -98,7 +98,7 @@ export function EditorHeader({
           </Button>
         ) : (
           <Button asChild size="header" className="h-11 px-4 lg:h-[34px] lg:px-3.5">
-            <Link to="/ad/$id/export" params={{ id }}>
+            <Link to="/app/ad/$id/export" params={{ id }}>
               <span className="lg:hidden">Export</span><span className="hidden lg:inline">Next: Export</span> <ChevronRight strokeWidth={1.7} />
             </Link>
           </Button>

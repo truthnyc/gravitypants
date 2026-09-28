@@ -2,9 +2,9 @@ import { Link } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 
 const tabs = [
-  { to: "/account", label: "Profile" },
-  { to: "/account/billing", label: "Billing" },
-  { to: "/account/members", label: "Team" },
+  { to: "/app/account", label: "Profile" },
+  { to: "/app/account/billing", label: "Billing" },
+  { to: "/app/account/members", label: "Team" },
 ] as const;
 
 export function AccountTabs() {

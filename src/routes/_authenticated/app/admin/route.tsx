@@ -2,7 +2,7 @@ import { createFileRoute, notFound, Outlet } from "@tanstack/react-router";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { checkAdmin } from "@/lib/stillframe/admin.functions";
 
-export const Route = createFileRoute("/_authenticated/admin")({
+export const Route = createFileRoute("/_authenticated/app/admin")({
   beforeLoad: async () => {
     const { admin } = await checkAdmin();
     if (!admin) throw notFound();

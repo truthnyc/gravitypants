@@ -11,8 +11,8 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/u
 import { useState } from "react";
 
 const navItems = [
-  { to: "/", label: "Your Ads" },
-  { to: "/brand", label: "Brand Kit" },
+  { to: "/app/ads", label: "Your Ads" },
+  { to: "/app/brand", label: "Brand Kit" },
 ] as const;
 
 export function AppHeader() {
@@ -23,7 +23,7 @@ export function AppHeader() {
   return (
     <header className="sticky top-0 z-30 bg-card/90 backdrop-blur-xl hairline-b safe-top">
       <div className="mx-auto flex h-[60px] items-center gap-6 px-4 sm:px-6">
-        <Link to="/" className="flex items-center gap-2.5 rounded-lg" aria-label="Gravity Pants home">
+        <Link to="/app/ads" className="flex items-center gap-2.5 rounded-lg" aria-label="Gravity Pants home">
           <GravityPantsLogo size={26} showWordmark />
         </Link>
 

@@ -3,11 +3,11 @@ import { Link } from "@tanstack/react-router";
 import { FileClock, LayoutDashboard, ShieldCheck, Users, Video } from "lucide-react";
 
 const NAV = [
-  { to: "/admin", label: "Overview", icon: LayoutDashboard, exact: true },
-  { to: "/admin/clients", label: "Clients", icon: Users },
-  { to: "/admin/exports", label: "Exports", icon: Video },
-  { to: "/admin/admins", label: "Admins", icon: ShieldCheck },
-  { to: "/admin/audit", label: "Audit Log", icon: FileClock },
+  { to: "/app/admin", label: "Overview", icon: LayoutDashboard, exact: true },
+  { to: "/app/admin/clients", label: "Clients", icon: Users },
+  { to: "/app/admin/exports", label: "Exports", icon: Video },
+  { to: "/app/admin/admins", label: "Admins", icon: ShieldCheck },
+  { to: "/app/admin/audit", label: "Audit Log", icon: FileClock },
 ] as const;
 
 export function AdminShell({ children }: { children: ReactNode }) {

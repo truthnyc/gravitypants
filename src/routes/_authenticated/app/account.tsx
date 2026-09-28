@@ -12,7 +12,7 @@ import { deleteMyAccount } from "@/lib/stillframe/account.functions";
 import { uploadMedia } from "@/lib/stillframe/media";
 import { AccountTabs } from "@/components/billing/AccountTabs";
 
-export const Route = createFileRoute("/_authenticated/account")({
+export const Route = createFileRoute("/_authenticated/app/account")({
   head: () => ({
     meta: [
       { title: "Account — Gravity Pants" },
@@ -79,7 +79,7 @@ function AccountPage() {
   }
 
   async function changeEmail() {
-    const { error } = await supabase.auth.updateUser({ email: email.trim() }, { emailRedirectTo: window.location.origin + "/account" });
+    const { error } = await supabase.auth.updateUser({ email: email.trim() }, { emailRedirectTo: window.location.origin + "/app/account" });
     if (error) toast.error("Couldn't change your email. Please check it and try again.");
     else toast.success("Check both inboxes to confirm the new email.");
   }

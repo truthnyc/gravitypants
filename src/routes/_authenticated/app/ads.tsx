@@ -4,7 +4,7 @@ import { DropZone } from "@/components/stillframe/DropZone";
 import { useSearch } from "@/components/stillframe/search-context";
 import { useProjects } from "@/lib/stillframe/data";
 
-export const Route = createFileRoute("/_authenticated/")({
+export const Route = createFileRoute("/_authenticated/app/ads")({
   head: () => ({
     meta: [
       { title: "Your Ads — Gravity Pants" },
@@ -37,7 +37,7 @@ function YourAds() {
     <main className="px-4 py-7 sm:px-8 sm:py-10 lg:px-16">
       <div className="mb-6 flex items-end justify-between lg:mb-4 lg:justify-end">
         <h1 className="text-[36px] font-bold leading-none lg:hidden">Your ads</h1>
-        <Link to="/templates" className="flex h-11 items-center text-[14px] font-medium text-link">Templates</Link>
+        <Link to="/app/templates" className="flex h-11 items-center text-[14px] font-medium text-link">Templates</Link>
       </div>
       <div className={isEmpty ? "mx-auto max-w-[860px] py-4 lg:py-16" : ""}>
         <DropZone spacious={isEmpty} />
