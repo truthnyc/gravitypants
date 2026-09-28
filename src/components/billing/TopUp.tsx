@@ -11,7 +11,7 @@ function TopUpCheckout({ workspaceId }: { workspaceId: string }) {
   const create = useServerFn(createTopUpSession);
   const fetchClientSecret = async () => {
     const r = await create({
-      data: { workspaceId, returnUrl: `${window.location.origin}/account/billing?checkout=success`, environment: getStripeEnvironment() },
+       data: { workspaceId, returnUrl: `${window.location.origin}/app/account/billing?checkout=success`, environment: getStripeEnvironment() },
     });
     if ("error" in r) throw new Error(r.error);
     return r.clientSecret;

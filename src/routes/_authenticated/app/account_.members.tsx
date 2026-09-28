@@ -11,7 +11,7 @@ import { useBilling } from "@/lib/stillframe/billing";
 import { getWorkspaceId, setWorkspaceId } from "@/lib/stillframe/workspace";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/_authenticated/account_/members")({
+export const Route = createFileRoute("/_authenticated/app/account_/members")({
   head: () => ({
     meta: [
       { title: "Team — Gravity Pants" },
@@ -104,7 +104,7 @@ function MembersPage() {
 
   async function switchWorkspace(id: string) {
     setWorkspaceId(id);
-    window.location.href = "/";
+    window.location.href = "/app/ads";
   }
 
   async function sendInvite() {
@@ -169,7 +169,7 @@ function MembersPage() {
     await supabase.from("brand_kit").insert({ workspace_id: wsRow.id });
     toast.success("Team workspace created");
     setWorkspaceId(wsRow.id);
-    window.location.href = "/account/members";
+    window.location.href = "/app/account/members";
   }
 
   const seats = billing?.plan === "team" || billing?.plan === "team_yearly" ? 3 : 1;

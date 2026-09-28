@@ -41,7 +41,7 @@ function AcceptInvitePage() {
         return;
       }
       setWorkspaceId(data as unknown as string);
-      window.location.href = "/";
+      window.location.href = "/app/ads";
     })();
     return () => {
       cancelled = true;
@@ -54,7 +54,7 @@ function AcceptInvitePage() {
       {error ? (
         <>
           <p className="max-w-[420px] text-[15px] text-secondary-text">{error}</p>
-          <a href="/" className="text-[15px] font-medium text-primary">Go to your ads</a>
+          <a href="/app/ads" className="text-[15px] font-medium text-primary">Go to your ads</a>
         </>
       ) : (
         <p className="text-[15px] text-secondary-text">Joining your team…</p>

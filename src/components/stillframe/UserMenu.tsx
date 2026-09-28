@@ -57,14 +57,14 @@ export function UserMenu() {
           <div className="truncate text-[13px] text-secondary-text">{me?.email}</div>
         </DropdownMenuLabel>
         <DropdownMenuItem asChild>
-          <Link to="/account">Account</Link>
+          <Link to="/app/account">Account</Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link to="/brand">Brand Kit</Link>
+          <Link to="/app/brand">Brand Kit</Link>
         </DropdownMenuItem>
         {adm?.admin && (
           <DropdownMenuItem asChild>
-            <Link to="/admin">Admin</Link>
+            <Link to="/app/admin">Admin</Link>
           </DropdownMenuItem>
         )}
         <DropdownMenuSeparator />

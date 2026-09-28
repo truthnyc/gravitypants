@@ -1,5 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { GravityPantsLogo } from "@/components/GravityPantsLogo";
+import { createFileRoute } from "@tanstack/react-router";
+import { SiteShell } from "@/components/site/SiteShell";
 import { PlanCards } from "@/components/billing/PlanCards";
 
 export const Route = createFileRoute("/pricing")({
@@ -18,10 +18,8 @@ export const Route = createFileRoute("/pricing")({
 
 function Pricing() {
   return (
-    <main className="mx-auto max-w-[1040px] px-4 pb-20 pt-6 sm:px-8 sm:pt-10">
-      <Link to="/" className="inline-flex items-center gap-2.5 rounded-lg" aria-label="Gravity Pants home">
-        <GravityPantsLogo size={26} showWordmark />
-      </Link>
+    <SiteShell>
+    <div className="mx-auto max-w-[1040px] px-4 pb-20 pt-6 sm:px-8 sm:pt-10">
       <div className="mx-auto mt-10 max-w-[640px] text-center sm:mt-14">
         <h1 className="text-[40px] font-bold leading-[1.05] tracking-[-0.03em] sm:text-[56px]">Pick a plan.</h1>
         <p className="mt-4 text-[17px] text-secondary-text sm:text-[19px]">
@@ -31,6 +29,7 @@ function Pricing() {
       <div className="mt-12">
         <PlanCards />
       </div>
-    </main>
+    </div>
+    </SiteShell>
   );
 }

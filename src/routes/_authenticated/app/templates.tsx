@@ -15,7 +15,7 @@ import { TemplateThumb, UpgradeNote } from "@/components/templates/TemplateDialo
 import { useCanEditKits, useDeleteTemplate, useTemplateAccess, useTemplates, useUpdateTemplate, type Template } from "@/lib/stillframe/data";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/_authenticated/templates")({
+export const Route = createFileRoute("/_authenticated/app/templates")({
   head: () => ({
     meta: [
       { title: "Templates — Gravity Pants" },
@@ -43,7 +43,7 @@ function TemplatesPage() {
   return (
     <main className="mx-auto max-w-[960px] space-y-6 px-4 pb-16 pt-6 sm:px-8 sm:pt-8">
       <div>
-        <Link to="/" className="inline-flex h-11 items-center text-[13px] font-medium text-link lg:h-auto">Your ads</Link>
+        <Link to="/app/ads" className="inline-flex h-11 items-center text-[13px] font-medium text-link lg:h-auto">Your ads</Link>
         <h1 className="text-[22px] font-bold tracking-[-0.02em]">Templates</h1>
         <p className="mt-1 text-[14px] text-secondary-text">Save any ad as a template from its "…" menu. New ads can start from one after you choose photos.</p>
       </div>

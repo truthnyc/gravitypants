@@ -13,7 +13,7 @@ import { Card, fmtBytes, fmtDate, fmtDateTime, fmtMoney, Pill, planLabel, status
 import { MediaImage } from "@/components/stillframe/MediaImage";
 import { adminAction, adminClient, adminSupport } from "@/lib/stillframe/admin.functions";
 
-export const Route = createFileRoute("/_authenticated/admin/clients_/$id")({
+export const Route = createFileRoute("/_authenticated/app/admin/clients_/$id")({
   head: () => ({ meta: [
     { title: "Admin Client — Gravity Pants" },
     { name: "description", content: "Private Gravity Pants client details." },
@@ -60,7 +60,7 @@ function ClientPage() {
 
   return (
     <>
-      <Link to="/admin/clients" className="mb-3 inline-flex items-center gap-1 text-[13px] text-secondary-text hover:text-foreground">
+      <Link to="/app/admin/clients" className="mb-3 inline-flex items-center gap-1 text-[13px] text-secondary-text hover:text-foreground">
         <ChevronLeft className="size-4" strokeWidth={1.7} /> Clients
       </Link>
       <div className="mb-6 flex flex-col items-start justify-between gap-4 lg:flex-row">
@@ -175,7 +175,7 @@ function ClientPage() {
       <h2 id="ads" className="mb-3 mt-8 text-[17px] font-semibold">Ads · {data.ads.length}</h2>
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
         {data.ads.map((a) => (
-          <Link key={a.id} to="/ad/$id/edit" params={{ id: a.id }} className="overflow-hidden rounded-sm bg-card shadow-card hover:ring-2 hover:ring-primary">
+          <Link key={a.id} to="/app/ad/$id/edit" params={{ id: a.id }} className="overflow-hidden rounded-sm bg-card shadow-card hover:ring-2 hover:ring-primary">
             <div className="flex aspect-square items-center justify-center bg-control-fill">
               {a.thumbnail_url ? <MediaImage path={a.thumbnail_url} alt="" className="h-full w-full object-cover" /> : <span className="text-[12px] text-secondary-text">{a.primary_format}</span>}
             </div>
@@ -221,7 +221,7 @@ function ActionDialog({ act, name, id, onClose, onDone }: { act: Act; name: stri
       if (act === "support") await support({ data: { id, start: true, reason } });
       else await action({ data: { id, action: act, reason, days, plan, until, confirmName } });
       toast(act === "support" ? "Support editing on for 60 minutes" : `${TITLES[act]} done`);
-      if (act === "delete") navigate({ to: "/admin/clients" });
+      if (act === "delete") navigate({ to: "/app/admin/clients" });
       onDone();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "That didn't work");

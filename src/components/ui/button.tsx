@@ -18,6 +18,7 @@ const buttonVariants = cva(
         ghost: "text-foreground hover:bg-control-fill/60",
         secondary: "bg-control-fill text-foreground hover:bg-control-fill/70",
         link: "text-link underline-offset-4 hover:underline",
+        site: "bg-site-primary text-site-on-primary hover:bg-site-primary-hover",
       },
       size: {
         header: "h-[34px] px-3.5",
@@ -26,6 +27,8 @@ const buttonVariants = cva(
         large: "h-[50px] px-7 text-[15px]",
         sm: "h-8 px-3 text-[13px]",
         icon: "h-[34px] w-[34px] rounded-lg",
+        siteHeader: "h-10 rounded-full px-[18px] text-[15px] font-normal max-md:h-11",
+        site: "h-12 rounded-full px-6 text-[17px] font-normal",
       },
     },
     defaultVariants: {

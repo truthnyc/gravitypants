@@ -320,7 +320,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
                     <span className="font-semibold nums">Frame {iss.frame + 1}</span> · {iss.text}
                   </p>
                   <Button asChild variant="plain" size="sm">
-                    <Link to="/ad/$id/edit" params={{ id: project.id }}>
+                    <Link to="/app/ad/$id/edit" params={{ id: project.id }}>
                       Fix in editor
                     </Link>
                   </Button>
@@ -446,7 +446,7 @@ function ExportHeader({ id, name }: { id: string; name: string }) {
     <header className="grid shrink-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 bg-card px-2 hairline-b safe-top lg:h-[60px] lg:grid-cols-[1fr_auto_1fr] lg:gap-4 lg:px-4">
       <div className="flex min-w-0 items-center gap-2">
         <Button asChild variant="ghost" size="icon" aria-label="Back to Your Ads">
-          <Link to="/">
+          <Link to="/app/ads">
             <LayoutGrid className="hidden lg:block" strokeWidth={1.7} /><ChevronLeft className="lg:hidden" strokeWidth={1.7} />
           </Link>
         </Button>
@@ -454,10 +454,10 @@ function ExportHeader({ id, name }: { id: string; name: string }) {
         <div className="min-w-0 px-1"><span className="block truncate text-[17px] font-semibold lg:hidden">Export</span><span className="hidden truncate text-[15px] font-semibold lg:block">{name}</span><span className="block truncate text-[13px] text-secondary-text lg:hidden">{name} · Step 3 of 3</span></div>
       </div>
       <nav className="hidden h-8 items-center rounded-lg bg-control-fill p-0.5 text-[13px] font-medium lg:flex" aria-label="Steps">
-        <Link to="/" className="flex h-7 items-center gap-1.5 rounded-lg px-3 text-secondary-text">
+        <Link to="/app/ads" className="flex h-7 items-center gap-1.5 rounded-lg px-3 text-secondary-text">
           {done} Photos
         </Link>
-        <Link to="/ad/$id/edit" params={{ id }} className="flex h-7 items-center gap-1.5 rounded-lg px-3 text-secondary-text">
+        <Link to="/app/ad/$id/edit" params={{ id }} className="flex h-7 items-center gap-1.5 rounded-lg px-3 text-secondary-text">
           {done} Edit
         </Link>
         <span className="flex h-7 items-center gap-1.5 rounded-lg bg-card px-3 shadow-segment" aria-current="step">
@@ -467,7 +467,7 @@ function ExportHeader({ id, name }: { id: string; name: string }) {
       </nav>
       <div className="hidden justify-end lg:flex">
         <Button asChild variant="plain" size="header">
-          <Link to="/ad/$id/edit" params={{ id }}>
+          <Link to="/app/ad/$id/edit" params={{ id }}>
             <ChevronLeft strokeWidth={1.7} /> Back to Edit
           </Link>
         </Button>

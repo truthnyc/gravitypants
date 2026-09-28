@@ -7,7 +7,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { adminLogOpen } from "@/lib/stillframe/admin.functions";
 import { getWorkspaceId } from "@/lib/stillframe/workspace";
 
-export const Route = createFileRoute("/_authenticated/ad/$id/edit")({
+export const Route = createFileRoute("/_authenticated/app/ad/$id/edit")({
   head: () => ({
     meta: [
       { title: "Edit ad — Gravity Pants" },
@@ -39,7 +39,7 @@ function EditPage() {
           <h1 className="text-[22px] font-bold tracking-[-0.02em]">This ad isn't available</h1>
           <p className="mt-2 text-[14px] text-secondary-text">It may have been moved to the trash.</p>
           <Button asChild variant="plain" className="mt-6">
-            <Link to="/">Back to Your Ads</Link>
+            <Link to="/app/ads">Back to Your Ads</Link>
           </Button>
         </div>
       </main>
@@ -57,7 +57,7 @@ function EditPage() {
         banner={
           <div role="status" className="flex h-8 shrink-0 items-center justify-center gap-3 bg-foreground text-[13px] text-background">
             {support ? "Support editing — every change is logged" : "Viewing as admin — read only"}
-            <Link to="/admin/clients/$id" params={{ id: project.workspace_id }} className="underline">Back to client</Link>
+            <Link to="/app/admin/clients/$id" params={{ id: project.workspace_id }} className="underline">Back to client</Link>
           </div>
         }
       />

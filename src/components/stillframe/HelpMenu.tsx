@@ -31,7 +31,7 @@ export function HelpMenu() {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48">
-          <DropdownMenuItem asChild className="h-11 lg:h-9"><Link to="/help">Help center</Link></DropdownMenuItem>
+          <DropdownMenuItem asChild className="h-11 lg:h-9"><Link to="/app/help">Help center</Link></DropdownMenuItem>
           <DropdownMenuItem className="h-11 lg:h-9" onSelect={() => setOpen(true)}>Contact support</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

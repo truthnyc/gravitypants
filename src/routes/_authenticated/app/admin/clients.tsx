@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, fmtBytes, fmtDate, PageTitle, Pill, planLabel, statusLabel, statusTone } from "@/components/admin/AdminShell";
 import { adminClients } from "@/lib/stillframe/admin.functions";
 
-export const Route = createFileRoute("/_authenticated/admin/clients")({
+export const Route = createFileRoute("/_authenticated/app/admin/clients")({
   head: () => ({ meta: [
     { title: "Admin Clients — Gravity Pants" },
     { name: "description", content: "Private Gravity Pants client list." },
@@ -75,7 +75,7 @@ function Clients() {
           </thead>
           <tbody>
             {rows.map((c) => (
-              <tr key={c.id} className="cursor-pointer hairline-b last:border-0 hover:bg-canvas" onClick={() => navigate({ to: "/admin/clients/$id", params: { id: c.id } })}>
+              <tr key={c.id} className="cursor-pointer hairline-b last:border-0 hover:bg-canvas" onClick={() => navigate({ to: "/app/admin/clients/$id", params: { id: c.id } })}>
                 <td className="px-4 py-3">
                   <div className="font-medium">{c.name}</div>
                   <div className="text-secondary-text">{c.ownerEmail}</div>

@@ -15,7 +15,7 @@ import type { BrandKit, BrandLogo, BrandLogoRole, Format } from "@/lib/stillfram
 import { ANCHORS, DEFAULT_FONT } from "@/render/renderFrame";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/_authenticated/brand")({
+export const Route = createFileRoute("/_authenticated/app/brand")({
   head: () => ({
     meta: [
       { title: "Brand Kit — Gravity Pants" },

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ExportPage } from "@/components/export/ExportPage";
 import { useProject } from "@/lib/stillframe/data";
 
-export const Route = createFileRoute("/_authenticated/ad/$id/export")({
+export const Route = createFileRoute("/_authenticated/app/ad/$id/export")({
   head: () => ({
     meta: [
       { title: "Export ad — Gravity Pants" },
@@ -28,7 +28,7 @@ function ExportRoute() {
           <h1 className="text-[22px] font-bold tracking-[-0.02em]">This ad isn't available</h1>
           <p className="mt-2 text-[14px] text-secondary-text">It may have been moved to the trash.</p>
           <Button asChild variant="plain" className="mt-6">
-            <Link to="/">Back to Your Ads</Link>
+            <Link to="/app/ads">Back to Your Ads</Link>
           </Button>
         </div>
       </main>

@@ -55,7 +55,7 @@ function Reset() {
     const { error } = await supabase.auth.updateUser({ password });
     setBusy(false);
     if (error) setError(plainAuthError(error.message));
-    else navigate({ to: "/", replace: true });
+    else navigate({ to: "/app/ads", replace: true });
   }
 
   if (recovery) {

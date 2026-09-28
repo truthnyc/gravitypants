@@ -32,7 +32,7 @@ export function DropZone({ spacious = false }: { spacious?: boolean }) {
         ? await fromTemplate.mutateAsync({ template, files: images, onProgress: setUploads })
         : await createAd.mutateAsync({ files: images, onProgress: setUploads });
       setUploads([]);
-      navigate({ to: "/ad/$id/edit", params: { id } });
+      navigate({ to: "/app/ad/$id/edit", params: { id } });
     } catch {
       setUploads([]);
       toast.error("Those photos could not be uploaded. Please try again.");
