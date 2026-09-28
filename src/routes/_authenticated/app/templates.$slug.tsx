@@ -207,7 +207,7 @@ function CustomizeTemplate({ template: t, slug }: { template: Template; slug: st
 }
 
 function SlideRow({ index, slide, value, format, bg, active, busy, error, onFocus, onFile, onRemove, onChange }: {
-  index: number; slide: TemplateSlide; value: CustomSlide; format: Aspect; bg: string; active: boolean; busy: boolean; error?: string;
+  index: number; slide: TemplateSlide; value: CustomSlide; format: Aspect; bg: string; active: boolean; busy: boolean; error?: string | undefined;
   onFocus: () => void; onFile: (f: File) => void; onRemove: () => void; onChange: (p: Partial<CustomSlide>) => void;
 }) {
   const input = useRef<HTMLInputElement>(null);
