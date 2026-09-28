@@ -39,4 +39,4 @@
 - [x] Rebuild reference sections, mobile layouts, jump links, and animations; verify at phone and desktop widths
 
 ## Public examples page
-- [ ] Rebuild reference gallery, responsive reels, featured example, shareable filters and signup links
+- [x] Rebuild reference gallery, responsive reels, featured example, shareable filters and signup links
