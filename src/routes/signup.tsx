@@ -6,7 +6,12 @@ import { Button } from "@/components/ui/button";
 import { AuthShell, FieldGroup, GoogleButton, plainAuthError, safeRedirect } from "@/components/auth/AuthShell";
 
 export const Route = createFileRoute("/signup")({
-  validateSearch: z.object({ redirect: z.string().optional(), template: z.string().optional() }),
+  validateSearch: z.object({
+    redirect: z.string().optional(),
+    template: z.string().optional(),
+    plan: z.enum(["simple", "business", "team"]).optional(),
+    billing: z.enum(["monthly", "yearly"]).optional(),
+  }),
   head: () => ({
     meta: [
       { title: "Create your account — Gravity Pants" },

@@ -1,3 +1,5 @@
+import { PLANS } from "./plans-config";
+
 /** Single source for how payment prices map to app plans. Used by the webhook, the portal and the billing checks. */
 export const PLAN_BY_PRICE: Record<string, string> = {
   simple_monthly: "simple",
@@ -12,13 +14,9 @@ export const PLAN_PRICE_KEYS = Object.keys(PLAN_BY_PRICE);
 /** Every value workspace_billing.plan may hold (must match the database check). */
 export const BILLING_PLAN_VALUES = ["trial", "none", ...Object.values(PLAN_BY_PRICE)];
 
-export const PLAN_NAMES: Record<string, string> = {
-  simple: "Simple",
-  business: "Business",
-  business_yearly: "Business Yearly",
-  team: "Team",
-  team_yearly: "Team Yearly",
-};
+export const PLAN_NAMES: Record<string, string> = Object.fromEntries(
+  PLANS.flatMap((p) => [[p.id, p.name], ...(p.yearly != null ? [[`${p.id}_yearly`, `${p.name} Yearly`]] : [])]),
+);
 
 export function mapStatus(s: string): string {
   if (s === "active" || s === "trialing") return "active";

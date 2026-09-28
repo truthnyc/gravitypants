@@ -3,6 +3,7 @@ import { HelpMenu } from "@/components/stillframe/HelpMenu";
 import { openUpgrade, usePlanAccess } from "@/lib/stillframe/plan";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
+import { TRIAL } from "@/lib/stillframe/plans-config";
 import { AlertCircle, Check, ChevronDown, ChevronLeft, Download, Film, Image as ImageIcon, LayoutGrid, Plus } from "lucide-react";
 import { zipSync } from "fflate";
 import { toast } from "sonner";
@@ -342,7 +343,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
             </p>
             {exportStatus?.limit != null && (
               <p className="mt-2 text-[13px] font-medium nums">
-                {Math.max(0, exportStatus.limit - (exportStatus.used ?? 0))} of {exportStatus.limit} exports left{exportStatus.watermark ? " in your free trial" : " this month"}
+                {Math.max(0, exportStatus.limit - (exportStatus.used ?? 0))} of {exportStatus.limit} left{exportStatus.watermark ? " in your free trial" : " this month"}
               </p>
             )}
             {!!exportStatus?.extras && exportStatus.extras > 0 && (
@@ -416,16 +417,19 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
       <Dialog open={!!planSheet} onOpenChange={(o) => !o && setPlanSheet(null)}>
         <DialogContent className="max-w-[900px]">
           <DialogHeader>
-            <DialogTitle>{planSheet === "limit_reached" ? "You've used this month's exports" : planSheet === "payment_problem" ? "There's a problem with your payment" : "Pick a plan to export"}</DialogTitle>
+            <DialogTitle>{planSheet === "limit_reached" ? "You've used this month's exports" : planSheet === "payment_problem" ? "There's a problem with your payment" : "Choose a plan"}</DialogTitle>
             <DialogDescription>
               {planSheet === "limit_reached"
                 ? "Your monthly exports are used up. Buy a top-up of 5 extra exports for $12.50 on the Billing page — they never expire — or move up a plan."
                 : planSheet === "payment_problem"
                   ? "We couldn't take your last payment. Update your card in Manage Billing to keep exporting."
-                  : "Your free trial lets you build and preview. Pick a plan to export your videos and GIFs."}
+                  : `Your free trial has ended or its ${TRIAL.exports} exports are used. Your ads are safe — choose a plan to keep exporting without a watermark.`}
             </DialogDescription>
           </DialogHeader>
           <PlanCards compact />
+          <p className="text-center text-[14px] text-secondary-text">
+            <Link to="/pricing" className="text-primary">Compare all plans</Link>
+          </p>
         </DialogContent>
       </Dialog>
 
