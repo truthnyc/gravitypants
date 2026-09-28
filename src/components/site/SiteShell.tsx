@@ -52,9 +52,10 @@ function SiteHeader() {
 }
 
 const columns = [
-  { label: "Product", links: [["Features", "/features"], ["Examples", "/examples"], ["Pricing", "/pricing"], ["Templates", "/features"]] },
+  { label: "Product", links: [["Features", "/features"], ["Pricing", "/pricing"], ["Templates", "/features"]] },
+  { label: "Examples", links: [["Gallery", "/examples"], ["Submit your reel", "mailto:info@gravitypants.com?subject=Submit%20my%20reel"]] },
   { label: "Company", links: [["About", "/"], ["Blog", "/"], ["Contact", "mailto:info@gravitypants.com"]] },
-  { label: "Help", links: [["Help center", "/signin"], ["Privacy", "/"], ["Terms", "/"]] },
+  { label: "Help", links: [["Help center", "/help"], ["Privacy", "/privacy"], ["Terms", "/terms"]] },
 ] as const;
 
 function SiteFooter() {
