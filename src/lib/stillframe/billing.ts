@@ -17,7 +17,12 @@ export type Billing = {
   cancel_at_period_end: boolean;
   stripe_customer_id: string | null;
   extra_exports?: number;
+  /** Set when this workspace runs on a plan paid for by another workspace of the same owner. */
+  inherited?: boolean;
+  source_workspace_id?: string;
+  source_workspace_name?: string | null;
 };
+
 export type ExportStatus = { allowed: boolean; reason: "no_plan" | "limit_reached" | "payment_problem" | "no_access" | null; used?: number; limit?: number; resets_at?: string | null; watermark?: boolean; extras?: number };
 
 export const billingKey = ["billing"] as const;
