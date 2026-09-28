@@ -79,7 +79,7 @@ function TemplateDetail() {
 
   async function start(files: File[]) {
     const images = files.filter(isAcceptedImage);
-    if (!images.length) return toast.error("Please choose JPG, PNG, HEIC or WebP photos");
+    if (!images.length) { toast.error("Please choose JPG, PNG, HEIC or WebP photos"); return; }
     try {
       const id = await create.mutateAsync({ template: t!, files: images, onProgress: setUploads });
       navigate({ to: "/app/ad/$id/edit", params: { id } });
