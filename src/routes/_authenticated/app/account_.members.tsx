@@ -111,7 +111,7 @@ function MembersPage() {
 
   async function sendInvite() {
     setBusy(true);
-    const r = await invite({ data: { workspaceId: ws, email: email.trim(), role, origin: window.location.origin } });
+    const r = await invite({ data: { workspaceId: ws, email: email.trim(), role } });
     setBusy(false);
     if ("error" in r) toast.error(r.error);
     else {
@@ -284,7 +284,7 @@ function MembersPage() {
                   <div key={i.id} className="flex flex-wrap items-center gap-2 py-2.5">
                     <span className="min-w-0 flex-1 truncate text-[14px]">{i.email}</span>
                     <span className="text-[12px] capitalize text-secondary-text">{i.role}</span>
-                    <Button variant="plain" size="sm" onClick={() => void resend({ data: { inviteId: i.id, origin: window.location.origin } }).then((r) => ("error" in r ? toast.error(r.error) : toast.success("Invite resent")))}>
+                    <Button variant="plain" size="sm" onClick={() => void resend({ data: { inviteId: i.id } }).then((r) => ("error" in r ? toast.error(r.error) : toast.success("Invite resent")))}>
                       Resend
                     </Button>
                     <Button variant="plain" size="sm" onClick={() => void cancelInvite(i.id)}>Cancel</Button>
