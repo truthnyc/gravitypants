@@ -23,6 +23,7 @@ import { Route as SigninRouteImport } from './routes/signin'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AuthenticatedAppRouteRouteImport } from './routes/_authenticated/app/route'
+import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as InviteTokenRouteImport } from './routes/invite.$token'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app/index'
@@ -117,6 +118,11 @@ const AuthenticatedAppRouteRoute = AuthenticatedAppRouteRouteImport.update({
   id: '/app',
   path: '/app',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const BlogIndexRoute = BlogIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => BlogRoute,
 } as any)
 const BlogSlugRoute = BlogSlugRouteImport.update({
   id: '/$slug',
@@ -274,6 +280,7 @@ export interface FileRoutesByFullPath {
   '/app': typeof AuthenticatedAppRouteRouteWithChildren
   '/blog/$slug': typeof BlogSlugRoute
   '/invite/$token': typeof InviteTokenRoute
+  '/blog/': typeof BlogIndexRoute
   '/app/admin': typeof AuthenticatedAppAdminRouteRouteWithChildren
   '/app/account': typeof AuthenticatedAppAccountRoute
   '/app/ads': typeof AuthenticatedAppAdsRoute
@@ -301,7 +308,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/blog': typeof BlogRouteWithChildren
   '/examples': typeof ExamplesRoute
   '/features': typeof FeaturesRoute
   '/help': typeof HelpRoute
@@ -313,6 +319,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/invite/$token': typeof InviteTokenRoute
+  '/blog': typeof BlogIndexRoute
   '/app/account': typeof AuthenticatedAppAccountRoute
   '/app/ads': typeof AuthenticatedAppAdsRoute
   '/app/brand': typeof AuthenticatedAppBrandRoute
@@ -354,6 +361,7 @@ export interface FileRoutesById {
   '/_authenticated/app': typeof AuthenticatedAppRouteRouteWithChildren
   '/blog/$slug': typeof BlogSlugRoute
   '/invite/$token': typeof InviteTokenRoute
+  '/blog/': typeof BlogIndexRoute
   '/_authenticated/app/admin': typeof AuthenticatedAppAdminRouteRouteWithChildren
   '/_authenticated/app/account': typeof AuthenticatedAppAccountRoute
   '/_authenticated/app/ads': typeof AuthenticatedAppAdsRoute
@@ -396,6 +404,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/blog/$slug'
     | '/invite/$token'
+    | '/blog/'
     | '/app/admin'
     | '/app/account'
     | '/app/ads'
@@ -423,7 +432,6 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
-    | '/blog'
     | '/examples'
     | '/features'
     | '/help'
@@ -435,6 +443,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/blog/$slug'
     | '/invite/$token'
+    | '/blog'
     | '/app/account'
     | '/app/ads'
     | '/app/brand'
@@ -475,6 +484,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app'
     | '/blog/$slug'
     | '/invite/$token'
+    | '/blog/'
     | '/_authenticated/app/admin'
     | '/_authenticated/app/account'
     | '/_authenticated/app/ads'
@@ -622,6 +632,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/app'
       preLoaderRoute: typeof AuthenticatedAppRouteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/blog/': {
+      id: '/blog/'
+      path: '/'
+      fullPath: '/blog/'
+      preLoaderRoute: typeof BlogIndexRouteImport
+      parentRoute: typeof BlogRoute
     }
     '/blog/$slug': {
       id: '/blog/$slug'
@@ -871,10 +888,12 @@ const AuthenticatedRouteRouteWithChildren =
 
 interface BlogRouteChildren {
   BlogSlugRoute: typeof BlogSlugRoute
+  BlogIndexRoute: typeof BlogIndexRoute
 }
 
 const BlogRouteChildren: BlogRouteChildren = {
   BlogSlugRoute: BlogSlugRoute,
+  BlogIndexRoute: BlogIndexRoute,
 }
 
 const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
