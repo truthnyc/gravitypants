@@ -33,11 +33,19 @@ function AcceptInvitePage() {
       const { data, error: rpcError } = await supabase.rpc("accept_invite" as never, { _token: token } as never);
       if (cancelled) return;
       if (rpcError || !data) {
-        setError(
-          rpcError?.message?.includes("No seats left")
-            ? "This team is full — ask the owner to free up a seat."
-            : "This invite isn't valid for your account. It may have expired, been cancelled, or been sent to a different email address.",
-        );
+        const msg = rpcError?.message ?? "";
+        if (msg.includes("different email")) {
+          setError(
+            `This invite was sent to a different email address. You're signed in as ${session.session.user.email ?? "another account"} — sign out and open the link again with the invited email.`,
+          );
+          setShowSignOut(true);
+        } else if (msg.includes("full") || msg.includes("No seats")) {
+          setError("This team is full — ask the owner to free up a seat.");
+        } else if (msg.includes("expired")) {
+          setError("This invite has expired — ask the owner to resend it from the Team page.");
+        } else {
+          setError("This invite isn't valid. It may have been cancelled or already used.");
+        }
         return;
       }
       rememberWorkspaceId(session.session.user.id, data as unknown as string);
