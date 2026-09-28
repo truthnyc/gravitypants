@@ -336,8 +336,11 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
             </p>
             {exportStatus?.limit != null && (
               <p className="mt-2 text-[13px] font-medium nums">
-                {Math.max(0, exportStatus.limit - (exportStatus.used ?? 0))} of {exportStatus.limit} exports left this month
+                {Math.max(0, exportStatus.limit - (exportStatus.used ?? 0))} of {exportStatus.limit} exports left{exportStatus.watermark ? " in your free trial" : " this month"}
               </p>
+            )}
+            {exportStatus?.watermark && (
+              <p className="mt-1 text-[13px] text-secondary-text">Trial exports carry a small Gravity Pants mark. Pick a plan to remove it.</p>
             )}
           </div>
 
