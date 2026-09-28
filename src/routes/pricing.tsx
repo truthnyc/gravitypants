@@ -25,7 +25,7 @@ function Pricing() {
       <div className="mx-auto mt-10 max-w-[640px] text-center sm:mt-14">
         <h1 className="text-[40px] font-bold leading-[1.05] tracking-[-0.03em] sm:text-[56px]">Pick a plan.</h1>
         <p className="mt-4 text-[17px] text-secondary-text sm:text-[19px]">
-          Start free: 7 days and 3 exports with a small Gravity Pants mark. Pick a plan for clean, unlimited-looking exports.
+          Start free: 7 days and 3 exports with a small Gravity Pants mark. Pick a plan for clean exports without it.
         </p>
       </div>
       <div className="mt-12">
