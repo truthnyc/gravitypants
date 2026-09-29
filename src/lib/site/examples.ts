@@ -3,6 +3,9 @@ export type ExampleFormat = "916" | "11" | "169";
 export type GalleryExample = {
   id: string; name: string; category: ExampleCategory; format: ExampleFormat;
   photos: number; seconds: number; headline: string; sub: string; frames: string[];
+  // "top" matches the Purl Soho ad: light centered headline at the top, logo text near the bottom.
+  layout?: "top";
+  logo?: string;
 };
 
 // Drawn reference reels are local stand-ins for future exported videos.
@@ -11,7 +14,7 @@ import purlPhoto2 from "@/assets/site/purl-soho-photo-2.png.asset.json";
 import purlPhoto3 from "@/assets/site/purl-soho-photo-3.png.asset.json";
 
 export const galleryExamples: GalleryExample[] = [
-  { id: "purl-soho", name: "Japanese Denim Cotton", category: "fashion", format: "916", photos: 3, seconds: 7.8, headline: 'Japanese Denim\nCotton.', sub: 'Purl Soho', frames: [purlPhoto1.url, purlPhoto2.url, purlPhoto3.url] },
+  { id: "purl-soho", name: "Japanese Denim Cotton", category: "fashion", format: "916", photos: 3, seconds: 7.8, headline: 'Japanese Denim\nCotton', sub: 'A soft, springy cotton yarn', layout: "top", logo: "Purl Soho", frames: [purlPhoto1.url, purlPhoto2.url, purlPhoto3.url] },
   { id: "denim", name: "Denim restock", category: "fashion", format: "11", photos: 3, seconds: 6, headline: 'Your fit.\nBack in stock.', sub: 'All sizes', frames: ["/site-art/gallery-denim-1.svg", "/site-art/gallery-denim-2.svg", "/site-art/gallery-denim-3.svg"] },
   { id: "sneaker", name: "Sneaker restock", category: "fashion", format: "916", photos: 4, seconds: 8, headline: 'Back in\nevery size.', sub: 'Restock live now', frames: ["/site-art/gallery-sneaker-1.svg", "/site-art/gallery-sneaker-2.svg", "/site-art/gallery-sneaker-3.svg"] },
   { id: "jewel", name: "Jewelry gift guide", category: "fashion", format: "169", photos: 3, seconds: 7.5, headline: 'Give something that lasts.', sub: 'Gift guide', frames: ["/site-art/gallery-jewel-1.svg", "/site-art/gallery-jewel-2.svg", "/site-art/gallery-jewel-3.svg"] },
