@@ -235,7 +235,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
   const sizeOf = (el: "headline" | "subline" | "logo") =>
     el === "logo" ? (doc.project.logo.size_pct ?? 16) : (frame?.[el]?.size_px ?? (el === "headline" ? 108 : 48));
   const resizeEl = (el: "headline" | "subline" | "logo", v: number, key?: string) => {
-    if (el === "logo") return updateLogo({ size_pct: Math.round(Math.min(40, Math.max(5, v))) }, key);
+    if (el === "logo") return updateLogo({ size_pct: Math.round(Math.min(100, Math.max(5, v))) }, key);
     updateText(el, { size_px: Math.round(Math.min(240, Math.max(24, v))) }, key);
   };
 
