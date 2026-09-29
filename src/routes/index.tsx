@@ -1,6 +1,6 @@
 // TODO before launch: replace the reference placeholders [LOGO], [Your product line], [Customer logo], [Roaster name], [A customer quote about how fast they made their first reel, and what it did for their sales.], [Photo], [Customer name], [Role, Company], [X], [X] min, [X]%, [Result metric], [One-line result, e.g. how many ads they shipped for a launch], [One-line result, e.g. time saved each week], and [One-line result, e.g. lift in click-through].
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowRight, Check, Play } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { ReelPhone, type ReelFrame } from "@/components/site/ReelPhone";
@@ -49,6 +49,27 @@ const examples: HomeExample[] = [
   { name: "Sneaker restock", headline: "Back in\nevery size.", subline: "Restock live now", detail: "4 photos · 8 sec · 9:16" },
   { name: "Jewelry gift guide", headline: "Give something\nthat lasts.", subline: "Gift guide", detail: "3 photos · 7.5 sec · 9:16 + 16:9" },
 ];
+function HomeReelVideo({ example }: { example: HomeExample }) {
+  const ref = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    const video = ref.current;
+    if (!video) return;
+    const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const sync = () => {
+      if (preference.matches) { video.pause(); video.currentTime = 0; }
+      else void video.play().catch(() => {});
+    };
+    sync();
+    preference.addEventListener("change", sync);
+    return () => preference.removeEventListener("change", sync);
+  }, []);
+  return <div className="home-example-video" aria-label={`${example.name} video ad`}>
+    <video ref={ref} poster={example.poster} loop muted playsInline preload="metadata">
+      {example.videoWebm && <source src={example.videoWebm} type="video/webm" />}
+      <source src={example.video} type="video/mp4" />
+    </video>
+  </div>;
+}
 const tabs = ["Edit in a tap", "Brand kit", "Motion", "Timing", "Export"] as const;
 type Tab = typeof tabs[number];
 const tabCopy: Record<Tab, { title: string; body: string }> = {
