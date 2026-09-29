@@ -68,12 +68,14 @@ function Pricing() {
         </section>
 
         <section className="pr-tiers">
-          <div className="pr-trial">
-            <span className="pr-trial-ic"><Clock strokeWidth={1.8} /></span>
-            <div><b>Start with a {TRIAL.days}-day free trial</b><span>{TRIAL.blurb}</span></div>
-            <Link to="/signup" className="pr-btn pri">Start free trial</Link>
-          </div>
-          <div className="pr-grid">
+          <div className="pr-grid pr-grid-4">
+            <article className="pr-tier">
+              <div className="pr-tier-top"><h3>{TRIAL.name}</h3><p>Try every feature and make {TRIAL.exports} watermarked exports.</p></div>
+              <div className="pr-price"><b>$0</b><span>for {TRIAL.days} days</span></div>
+              <span className="pr-note">No card needed</span>
+              <Link to="/signup" className="pr-btn sec full">Start free trial</Link>
+              <ul>{[`${TRIAL.exports} exports in total`, "Watermark on every export", "9:16, 1:1 and 16:9", "MP4 and GIF", "Brand kits", "Templates"].map((f) => <li key={f}><Tick /><span>{f}</span></li>)}</ul>
+            </article>
             {PLANS.map((p) => {
               const pr = priceFor(p, billing);
               const pop = p.id === "simple";
