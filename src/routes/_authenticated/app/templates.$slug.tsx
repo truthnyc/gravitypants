@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { MediaImage } from "@/components/stillframe/MediaImage";
 import { StepBar, templateBackground, templateFormat, templateSlides, type Aspect } from "@/components/templates/TemplatePreview";
-import { useCreateAdFromCustomization, useMyUserId, useProject, useTemplates, type CustomSlide, type Template, type TemplateSlide } from "@/lib/stillframe/data";
+import { useCreateAdFromCustomization, useDeleteTemplate, useMyUserId, useProject, useTemplateAccess, useTemplates, useUpdateTemplate, type CustomSlide, type Template, type TemplateSlide } from "@/lib/stillframe/data";
 import type { ProjectWithFrames } from "@/lib/stillframe/types";
 import { templateForExample } from "@/lib/site/example-template";
 import { isAcceptedImage, uploadMedia } from "@/lib/stillframe/media";
@@ -215,6 +215,8 @@ function CustomizeTemplate({ template: t, slug, fromAd }: { template: Template; 
               />
             ))}
           </ol>
+
+          {t.source !== "system" && <ManageTemplate template={t} />}
         </section>
 
         <aside className="hidden md:block lg:sticky lg:top-20 lg:self-start">
