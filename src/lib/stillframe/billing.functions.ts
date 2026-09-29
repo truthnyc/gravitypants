@@ -60,11 +60,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
       const price = prices.data[0];
       if (!price) return { error: "That plan isn't available." };
 
-      let customerId = billing?.stripe_customer_id ?? null;
-      if (!customerId) {
-        const found = await stripe.customers.search({ query: `metadata['workspaceId']:'${data.workspaceId}'`, limit: 1 });
-        customerId = found.data[0]?.id ?? null;
-      }
+      let customerId = await resolveCustomer(stripe, billing?.stripe_customer_id ?? null, data.workspaceId);
       // Never start a second subscription: plan changes go through Manage Billing.
       if (customerId) {
         const live = await stripe.subscriptions.list({ customer: customerId, status: "all", limit: 20 });
@@ -122,11 +118,7 @@ export const createTopUpSession = createServerFn({ method: "POST" })
       const prices = await stripe.prices.list({ lookup_keys: ["extra_exports_5"] });
       const price = prices.data[0];
       if (!price) return { error: "That pack isn't available." };
-      let customerId = billing?.stripe_customer_id ?? null;
-      if (!customerId) {
-        const found = await stripe.customers.search({ query: `metadata['workspaceId']:'${payer}'`, limit: 1 });
-        customerId = found.data[0]?.id ?? null;
-      }
+      let customerId = await resolveCustomer(stripe, billing?.stripe_customer_id ?? null, payer);
       if (!customerId) {
         const c = await stripe.customers.create({
           ...(u.user?.email ? { email: u.user.email } : {}),
@@ -167,11 +159,12 @@ export const createPortalSession = createServerFn({ method: "POST" })
       .eq("workspace_id", payer)
       .maybeSingle();
 
-    if (!billing?.stripe_customer_id) return { error: "There's no billing to manage yet. Pick a plan first." };
     try {
       const stripe = createStripeClient(data.environment);
+      const customer = await resolveCustomer(stripe, billing?.stripe_customer_id ?? null, payer);
+      if (!customer) return { error: "There's no billing to manage yet. Pick a plan first." };
       const configuration = await ensurePortalConfig(stripe);
-      const portal = await stripe.billingPortal.sessions.create({ customer: billing.stripe_customer_id, return_url: data.returnUrl, configuration });
+      const portal = await stripe.billingPortal.sessions.create({ customer, return_url: data.returnUrl, configuration });
       return { url: portal.url };
     } catch (e) {
       return { error: getStripeErrorMessage(e) };
