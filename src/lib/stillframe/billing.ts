@@ -68,7 +68,7 @@ export function useBilling() {
 
 export function useExportStatus() {
   return useQuery({
-    queryKey: [...billingKey, "export"],
+    queryKey: [...billingKey, "export", peekWorkspaceId()],
     queryFn: fetchExportStatus,
     refetchOnWindowFocus: "always",
   });
