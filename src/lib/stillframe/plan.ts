@@ -42,7 +42,7 @@ export function canUseWith(e: Entitlements | undefined, f: Feature): boolean {
     case "gif":
     case "brand_kits":
     case "templates":
-      return e.paid;
+      return e.paid || Boolean(e.trial);
     case "team_sharing":
     case "priority_support":
       return e.team;

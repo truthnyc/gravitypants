@@ -592,6 +592,9 @@ html:has(.features-page) { scroll-behavior: smooth; }
 .pr-trial-ic { width:44px; height:44px; border-radius:22px; background:var(--site-page); display:flex; align-items:center; justify-content:center; flex-shrink:0; color:var(--site-primary); }
 .pr-trial-ic svg { width:20px; height:20px; }
 .pr-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:24px; }
+.pr-grid.pr-grid-4 { grid-template-columns:repeat(4,minmax(0,1fr)); gap:18px; }
+@media (max-width:1180px) { .pr-grid.pr-grid-4 { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+.pr-grid.pr-grid-4 .pr-tier.pop { grid-column:auto; }
 .pr-tier { position:relative; border-radius:24px; background:var(--site-panel); padding:36px; display:flex; flex-direction:column; gap:22px; }
 .pr-tier.pop { background:var(--site-page); box-shadow:0 0 0 2px var(--site-primary), 0 30px 60px -30px rgb(0 113 227 / .35); }
 .pr-tier-top h3 { font-size:26px; font-weight:600; letter-spacing:-.02em; }
