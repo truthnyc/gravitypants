@@ -47,7 +47,7 @@ const groups = [
     points: [
       "Search and preview the whole Google Fonts library",
       "Upload your own font file",
-      "Size, weight and colour for headline and subline",
+      "Size, weight and color for headline and subline",
       "Nine fixed positions, no nudging",
       "Apply one text style to every frame at once",
       "Optional darkening behind text for readability",
@@ -58,9 +58,9 @@ const groups = [
     eyebrow: "Brand kits",
     title: "Save your brand once.",
     points: [
-      "Named brand kits with logo, colours and fonts",
+      "Named brand kits with logo, colors and fonts",
       "Logo placement, size and opacity",
-      "Brand colours in every colour picker",
+      "Brand colors in every color picker",
       "Optional end card on every ad",
       "Shared brand kits on the Team plan",
     ],
@@ -129,14 +129,14 @@ const groups = [
 const allFeatures = [
   ["Photos", "Drag-and-drop photos", "Automatic frames and timing", "Move and zoom inside a frame", "Add, duplicate, delete frames"],
   ["Editing", "Photo, headline, subline, logo", "Tap to select", "Undo and redo", "Saves as you work"],
-  ["Text", "Google Fonts picker", "Upload your own font", "Size, weight, colour", "Nine-point position", "Same on all frames"],
-  ["Brand", "Named brand kits", "Logo, colours, fonts", "Logo placement and size", "End card", "Shared kits on Team"],
+  ["Text", "Google Fonts picker", "Upload your own font", "Size, weight, color", "Nine-point position", "Same on all frames"],
+  ["Brand", "Named brand kits", "Logo, colors, fonts", "Logo placement and size", "End card", "Shared kits on Team"],
   ["Motion", "Fade, slide, swipe, zoom, cut", "Rise up, fade in, typewriter", "Slow zoom and pan", "Per-frame timing"],
   ["Formats", "9:16, 1:1, 16:9", "Switch while editing", "Layout adapts to the shape"],
   ["Export", "MP4 and GIF", "All sizes at once", "Made in your browser", "Kept for 30 days"],
   ["Templates", "Ready-made templates", "Save your own", "Make another from a kit", "Duplicate and rename"],
   ["Account", "Private workspace", "Team seats and roles", "Email invites", "Billing and invoices"],
-  ["Support", "Help centre", "Email support", "Priority on paid plans"],
+  ["Support", "Help center", "Email support", "Priority on paid plans"],
 ];
 
 function FeaturesPage() {
