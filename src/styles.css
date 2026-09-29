@@ -393,6 +393,8 @@
 @keyframes home-scroll { to { transform:translateX(-50%); } }
 .home-example-figure { width:250px; flex:0 0 250px; margin-right:28px !important; display:flex; flex-direction:column; gap:16px; }
 .home-example-figure:nth-child(even) { padding-top:56px; }
+.home-example-video { display:flex; align-items:center; justify-content:center; width:250px; height:450px; }
+.home-example-video video { display:block; width:250px; height:250px; object-fit:cover; border-radius:8px; background:var(--site-panel); box-shadow:0 0 0 1px var(--site-inner), 0 40px 80px -30px color-mix(in oklab, var(--site-ink) 20%, transparent); }
 .home-example-figure figcaption { display:flex; flex-direction:column; gap:2px; }
 .home-example-figure figcaption b { font-size:15px; }.home-example-figure figcaption span { color:var(--site-secondary); font-size:13px; }
 .home-before { min-height:880px; padding-top:120px; display:flex; flex-direction:column; gap:56px; }
