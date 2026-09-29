@@ -773,6 +773,19 @@ function LogoPanel({
           <ToggleRow label="Show on this frame" checked={frame.logo_visible} onChange={actions.onLogoVisible} />
         )}
       </Field>
+      <div className="flex gap-2">
+        <Button variant="plain" size="sm" className="flex-1" onClick={() => fileRef.current?.click()}>
+          Replace logo
+        </Button>
+        <Button
+          variant="plain"
+          size="sm"
+          className="flex-1 text-destructive"
+          onClick={() => actions.onLogo({ path: null, light_path: null, dark_path: null, asset_id: null })}
+        >
+          Remove logo
+        </Button>
+      </div>
       {input}
     </>
   );
