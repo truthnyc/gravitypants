@@ -16,6 +16,11 @@ const formatLabel = { "916": "9:16", "11": "1:1", "169": "16:9" } as const;
 const categoryLabel = { fashion: "Fashion", food: "Food & drink", beauty: "Beauty", home: "Home" } as const;
 
 function GalleryReel({ example }: { example: GalleryExample }) {
+  if (example.video) {
+    return <div className={`examples-reel examples-reel-${example.format}`} aria-label={`${example.name} video ad`}>
+      <video className="examples-reel-video" src={example.video} poster={example.poster} autoPlay loop muted playsInline preload="metadata" aria-label={`${example.name} video ad`} />
+    </div>;
+  }
   return <div className={`examples-reel examples-reel-${example.format}${example.layout === "top" ? " examples-reel-top" : ""}`} aria-label={`${example.name} animated reel`}>
     <div className="examples-reel-bars" aria-hidden="true">{example.frames.map((_, i) => <span key={i}><i className={`site-fill-${i + 1}`} /></span>)}</div>
     {example.frames.map((src, i) => <div className={`examples-reel-frame site-frame-${i + 1}`} key={src} aria-hidden="true"><img src={src} alt="" loading="lazy" /></div>)}
