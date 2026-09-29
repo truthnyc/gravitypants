@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
 import { ArrowRight } from "lucide-react";
@@ -15,10 +16,27 @@ const formats = [{ id: "all", label: "All formats", short: "All" }, { id: "916",
 const formatLabel = { "916": "9:16", "11": "1:1", "169": "16:9" } as const;
 const categoryLabel = { fashion: "Fashion", food: "Food & drink", beauty: "Beauty", home: "Home" } as const;
 
+function ReelVideo({ example }: { example: GalleryExample }) {
+  const ref = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    const video = ref.current;
+    if (!video) return;
+    const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const sync = () => {
+      if (preference.matches) { video.pause(); video.currentTime = 0; }
+      else void video.play().catch(() => {});
+    };
+    sync();
+    preference.addEventListener("change", sync);
+    return () => preference.removeEventListener("change", sync);
+  }, []);
+  return <video ref={ref} className="examples-reel-video" src={example.video} poster={example.poster} loop muted playsInline preload="metadata" aria-label={`${example.name} video ad`} />;
+}
+
 function GalleryReel({ example }: { example: GalleryExample }) {
   if (example.video) {
     return <div className={`examples-reel examples-reel-${example.format}`} aria-label={`${example.name} video ad`}>
-      <video className="examples-reel-video" src={example.video} poster={example.poster} autoPlay loop muted playsInline preload="metadata" aria-label={`${example.name} video ad`} />
+      <ReelVideo example={example} />
     </div>;
   }
   return <div className={`examples-reel examples-reel-${example.format}${example.layout === "top" ? " examples-reel-top" : ""}`} aria-label={`${example.name} animated reel`}>
