@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { MediaImage } from "@/components/stillframe/MediaImage";
 import { StepBar, templateBackground, templateFormat, templateSlides, type Aspect } from "@/components/templates/TemplatePreview";
-import { useCreateAdFromCustomization, useMyUserId, useProject, useTemplates, type CustomSlide, type Template, type TemplateSlide } from "@/lib/stillframe/data";
+import { useCreateAdFromCustomization, useDeleteTemplate, useMyUserId, useProject, useTemplateAccess, useTemplates, useUpdateTemplate, type CustomSlide, type Template, type TemplateSlide } from "@/lib/stillframe/data";
 import type { ProjectWithFrames } from "@/lib/stillframe/types";
 import { templateForExample } from "@/lib/site/example-template";
 import { isAcceptedImage, uploadMedia } from "@/lib/stillframe/media";
@@ -215,6 +215,8 @@ function CustomizeTemplate({ template: t, slug, fromAd }: { template: Template; 
               />
             ))}
           </ol>
+
+          {t.source !== "system" && <ManageTemplate template={t} />}
         </section>
 
         <aside className="hidden md:block lg:sticky lg:top-20 lg:self-start">
@@ -420,6 +422,98 @@ function PlayControls({ pb }: { pb: Playback }) {
       </Button>
       <span className="nums text-[13px] text-secondary-text">{clock(pb.time)} / {clock(pb.total)}</span>
     </div>
+  );
+}
+
+/** Rename, re-share or delete a template you saved. Ready-made (system) templates are managed by staff. */
+function ManageTemplate({ template: t }: { template: Template }) {
+  const navigate = useNavigate();
+  const { data: userId } = useMyUserId();
+  const { data: access } = useTemplateAccess();
+  const update = useUpdateTemplate();
+  const del = useDeleteTemplate();
+  const [name, setName] = useState(t.name);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+
+  const mine = t.created_by === userId;
+  const canManageTeam = t.visibility === "team" && Boolean(access?.team);
+  if (!mine && !canManageTeam) return null;
+
+  const fail = (e: unknown) => toast.error(e instanceof Error && e.message ? e.message : "That didn't work. Try again.");
+  const renamed = name.trim() && name.trim() !== t.name;
+
+  return (
+    <section className="mt-8 rounded-sm bg-card p-4 shadow-card sm:p-5">
+      <h2 className="text-[15px] font-semibold">Manage template</h2>
+      <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-end">
+        <label className="block flex-1 space-y-1.5">
+          <span className="text-[12px] text-secondary-text">Template name</span>
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="h-11 w-full rounded-sm bg-control-fill px-3 text-[16px] lg:h-10 lg:text-[14px]"
+          />
+        </label>
+        <Button
+          variant="secondary"
+          className="h-11 lg:h-10"
+          disabled={!renamed || update.isPending}
+          onClick={() => update.mutate({ id: t.id, patch: { name: name.trim() } }, { onSuccess: () => toast.success("Template renamed"), onError: fail })}
+        >
+          {update.isPending ? "Saving…" : "Save name"}
+        </Button>
+      </div>
+
+      {access?.team && (
+        <div className="mt-4 space-y-1.5">
+          <span className="text-[12px] text-secondary-text">Who can use it?</span>
+          <div className="flex rounded-lg bg-control-fill p-0.5">
+            {([["private", "Only me"], ["team", `Everyone in ${access.name}`]] as const).map(([v, label]) => (
+              <button
+                key={v}
+                type="button"
+                aria-pressed={t.visibility === v}
+                disabled={update.isPending}
+                onClick={() => update.mutate({ id: t.id, patch: { visibility: v } }, { onError: fail })}
+                className={cn("h-11 min-w-0 flex-1 truncate rounded-lg px-2 text-[13px] font-medium lg:h-8", t.visibility === v && "bg-card shadow-segment")}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="mt-4 border-t border-border pt-4">
+        <Button variant="destructive-plain" className="h-11 lg:h-9" onClick={() => setConfirmDelete(true)}>
+          Delete template
+        </Button>
+        <p className="mt-1 text-[12px] text-secondary-text">Ads already made from this template keep working.</p>
+      </div>
+
+      <AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>
+        <AlertDialogContent>
+          <AlertDialogTitle>Delete “{t.name}”?</AlertDialogTitle>
+          <AlertDialogDescription>This can't be undone. Ads already made from it are not affected.</AlertDialogDescription>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Keep</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() =>
+                del.mutate(t.id, {
+                  onSuccess: () => {
+                    toast.success("Template deleted");
+                    void navigate({ to: "/app/templates" });
+                  },
+                  onError: fail,
+                })
+              }
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </section>
   );
 }
 
