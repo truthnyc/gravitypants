@@ -108,7 +108,7 @@ function BillingPage() {
         {status?.limit != null && (
           <div className="mt-5">
             <p className="text-[14px] nums">
-              {status.used ?? 0} of {status.limit} exports used {limited ? "this month" : "in your trial"}
+              {status.used ?? 0} of {status.limit} exports used {limited ? "this month" : "in your trial"}{status.watermark ? " · watermarked" : ""}
             </p>
             <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-control-fill">
               <div className="h-full rounded-full bg-primary" style={{ width: `${Math.min(100, ((status.used ?? 0) / (status.limit || 1)) * 100)}%` }} />
@@ -149,6 +149,10 @@ function exportsLeft(st: ExportStatus | null | undefined): string {
   if (!st) return "—";
   const extras = st.extras ?? 0;
   const extra = extras > 0 ? ` + ${extras} extra` : "";
-  if (st.limit == null) return st.allowed ? `Unlimited${extra}` : extras > 0 ? `${extras} extra` : "None — pick a plan";
-  return `${Math.max(0, st.limit - (st.used ?? 0))} of ${st.limit}${extra}`;
+  if (st.limit == null) {
+    if (st.allowed) return `Unlimited${extra}`;
+    if (extras > 0) return `${extras} extra`;
+    return st.reason === "no_plan" || st.reason === "limit_reached" ? "None — pick a plan" : "—";
+  }
+  return `${Math.max(0, st.limit - (st.used ?? 0))} of ${st.limit}${extra}${st.watermark ? " · watermarked" : ""}`;
 }
