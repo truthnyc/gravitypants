@@ -16,6 +16,7 @@ import { Route as BlogRouteImport } from './routes/blog'
 import { Route as ExamplesRouteImport } from './routes/examples'
 import { Route as FeaturesRouteImport } from './routes/features'
 import { Route as HelpRouteImport } from './routes/help'
+import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ResetRouteImport } from './routes/reset'
@@ -88,6 +89,11 @@ const FeaturesRoute = FeaturesRouteImport.update({
 const HelpRoute = HelpRouteImport.update({
   id: '/help',
   path: '/help',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HowItWorksRoute = HowItWorksRouteImport.update({
+  id: '/how-it-works',
+  path: '/how-it-works',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PricingRoute = PricingRouteImport.update({
@@ -310,6 +316,7 @@ export interface FileRoutesByFullPath {
   '/examples': typeof ExamplesRoute
   '/features': typeof FeaturesRoute
   '/help': typeof HelpRoute
+  '/how-it-works': typeof HowItWorksRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/reset': typeof ResetRoute
@@ -356,6 +363,7 @@ export interface FileRoutesByTo {
   '/examples': typeof ExamplesRoute
   '/features': typeof FeaturesRoute
   '/help': typeof HelpRoute
+  '/how-it-works': typeof HowItWorksRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/reset': typeof ResetRoute
@@ -403,6 +411,7 @@ export interface FileRoutesById {
   '/examples': typeof ExamplesRoute
   '/features': typeof FeaturesRoute
   '/help': typeof HelpRoute
+  '/how-it-works': typeof HowItWorksRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/reset': typeof ResetRoute
@@ -452,6 +461,7 @@ export interface FileRouteTypes {
     | '/examples'
     | '/features'
     | '/help'
+    | '/how-it-works'
     | '/pricing'
     | '/privacy'
     | '/reset'
@@ -498,6 +508,7 @@ export interface FileRouteTypes {
     | '/examples'
     | '/features'
     | '/help'
+    | '/how-it-works'
     | '/pricing'
     | '/privacy'
     | '/reset'
@@ -544,6 +555,7 @@ export interface FileRouteTypes {
     | '/examples'
     | '/features'
     | '/help'
+    | '/how-it-works'
     | '/pricing'
     | '/privacy'
     | '/reset'
@@ -593,6 +605,7 @@ export interface RootRouteChildren {
   ExamplesRoute: typeof ExamplesRoute
   FeaturesRoute: typeof FeaturesRoute
   HelpRoute: typeof HelpRoute
+  HowItWorksRoute: typeof HowItWorksRoute
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
   ResetRoute: typeof ResetRoute
@@ -657,6 +670,13 @@ declare module '@tanstack/react-router' {
       path: '/help'
       fullPath: '/help'
       preLoaderRoute: typeof HelpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/how-it-works': {
+      id: '/how-it-works'
+      path: '/how-it-works'
+      fullPath: '/how-it-works'
+      preLoaderRoute: typeof HowItWorksRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pricing': {
@@ -1050,6 +1070,7 @@ const rootRouteChildren: RootRouteChildren = {
   ExamplesRoute: ExamplesRoute,
   FeaturesRoute: FeaturesRoute,
   HelpRoute: HelpRoute,
+  HowItWorksRoute: HowItWorksRoute,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
   ResetRoute: ResetRoute,
