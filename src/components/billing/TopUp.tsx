@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { EmbeddedCheckout, EmbeddedCheckoutProvider } from "@stripe/react-stripe-js";
 import { Button } from "@/components/ui/button";
@@ -9,15 +9,32 @@ import { currentWorkspaceId } from "@/lib/stillframe/billing";
 
 function TopUpCheckout({ workspaceId }: { workspaceId: string }) {
   const create = useServerFn(createTopUpSession);
-  const fetchClientSecret = async () => {
-    const r = await create({
-       data: { workspaceId, returnUrl: `${window.location.origin}/app/account/billing?checkout=success`, environment: getStripeEnvironment() },
-    });
-    if ("error" in r) throw new Error(r.error);
-    return r.clientSecret;
-  };
+  const [state, setState] = useState<{ secret?: string; error?: string; loading: boolean }>({ loading: true });
+  const load = useCallback(async () => {
+    setState({ loading: true });
+    try {
+      const r = await create({
+        data: { workspaceId, returnUrl: `${window.location.origin}/app/account/billing?checkout=success`, environment: getStripeEnvironment() },
+      });
+      if ("error" in r) setState({ loading: false, error: r.error });
+      else setState({ loading: false, secret: r.clientSecret });
+    } catch (e) {
+      setState({ loading: false, error: e instanceof Error ? e.message : "Checkout couldn't load." });
+    }
+  }, [create, workspaceId]);
+  useEffect(() => { void load(); }, [load]);
+  if (state.loading) return <p className="py-10 text-center text-[14px] text-secondary-text">Loading checkout…</p>;
+  if (state.error || !state.secret) {
+    return (
+      <div className="py-8 text-center">
+        <p className="text-[14px] text-destructive">{state.error ?? "Checkout couldn't load."}</p>
+        <Button className="mt-4" variant="plain" onClick={() => void load()}>Try again</Button>
+      </div>
+    );
+  }
+  const secret = state.secret;
   return (
-    <EmbeddedCheckoutProvider stripe={getStripe()} options={{ fetchClientSecret }}>
+    <EmbeddedCheckoutProvider stripe={getStripe()} options={{ fetchClientSecret: async () => secret }}>
       <EmbeddedCheckout />
     </EmbeddedCheckoutProvider>
   );
@@ -48,7 +65,7 @@ export function TopUpCard({ extras }: { extras?: number | undefined }) {
       </div>
       <Dialog open={!!open} onOpenChange={(o) => !o && setOpen(null)}>
         <DialogContent className="max-h-[90vh] max-w-[560px] overflow-y-auto">
-          <DialogTitle className="sr-only">Buy extra exports</DialogTitle>
+          <DialogTitle className="text-[17px] font-semibold">Buy 5 extra exports · <span className="nums">$12.50</span></DialogTitle>
           {open && <TopUpCheckout workspaceId={open} />}
         </DialogContent>
       </Dialog>
