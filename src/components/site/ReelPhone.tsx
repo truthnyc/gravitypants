@@ -9,8 +9,8 @@ export function ReelPhone({ frames, headline, subline, logoBadge, size = "medium
   logoBadge?: ReactNode;
   size?: "small" | "medium" | "large";
   // "top" matches the Purl Soho ad: light centered headline at the top, logo line near the bottom.
-  layout?: "top";
-  logo?: ReactNode;
+  layout?: "top" | undefined;
+  logo?: ReactNode | undefined;
 }) {
   const shown = frames.slice(0, 3);
   return <div className={`site-phone site-phone-${size}${layout === "top" ? " site-phone-top" : ""}`} aria-label={`${headline}. ${subline}`}>
