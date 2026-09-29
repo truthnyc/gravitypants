@@ -1,7 +1,7 @@
 // TODO placeholders to confirm before launch: "[USD]", "[Taxes may apply.]", and the FAQ answers written in [brackets].
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Check, Clock } from "lucide-react";
+import { Check } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { CheckoutDialog, type CheckoutTarget } from "@/components/billing/CheckoutDialog";
 import { currentWorkspaceId, isPaid, useBilling, useManageBilling } from "@/lib/stillframe/billing";
@@ -72,7 +72,7 @@ function Pricing() {
             <article className="pr-tier">
               <div className="pr-tier-top"><h3>{TRIAL.name}</h3><p>Try every feature and make {TRIAL.exports} watermarked exports.</p></div>
               <div className="pr-price"><b>$0</b><span>for {TRIAL.days} days</span></div>
-              <span className="pr-note">No card needed</span>
+              <span className="pr-note">Then choose a plan if you want to continue</span>
               <Link to="/signup" className="pr-btn sec full">Start free trial</Link>
               <ul>{[`${TRIAL.exports} exports in total`, "Watermark on every export", "9:16, 1:1 and 16:9", "MP4 and GIF", "Brand kits", "Templates"].map((f) => <li key={f}><Tick /><span>{f}</span></li>)}</ul>
             </article>
