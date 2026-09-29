@@ -547,7 +547,7 @@ function LogoEditor({ style, onChange, upload }: { style: TemplateDoc["style"]; 
           </div>
           <div className="flex items-center gap-3">
             <span className="w-10 text-[12px] text-secondary-text">Size</span>
-            <input type="range" min={5} max={40} value={size} aria-label="Template logo size" className="min-w-0 flex-1 accent-[var(--primary)]" onChange={(e) => onChange({ logo_size_pct: Number(e.target.value) })} />
+            <input type="range" min={5} max={100} value={size} aria-label="Template logo size" className="min-w-0 flex-1 accent-[var(--primary)]" onChange={(e) => onChange({ logo_size_pct: Number(e.target.value) })} />
             <span className="nums w-9 text-right text-[12px]">{size}%</span>
           </div>
           <Seg value={style.logo_opacity ?? "solid"} options={["solid", "soft"]} onChange={(v) => onChange({ logo_opacity: v })} small />
