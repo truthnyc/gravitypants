@@ -360,23 +360,21 @@ function PhotoPanel({ photo, adjusting, actions }: { photo: PhotoSettings; adjus
           onChange={(v) => actions.onPhoto({ fit: v })}
         />
       </Field>
-      {fit === "fit" && (
-        <Field label="Background color">
-          <div className="flex items-center gap-2">
-            {BG_COLORS.map((c) => (
-              <button
-                key={c}
-                type="button"
-                aria-label={`Background ${c}`}
-                onClick={() => actions.onPhoto({ background_color: c })}
-                className={cn("size-8 rounded-full border border-border lg:size-7", (photo.background_color ?? "").toUpperCase() === c && "ring-2 ring-primary ring-offset-2")}
-                style={{ background: c }}
-              />
-            ))}
-            <CustomColor onPick={(c) => actions.onPhoto({ background_color: c }, "drag:photo-bg")} />
-          </div>
-        </Field>
-      )}
+      <Field label="Background color">
+        <div className="flex items-center gap-2">
+          {BG_COLORS.map((c) => (
+            <button
+              key={c}
+              type="button"
+              aria-label={`Background ${c}`}
+              onClick={() => actions.onPhoto({ background_color: c })}
+              className={cn("size-8 rounded-full border border-border lg:size-7", (photo.background_color ?? "").toUpperCase() === c && "ring-2 ring-primary ring-offset-2")}
+              style={{ background: c }}
+            />
+          ))}
+          <CustomColor onPick={(c) => actions.onPhoto({ background_color: c }, "drag:photo-bg")} />
+        </div>
+      </Field>
       {fit === "fill" && (
         <Field label="Crop & focus">
           <Button variant={adjusting ? "primary" : "default"} size="sm" onClick={actions.onAdjust}>
