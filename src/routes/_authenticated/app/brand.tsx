@@ -130,7 +130,7 @@ function PlacementCard({ kit, save }: SaveProps) {
             name="Default logo size"
             color="var(--el-logo)"
             min={5}
-            max={40}
+            max={100}
             value={size}
             onChange={(v) => setSize(v)}
             left={<span className="size-2.5 rounded-[2px] bg-secondary-text/50" />}
