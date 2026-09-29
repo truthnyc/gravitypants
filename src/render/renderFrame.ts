@@ -518,6 +518,31 @@ export function renderAt(
   }
 
   if (watermark) {
+    // Centered Gravity Pants mark (same shapes as public/favicon.svg, 24-unit grid), drawn as paths so export never waits on an image.
+    const size = Math.min(W, H) * 0.22;
+    ctx.save();
+    ctx.globalAlpha = 0.4;
+    ctx.translate((W - size) / 2, (H - size) / 2);
+    ctx.scale(size / 24, size / 24);
+    ctx.fillStyle = "#0071E3";
+    ctx.beginPath();
+    ctx.roundRect(0, 0, 24, 24, 5.4);
+    ctx.fill();
+    ctx.translate(0.75, 1.65);
+    ctx.scale(0.9, 0.9);
+    ctx.fillStyle = "#FFFFFF";
+    const mark = new Path2D();
+    mark.arc(11, 13, 7, 0, Math.PI * 2);
+    mark.moveTo(9.7, 9.85);
+    mark.lineTo(14.7, 13);
+    mark.lineTo(9.7, 16.15);
+    mark.closePath();
+    ctx.fill(mark, "evenodd");
+    ctx.beginPath();
+    ctx.arc(19, 5, 2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
     const label = "Made with Gravity Pants";
     const fs = Math.max(12, Math.round(W * 0.032));
     ctx.save();
