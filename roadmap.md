@@ -57,3 +57,4 @@
 ## Public examples page
 - [x] Rebuild reference gallery, responsive reels, featured example, shareable filters and signup links
 - [x] Show the supplied Purl Soho ad in the featured example and home-page phone, with poster frames and playback controls
+- [x] Replace decorative source tiles and extracted video stills with the three original Purl Soho photos
