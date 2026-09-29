@@ -10,6 +10,9 @@ import { Button } from "@/components/ui/button";
 import photo1 from "@/assets/site/purl-soho-photo-1.png.asset.json";
 import photo2 from "@/assets/site/purl-soho-photo-2.png.asset.json";
 import photo3 from "@/assets/site/purl-soho-photo-3.png.asset.json";
+import aroVideo from "@/assets/site/product-spotlight.mp4.asset.json";
+import aroVideoWebm from "@/assets/site/product-spotlight.webm.asset.json";
+import aroPoster from "@/assets/site/product-spotlight-poster.jpg.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({ meta: [
@@ -34,9 +37,10 @@ function frames(name: string, palette: string[]): ReelFrame[] {
   return palette.map((background, i) => ({ background, artwork: <img src={`/site-art/${name}-${i + 1}.svg`} alt="" /> }));
 }
 const purlFrames: ReelFrame[] = [photo1, photo2, photo3].map(photo => ({ background: "#1D2A3A", artwork: <img src={photo.url} alt="" /> }));
-type HomeExample = { name: string; headline: string; subline: string; detail: string; frames?: ReelFrame[]; layout?: "top"; logo?: string };
+type HomeExample = { name: string; headline: string; subline: string; detail: string; frames?: ReelFrame[]; layout?: "top"; logo?: string; video?: string; videoWebm?: string; poster?: string };
 const examples: HomeExample[] = [
   { name: "Japanese Denim Cotton", headline: "Japanese Denim\nCotton", subline: "A soft, springy cotton yarn", detail: "3 photos · 7.8 sec · 9:16 · Purl Soho", frames: purlFrames, layout: "top", logo: "Purl Soho" },
+  { name: "AW 26-27 Collection", detail: "3 photos · 6 sec · 1:1 · Aro", video: aroVideo.url, videoWebm: aroVideoWebm.url, poster: aroPoster.url },
   { name: "Coffee subscription", headline: "Slow mornings.\nFast shipping.", subline: "[Roaster name]", detail: "3 photos · 9 sec · 9:16 + 1:1" },
   { name: "Candle launch", headline: "Light up the\nlong nights.", subline: "Winter scents", detail: "3 photos · 7.5 sec · 9:16" },
   { name: "Skincare bundle", headline: "Glow,\nbottled.", subline: "Daily ritual", detail: "3 photos · 7.5 sec · 9:16" },
