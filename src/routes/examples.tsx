@@ -30,7 +30,10 @@ function ReelVideo({ example }: { example: GalleryExample }) {
     preference.addEventListener("change", sync);
     return () => preference.removeEventListener("change", sync);
   }, []);
-  return <video ref={ref} className="examples-reel-video" src={example.video} poster={example.poster} loop muted playsInline preload="metadata" aria-label={`${example.name} video ad`} />;
+  return <video ref={ref} className="examples-reel-video" poster={example.poster} loop muted playsInline preload="metadata" aria-label={`${example.name} video ad`}>
+    {example.videoWebm && <source src={example.videoWebm} type="video/webm" />}
+    <source src={example.video} type="video/mp4" />
+  </video>;
 }
 
 function GalleryReel({ example }: { example: GalleryExample }) {
