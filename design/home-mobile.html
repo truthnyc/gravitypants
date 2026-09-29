@@ -1,297 +1,717 @@
 <!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Gravity Pants — Home (mobile)</title>
-<!--
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Gravity Pants — Home (mobile)</title>
+    <!--
   Gravity Pants — design reference for Lovable.
   Home page, mobile layout (390px). Same content as home.html, stacked. Tabs switch the editor panel and its caption.
   Placeholders in [square brackets] must be replaced with real content before launch.
   Drawn "reels" are stand-ins: replace with real exported MP4s (<video autoplay muted loop playsinline>).
 -->
-<style>
-body{margin:0;background:#fff;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",system-ui,sans-serif;-webkit-font-smoothing:antialiased;color:#1D1D1F}
-*{box-sizing:border-box}
-a{color:#0066CC;text-decoration:none}
-h1,h2,h3,p{margin:0}
-.btn{height:50px;padding:0 22px;border-radius:25px;font-size:17px;font-weight:400;display:flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap;border:0;cursor:pointer;font-family:inherit}
-.btn.pri{background:#0071E3;color:#fff}
-.btn.sec{background:#F5F5F7;color:#1D1D1F}
-.eyebrow{font-size:14px;font-weight:600;color:#0058B0}
-.h2{font-size:38px;font-weight:600;letter-spacing:-.03em;line-height:1.06}
-.lede{font-size:17px;line-height:1.5;color:#57575C}
-.card{background:#F5F5F7;border-radius:22px;overflow:hidden;position:relative}
-.ic{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
-.slot{height:48px;border-radius:12px;border:1.5px dashed #C5C9C0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:#6E6E73}
-.chip{height:30px;padding:0 12px;border-radius:15px;background:#fff;font-size:13px;font-weight:500;display:inline-flex;align-items:center;color:#1D1D1F}
-.sec-pad{padding:72px 20px 0;display:flex;flex-direction:column;gap:28px}
-.feat{padding:22px;display:flex;flex-direction:column;gap:8px}
-.feat h3{font-size:20px;font-weight:600;letter-spacing:-.015em}
-.feat p{font-size:15px;line-height:1.5;color:#57575C}
+    <style>
+      body{margin:0;background:#fff;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",system-ui,sans-serif;-webkit-font-smoothing:antialiased;color:#1D1D1F}
+      *{box-sizing:border-box}
+      a{color:#0066CC;text-decoration:none}
+      h1,h2,h3,p{margin:0}
+      .btn{height:50px;padding:0 22px;border-radius:25px;font-size:17px;font-weight:400;display:flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap;border:0;cursor:pointer;font-family:inherit}
+      .btn.pri{background:#0071E3;color:#fff}
+      .btn.sec{background:#F5F5F7;color:#1D1D1F}
+      .eyebrow{font-size:14px;font-weight:600;color:#0058B0}
+      .h2{font-size:38px;font-weight:600;letter-spacing:-.03em;line-height:1.06}
+      .lede{font-size:17px;line-height:1.5;color:#57575C}
+      .card{background:#F5F5F7;border-radius:22px;overflow:hidden;position:relative}
+      .ic{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+      .slot{height:48px;border-radius:12px;border:1.5px dashed #C5C9C0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:#6E6E73}
+      .chip{height:30px;padding:0 12px;border-radius:15px;background:#fff;font-size:13px;font-weight:500;display:inline-flex;align-items:center;color:#1D1D1F}
+      .sec-pad{padding:72px 20px 0;display:flex;flex-direction:column;gap:28px}
+      .feat{padding:22px;display:flex;flex-direction:column;gap:8px}
+      .feat h3{font-size:20px;font-weight:600;letter-spacing:-.015em}
+      .feat p{font-size:15px;line-height:1.5;color:#57575C}
 
-.phone{position:relative;background:#F5F5F7;padding:5px;border-radius:26px;box-shadow:0 0 0 1px #E3E3E8,0 30px 60px -24px rgba(0,0,0,.22);flex-shrink:0}
-.scr{position:relative;width:100%;height:100%;border-radius:21px;overflow:hidden;background:#222}
-.fr{position:absolute;left:0;top:0;right:0;bottom:0;opacity:0}
-.fr svg{position:absolute;left:0;top:0;width:100%;height:100%;animation:drift 9s ease-in-out infinite alternate}
-.f1{animation:show1 9s infinite}.f2{animation:show2 9s infinite}.f3{animation:show3 9s infinite}
-.bars{position:absolute;left:9px;right:9px;top:9px;display:flex;gap:3px;z-index:2}
-.bars span{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.35);overflow:hidden}
-.bars i{display:block;height:100%;background:#fff;width:0}
-.b1{animation:fill1 9s linear infinite}.b2{animation:fill2 9s linear infinite}.b3{animation:fill3 9s linear infinite}
-.copy{position:absolute;left:12px;right:12px;bottom:16px;z-index:2;color:#fff;animation:rise 9s ease-out infinite}
-.copy b{display:block;font-weight:700;letter-spacing:-.025em;line-height:1.04}
-@keyframes show1{0%{opacity:1}30%{opacity:1}34%{opacity:0}96%{opacity:0}100%{opacity:1}}
-@keyframes show2{0%{opacity:0}30%{opacity:0}34%{opacity:1}63%{opacity:1}67%{opacity:0}100%{opacity:0}}
-@keyframes show3{0%{opacity:0}63%{opacity:0}67%{opacity:1}96%{opacity:1}100%{opacity:0}}
-@keyframes fill1{0%{width:0}33%{width:100%}100%{width:100%}}
-@keyframes fill2{0%{width:0}33%{width:0}66%{width:100%}100%{width:100%}}
-@keyframes fill3{0%{width:0}66%{width:0}100%{width:100%}}
-@keyframes drift{0%{transform:scale(1.14)}100%{transform:scale(1)}}
-@keyframes rise{0%{opacity:0;transform:translateY(12px)}6%{opacity:1;transform:translateY(0)}92%{opacity:1}100%{opacity:0}}
-.drop{position:absolute;border-radius:12px;overflow:hidden;box-shadow:0 18px 36px rgba(0,0,0,.16)}
-.dr1{animation:fall1 6s cubic-bezier(.3,1.35,.55,1) infinite}
-.dr2{animation:fall2 6s cubic-bezier(.3,1.35,.55,1) infinite}
-@keyframes fall1{0%{transform:translateY(-90px) rotate(-22deg);opacity:0}12%{opacity:1}28%{transform:translateY(0) rotate(-10deg)}100%{transform:translateY(0) rotate(-10deg);opacity:1}}
-@keyframes fall2{0%,10%{transform:translateY(-110px) rotate(18deg);opacity:0}22%{opacity:1}38%{transform:translateY(0) rotate(9deg)}100%{transform:translateY(0) rotate(9deg);opacity:1}}
-.scroller{display:flex;gap:14px;overflow-x:auto;padding:4px 20px 12px;scroll-snap-type:x mandatory;scrollbar-width:none}
-.scroller > *{scroll-snap-align:start}
-.tabs{display:flex;gap:4px;overflow-x:auto;padding:4px;border-radius:22px;background:#F5F5F7;scrollbar-width:none}
-.tab{height:36px;padding:0 14px;border-radius:18px;font-size:14px;font-weight:500;color:#424245;background:transparent;border:0;white-space:nowrap;font-family:inherit;cursor:pointer}
-.tab.on{background:#fff;color:#1D1D1F;box-shadow:0 1px 3px rgba(0,0,0,.1)}
-.fcol a{color:#57575C;font-size:15px}
-@media (prefers-reduced-motion: reduce){*{animation:none !important}.f1{opacity:1}.bars i{width:100%}}
+      .phone{position:relative;background:#F5F5F7;padding:5px;border-radius:26px;box-shadow:0 0 0 1px #E3E3E8,0 30px 60px -24px rgba(0,0,0,.22);flex-shrink:0}
+      .scr{position:relative;width:100%;height:100%;border-radius:21px;overflow:hidden;background:#222}
+      .fr{position:absolute;left:0;top:0;right:0;bottom:0;opacity:0}
+      .fr svg{position:absolute;left:0;top:0;width:100%;height:100%;animation:drift 9s ease-in-out infinite alternate}
+      .f1{animation:show1 9s infinite}.f2{animation:show2 9s infinite}.f3{animation:show3 9s infinite}
+      .bars{position:absolute;left:9px;right:9px;top:9px;display:flex;gap:3px;z-index:2}
+      .bars span{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.35);overflow:hidden}
+      .bars i{display:block;height:100%;background:#fff;width:0}
+      .b1{animation:fill1 9s linear infinite}.b2{animation:fill2 9s linear infinite}.b3{animation:fill3 9s linear infinite}
+      .copy{position:absolute;left:12px;right:12px;bottom:16px;z-index:2;color:#fff;animation:rise 9s ease-out infinite}
+      .copy b{display:block;font-weight:700;letter-spacing:-.025em;line-height:1.04}
+      @keyframes show1{0%{opacity:1}30%{opacity:1}34%{opacity:0}96%{opacity:0}100%{opacity:1}}
+      @keyframes show2{0%{opacity:0}30%{opacity:0}34%{opacity:1}63%{opacity:1}67%{opacity:0}100%{opacity:0}}
+      @keyframes show3{0%{opacity:0}63%{opacity:0}67%{opacity:1}96%{opacity:1}100%{opacity:0}}
+      @keyframes fill1{0%{width:0}33%{width:100%}100%{width:100%}}
+      @keyframes fill2{0%{width:0}33%{width:0}66%{width:100%}100%{width:100%}}
+      @keyframes fill3{0%{width:0}66%{width:0}100%{width:100%}}
+      @keyframes drift{0%{transform:scale(1.14)}100%{transform:scale(1)}}
+      @keyframes rise{0%{opacity:0;transform:translateY(12px)}6%{opacity:1;transform:translateY(0)}92%{opacity:1}100%{opacity:0}}
+      .drop{position:absolute;border-radius:12px;overflow:hidden;box-shadow:0 18px 36px rgba(0,0,0,.16)}
+      .dr1{animation:fall1 6s cubic-bezier(.3,1.35,.55,1) infinite}
+      .dr2{animation:fall2 6s cubic-bezier(.3,1.35,.55,1) infinite}
+      @keyframes fall1{0%{transform:translateY(-90px) rotate(-22deg);opacity:0}12%{opacity:1}28%{transform:translateY(0) rotate(-10deg)}100%{transform:translateY(0) rotate(-10deg);opacity:1}}
+      @keyframes fall2{0%,10%{transform:translateY(-110px) rotate(18deg);opacity:0}22%{opacity:1}38%{transform:translateY(0) rotate(9deg)}100%{transform:translateY(0) rotate(9deg);opacity:1}}
+      .scroller{display:flex;gap:14px;overflow-x:auto;padding:4px 20px 12px;scroll-snap-type:x mandatory;scrollbar-width:none}
+      .scroller > *{scroll-snap-align:start}
+      .tabs{display:flex;gap:4px;overflow-x:auto;padding:4px;border-radius:22px;background:#F5F5F7;scrollbar-width:none}
+      .tab{height:36px;padding:0 14px;border-radius:18px;font-size:14px;font-weight:500;color:#424245;background:transparent;border:0;white-space:nowrap;font-family:inherit;cursor:pointer}
+      .tab.on{background:#fff;color:#1D1D1F;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+      .fcol a{color:#57575C;font-size:15px}
+      @media (prefers-reduced-motion: reduce){*{animation:none !important}.f1{opacity:1}.bars i{width:100%}}
 
-[hidden]{display:none !important}
-</style>
-</head>
-<body>
+      [hidden]{display:none !important}
+    </style>
+  </head>
+  <body>
+    <div style="width:390px;min-height:100vh;display:flex;flex-direction:column;background:#fff;overflow:hidden">
+      <!-- NAV -->
+      <header
+        style="height:56px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 20px;border-bottom:1px solid #F0F0F2"
+      >
+        <a href="#top" style="display:flex;align-items:center;gap:8px;color:#1D1D1F">
+          <svg viewBox="0 0 24 24" style="width:26px;height:26px" aria-hidden="true">
+            <rect width="24" height="24" rx="5.4" fill="#0071E3"></rect>
+            <g transform="translate(0.75 1.65) scale(0.9)">
+              <circle cx="11" cy="13" r="7" fill="#fff"></circle>
+              <path
+                d="M9.95 10.3 14.2 13 9.95 15.7Z"
+                fill="#0071E3"
+                stroke="#0071E3"
+                stroke-width="1"
+                stroke-linejoin="round"
+              ></path>
+              <circle cx="19" cy="5" r="2" fill="#fff"></circle>
+            </g>
+          </svg>
+          <span style="font-size:17px;font-weight:600;letter-spacing:-.01em">Gravity Pants</span>
+        </a>
+        <div style="display:flex;align-items:center;gap:6px">
+          <a
+            href="#start"
+            style="height:34px;padding:0 14px;border-radius:17px;background:#0071E3;color:#fff;font-size:14px;display:flex;align-items:center"
+            >Start free</a
+          >
+          <button
+            aria-label="Open menu"
+            style="width:44px;height:44px;border:0;background:transparent;display:flex;align-items:center;justify-content:center;color:#1D1D1F"
+          >
+            <svg class="ic" viewBox="0 0 24 24" style="width:22px;height:22px"><path d="M4 8h16M4 16h16"></path></svg>
+          </button>
+        </div>
+      </header>
 
+      <!-- HERO -->
+      <section id="top" style="padding:44px 20px 0;display:flex;flex-direction:column;gap:22px">
+        <a
+          href="#spotlight"
+          style="align-self:flex-start;height:30px;padding:0 12px;border-radius:15px;background:#F5F5F7;font-size:13px;font-weight:500;color:#1D1D1F;display:flex;align-items:center"
+          >Export MP4 and GIF in one click</a
+        >
+        <h1 style="font-size:58px;font-weight:600;letter-spacing:-.045em;line-height:.98">
+          Photos in.<br /><span style="color:#0071E3">Reels out.</span>
+        </h1>
+        <p class="lede">
+          Drop in a few product photos. Gravity Pants turns them into a scroll-stopping video ad, with your words, your
+          brand and every format you need.
+        </p>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <a class="btn pri" href="#start"
+            >Make your first reel<svg class="ic" viewBox="0 0 24 24" style="width:16px;height:16px">
+              <path d="M5 12h14M13 6l6 6-6 6"></path></svg
+          ></a>
+          <a class="btn sec" href="#examples"
+            ><svg class="ic" viewBox="0 0 24 24" style="width:14px;height:14px">
+              <path d="M7 4.5v15l12-7.5z" fill="currentColor" stroke="none"></path></svg
+            >Watch examples</a
+          >
+        </div>
+        <p style="font-size:13px;color:#6E6E73;text-align:center">
+          No editing skills needed. Start free and make your first reel in the next few minutes. Try every feature and
+          make 3 watermarked exports.
+        </p>
+        <div style="position:relative;height:500px;margin-top:8px" aria-hidden="true">
+          <div class="drop dr1" style="left:0;top:120px;width:108px;height:144px;background:#C9B8A3">
+            <svg viewBox="0 0 150 200" style="width:100%;height:100%">
+              <rect x="56" y="78" width="38" height="80" rx="9" fill="#F4ECE1"></rect>
+              <rect x="66" y="60" width="18" height="20" rx="3" fill="#3A2E1F"></rect>
+            </svg>
+          </div>
+          <div class="drop dr2" style="right:0;top:280px;width:108px;height:144px;background:#8C2F2B">
+            <svg viewBox="0 0 150 200" style="width:100%;height:100%">
+              <rect x="52" y="104" width="46" height="58" rx="5" fill="#EBDDC6"></rect>
+              <path d="M75 70c9 11 9 22 0 30-9-8-9-19 0-30z" fill="#F5B94A"></path>
+            </svg>
+          </div>
+          <div class="phone" style="position:absolute;left:83px;top:0;width:224px;height:460px">
+            <div class="scr">
+              <div class="bars">
+                <span><i class="b1"></i></span><span><i class="b2"></i></span><span><i class="b3"></i></span>
+              </div>
+              <div class="fr f1" style="background:#C9B8A3">
+                <svg viewBox="0 0 100 205" preserveAspectRatio="xMidYMid slice">
+                  <rect x="37" y="72" width="26" height="55" rx="6" fill="#F4ECE1"></rect>
+                  <rect x="44" y="59" width="12" height="14" rx="2" fill="#3A2E1F"></rect>
+                </svg>
+              </div>
+              <div class="fr f2" style="background:#2F3A33">
+                <svg viewBox="0 0 100 205" preserveAspectRatio="xMidYMid slice">
+                  <path d="M32 94h34v24a12 12 0 0 1-12 12H44a12 12 0 0 1-12-12z" fill="#E9E1D3"></path>
+                  <path d="M66 99h4a7 7 0 0 1 0 14h-4" fill="none" stroke="#E9E1D3" stroke-width="4.5"></path>
+                </svg>
+              </div>
+              <div class="fr f3" style="background:#8C2F2B">
+                <svg viewBox="0 0 100 205" preserveAspectRatio="xMidYMid slice">
+                  <rect x="35" y="88" width="30" height="40" rx="4" fill="#EBDDC6"></rect>
+                  <path d="M50 64c6 7 6 14 0 20-6-6-6-13 0-20z" fill="#F5B94A"></path>
+                </svg>
+              </div>
+              <div class="copy">
+                <b style="font-size:26px">New season.<br />New ritual.</b>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-<div style="width:390px;min-height:100vh;display:flex;flex-direction:column;background:#fff;overflow:hidden">
+      <!-- LOGOS -->
+      <section
+        id="customers"
+        style="padding:40px 20px 0;display:flex;flex-direction:column;gap:16px;align-items:center"
+      >
+        <p style="font-size:14px;color:#6E6E73">Brands making reels with Gravity Pants</p>
+        <div style="width:100%;display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:10px">
+          <span class="slot">[Logo]</span><span class="slot">[Logo]</span><span class="slot">[Logo]</span
+          ><span class="slot">[Logo]</span><span class="slot">[Logo]</span><span class="slot">[Logo]</span>
+        </div>
+      </section>
 
-<!-- NAV -->
-<header style="height:56px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 20px;border-bottom:1px solid #F0F0F2">
-  <a href="#top" style="display:flex;align-items:center;gap:8px;color:#1D1D1F">
-    <svg viewBox="0 0 24 24" style="width:26px;height:26px" aria-hidden="true"><rect width="24" height="24" rx="5.4" fill="#0071E3"></rect><g transform="translate(0.75 1.65) scale(0.9)"><circle cx="11" cy="13" r="7" fill="#fff"></circle><path d="M9.95 10.3 14.2 13 9.95 15.7Z" fill="#0071E3" stroke="#0071E3" stroke-width="1" stroke-linejoin="round"></path><circle cx="19" cy="5" r="2" fill="#fff"></circle></g></svg>
-    <span style="font-size:17px;font-weight:600;letter-spacing:-.01em">Gravity Pants</span>
-  </a>
-  <div style="display:flex;align-items:center;gap:6px">
-    <a href="#start" style="height:34px;padding:0 14px;border-radius:17px;background:#0071E3;color:#fff;font-size:14px;display:flex;align-items:center">Start free</a>
-    <button aria-label="Open menu" style="width:44px;height:44px;border:0;background:transparent;display:flex;align-items:center;justify-content:center;color:#1D1D1F"><svg class="ic" viewBox="0 0 24 24" style="width:22px;height:22px"><path d="M4 8h16M4 16h16"></path></svg></button>
-  </div>
-</header>
+      <!-- HOW -->
+      <section id="how" class="sec-pad">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <span class="eyebrow">How it works</span>
+          <h2 class="h2">Three steps.<br />About three minutes.</h2>
+        </div>
+        <article class="card">
+          <div
+            style="height:200px;background:#EDEDF0;display:flex;align-items:flex-end;justify-content:center;gap:8px;padding-bottom:30px"
+          >
+            <span style="width:50px;height:88px;border-radius:7px;background:#C9B8A3;transform:rotate(-8deg)"></span
+            ><span style="width:50px;height:88px;border-radius:7px;background:#2F3A33"></span
+            ><span style="width:50px;height:88px;border-radius:7px;background:#8C2F2B;transform:rotate(8deg)"></span>
+          </div>
+          <div class="feat">
+            <span style="font-size:13px;font-weight:700;color:#0058B0">01</span>
+            <h3>Drop in your photos</h3>
+            <p>Each photo becomes a frame, already in order and already timed.</p>
+          </div>
+        </article>
+        <article class="card">
+          <div style="height:200px;background:#EDEDF0;display:flex;align-items:center;justify-content:center">
+            <div style="width:100px;height:172px;border-radius:9px;background:#C9B8A3;position:relative">
+              <span
+                style="position:absolute;left:10px;right:10px;bottom:34px;color:#fff;font-size:14px;font-weight:700;line-height:1.05;outline:2px solid #7D3BD6;outline-offset:4px;border-radius:2px"
+                >New season.</span
+              ><span
+                style="position:absolute;top:10px;right:10px;width:30px;height:11px;border-radius:2px;background:#1D1D1F;outline:1.5px dashed #B25200;outline-offset:2px"
+              ></span>
+            </div>
+          </div>
+          <div class="feat">
+            <span style="font-size:13px;font-weight:700;color:#0058B0">02</span>
+            <h3>Make it yours</h3>
+            <p>Tap the headline, logo or a transition and change it. No layers, no keyframes.</p>
+          </div>
+        </article>
+        <article class="card">
+          <div style="height:200px;background:#EDEDF0;display:flex;align-items:center;justify-content:center;gap:10px">
+            <span style="width:56px;height:100px;border-radius:7px;background:#2F3A33"></span
+            ><span style="width:80px;height:80px;border-radius:7px;background:#2F3A33"></span
+            ><span style="width:100px;height:56px;border-radius:7px;background:#2F3A33"></span>
+          </div>
+          <div class="feat">
+            <span style="font-size:13px;font-weight:700;color:#0058B0">03</span>
+            <h3>Export everywhere</h3>
+            <p>9:16, 1:1 and 16:9 at once, as MP4 or GIF.</p>
+          </div>
+        </article>
+      </section>
 
-<!-- HERO -->
-<section id="top" style="padding:44px 20px 0;display:flex;flex-direction:column;gap:22px">
-  <a href="#spotlight" style="align-self:flex-start;height:30px;padding:0 12px;border-radius:15px;background:#F5F5F7;font-size:13px;font-weight:500;color:#1D1D1F;display:flex;align-items:center">Export MP4 and GIF in one click</a>
-  <h1 style="font-size:58px;font-weight:600;letter-spacing:-.045em;line-height:.98">Photos in.<br><span style="color:#0071E3">Reels out.</span></h1>
-  <p class="lede">Drop in a few product photos. Gravity Pants turns them into a scroll-stopping video ad, with your words, your brand and every format you need.</p>
-  <div style="display:flex;flex-direction:column;gap:10px">
-    <a class="btn pri" href="#start">Make your first reel<svg class="ic" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
-    <a class="btn sec" href="#examples"><svg class="ic" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M7 4.5v15l12-7.5z" fill="currentColor" stroke="none"></path></svg>Watch examples</a>
-  </div>
-  <p style="font-size:13px;color:#6E6E73;text-align:center">No editing skills needed. [Your free-plan line]</p>
-  <div style="position:relative;height:500px;margin-top:8px" aria-hidden="true">
-    <div class="drop dr1" style="left:0;top:120px;width:108px;height:144px;background:#C9B8A3"><svg viewBox="0 0 150 200" style="width:100%;height:100%"><rect x="56" y="78" width="38" height="80" rx="9" fill="#F4ECE1"></rect><rect x="66" y="60" width="18" height="20" rx="3" fill="#3A2E1F"></rect></svg></div>
-    <div class="drop dr2" style="right:0;top:280px;width:108px;height:144px;background:#8C2F2B"><svg viewBox="0 0 150 200" style="width:100%;height:100%"><rect x="52" y="104" width="46" height="58" rx="5" fill="#EBDDC6"></rect><path d="M75 70c9 11 9 22 0 30-9-8-9-19 0-30z" fill="#F5B94A"></path></svg></div>
-    <div class="phone" style="position:absolute;left:83px;top:0;width:224px;height:460px"><div class="scr">
-      <div class="bars"><span><i class="b1"></i></span><span><i class="b2"></i></span><span><i class="b3"></i></span></div>
-      <div class="fr f1" style="background:#C9B8A3"><svg viewBox="0 0 100 205" preserveAspectRatio="xMidYMid slice"><rect x="37" y="72" width="26" height="55" rx="6" fill="#F4ECE1"></rect><rect x="44" y="59" width="12" height="14" rx="2" fill="#3A2E1F"></rect></svg></div>
-      <div class="fr f2" style="background:#2F3A33"><svg viewBox="0 0 100 205" preserveAspectRatio="xMidYMid slice"><path d="M32 94h34v24a12 12 0 0 1-12 12H44a12 12 0 0 1-12-12z" fill="#E9E1D3"></path><path d="M66 99h4a7 7 0 0 1 0 14h-4" fill="none" stroke="#E9E1D3" stroke-width="4.5"></path></svg></div>
-      <div class="fr f3" style="background:#8C2F2B"><svg viewBox="0 0 100 205" preserveAspectRatio="xMidYMid slice"><rect x="35" y="88" width="30" height="40" rx="4" fill="#EBDDC6"></rect><path d="M50 64c6 7 6 14 0 20-6-6-6-13 0-20z" fill="#F5B94A"></path></svg></div>
-      <div class="copy"><b style="font-size:26px">New season.<br>New ritual.</b></div>
-    </div></div>
-  </div>
-</section>
+      <!-- EXAMPLES -->
+      <section
+        id="examples"
+        style="margin-top:72px;padding:56px 0 48px;background:#F5F5F7;display:flex;flex-direction:column;gap:24px"
+      >
+        <div style="padding:0 20px;display:flex;flex-direction:column;gap:12px">
+          <span class="eyebrow">Made with Gravity Pants</span>
+          <h2 class="h2">Every one of these started as a few photos.</h2>
+        </div>
+        <div class="scroller" aria-label="Example reels">
+          <figure style="margin:0;display:flex;flex-direction:column;gap:10px;flex-shrink:0">
+            <div class="phone" style="width:190px;height:360px">
+              <div class="scr">
+                <div class="bars">
+                  <span><i class="b1"></i></span><span><i class="b2"></i></span><span><i class="b3"></i></span>
+                </div>
+                <div class="fr f1" style="background:#B8C4D6">
+                  <svg viewBox="0 0 100 190" preserveAspectRatio="xMidYMid slice">
+                    <path d="M40 60h20l4 10-4 4 12 56H28l12-56-4-4z" fill="#1D2A3A"></path>
+                  </svg>
+                </div>
+                <div class="fr f2" style="background:#1D2A3A">
+                  <svg viewBox="0 0 100 190" preserveAspectRatio="xMidYMid slice">
+                    <path d="M40 60h20l4 10-4 4 12 56H28l12-56-4-4z" fill="#E4B363"></path>
+                  </svg>
+                </div>
+                <div class="fr f3" style="background:#E4B363">
+                  <svg viewBox="0 0 100 190" preserveAspectRatio="xMidYMid slice">
+                    <path d="M40 60h20l4 10-4 4 12 56H28l12-56-4-4z" fill="#1D2A3A"></path>
+                  </svg>
+                </div>
+                <div class="copy">
+                  <b style="font-size:19px">New season.<br />New color.</b>
+                </div>
+              </div>
+            </div>
+            <figcaption style="font-size:14px;font-weight:600">Fashion drop</figcaption>
+          </figure>
+          <figure style="margin:0;display:flex;flex-direction:column;gap:10px;flex-shrink:0">
+            <div class="phone" style="width:190px;height:360px">
+              <div class="scr">
+                <div class="bars">
+                  <span><i class="b1"></i></span><span><i class="b2"></i></span><span><i class="b3"></i></span>
+                </div>
+                <div class="fr f1" style="background:#3A2E1F">
+                  <svg viewBox="0 0 100 190" preserveAspectRatio="xMidYMid slice">
+                    <path d="M32 90h34v24a12 12 0 0 1-12 12H44a12 12 0 0 1-12-12z" fill="#E9E1D3"></path>
+                  </svg>
+                </div>
+                <div class="fr f2" style="background:#B8860B">
+                  <svg viewBox="0 0 100 190" preserveAspectRatio="xMidYMid slice">
+                    <rect x="30" y="64" width="40" height="62" rx="4" fill="#3A2E1F"></rect>
+                  </svg>
+                </div>
+                <div class="fr f3" style="background:#E6D5B8">
+                  <svg viewBox="0 0 100 190" preserveAspectRatio="xMidYMid slice">
+                    <ellipse cx="50" cy="104" rx="26" ry="8" fill="#3A2E1F"></ellipse>
+                  </svg>
+                </div>
+                <div class="copy">
+                  <b style="font-size:19px">Slow mornings.<br />Fast shipping.</b>
+                </div>
+              </div>
+            </div>
+            <figcaption style="font-size:14px;font-weight:600">Coffee subscription</figcaption>
+          </figure>
+          <figure style="margin:0;display:flex;flex-direction:column;gap:10px;flex-shrink:0">
+            <div class="phone" style="width:190px;height:360px">
+              <div class="scr">
+                <div class="bars">
+                  <span><i class="b1"></i></span><span><i class="b2"></i></span><span><i class="b3"></i></span>
+                </div>
+                <div class="fr f1" style="background:#1F2937">
+                  <svg viewBox="0 0 100 190" preserveAspectRatio="xMidYMid slice">
+                    <rect x="35" y="84" width="30" height="40" rx="4" fill="#EBDDC6"></rect>
+                    <path d="M50 60c6 7 6 14 0 20-6-6-6-13 0-20z" fill="#F5B94A"></path>
+                  </svg>
+                </div>
+                <div class="fr f2" style="background:#8C2F2B">
+                  <svg viewBox="0 0 100 190" preserveAspectRatio="xMidYMid slice">
+                    <rect x="35" y="84" width="30" height="40" rx="4" fill="#EBDDC6"></rect>
+                  </svg>
+                </div>
+                <div class="fr f3" style="background:#EBDDC6">
+                  <svg viewBox="0 0 100 190" preserveAspectRatio="xMidYMid slice">
+                    <rect x="35" y="84" width="30" height="40" rx="4" fill="#8C2F2B"></rect>
+                  </svg>
+                </div>
+                <div class="copy">
+                  <b style="font-size:19px">Light up the<br />long nights.</b>
+                </div>
+              </div>
+            </div>
+            <figcaption style="font-size:14px;font-weight:600">Candle launch</figcaption>
+          </figure>
+          <figure style="margin:0;display:flex;flex-direction:column;gap:10px;flex-shrink:0">
+            <div class="phone" style="width:190px;height:360px">
+              <div class="scr">
+                <div class="bars">
+                  <span><i class="b1"></i></span><span><i class="b2"></i></span><span><i class="b3"></i></span>
+                </div>
+                <div class="fr f1" style="background:#E8C7C0">
+                  <svg viewBox="0 0 100 190" preserveAspectRatio="xMidYMid slice">
+                    <rect x="30" y="100" width="40" height="24" rx="6" fill="#FFF6F2"></rect>
+                  </svg>
+                </div>
+                <div class="fr f2" style="background:#B85C4E">
+                  <svg viewBox="0 0 100 190" preserveAspectRatio="xMidYMid slice">
+                    <rect x="40" y="62" width="20" height="62" rx="8" fill="#FFF6F2"></rect>
+                  </svg>
+                </div>
+                <div class="fr f3" style="background:#FFF6F2">
+                  <svg viewBox="0 0 100 190" preserveAspectRatio="xMidYMid slice">
+                    <rect x="58" y="68" width="18" height="56" rx="7" fill="#B85C4E"></rect>
+                  </svg>
+                </div>
+                <div class="copy">
+                  <b style="font-size:19px">Glow,<br />bottled.</b>
+                </div>
+              </div>
+            </div>
+            <figcaption style="font-size:14px;font-weight:600">Skincare bundle</figcaption>
+          </figure>
+        </div>
+        <div style="padding:0 20px;display:flex;justify-content:space-between;align-items:center">
+          <span style="display:flex;gap:6px" aria-hidden="true"
+            ><span style="width:20px;height:6px;border-radius:3px;background:#1D1D1F"></span
+            ><span style="width:6px;height:6px;border-radius:3px;background:#C7C7CC"></span
+            ><span style="width:6px;height:6px;border-radius:3px;background:#C7C7CC"></span
+            ><span style="width:6px;height:6px;border-radius:3px;background:#C7C7CC"></span
+          ></span>
+          <a href="#gallery" style="font-size:16px;font-weight:500;display:flex;align-items:center;gap:4px"
+            >Browse the gallery<svg class="ic" viewBox="0 0 24 24" style="width:14px;height:14px">
+              <path d="M5 12h14M13 6l6 6-6 6"></path></svg
+          ></a>
+        </div>
+      </section>
 
-<!-- LOGOS -->
-<section id="customers" style="padding:40px 20px 0;display:flex;flex-direction:column;gap:16px;align-items:center">
-  <p style="font-size:14px;color:#6E6E73">Brands making reels with Gravity Pants</p>
-  <div style="width:100%;display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:10px">
-    <span class="slot">[Logo]</span><span class="slot">[Logo]</span><span class="slot">[Logo]</span><span class="slot">[Logo]</span><span class="slot">[Logo]</span><span class="slot">[Logo]</span>
-  </div>
-</section>
+      <!-- STILLS TO STORY -->
+      <section id="before-after" class="sec-pad">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <span class="eyebrow">See the difference</span>
+          <h2 class="h2">From stills to story.</h2>
+          <p class="lede">Three ordinary photos in. One finished reel out.</p>
+        </div>
+        <article class="card" style="padding:24px;display:flex;flex-direction:column;gap:20px">
+          <div style="display:flex;align-items:center;justify-content:center;gap:14px">
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <span style="width:64px;height:80px;border-radius:9px;background:#1F2937;display:block"></span
+              ><span style="width:64px;height:80px;border-radius:9px;background:#8C2F2B;display:block"></span
+              ><span style="width:64px;height:80px;border-radius:9px;background:#EBDDC6;display:block"></span>
+            </div>
+            <svg class="ic" viewBox="0 0 24 24" style="width:22px;height:22px;color:#0071E3">
+              <path d="M5 12h14M13 6l6 6-6 6"></path>
+            </svg>
+            <div class="phone" style="width:150px;height:280px">
+              <div class="scr">
+                <div class="bars">
+                  <span><i class="b1"></i></span><span><i class="b2"></i></span><span><i class="b3"></i></span>
+                </div>
+                <div class="fr f1" style="background:#1F2937">
+                  <svg viewBox="0 0 100 186" preserveAspectRatio="xMidYMid slice">
+                    <circle cx="50" cy="72" r="28" fill="#F5B94A" opacity=".18"></circle>
+                    <rect x="35" y="80" width="30" height="40" rx="4" fill="#EBDDC6"></rect>
+                    <path d="M50 56c6 7 6 14 0 20-6-6-6-13 0-20z" fill="#F5B94A"></path>
+                  </svg>
+                </div>
+                <div class="fr f2" style="background:#8C2F2B">
+                  <svg viewBox="0 0 100 186" preserveAspectRatio="xMidYMid slice">
+                    <rect x="24" y="92" width="22" height="28" rx="3" fill="#EBDDC6"></rect>
+                    <rect x="54" y="84" width="22" height="36" rx="3" fill="#EBDDC6"></rect>
+                  </svg>
+                </div>
+                <div class="fr f3" style="background:#EBDDC6">
+                  <svg viewBox="0 0 100 186" preserveAspectRatio="xMidYMid slice">
+                    <rect x="35" y="80" width="30" height="40" rx="4" fill="#8C2F2B"></rect>
+                  </svg>
+                </div>
+                <div class="copy">
+                  <b style="font-size:16px">Light up the<br />long nights.</b>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <span style="font-size:18px;font-weight:600">Candle launch</span
+            ><span style="font-size:14px;color:#57575C">3 photos → 7.5 sec reel · Fade, Slide, Zoom</span>
+          </div>
+        </article>
+      </section>
 
-<!-- HOW -->
-<section id="how" class="sec-pad">
-  <div style="display:flex;flex-direction:column;gap:12px"><span class="eyebrow">How it works</span><h2 class="h2">Three steps.<br>About three minutes.</h2></div>
-  <article class="card">
-    <div style="height:200px;background:#EDEDF0;display:flex;align-items:flex-end;justify-content:center;gap:8px;padding-bottom:30px"><span style="width:50px;height:88px;border-radius:7px;background:#C9B8A3;transform:rotate(-8deg)"></span><span style="width:50px;height:88px;border-radius:7px;background:#2F3A33"></span><span style="width:50px;height:88px;border-radius:7px;background:#8C2F2B;transform:rotate(8deg)"></span></div>
-    <div class="feat"><span style="font-size:13px;font-weight:700;color:#0058B0">01</span><h3>Drop in your photos</h3><p>Each photo becomes a frame, already in order and already timed.</p></div>
-  </article>
-  <article class="card">
-    <div style="height:200px;background:#EDEDF0;display:flex;align-items:center;justify-content:center"><div style="width:100px;height:172px;border-radius:9px;background:#C9B8A3;position:relative"><span style="position:absolute;left:10px;right:10px;bottom:34px;color:#fff;font-size:14px;font-weight:700;line-height:1.05;outline:2px solid #7D3BD6;outline-offset:4px;border-radius:2px">New season.</span><span style="position:absolute;top:10px;right:10px;width:30px;height:11px;border-radius:2px;background:#1D1D1F;outline:1.5px dashed #B25200;outline-offset:2px"></span></div></div>
-    <div class="feat"><span style="font-size:13px;font-weight:700;color:#0058B0">02</span><h3>Make it yours</h3><p>Tap the headline, logo or a transition and change it. No layers, no keyframes.</p></div>
-  </article>
-  <article class="card">
-    <div style="height:200px;background:#EDEDF0;display:flex;align-items:center;justify-content:center;gap:10px"><span style="width:56px;height:100px;border-radius:7px;background:#2F3A33"></span><span style="width:80px;height:80px;border-radius:7px;background:#2F3A33"></span><span style="width:100px;height:56px;border-radius:7px;background:#2F3A33"></span></div>
-    <div class="feat"><span style="font-size:13px;font-weight:700;color:#0058B0">03</span><h3>Export everywhere</h3><p>9:16, 1:1 and 16:9 at once, as MP4 or GIF.</p></div>
-  </article>
-</section>
+      <!-- SPOTLIGHT (working tabs) -->
+      <section id="spotlight" class="sec-pad">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <span class="eyebrow">In the editor</span>
+          <h2 class="h2">Tap anything.<br />Change everything.</h2>
+        </div>
+        <div class="tabs" role="tablist" aria-label="Editor features">
+          <button role="tab" data-tab="edit" aria-selected="true" class="tab on">Edit in a tap</button
+          ><button role="tab" data-tab="brand" aria-selected="false" class="tab">Brand kit</button
+          ><button role="tab" data-tab="motion" aria-selected="false" class="tab">Motion</button
+          ><button role="tab" data-tab="timing" aria-selected="false" class="tab">Timing</button
+          ><button role="tab" data-tab="export" aria-selected="false" class="tab">Export</button>
+        </div>
+        <article class="card">
+          <div
+            style="height:300px;margin:12px;border-radius:16px;background:#EDEDF0;display:flex;align-items:center;justify-content:center;gap:18px"
+          >
+            <div data-if="isEdit" data-panel="edit" style="display:contents">
+              <div style="width:130px;height:232px;border-radius:10px;background:#C9B8A3;position:relative">
+                <span
+                  style="position:absolute;top:12px;right:12px;width:36px;height:13px;border-radius:3px;background:#1D1D1F;outline:1.5px dashed #B25200;outline-offset:3px"
+                ></span
+                ><span
+                  style="position:absolute;left:12px;right:12px;bottom:46px;color:#fff;font-size:18px;font-weight:700;line-height:1.05;outline:2px solid #7D3BD6;outline-offset:4px;border-radius:2px"
+                  >New season.<br />New color.</span
+                >
+              </div>
+              <div
+                style="width:130px;border-radius:12px;background:#fff;padding:10px;display:flex;flex-direction:column;gap:8px;font-size:11px"
+              >
+                <b style="font-size:12px">Headline</b
+                ><span
+                  style="height:26px;border-radius:6px;background:#F5F5F7;display:flex;align-items:center;padding:0 8px;font-weight:600"
+                  >New season.</span
+                ><span style="color:#57575C">Size · 108 px</span
+                ><span style="height:3px;border-radius:2px;background:#E3E3E8;position:relative"
+                  ><span
+                    style="position:absolute;left:0;top:0;bottom:0;width:40%;background:#7D3BD6;border-radius:2px"
+                  ></span></span
+                ><span style="color:#57575C">Animation · Rise up</span>
+              </div>
+            </div>
+            <div data-if="isBrand" data-panel="brand" style="display:contents" hidden>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:16px">
+                <div style="display:flex;gap:10px;align-items:center">
+                  <span
+                    style="width:68px;height:68px;border-radius:16px;background:#1D1D1F;color:#fff;font-size:10px;font-weight:800;letter-spacing:.14em;display:flex;align-items:center;justify-content:center"
+                    >LOGO</span
+                  ><span style="width:44px;height:44px;border-radius:22px;background:#D4502A"></span
+                  ><span style="width:44px;height:44px;border-radius:22px;background:#1D2A3A"></span
+                  ><span style="width:44px;height:44px;border-radius:22px;background:#E4B363"></span>
+                </div>
+                <div style="display:flex;gap:10px">
+                  <span
+                    style="width:110px;height:72px;border-radius:12px;background:#fff;display:flex;flex-direction:column;justify-content:center;padding:0 12px"
+                    ><b style="font-size:26px">Aa</b><span style="font-size:11px;color:#57575C">Headline</span></span
+                  ><span
+                    style="width:110px;height:72px;border-radius:12px;background:#fff;display:flex;flex-direction:column;justify-content:center;padding:0 12px"
+                    ><span style="font-size:26px;font-family:Georgia,serif">Aa</span
+                    ><span style="font-size:11px;color:#57575C">Subline</span></span
+                  >
+                </div>
+              </div>
+            </div>
+            <div data-if="isMotion" data-panel="motion" style="display:contents" hidden>
+              <div class="phone" style="width:140px;height:260px">
+                <div class="scr">
+                  <div class="bars">
+                    <span><i class="b1"></i></span><span><i class="b2"></i></span><span><i class="b3"></i></span>
+                  </div>
+                  <div class="fr f1" style="background:#1D2A3A">
+                    <svg viewBox="0 0 100 186" preserveAspectRatio="xMidYMid slice">
+                      <path d="M40 60h20l4 10-4 4 12 56H28l12-56-4-4z" fill="#E4B363"></path>
+                    </svg>
+                  </div>
+                  <div class="fr f2" style="background:#E4B363">
+                    <svg viewBox="0 0 100 186" preserveAspectRatio="xMidYMid slice">
+                      <path d="M40 60h20l4 10-4 4 12 56H28l12-56-4-4z" fill="#1D2A3A"></path>
+                    </svg>
+                  </div>
+                  <div class="fr f3" style="background:#B8C4D6">
+                    <svg viewBox="0 0 100 186" preserveAspectRatio="xMidYMid slice">
+                      <path d="M40 60h20l4 10-4 4 12 56H28l12-56-4-4z" fill="#1D2A3A"></path>
+                    </svg>
+                  </div>
+                  <div class="copy">
+                    <b style="font-size:15px">New season.<br />New color.</b>
+                  </div>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <span class="chip">Fade</span><span class="chip">Slide</span
+                ><span class="chip" style="background:#0071E3;color:#fff">Zoom</span><span class="chip">Rise up</span>
+              </div>
+            </div>
+            <div data-if="isTiming" data-panel="timing" style="display:contents" hidden>
+              <div style="width:300px;display:flex;gap:4px">
+                <span
+                  style="flex:3.5;height:52px;border-radius:9px;background:#C9B8A3;box-shadow:0 0 0 2px #0071E3;color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;padding-left:10px"
+                  >3.5s</span
+                ><span
+                  style="flex:1.5;height:52px;border-radius:9px;background:#2F3A33;color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;padding-left:8px"
+                  >1.5s</span
+                ><span
+                  style="flex:3;height:52px;border-radius:9px;background:#8C2F2B;color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;padding-left:10px"
+                  >3s</span
+                >
+              </div>
+            </div>
+            <div data-if="isExport" data-panel="export" style="display:contents" hidden>
+              <div style="display:flex;align-items:flex-end;gap:10px">
+                <span style="width:64px;height:114px;border-radius:8px;background:#1D2A3A"></span
+                ><span style="width:86px;height:86px;border-radius:8px;background:#1D2A3A"></span
+                ><span style="width:120px;height:68px;border-radius:8px;background:#1D2A3A"></span>
+              </div>
+            </div>
+          </div>
+          <div class="feat" style="padding:8px 22px 24px">
+            <h3><span id="spotTitle">Select it. Change it. Done.</span></h3>
+            <p>
+              <span id="spotBody"
+                >Photo, headline, subline, logo, timing and transition each have one simple panel.</span
+              >
+            </p>
+          </div>
+        </article>
+      </section>
 
-<!-- EXAMPLES -->
-<section id="examples" style="margin-top:72px;padding:56px 0 48px;background:#F5F5F7;display:flex;flex-direction:column;gap:24px">
-  <div style="padding:0 20px;display:flex;flex-direction:column;gap:12px"><span class="eyebrow">Made with Gravity Pants</span><h2 class="h2">Every one of these started as a few photos.</h2></div>
-  <div class="scroller" aria-label="Example reels">
-    <figure style="margin:0;display:flex;flex-direction:column;gap:10px;flex-shrink:0">
-      <div class="phone" style="width:190px;height:360px"><div class="scr"><div class="bars"><span><i class="b1"></i></span><span><i class="b2"></i></span><span><i class="b3"></i></span></div>
-        <div class="fr f1" style="background:#B8C4D6"><svg viewBox="0 0 100 190" preserveAspectRatio="xMidYMid slice"><path d="M40 60h20l4 10-4 4 12 56H28l12-56-4-4z" fill="#1D2A3A"></path></svg></div>
-        <div class="fr f2" style="background:#1D2A3A"><svg viewBox="0 0 100 190" preserveAspectRatio="xMidYMid slice"><path d="M40 60h20l4 10-4 4 12 56H28l12-56-4-4z" fill="#E4B363"></path></svg></div>
-        <div class="fr f3" style="background:#E4B363"><svg viewBox="0 0 100 190" preserveAspectRatio="xMidYMid slice"><path d="M40 60h20l4 10-4 4 12 56H28l12-56-4-4z" fill="#1D2A3A"></path></svg></div>
-        <div class="copy"><b style="font-size:19px">New season.<br>New color.</b></div></div></div>
-      <figcaption style="font-size:14px;font-weight:600">Fashion drop</figcaption>
-    </figure>
-    <figure style="margin:0;display:flex;flex-direction:column;gap:10px;flex-shrink:0">
-      <div class="phone" style="width:190px;height:360px"><div class="scr"><div class="bars"><span><i class="b1"></i></span><span><i class="b2"></i></span><span><i class="b3"></i></span></div>
-        <div class="fr f1" style="background:#3A2E1F"><svg viewBox="0 0 100 190" preserveAspectRatio="xMidYMid slice"><path d="M32 90h34v24a12 12 0 0 1-12 12H44a12 12 0 0 1-12-12z" fill="#E9E1D3"></path></svg></div>
-        <div class="fr f2" style="background:#B8860B"><svg viewBox="0 0 100 190" preserveAspectRatio="xMidYMid slice"><rect x="30" y="64" width="40" height="62" rx="4" fill="#3A2E1F"></rect></svg></div>
-        <div class="fr f3" style="background:#E6D5B8"><svg viewBox="0 0 100 190" preserveAspectRatio="xMidYMid slice"><ellipse cx="50" cy="104" rx="26" ry="8" fill="#3A2E1F"></ellipse></svg></div>
-        <div class="copy"><b style="font-size:19px">Slow mornings.<br>Fast shipping.</b></div></div></div>
-      <figcaption style="font-size:14px;font-weight:600">Coffee subscription</figcaption>
-    </figure>
-    <figure style="margin:0;display:flex;flex-direction:column;gap:10px;flex-shrink:0">
-      <div class="phone" style="width:190px;height:360px"><div class="scr"><div class="bars"><span><i class="b1"></i></span><span><i class="b2"></i></span><span><i class="b3"></i></span></div>
-        <div class="fr f1" style="background:#1F2937"><svg viewBox="0 0 100 190" preserveAspectRatio="xMidYMid slice"><rect x="35" y="84" width="30" height="40" rx="4" fill="#EBDDC6"></rect><path d="M50 60c6 7 6 14 0 20-6-6-6-13 0-20z" fill="#F5B94A"></path></svg></div>
-        <div class="fr f2" style="background:#8C2F2B"><svg viewBox="0 0 100 190" preserveAspectRatio="xMidYMid slice"><rect x="35" y="84" width="30" height="40" rx="4" fill="#EBDDC6"></rect></svg></div>
-        <div class="fr f3" style="background:#EBDDC6"><svg viewBox="0 0 100 190" preserveAspectRatio="xMidYMid slice"><rect x="35" y="84" width="30" height="40" rx="4" fill="#8C2F2B"></rect></svg></div>
-        <div class="copy"><b style="font-size:19px">Light up the<br>long nights.</b></div></div></div>
-      <figcaption style="font-size:14px;font-weight:600">Candle launch</figcaption>
-    </figure>
-    <figure style="margin:0;display:flex;flex-direction:column;gap:10px;flex-shrink:0">
-      <div class="phone" style="width:190px;height:360px"><div class="scr"><div class="bars"><span><i class="b1"></i></span><span><i class="b2"></i></span><span><i class="b3"></i></span></div>
-        <div class="fr f1" style="background:#E8C7C0"><svg viewBox="0 0 100 190" preserveAspectRatio="xMidYMid slice"><rect x="30" y="100" width="40" height="24" rx="6" fill="#FFF6F2"></rect></svg></div>
-        <div class="fr f2" style="background:#B85C4E"><svg viewBox="0 0 100 190" preserveAspectRatio="xMidYMid slice"><rect x="40" y="62" width="20" height="62" rx="8" fill="#FFF6F2"></rect></svg></div>
-        <div class="fr f3" style="background:#FFF6F2"><svg viewBox="0 0 100 190" preserveAspectRatio="xMidYMid slice"><rect x="58" y="68" width="18" height="56" rx="7" fill="#B85C4E"></rect></svg></div>
-        <div class="copy"><b style="font-size:19px">Glow,<br>bottled.</b></div></div></div>
-      <figcaption style="font-size:14px;font-weight:600">Skincare bundle</figcaption>
-    </figure>
-  </div>
-  <div style="padding:0 20px;display:flex;justify-content:space-between;align-items:center">
-    <span style="display:flex;gap:6px" aria-hidden="true"><span style="width:20px;height:6px;border-radius:3px;background:#1D1D1F"></span><span style="width:6px;height:6px;border-radius:3px;background:#C7C7CC"></span><span style="width:6px;height:6px;border-radius:3px;background:#C7C7CC"></span><span style="width:6px;height:6px;border-radius:3px;background:#C7C7CC"></span></span>
-    <a href="#gallery" style="font-size:16px;font-weight:500;display:flex;align-items:center;gap:4px">Browse the gallery<svg class="ic" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
-  </div>
-</section>
+      <!-- FEATURES -->
+      <section id="features" class="sec-pad">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <span class="eyebrow">Features</span>
+          <h2 class="h2">Everything a great ad needs. Nothing it doesn’t.</h2>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <article class="card feat">
+            <div style="display:flex;gap:8px;align-items:flex-end;margin-bottom:8px">
+              <span style="width:36px;height:64px;border-radius:6px;background:#1D2A3A"></span
+              ><span style="width:52px;height:52px;border-radius:6px;background:#1D2A3A"></span
+              ><span style="width:72px;height:40px;border-radius:6px;background:#1D2A3A"></span>
+            </div>
+            <h3>Every format at once</h3>
+            <p>One design, live as a Story, a feed post and a banner.</p>
+          </article>
+          <article class="card feat">
+            <h3>Brand kit</h3>
+            <p>Logo, colors and fonts saved once, on every new ad.</p>
+          </article>
+          <article class="card feat">
+            <h3>Timing per frame</h3>
+            <p>Linger on the hero shot and speed through the rest.</p>
+          </article>
+          <article class="card feat">
+            <h3>Duplicate with new photos</h3>
+            <p>Keep what works and swap in new photos.</p>
+          </article>
+          <article class="card feat" style="background:#EEF4FB">
+            <h3>MP4 and GIF</h3>
+            <p>Every format and file type in one download.</p>
+          </article>
+          <article class="card feat">
+            <h3>Every Google Font</h3>
+            <p>Search the Google Fonts library right in the editor.</p>
+          </article>
+        </div>
+      </section>
 
-<!-- STILLS TO STORY -->
-<section id="before-after" class="sec-pad">
-  <div style="display:flex;flex-direction:column;gap:12px"><span class="eyebrow">See the difference</span><h2 class="h2">From stills to story.</h2><p class="lede">Three ordinary photos in. One finished reel out.</p></div>
-  <article class="card" style="padding:24px;display:flex;flex-direction:column;gap:20px">
-    <div style="display:flex;align-items:center;justify-content:center;gap:14px">
-      <div style="display:flex;flex-direction:column;gap:8px"><span style="width:64px;height:80px;border-radius:9px;background:#1F2937;display:block"></span><span style="width:64px;height:80px;border-radius:9px;background:#8C2F2B;display:block"></span><span style="width:64px;height:80px;border-radius:9px;background:#EBDDC6;display:block"></span></div>
-      <svg class="ic" viewBox="0 0 24 24" style="width:22px;height:22px;color:#0071E3"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
-      <div class="phone" style="width:150px;height:280px"><div class="scr"><div class="bars"><span><i class="b1"></i></span><span><i class="b2"></i></span><span><i class="b3"></i></span></div>
-        <div class="fr f1" style="background:#1F2937"><svg viewBox="0 0 100 186" preserveAspectRatio="xMidYMid slice"><circle cx="50" cy="72" r="28" fill="#F5B94A" opacity=".18"></circle><rect x="35" y="80" width="30" height="40" rx="4" fill="#EBDDC6"></rect><path d="M50 56c6 7 6 14 0 20-6-6-6-13 0-20z" fill="#F5B94A"></path></svg></div>
-        <div class="fr f2" style="background:#8C2F2B"><svg viewBox="0 0 100 186" preserveAspectRatio="xMidYMid slice"><rect x="24" y="92" width="22" height="28" rx="3" fill="#EBDDC6"></rect><rect x="54" y="84" width="22" height="36" rx="3" fill="#EBDDC6"></rect></svg></div>
-        <div class="fr f3" style="background:#EBDDC6"><svg viewBox="0 0 100 186" preserveAspectRatio="xMidYMid slice"><rect x="35" y="80" width="30" height="40" rx="4" fill="#8C2F2B"></rect></svg></div>
-        <div class="copy"><b style="font-size:16px">Light up the<br>long nights.</b></div></div></div>
+      <!-- PROOF -->
+      <section class="sec-pad">
+        <svg viewBox="0 0 40 30" style="width:36px;height:27px" aria-hidden="true">
+          <path
+            d="M0 30V17C0 7 6 1 16 0v6c-5 1-8 5-8 10h8v14zm24 0V17c0-10 6-16 16-17v6c-5 1-8 5-8 10h8v14z"
+            fill="#0071E3"
+          ></path>
+        </svg>
+        <p style="font-size:26px;font-weight:600;letter-spacing:-.02em;line-height:1.25">
+          [A customer quote about how fast they made their first reel.]
+        </p>
+        <div style="display:flex;align-items:center;gap:12px">
+          <span
+            style="width:44px;height:44px;border-radius:22px;background:#E3E3E8;display:flex;align-items:center;justify-content:center;font-size:10px;color:#6E6E73"
+            >[Photo]</span
+          >
+          <div style="display:flex;flex-direction:column">
+            <span style="font-size:15px;font-weight:600">[Customer name]</span
+            ><span style="font-size:13px;color:#6E6E73">[Role, Company]</span>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:10px">
+          <div class="card" style="padding:18px;display:flex;flex-direction:column;gap:4px">
+            <b style="font-size:30px;letter-spacing:-.03em">[X]</b
+            ><span style="font-size:13px;color:#57575C">reels made</span>
+          </div>
+          <div class="card" style="padding:18px;display:flex;flex-direction:column;gap:4px">
+            <b style="font-size:30px;letter-spacing:-.03em">[X] min</b
+            ><span style="font-size:13px;color:#57575C">to a first ad</span>
+          </div>
+          <div class="card" style="padding:18px;display:flex;flex-direction:column;gap:4px">
+            <b style="font-size:30px;letter-spacing:-.03em">[X]</b
+            ><span style="font-size:13px;color:#57575C">brands on board</span>
+          </div>
+          <div class="card" style="padding:18px;display:flex;flex-direction:column;gap:4px">
+            <b style="font-size:30px;letter-spacing:-.03em">[X]%</b
+            ><span style="font-size:13px;color:#57575C">[Result metric]</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- STORY -->
+      <section class="sec-pad">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <span class="eyebrow">Customer stories</span>
+          <h2 class="h2">Small teams, big-brand reels.</h2>
+        </div>
+        <a class="card" href="#story-1" style="display:flex;flex-direction:column;color:#1D1D1F">
+          <div style="height:200px;background:#1D2A3A;display:flex;align-items:center;justify-content:center;gap:8px">
+            <span style="width:62px;height:110px;border-radius:7px;background:#B8C4D6"></span
+            ><span style="width:62px;height:110px;border-radius:7px;background:#E4B363"></span>
+          </div>
+          <div class="feat">
+            <span style="font-size:12px;font-weight:600;color:#6E6E73;text-transform:uppercase;letter-spacing:.06em"
+              >[Customer name] · Fashion</span
+            ><span style="font-size:19px;font-weight:600;line-height:1.25">[One-line result]</span
+            ><span style="font-size:15px;color:#0066CC">Read the story</span>
+          </div>
+        </a>
+        <a href="#stories" style="font-size:16px;font-weight:500">All stories</a>
+      </section>
+
+      <!-- CTA -->
+      <section id="start" style="padding:72px 20px 0">
+        <div
+          class="card"
+          style="padding:40px 24px;display:flex;flex-direction:column;align-items:center;gap:20px;text-align:center"
+        >
+          <svg viewBox="0 0 24 24" style="width:64px;height:64px" aria-hidden="true">
+            <rect width="24" height="24" rx="5.4" fill="#0071E3"></rect>
+            <g transform="translate(0.75 1.65) scale(0.9)">
+              <circle cx="11" cy="13" r="7" fill="#fff"></circle>
+              <path
+                d="M9.95 10.3 14.2 13 9.95 15.7Z"
+                fill="#0071E3"
+                stroke="#0071E3"
+                stroke-width="1"
+                stroke-linejoin="round"
+              ></path>
+              <circle cx="19" cy="5" r="2" fill="#fff"></circle>
+            </g>
+          </svg>
+          <h2 class="h2" style="font-size:36px">Your next ad is three photos away.</h2>
+          <a class="btn pri" href="#signup" style="width:100%">Start free</a>
+          <a class="btn" href="#pricing" style="width:100%;background:#fff;color:#1D1D1F">See pricing</a>
+        </div>
+      </section>
+
+      <!-- FOOTER -->
+      <footer style="flex-grow:1;padding:56px 20px 40px;display:flex;flex-direction:column;gap:28px">
+        <div class="fcol" style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:24px">
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <span style="font-size:14px;font-weight:600">Product</span><a href="#spotlight">Features</a
+            ><a href="#examples">Examples</a><a href="#pricing">Pricing</a>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <span style="font-size:14px;font-weight:600">Company</span><a href="#about">About</a
+            ><a href="#contact">Contact</a>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <span style="font-size:14px;font-weight:600">Help</span><a href="#help">Help center</a
+            ><a href="#privacy">Privacy</a><a href="#terms">Terms</a>
+          </div>
+        </div>
+        <p style="font-size:12px;color:#6E6E73">© 2026 Gravity Pants. All rights reserved.</p>
+      </footer>
     </div>
-    <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:18px;font-weight:600">Candle launch</span><span style="font-size:14px;color:#57575C">3 photos → 7.5 sec reel · Fade, Slide, Zoom</span></div>
-  </article>
-</section>
 
-<!-- SPOTLIGHT (working tabs) -->
-<section id="spotlight" class="sec-pad">
-  <div style="display:flex;flex-direction:column;gap:12px"><span class="eyebrow">In the editor</span><h2 class="h2">Tap anything.<br>Change everything.</h2></div>
-  <div class="tabs" role="tablist" aria-label="Editor features">
-    <button role="tab" data-tab="edit" aria-selected="true" class="tab on">Edit in a tap</button><button role="tab" data-tab="brand" aria-selected="false" class="tab">Brand kit</button><button role="tab" data-tab="motion" aria-selected="false" class="tab">Motion</button><button role="tab" data-tab="timing" aria-selected="false" class="tab">Timing</button><button role="tab" data-tab="export" aria-selected="false" class="tab">Export</button>
-  </div>
-  <article class="card">
-    <div style="height:300px;margin:12px;border-radius:16px;background:#EDEDF0;display:flex;align-items:center;justify-content:center;gap:18px">
-      <div data-if="isEdit" data-panel="edit" style="display:contents">
-        <div style="width:130px;height:232px;border-radius:10px;background:#C9B8A3;position:relative"><span style="position:absolute;top:12px;right:12px;width:36px;height:13px;border-radius:3px;background:#1D1D1F;outline:1.5px dashed #B25200;outline-offset:3px"></span><span style="position:absolute;left:12px;right:12px;bottom:46px;color:#fff;font-size:18px;font-weight:700;line-height:1.05;outline:2px solid #7D3BD6;outline-offset:4px;border-radius:2px">New season.<br>New color.</span></div>
-        <div style="width:130px;border-radius:12px;background:#fff;padding:10px;display:flex;flex-direction:column;gap:8px;font-size:11px"><b style="font-size:12px">Headline</b><span style="height:26px;border-radius:6px;background:#F5F5F7;display:flex;align-items:center;padding:0 8px;font-weight:600">New season.</span><span style="color:#57575C">Size · 108 px</span><span style="height:3px;border-radius:2px;background:#E3E3E8;position:relative"><span style="position:absolute;left:0;top:0;bottom:0;width:40%;background:#7D3BD6;border-radius:2px"></span></span><span style="color:#57575C">Animation · Rise up</span></div>
-      </div>
-      <div data-if="isBrand" data-panel="brand" style="display:contents" hidden>
-        <div style="display:flex;flex-direction:column;align-items:center;gap:16px"><div style="display:flex;gap:10px;align-items:center"><span style="width:68px;height:68px;border-radius:16px;background:#1D1D1F;color:#fff;font-size:10px;font-weight:800;letter-spacing:.14em;display:flex;align-items:center;justify-content:center">LOGO</span><span style="width:44px;height:44px;border-radius:22px;background:#D4502A"></span><span style="width:44px;height:44px;border-radius:22px;background:#1D2A3A"></span><span style="width:44px;height:44px;border-radius:22px;background:#E4B363"></span></div><div style="display:flex;gap:10px"><span style="width:110px;height:72px;border-radius:12px;background:#fff;display:flex;flex-direction:column;justify-content:center;padding:0 12px"><b style="font-size:26px">Aa</b><span style="font-size:11px;color:#57575C">Headline</span></span><span style="width:110px;height:72px;border-radius:12px;background:#fff;display:flex;flex-direction:column;justify-content:center;padding:0 12px"><span style="font-size:26px;font-family:Georgia,serif">Aa</span><span style="font-size:11px;color:#57575C">Subline</span></span></div></div>
-      </div>
-      <div data-if="isMotion" data-panel="motion" style="display:contents" hidden>
-        <div class="phone" style="width:140px;height:260px"><div class="scr"><div class="bars"><span><i class="b1"></i></span><span><i class="b2"></i></span><span><i class="b3"></i></span></div>
-          <div class="fr f1" style="background:#1D2A3A"><svg viewBox="0 0 100 186" preserveAspectRatio="xMidYMid slice"><path d="M40 60h20l4 10-4 4 12 56H28l12-56-4-4z" fill="#E4B363"></path></svg></div>
-          <div class="fr f2" style="background:#E4B363"><svg viewBox="0 0 100 186" preserveAspectRatio="xMidYMid slice"><path d="M40 60h20l4 10-4 4 12 56H28l12-56-4-4z" fill="#1D2A3A"></path></svg></div>
-          <div class="fr f3" style="background:#B8C4D6"><svg viewBox="0 0 100 186" preserveAspectRatio="xMidYMid slice"><path d="M40 60h20l4 10-4 4 12 56H28l12-56-4-4z" fill="#1D2A3A"></path></svg></div>
-          <div class="copy"><b style="font-size:15px">New season.<br>New color.</b></div></div></div>
-        <div style="display:flex;flex-direction:column;gap:8px"><span class="chip">Fade</span><span class="chip">Slide</span><span class="chip" style="background:#0071E3;color:#fff">Zoom</span><span class="chip">Rise up</span></div>
-      </div>
-      <div data-if="isTiming" data-panel="timing" style="display:contents" hidden>
-        <div style="width:300px;display:flex;gap:4px"><span style="flex:3.5;height:52px;border-radius:9px;background:#C9B8A3;box-shadow:0 0 0 2px #0071E3;color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;padding-left:10px">3.5s</span><span style="flex:1.5;height:52px;border-radius:9px;background:#2F3A33;color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;padding-left:8px">1.5s</span><span style="flex:3;height:52px;border-radius:9px;background:#8C2F2B;color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;padding-left:10px">3s</span></div>
-      </div>
-      <div data-if="isExport" data-panel="export" style="display:contents" hidden>
-        <div style="display:flex;align-items:flex-end;gap:10px"><span style="width:64px;height:114px;border-radius:8px;background:#1D2A3A"></span><span style="width:86px;height:86px;border-radius:8px;background:#1D2A3A"></span><span style="width:120px;height:68px;border-radius:8px;background:#1D2A3A"></span></div>
-      </div>
-    </div>
-    <div class="feat" style="padding:8px 22px 24px">
-      <h3><span id="spotTitle">Select it. Change it. Done.</span></h3>
-      <p><span id="spotBody">Photo, headline, subline, logo, timing and transition each have one simple panel.</span></p>
-    </div>
-  </article>
-</section>
-
-<!-- FEATURES -->
-<section id="features" class="sec-pad">
-  <div style="display:flex;flex-direction:column;gap:12px"><span class="eyebrow">Features</span><h2 class="h2">Everything a great ad needs. Nothing it doesn’t.</h2></div>
-  <div style="display:flex;flex-direction:column;gap:12px">
-    <article class="card feat"><div style="display:flex;gap:8px;align-items:flex-end;margin-bottom:8px"><span style="width:36px;height:64px;border-radius:6px;background:#1D2A3A"></span><span style="width:52px;height:52px;border-radius:6px;background:#1D2A3A"></span><span style="width:72px;height:40px;border-radius:6px;background:#1D2A3A"></span></div><h3>Every format at once</h3><p>One design, live as a Story, a feed post and a banner.</p></article>
-    <article class="card feat"><h3>Brand kit</h3><p>Logo, colors and fonts saved once, on every new ad.</p></article>
-    <article class="card feat"><h3>Timing per frame</h3><p>Linger on the hero shot and speed through the rest.</p></article>
-    <article class="card feat"><h3>Duplicate with new photos</h3><p>Keep what works and swap in new photos.</p></article>
-    <article class="card feat" style="background:#EEF4FB"><h3>MP4 and GIF</h3><p>Every format and file type in one download.</p></article>
-    <article class="card feat"><h3>Every Google Font</h3><p>Search the Google Fonts library right in the editor.</p></article>
-  </div>
-</section>
-
-<!-- PROOF -->
-<section class="sec-pad">
-  <svg viewBox="0 0 40 30" style="width:36px;height:27px" aria-hidden="true"><path d="M0 30V17C0 7 6 1 16 0v6c-5 1-8 5-8 10h8v14zm24 0V17c0-10 6-16 16-17v6c-5 1-8 5-8 10h8v14z" fill="#0071E3"></path></svg>
-  <p style="font-size:26px;font-weight:600;letter-spacing:-.02em;line-height:1.25">[A customer quote about how fast they made their first reel.]</p>
-  <div style="display:flex;align-items:center;gap:12px"><span style="width:44px;height:44px;border-radius:22px;background:#E3E3E8;display:flex;align-items:center;justify-content:center;font-size:10px;color:#6E6E73">[Photo]</span><div style="display:flex;flex-direction:column"><span style="font-size:15px;font-weight:600">[Customer name]</span><span style="font-size:13px;color:#6E6E73">[Role, Company]</span></div></div>
-  <div style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:10px">
-    <div class="card" style="padding:18px;display:flex;flex-direction:column;gap:4px"><b style="font-size:30px;letter-spacing:-.03em">[X]</b><span style="font-size:13px;color:#57575C">reels made</span></div>
-    <div class="card" style="padding:18px;display:flex;flex-direction:column;gap:4px"><b style="font-size:30px;letter-spacing:-.03em">[X] min</b><span style="font-size:13px;color:#57575C">to a first ad</span></div>
-    <div class="card" style="padding:18px;display:flex;flex-direction:column;gap:4px"><b style="font-size:30px;letter-spacing:-.03em">[X]</b><span style="font-size:13px;color:#57575C">brands on board</span></div>
-    <div class="card" style="padding:18px;display:flex;flex-direction:column;gap:4px"><b style="font-size:30px;letter-spacing:-.03em">[X]%</b><span style="font-size:13px;color:#57575C">[Result metric]</span></div>
-  </div>
-</section>
-
-<!-- STORY -->
-<section class="sec-pad">
-  <div style="display:flex;flex-direction:column;gap:12px"><span class="eyebrow">Customer stories</span><h2 class="h2">Small teams, big-brand reels.</h2></div>
-  <a class="card" href="#story-1" style="display:flex;flex-direction:column;color:#1D1D1F">
-    <div style="height:200px;background:#1D2A3A;display:flex;align-items:center;justify-content:center;gap:8px"><span style="width:62px;height:110px;border-radius:7px;background:#B8C4D6"></span><span style="width:62px;height:110px;border-radius:7px;background:#E4B363"></span></div>
-    <div class="feat"><span style="font-size:12px;font-weight:600;color:#6E6E73;text-transform:uppercase;letter-spacing:.06em">[Customer name] · Fashion</span><span style="font-size:19px;font-weight:600;line-height:1.25">[One-line result]</span><span style="font-size:15px;color:#0066CC">Read the story</span></div>
-  </a>
-  <a href="#stories" style="font-size:16px;font-weight:500">All stories</a>
-</section>
-
-<!-- CTA -->
-<section id="start" style="padding:72px 20px 0">
-  <div class="card" style="padding:40px 24px;display:flex;flex-direction:column;align-items:center;gap:20px;text-align:center">
-    <svg viewBox="0 0 24 24" style="width:64px;height:64px" aria-hidden="true"><rect width="24" height="24" rx="5.4" fill="#0071E3"></rect><g transform="translate(0.75 1.65) scale(0.9)"><circle cx="11" cy="13" r="7" fill="#fff"></circle><path d="M9.95 10.3 14.2 13 9.95 15.7Z" fill="#0071E3" stroke="#0071E3" stroke-width="1" stroke-linejoin="round"></path><circle cx="19" cy="5" r="2" fill="#fff"></circle></g></svg>
-    <h2 class="h2" style="font-size:36px">Your next ad is three photos away.</h2>
-    <a class="btn pri" href="#signup" style="width:100%">Start free</a>
-    <a class="btn" href="#pricing" style="width:100%;background:#fff;color:#1D1D1F">See pricing</a>
-  </div>
-</section>
-
-<!-- FOOTER -->
-<footer style="flex-grow:1;padding:56px 20px 40px;display:flex;flex-direction:column;gap:28px">
-  <div class="fcol" style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:24px">
-    <div style="display:flex;flex-direction:column;gap:10px"><span style="font-size:14px;font-weight:600">Product</span><a href="#spotlight">Features</a><a href="#examples">Examples</a><a href="#pricing">Pricing</a></div>
-    <div style="display:flex;flex-direction:column;gap:10px"><span style="font-size:14px;font-weight:600">Company</span><a href="#about">About</a><a href="#contact">Contact</a></div>
-    <div style="display:flex;flex-direction:column;gap:10px"><span style="font-size:14px;font-weight:600">Help</span><a href="#help">Help center</a><a href="#privacy">Privacy</a><a href="#terms">Terms</a></div>
-  </div>
-  <p style="font-size:12px;color:#6E6E73">© 2026 Gravity Pants. All rights reserved.</p>
-</footer>
-
-</div>
-
-<script>
-document.querySelectorAll('[data-tab]').forEach(function(b){b.addEventListener('click',function(){
-  var id=b.getAttribute('data-tab');
-  document.querySelectorAll('[data-tab]').forEach(function(x){var on=x===b;x.classList.toggle('on',on);x.setAttribute('aria-selected',on?'true':'false');});
-  document.querySelectorAll('[data-if^="is"]').forEach(function(p){p.hidden=p.getAttribute('data-panel')!==id;});
-  var S={"edit": ["Select it. Change it. Done.", "Photo, headline, subline, logo, timing and transition each have one simple panel."], "brand": ["On brand, every time.", "Your logo, colors and fonts, saved once and ready on every new ad."], "motion": ["Motion that feels right.", "Fade, slide or zoom between frames, and let your words rise into view."], "timing": ["Linger on the hero shot.", "Give each frame its own length and play the reel back as you go."], "export": ["Ready for everywhere.", "9:16, 1:1 and 16:9 together, as MP4 or GIF, in one click."]};document.getElementById("spotTitle").textContent=S[id][0];document.getElementById("spotBody").textContent=S[id][1];
-});});
-</script>
-</body>
+    <script>
+      document.querySelectorAll('[data-tab]').forEach(function(b){b.addEventListener('click',function(){
+        var id=b.getAttribute('data-tab');
+        document.querySelectorAll('[data-tab]').forEach(function(x){var on=x===b;x.classList.toggle('on',on);x.setAttribute('aria-selected',on?'true':'false');});
+        document.querySelectorAll('[data-if^="is"]').forEach(function(p){p.hidden=p.getAttribute('data-panel')!==id;});
+        var S={"edit": ["Select it. Change it. Done.", "Photo, headline, subline, logo, timing and transition each have one simple panel."], "brand": ["On brand, every time.", "Your logo, colors and fonts, saved once and ready on every new ad."], "motion": ["Motion that feels right.", "Fade, slide or zoom between frames, and let your words rise into view."], "timing": ["Linger on the hero shot.", "Give each frame its own length and play the reel back as you go."], "export": ["Ready for everywhere.", "9:16, 1:1 and 16:9 together, as MP4 or GIF, in one click."]};document.getElementById("spotTitle").textContent=S[id][0];document.getElementById("spotBody").textContent=S[id][1];
+      });});
+    </script>
+  </body>
 </html>
