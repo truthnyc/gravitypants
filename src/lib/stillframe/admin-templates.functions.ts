@@ -47,7 +47,7 @@ const docSchema = z.object({
     text_position: z.string().max(20),
     logo_position: z.string().max(20),
     logo_path: z.string().max(300).nullable().optional(),
-    logo_size_pct: z.number().min(5).max(40).optional(),
+    logo_size_pct: z.number().min(5).max(100).optional(),
     logo_opacity: z.enum(["solid", "soft"]).optional(),
   }),
   slides: z.array(slide).min(1, "Add at least one slide.").max(10),
@@ -294,7 +294,7 @@ export const adminTemplateFromAd = createServerFn({ method: "POST" })
         text_position: String(h0.position ?? "center").slice(0, 20),
         logo_position: String(p.logo?.positions?.[format] ?? p.logo?.position ?? "top-right").slice(0, 20),
         logo_path: null,
-        logo_size_pct: Math.min(40, Math.max(5, Number(p.logo?.size_pct ?? 16))),
+        logo_size_pct: Math.min(100, Math.max(5, Number(p.logo?.size_pct ?? 16))),
         logo_opacity: p.logo?.opacity === "soft" ? "soft" : "solid",
       },
       slides: frames.map((f, i) => ({
