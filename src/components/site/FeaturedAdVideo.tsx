@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Pause, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import videoAsset from "@/assets/site/example-of-the-week.mp4.asset.json";
+import webmAsset from "@/assets/site/example-of-the-week.webm.asset.json";
 import posterAsset from "@/assets/site/example-of-the-week-poster.jpg.asset.json";
 
 export function FeaturedAdVideo({ controls = false }: { controls?: boolean }) {
@@ -36,7 +37,6 @@ export function FeaturedAdVideo({ controls = false }: { controls?: boolean }) {
     <div className="site-phone-screen">
       <video
         ref={videoRef}
-        src={videoAsset.url}
         poster={posterAsset.url}
         loop
         muted
@@ -45,7 +45,10 @@ export function FeaturedAdVideo({ controls = false }: { controls?: boolean }) {
         aria-label="Purl Soho Japanese Denim Cotton video ad"
         onPlay={() => setPlaying(true)}
         onPause={() => setPlaying(false)}
-      />
+      >
+        <source src={webmAsset.url} type="video/webm" />
+        <source src={videoAsset.url} type="video/mp4" />
+      </video>
       {controls && <Button type="button" variant="siteSecondary" size="icon" className="featured-ad-control" aria-label={playing ? "Pause featured ad" : "Play featured ad"} onClick={toggle}>
         {playing ? <Pause size={18} fill="currentColor" /> : <Play size={18} fill="currentColor" />}
       </Button>}
