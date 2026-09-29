@@ -24,7 +24,7 @@ const candleFrames = ["#1F2937", "#8C2F2B", "#EBDDC6"].map((background, i) => ({
 
 function AuthVisual({ mode }: { mode: "signup" | "signin" }) {
   if (mode === "signin") {
-    const reels = ["fashion", "coffee", "candle", "skincare", "plants", "sneaker"];
+    const reels = ["purl-soho", "coffee", "candle", "skincare", "plants", "sneaker"];
     return <div className="auth-visual auth-reels" aria-hidden="true">
       {[false, true].map((reverse) => <div className={`auth-reel-row${reverse ? " auth-reel-reverse" : ""}`} key={String(reverse)}>
         {[...reels, ...reels].map((id, i) => {
