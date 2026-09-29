@@ -3,7 +3,7 @@ import { ArrowRight, Check, Play } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { Button } from "@/components/ui/button";
 
-export const Route = createFileRoute("/features")({
+export const Route = createFileRoute("/how-it-works")({
   head: () => ({ meta: [
     { title: "Features — Gravity Pants" },
     { name: "description", content: "Explore everything Gravity Pants offers to turn photos into video ads: editing, branding, motion, formats, and export." },
