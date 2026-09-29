@@ -33,8 +33,10 @@ const exampleColors = [colors.fashion, ["#3A2E1F", "#B8860B", "#E6D5B8"], colors
 function frames(name: string, palette: string[]): ReelFrame[] {
   return palette.map((background, i) => ({ background, artwork: <img src={`/site-art/${name}-${i + 1}.svg`} alt="" /> }));
 }
-const examples = [
-  { name: "Fashion drop", headline: "New season.\nNew color.", subline: "Spring collection", detail: "3 photos · 7.5 sec · 9:16" },
+const purlFrames: ReelFrame[] = [photo1, photo2, photo3].map(photo => ({ background: "#1D2A3A", artwork: <img src={photo.url} alt="" /> }));
+type HomeExample = { name: string; headline: string; subline: string; detail: string; frames?: ReelFrame[]; layout?: "top"; logo?: string };
+const examples: HomeExample[] = [
+  { name: "Japanese Denim Cotton", headline: "Japanese Denim\nCotton", subline: "A soft, springy cotton yarn", detail: "3 photos · 7.8 sec · 9:16 · Purl Soho", frames: purlFrames, layout: "top", logo: "Purl Soho" },
   { name: "Coffee subscription", headline: "Slow mornings.\nFast shipping.", subline: "[Roaster name]", detail: "3 photos · 9 sec · 9:16 + 1:1" },
   { name: "Candle launch", headline: "Light up the\nlong nights.", subline: "Winter scents", detail: "3 photos · 7.5 sec · 9:16" },
   { name: "Skincare bundle", headline: "Glow,\nbottled.", subline: "Daily ritual", detail: "3 photos · 7.5 sec · 9:16" },
