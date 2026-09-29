@@ -26,16 +26,6 @@ const sections = [
   { id: "manage", eyebrow: "Manage", title: "Reuse the ads that work.", description: "Keep all your ads in one place. Duplicate one with new photos, keep its words and timing, or save the whole setup as a template.", points: ["Duplicate with new photos", "Save as template", "Rename, duplicate and organize from one menu"] },
 ] as const;
 
-const allFeatures = [
-  ["Create", "Drag-and-drop photos", "Automatic frames & timing", "Add, duplicate, delete frames"],
-  ["Edit", "Photo, headline, subline, logo", "Tap-to-select elements", "Undo and auto-save"],
-  ["Text", "Google Fonts picker", "Size, color, nine-point position", "Same on all frames"],
-  ["Brand", "Brand kit: logo, colors, fonts", "Brand colors in every picker"],
-  ["Motion", "Fade, Slide, Zoom transitions", "Rise-up text animation", "Per-frame timing, live playback"],
-  ["Formats", "9:16, 1:1, 16:9", "Adaptive layouts"],
-  ["Export", "MP4 and GIF", "All sizes in one click"],
-  ["Manage", "Your ads library", "Duplicate with new photos", "Save as template"],
-];
 
 function FeatureIllustration({ kind }: { kind: string }) {
   switch (kind) {
