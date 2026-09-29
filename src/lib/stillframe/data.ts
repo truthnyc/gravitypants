@@ -717,7 +717,10 @@ function sourceFromTemplate(t: Template, count: number): ProjectWithFrames {
     primary_format: s.primary_format,
     formats: s.formats,
     pace: s.pace,
-    logo: { ...DEFAULT_LOGO, ...s.logo },
+    // Gravity Pants templates keep their logo only for previews; customers add their own.
+    logo: t.source === "system"
+      ? { ...DEFAULT_LOGO, ...s.logo, path: null, light_path: null, dark_path: null }
+      : { ...DEFAULT_LOGO, ...s.logo },
     end_card: s.end_card ?? {},
     brand_kit_id: s.brand_kit_id ?? null,
     template_id: t.is_reusable && !t.id.startsWith("example") ? t.id : null,
