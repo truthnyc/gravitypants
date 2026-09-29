@@ -1,6 +1,6 @@
 // TODO before launch: replace the reference placeholders [LOGO], [Your product line], [Customer logo], [Roaster name], [A customer quote about how fast they made their first reel, and what it did for their sales.], [Photo], [Customer name], [Role, Company], [X], [X] min, [X]%, [Result metric], [One-line result, e.g. how many ads they shipped for a launch], [One-line result, e.g. time saved each week], and [One-line result, e.g. lift in click-through].
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowRight, Check, Play } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { ReelPhone, type ReelFrame } from "@/components/site/ReelPhone";
@@ -10,6 +10,9 @@ import { Button } from "@/components/ui/button";
 import photo1 from "@/assets/site/purl-soho-photo-1.png.asset.json";
 import photo2 from "@/assets/site/purl-soho-photo-2.png.asset.json";
 import photo3 from "@/assets/site/purl-soho-photo-3.png.asset.json";
+import aroVideo from "@/assets/site/product-spotlight.mp4.asset.json";
+import aroVideoWebm from "@/assets/site/product-spotlight.webm.asset.json";
+import aroPoster from "@/assets/site/product-spotlight-poster.jpg.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({ meta: [
@@ -34,9 +37,10 @@ function frames(name: string, palette: string[]): ReelFrame[] {
   return palette.map((background, i) => ({ background, artwork: <img src={`/site-art/${name}-${i + 1}.svg`} alt="" /> }));
 }
 const purlFrames: ReelFrame[] = [photo1, photo2, photo3].map(photo => ({ background: "#1D2A3A", artwork: <img src={photo.url} alt="" /> }));
-type HomeExample = { name: string; headline: string; subline: string; detail: string; frames?: ReelFrame[]; layout?: "top"; logo?: string };
+type HomeExample = { name: string; headline: string; subline: string; detail: string; frames?: ReelFrame[]; layout?: "top"; logo?: string; video?: string; videoWebm?: string; poster?: string };
 const examples: HomeExample[] = [
   { name: "Japanese Denim Cotton", headline: "Japanese Denim\nCotton", subline: "A soft, springy cotton yarn", detail: "3 photos · 7.8 sec · 9:16 · Purl Soho", frames: purlFrames, layout: "top", logo: "Purl Soho" },
+  { name: "AW 26-27 Collection", detail: "3 photos · 6 sec · 1:1 · Aro", video: aroVideo.url, videoWebm: aroVideoWebm.url, poster: aroPoster.url },
   { name: "Coffee subscription", headline: "Slow mornings.\nFast shipping.", subline: "[Roaster name]", detail: "3 photos · 9 sec · 9:16 + 1:1" },
   { name: "Candle launch", headline: "Light up the\nlong nights.", subline: "Winter scents", detail: "3 photos · 7.5 sec · 9:16" },
   { name: "Skincare bundle", headline: "Glow,\nbottled.", subline: "Daily ritual", detail: "3 photos · 7.5 sec · 9:16" },
@@ -45,6 +49,27 @@ const examples: HomeExample[] = [
   { name: "Sneaker restock", headline: "Back in\nevery size.", subline: "Restock live now", detail: "4 photos · 8 sec · 9:16" },
   { name: "Jewelry gift guide", headline: "Give something\nthat lasts.", subline: "Gift guide", detail: "3 photos · 7.5 sec · 9:16 + 16:9" },
 ];
+function HomeReelVideo({ example }: { example: HomeExample }) {
+  const ref = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    const video = ref.current;
+    if (!video) return;
+    const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const sync = () => {
+      if (preference.matches) { video.pause(); video.currentTime = 0; }
+      else void video.play().catch(() => {});
+    };
+    sync();
+    preference.addEventListener("change", sync);
+    return () => preference.removeEventListener("change", sync);
+  }, []);
+  return <div className="home-example-video" aria-label={`${example.name} video ad`}>
+    <video ref={ref} poster={example.poster} loop muted playsInline preload="metadata">
+      {example.videoWebm && <source src={example.videoWebm} type="video/webm" />}
+      <source src={example.video} type="video/mp4" />
+    </video>
+  </div>;
+}
 const tabs = ["Edit in a tap", "Brand kit", "Motion", "Timing", "Export"] as const;
 type Tab = typeof tabs[number];
 const tabCopy: Record<Tab, { title: string; body: string }> = {
@@ -106,7 +131,7 @@ function Home() {
     <section id="top" className="home-hero home-section"><div className="home-hero-copy"><a className="home-announcement" href="#features">Export MP4 and GIF together <span>See how it works</span></a><h1>Photos in.<br /><span>Reels out.</span></h1><p className="site-lede home-hero-lede">Add a few product photos. Gravity Pants turns them into a short video ad with your words, logo and colors. Download it in every size you need.</p><div className="home-actions"><Primary>Make your first reel <ArrowRight size={18} strokeWidth={1.7} /></Primary><Secondary to="/examples"><Play size={17} fill="currentColor" /> Watch examples</Secondary></div><p className="home-note"><span className="home-desktop-only">No video editing experience needed. </span><span className="home-mobile-only">No video editing needed. </span>No editing skills needed. Start free and make your first reel in the next few minutes. Try every feature and make 3 watermarked exports.</p></div><div className="home-hero-visual" aria-hidden="true"><div className="home-drop home-drop-one"><img src={photo1.url} alt="" /></div><div className="home-drop home-drop-two"><img src={photo2.url} alt="" /></div><div className="home-drop home-drop-three"><img src={photo3.url} alt="" /></div><div className="home-hero-phone"><FeaturedAdVideo /></div><div className="site-card home-exported"><span>Exported</span><div><span>9:16</span><span>1:1</span><span>16:9</span></div><b><Check size={14} strokeWidth={2} /> MP4 + GIF ready</b></div></div></section>
     <section id="customers" className="home-logos home-section"><p>Brands making reels with Gravity Pants</p><div>{Array.from({ length: 6 }, (_, i) => <span key={i}>[Customer logo]</span>)}</div></section>
     <section id="how" className="home-section home-how"><Heading eyebrow="How it works">From photos to a finished reel.</Heading><div className="home-how-grid"><article className="site-card home-step"><div className="home-step-art home-photos"><div><span /><span /><span /></div></div><div className="home-step-copy"><span>01</span><h3>Add your photos</h3><p>Choose the photos you want to use. Each one becomes a frame in your reel.</p></div></article><article className="site-card home-step"><div className="home-step-art"><div className="home-step-edit"><b>New season.</b><small>[Your product line]</small><i>Headline</i></div></div><div className="home-step-copy"><span>02</span><h3>Add your words and brand</h3><p>Tap a headline, logo, photo or transition to change it. Your work saves as you go.</p></div></article><article className="site-card home-step"><div className="home-step-art"><FormatShapes /></div><div className="home-step-copy"><span>03</span><h3>Download your files</h3><p>Get 9:16, 1:1 and 16:9 versions as MP4 or GIF, ready for social, ads, email and websites.</p></div></article></div></section>
-    <section id="examples" className="home-examples"><div className="home-examples-top home-section"><Heading eyebrow="Made with Gravity Pants">Every one of these<br className="home-desktop-only" /> started as a few photos.</Heading><div className="home-gallery-desktop"><Primary to="/examples">Browse the gallery <ArrowRight size={18} strokeWidth={1.7} /></Primary></div></div><div className="home-example-viewport" aria-label="Example reels made with Gravity Pants"><div className="home-example-track">{[...examples, ...examples].map((ex, i) => <figure key={`${ex.name}-${i}`} className="home-example-figure" aria-hidden={i >= examples.length ? true : undefined}>{ex.frames ? <ReelPhone frames={ex.frames} headline={ex.headline} subline={ex.subline} layout={ex.layout} logo={ex.logo} /> : <Reel id={`ex-${i % examples.length}`} palette={exampleColors[i % exampleColors.length] ?? colors.fashion} headline={ex.headline} subline={ex.subline} />}<figcaption><b>{ex.name}</b><span>{ex.detail}</span></figcaption></figure>)}</div></div><div className="home-gallery-mobile home-section"><span className="home-swipe-dots" aria-hidden="true"><i /><i /><i /><i /></span><Link className="home-text-link" to="/examples">Browse the gallery <ArrowRight size={16} /></Link></div></section>
+    <section id="examples" className="home-examples"><div className="home-examples-top home-section"><Heading eyebrow="Made with Gravity Pants">Every one of these<br className="home-desktop-only" /> started as a few photos.</Heading><div className="home-gallery-desktop"><Primary to="/examples">Browse the gallery <ArrowRight size={18} strokeWidth={1.7} /></Primary></div></div><div className="home-example-viewport" aria-label="Example reels made with Gravity Pants"><div className="home-example-track">{[...examples, ...examples].map((ex, i) => <figure key={`${ex.name}-${i}`} className="home-example-figure" aria-hidden={i >= examples.length ? true : undefined}>{ex.video ? <HomeReelVideo example={ex} /> : ex.frames ? <ReelPhone frames={ex.frames} headline={ex.headline} subline={ex.subline} layout={ex.layout} logo={ex.logo} /> : <Reel id={`ex-${i % examples.length}`} palette={exampleColors[i % exampleColors.length] ?? colors.fashion} headline={ex.headline} subline={ex.subline} />}<figcaption><b>{ex.name}</b><span>{ex.detail}</span></figcaption></figure>)}</div></div><div className="home-gallery-mobile home-section"><span className="home-swipe-dots" aria-hidden="true"><i /><i /><i /><i /></span><Link className="home-text-link" to="/examples">Browse the gallery <ArrowRight size={16} /></Link></div></section>
     <section id="before-after" className="home-section home-before"><div className="home-before-top"><Heading eyebrow="Before and after">See what three photos can become.</Heading><p className="site-lede">Gravity Pants adds movement, words and your brand, then turns the result into a finished reel.</p></div><div className="home-before-grid"><BeforeAfter id="candle" palette={colors.candle} title="Candle launch" detail="3 photos → 7.5 sec reel · Fade, Slide, Zoom" headline={"Light up the\nlong nights."} subline="Winter scents · Shop now" /><BeforeAfter id="plant" palette={colors.plant} title="Plant shop promo" detail="3 photos → 7.5 sec reel · 9:16 + 1:1" headline={"Bring the\noutside in."} subline="Delivered potted · Shop now" /></div></section>
     <Spotlight />
     <section id="features" className="home-section home-features"><Heading eyebrow="Features">The tools you need to make and reuse ads.</Heading><div className="home-features-grid"><article className="site-card home-feature home-feature-wide"><div><h3>See every format while you edit</h3><p>Check your ad as a Story, square post and wide banner. The layout adjusts to each size so your words and logo stay in view.</p></div><FormatShapes labelled /></article>{features.map(f => <article className={`site-card home-feature ${f.art === "export" ? "home-feature-blue" : ""}`} key={f.title}><FeatureArt art={f.art} /><div><h3>{f.title}</h3><p>{f.body}</p></div></article>)}</div></section>
