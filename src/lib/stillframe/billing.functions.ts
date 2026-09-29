@@ -170,3 +170,17 @@ export const createPortalSession = createServerFn({ method: "POST" })
       return { error: getStripeErrorMessage(e) };
     }
   });
+
+/** Saved customer ids may come from the other (test/live) environment; only reuse one that exists here. */
+async function resolveCustomer(stripe: Stripe, saved: string | null, workspaceId: string): Promise<string | null> {
+  if (saved) {
+    try {
+      const c = await stripe.customers.retrieve(saved);
+      if (!("deleted" in c && c.deleted)) return c.id;
+    } catch {
+      // Not in this environment; fall back to a metadata lookup.
+    }
+  }
+  const found = await stripe.customers.search({ query: `metadata['workspaceId']:'${workspaceId}'`, limit: 1 });
+  return found.data[0]?.id ?? null;
+}
