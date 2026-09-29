@@ -427,7 +427,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
       <Dialog open={!!planSheet} onOpenChange={(o) => !o && setPlanSheet(null)}>
         <DialogContent className="max-w-[900px]">
           <DialogHeader>
-            <DialogTitle>{planSheet === "limit_reached" ? "You've used this month's exports" : planSheet === "payment_problem" ? "There's a problem with your payment" : "Choose a plan"}</DialogTitle>
+            <DialogTitle>{planSheet === "limit_reached" ? (exportStatus?.watermark ? `You've used your ${TRIAL.exports} trial exports` : "You've used this month's exports") : planSheet === "payment_problem" ? "There's a problem with your payment" : "Choose a plan"}</DialogTitle>
             <DialogDescription>
               {planSheet === "limit_reached"
                 ? "Your monthly exports are used up. Buy a top-up of 5 extra exports for $12.50 on the Billing page — they never expire — or move up a plan."
