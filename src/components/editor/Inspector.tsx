@@ -778,9 +778,9 @@ function LogoPanel({
           Replace logo
         </Button>
         <Button
-          variant="plain"
+          variant="destructive-plain"
           size="sm"
-          className="flex-1 text-destructive"
+          className="flex-1"
           onClick={() => actions.onLogo({ path: null, light_path: null, dark_path: null, asset_id: null })}
         >
           Remove logo
