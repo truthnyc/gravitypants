@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 
 const nav = [
-  { label: "How it works", to: "/features" },
+  { label: "How it works", to: "/how-it-works" },
   { label: "Examples", to: "/examples" },
   { label: "Features", to: "/features" },
   { label: "Pricing", to: "/pricing" },
