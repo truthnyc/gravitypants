@@ -5,14 +5,14 @@ import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/how-it-works")({
   head: () => ({ meta: [
-    { title: "Features — Gravity Pants" },
-    { name: "description", content: "Explore everything Gravity Pants offers to turn photos into video ads: editing, branding, motion, formats, and export." },
-    { property: "og:title", content: "Features — Gravity Pants" },
-    { property: "og:description", content: "See how Gravity Pants turns your photos into video ads, from upload to export." },
+    { title: "How it works — Gravity Pants" },
+    { name: "description", content: "Follow the steps from dropping in photos to downloading a finished video ad: create, edit, brand, animate, resize and export." },
+    { property: "og:title", content: "How it works — Gravity Pants" },
+    { property: "og:description", content: "See the steps that turn your product photos into a short video ad, from upload to export." },
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary" },
   ] }),
-  component: FeaturesPage,
+  component: HowItWorksPage,
 });
 
 const sections = [
