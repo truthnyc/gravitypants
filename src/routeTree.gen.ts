@@ -20,6 +20,7 @@ import { Route as HelpRouteImport } from './routes/help'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as ProductRouteImport } from './routes/product'
 import { Route as ResetRouteImport } from './routes/reset'
 import { Route as ShowcaseRouteImport } from './routes/showcase'
 import { Route as SigninRouteImport } from './routes/signin'
@@ -31,6 +32,7 @@ import { Route as AuthenticatedAppRouteRouteImport } from './routes/_authenticat
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as InviteTokenRouteImport } from './routes/invite.$token'
+import { Route as ProductSplatRouteImport } from './routes/product.$'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedAdminAdminsRouteImport } from './routes/_authenticated/admin/admins'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin/audit'
@@ -115,6 +117,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
   path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProductRoute = ProductRouteImport.update({
+  id: '/product',
+  path: '/product',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResetRoute = ResetRouteImport.update({
   id: '/reset',
   path: '/reset',
@@ -169,6 +176,11 @@ const InviteTokenRoute = InviteTokenRouteImport.update({
   id: '/invite/$token',
   path: '/invite/$token',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ProductSplatRoute = ProductSplatRouteImport.update({
+  id: '/$',
+  path: '/$',
+  getParentRoute: () => ProductRoute,
 } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
@@ -344,6 +356,7 @@ export interface FileRoutesByFullPath {
   '/how-it-works': typeof HowItWorksRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
+  '/product': typeof ProductRouteWithChildren
   '/reset': typeof ResetRoute
   '/showcase': typeof ShowcaseRoute
   '/signin': typeof SigninRoute
@@ -354,6 +367,7 @@ export interface FileRoutesByFullPath {
   '/app': typeof AuthenticatedAppRouteRouteWithChildren
   '/blog/$slug': typeof BlogSlugRoute
   '/invite/$token': typeof InviteTokenRoute
+  '/product/$': typeof ProductSplatRoute
   '/blog/': typeof BlogIndexRoute
   '/admin/admins': typeof AuthenticatedAdminAdminsRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
@@ -395,6 +409,7 @@ export interface FileRoutesByTo {
   '/how-it-works': typeof HowItWorksRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
+  '/product': typeof ProductRouteWithChildren
   '/reset': typeof ResetRoute
   '/showcase': typeof ShowcaseRoute
   '/signin': typeof SigninRoute
@@ -403,6 +418,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/invite/$token': typeof InviteTokenRoute
+  '/product/$': typeof ProductSplatRoute
   '/blog': typeof BlogIndexRoute
   '/admin/admins': typeof AuthenticatedAdminAdminsRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
@@ -447,6 +463,7 @@ export interface FileRoutesById {
   '/how-it-works': typeof HowItWorksRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
+  '/product': typeof ProductRouteWithChildren
   '/reset': typeof ResetRoute
   '/showcase': typeof ShowcaseRoute
   '/signin': typeof SigninRoute
@@ -457,6 +474,7 @@ export interface FileRoutesById {
   '/_authenticated/app': typeof AuthenticatedAppRouteRouteWithChildren
   '/blog/$slug': typeof BlogSlugRoute
   '/invite/$token': typeof InviteTokenRoute
+  '/product/$': typeof ProductSplatRoute
   '/blog/': typeof BlogIndexRoute
   '/_authenticated/admin/admins': typeof AuthenticatedAdminAdminsRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
@@ -501,6 +519,7 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/pricing'
     | '/privacy'
+    | '/product'
     | '/reset'
     | '/showcase'
     | '/signin'
@@ -511,6 +530,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/blog/$slug'
     | '/invite/$token'
+    | '/product/$'
     | '/blog/'
     | '/admin/admins'
     | '/admin/audit'
@@ -552,6 +572,7 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/pricing'
     | '/privacy'
+    | '/product'
     | '/reset'
     | '/showcase'
     | '/signin'
@@ -560,6 +581,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/blog/$slug'
     | '/invite/$token'
+    | '/product/$'
     | '/blog'
     | '/admin/admins'
     | '/admin/audit'
@@ -603,6 +625,7 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/pricing'
     | '/privacy'
+    | '/product'
     | '/reset'
     | '/showcase'
     | '/signin'
@@ -613,6 +636,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app'
     | '/blog/$slug'
     | '/invite/$token'
+    | '/product/$'
     | '/blog/'
     | '/_authenticated/admin/admins'
     | '/_authenticated/admin/audit'
@@ -657,6 +681,7 @@ export interface RootRouteChildren {
   HowItWorksRoute: typeof HowItWorksRoute
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
+  ProductRoute: typeof ProductRouteWithChildren
   ResetRoute: typeof ResetRoute
   ShowcaseRoute: typeof ShowcaseRoute
   SigninRoute: typeof SigninRoute
@@ -751,6 +776,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/product': {
+      id: '/product'
+      path: '/product'
+      fullPath: '/product'
+      preLoaderRoute: typeof ProductRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reset': {
       id: '/reset'
       path: '/reset'
@@ -827,6 +859,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/invite/$token'
       preLoaderRoute: typeof InviteTokenRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/product/$': {
+      id: '/product/$'
+      path: '/$'
+      fullPath: '/product/$'
+      preLoaderRoute: typeof ProductSplatRouteImport
+      parentRoute: typeof ProductRoute
     }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
@@ -1143,6 +1182,17 @@ const BlogRouteChildren: BlogRouteChildren = {
 
 const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
 
+interface ProductRouteChildren {
+  ProductSplatRoute: typeof ProductSplatRoute
+}
+
+const ProductRouteChildren: ProductRouteChildren = {
+  ProductSplatRoute: ProductSplatRoute,
+}
+
+const ProductRouteWithChildren =
+  ProductRoute._addFileChildren(ProductRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
@@ -1155,6 +1205,7 @@ const rootRouteChildren: RootRouteChildren = {
   HowItWorksRoute: HowItWorksRoute,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
+  ProductRoute: ProductRouteWithChildren,
   ResetRoute: ResetRoute,
   ShowcaseRoute: ShowcaseRoute,
   SigninRoute: SigninRoute,
