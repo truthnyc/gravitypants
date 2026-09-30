@@ -90,6 +90,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
   const [styleClip, setStyleClip] = useState<FrameStyle | null>(null);
   const [mobileSheetOpen, setMobileSheetOpen] = useState(false);
   const [sameLength, setSameLength] = useState(false);
+  const [sameTransition, setSameTransition] = useState(false);
   const replaceRef = useRef<HTMLInputElement>(null);
   const replaceAt = useRef(0);
   const { data: settings } = useBrandKit();
@@ -431,9 +432,15 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
         project: { ...d.project, pace },
         frames: d.frames.map((f) => ({ ...f, duration_sec: PACE_SECONDS[pace] })),
       })),
-    onTransition: (patch: Partial<TransitionSettings>) =>
-      updateFrame(idx, (f) => ({ ...f, transition_in: { ...{ type: "cut" as const, speed: "smooth" as const }, ...f.transition_in, ...patch } })),
-    onTransitionAll: () => {
+    onTransition: (patch: Partial<TransitionSettings>) => {
+      const merge = (f: Frame) => ({ ...f, transition_in: { ...{ type: "cut" as const, speed: "smooth" as const }, ...f.transition_in, ...patch } });
+      if (sameTransition) apply((d) => ({ ...d, frames: d.frames.map((f, j) => (j === 0 ? f : merge(f))) }));
+      else updateFrame(idx, merge);
+    },
+    sameTransition,
+    onSameTransition: (on: boolean) => {
+      setSameTransition(on);
+      if (!on) return;
       const tr = frame?.transition_in;
       if (tr) apply((d) => ({ ...d, frames: d.frames.map((f, j) => (j === 0 ? f : { ...f, transition_in: { ...tr } })) }));
     },
