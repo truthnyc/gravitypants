@@ -89,6 +89,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
   const [adjusting, setAdjusting] = useState(false);
   const [styleClip, setStyleClip] = useState<FrameStyle | null>(null);
   const [mobileSheetOpen, setMobileSheetOpen] = useState(false);
+  const [sameLength, setSameLength] = useState(false);
   const replaceRef = useRef<HTMLInputElement>(null);
   const replaceAt = useRef(0);
   const { data: settings } = useBrandKit();
@@ -416,11 +417,12 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
         : d.frames,
     })),
     onDuration: (sec, key) => {
-      const same = frames.every((f) => f.duration_sec === frames[0]?.duration_sec) && frames.length > 1;
-      if (same) apply((d) => ({ ...d, frames: d.frames.map((f) => ({ ...f, duration_sec: sec })) }), key ?? "duration-all");
+      if (sameLength && frames.length > 1) apply((d) => ({ ...d, frames: d.frames.map((f) => ({ ...f, duration_sec: sec })) }), key ?? "duration-all");
       else setDuration(idx, sec);
     },
+    sameLength,
     onSameLength: (on) => {
+      setSameLength(on);
       if (on && frame) apply((d) => ({ ...d, frames: d.frames.map((f) => ({ ...f, duration_sec: frame.duration_sec })) }));
     },
     onPace: (pace: Pace) =>
