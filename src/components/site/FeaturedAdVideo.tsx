@@ -6,7 +6,7 @@ import videoAsset from "@/assets/site/example-of-the-week.mp4.asset.json";
 import webmAsset from "@/assets/site/example-of-the-week.webm.asset.json";
 import posterAsset from "@/assets/site/example-of-the-week-poster.webp.asset.json";
 
-export function FeaturedAdVideo({ controls = false, video = videoAsset.url, videoWebm = webmAsset.url, poster = posterAsset.url, label = "Purl Soho Japanese Denim Cotton video ad", format = "916" }: { controls?: boolean; video?: string; videoWebm?: string | undefined; poster?: string | undefined; label?: string; format?: "916" | "169" }) {
+export function FeaturedAdVideo({ controls = false, video = videoAsset.url, videoWebm = webmAsset.url, poster = posterAsset.url, label = "Purl Soho Japanese Denim Cotton video ad", format = "916", tapToggle = false }: { tapToggle?: boolean; controls?: boolean; video?: string; videoWebm?: string | undefined; poster?: string | undefined; label?: string; format?: "916" | "169" }) {
   const [playing, setPlaying] = useState(false);
   const phoneRef = useRef<HTMLDivElement>(null);
 
@@ -19,7 +19,7 @@ export function FeaturedAdVideo({ controls = false, video = videoAsset.url, vide
   };
 
   return <div ref={phoneRef} className={`site-phone site-phone-large featured-ad-phone featured-ad-${format}`}>
-    <div className="site-phone-screen">
+    <div className="site-phone-screen" style={tapToggle ? { cursor: "pointer" } : undefined} onClick={tapToggle ? event => { event.preventDefault(); event.stopPropagation(); toggle(); } : undefined}>
       <ReelVideo
          video={video}
          videoWebm={videoWebm}
