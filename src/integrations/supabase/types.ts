@@ -178,6 +178,36 @@ export type Database = {
           },
         ]
       }
+      brand_requests: {
+        Row: {
+          brand: string
+          created_at: string
+          email: string
+          id: string
+          message: string | null
+          name: string
+          website: string | null
+        }
+        Insert: {
+          brand: string
+          created_at?: string
+          email: string
+          id?: string
+          message?: string | null
+          name: string
+          website?: string | null
+        }
+        Update: {
+          brand?: string
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string | null
+          name?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
       export_usage: {
         Row: {
           created_at: string
@@ -435,6 +465,60 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      site_reels: {
+        Row: {
+          brand: string
+          category: string
+          created_at: string
+          format: string
+          href: string | null
+          id: string
+          photos: number
+          poster_url: string | null
+          published: boolean
+          seconds: number
+          sort_order: number
+          title: string
+          updated_at: string
+          video_url: string
+          video_webm_url: string | null
+        }
+        Insert: {
+          brand: string
+          category?: string
+          created_at?: string
+          format?: string
+          href?: string | null
+          id?: string
+          photos?: number
+          poster_url?: string | null
+          published?: boolean
+          seconds?: number
+          sort_order?: number
+          title: string
+          updated_at?: string
+          video_url: string
+          video_webm_url?: string | null
+        }
+        Update: {
+          brand?: string
+          category?: string
+          created_at?: string
+          format?: string
+          href?: string | null
+          id?: string
+          photos?: number
+          poster_url?: string | null
+          published?: boolean
+          seconds?: number
+          sort_order?: number
+          title?: string
+          updated_at?: string
+          video_url?: string
+          video_webm_url?: string | null
+        }
+        Relationships: []
       }
       support_sessions: {
         Row: {

@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as BlogRouteImport } from './routes/blog'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ExamplesRouteImport } from './routes/examples'
 import { Route as FeaturesRouteImport } from './routes/features'
 import { Route as HelpRouteImport } from './routes/help'
@@ -20,6 +21,7 @@ import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ResetRouteImport } from './routes/reset'
+import { Route as ShowcaseRouteImport } from './routes/showcase'
 import { Route as SigninRouteImport } from './routes/signin'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
@@ -34,6 +36,7 @@ import { Route as AuthenticatedAdminAdminsRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin/audit'
 import { Route as AuthenticatedAdminClientsRouteImport } from './routes/_authenticated/admin/clients'
 import { Route as AuthenticatedAdminExportsRouteImport } from './routes/_authenticated/admin/exports'
+import { Route as AuthenticatedAdminReelsRouteImport } from './routes/_authenticated/admin/reels'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app/index'
 import { Route as AuthenticatedAppAccountRouteImport } from './routes/_authenticated/app/account'
 import { Route as AuthenticatedAppAdsRouteImport } from './routes/_authenticated/app/ads'
@@ -77,6 +80,11 @@ const BlogRoute = BlogRouteImport.update({
   path: '/blog',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ExamplesRoute = ExamplesRouteImport.update({
   id: '/examples',
   path: '/examples',
@@ -110,6 +118,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const ResetRoute = ResetRouteImport.update({
   id: '/reset',
   path: '/reset',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShowcaseRoute = ShowcaseRouteImport.update({
+  id: '/showcase',
+  path: '/showcase',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SigninRoute = SigninRouteImport.update({
@@ -185,6 +198,11 @@ const AuthenticatedAdminExportsRoute =
     path: '/exports',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminReelsRoute = AuthenticatedAdminReelsRouteImport.update({
+  id: '/reels',
+  path: '/reels',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
 const AuthenticatedAppIndexRoute = AuthenticatedAppIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -319,6 +337,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/blog': typeof BlogRouteWithChildren
+  '/contact': typeof ContactRoute
   '/examples': typeof ExamplesRoute
   '/features': typeof FeaturesRoute
   '/help': typeof HelpRoute
@@ -326,6 +345,7 @@ export interface FileRoutesByFullPath {
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/reset': typeof ResetRoute
+  '/showcase': typeof ShowcaseRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -339,6 +359,7 @@ export interface FileRoutesByFullPath {
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/clients': typeof AuthenticatedAdminClientsRoute
   '/admin/exports': typeof AuthenticatedAdminExportsRoute
+  '/admin/reels': typeof AuthenticatedAdminReelsRoute
   '/app/account': typeof AuthenticatedAppAccountRoute
   '/app/ads': typeof AuthenticatedAppAdsRoute
   '/app/brand': typeof AuthenticatedAppBrandRoute
@@ -367,6 +388,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/contact': typeof ContactRoute
   '/examples': typeof ExamplesRoute
   '/features': typeof FeaturesRoute
   '/help': typeof HelpRoute
@@ -374,6 +396,7 @@ export interface FileRoutesByTo {
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/reset': typeof ResetRoute
+  '/showcase': typeof ShowcaseRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -385,6 +408,7 @@ export interface FileRoutesByTo {
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/clients': typeof AuthenticatedAdminClientsRoute
   '/admin/exports': typeof AuthenticatedAdminExportsRoute
+  '/admin/reels': typeof AuthenticatedAdminReelsRoute
   '/app/account': typeof AuthenticatedAppAccountRoute
   '/app/ads': typeof AuthenticatedAppAdsRoute
   '/app/brand': typeof AuthenticatedAppBrandRoute
@@ -416,6 +440,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/blog': typeof BlogRouteWithChildren
+  '/contact': typeof ContactRoute
   '/examples': typeof ExamplesRoute
   '/features': typeof FeaturesRoute
   '/help': typeof HelpRoute
@@ -423,6 +448,7 @@ export interface FileRoutesById {
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/reset': typeof ResetRoute
+  '/showcase': typeof ShowcaseRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -436,6 +462,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/admin/clients': typeof AuthenticatedAdminClientsRoute
   '/_authenticated/admin/exports': typeof AuthenticatedAdminExportsRoute
+  '/_authenticated/admin/reels': typeof AuthenticatedAdminReelsRoute
   '/_authenticated/app/account': typeof AuthenticatedAppAccountRoute
   '/_authenticated/app/ads': typeof AuthenticatedAppAdsRoute
   '/_authenticated/app/brand': typeof AuthenticatedAppBrandRoute
@@ -467,6 +494,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/blog'
+    | '/contact'
     | '/examples'
     | '/features'
     | '/help'
@@ -474,6 +502,7 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/privacy'
     | '/reset'
+    | '/showcase'
     | '/signin'
     | '/signup'
     | '/sitemap.xml'
@@ -487,6 +516,7 @@ export interface FileRouteTypes {
     | '/admin/audit'
     | '/admin/clients'
     | '/admin/exports'
+    | '/admin/reels'
     | '/app/account'
     | '/app/ads'
     | '/app/brand'
@@ -515,6 +545,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/contact'
     | '/examples'
     | '/features'
     | '/help'
@@ -522,6 +553,7 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/privacy'
     | '/reset'
+    | '/showcase'
     | '/signin'
     | '/signup'
     | '/sitemap.xml'
@@ -533,6 +565,7 @@ export interface FileRouteTypes {
     | '/admin/audit'
     | '/admin/clients'
     | '/admin/exports'
+    | '/admin/reels'
     | '/app/account'
     | '/app/ads'
     | '/app/brand'
@@ -563,6 +596,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/about'
     | '/blog'
+    | '/contact'
     | '/examples'
     | '/features'
     | '/help'
@@ -570,6 +604,7 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/privacy'
     | '/reset'
+    | '/showcase'
     | '/signin'
     | '/signup'
     | '/sitemap.xml'
@@ -583,6 +618,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/audit'
     | '/_authenticated/admin/clients'
     | '/_authenticated/admin/exports'
+    | '/_authenticated/admin/reels'
     | '/_authenticated/app/account'
     | '/_authenticated/app/ads'
     | '/_authenticated/app/brand'
@@ -614,6 +650,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
   BlogRoute: typeof BlogRouteWithChildren
+  ContactRoute: typeof ContactRoute
   ExamplesRoute: typeof ExamplesRoute
   FeaturesRoute: typeof FeaturesRoute
   HelpRoute: typeof HelpRoute
@@ -621,6 +658,7 @@ export interface RootRouteChildren {
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
   ResetRoute: typeof ResetRoute
+  ShowcaseRoute: typeof ShowcaseRoute
   SigninRoute: typeof SigninRoute
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -662,6 +700,13 @@ declare module '@tanstack/react-router' {
       path: '/blog'
       fullPath: '/blog'
       preLoaderRoute: typeof BlogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/examples': {
@@ -711,6 +756,13 @@ declare module '@tanstack/react-router' {
       path: '/reset'
       fullPath: '/reset'
       preLoaderRoute: typeof ResetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/showcase': {
+      id: '/showcase'
+      path: '/showcase'
+      fullPath: '/showcase'
+      preLoaderRoute: typeof ShowcaseRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/signin': {
@@ -809,6 +861,13 @@ declare module '@tanstack/react-router' {
       path: '/exports'
       fullPath: '/admin/exports'
       preLoaderRoute: typeof AuthenticatedAdminExportsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/reels': {
+      id: '/_authenticated/admin/reels'
+      path: '/reels'
+      fullPath: '/admin/reels'
+      preLoaderRoute: typeof AuthenticatedAdminReelsRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
     '/_authenticated/app/': {
@@ -995,6 +1054,7 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
   AuthenticatedAdminClientsRoute: typeof AuthenticatedAdminClientsRoute
   AuthenticatedAdminExportsRoute: typeof AuthenticatedAdminExportsRoute
+  AuthenticatedAdminReelsRoute: typeof AuthenticatedAdminReelsRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
   AuthenticatedAdminClientsIdRoute: typeof AuthenticatedAdminClientsIdRoute
   AuthenticatedAdminTemplatesIdRoute: typeof AuthenticatedAdminTemplatesIdRouteWithChildren
@@ -1008,6 +1068,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
     AuthenticatedAdminClientsRoute: AuthenticatedAdminClientsRoute,
     AuthenticatedAdminExportsRoute: AuthenticatedAdminExportsRoute,
+    AuthenticatedAdminReelsRoute: AuthenticatedAdminReelsRoute,
     AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
     AuthenticatedAdminClientsIdRoute: AuthenticatedAdminClientsIdRoute,
     AuthenticatedAdminTemplatesIdRoute:
@@ -1087,6 +1148,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AboutRoute: AboutRoute,
   BlogRoute: BlogRouteWithChildren,
+  ContactRoute: ContactRoute,
   ExamplesRoute: ExamplesRoute,
   FeaturesRoute: FeaturesRoute,
   HelpRoute: HelpRoute,
@@ -1094,6 +1156,7 @@ const rootRouteChildren: RootRouteChildren = {
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
   ResetRoute: ResetRoute,
+  ShowcaseRoute: ShowcaseRoute,
   SigninRoute: SigninRoute,
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,

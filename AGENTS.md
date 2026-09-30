@@ -44,3 +44,5 @@
 - Public art uses `public/site-art`; the Purl Soho video uses shared `FeaturedAdVideo` and CDN pointers, keeping site media separate from private workspace assets.
 - Reusable kits: ads made from an `is_reusable` template store `projects.template_id`; `KitAgain.tsx` (useKit/KitAgainButton) drives the label, search and "Make another" (`/app/templates/$slug?from=<ad>` prefills text, no photos) from one place.
 - Staff role: `user_roles` (enum app_role, admin) checked via `has_role()`; `is_platform_admin()` wraps it; staff area at `/admin` (`_authenticated/admin/`) 404s non-admins — roles never live on profiles.
+- Website reels: brand reels live in `site_reels` (files in private `site-reels` bucket as `site-reels:<path>`, signed by public `listSiteReels`) and drive home, /examples and /showcase; staff manage them at /admin/reels via `admin-reels.functions.ts`. Drawn placeholders in `examples.ts` fill gaps only.
+- Brand requests: /contact saves to `brand_requests` (anon insert only) and emails help@gravitypants.com via the `brand-request` template.

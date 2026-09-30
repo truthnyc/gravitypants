@@ -11,6 +11,10 @@ import { GravityPantsLogo } from "@/components/GravityPantsLogo";
 import { Button } from "@/components/ui/button";
 import { galleryExamples, type GalleryExample } from "@/lib/site/examples";
 import { siteHead } from "@/lib/site/seo";
+import { listSiteReels } from "@/lib/site/reels.functions";
+import type { SiteReel } from "@/lib/site/reels";
+
+const reelToExample = (r: SiteReel): GalleryExample => ({ id: r.id, name: r.title, category: r.category, format: r.format, photos: r.photos, seconds: r.seconds, headline: r.title, sub: r.brand, logo: r.brand, video: r.video, ...(r.videoWebm ? { videoWebm: r.videoWebm } : {}), ...(r.poster ? { poster: r.poster } : {}), ...(r.href ? { href: r.href } : {}), frames: [] });
 
 const categories = [{ id: "all", label: "All" }, { id: "fashion", label: "Fashion" }, { id: "food", label: "Food & drink" }, { id: "beauty", label: "Beauty" }, { id: "home", label: "Home" }] as const;
 const formats = [{ id: "all", label: "All formats", short: "All" }, { id: "916", label: "9:16", short: "9:16" }, { id: "11", label: "1:1", short: "1:1" }, { id: "169", label: "16:9", short: "16:9" }] as const;
@@ -42,7 +46,8 @@ function GalleryCard({ example }: { example: GalleryExample }) {
 
 export const Route = createFileRoute("/examples")({
   validateSearch: z.object({ cat: z.string().optional(), format: z.coerce.number().optional() }),
-  head: () => siteHead({ path: "/examples", title: "Examples — Gravity Pants", description: "Browse twelve Gravity Pants video ad examples across fashion, food, beauty, and home. Find a style for your photos." }),
+  head: () => siteHead({ path: "/examples", title: "Examples — Gravity Pants", description: "Browse Gravity Pants video ad examples across fashion, food, beauty, and home. Find a style for your photos." }),
+  loader: () => listSiteReels().catch(() => [] as SiteReel[]),
   component: ExamplesPage,
 });
 
@@ -51,14 +56,17 @@ function ExamplesPage() {
   const navigate = useNavigate({ from: "/examples" });
   const cat = categories.some(c => c.id === search.cat) ? search.cat : undefined;
   const format = formats.some(f => f.id === String(search.format)) ? String(search.format) : undefined;
-  const visible = galleryExamples.filter(example => (!cat || example.category === cat) && (!format || example.format === format));
+  const reels = Route.useLoaderData();
+  // Brand reels come from /admin/reels; drawn stand-ins (no brand link) fill the rest.
+  const all = [...reels.map(reelToExample), ...galleryExamples.filter(e => !e.href)];
+  const visible = all.filter(example => (!cat || example.category === cat) && (!format || example.format === format));
   return <SiteShell><div className="examples-page">
     <section className="examples-hero examples-container"><span className="site-eyebrow">Examples</span><div><h1>See what your<br />photos can become.</h1><p className="site-lede">Each example started with a few still photos. Choose a style you like and use it with your own products.</p></div></section>
     <section className="examples-featured examples-container" aria-label="Example of the week"><article className="site-card examples-featured-panel"><div className="examples-featured-copy"><div><span className="examples-badge">Example of the week</span><h2>Japanese Denim Cotton</h2><p>A Purl Soho ad, from textured yarn and product details to a simple invitation to shop.</p></div><div className="examples-featured-bottom"><div className="examples-chips"><span>3 photos</span><span>7.8 sec</span><span>9:16</span><span>Purl Soho</span></div><div className="examples-featured-actions"><Button asChild variant="siteSecondary" size="site"><a href="#gallery">Browse more examples</a></Button></div></div></div><div className="examples-featured-media"><div className="examples-featured-stills"><small>Original photos</small>{[photo1, photo2, photo3].map((photo, index) => <img key={photo.url} src={photo.url} alt={`Purl Soho original photo ${index + 1}`} />)}</div><ArrowRight className="examples-featured-arrow" size={30} strokeWidth={1.7} /><div className="examples-featured-phone"><small>Video ad</small><a className="site-reel-link" href="https://purlsoho.com" target="_blank" rel="noreferrer" aria-label="Japanese Denim Cotton — visit Purl Soho"><FeaturedAdVideo controls /></a></div></div></article></section>
     <section id="gallery" className="examples-gallery examples-container" aria-label="Examples gallery"><div className="examples-filters"><div className="examples-categories" role="group" aria-label="Filter by category">{categories.map(option => <Button key={option.id} type="button" variant="ghost" className="examples-filter-button" aria-pressed={(cat || "all") === option.id} onClick={() => navigate({ search: prev => ({ ...prev, cat: option.id === "all" ? undefined : option.id }), hash: "gallery", replace: true })}>{option.label}</Button>)}</div><div className="examples-filter-right"><span className="examples-count" aria-live="polite">{visible.length} {visible.length === 1 ? "example" : "examples"}</span><div className="examples-formats" role="group" aria-label="Filter by format">{formats.map(option => <Button key={option.id} type="button" variant="ghost" className="examples-filter-button" aria-pressed={(format || "all") === option.id} onClick={() => navigate({ search: prev => ({ ...prev, format: option.id === "all" ? undefined : Number(option.id) }), hash: "gallery", replace: true })}><span className="examples-format-long">{option.label}</span><span className="examples-format-short">{option.short}</span></Button>)}</div></div></div>
       {visible.length > 0 ? <div className="examples-grid">{visible.map(example => <GalleryCard key={example.id} example={example} />)}</div> : <div className="site-card examples-empty"><h2>No examples in this combination yet.</h2><Button variant="siteSecondary" size="site" onClick={() => navigate({ search: { cat: undefined, format: undefined }, hash: "gallery", replace: true })}>Show all examples</Button></div>}
     </section>
-    <section className="examples-submit examples-container"><span>Made something you’re proud of?</span><Link to="/signup">Submit it to the gallery <ArrowRight size={16} strokeWidth={1.7} /></Link></section>
+    <section className="examples-submit examples-container"><span>Want a reel like these for your brand?</span><Link to="/contact">Tell us about it <ArrowRight size={16} strokeWidth={1.7} /></Link></section>
     <section className="examples-closing examples-container"><div className="site-card examples-closing-inner"><div className="examples-closing-copy"><div className="examples-closing-logo"><GravityPantsLogo size={64} /></div><h2>Found a style you like?</h2><p>Use it with your own photos and change anything you want.</p><div><Button asChild variant="site" size="site"><Link to="/signup">Start free</Link></Button><Button asChild variant="siteSecondary" size="site"><Link to="/pricing">See pricing</Link></Button></div></div><div className="examples-closing-orbit" aria-hidden="true"><span /></div></div></section>
   </div></SiteShell>;
 }
