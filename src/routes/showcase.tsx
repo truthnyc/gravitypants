@@ -78,7 +78,7 @@ function Showcase() {
               <br />
               for your brand.
             </h1>
-            <p className="site-lede">Each reel started as a few product photos. Tap a reel to visit the brand.</p>
+            <p className="site-lede">Each reel starts as a few product photos. Tap a reel to visit the brand.</p>
           </div>
         </section>
         <section className="examples-gallery examples-container" aria-label="Brand reels">
