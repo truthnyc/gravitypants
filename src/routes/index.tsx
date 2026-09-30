@@ -730,7 +730,7 @@ function Home() {
           <div className="home-quote">
             <span className="home-quote-mark">“</span>
             <p>
-              "We shot a few photos of our products and had a finished reel for Instagram in minutes. It looks like our
+              "We used a few photos of our products and had a finished reel for Instagram in minutes. It looks like our
               brand, not a template, and we didn't need a video editor to get there."
             </p>
             <div className="home-person">
