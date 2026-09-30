@@ -13,6 +13,12 @@ import photo1 from "@/assets/site/purl-soho-photo-1.webp.asset.json";
 import photo2 from "@/assets/site/purl-soho-photo-2.webp.asset.json";
 import photo3 from "@/assets/site/purl-soho-photo-3.webp.asset.json";
 import heroPoster from "@/assets/site/example-of-the-week-poster.webp.asset.json";
+import jewelryVideo from "@/assets/site/fine-jewelry-gifts.mp4.asset.json";
+import jewelryWebm from "@/assets/site/fine-jewelry-gifts.webm.asset.json";
+import jewelryPoster from "@/assets/site/fine-jewelry-gifts-poster.webp.asset.json";
+import jewelryFrame1 from "@/assets/site/fine-jewelry-frame-1.webp.asset.json";
+import jewelryFrame2 from "@/assets/site/fine-jewelry-frame-2.webp.asset.json";
+import jewelryFrame3 from "@/assets/site/fine-jewelry-frame-3.webp.asset.json";
 import { siteHead } from "@/lib/site/seo";
 import { listSiteReels } from "@/lib/site/reels.functions";
 import { FORMAT_LABEL, type SiteReel } from "@/lib/site/reels";
@@ -224,6 +230,8 @@ function BeforeAfter({
   video,
   videoWebm,
   poster,
+  format = "916",
+  imageLabel = "Original photos",
 }: {
   stills: string[];
   title: string;
@@ -231,20 +239,22 @@ function BeforeAfter({
   video: string;
   videoWebm?: string | undefined;
   poster?: string | undefined;
+  format?: "916" | "169";
+  imageLabel?: string;
 }) {
   return (
     <article className="site-card home-before-card">
       <div className="home-before-art">
-        <div className="home-stills">
+        <div className="home-stills examples-featured-stills">
+          <small>{imageLabel}</small>
           {stills.map((src, i) => (
-            <span key={src} className={`home-still home-still-${i + 1}`}>
-              <img src={src} alt="" />
-            </span>
+            <img key={src} src={src} alt={`${title} ${imageLabel === "Video frames" ? "video frame" : "original photo"} ${i + 1}`} loading="lazy" />
           ))}
         </div>
         <ArrowRight className="home-arrow" strokeWidth={1.7} />
-        <div className="home-example-video home-example-video-916">
-          <ReelVideo video={video} videoWebm={videoWebm} poster={poster} label={`${title} video ad`} />
+        <div className="home-before-video examples-featured-phone">
+          <small>Video ad</small>
+          <FeaturedAdVideo controls video={video} videoWebm={videoWebm} poster={poster} label={`${title} video ad`} format={format} />
         </div>
       </div>
       <div className="home-before-caption">
@@ -656,34 +666,24 @@ function Home() {
             </p>
           </div>
           <div className="home-before-grid">
-            {(() => {
-              const purl = examples.find((e) => e.name === "Japanese Denim Cotton");
-              const aro = examples.find((e) => e.name === "AW 26-27 Collection");
-              return (
-                <>
-                  {purl?.video && (
-                    <BeforeAfter
-                      stills={[photo1.url, photo2.url, photo3.url]}
-                      title="Japanese Denim Cotton"
-                      detail="3 photos → 7.8 sec reel · Purl Soho"
-                      video={purl.video}
-                      videoWebm={purl.videoWebm}
-                      poster={purl.poster}
-                    />
-                  )}
-                  {aro?.video && (
-                    <BeforeAfter
-                      stills={aro.poster ? [aro.poster] : []}
-                      title="AW 26-27 Collection"
-                      detail="3 photos → 6 sec reel · Aro"
-                      video={aro.video}
-                      videoWebm={aro.videoWebm}
-                      poster={aro.poster}
-                    />
-                  )}
-                </>
-              );
-            })()}
+            <BeforeAfter
+              stills={[photo1.url, photo2.url, photo3.url]}
+              title="Japanese Denim Cotton"
+              detail="3 photos → 7.8 sec reel · Purl Soho"
+              video={featuredVideo.url}
+              videoWebm={featuredWebm.url}
+              poster={heroPoster.url}
+            />
+            <BeforeAfter
+              stills={[jewelryFrame1.url, jewelryFrame2.url, jewelryFrame3.url]}
+              imageLabel="Video frames"
+              title="Fine Jewelry Gifts"
+              detail="8 sec reel · Katherine Grover Fine Jewelry"
+              video={jewelryVideo.url}
+              videoWebm={jewelryWebm.url}
+              poster={jewelryPoster.url}
+              format="169"
+            />
           </div>
         </section>
         <Spotlight />
