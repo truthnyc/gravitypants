@@ -74,30 +74,9 @@ type HomeExample = {
   videoFormat?: "11" | "916" | "169";
   href?: string | undefined;
 };
-// Drawn stand-ins fill the carousel between the real brand reels managed in /admin/reels.
-const drawnExamples: HomeExample[] = [
-  {
-    name: "Coffee subscription",
-    headline: "Slow mornings.\nFast shipping.",
-    subline: "[Roaster name]",
-    detail: "3 photos · 9 sec · 9:16 + 1:1",
-  },
-  {
-    name: "Candle launch",
-    headline: "Light up the\nlong nights.",
-    subline: "Winter scents",
-    detail: "3 photos · 7.5 sec · 9:16",
-  },
-  {
-    name: "Plant shop promo",
-    headline: "Bring the\noutside in.",
-    subline: "Delivered potted",
-    detail: "3 photos · 7.5 sec · 1:1",
-  },
-  { name: "Bakery weekend", headline: "Fresh out\nat 7am.", subline: "Order ahead", detail: "3 photos · 6 sec · 1:1" },
-];
+// Only real brand reels managed in /admin/reels appear in the carousel.
 function homeExamples(reels: SiteReel[]): HomeExample[] {
-  const real: HomeExample[] = reels.map((r) => ({
+  return reels.map((r) => ({
     name: r.title,
     logo: r.brand,
     detail: `${r.photos} photos · ${r.seconds} sec · ${FORMAT_LABEL[r.format]} · ${r.brand}`,
@@ -107,13 +86,6 @@ function homeExamples(reels: SiteReel[]): HomeExample[] {
     videoFormat: r.format,
     href: r.href ?? undefined,
   }));
-  const out: HomeExample[] = [];
-  real.forEach((r, i) => {
-    out.push(r);
-    const d = drawnExamples[i];
-    if (i % 2 === 1 && d) out.push(d);
-  });
-  return out.length ? out : drawnExamples;
 }
 function HomeReelVideo({ example }: { example: HomeExample }) {
   return (

@@ -57,8 +57,8 @@ function ExamplesPage() {
   const cat = categories.some(c => c.id === search.cat) ? search.cat : undefined;
   const format = formats.some(f => f.id === String(search.format)) ? String(search.format) : undefined;
   const reels = Route.useLoaderData();
-  // Brand reels come from /admin/reels; drawn stand-ins (no brand link) fill the rest.
-  const all = [...reels.map(reelToExample), ...galleryExamples.filter(e => !e.href)];
+  // Only real brand reels from /admin/reels are shown.
+  const all = reels.map(reelToExample);
   const visible = all.filter(example => (!cat || example.category === cat) && (!format || example.format === format));
   return <SiteShell><div className="examples-page">
     <section className="examples-hero examples-container"><span className="site-eyebrow">Examples</span><div><h1>See what your<br />photos can become.</h1><p className="site-lede">Each example started with a few still photos. Choose a style you like and use it with your own products.</p></div></section>
