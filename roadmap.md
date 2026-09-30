@@ -50,6 +50,7 @@
 
 ## Public home page
 - [x] Rebuild desktop and mobile reference sections and interactions; verify responsive flow
+- [x] Pair Purl Soho originals and Fine Jewelry Gifts video frames with their matching reels in the before-and-after panels
 
 ## Public features page
 - [x] Rebuild reference sections, mobile layouts, jump links, and animations; verify at phone and desktop widths
