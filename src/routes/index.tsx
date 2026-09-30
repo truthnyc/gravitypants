@@ -13,6 +13,8 @@ import photo1 from "@/assets/site/purl-soho-photo-1.webp.asset.json";
 import photo2 from "@/assets/site/purl-soho-photo-2.webp.asset.json";
 import photo3 from "@/assets/site/purl-soho-photo-3.webp.asset.json";
 import heroPoster from "@/assets/site/example-of-the-week-poster.webp.asset.json";
+import featuredVideo from "@/assets/site/example-of-the-week.mp4.asset.json";
+import featuredWebm from "@/assets/site/example-of-the-week.webm.asset.json";
 import jewelryVideo from "@/assets/site/fine-jewelry-gifts.mp4.asset.json";
 import jewelryWebm from "@/assets/site/fine-jewelry-gifts.webm.asset.json";
 import jewelryPoster from "@/assets/site/fine-jewelry-gifts-poster.webp.asset.json";
@@ -670,6 +672,8 @@ function Home() {
               stills={[photo1.url, photo2.url, photo3.url]}
               title="Japanese Denim Cotton"
               detail="3 photos → 7.8 sec reel · Purl Soho"
+              video={featuredVideo.url}
+              videoWebm={featuredWebm.url}
               poster={heroPoster.url}
             />
             <BeforeAfter
