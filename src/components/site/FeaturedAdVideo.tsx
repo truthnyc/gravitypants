@@ -25,8 +25,10 @@ export function FeaturedAdVideo({ controls = false, video = videoAsset.url, vide
          videoWebm={videoWebm}
          poster={poster}
          label={label}
+        noFullscreen={tapToggle || controls}
         onPlayingChange={setPlaying}
       />
+
       {controls && <Button type="button" variant="siteSecondary" size="icon" className="featured-ad-control" aria-label={playing ? "Pause featured ad" : "Play featured ad"} onClick={toggle}>
         {playing ? <Pause size={18} fill="currentColor" /> : <Play size={18} fill="currentColor" />}
       </Button>}
