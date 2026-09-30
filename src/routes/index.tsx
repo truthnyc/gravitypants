@@ -733,7 +733,7 @@ function Home() {
             {[
               ["10 min", "to your first ad"],
               ["3", "formats from one edit"],
-              ["6+", "ready-made templates"],
+              ["10+", "ready-made templates"],
               ["0", "video skills needed"],
             ].map(([num, label], i) => (
               <div className="site-card" key={i}>
