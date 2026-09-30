@@ -746,7 +746,7 @@ function Home() {
               ["120", "reels made"],
               ["5-6 min", "average time to first ad"],
               ["13", "brands on board"],
-              ["65%", "[Result metric]"],
+              ["65%", "time saved per ad"],
             ].map(([num, label], i) => (
               <div className="site-card" key={i}>
                 <b>{num}</b>
