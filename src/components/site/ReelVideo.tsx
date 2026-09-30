@@ -15,19 +15,20 @@ export type ReelVideoSource = {
  * (preload="none" plus an IntersectionObserver), pauses when it leaves the
  * viewport, and stays still for visitors who prefer reduced motion.
  */
-export function ReelVideo({ video, videoWebm, poster, label, className, onPlayingChange, tabIndex }: ReelVideoSource & {
+export function ReelVideo({ video, videoWebm, poster, label, className, onPlayingChange, tabIndex, noFullscreen = false }: ReelVideoSource & {
   className?: string;
   onPlayingChange?: (playing: boolean) => void;
   tabIndex?: number;
+  /** Set when the surrounding panel handles the click itself (play/pause in place). */
+  noFullscreen?: boolean;
 }) {
   const ref = useRef<HTMLVideoElement>(null);
   const [active, setActive] = useState(false);
 
   useEffect(() => {
     const element = ref.current;
-    if (!element) return;
+    if (!element || noFullscreen) return;
     const openFullscreen = (event: MouseEvent) => {
-      if (!window.matchMedia("(max-width: 767px)").matches) return;
       event.preventDefault();
       event.stopPropagation();
       event.stopImmediatePropagation();
@@ -46,7 +47,8 @@ export function ReelVideo({ video, videoWebm, poster, label, className, onPlayin
     };
     element.addEventListener("click", openFullscreen, true);
     return () => element.removeEventListener("click", openFullscreen, true);
-  }, []);
+  }, [noFullscreen]);
+
 
   useEffect(() => {
     const element = ref.current;
