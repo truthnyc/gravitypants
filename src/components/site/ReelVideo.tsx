@@ -46,6 +46,8 @@ export function ReelVideo({ video, videoWebm, poster, label, className, onPlayin
       else void element.play().catch(() => {});
     };
     // Sources render only once active, so wait for the element to pick them up.
+    element.muted = true;
+    element.defaultMuted = true;
     element.load();
     sync();
     preference.addEventListener("change", sync);
