@@ -855,7 +855,6 @@ function TransitionPanel({ frames, frame, first, actions }: { frames: Frame[]; f
   }
   const tr = frame.transition_in ?? { type: "cut", speed: "smooth" };
   const rest = frames.slice(1);
-  const allSame = rest.every((f) => f.transition_in?.type === tr.type && f.transition_in?.speed === tr.speed);
   return (
     <>
       <div className="grid grid-cols-3 gap-2">
