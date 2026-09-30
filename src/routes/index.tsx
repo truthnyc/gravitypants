@@ -572,7 +572,7 @@ function Home() {
               <img src={photo3.url} alt="Purl Soho denim cotton yarn skeins photo" />
             </div>
             <div className="home-hero-phone">
-              <FeaturedAdVideo />
+              <FeaturedAdVideo tapToggle />
             </div>
             <div className="site-card home-exported">
               <span>Exported</span>
