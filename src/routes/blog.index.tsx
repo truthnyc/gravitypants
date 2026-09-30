@@ -1,18 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteShell } from "@/components/site/SiteShell";
 import { POSTS } from "@/lib/site/blog";
+import { siteHead } from "@/lib/site/seo";
 
 export const Route = createFileRoute("/blog/")({
-  head: () => ({
-    meta: [
-      { title: "Blog — Gravity Pants" },
-      { name: "description", content: "Notes on making video ads from photos: craft, product thinking and why feeds reward movement." },
-      { property: "og:title", content: "Blog — Gravity Pants" },
-      { property: "og:description", content: "Notes on making video ads from photos: craft, product thinking and why feeds reward movement." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-    ],
-  }),
+  head: () => siteHead({ path: "/blog", title: "Blog — Gravity Pants", description: "Notes on making video ads from photos: craft, product thinking and why feeds reward movement." }),
   component: BlogIndexPage,
 });
 

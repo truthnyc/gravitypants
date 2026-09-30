@@ -24,16 +24,10 @@ import fallWinterPoster from "@/assets/site/fall-winter-collection-poster.jpg.as
 import fineJewelryVideo from "@/assets/site/fine-jewelry-gifts.mp4.asset.json";
 import fineJewelryVideoWebm from "@/assets/site/fine-jewelry-gifts.webm.asset.json";
 import fineJewelryPoster from "@/assets/site/fine-jewelry-gifts-poster.jpg.asset.json";
+import { siteHead } from "@/lib/site/seo";
 
 export const Route = createFileRoute("/")({
-  head: () => ({ meta: [
-    { title: "Gravity Pants — Photos in. Reels out." },
-    { name: "description", content: "Gravity Pants turns still photos into short video ads and animated GIFs for social." },
-    { property: "og:title", content: "Gravity Pants — Photos in. Reels out." },
-    { property: "og:description", content: "Turn still photos into short video ads and animated GIFs." },
-    { property: "og:type", content: "website" },
-    { name: "twitter:card", content: "summary" },
-  ] }),
+  head: () => siteHead({ path: "/", title: "Gravity Pants — Photos in. Reels out.", description: "Gravity Pants turns still photos into short video ads and animated GIFs for social." }),
   component: Home,
 });
 

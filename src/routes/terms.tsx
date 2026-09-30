@@ -1,17 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteShell } from "@/components/site/SiteShell";
+import { siteHead } from "@/lib/site/seo";
 
 export const Route = createFileRoute("/terms")({
-  head: () => ({
-    meta: [
-      { title: "Terms of service — Gravity Pants" },
-      { name: "description", content: "The terms that govern your use of Gravity Pants." },
-      { property: "og:title", content: "Terms of service — Gravity Pants" },
-      { property: "og:description", content: "The terms that govern your use of Gravity Pants." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-    ],
-  }),
+  head: () => siteHead({ path: "/terms", title: "Terms of service — Gravity Pants", description: "The terms that govern your use of Gravity Pants." }),
   component: TermsPage,
 });
 

@@ -6,18 +6,10 @@ import { SiteShell } from "@/components/site/SiteShell";
 import { CheckoutDialog, type CheckoutTarget } from "@/components/billing/CheckoutDialog";
 import { currentWorkspaceId, isPaid, useBilling, useManageBilling } from "@/lib/stillframe/billing";
 import { COMPARE, FAQ, PLANS, TRIAL, YEARLY_LABEL, priceFor, signupHref, type Billing, type PlanConfig } from "@/lib/stillframe/plans-config";
+import { siteHead } from "@/lib/site/seo";
 
 export const Route = createFileRoute("/pricing")({
-  head: () => ({
-    meta: [
-      { title: "Pricing — Gravity Pants" },
-      { name: "description", content: "Simple, Business and Team plans for turning photos into video ads and GIFs. Every account starts with a 7-day free trial." },
-      { property: "og:title", content: "Pricing — Gravity Pants" },
-      { property: "og:description", content: "Start free for 7 days. Grow into Simple, Business or Team when you’re ready." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-    ],
-  }),
+  head: () => siteHead({ path: "/pricing", title: "Pricing — Gravity Pants", description: "Simple, Business and Team plans for turning photos into video ads and GIFs. Every account starts with a 7-day free trial." }),
   component: Pricing,
 });
 

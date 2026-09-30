@@ -10,6 +10,7 @@ import photo3 from "@/assets/site/purl-soho-photo-3.png.asset.json";
 import { GravityPantsLogo } from "@/components/GravityPantsLogo";
 import { Button } from "@/components/ui/button";
 import { galleryExamples, type GalleryExample } from "@/lib/site/examples";
+import { siteHead } from "@/lib/site/seo";
 
 const categories = [{ id: "all", label: "All" }, { id: "fashion", label: "Fashion" }, { id: "food", label: "Food & drink" }, { id: "beauty", label: "Beauty" }, { id: "home", label: "Home" }] as const;
 const formats = [{ id: "all", label: "All formats", short: "All" }, { id: "916", label: "9:16", short: "9:16" }, { id: "11", label: "1:1", short: "1:1" }, { id: "169", label: "16:9", short: "16:9" }] as const;
@@ -41,14 +42,7 @@ function GalleryCard({ example }: { example: GalleryExample }) {
 
 export const Route = createFileRoute("/examples")({
   validateSearch: z.object({ cat: z.string().optional(), format: z.coerce.number().optional() }),
-  head: () => ({ meta: [
-    { title: "Examples — Gravity Pants" },
-    { name: "description", content: "Browse twelve Gravity Pants video ad examples across fashion, food, beauty, and home. Find a style for your photos." },
-    { property: "og:title", content: "Examples — Gravity Pants" },
-    { property: "og:description", content: "Find a reel you like and use its style for your own products." },
-    { property: "og:type", content: "website" },
-    { name: "twitter:card", content: "summary" },
-  ] }),
+  head: () => siteHead({ path: "/examples", title: "Examples — Gravity Pants", description: "Browse twelve Gravity Pants video ad examples across fashion, food, beauty, and home. Find a style for your photos." }),
   component: ExamplesPage,
 });
 

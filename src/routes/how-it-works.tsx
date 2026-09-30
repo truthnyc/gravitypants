@@ -2,16 +2,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Check, Play } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { Button } from "@/components/ui/button";
+import { siteHead } from "@/lib/site/seo";
 
 export const Route = createFileRoute("/how-it-works")({
-  head: () => ({ meta: [
-    { title: "How it works — Gravity Pants" },
-    { name: "description", content: "Follow the steps from dropping in photos to downloading a finished video ad: create, edit, brand, animate, resize and export." },
-    { property: "og:title", content: "How it works — Gravity Pants" },
-    { property: "og:description", content: "See the steps that turn your product photos into a short video ad, from upload to export." },
-    { property: "og:type", content: "website" },
-    { name: "twitter:card", content: "summary" },
-  ] }),
+  head: () => siteHead({ path: "/how-it-works", title: "How it works — Gravity Pants", description: "Follow the steps from dropping in photos to downloading a finished video ad: create, edit, brand, animate, resize and export." }),
   component: HowItWorksPage,
 });
 
