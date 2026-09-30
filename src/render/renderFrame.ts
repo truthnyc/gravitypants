@@ -432,10 +432,11 @@ function drawFrame(
   if (layout.logo) {
     const l = project.logo;
     let path = layout.logo.path;
-    if ((l.version ?? "auto") === "auto" && l.light_path && l.dark_path) {
+    const variant = frame.logo_variant ?? l.version ?? "auto";
+    if (variant === "auto" && l.light_path && l.dark_path) {
       path = averageLuma(ctx, layout.logo) > 0.55 ? l.dark_path : l.light_path;
-    } else if (l.version === "light" && l.light_path) path = l.light_path;
-    else if (l.version === "dark" && l.dark_path) path = l.dark_path;
+    } else if (variant === "light" && l.light_path) path = l.light_path;
+    else if (variant === "dark" && l.dark_path) path = l.dark_path;
     const img = images?.get(path);
     if (img && img.naturalWidth) {
       ctx.save();

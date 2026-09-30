@@ -72,7 +72,9 @@ export function useAutosave(doc: EditorDoc, enabled = true) {
           saved.current = doc;
           setStatus((s) => (s === "saving" ? "saved" : s));
           queryClient.invalidateQueries({ queryKey: projectKeys.all, exact: true });
-        } catch {
+          queryClient.invalidateQueries({ queryKey: projectKeys.detail(doc.project.id), exact: true });
+        } catch (error) {
+          console.error("Editor autosave failed", error);
           setStatus("error");
         }
       });
