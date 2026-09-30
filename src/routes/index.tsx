@@ -218,30 +218,34 @@ function FormatShapes({ labelled = false }: { labelled?: boolean }) {
   );
 }
 function BeforeAfter({
-  id,
-  palette,
+  stills,
   title,
   detail,
-  headline,
-  subline,
+  video,
+  videoWebm,
+  poster,
 }: {
-  id: "candle" | "plant";
-  palette: string[];
+  stills: string[];
   title: string;
   detail: string;
-  headline: string;
-  subline: string;
+  video: string;
+  videoWebm?: string | undefined;
+  poster?: string | undefined;
 }) {
   return (
     <article className="site-card home-before-card">
       <div className="home-before-art">
         <div className="home-stills">
-          {palette.map((color, i) => (
-            <span key={color} className={`home-still home-still-${i + 1}`} style={{ backgroundColor: color }} />
+          {stills.map((src, i) => (
+            <span key={src} className={`home-still home-still-${i + 1}`}>
+              <img src={src} alt="" />
+            </span>
           ))}
         </div>
         <ArrowRight className="home-arrow" strokeWidth={1.7} />
-        <Reel id={id} palette={palette} headline={headline} subline={subline} logoBadge="[LOGO]" size="small" />
+        <div className="home-example-video home-example-video-916">
+          <ReelVideo video={video} videoWebm={videoWebm} poster={poster} label={`${title} video ad`} />
+        </div>
       </div>
       <div className="home-before-caption">
         <div>
