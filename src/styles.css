@@ -863,3 +863,20 @@ html:has(.features-page) { scroll-behavior: smooth; }
 @keyframes tpl-pop { from { transform: scale(.6); opacity: 0 } to { transform: none; opacity: 1 } }
 @keyframes tpl-type { from { clip-path: inset(0 100% 0 0) } to { clip-path: inset(0) } }
 @media (prefers-reduced-motion: reduce) { .tpl-slide, .tpl-slide * { animation: none !important; } }
+
+/* Comfortable touch targets: every button-like control is at least 44px tall on phones and small tablets. */
+@media (max-width: 1023px) {
+  .features-jumps a,
+  .examples-filter-button,
+  .examples-categories .examples-filter-button,
+  .examples-formats .examples-filter-button,
+  .home-announcement,
+  .home-tabs button,
+  .site-header a,
+  .site-header button,
+  .site-footer a {
+    min-height: 44px;
+  }
+  .examples-formats .examples-filter-button { padding-inline: 14px; }
+  .site-footer a { display: inline-flex; align-items: center; }
+}
