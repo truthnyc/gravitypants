@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
 
 export type ReelVideoSource = {
   /** MP4 URL. */
@@ -23,7 +23,7 @@ export function ReelVideo({ video, videoWebm, poster, label, className, onPlayin
   const ref = useRef<HTMLVideoElement>(null);
   const [active, setActive] = useState(false);
 
-  const openFullscreenOnMobile = (event: React.MouseEvent<HTMLVideoElement>) => {
+  const openFullscreenOnMobile = (event: MouseEvent<HTMLVideoElement>) => {
     if (!window.matchMedia("(max-width: 767px)").matches) return;
     event.preventDefault();
     event.stopPropagation();
