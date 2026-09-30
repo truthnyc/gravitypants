@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ReelVideo } from "@/components/site/ReelVideo";
 import videoAsset from "@/assets/site/example-of-the-week.mp4.asset.json";
 import webmAsset from "@/assets/site/example-of-the-week.webm.asset.json";
-import posterAsset from "@/assets/site/example-of-the-week-poster.jpg.asset.json";
+import posterAsset from "@/assets/site/example-of-the-week-poster.webp.asset.json";
 
 export function FeaturedAdVideo({ controls = false }: { controls?: boolean }) {
   const [playing, setPlaying] = useState(false);

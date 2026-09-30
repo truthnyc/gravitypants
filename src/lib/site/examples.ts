@@ -19,16 +19,16 @@ import purlPhoto2 from "@/assets/site/purl-soho-photo-2.webp.asset.json";
 import purlPhoto3 from "@/assets/site/purl-soho-photo-3.webp.asset.json";
 import spotlightVideo from "@/assets/site/product-spotlight.mp4.asset.json";
 import spotlightVideoWebm from "@/assets/site/product-spotlight.webm.asset.json";
-import spotlightPoster from "@/assets/site/product-spotlight-poster.jpg.asset.json";
+import spotlightPoster from "@/assets/site/product-spotlight-poster.webp.asset.json";
 import bioshieldVideo from "@/assets/site/bioshield-collection.mp4.asset.json";
 import bioshieldVideoWebm from "@/assets/site/bioshield-collection.webm.asset.json";
-import bioshieldPoster from "@/assets/site/bioshield-collection-poster.jpg.asset.json";
+import bioshieldPoster from "@/assets/site/bioshield-collection-poster.webp.asset.json";
 import fallWinterVideo from "@/assets/site/fall-winter-collection.mp4.asset.json";
 import fallWinterVideoWebm from "@/assets/site/fall-winter-collection.webm.asset.json";
-import fallWinterPoster from "@/assets/site/fall-winter-collection-poster.jpg.asset.json";
+import fallWinterPoster from "@/assets/site/fall-winter-collection-poster.webp.asset.json";
 import fineJewelryVideo from "@/assets/site/fine-jewelry-gifts.mp4.asset.json";
 import fineJewelryVideoWebm from "@/assets/site/fine-jewelry-gifts.webm.asset.json";
-import fineJewelryPoster from "@/assets/site/fine-jewelry-gifts-poster.jpg.asset.json";
+import fineJewelryPoster from "@/assets/site/fine-jewelry-gifts-poster.webp.asset.json";
 
 export const galleryExamples: GalleryExample[] = [
   { id: "purl-soho", name: "Japanese Denim Cotton", category: "fashion", format: "916", photos: 3, seconds: 7.8, headline: 'Japanese Denim\nCotton', sub: 'A soft, springy cotton yarn', layout: "top", logo: "Purl Soho", frames: [purlPhoto1.url, purlPhoto2.url, purlPhoto3.url], href: "https://purlsoho.com" },

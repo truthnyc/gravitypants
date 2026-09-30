@@ -14,16 +14,16 @@ import photo2 from "@/assets/site/purl-soho-photo-2.webp.asset.json";
 import photo3 from "@/assets/site/purl-soho-photo-3.webp.asset.json";
 import aroVideo from "@/assets/site/product-spotlight.mp4.asset.json";
 import aroVideoWebm from "@/assets/site/product-spotlight.webm.asset.json";
-import aroPoster from "@/assets/site/product-spotlight-poster.jpg.asset.json";
+import aroPoster from "@/assets/site/product-spotlight-poster.webp.asset.json";
 import bioshieldVideo from "@/assets/site/bioshield-collection.mp4.asset.json";
 import bioshieldVideoWebm from "@/assets/site/bioshield-collection.webm.asset.json";
-import bioshieldPoster from "@/assets/site/bioshield-collection-poster.jpg.asset.json";
+import bioshieldPoster from "@/assets/site/bioshield-collection-poster.webp.asset.json";
 import fallWinterVideo from "@/assets/site/fall-winter-collection.mp4.asset.json";
 import fallWinterVideoWebm from "@/assets/site/fall-winter-collection.webm.asset.json";
-import fallWinterPoster from "@/assets/site/fall-winter-collection-poster.jpg.asset.json";
+import fallWinterPoster from "@/assets/site/fall-winter-collection-poster.webp.asset.json";
 import fineJewelryVideo from "@/assets/site/fine-jewelry-gifts.mp4.asset.json";
 import fineJewelryVideoWebm from "@/assets/site/fine-jewelry-gifts.webm.asset.json";
-import fineJewelryPoster from "@/assets/site/fine-jewelry-gifts-poster.jpg.asset.json";
+import fineJewelryPoster from "@/assets/site/fine-jewelry-gifts-poster.webp.asset.json";
 import { siteHead } from "@/lib/site/seo";
 
 export const Route = createFileRoute("/")({
