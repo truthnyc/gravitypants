@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { ReelVideo } from "@/components/site/ReelVideo";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
 import { ArrowRight } from "lucide-react";
