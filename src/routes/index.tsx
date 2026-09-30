@@ -19,6 +19,9 @@ import bioshieldPoster from "@/assets/site/bioshield-collection-poster.jpg.asset
 import fallWinterVideo from "@/assets/site/fall-winter-collection.mp4.asset.json";
 import fallWinterVideoWebm from "@/assets/site/fall-winter-collection.webm.asset.json";
 import fallWinterPoster from "@/assets/site/fall-winter-collection-poster.jpg.asset.json";
+import fineJewelryVideo from "@/assets/site/fine-jewelry-gifts.mp4.asset.json";
+import fineJewelryVideoWebm from "@/assets/site/fine-jewelry-gifts.webm.asset.json";
+import fineJewelryPoster from "@/assets/site/fine-jewelry-gifts-poster.jpg.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({ meta: [
@@ -43,7 +46,7 @@ function frames(name: string, palette: string[]): ReelFrame[] {
   return palette.map((background, i) => ({ background, artwork: <img src={`/site-art/${name}-${i + 1}.svg`} alt="" /> }));
 }
 const purlFrames: ReelFrame[] = [photo1, photo2, photo3].map(photo => ({ background: "#1D2A3A", artwork: <img src={photo.url} alt="" /> }));
-type HomeExample = { name: string; headline?: string; subline?: string; detail: string; frames?: ReelFrame[]; layout?: "top"; logo?: string; video?: string; videoWebm?: string; poster?: string; videoFormat?: "11" | "916"; href?: string };
+type HomeExample = { name: string; headline?: string; subline?: string; detail: string; frames?: ReelFrame[]; layout?: "top"; logo?: string; video?: string; videoWebm?: string; poster?: string; videoFormat?: "11" | "916" | "169"; href?: string };
 const examples: HomeExample[] = [
   { name: "Japanese Denim Cotton", headline: "Japanese Denim\nCotton", subline: "A soft, springy cotton yarn", detail: "3 photos · 7.8 sec · 9:16 · Purl Soho", frames: purlFrames, layout: "top", logo: "Purl Soho", href: "https://purlsoho.com" },
   { name: "AW 26-27 Collection", detail: "3 photos · 6 sec · 1:1 · Aro", video: aroVideo.url, videoWebm: aroVideoWebm.url, poster: aroPoster.url, href: "https://aroshoes.com/" },
@@ -53,7 +56,7 @@ const examples: HomeExample[] = [
   { name: "Plant shop promo", headline: "Bring the\noutside in.", subline: "Delivered potted", detail: "3 photos · 7.5 sec · 1:1" },
   { name: "Bakery weekend", headline: "Fresh out\nat 7am.", subline: "Order ahead", detail: "3 photos · 6 sec · 1:1" },
   { name: "Fall–Winter Collection", detail: "3 photos · 8 sec · 9:16 · Agnona", video: fallWinterVideo.url, videoWebm: fallWinterVideoWebm.url, poster: fallWinterPoster.url, videoFormat: "916", href: "https://agnona.com" },
-  { name: "Jewelry gift guide", headline: "Give something\nthat lasts.", subline: "Gift guide", detail: "3 photos · 7.5 sec · 9:16 + 16:9" },
+  { name: "Fine Jewelry Gifts", detail: "3 photos · 8 sec · 16:9 · Katherine Grover", video: fineJewelryVideo.url, videoWebm: fineJewelryVideoWebm.url, poster: fineJewelryPoster.url, videoFormat: "169", href: "https://www.katherinegroverfinejewelry.com" },
 ];
 function HomeReelVideo({ example }: { example: HomeExample }) {
   const ref = useRef<HTMLVideoElement>(null);
@@ -69,7 +72,7 @@ function HomeReelVideo({ example }: { example: HomeExample }) {
     preference.addEventListener("change", sync);
     return () => preference.removeEventListener("change", sync);
   }, []);
-  return <div className={`home-example-video${example.videoFormat === "916" ? " home-example-video-916" : ""}`} aria-label={`${example.name} video ad`}>
+  return <div className={`home-example-video${example.videoFormat ? ` home-example-video-${example.videoFormat}` : ""}`} aria-label={`${example.name} video ad`}>
     <video ref={ref} poster={example.poster} loop muted playsInline preload="metadata">
       {example.videoWebm && <source src={example.videoWebm} type="video/webm" />}
       <source src={example.video} type="video/mp4" />
