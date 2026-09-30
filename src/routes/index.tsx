@@ -729,12 +729,15 @@ function Home() {
         <section className="home-section home-proof">
           <div className="home-quote">
             <span className="home-quote-mark">“</span>
-            <p>[A customer quote about how fast they made their first reel, and what it did for their sales.]</p>
+            <p>
+              "We shot a few photos of our products and had a finished reel for Instagram in minutes. It looks like our
+              brand, not a template, and we didn't need a video editor to get there."
+            </p>
             <div className="home-person">
-              <span>[Photo]</span>
+              <span> </span>
               <div>
-                <b>Joelle Hoverson</b>
-                <small>Purl Soho</small>
+                <b> </b>
+                <small> </small>
               </div>
             </div>
           </div>
