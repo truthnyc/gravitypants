@@ -72,7 +72,7 @@ function ReelForm({ initial, onDone, onCancel }: { initial: Draft; onDone: () =>
   const isNew = !initial.id;
 
   const submit = async () => {
-    if (isNew && !file) return toast.error("Pick a reel file.");
+    if (isNew && !file) { toast.error("Pick a reel file."); return; }
     let href = d.href.trim();
     if (href && !/^https?:\/\//.test(href)) href = `https://${href}`;
     setBusy(true);

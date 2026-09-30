@@ -38,7 +38,7 @@ function frames(name: string, palette: string[]): ReelFrame[] {
   return palette.map((background, i) => ({ background, artwork: <img src={`/site-art/${name}-${i + 1}.svg`} alt="" /> }));
 }
 const purlFrames: ReelFrame[] = [photo1, photo2, photo3].map(photo => ({ background: "#1D2A3A", artwork: <img src={photo.url} alt="" /> }));
-type HomeExample = { name: string; headline?: string; subline?: string; detail: string; frames?: ReelFrame[]; layout?: "top"; logo?: string; video?: string; videoWebm?: string; poster?: string; videoFormat?: "11" | "916" | "169"; href?: string };
+type HomeExample = { name: string; headline?: string; subline?: string; detail: string; frames?: ReelFrame[]; layout?: "top"; logo?: string; video?: string; videoWebm?: string | undefined; poster?: string | undefined; videoFormat?: "11" | "916" | "169"; href?: string | undefined };
 // Drawn stand-ins fill the carousel between the real brand reels managed in /admin/reels.
 const drawnExamples: HomeExample[] = [
   { name: "Coffee subscription", headline: "Slow mornings.\nFast shipping.", subline: "[Roaster name]", detail: "3 photos · 9 sec · 9:16 + 1:1" },
