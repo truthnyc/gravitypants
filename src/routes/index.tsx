@@ -74,30 +74,9 @@ type HomeExample = {
   videoFormat?: "11" | "916" | "169";
   href?: string | undefined;
 };
-// Drawn stand-ins fill the carousel between the real brand reels managed in /admin/reels.
-const drawnExamples: HomeExample[] = [
-  {
-    name: "Coffee subscription",
-    headline: "Slow mornings.\nFast shipping.",
-    subline: "[Roaster name]",
-    detail: "3 photos · 9 sec · 9:16 + 1:1",
-  },
-  {
-    name: "Candle launch",
-    headline: "Light up the\nlong nights.",
-    subline: "Winter scents",
-    detail: "3 photos · 7.5 sec · 9:16",
-  },
-  {
-    name: "Plant shop promo",
-    headline: "Bring the\noutside in.",
-    subline: "Delivered potted",
-    detail: "3 photos · 7.5 sec · 1:1",
-  },
-  { name: "Bakery weekend", headline: "Fresh out\nat 7am.", subline: "Order ahead", detail: "3 photos · 6 sec · 1:1" },
-];
+// Only real brand reels managed in /admin/reels appear in the carousel.
 function homeExamples(reels: SiteReel[]): HomeExample[] {
-  const real: HomeExample[] = reels.map((r) => ({
+  return reels.map((r) => ({
     name: r.title,
     logo: r.brand,
     detail: `${r.photos} photos · ${r.seconds} sec · ${FORMAT_LABEL[r.format]} · ${r.brand}`,
@@ -107,13 +86,6 @@ function homeExamples(reels: SiteReel[]): HomeExample[] {
     videoFormat: r.format,
     href: r.href ?? undefined,
   }));
-  const out: HomeExample[] = [];
-  real.forEach((r, i) => {
-    out.push(r);
-    const d = drawnExamples[i];
-    if (i % 2 === 1 && d) out.push(d);
-  });
-  return out.length ? out : drawnExamples;
 }
 function HomeReelVideo({ example }: { example: HomeExample }) {
   return (
@@ -246,30 +218,34 @@ function FormatShapes({ labelled = false }: { labelled?: boolean }) {
   );
 }
 function BeforeAfter({
-  id,
-  palette,
+  stills,
   title,
   detail,
-  headline,
-  subline,
+  video,
+  videoWebm,
+  poster,
 }: {
-  id: "candle" | "plant";
-  palette: string[];
+  stills: string[];
   title: string;
   detail: string;
-  headline: string;
-  subline: string;
+  video: string;
+  videoWebm?: string | undefined;
+  poster?: string | undefined;
 }) {
   return (
     <article className="site-card home-before-card">
       <div className="home-before-art">
         <div className="home-stills">
-          {palette.map((color, i) => (
-            <span key={color} className={`home-still home-still-${i + 1}`} style={{ backgroundColor: color }} />
+          {stills.map((src, i) => (
+            <span key={src} className={`home-still home-still-${i + 1}`}>
+              <img src={src} alt="" />
+            </span>
           ))}
         </div>
         <ArrowRight className="home-arrow" strokeWidth={1.7} />
-        <Reel id={id} palette={palette} headline={headline} subline={subline} logoBadge="[LOGO]" size="small" />
+        <div className="home-example-video home-example-video-916">
+          <ReelVideo video={video} videoWebm={videoWebm} poster={poster} label={`${title} video ad`} />
+        </div>
       </div>
       <div className="home-before-caption">
         <div>
@@ -680,22 +656,34 @@ function Home() {
             </p>
           </div>
           <div className="home-before-grid">
-            <BeforeAfter
-              id="candle"
-              palette={colors.candle}
-              title="Candle launch"
-              detail="3 photos → 7.5 sec reel · Fade, Slide, Zoom"
-              headline={"Light up the\nlong nights."}
-              subline="Winter scents · Shop now"
-            />
-            <BeforeAfter
-              id="plant"
-              palette={colors.plant}
-              title="Plant shop promo"
-              detail="3 photos → 7.5 sec reel · 9:16 + 1:1"
-              headline={"Bring the\noutside in."}
-              subline="Delivered potted · Shop now"
-            />
+            {(() => {
+              const purl = examples.find((e) => e.name === "Japanese Denim Cotton");
+              const aro = examples.find((e) => e.name === "AW 26-27 Collection");
+              return (
+                <>
+                  {purl?.video && (
+                    <BeforeAfter
+                      stills={[photo1.url, photo2.url, photo3.url]}
+                      title="Japanese Denim Cotton"
+                      detail="3 photos → 7.8 sec reel · Purl Soho"
+                      video={purl.video}
+                      videoWebm={purl.videoWebm}
+                      poster={purl.poster}
+                    />
+                  )}
+                  {aro?.video && (
+                    <BeforeAfter
+                      stills={aro.poster ? [aro.poster] : []}
+                      title="AW 26-27 Collection"
+                      detail="3 photos → 6 sec reel · Aro"
+                      video={aro.video}
+                      videoWebm={aro.videoWebm}
+                      poster={aro.poster}
+                    />
+                  )}
+                </>
+              );
+            })()}
           </div>
         </section>
         <Spotlight />

@@ -24,12 +24,14 @@ const candleFrames = ["#1F2937", "#8C2F2B", "#EBDDC6"].map((background, i) => ({
 
 function AuthVisual({ mode }: { mode: "signup" | "signin" }) {
   if (mode === "signin") {
-    const reels = ["purl-soho", "coffee", "candle", "skincare", "plants", "sneaker"];
+    const reels = ["purl-soho", "skincare", "sneaker", "aro", "jewel", "purl-soho"];
     return <div className="auth-visual auth-reels" aria-hidden="true">
       {[false, true].map((reverse) => <div className={`auth-reel-row${reverse ? " auth-reel-reverse" : ""}`} key={String(reverse)}>
         {[...reels, ...reels].map((id, i) => {
           const example = galleryExamples.find((item) => item.id === id);
-          return example ? <ReelPhone key={`${id}-${i}`} size="small" frames={example.frames.map((src) => ({ background: "var(--site-ink)", artwork: <img src={src} alt="" /> }))} headline={example.headline} subline={example.sub} /> : null;
+          if (!example) return null;
+          const stills = example.frames.length ? example.frames : example.poster ? [example.poster] : [];
+          return <ReelPhone key={`${id}-${i}`} size="small" frames={stills.map((src) => ({ background: "var(--site-ink)", artwork: <img src={src} alt="" /> }))} headline={example.headline} subline={example.sub} />;
         })}
       </div>)}
     </div>;
