@@ -23,6 +23,23 @@ export function ReelVideo({ video, videoWebm, poster, label, className, onPlayin
   const ref = useRef<HTMLVideoElement>(null);
   const [active, setActive] = useState(false);
 
+  const openFullscreenOnMobile = (event: React.MouseEvent<HTMLVideoElement>) => {
+    if (!window.matchMedia("(max-width: 767px)").matches) return;
+    event.preventDefault();
+    event.stopPropagation();
+
+    const element = event.currentTarget;
+    element.muted = true;
+    void element.play().catch(() => {});
+
+    const iosVideo = element as HTMLVideoElement & { webkitEnterFullscreen?: () => void };
+    if (typeof iosVideo.webkitEnterFullscreen === "function") {
+      iosVideo.webkitEnterFullscreen();
+      return;
+    }
+    if (typeof element.requestFullscreen === "function") void element.requestFullscreen().catch(() => {});
+  };
+
   useEffect(() => {
     const element = ref.current;
     if (!element) return;
@@ -65,6 +82,7 @@ export function ReelVideo({ video, videoWebm, poster, label, className, onPlayin
     preload="none"
     tabIndex={tabIndex}
     aria-label={label}
+    onClick={openFullscreenOnMobile}
     onPlay={() => onPlayingChange?.(true)}
     onPause={() => onPlayingChange?.(false)}
   >
