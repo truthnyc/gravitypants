@@ -19,7 +19,9 @@ export const listSiteReels = createServerFn({ method: "GET" }).handler(async ():
     .map((u) => u.slice(REEL_PREFIX.length));
   const signed = new Map<string, string>();
   if (paths.length) {
-    const { data: s } = await db.storage.from("site-reels").createSignedUrls(paths, 60 * 60 * 24 * 7);
+    // Bucket is private with no public read; sign only paths of published rows, server-side.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: s } = await supabaseAdmin.storage.from("site-reels").createSignedUrls(paths, 60 * 60 * 24 * 7);
     for (const x of s ?? []) if (x.path && x.signedUrl) signed.set(x.path, x.signedUrl);
   }
   const resolve = (u: string | null) => (u && u.startsWith(REEL_PREFIX) ? signed.get(u.slice(REEL_PREFIX.length)) ?? null : u);
