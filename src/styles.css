@@ -414,7 +414,7 @@
 .home-before-top { display:flex; align-items:flex-end; justify-content:space-between; gap:40px; }
 .home-before-top > p { max-width:420px; font-size:19px; }
 .home-before-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px; }
-.home-before-card { min-width:0; height:540px; padding:36px; display:flex; flex-direction:column; }
+.home-before-card { min-width:0; height:620px; padding:36px; display:flex; flex-direction:column; }
 .home-before-art { flex:1; min-height:0; display:flex; align-items:center; justify-content:center; gap:36px; }
 .home-stills { display:flex; flex-direction:column; gap:10px; }.home-still { width:100px; height:124px; border-radius:12px; animation:home-still 9s ease-in-out infinite; }
 .home-still-2 { animation-delay:3s; }.home-still-3 { animation-delay:6s; }

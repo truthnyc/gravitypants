@@ -662,7 +662,7 @@ function Home() {
         </section>
         <section id="before-after" className="home-section home-before">
           <div className="home-before-top">
-            <Heading eyebrow="Before and after">See what three photos can become.</Heading>
+            <Heading eyebrow="Before and after">See what images can become.</Heading>
             <p className="site-lede">
               Gravity Pants adds movement, words and your brand, then turns the result into a finished reel.
             </p>

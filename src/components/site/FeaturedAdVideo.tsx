@@ -6,7 +6,7 @@ import videoAsset from "@/assets/site/example-of-the-week.mp4.asset.json";
 import webmAsset from "@/assets/site/example-of-the-week.webm.asset.json";
 import posterAsset from "@/assets/site/example-of-the-week-poster.webp.asset.json";
 
-export function FeaturedAdVideo({ controls = false, video = videoAsset.url, videoWebm = webmAsset.url, poster = posterAsset.url, label = "Purl Soho Japanese Denim Cotton video ad", format = "916" }: { controls?: boolean; video?: string; videoWebm?: string; poster?: string; label?: string; format?: "916" | "169" }) {
+export function FeaturedAdVideo({ controls = false, video = videoAsset.url, videoWebm = webmAsset.url, poster = posterAsset.url, label = "Purl Soho Japanese Denim Cotton video ad", format = "916" }: { controls?: boolean; video?: string; videoWebm?: string | undefined; poster?: string | undefined; label?: string; format?: "916" | "169" }) {
   const [playing, setPlaying] = useState(false);
   const phoneRef = useRef<HTMLDivElement>(null);
 
