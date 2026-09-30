@@ -69,6 +69,7 @@ export type InspectorActions = {
   onLogoVariant: (variant: "auto" | "light" | "dark") => void;
   onLogoScope: (scope: NonNullable<LogoSettings["show_on"]>) => void;
   onDuration: (seconds: number, key?: string) => void;
+  sameLength: boolean;
   onSameLength: (on: boolean) => void;
   onPace: (pace: Pace) => void;
   onTransition: (patch: Partial<TransitionSettings>) => void;
@@ -793,7 +794,7 @@ function LogoPanel({
 
 function TimingPanel({ frames, frame, actions, endSeconds }: { frames: Frame[]; frame: Frame; actions: InspectorActions; endSeconds: number }) {
   const d = frame.duration_sec;
-  const same = frames.every((f) => f.duration_sec === frames[0]?.duration_sec);
+  const same = actions.sameLength;
   const pace = (Object.keys(PACE_SECONDS) as Pace[]).find((p) => frames.every((f) => f.duration_sec === PACE_SECONDS[p]));
   const set = (v: number) => actions.onDuration(Math.max(0.5, Math.min(15, Math.round(v * 2) / 2)));
   return (
