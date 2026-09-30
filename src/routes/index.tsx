@@ -59,26 +59,11 @@ const examples: HomeExample[] = [
   { name: "Fine Jewelry Gifts", detail: "3 photos · 8 sec · 16:9 · Katherine Grover", video: fineJewelryVideo.url, videoWebm: fineJewelryVideoWebm.url, poster: fineJewelryPoster.url, videoFormat: "169", href: "https://www.katherinegroverfinejewelry.com" },
 ];
 function HomeReelVideo({ example }: { example: HomeExample }) {
-  const ref = useRef<HTMLVideoElement>(null);
-  useEffect(() => {
-    const video = ref.current;
-    if (!video) return;
-    const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const sync = () => {
-      if (preference.matches) { video.pause(); video.currentTime = 0; }
-      else void video.play().catch(() => {});
-    };
-    sync();
-    preference.addEventListener("change", sync);
-    return () => preference.removeEventListener("change", sync);
-  }, []);
-  return <div className={`home-example-video${example.videoFormat ? ` home-example-video-${example.videoFormat}` : ""}`} aria-label={`${example.name} video ad`}>
-    <video ref={ref} poster={example.poster} loop muted playsInline preload="metadata">
-      {example.videoWebm && <source src={example.videoWebm} type="video/webm" />}
-      <source src={example.video} type="video/mp4" />
-    </video>
+  return <div className={`home-example-video${example.videoFormat ? ` home-example-video-${example.videoFormat}` : ""}`}>
+    <ReelVideo video={example.video!} videoWebm={example.videoWebm} poster={example.poster} label={`${example.name} video ad`} />
   </div>;
 }
+
 function HomeExampleMedia({ example, index }: { example: HomeExample; index: number }) {
   const media = example.video ? <HomeReelVideo example={example} /> : example.frames ? <ReelPhone frames={example.frames} headline={example.headline ?? ""} subline={example.subline ?? ""} layout={example.layout} logo={example.logo} /> : <Reel id={`ex-${index % examples.length}`} palette={exampleColors[index % exampleColors.length] ?? colors.fashion} headline={example.headline ?? ""} subline={example.subline ?? ""} />;
   return example.href ? <a className="site-reel-link" href={example.href} target="_blank" rel="noreferrer" tabIndex={index >= examples.length ? -1 : undefined} aria-label={`Visit ${example.logo ?? example.name}`}>{media}</a> : media;
