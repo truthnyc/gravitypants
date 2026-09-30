@@ -10,6 +10,7 @@ export type GalleryExample = {
   video?: string;
   videoWebm?: string;
   poster?: string;
+  href?: string;
 };
 
 // Drawn reference reels are local stand-ins for future exported videos.
@@ -22,11 +23,14 @@ import spotlightPoster from "@/assets/site/product-spotlight-poster.jpg.asset.js
 import bioshieldVideo from "@/assets/site/bioshield-collection.mp4.asset.json";
 import bioshieldVideoWebm from "@/assets/site/bioshield-collection.webm.asset.json";
 import bioshieldPoster from "@/assets/site/bioshield-collection-poster.jpg.asset.json";
+import fallWinterVideo from "@/assets/site/fall-winter-collection.mp4.asset.json";
+import fallWinterVideoWebm from "@/assets/site/fall-winter-collection.webm.asset.json";
+import fallWinterPoster from "@/assets/site/fall-winter-collection-poster.jpg.asset.json";
 
 export const galleryExamples: GalleryExample[] = [
-  { id: "purl-soho", name: "Japanese Denim Cotton", category: "fashion", format: "916", photos: 3, seconds: 7.8, headline: 'Japanese Denim\nCotton', sub: 'A soft, springy cotton yarn', layout: "top", logo: "Purl Soho", frames: [purlPhoto1.url, purlPhoto2.url, purlPhoto3.url] },
+  { id: "purl-soho", name: "Japanese Denim Cotton", category: "fashion", format: "916", photos: 3, seconds: 7.8, headline: 'Japanese Denim\nCotton', sub: 'A soft, springy cotton yarn', layout: "top", logo: "Purl Soho", frames: [purlPhoto1.url, purlPhoto2.url, purlPhoto3.url], href: "https://purlsoho.com" },
   { id: "aro", name: "AW 26-27 Collection", category: "fashion", format: "11", photos: 3, seconds: 6, headline: 'Meet AW 26-27 Collection', sub: 'aroshoes.com', video: spotlightVideo.url, videoWebm: spotlightVideoWebm.url, poster: spotlightPoster.url, frames: [] },
-  { id: "sneaker", name: "Sneaker restock", category: "fashion", format: "916", photos: 4, seconds: 8, headline: 'Back in\nevery size.', sub: 'Restock live now', frames: ["/site-art/gallery-sneaker-1.svg", "/site-art/gallery-sneaker-2.svg", "/site-art/gallery-sneaker-3.svg"] },
+  { id: "sneaker", name: "Fall–Winter Collection", category: "fashion", format: "916", photos: 3, seconds: 8, headline: "Fall–Winter Collection", sub: "Agnona", video: fallWinterVideo.url, videoWebm: fallWinterVideoWebm.url, poster: fallWinterPoster.url, frames: [] },
   { id: "jewel", name: "Jewelry gift guide", category: "fashion", format: "169", photos: 3, seconds: 7.5, headline: 'Give something that lasts.', sub: 'Gift guide', frames: ["/site-art/gallery-jewel-1.svg", "/site-art/gallery-jewel-2.svg", "/site-art/gallery-jewel-3.svg"] },
   { id: "coffee", name: "Coffee subscription", category: "food", format: "916", photos: 3, seconds: 9, headline: 'Slow mornings.\nFast shipping.', sub: '[Roaster name]', frames: ["/site-art/gallery-coffee-1.svg", "/site-art/gallery-coffee-2.svg", "/site-art/gallery-coffee-3.svg"] },
   { id: "bakery", name: "Bakery weekend", category: "food", format: "11", photos: 3, seconds: 6, headline: 'Fresh out\nat 7am.', sub: 'Order ahead', frames: ["/site-art/gallery-bakery-1.svg", "/site-art/gallery-bakery-2.svg", "/site-art/gallery-bakery-3.svg"] },
