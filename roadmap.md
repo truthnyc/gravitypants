@@ -63,5 +63,5 @@
 - [x] Diagnose and fix editor autosave showing “Not saved”
 - [x] Add per-frame logo visibility when “This frame” is selected
 - [x] Support light and dark logo files with per-frame version selection
-- [ ] Verify preview/export match and editor saving persists after reload
+- [x] Verify preview/export match and editor saving persists after reload
 - [x] Tighten site-reels storage reads to signed-link access only
