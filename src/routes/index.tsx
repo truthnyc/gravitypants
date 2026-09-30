@@ -21,7 +21,7 @@ import jewelryPoster from "@/assets/site/fine-jewelry-gifts-poster.webp.asset.js
 import jewelryFrame1 from "@/assets/site/fine-jewelry-frame-1.webp.asset.json";
 import jewelryFrame2 from "@/assets/site/fine-jewelry-frame-2.webp.asset.json";
 import jewelryFrame3 from "@/assets/site/fine-jewelry-frame-3.webp.asset.json";
-import { siteHead } from "@/lib/site/seo";
+import { SITE_ORIGIN, siteHead } from "@/lib/site/seo";
 import { listSiteReels } from "@/lib/site/reels.functions";
 import { FORMAT_LABEL, type SiteReel } from "@/lib/site/reels";
 
@@ -29,13 +29,31 @@ export const Route = createFileRoute("/")({
   head: () => {
     const head = siteHead({
       path: "/",
-      title: "Gravity Pants — Photos in. Reels out.",
-      description: "Gravity Pants turns still photos into short video ads and animated GIFs for social.",
+      title: "Gravity Pants – Turn Product Photos into Video Ads & GIFs",
+      description: "Turn product photos into short MP4 video ads and animated GIFs for Instagram, TikTok and Facebook in minutes. No editing skills needed. Start a free trial.",
     });
+    const jsonLd = {
+      "@context": "https://schema.org",
+      "@graph": [
+        { "@type": "Organization", "@id": `${SITE_ORIGIN}/#org`, name: "Gravity Pants", url: `${SITE_ORIGIN}/`, logo: `${SITE_ORIGIN}/apple-touch-icon.png`, email: "help@gravitypants.com" },
+        { "@type": "WebSite", name: "Gravity Pants", url: `${SITE_ORIGIN}/`, publisher: { "@id": `${SITE_ORIGIN}/#org` } },
+        {
+          "@type": "SoftwareApplication",
+          name: "Gravity Pants",
+          applicationCategory: "MultimediaApplication",
+          operatingSystem: "Web browser",
+          url: `${SITE_ORIGIN}/`,
+          description: "Turns still product photos into short MP4 video ads and animated GIFs for social media.",
+          publisher: { "@id": `${SITE_ORIGIN}/#org` },
+          offers: { "@type": "Offer", name: "7-day free trial", price: "0", priceCurrency: "USD" },
+        },
+      ],
+    };
     // Preload the hero reel's still frame so the largest element paints early.
     return {
       ...head,
       links: [...(head.links ?? []), { rel: "preload", as: "image", href: heroPoster.url, type: "image/webp" }],
+      scripts: [{ type: "application/ld+json", children: JSON.stringify(jsonLd) }],
     };
   },
   loader: () => listSiteReels().catch(() => [] as SiteReel[]),
@@ -545,13 +563,13 @@ function Home() {
           </div>
           <div className="home-hero-visual" aria-hidden="true">
             <div className="home-drop home-drop-one">
-              <img src={photo1.url} alt="" />
+              <img src={photo1.url} alt="Purl Soho Japanese Denim Cotton yarn product photo" />
             </div>
             <div className="home-drop home-drop-two">
-              <img src={photo2.url} alt="" />
+              <img src={photo2.url} alt="Purl Soho knitted denim cotton sweater photo" />
             </div>
             <div className="home-drop home-drop-three">
-              <img src={photo3.url} alt="" />
+              <img src={photo3.url} alt="Purl Soho denim cotton yarn skeins photo" />
             </div>
             <div className="home-hero-phone">
               <FeaturedAdVideo />
