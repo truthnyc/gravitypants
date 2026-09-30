@@ -58,3 +58,10 @@
 - [x] Rebuild reference gallery, responsive reels, featured example, shareable filters and signup links
 - [x] Show the supplied Purl Soho ad in the featured example and home-page phone, with poster frames and playback controls
 - [x] Replace decorative source tiles and extracted video stills with the three original Purl Soho photos
+
+## Editor save and frame logos
+- [ ] Diagnose and fix editor autosave showing “Not saved”
+- [ ] Add per-frame logo visibility when “This frame” is selected
+- [ ] Support light and dark logo files with per-frame version selection
+- [ ] Verify preview/export match and editor saving persists after reload
+- [ ] Tighten site-reels storage reads to signed-link access only
