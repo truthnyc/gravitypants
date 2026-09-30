@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { siteHead } from "@/lib/site/seo";
 
 export const Route = createFileRoute("/about")({
-  head: () => siteHead({ path: "/about", title: "About — Gravity Pants", description: "Why we built Gravity Pants: turning still photos into video ads for everyone who has better things to do than edit video." }),
+  head: () => siteHead({ path: "/about", title: "About Gravity Pants – The Photo-to-Video Ad Maker", description: "Gravity Pants is a video ad maker that turns product photos into MP4 video ads and animated GIFs for Instagram, TikTok and Facebook, with no editing skills needed." }),
   component: AboutPage,
 });
 
@@ -50,6 +50,16 @@ function AboutPage() {
               <p className="mt-3 text-[15px] leading-[1.5] text-site-secondary">{s.l}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-[1248px] px-5 pb-16 md:px-8 lg:px-16 xl:px-24">
+        <h2 className="text-[28px] font-semibold tracking-[-0.02em] text-site-ink md:text-[40px]">What Gravity Pants does</h2>
+        <div className="mt-6 grid max-w-[820px] gap-5 text-[17px] leading-[1.6] text-site-secondary">
+          <p>Gravity Pants is an online video ad maker for small brands and shops. You upload a few product photos, and it turns them into a short video ad with movement, transitions, text and your logo. There is no timeline to learn and nothing to install.</p>
+          <p>Every ad exports as an MP4 video and, when you need one, an animated GIF. Each reel comes in three shapes at once: 9:16 for Instagram Reels, TikTok and Stories, 1:1 for feed posts, and 16:9 for YouTube, websites and email. You make one ad and get a file for every place you post it.</p>
+          <p>Brand kits keep your logo, colors and fonts in one place, so every new ad already looks like yours. Templates give you a ready-made style to start from, and you can save your own to reuse for the next product launch, sale or seasonal collection.</p>
+          <p>Gravity Pants works well for product launches, restocks, new collections, gift guides and sale announcements, anywhere a still photo would do better as a few seconds of motion.</p>
         </div>
       </section>
 

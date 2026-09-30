@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { siteHead } from "@/lib/site/seo";
 
 export const Route = createFileRoute("/help")({
-  head: () => siteHead({ path: "/help", title: "Help center — Gravity Pants", description: "Answers to common questions about Gravity Pants: plans, exports, formats, billing and getting started." }),
+  head: () => siteHead({ path: "/help", title: "Help & FAQ – Making Video Ads from Photos | Gravity Pants", description: "Answers about making video ads from product photos with Gravity Pants: MP4 and GIF exports, 9:16, 1:1 and 16:9 formats, brand kits, plans and billing." }),
   component: HelpPage,
 });
 
@@ -16,6 +16,15 @@ const guides = [
   { q: "Can I use my own fonts and logo?", a: "Yes. Add your logo, colors and fonts to a brand kit, then use it when you make a new ad. Every Google Font is included on all plans." },
   { q: "How do I work with my team?", a: "The Team plan lets you invite 3 teammates with shared brand kits, shared templates and 150 exports a month shared across the workspace. Invite people from Account → Team." },
   { q: "How do I change or cancel my plan?", a: "Go to Account → Billing to switch plans, update your card or cancel. Changes start right away; cancellations keep your access until the end of the paid period." },
+];
+
+const videoAds = [
+  { q: "Can I make a video ad from product photos?", a: "Yes. That is what Gravity Pants is for. Choose three to five product photos and it builds a short video ad with movement, transitions, your text and your logo. You can change any part before exporting." },
+  { q: "Which formats do I get for Instagram, TikTok and Facebook?", a: "Every reel exports in 9:16 for Reels, TikTok and Stories, 1:1 for feed posts and 16:9 for YouTube, websites and email, so one ad covers every placement." },
+  { q: "Should I export an MP4 or a GIF?", a: "Use MP4 for social media ads and anywhere video plays. Use an animated GIF for email newsletters and places that do not play video. Gravity Pants makes both from the same ad, and they look the same." },
+  { q: "Do I need video editing experience?", a: "No. Gravity Pants starts with a finished reel instead of an empty timeline. Tap the words, colors, photo framing or movement to change them." },
+  { q: "Can my video ads match my brand?", a: "Yes. Save your logo, colors and fonts in a brand kit and every new ad starts with them. You can also add a light and a dark version of your logo and pick which one shows on each frame." },
+  { q: "Can I try it before paying?", a: "The 7-day free trial includes every feature and three exports with a small Gravity Pants watermark. Paid plans export without a watermark." },
 ];
 
 function HelpPage() {
@@ -35,6 +44,18 @@ function HelpPage() {
         <h2 className="text-[28px] font-semibold tracking-[-0.02em] text-site-ink md:text-[40px]">Getting started</h2>
         <div className="mt-8 grid gap-4 md:grid-cols-2">
           {guides.map((item) => (
+            <div key={item.q} className="rounded-[24px] bg-site-panel p-6 md:p-8">
+              <h3 className="text-[17px] font-semibold text-site-ink">{item.q}</h3>
+              <p className="mt-2 text-[15px] leading-[1.5] text-site-secondary">{item.a}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-[1248px] px-5 pb-20 md:px-8 lg:px-16 xl:px-24">
+        <h2 className="text-[28px] font-semibold tracking-[-0.02em] text-site-ink md:text-[40px]">Making video ads from photos</h2>
+        <div className="mt-8 grid gap-4 md:grid-cols-2">
+          {videoAds.map((item) => (
             <div key={item.q} className="rounded-[24px] bg-site-panel p-6 md:p-8">
               <h3 className="text-[17px] font-semibold text-site-ink">{item.q}</h3>
               <p className="mt-2 text-[15px] leading-[1.5] text-site-secondary">{item.a}</p>
