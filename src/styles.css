@@ -906,3 +906,4 @@ textarea.contact-input { resize: vertical; }
 .contact-sent p { color: var(--site-secondary); }
 .contact-sent-icon { display: inline-flex; width: 44px; height: 44px; align-items: center; justify-content: center; border-radius: 999px; background: var(--site-primary); color: var(--site-on-primary); }
 @media (max-width: 767px) { .contact-card { padding: 22px; } .contact-form { grid-template-columns: 1fr; } .contact-section { padding-top: 24px; padding-bottom: 64px; } }
+.showcase-card .examples-reel-11, .showcase-card .examples-reel-169 { max-width: 100%; }
