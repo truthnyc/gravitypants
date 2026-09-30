@@ -670,8 +670,6 @@ function Home() {
               stills={[photo1.url, photo2.url, photo3.url]}
               title="Japanese Denim Cotton"
               detail="3 photos → 7.8 sec reel · Purl Soho"
-              video={featuredVideo.url}
-              videoWebm={featuredWebm.url}
               poster={heroPoster.url}
             />
             <BeforeAfter
