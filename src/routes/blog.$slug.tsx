@@ -1,6 +1,8 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { SiteShell } from "@/components/site/SiteShell";
 import { POSTS, postBySlug } from "@/lib/site/blog";
+import { siteHead } from "@/lib/site/seo";
+
 
 export const Route = createFileRoute("/blog/$slug")({
   loader: ({ params }) => {
@@ -8,22 +10,18 @@ export const Route = createFileRoute("/blog/$slug")({
     if (!post) throw notFound();
     return { post };
   },
-  head: ({ loaderData }) => {
+  head: ({ loaderData, params }) => {
     if (!loaderData) {
       return { meta: [{ title: "Not found" }, { name: "robots", content: "noindex" }] };
     }
-    const title = `${loaderData.post.title} — Gravity Pants Blog`;
-    return {
-      meta: [
-        { title },
-        { name: "description", content: loaderData.post.dek },
-        { property: "og:title", content: title },
-        { property: "og:description", content: loaderData.post.dek },
-        { property: "og:type", content: "article" },
-        { name: "twitter:card", content: "summary" },
-      ],
-    };
+    return siteHead({
+      path: `/blog/${params.slug}`,
+      title: `${loaderData.post.title} — Gravity Pants Blog`,
+      description: loaderData.post.dek,
+      ogType: "article",
+    });
   },
+
   component: BlogPostPage,
 });
 
