@@ -246,7 +246,7 @@ function BeforeAfter({
 }) {
   return (
     <article className="site-card home-before-card">
-      <div className="home-before-art">
+      <div className={`home-before-art${format === "169" ? " home-before-landscape" : ""}`}>
         <div className="home-stills examples-featured-stills">
           <small>{imageLabel}</small>
           {stills.map((src, i) => (
