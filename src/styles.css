@@ -880,3 +880,8 @@ html:has(.features-page) { scroll-behavior: smooth; }
   .examples-formats .examples-filter-button { padding-inline: 14px; }
   .site-footer a { display: inline-flex; align-items: center; }
 }
+
+/* Readable contrast: links and illustration labels meet WCAG AA. */
+.home-text-link, .site-reel-link .home-text-link { color: #0060c0; }
+.home-edit-reel strong, .home-timing-track span, .home-feature .home-timing-track span { color: var(--site-ink); }
+.home-person > span { color: #52525a; }

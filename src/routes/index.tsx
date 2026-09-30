@@ -9,9 +9,9 @@ import { ReelPhone, type ReelFrame } from "@/components/site/ReelPhone";
 import { FeaturedAdVideo } from "@/components/site/FeaturedAdVideo";
 import { GravityPantsLogo } from "@/components/GravityPantsLogo";
 import { Button } from "@/components/ui/button";
-import photo1 from "@/assets/site/purl-soho-photo-1.png.asset.json";
-import photo2 from "@/assets/site/purl-soho-photo-2.png.asset.json";
-import photo3 from "@/assets/site/purl-soho-photo-3.png.asset.json";
+import photo1 from "@/assets/site/purl-soho-photo-1.webp.asset.json";
+import photo2 from "@/assets/site/purl-soho-photo-2.webp.asset.json";
+import photo3 from "@/assets/site/purl-soho-photo-3.webp.asset.json";
 import aroVideo from "@/assets/site/product-spotlight.mp4.asset.json";
 import aroVideoWebm from "@/assets/site/product-spotlight.webm.asset.json";
 import aroPoster from "@/assets/site/product-spotlight-poster.jpg.asset.json";
@@ -62,7 +62,7 @@ function HomeReelVideo({ example }: { example: HomeExample }) {
 
 function HomeExampleMedia({ example, index }: { example: HomeExample; index: number }) {
   const media = example.video ? <HomeReelVideo example={example} /> : example.frames ? <ReelPhone frames={example.frames} headline={example.headline ?? ""} subline={example.subline ?? ""} layout={example.layout} logo={example.logo} /> : <Reel id={`ex-${index % examples.length}`} palette={exampleColors[index % exampleColors.length] ?? colors.fashion} headline={example.headline ?? ""} subline={example.subline ?? ""} />;
-  return example.href ? <a className="site-reel-link" href={example.href} target="_blank" rel="noreferrer" tabIndex={index >= examples.length ? -1 : undefined} aria-label={`Visit ${example.logo ?? example.name}`}>{media}</a> : media;
+  return example.href ? <a className="site-reel-link" href={example.href} target="_blank" rel="noreferrer" tabIndex={index >= examples.length ? -1 : undefined} aria-label={example.frames ? undefined : `Visit ${example.logo ?? example.name}`}>{media}</a> : media;
 }
 const tabs = ["Edit in a tap", "Brand kit", "Motion", "Timing", "Export"] as const;
 type Tab = typeof tabs[number];

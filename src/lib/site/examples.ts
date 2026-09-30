@@ -14,9 +14,9 @@ export type GalleryExample = {
 };
 
 // Drawn reference reels are local stand-ins for future exported videos.
-import purlPhoto1 from "@/assets/site/purl-soho-photo-1.png.asset.json";
-import purlPhoto2 from "@/assets/site/purl-soho-photo-2.png.asset.json";
-import purlPhoto3 from "@/assets/site/purl-soho-photo-3.png.asset.json";
+import purlPhoto1 from "@/assets/site/purl-soho-photo-1.webp.asset.json";
+import purlPhoto2 from "@/assets/site/purl-soho-photo-2.webp.asset.json";
+import purlPhoto3 from "@/assets/site/purl-soho-photo-3.webp.asset.json";
 import spotlightVideo from "@/assets/site/product-spotlight.mp4.asset.json";
 import spotlightVideoWebm from "@/assets/site/product-spotlight.webm.asset.json";
 import spotlightPoster from "@/assets/site/product-spotlight-poster.jpg.asset.json";
