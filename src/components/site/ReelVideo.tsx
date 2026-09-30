@@ -33,11 +33,16 @@ export function ReelVideo({ video, videoWebm, poster, label, className, onPlayin
     void element.play().catch(() => {});
 
     const iosVideo = element as HTMLVideoElement & { webkitEnterFullscreen?: () => void };
-    if (typeof iosVideo.webkitEnterFullscreen === "function") {
+    const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    if (isIos && typeof iosVideo.webkitEnterFullscreen === "function") {
       iosVideo.webkitEnterFullscreen();
       return;
     }
-    if (typeof element.requestFullscreen === "function") void element.requestFullscreen().catch(() => {});
+    if (typeof element.requestFullscreen === "function") {
+      void element.requestFullscreen().catch(() => {});
+      return;
+    }
+    iosVideo.webkitEnterFullscreen?.();
   };
 
   useEffect(() => {
