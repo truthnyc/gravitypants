@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "Anyone views site reels" ON storage.objects;
