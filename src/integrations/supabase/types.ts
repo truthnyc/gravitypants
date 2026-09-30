@@ -296,6 +296,7 @@ export type Database = {
           duration_sec: number
           headline: Json | null
           id: string
+          logo_variant: string | null
           logo_visible: boolean
           photo: Json
           project_id: string
@@ -309,6 +310,7 @@ export type Database = {
           duration_sec?: number
           headline?: Json | null
           id?: string
+          logo_variant?: string | null
           logo_visible?: boolean
           photo?: Json
           project_id: string
@@ -322,6 +324,7 @@ export type Database = {
           duration_sec?: number
           headline?: Json | null
           id?: string
+          logo_variant?: string | null
           logo_visible?: boolean
           photo?: Json
           project_id?: string

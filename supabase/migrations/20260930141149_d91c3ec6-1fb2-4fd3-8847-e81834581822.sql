@@ -1,0 +1,2 @@
+ALTER TABLE public.frames ADD COLUMN logo_variant text NULL;
+ALTER TABLE public.frames ADD CONSTRAINT frames_logo_variant_check CHECK (logo_variant IS NULL OR logo_variant IN ('auto', 'light', 'dark'));
