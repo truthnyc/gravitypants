@@ -426,6 +426,9 @@
 .home-before-art .examples-featured-stills img { width:clamp(56px,6vw,88px); height:clamp(70px,7.5vw,110px); border-radius:8px; }
 .home-before-art .examples-featured-phone { min-width:0; }
 .home-before-art .featured-ad-phone { width:clamp(150px,16vw,220px); height:clamp(280px,29vw,400px); }
+.home-before-art .examples-featured-phone .featured-ad-169 { width:clamp(160px,24vw,300px); height:auto; aspect-ratio:16/9; }
+.home-before-art .featured-ad-169 video { object-fit:cover; }
+.home-before-landscape .examples-featured-stills img { height:auto; aspect-ratio:16/9; object-fit:cover; }
 .home-before-art .home-arrow { color:var(--site-primary); flex-shrink:0; width:24px; }
 .home-use { background:var(--site-page); flex-shrink:0; }
 .home-spotlight { min-height:900px; padding-top:120px; display:flex; flex-direction:column; gap:40px; }
@@ -478,12 +481,15 @@
   .home-before-art { gap:clamp(8px,3vw,16px); }
   .home-before-art .examples-featured-stills img { width:56px; height:70px; }
   .home-before-art .featured-ad-phone { width:clamp(145px,42vw,170px); height:clamp(265px,77vw,310px); }
+  .home-before-art .examples-featured-phone .featured-ad-169 { width:clamp(145px,45vw,200px); height:auto; }
+  .home-before-landscape .examples-featured-stills img { height:auto; }
   .home-before-art .home-arrow { width:20px; }
   .home-before-art .examples-featured-stills small, .home-before-art .examples-featured-phone small { display:none; }
 }
 @media (max-width: 375px) {
   .home-before-art .examples-featured-stills img { width:50px; height:64px; }
   .home-before-art .featured-ad-phone { width:145px; height:265px; }
+  .home-before-landscape .examples-featured-stills img { height:auto; }
 }
 
 /* Public features reference — scoped so /app keeps its own layout. */
