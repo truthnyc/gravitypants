@@ -656,22 +656,34 @@ function Home() {
             </p>
           </div>
           <div className="home-before-grid">
-            <BeforeAfter
-              id="candle"
-              palette={colors.candle}
-              title="Candle launch"
-              detail="3 photos → 7.5 sec reel · Fade, Slide, Zoom"
-              headline={"Light up the\nlong nights."}
-              subline="Winter scents · Shop now"
-            />
-            <BeforeAfter
-              id="plant"
-              palette={colors.plant}
-              title="Plant shop promo"
-              detail="3 photos → 7.5 sec reel · 9:16 + 1:1"
-              headline={"Bring the\noutside in."}
-              subline="Delivered potted · Shop now"
-            />
+            {(() => {
+              const purl = examples.find((e) => e.name === "Japanese Denim Cotton");
+              const aro = examples.find((e) => e.name === "AW 26-27 Collection");
+              return (
+                <>
+                  {purl?.video && (
+                    <BeforeAfter
+                      stills={[photo1.url, photo2.url, photo3.url]}
+                      title="Japanese Denim Cotton"
+                      detail="3 photos → 7.8 sec reel · Purl Soho"
+                      video={purl.video}
+                      videoWebm={purl.videoWebm}
+                      poster={purl.poster}
+                    />
+                  )}
+                  {aro?.video && (
+                    <BeforeAfter
+                      stills={aro.poster ? [aro.poster] : []}
+                      title="AW 26-27 Collection"
+                      detail="3 photos → 6 sec reel · Aro"
+                      video={aro.video}
+                      videoWebm={aro.videoWebm}
+                      poster={aro.poster}
+                    />
+                  )}
+                </>
+              );
+            })()}
           </div>
         </section>
         <Spotlight />
