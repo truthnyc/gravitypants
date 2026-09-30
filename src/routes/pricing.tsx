@@ -6,10 +6,27 @@ import { SiteShell } from "@/components/site/SiteShell";
 import { CheckoutDialog, type CheckoutTarget } from "@/components/billing/CheckoutDialog";
 import { currentWorkspaceId, isPaid, useBilling, useManageBilling } from "@/lib/stillframe/billing";
 import { COMPARE, FAQ, PLANS, TRIAL, YEARLY_LABEL, priceFor, signupHref, type Billing, type PlanConfig } from "@/lib/stillframe/plans-config";
-import { siteHead } from "@/lib/site/seo";
+import { SITE_ORIGIN, siteHead } from "@/lib/site/seo";
 
 export const Route = createFileRoute("/pricing")({
-  head: () => siteHead({ path: "/pricing", title: "Pricing — Gravity Pants", description: "Simple, Business and Team plans for turning photos into video ads and GIFs. Every account starts with a 7-day free trial." }),
+  head: () => ({
+    ...siteHead({ path: "/pricing", title: "Pricing — Gravity Pants", description: "Simple, Business and Team plans for turning photos into video ads and GIFs. Every account starts with a 7-day free trial." }),
+    scripts: [{
+      type: "application/ld+json",
+      children: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        name: "Gravity Pants",
+        applicationCategory: "MultimediaApplication",
+        operatingSystem: "Web browser",
+        url: `${SITE_ORIGIN}/pricing`,
+        offers: [
+          { "@type": "Offer", name: TRIAL.name, price: "0", priceCurrency: "USD" },
+          ...PLANS.map((p) => ({ "@type": "Offer", name: `${p.name} plan`, price: String(p.monthly), priceCurrency: "USD", url: `${SITE_ORIGIN}/pricing`, priceSpecification: { "@type": "UnitPriceSpecification", price: String(p.monthly), priceCurrency: "USD", unitCode: "MON" } })),
+        ],
+      }),
+    }],
+  }),
   component: Pricing,
 });
 

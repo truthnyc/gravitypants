@@ -12,10 +12,12 @@ type HeadInput = {
   /** Absolute https image URL. Defaults to the shared social cover. */
   image?: string;
   ogType?: "website" | "article";
+  /** Keep this page out of search results. */
+  noindex?: boolean;
 };
 
-export function siteHead({ path, title, description, image = SITE_OG_IMAGE, ogType = "website" }: HeadInput) {
-  const url = `${SITE_ORIGIN}${path === "/" ? "" : path}`;
+export function siteHead({ path, title, description, image = SITE_OG_IMAGE, ogType = "website", noindex = false }: HeadInput) {
+  const url = `${SITE_ORIGIN}${path}`;
   return {
     meta: [
       { title },
@@ -31,6 +33,7 @@ export function siteHead({ path, title, description, image = SITE_OG_IMAGE, ogTy
       { name: "twitter:title", content: title },
       { name: "twitter:description", content: description },
       { name: "twitter:image", content: image },
+      ...(noindex ? [{ name: "robots", content: "noindex, follow" }] : []),
     ],
     links: [{ rel: "canonical", href: url }],
   };

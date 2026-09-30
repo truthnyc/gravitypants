@@ -1,6 +1,8 @@
 export type BlogPost = {
   slug: string;
   title: string;
+  /** Shorter title for search results (under 60 characters). */
+  seoTitle?: string;
   dek: string;
   date: string;
   minutes: number;
@@ -42,6 +44,7 @@ export const POSTS: BlogPost[] = [
   {
     slug: "three-photos-one-ad",
     title: "The three-photo rule: how to shoot for a reel you haven't made yet",
+    seoTitle: "The Three-Photo Rule for Better Video Ads",
     dek: "Take one wide photo, one detail and one close-up. That is usually enough for a useful product reel.",
     date: "September 15, 2026",
     minutes: 3,

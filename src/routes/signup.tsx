@@ -17,7 +17,7 @@ export const Route = createFileRoute("/signup")({
     plan: z.enum(["simple", "business", "team"]).optional(),
     billing: z.enum(["monthly", "yearly"]).optional(),
   }),
-  head: () => siteHead({ path: "/signup", title: "Create your account — Gravity Pants", description: "Create a Gravity Pants account and turn photos into video ads and GIFs." }),
+  head: () => siteHead({ path: "/signup", title: "Create your account — Gravity Pants", description: "Create a Gravity Pants account and turn photos into video ads and GIFs.", noindex: true }),
   component: SignUp,
 });
 
