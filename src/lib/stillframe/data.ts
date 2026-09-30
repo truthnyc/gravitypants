@@ -27,9 +27,11 @@ function normalizeProject(row: Record<string, unknown>): Project {
 }
 
 function normalizeFrame(row: Record<string, unknown>): Frame {
+  const variant = row["logo_variant"];
   return {
     ...(row as unknown as Frame),
     duration_sec: Number(row["duration_sec"] ?? 2.5),
+    logo_variant: variant === "auto" || variant === "light" || variant === "dark" ? variant : null,
   };
 }
 
@@ -336,10 +338,20 @@ export async function saveEditorDoc(prev: EditorDoc, next: EditorDoc) {
     if (error) throw error;
   }
 
-  const before = new Map(prev.frames.map((f, i) => [f.id, JSON.stringify({ ...f, sort_order: i })]));
-  const rows = next.frames
-    .map((f, i) => ({ ...f, sort_order: i, project_id: next.project.id }))
-    .filter((f) => before.get(f.id) !== JSON.stringify({ ...f }));
+  const frameRow = (f: Frame, sortOrder: number) => ({
+    id: f.id,
+    project_id: next.project.id,
+    sort_order: sortOrder,
+    duration_sec: f.duration_sec,
+    photo: f.photo,
+    transition_in: f.transition_in,
+    headline: f.headline,
+    subline: f.subline,
+    logo_visible: f.logo_visible,
+    logo_variant: f.logo_variant ?? null,
+  });
+  const before = new Map(prev.frames.map((f, i) => [f.id, JSON.stringify(frameRow(f, i))]));
+  const rows = next.frames.map(frameRow).filter((f) => before.get(f.id) !== JSON.stringify(f));
   const keep = new Set(next.frames.map((f) => f.id));
   const removed = prev.frames.filter((f) => !keep.has(f.id)).map((f) => f.id);
 

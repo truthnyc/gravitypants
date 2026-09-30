@@ -66,6 +66,8 @@ export type InspectorActions = {
   onText: (el: "headline" | "subline", patch: Partial<TextSettings>, key?: string) => void;
   onLogo: (patch: Partial<LogoSettings>, key?: string) => void;
   onLogoVisible: (visible: boolean) => void;
+  onLogoVariant: (variant: "auto" | "light" | "dark") => void;
+  onLogoScope: (scope: NonNullable<LogoSettings["show_on"]>) => void;
   onDuration: (seconds: number, key?: string) => void;
   onSameLength: (on: boolean) => void;
   onPace: (pace: Pace) => void;
@@ -73,7 +75,7 @@ export type InspectorActions = {
   onTransitionAll: () => void;
   onReplacePhoto: () => void;
   onAdjust: () => void;
-  onAddLogo: (file: File) => void;
+  onAddLogo: (file: File, variant: "light" | "dark") => void;
 };
 
 export function Inspector({
@@ -645,19 +647,14 @@ function LogoPanel({
   kit: BrandKit | null | undefined;
   actions: InspectorActions;
 }) {
-  const fileRef = useRef<HTMLInputElement>(null);
-  const input = (
-    <input
-      ref={fileRef}
-      type="file"
-      accept="image/png,image/svg+xml,image/webp"
-      className="hidden"
-      onChange={(e) => {
-        const f = e.target.files?.[0];
-        e.target.value = "";
-        if (f) actions.onAddLogo(f);
-      }}
-    />
+  const lightRef = useRef<HTMLInputElement>(null);
+  const darkRef = useRef<HTMLInputElement>(null);
+  const logoInput = (variant: "light" | "dark", ref: { current: HTMLInputElement | null }) => (
+    <input ref={ref} type="file" accept="image/png,image/svg+xml,image/webp" className="hidden" onChange={(e) => {
+      const f = e.target.files?.[0];
+      e.target.value = "";
+      if (f) actions.onAddLogo(f, variant);
+    }} />
   );
   if (!hasLogo) {
     return (
@@ -669,15 +666,16 @@ function LogoPanel({
         <p className="mt-1 max-w-[230px] text-[13px] text-secondary-text">
           It's saved to your Brand Kit and shows on every ad. A PNG or SVG with a see-through background works best.
         </p>
-        <Button variant="primary" size="sm" className="mt-4" onClick={() => fileRef.current?.click()}>
-          Add Logo
-        </Button>
-        {input}
+        <div className="mt-4 flex gap-2">
+          <Button variant="primary" size="sm" onClick={() => darkRef.current?.click()}>Add dark logo</Button>
+          <Button variant="plain" size="sm" onClick={() => lightRef.current?.click()}>Add light logo</Button>
+        </div>
+        {logoInput("light", lightRef)}{logoInput("dark", darkRef)}
       </div>
     );
   }
   const size = logo.size_pct ?? 16;
-  const version = logo.version ?? "auto";
+  const version = frame.logo_variant ?? logo.version ?? "auto";
   const show = logo.show_on ?? "all";
   const tiles: { value: NonNullable<LogoSettings["version"]>; label: string; hint: string; path: string | null | undefined }[] = [
     { value: "auto", label: "Auto", hint: "Best contrast", path: logo.dark_path ?? logo.path },
@@ -695,7 +693,7 @@ function LogoPanel({
                 key={t.value}
                 type="button"
                 disabled={disabled}
-                onClick={() => actions.onLogo({ version: t.value })}
+                onClick={() => actions.onLogoVariant(t.value)}
                 title={disabled ? "Add this version in your Brand Kit" : undefined}
                 className={cn(
                   "flex flex-col items-center gap-1 rounded-sm p-2 text-center disabled:opacity-40",
@@ -758,8 +756,7 @@ function LogoPanel({
               type="button"
               aria-pressed={show === o.value}
               onClick={() => {
-                actions.onLogo({ show_on: o.value });
-                if (o.value === "selected") actions.onLogoVisible(true);
+                actions.onLogoScope(o.value);
               }}
               className={cn("h-7 rounded-lg px-2.5 text-[12px] font-medium", show === o.value ? "bg-el-logo text-primary-foreground" : "bg-control-fill")}
             >
@@ -771,20 +768,23 @@ function LogoPanel({
           <ToggleRow label="Show on this frame" checked={frame.logo_visible} onChange={actions.onLogoVisible} />
         )}
       </Field>
-      <div className="flex gap-2">
-        <Button variant="plain" size="sm" className="flex-1" onClick={() => fileRef.current?.click()}>
-          Replace logo
+      <div className="grid grid-cols-2 gap-2">
+        <Button variant="plain" size="sm" onClick={() => lightRef.current?.click()}>
+          {logo.light_path ? "Replace light" : "Add light"}
+        </Button>
+        <Button variant="plain" size="sm" onClick={() => darkRef.current?.click()}>
+          {logo.dark_path ? "Replace dark" : "Add dark"}
         </Button>
         <Button
           variant="destructive-plain"
           size="sm"
-          className="flex-1"
+          className="col-span-2"
           onClick={() => actions.onLogo({ path: null, light_path: null, dark_path: null, asset_id: null })}
         >
           Remove logo
         </Button>
       </div>
-      {input}
+      {logoInput("light", lightRef)}{logoInput("dark", darkRef)}
     </>
   );
 }

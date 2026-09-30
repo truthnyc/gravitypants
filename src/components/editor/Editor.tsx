@@ -331,11 +331,13 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
     }
   };
 
-  const addLogo = async (file: File) => {
+  const addLogo = async (file: File, variant: "light" | "dark") => {
     try {
       const up = await uploadMedia(file, "logo");
-      updateLogo({ path: up.path, dark_path: up.path, light_path: doc.project.logo.light_path ?? null });
-      toast("Logo added to this ad");
+      updateLogo(variant === "light"
+        ? { path: doc.project.logo.path ?? up.path, light_path: up.path }
+        : { path: doc.project.logo.path ?? up.path, dark_path: up.path });
+      toast(`${variant === "light" ? "Light" : "Dark"} logo added`);
     } catch {
       toast.error("That logo couldn't be uploaded. Try again.");
     }
@@ -405,6 +407,14 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
     onText: updateText,
     onLogo: updateLogo,
     onLogoVisible: (v) => updateFrame(idx, (f) => ({ ...f, logo_visible: v })),
+    onLogoVariant: (v) => updateFrame(idx, (f) => ({ ...f, logo_variant: v })),
+    onLogoScope: (scope) => apply((d) => ({
+      ...d,
+      project: { ...d.project, logo: { ...d.project.logo, show_on: scope } },
+      frames: scope === "selected"
+        ? d.frames.map((f, i) => ({ ...f, logo_visible: i === idx }))
+        : d.frames,
+    })),
     onDuration: (sec, key) => {
       const same = frames.every((f) => f.duration_sec === frames[0]?.duration_sec) && frames.length > 1;
       if (same) apply((d) => ({ ...d, frames: d.frames.map((f) => ({ ...f, duration_sec: sec })) }), key ?? "duration-all");
@@ -430,7 +440,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
       setSelected("photo");
       setAdjusting((a) => !a);
     },
-    onAddLogo: (file) => void addLogo(file),
+    onAddLogo: (file, variant) => void addLogo(file, variant),
   };
 
   /* ---------------- keyboard */

@@ -78,6 +78,8 @@ export type Frame = {
   headline: TextSettings | null;
   subline: TextSettings | null;
   logo_visible: boolean;
+  /** Optional logo artwork override for this frame; falls back to the ad setting. */
+  logo_variant?: "auto" | "light" | "dark" | null;
 };
 
 export type Project = {
