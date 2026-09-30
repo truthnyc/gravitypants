@@ -526,8 +526,8 @@ function Home() {
               <span>Reels out.</span>
             </h1>
             <p className="site-lede home-hero-lede">
-              Add a few product photos. Gravity Pants turns them into a short video ad with your words, logo and colors.
-              Download it in every size you need.
+              Turn product photos into video ads and GIFs. Add a few photos and Gravity Pants makes a short ad with your
+              words, logo and colors. Download it in every size you need.
             </p>
             <div className="home-actions">
               <Primary>

@@ -11,7 +11,7 @@ import { siteHead } from "@/lib/site/seo";
 
 export const Route = createFileRoute("/signin")({
   validateSearch: z.object({ redirect: z.string().optional() }),
-  head: () => siteHead({ path: "/signin", title: "Sign in — Gravity Pants", description: "Sign in to Gravity Pants to make video ads and GIFs from your photos." }),
+  head: () => siteHead({ path: "/signin", title: "Sign in — Gravity Pants", description: "Sign in to Gravity Pants to make video ads and GIFs from your photos.", noindex: true }),
   component: SignIn,
 });
 

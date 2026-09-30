@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { SiteShell } from "@/components/site/SiteShell";
 import { POSTS, postBySlug } from "@/lib/site/blog";
-import { siteHead } from "@/lib/site/seo";
+import { SITE_OG_IMAGE, SITE_ORIGIN, siteHead } from "@/lib/site/seo";
 
 
 export const Route = createFileRoute("/blog/$slug")({
@@ -14,12 +14,38 @@ export const Route = createFileRoute("/blog/$slug")({
     if (!loaderData) {
       return { meta: [{ title: "Not found" }, { name: "robots", content: "noindex" }] };
     }
-    return siteHead({
+    const post = loaderData.post;
+    const url = `${SITE_ORIGIN}/blog/${params.slug}`;
+    const head = siteHead({
       path: `/blog/${params.slug}`,
-      title: `${loaderData.post.title} — Gravity Pants Blog`,
-      description: loaderData.post.dek,
+      title: post.seoTitle ? `${post.seoTitle} — Gravity Pants` : `${post.title} — Gravity Pants Blog`,
+      description: post.dek,
       ogType: "article",
     });
+    const published = new Date(post.date);
+    const jsonLd = [
+      {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        headline: post.title,
+        description: post.dek,
+        ...(Number.isNaN(published.getTime()) ? {} : { datePublished: published.toISOString().slice(0, 10) }),
+        author: { "@type": "Organization", name: "Gravity Pants", url: `${SITE_ORIGIN}/` },
+        publisher: { "@type": "Organization", name: "Gravity Pants", logo: { "@type": "ImageObject", url: `${SITE_ORIGIN}/apple-touch-icon.png` } },
+        mainEntityOfPage: url,
+        image: SITE_OG_IMAGE,
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Home", item: `${SITE_ORIGIN}/` },
+          { "@type": "ListItem", position: 2, name: "Blog", item: `${SITE_ORIGIN}/blog` },
+          { "@type": "ListItem", position: 3, name: post.title, item: url },
+        ],
+      },
+    ];
+    return { ...head, scripts: jsonLd.map((d) => ({ type: "application/ld+json", children: JSON.stringify(d) })) };
   },
 
   component: BlogPostPage,
