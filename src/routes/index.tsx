@@ -24,10 +24,15 @@ import fallWinterPoster from "@/assets/site/fall-winter-collection-poster.webp.a
 import fineJewelryVideo from "@/assets/site/fine-jewelry-gifts.mp4.asset.json";
 import fineJewelryVideoWebm from "@/assets/site/fine-jewelry-gifts.webm.asset.json";
 import fineJewelryPoster from "@/assets/site/fine-jewelry-gifts-poster.webp.asset.json";
+import heroPoster from "@/assets/site/example-of-the-week-poster.webp.asset.json";
 import { siteHead } from "@/lib/site/seo";
 
 export const Route = createFileRoute("/")({
-  head: () => siteHead({ path: "/", title: "Gravity Pants — Photos in. Reels out.", description: "Gravity Pants turns still photos into short video ads and animated GIFs for social." }),
+  head: () => {
+    const head = siteHead({ path: "/", title: "Gravity Pants — Photos in. Reels out.", description: "Gravity Pants turns still photos into short video ads and animated GIFs for social." });
+    // Preload the hero reel's still frame so the largest element paints early.
+    return { ...head, links: [...(head.links ?? []), { rel: "preload", as: "image", href: heroPoster.url, type: "image/webp" }] };
+  },
   component: Home,
 });
 
