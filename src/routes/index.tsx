@@ -46,13 +46,13 @@ const purlFrames: ReelFrame[] = [photo1, photo2, photo3].map(photo => ({ backgro
 type HomeExample = { name: string; headline?: string; subline?: string; detail: string; frames?: ReelFrame[]; layout?: "top"; logo?: string; video?: string; videoWebm?: string; poster?: string; videoFormat?: "11" | "916"; href?: string };
 const examples: HomeExample[] = [
   { name: "Japanese Denim Cotton", headline: "Japanese Denim\nCotton", subline: "A soft, springy cotton yarn", detail: "3 photos · 7.8 sec · 9:16 · Purl Soho", frames: purlFrames, layout: "top", logo: "Purl Soho", href: "https://purlsoho.com" },
-  { name: "AW 26-27 Collection", detail: "3 photos · 6 sec · 1:1 · Aro", video: aroVideo.url, videoWebm: aroVideoWebm.url, poster: aroPoster.url },
+  { name: "AW 26-27 Collection", detail: "3 photos · 6 sec · 1:1 · Aro", video: aroVideo.url, videoWebm: aroVideoWebm.url, poster: aroPoster.url, href: "https://aroshoes.com/" },
   { name: "Coffee subscription", headline: "Slow mornings.\nFast shipping.", subline: "[Roaster name]", detail: "3 photos · 9 sec · 9:16 + 1:1" },
   { name: "Candle launch", headline: "Light up the\nlong nights.", subline: "Winter scents", detail: "3 photos · 7.5 sec · 9:16" },
-  { name: "Bioshield Collection", headline: "Bioshield Collection", subline: "Sachajuan", detail: "3 photos · 9 sec · 9:16 · Sachajuan", video: bioshieldVideo.url, videoWebm: bioshieldVideoWebm.url, poster: bioshieldPoster.url, videoFormat: "916" },
+  { name: "Bioshield Collection", headline: "Bioshield Collection", subline: "Sachajuan", detail: "3 photos · 9 sec · 9:16 · Sachajuan", video: bioshieldVideo.url, videoWebm: bioshieldVideoWebm.url, poster: bioshieldPoster.url, videoFormat: "916", href: "https://shop.sachajuan.com" },
   { name: "Plant shop promo", headline: "Bring the\noutside in.", subline: "Delivered potted", detail: "3 photos · 7.5 sec · 1:1" },
   { name: "Bakery weekend", headline: "Fresh out\nat 7am.", subline: "Order ahead", detail: "3 photos · 6 sec · 1:1" },
-  { name: "Fall–Winter Collection", detail: "3 photos · 8 sec · 9:16 · Agnona", video: fallWinterVideo.url, videoWebm: fallWinterVideoWebm.url, poster: fallWinterPoster.url, videoFormat: "916" },
+  { name: "Fall–Winter Collection", detail: "3 photos · 8 sec · 9:16 · Agnona", video: fallWinterVideo.url, videoWebm: fallWinterVideoWebm.url, poster: fallWinterPoster.url, videoFormat: "916", href: "https://agnona.com" },
   { name: "Jewelry gift guide", headline: "Give something\nthat lasts.", subline: "Gift guide", detail: "3 photos · 7.5 sec · 9:16 + 16:9" },
 ];
 function HomeReelVideo({ example }: { example: HomeExample }) {
