@@ -8,6 +8,8 @@ const PAGES: { path: string; priority: string; changefreq: string }[] = [
   { path: "/how-it-works", priority: "0.9", changefreq: "monthly" },
   { path: "/features", priority: "0.9", changefreq: "monthly" },
   { path: "/examples", priority: "0.9", changefreq: "weekly" },
+  { path: "/showcase", priority: "0.8", changefreq: "weekly" },
+  { path: "/contact", priority: "0.6", changefreq: "monthly" },
   { path: "/pricing", priority: "0.9", changefreq: "monthly" },
   { path: "/about", priority: "0.6", changefreq: "yearly" },
   { path: "/blog", priority: "0.7", changefreq: "weekly" },

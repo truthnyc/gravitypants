@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 const nav = [
   { label: "How it works", to: "/how-it-works" },
   { label: "Examples", to: "/examples" },
+  { label: "Showcase", to: "/showcase" },
   { label: "Features", to: "/features" },
   { label: "Pricing", to: "/pricing" },
 ] as const;
@@ -54,7 +55,7 @@ function SiteHeader() {
 type FooterLink = { label: string; to: string; mailto?: boolean };
 const columns: { label: string; links: FooterLink[] }[] = [
   { label: "Product", links: [{ label: "How it works", to: "/how-it-works" }, { label: "Features", to: "/features" }, { label: "Pricing", to: "/pricing" }, { label: "Blog", to: "/blog" }] },
-  { label: "Examples", links: [{ label: "Gallery", to: "/examples" }, { label: "Submit your reel", to: "mailto:info@gravitypants.com?subject=Submit%20my%20reel", mailto: true }] },
+  { label: "Examples", links: [{ label: "Gallery", to: "/examples" }, { label: "Showcase", to: "/showcase" }, { label: "Get a brand reel", to: "/contact" }] },
   { label: "Company", links: [{ label: "About", to: "/about" }, { label: "Contact", to: "mailto:info@gravitypants.com", mailto: true }] },
   { label: "Help", links: [{ label: "Help center", to: "/help" }, { label: "Privacy", to: "/privacy" }, { label: "Terms", to: "/terms" }] },
 ];
