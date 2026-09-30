@@ -12,5 +12,14 @@ export const getRouter = () => {
     defaultPreloadStaleTime: 0,
   });
 
+  // Always land at the top of a new page (footer links included).
+  router.subscribe("onResolved", ({ fromLocation, toLocation }) => {
+    if (typeof window === "undefined" || toLocation.hash) return;
+    if (fromLocation && fromLocation.pathname === toLocation.pathname) return;
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  });
+
   return router;
 };

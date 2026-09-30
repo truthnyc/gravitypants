@@ -13,6 +13,7 @@ export function FeaturedAdVideo({ controls = false, video = videoAsset.url, vide
   const toggle = () => {
     const element = phoneRef.current?.querySelector("video");
     if (!element) return;
+    element.muted = true;
     if (element.paused) void element.play().catch(() => setPlaying(false));
     else element.pause();
   };

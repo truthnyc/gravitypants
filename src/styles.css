@@ -142,7 +142,7 @@
 
   html {
     background-color: var(--canvas);
-    overflow-x: hidden;
+    overflow-x: clip;
   }
 
   body {
@@ -153,7 +153,7 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     min-width: 0;
-    overflow-x: hidden;
+    overflow-x: clip;
   }
 
   @media (max-width: 1023px) {
