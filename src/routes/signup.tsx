@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { planById } from "@/lib/stillframe/plans-config";
 import { rememberSignupChoice } from "@/lib/stillframe/signup-choice";
 import { templateForExample } from "@/lib/site/example-template";
+import { siteHead } from "@/lib/site/seo";
 
 export const Route = createFileRoute("/signup")({
   validateSearch: z.object({
@@ -16,16 +17,7 @@ export const Route = createFileRoute("/signup")({
     plan: z.enum(["simple", "business", "team"]).optional(),
     billing: z.enum(["monthly", "yearly"]).optional(),
   }),
-  head: () => ({
-    meta: [
-      { title: "Create your account — Gravity Pants" },
-      { name: "description", content: "Create a Gravity Pants account and turn photos into video ads and GIFs." },
-      { property: "og:title", content: "Create your account — Gravity Pants" },
-      { property: "og:description", content: "Turn photos into video ads and GIFs." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-    ],
-  }),
+  head: () => siteHead({ path: "/signup", title: "Create your account — Gravity Pants", description: "Create a Gravity Pants account and turn photos into video ads and GIFs." }),
   component: SignUp,
 });
 

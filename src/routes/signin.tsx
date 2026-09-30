@@ -7,19 +7,11 @@ import { AuthShell, FieldGroup, GoogleButton, plainAuthError, safeRedirect } fro
 import { Button } from "@/components/ui/button";
 import { rememberSignupChoice } from "@/lib/stillframe/signup-choice";
 import { PLANS } from "@/lib/stillframe/plans-config";
+import { siteHead } from "@/lib/site/seo";
 
 export const Route = createFileRoute("/signin")({
   validateSearch: z.object({ redirect: z.string().optional() }),
-  head: () => ({
-    meta: [
-      { title: "Sign in — Gravity Pants" },
-      { name: "description", content: "Sign in to Gravity Pants to make video ads and GIFs from your photos." },
-      { property: "og:title", content: "Sign in — Gravity Pants" },
-      { property: "og:description", content: "Sign in to make video ads and GIFs from your photos." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-    ],
-  }),
+  head: () => siteHead({ path: "/signin", title: "Sign in — Gravity Pants", description: "Sign in to Gravity Pants to make video ads and GIFs from your photos." }),
   component: SignIn,
 });
 

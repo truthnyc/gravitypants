@@ -11,7 +11,7 @@ export function PaymentTestModeBanner() {
     <div className="w-full bg-warning-soft px-4 py-1.5 text-center text-[12px] text-foreground hairline-b">
       {clientToken ? "Payments in the preview are in test mode." : "Real payments aren't set up yet."}{" "}
       <a href="https://docs.lovable.dev/features/payments#test-and-live-environments" target="_blank" rel="noopener noreferrer" className="text-link underline">
-        Read more
+        Read about test and live payments
       </a>
     </div>
   );

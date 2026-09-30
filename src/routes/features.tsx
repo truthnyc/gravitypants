@@ -2,16 +2,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Check } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { Button } from "@/components/ui/button";
+import { siteHead } from "@/lib/site/seo";
 
 export const Route = createFileRoute("/features")({
-  head: () => ({ meta: [
-    { title: "Features — Gravity Pants" },
-    { name: "description", content: "Every Gravity Pants feature in one list: photo frames, text and fonts, brand kits, motion, three formats, MP4 and GIF export, templates and teams." },
-    { property: "og:title", content: "Features — Gravity Pants" },
-    { property: "og:description", content: "The full list of what you get: editing, brand kits, motion, formats, export, templates and team sharing." },
-    { property: "og:type", content: "website" },
-    { name: "twitter:card", content: "summary" },
-  ] }),
+  head: () => siteHead({ path: "/features", title: "Features — Gravity Pants", description: "Every Gravity Pants feature in one list: photo frames, text and fonts, brand kits, motion, three formats, MP4 and GIF export, templates and teams." }),
   component: FeaturesPage,
 });
 

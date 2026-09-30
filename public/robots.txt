@@ -1,8 +1,20 @@
+User-agent: *
+Allow: /
+Disallow: /app/
+Disallow: /admin/
+Disallow: /invite/
+Disallow: /reset
+Disallow: /api/
+
 User-agent: Googlebot
 Allow: /
+Disallow: /app/
+Disallow: /admin/
 
 User-agent: Bingbot
 Allow: /
+Disallow: /app/
+Disallow: /admin/
 
 User-agent: Twitterbot
 Allow: /
@@ -10,5 +22,4 @@ Allow: /
 User-agent: facebookexternalhit
 Allow: /
 
-User-agent: *
-Allow: /
+Sitemap: https://gravitypants.com/sitemap.xml

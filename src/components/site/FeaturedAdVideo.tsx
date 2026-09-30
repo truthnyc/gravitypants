@@ -1,33 +1,16 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { Pause, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ReelVideo } from "@/components/site/ReelVideo";
 import videoAsset from "@/assets/site/example-of-the-week.mp4.asset.json";
 import webmAsset from "@/assets/site/example-of-the-week.webm.asset.json";
-import posterAsset from "@/assets/site/example-of-the-week-poster.jpg.asset.json";
+import posterAsset from "@/assets/site/example-of-the-week-poster.webp.asset.json";
 
 export function FeaturedAdVideo({ controls = false }: { controls?: boolean }) {
-  const videoRef = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
 
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const sync = () => {
-      if (preference.matches) {
-        video.pause();
-        video.currentTime = 0;
-      } else {
-        void video.play().catch(() => setPlaying(false));
-      }
-    };
-    sync();
-    preference.addEventListener("change", sync);
-    return () => preference.removeEventListener("change", sync);
-  }, []);
-
   const toggle = () => {
-    const video = videoRef.current;
+    const video = document.querySelector<HTMLVideoElement>(".featured-ad-phone video");
     if (!video) return;
     if (video.paused) void video.play().catch(() => setPlaying(false));
     else video.pause();
@@ -35,20 +18,13 @@ export function FeaturedAdVideo({ controls = false }: { controls?: boolean }) {
 
   return <div className="site-phone site-phone-large featured-ad-phone">
     <div className="site-phone-screen">
-      <video
-        ref={videoRef}
+      <ReelVideo
+        video={videoAsset.url}
+        videoWebm={webmAsset.url}
         poster={posterAsset.url}
-        loop
-        muted
-        playsInline
-        preload="metadata"
-        aria-label="Purl Soho Japanese Denim Cotton video ad"
-        onPlay={() => setPlaying(true)}
-        onPause={() => setPlaying(false)}
-      >
-        <source src={webmAsset.url} type="video/webm" />
-        <source src={videoAsset.url} type="video/mp4" />
-      </video>
+        label="Purl Soho Japanese Denim Cotton video ad"
+        onPlayingChange={setPlaying}
+      />
       {controls && <Button type="button" variant="siteSecondary" size="icon" className="featured-ad-control" aria-label={playing ? "Pause featured ad" : "Play featured ad"} onClick={toggle}>
         {playing ? <Pause size={18} fill="currentColor" /> : <Play size={18} fill="currentColor" />}
       </Button>}

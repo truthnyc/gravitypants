@@ -1,37 +1,38 @@
 // TODO before launch: replace the reference placeholders [LOGO], [Your product line], [Customer logo], [Roaster name], [A customer quote about how fast they made their first reel, and what it did for their sales.], [Photo], [Customer name], [Role, Company], [X], [X] min, [X]%, [Result metric], [One-line result, e.g. how many ads they shipped for a launch], [One-line result, e.g. time saved each week], and [One-line result, e.g. lift in click-through].
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
+import { ReelVideo } from "@/components/site/ReelVideo";
+
 import { ArrowRight, Check, Play } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { ReelPhone, type ReelFrame } from "@/components/site/ReelPhone";
 import { FeaturedAdVideo } from "@/components/site/FeaturedAdVideo";
 import { GravityPantsLogo } from "@/components/GravityPantsLogo";
 import { Button } from "@/components/ui/button";
-import photo1 from "@/assets/site/purl-soho-photo-1.png.asset.json";
-import photo2 from "@/assets/site/purl-soho-photo-2.png.asset.json";
-import photo3 from "@/assets/site/purl-soho-photo-3.png.asset.json";
+import photo1 from "@/assets/site/purl-soho-photo-1.webp.asset.json";
+import photo2 from "@/assets/site/purl-soho-photo-2.webp.asset.json";
+import photo3 from "@/assets/site/purl-soho-photo-3.webp.asset.json";
 import aroVideo from "@/assets/site/product-spotlight.mp4.asset.json";
 import aroVideoWebm from "@/assets/site/product-spotlight.webm.asset.json";
-import aroPoster from "@/assets/site/product-spotlight-poster.jpg.asset.json";
+import aroPoster from "@/assets/site/product-spotlight-poster.webp.asset.json";
 import bioshieldVideo from "@/assets/site/bioshield-collection.mp4.asset.json";
 import bioshieldVideoWebm from "@/assets/site/bioshield-collection.webm.asset.json";
-import bioshieldPoster from "@/assets/site/bioshield-collection-poster.jpg.asset.json";
+import bioshieldPoster from "@/assets/site/bioshield-collection-poster.webp.asset.json";
 import fallWinterVideo from "@/assets/site/fall-winter-collection.mp4.asset.json";
 import fallWinterVideoWebm from "@/assets/site/fall-winter-collection.webm.asset.json";
-import fallWinterPoster from "@/assets/site/fall-winter-collection-poster.jpg.asset.json";
+import fallWinterPoster from "@/assets/site/fall-winter-collection-poster.webp.asset.json";
 import fineJewelryVideo from "@/assets/site/fine-jewelry-gifts.mp4.asset.json";
 import fineJewelryVideoWebm from "@/assets/site/fine-jewelry-gifts.webm.asset.json";
-import fineJewelryPoster from "@/assets/site/fine-jewelry-gifts-poster.jpg.asset.json";
+import fineJewelryPoster from "@/assets/site/fine-jewelry-gifts-poster.webp.asset.json";
+import heroPoster from "@/assets/site/example-of-the-week-poster.webp.asset.json";
+import { siteHead } from "@/lib/site/seo";
 
 export const Route = createFileRoute("/")({
-  head: () => ({ meta: [
-    { title: "Gravity Pants — Photos in. Reels out." },
-    { name: "description", content: "Gravity Pants turns still photos into short video ads and animated GIFs for social." },
-    { property: "og:title", content: "Gravity Pants — Photos in. Reels out." },
-    { property: "og:description", content: "Turn still photos into short video ads and animated GIFs." },
-    { property: "og:type", content: "website" },
-    { name: "twitter:card", content: "summary" },
-  ] }),
+  head: () => {
+    const head = siteHead({ path: "/", title: "Gravity Pants — Photos in. Reels out.", description: "Gravity Pants turns still photos into short video ads and animated GIFs for social." });
+    // Preload the hero reel's still frame so the largest element paints early.
+    return { ...head, links: [...(head.links ?? []), { rel: "preload", as: "image", href: heroPoster.url, type: "image/webp" }] };
+  },
   component: Home,
 });
 
@@ -59,29 +60,14 @@ const examples: HomeExample[] = [
   { name: "Fine Jewelry Gifts", detail: "3 photos · 8 sec · 16:9 · Katherine Grover", video: fineJewelryVideo.url, videoWebm: fineJewelryVideoWebm.url, poster: fineJewelryPoster.url, videoFormat: "169", href: "https://www.katherinegroverfinejewelry.com" },
 ];
 function HomeReelVideo({ example }: { example: HomeExample }) {
-  const ref = useRef<HTMLVideoElement>(null);
-  useEffect(() => {
-    const video = ref.current;
-    if (!video) return;
-    const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const sync = () => {
-      if (preference.matches) { video.pause(); video.currentTime = 0; }
-      else void video.play().catch(() => {});
-    };
-    sync();
-    preference.addEventListener("change", sync);
-    return () => preference.removeEventListener("change", sync);
-  }, []);
-  return <div className={`home-example-video${example.videoFormat ? ` home-example-video-${example.videoFormat}` : ""}`} aria-label={`${example.name} video ad`}>
-    <video ref={ref} poster={example.poster} loop muted playsInline preload="metadata">
-      {example.videoWebm && <source src={example.videoWebm} type="video/webm" />}
-      <source src={example.video} type="video/mp4" />
-    </video>
+  return <div className={`home-example-video${example.videoFormat ? ` home-example-video-${example.videoFormat}` : ""}`}>
+    <ReelVideo video={example.video!} videoWebm={example.videoWebm} poster={example.poster} label={`${example.name} video ad`} />
   </div>;
 }
+
 function HomeExampleMedia({ example, index }: { example: HomeExample; index: number }) {
   const media = example.video ? <HomeReelVideo example={example} /> : example.frames ? <ReelPhone frames={example.frames} headline={example.headline ?? ""} subline={example.subline ?? ""} layout={example.layout} logo={example.logo} /> : <Reel id={`ex-${index % examples.length}`} palette={exampleColors[index % exampleColors.length] ?? colors.fashion} headline={example.headline ?? ""} subline={example.subline ?? ""} />;
-  return example.href ? <a className="site-reel-link" href={example.href} target="_blank" rel="noreferrer" tabIndex={index >= examples.length ? -1 : undefined} aria-label={`Visit ${example.logo ?? example.name}`}>{media}</a> : media;
+  return example.href ? <a className="site-reel-link" href={example.href} target="_blank" rel="noreferrer" tabIndex={index >= examples.length ? -1 : undefined} aria-label={example.frames ? undefined : `Visit ${example.logo ?? example.name}`}>{media}</a> : media;
 }
 const tabs = ["Edit in a tap", "Brand kit", "Motion", "Timing", "Export"] as const;
 type Tab = typeof tabs[number];

@@ -1,17 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteShell } from "@/components/site/SiteShell";
+import { siteHead } from "@/lib/site/seo";
 
 export const Route = createFileRoute("/privacy")({
-  head: () => ({
-    meta: [
-      { title: "Privacy policy — Gravity Pants" },
-      { name: "description", content: "How Gravity Pants collects, uses and protects your data." },
-      { property: "og:title", content: "Privacy policy — Gravity Pants" },
-      { property: "og:description", content: "How Gravity Pants collects, uses and protects your data." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-    ],
-  }),
+  head: () => siteHead({ path: "/privacy", title: "Privacy policy — Gravity Pants", description: "How Gravity Pants collects, uses and protects your data." }),
   component: PrivacyPage,
 });
 

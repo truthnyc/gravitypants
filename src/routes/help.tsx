@@ -2,18 +2,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteShell } from "@/components/site/SiteShell";
 import { FAQ } from "@/lib/stillframe/plans-config";
 import { Button } from "@/components/ui/button";
+import { siteHead } from "@/lib/site/seo";
 
 export const Route = createFileRoute("/help")({
-  head: () => ({
-    meta: [
-      { title: "Help center — Gravity Pants" },
-      { name: "description", content: "Answers to common questions about Gravity Pants: plans, exports, formats, billing and getting started." },
-      { property: "og:title", content: "Help center — Gravity Pants" },
-      { property: "og:description", content: "Answers to common questions about Gravity Pants: plans, exports, formats, billing and getting started." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-    ],
-  }),
+  head: () => siteHead({ path: "/help", title: "Help center — Gravity Pants", description: "Answers to common questions about Gravity Pants: plans, exports, formats, billing and getting started." }),
   component: HelpPage,
 });
 
