@@ -743,10 +743,10 @@ function Home() {
           </div>
           <div className="home-stats">
             {[
-              ["120", "reels made"],
-              ["5-6 min", "average time to first ad"],
-              ["13", "brands on board"],
-              ["65%", "time saved per ad"],
+              ["10 min", "to your first ad"],
+              ["3", "formats from one edit"],
+              ["6", "ready-made templates"],
+              ["0", "video skills needed"],
             ].map(([num, label], i) => (
               <div className="site-card" key={i}>
                 <b>{num}</b>
