@@ -1,0 +1,2 @@
+ALTER TABLE public.site_reels DROP CONSTRAINT IF EXISTS site_reels_category_check;
+ALTER TABLE public.site_reels ADD CONSTRAINT site_reels_category_check CHECK (char_length(category) BETWEEN 1 AND 50);
