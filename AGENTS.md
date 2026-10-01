@@ -17,7 +17,7 @@
 - The `media` storage bucket is private; resolve image URLs with `getMediaUrl()` in `src/lib/stillframe/media.ts` (workspace policy blocks public buckets).
 - Design tokens live only in `src/styles.css`; components use semantic classes (`bg-canvas`, `text-secondary-text`, `bg-control-fill`), never raw colors.
 - Preview and export both draw through `renderAt()` in `src/render/renderFrame.ts`; never add a second drawing path — the look must match everywhere.
-- Finished exports are uploaded to the private media bucket at `<workspace_id>/exports/<project-id>/<timestamp>/<file>` (bucket limit raised to 500MB for GIFs) and listed from storage, not a table.
+- Exports go to the private media bucket (500MB limit for GIFs), listed from storage.
 - Export: finished files are kept 30 days; daily 03:00 UTC cleanup via /api/public/cleanup-exports (only removes expired files, so no caller secret).
 - Accounts: authenticated routes call `ensure_workspace()`; the gate verifies membership before restoring a per-user workspace preference. Data reads `getWorkspaceId()`, not a constant — reloads preserve the selection safely.
 - Privacy: RLS on every table via `is_workspace_member()`; media files live under `<workspace_id>/…` (exports at `<workspace_id>/exports/<project>/<stamp>/`) and storage policies check the first folder.
@@ -41,3 +41,4 @@
 - Free trial is usage-based (no time limit): SQL `export_status` returns `trial`, `watermark` (false only for the first export) and `clean_left`; the UI reads these flags, never `trial_ends_at`.
 
 - Folder rules: see `AGENTS.md` in src/components/editor, src/render, src/lib/stillframe and src/routes/_authenticated/admin.
+- Admin analytics: public visits go to `page_views` (anon insert) via `src/lib/site/track.ts`; sign-up UTM in user metadata; `analytics.server.ts` feeds the Analytics page and deduped Monday `/api/public/weekly-report`.

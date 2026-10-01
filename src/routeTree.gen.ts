@@ -35,6 +35,7 @@ import { Route as InviteTokenRouteImport } from './routes/invite.$token'
 import { Route as ProductSplatRouteImport } from './routes/product.$'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedAdminAdminsRouteImport } from './routes/_authenticated/admin/admins'
+import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin/analytics'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin/audit'
 import { Route as AuthenticatedAdminClientsRouteImport } from './routes/_authenticated/admin/clients'
 import { Route as AuthenticatedAdminExportsRouteImport } from './routes/_authenticated/admin/exports'
@@ -47,6 +48,7 @@ import { Route as AuthenticatedAppExportsRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAppHelpRouteImport } from './routes/_authenticated/app/help'
 import { Route as ApiPublicCleanupExportsRouteImport } from './routes/api/public/cleanup-exports'
 import { Route as ApiPublicTrialRemindersRouteImport } from './routes/api/public/trial-reminders'
+import { Route as ApiPublicWeeklyReportRouteImport } from './routes/api/public/weekly-report'
 import { Route as AuthenticatedAdminClientsIdRouteImport } from './routes/_authenticated/admin/clients_.$id'
 import { Route as AuthenticatedAdminTemplatesIndexRouteImport } from './routes/_authenticated/admin/templates.index'
 import { Route as AuthenticatedAdminTemplatesIdRouteImport } from './routes/_authenticated/admin/templates.$id'
@@ -194,6 +196,12 @@ const AuthenticatedAdminAdminsRoute =
     path: '/admins',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminAnalyticsRoute =
+  AuthenticatedAdminAnalyticsRouteImport.update({
+    id: '/analytics',
+    path: '/analytics',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminAuditRoute = AuthenticatedAdminAuditRouteImport.update({
   id: '/audit',
   path: '/audit',
@@ -254,6 +262,11 @@ const ApiPublicCleanupExportsRoute = ApiPublicCleanupExportsRouteImport.update({
 const ApiPublicTrialRemindersRoute = ApiPublicTrialRemindersRouteImport.update({
   id: '/api/public/trial-reminders',
   path: '/api/public/trial-reminders',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicWeeklyReportRoute = ApiPublicWeeklyReportRouteImport.update({
+  id: '/api/public/weekly-report',
+  path: '/api/public/weekly-report',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminClientsIdRoute =
@@ -376,6 +389,7 @@ export interface FileRoutesByFullPath {
   '/product/$': typeof ProductSplatRoute
   '/blog/': typeof BlogIndexRoute
   '/admin/admins': typeof AuthenticatedAdminAdminsRoute
+  '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/clients': typeof AuthenticatedAdminClientsRoute
   '/admin/exports': typeof AuthenticatedAdminExportsRoute
@@ -387,6 +401,7 @@ export interface FileRoutesByFullPath {
   '/app/help': typeof AuthenticatedAppHelpRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
   '/api/public/trial-reminders': typeof ApiPublicTrialRemindersRoute
+  '/api/public/weekly-report': typeof ApiPublicWeeklyReportRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/app/': typeof AuthenticatedAppIndexRoute
   '/admin/clients/$id': typeof AuthenticatedAdminClientsIdRoute
@@ -428,6 +443,7 @@ export interface FileRoutesByTo {
   '/product/$': typeof ProductSplatRoute
   '/blog': typeof BlogIndexRoute
   '/admin/admins': typeof AuthenticatedAdminAdminsRoute
+  '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/clients': typeof AuthenticatedAdminClientsRoute
   '/admin/exports': typeof AuthenticatedAdminExportsRoute
@@ -439,6 +455,7 @@ export interface FileRoutesByTo {
   '/app/help': typeof AuthenticatedAppHelpRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
   '/api/public/trial-reminders': typeof ApiPublicTrialRemindersRoute
+  '/api/public/weekly-report': typeof ApiPublicWeeklyReportRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/app': typeof AuthenticatedAppIndexRoute
   '/admin/clients/$id': typeof AuthenticatedAdminClientsIdRoute
@@ -485,6 +502,7 @@ export interface FileRoutesById {
   '/product/$': typeof ProductSplatRoute
   '/blog/': typeof BlogIndexRoute
   '/_authenticated/admin/admins': typeof AuthenticatedAdminAdminsRoute
+  '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/admin/clients': typeof AuthenticatedAdminClientsRoute
   '/_authenticated/admin/exports': typeof AuthenticatedAdminExportsRoute
@@ -496,6 +514,7 @@ export interface FileRoutesById {
   '/_authenticated/app/help': typeof AuthenticatedAppHelpRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
   '/api/public/trial-reminders': typeof ApiPublicTrialRemindersRoute
+  '/api/public/weekly-report': typeof ApiPublicWeeklyReportRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
   '/_authenticated/admin/clients_/$id': typeof AuthenticatedAdminClientsIdRoute
@@ -542,6 +561,7 @@ export interface FileRouteTypes {
     | '/product/$'
     | '/blog/'
     | '/admin/admins'
+    | '/admin/analytics'
     | '/admin/audit'
     | '/admin/clients'
     | '/admin/exports'
@@ -553,6 +573,7 @@ export interface FileRouteTypes {
     | '/app/help'
     | '/api/public/cleanup-exports'
     | '/api/public/trial-reminders'
+    | '/api/public/weekly-report'
     | '/admin/'
     | '/app/'
     | '/admin/clients/$id'
@@ -594,6 +615,7 @@ export interface FileRouteTypes {
     | '/product/$'
     | '/blog'
     | '/admin/admins'
+    | '/admin/analytics'
     | '/admin/audit'
     | '/admin/clients'
     | '/admin/exports'
@@ -605,6 +627,7 @@ export interface FileRouteTypes {
     | '/app/help'
     | '/api/public/cleanup-exports'
     | '/api/public/trial-reminders'
+    | '/api/public/weekly-report'
     | '/admin'
     | '/app'
     | '/admin/clients/$id'
@@ -650,6 +673,7 @@ export interface FileRouteTypes {
     | '/product/$'
     | '/blog/'
     | '/_authenticated/admin/admins'
+    | '/_authenticated/admin/analytics'
     | '/_authenticated/admin/audit'
     | '/_authenticated/admin/clients'
     | '/_authenticated/admin/exports'
@@ -661,6 +685,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/help'
     | '/api/public/cleanup-exports'
     | '/api/public/trial-reminders'
+    | '/api/public/weekly-report'
     | '/_authenticated/admin/'
     | '/_authenticated/app/'
     | '/_authenticated/admin/clients_/$id'
@@ -703,6 +728,7 @@ export interface RootRouteChildren {
   InviteTokenRoute: typeof InviteTokenRoute
   ApiPublicCleanupExportsRoute: typeof ApiPublicCleanupExportsRoute
   ApiPublicTrialRemindersRoute: typeof ApiPublicTrialRemindersRoute
+  ApiPublicWeeklyReportRoute: typeof ApiPublicWeeklyReportRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
@@ -893,6 +919,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminAdminsRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/analytics': {
+      id: '/_authenticated/admin/analytics'
+      path: '/analytics'
+      fullPath: '/admin/analytics'
+      preLoaderRoute: typeof AuthenticatedAdminAnalyticsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/audit': {
       id: '/_authenticated/admin/audit'
       path: '/audit'
@@ -975,6 +1008,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/trial-reminders'
       fullPath: '/api/public/trial-reminders'
       preLoaderRoute: typeof ApiPublicTrialRemindersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/weekly-report': {
+      id: '/api/public/weekly-report'
+      path: '/api/public/weekly-report'
+      fullPath: '/api/public/weekly-report'
+      preLoaderRoute: typeof ApiPublicWeeklyReportRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin/clients_/$id': {
@@ -1109,6 +1149,7 @@ const AuthenticatedAdminTemplatesIdRouteWithChildren =
 
 interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminAdminsRoute: typeof AuthenticatedAdminAdminsRoute
+  AuthenticatedAdminAnalyticsRoute: typeof AuthenticatedAdminAnalyticsRoute
   AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
   AuthenticatedAdminClientsRoute: typeof AuthenticatedAdminClientsRoute
   AuthenticatedAdminExportsRoute: typeof AuthenticatedAdminExportsRoute
@@ -1123,6 +1164,7 @@ interface AuthenticatedAdminRouteRouteChildren {
 const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
   {
     AuthenticatedAdminAdminsRoute: AuthenticatedAdminAdminsRoute,
+    AuthenticatedAdminAnalyticsRoute: AuthenticatedAdminAnalyticsRoute,
     AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
     AuthenticatedAdminClientsRoute: AuthenticatedAdminClientsRoute,
     AuthenticatedAdminExportsRoute: AuthenticatedAdminExportsRoute,
@@ -1236,6 +1278,7 @@ const rootRouteChildren: RootRouteChildren = {
   InviteTokenRoute: InviteTokenRoute,
   ApiPublicCleanupExportsRoute: ApiPublicCleanupExportsRoute,
   ApiPublicTrialRemindersRoute: ApiPublicTrialRemindersRoute,
+  ApiPublicWeeklyReportRoute: ApiPublicWeeklyReportRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
