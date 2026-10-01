@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { siteHead } from "@/lib/site/seo";
 
 export const Route = createFileRoute("/how-it-works")({
-  head: () => siteHead({ path: "/how-it-works", title: "How it works — Gravity Pants", description: "Follow the steps from dropping in photos to downloading a finished video ad: create, edit, brand, animate, resize and export." }),
+  head: () => siteHead({ path: "/how-it-works", title: "How to Turn Product Photos into a Video Ad — Gravity Pants", description: "Follow the steps from dropping in photos to downloading a finished video ad: create, edit, brand, animate, resize and export." }),
   component: HowItWorksPage,
 });
 

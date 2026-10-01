@@ -29,9 +29,9 @@ export const Route = createFileRoute("/")({
   head: () => {
     const head = siteHead({
       path: "/",
-      title: "Gravity Pants – Turn Product Photos into Video Ads & GIFs",
+      title: "Video Ad Maker for Product Photos – Gravity Pants",
       description:
-        "Turn product photos into short MP4 video ads and animated GIFs for Instagram, TikTok and Facebook in minutes. No editing skills needed. Start a free trial.",
+        "Gravity Pants is a video ad maker that turns product photos into short MP4 video ads, Reels and GIFs for Instagram, TikTok and Facebook. No editing skills needed. Try it free.",
     });
     const jsonLd = {
       "@context": "https://schema.org",
