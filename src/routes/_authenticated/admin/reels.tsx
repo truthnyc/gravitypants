@@ -148,6 +148,7 @@ function Reels() {
   const { data, refetch } = useQuery({ queryKey: ["admin", "reels"], queryFn: () => list() });
   const [editing, setEditing] = useState<string | null>(null);
   const reels = data ?? [];
+  const categories = [...new Set([...DEFAULT_CATEGORIES, ...reels.map((r) => r.category)])];
 
   const reorder = async (i: number, dir: -1 | 1) => {
     const ids = reels.map((r) => r.id);
@@ -167,7 +168,7 @@ function Reels() {
   return (
     <>
       <PageTitle title="Website Reels" sub="These reels show on the home page, Examples and Showcase, in this order." />
-      <Card className="mb-6"><h2 className="mb-3 text-[17px] font-semibold">Add a reel</h2><ReelForm initial={empty} onDone={() => void refetch()} /></Card>
+      <Card className="mb-6"><h2 className="mb-3 text-[17px] font-semibold">Add a reel</h2><ReelForm initial={empty} categories={categories} onDone={() => void refetch()} /></Card>
       <Card className="p-0">
         <ul className="divide-y divide-border">
           {reels.map((r, i) => (
@@ -190,6 +191,7 @@ function Reels() {
               {editing === r.id && (
                 <div className="mt-4">
                   <ReelForm
+                    categories={categories}
                     initial={{ id: r.id, brand: r.brand, title: r.title, href: r.href ?? "", category: r.category, published: r.published, photos: r.photos, ...({ format: r.format, seconds: r.seconds } as object) }}
                     onDone={() => { setEditing(null); void refetch(); }}
                     onCancel={() => setEditing(null)}
