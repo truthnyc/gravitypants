@@ -1,13 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { authenticateCronRequest } from "@/integrations/supabase/cron-auth";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export const Route = createFileRoute("/api/public/weekly-report")({
   server: {
     handlers: {
-      POST: async ({ request }) => {
-        const denied = await authenticateCronRequest(request);
-        if (denied) return denied;
+      // No caller secret: it only emails admins, and the per-day idempotency key makes repeat calls send nothing new.
+      POST: async () => {
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const { computeAnalytics, searchReport } = await import("@/lib/stillframe/analytics.server");
         const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");

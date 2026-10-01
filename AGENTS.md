@@ -41,3 +41,4 @@
 - Free trial is usage-based (no time limit): SQL `export_status` returns `trial`, `watermark` (false only for the first export) and `clean_left`; the UI reads these flags, never `trial_ends_at`.
 
 - Folder rules: see `AGENTS.md` in src/components/editor, src/render, src/lib/stillframe and src/routes/_authenticated/admin.
+- Admin analytics: public page views are captured first-party into `page_views` (anon insert only) from `src/lib/site/track.ts`; sign-up first-touch UTM goes into auth user metadata; aggregation lives in `analytics.server.ts`, shared by the admin Analytics page and the Monday `/api/public/weekly-report` email (deduped per day, so no caller secret).
