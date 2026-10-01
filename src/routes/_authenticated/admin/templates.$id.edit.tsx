@@ -457,7 +457,7 @@ function SlideCard({ index, slide: s, count, open, onToggle, onChange, onMove, o
               {PHOTO_MOTIONS.map(([k, l]) => <option key={k} value={k}>{l}</option>)}
             </select>
           </Field>
-          <div className="flex items-end gap-6">
+          <div className="flex flex-col gap-1 sm:col-span-3 sm:flex-row sm:gap-10">
             {logoShowOn === "selected" && <Toggle label="Show logo" sub="on this slide" checked={s.logo_visible ?? true} onChange={(v) => onChange({ logo_visible: v })} />}
             <span title={previewOn <= 1 && s.preview !== false ? "At least one slide must show in previews" : undefined}>
               <Toggle label="Show in preview" sub="template cards" checked={s.preview !== false} onChange={(v) => { if (!v && previewOn <= 1) { toast.error("At least one slide must show in previews."); return; } onChange({ preview: v }); }} />
