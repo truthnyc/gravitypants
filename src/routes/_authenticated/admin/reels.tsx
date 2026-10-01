@@ -63,7 +63,7 @@ async function upload(blob: Blob, ext: string, type: string) {
 type Draft = { id?: string; brand: string; title: string; href: string; category: string; published: boolean; photos: number };
 const empty: Draft = { brand: "", title: "", href: "", category: "fashion", published: true, photos: 3 };
 
-function ReelForm({ initial, onDone, onCancel }: { initial: Draft; onDone: () => void; onCancel?: () => void }) {
+function ReelForm({ initial, categories, onDone, onCancel }: { initial: Draft; categories: string[]; onDone: () => void; onCancel?: () => void }) {
   const save = useServerFn(saveSiteReel);
   const [d, setD] = useState(initial);
   const [file, setFile] = useState<File | null>(null);
@@ -89,7 +89,7 @@ function ReelForm({ initial, onDone, onCancel }: { initial: Draft; onDone: () =>
       await save({ data: {
         ...(d.id ? { id: d.id } : {}),
         brand: d.brand, title: d.title, href: href || null,
-        category: d.category as "fashion", photos: d.photos, published: d.published,
+        category: d.category, photos: d.photos, published: d.published,
         format: files.format ?? current.format ?? "916",
         seconds: files.seconds ?? current.seconds ?? 8,
         ...(files.video_url ? { video_url: files.video_url, poster_url: files.poster_url ?? null } : {}),
@@ -114,9 +114,11 @@ function ReelForm({ initial, onDone, onCancel }: { initial: Draft; onDone: () =>
         <Input value={d.href} onChange={(e) => setD({ ...d, href: e.target.value })} placeholder="https://brand.com" inputMode="url" className="h-11 bg-card text-[15px] text-foreground" />
       </label>
       <label className="grid gap-1 text-[13px] text-secondary-text">Category
-        <select value={d.category} onChange={(e) => setD({ ...d, category: e.target.value })} className="h-11 rounded-sm border border-input bg-card px-3 text-[15px] text-foreground">
-          {CATEGORIES.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-        </select>
+        <Input required list="reel-categories" value={d.category} onChange={(e) => setD({ ...d, category: e.target.value })} placeholder="fashion" className="h-11 bg-card text-[15px] text-foreground" />
+        <datalist id="reel-categories">
+          {categories.map((c) => <option key={c} value={c}>{categoryLabel(c)}</option>)}
+        </datalist>
+        <span>Pick an existing one or type a new category.</span>
       </label>
       <div className="grid gap-1 text-[13px] text-secondary-text sm:col-span-2">Reel file (MP4 or WebM)
         <div className="flex flex-wrap items-center gap-3">
