@@ -211,6 +211,7 @@ function Builder({ row, refetch }: { row: any; refetch: () => void }) {
                   upload={uploadImage}
                   format={doc.format}
                   logoShowOn={doc.style.logo_show_on ?? "all"}
+                  previewOn={doc.slides.filter((x) => x.preview !== false).length}
                   dragging={dragFrom === i}
                   onDragStart={() => setDragFrom(i)}
                   onDragEnd={() => setDragFrom(null)}
@@ -399,11 +400,12 @@ function PosGrid({ title, note, value, onChange, only = () => true }: { title: s
   );
 }
 
-function SlideCard({ index, slide: s, count, open, onToggle, onChange, onMove, onDuplicate, onDelete, upload, format, logoShowOn, dragging, onDragStart, onDragEnd, onDrop }: {
+function SlideCard({ index, slide: s, count, open, onToggle, onChange, onMove, onDuplicate, onDelete, upload, format, logoShowOn, previewOn, dragging, onDragStart, onDragEnd, onDrop }: {
   index: number; slide: DocSlide; count: number; open: boolean; onToggle: () => void; onChange: (p: Partial<DocSlide>) => void;
   onMove: (by: number) => void; onDuplicate: () => void; onDelete: () => void; upload: (f: File) => Promise<string>;
   format: Format;
   logoShowOn: NonNullable<TemplateDoc["style"]["logo_show_on"]>;
+  previewOn: number;
   dragging: boolean; onDragStart: () => void; onDragEnd: () => void; onDrop: () => void;
 }) {
   const file = useRef<HTMLInputElement>(null);
@@ -455,8 +457,11 @@ function SlideCard({ index, slide: s, count, open, onToggle, onChange, onMove, o
               {PHOTO_MOTIONS.map(([k, l]) => <option key={k} value={k}>{l}</option>)}
             </select>
           </Field>
-          <div className="flex items-end">
+          <div className="flex items-end gap-6">
             {logoShowOn === "selected" && <Toggle label="Show logo" sub="on this slide" checked={s.logo_visible ?? true} onChange={(v) => onChange({ logo_visible: v })} />}
+            <span title={previewOn <= 1 && s.preview !== false ? "At least one slide must show in previews" : undefined}>
+              <Toggle label="Show in preview" sub="template cards" checked={s.preview !== false} onChange={(v) => { if (!v && previewOn <= 1) { toast.error("At least one slide must show in previews."); return; } onChange({ preview: v }); }} />
+            </span>
           </div>
           <div className="space-y-3 sm:col-span-2">
             <Field label="Headline placeholder"><input className={cn(inp, "font-semibold")} value={s.headline_placeholder} maxLength={120} onChange={(e) => onChange({ headline_placeholder: e.target.value })} /></Field>
