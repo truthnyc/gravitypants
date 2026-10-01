@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 
 const FEATURE: Record<string, string[]> = {
   simple: ["10 exports every month", "1 seat"],
+  simple_yearly: ["10 exports every month", "1 seat"],
   business: ["50 exports every month", "1 seat"],
   business_yearly: ["50 exports every month", "1 seat"],
   team: ["150 shared exports every month", "You + 3 teammates", "Shared brand kits and templates", "Priority support"],
@@ -15,6 +16,7 @@ const FEATURE: Record<string, string[]> = {
 };
 const CTA: Record<string, { label: string; variant: "plain" | "default" }> = {
   simple: { label: "Choose Simple", variant: "plain" },
+  simple_yearly: { label: "Choose Simple Yearly", variant: "plain" },
   business: { label: "Choose Business", variant: "default" },
   business_yearly: { label: "Choose Yearly", variant: "plain" },
   team: { label: "Choose Team", variant: "plain" },

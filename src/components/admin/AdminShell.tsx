@@ -73,7 +73,7 @@ export const fmtBytes = (n: number) =>
   n < 1024 ? `${n} B` : n < 1048576 ? `${(n / 1024).toFixed(0)} KB` : n < 1073741824 ? `${(n / 1048576).toFixed(1)} MB` : `${(n / 1073741824).toFixed(2)} GB`;
 export const fmtMoney = (cents: number) => `$${(cents / 100).toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
 
-const PLAN_LABEL: Record<string, string> = { trial: "Trial", none: "No plan", simple: "Simple", business: "Business", business_yearly: "Business Yearly" };
+const PLAN_LABEL: Record<string, string> = { trial: "Trial", none: "No plan", simple: "Simple", simple_yearly: "Simple Yearly", business: "Business", business_yearly: "Business Yearly" };
 export const planLabel = (p: string) => PLAN_LABEL[p] ?? p;
 const STATUS_LABEL: Record<string, string> = { trialing: "Trial", active: "Active", past_due: "Payment problem", canceled: "Canceled", suspended: "Paused", none: "—" };
 export const statusLabel = (s: string) => STATUS_LABEL[s] ?? s;

@@ -59,7 +59,7 @@ function Clients() {
       <PageTitle title="Clients" sub={data ? `${rows.length} of ${data.length}` : undefined} />
       <div className="mb-4 flex flex-wrap gap-2">
         <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search name or email" className="h-11 w-full bg-card sm:h-9 sm:w-[260px]" aria-label="Search clients" />
-        <F label="Plan" value={plan} set={setPlan} items={[["all", "All plans"], ["trial", "Trial"], ["simple", "Simple"], ["business", "Business"], ["business_yearly", "Business Yearly"], ["none", "No plan"]]} />
+        <F label="Plan" value={plan} set={setPlan} items={[["all", "All plans"], ["trial", "Trial"], ["simple", "Simple"], ["simple_yearly", "Simple Yearly"], ["business", "Business"], ["business_yearly", "Business Yearly"], ["none", "No plan"]]} />
         <F label="Status" value={status} set={setStatus} items={[["all", "All statuses"], ["trialing", "Trial"], ["active", "Active"], ["past_due", "Payment problem"], ["canceled", "Canceled"], ["suspended", "Paused"]]} />
         <F label="Trial or paying" value={kind} set={setKind} items={[["all", "Trial and paying"], ["trial", "Trial only"], ["paying", "Paying only"]]} />
         <F label="Signed up" value={since} set={setSince} items={[["all", "Any sign-up date"], ["7", "Last 7 days"], ["30", "Last 30 days"], ["90", "Last 90 days"]]} />

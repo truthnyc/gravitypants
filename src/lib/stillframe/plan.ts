@@ -24,7 +24,7 @@ export function planTier(b: { plan?: string; status?: string; comp_plan?: string
 
 /** Active free trial (no paid plan yet). */
 export function isTrial(b: { plan?: string; status?: string; trial_ends_at?: string | null } | null): boolean {
-  return !!b && b.plan === "trial" && b.status === "trialing" && !!b.trial_ends_at && new Date(b.trial_ends_at) > new Date();
+  return !!b && b.plan === "trial" && b.status === "trialing"; // no time limit: the trial lasts until its exports are used
 }
 
 /** Ready-made templates can be limited to plans; an empty audience means everyone. */

@@ -357,7 +357,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
             </p>
             {exportStatus?.limit != null && (
               <p className="mt-2 text-[13px] font-medium nums">
-                {Math.max(0, exportStatus.limit - (exportStatus.used ?? 0))} of {exportStatus.limit} left{exportStatus.watermark ? " in your free trial" : " this month"}
+                {Math.max(0, exportStatus.limit - (exportStatus.used ?? 0))} of {exportStatus.limit} left{exportStatus.trial ? " in your free trial" : " this month"}
               </p>
             )}
             {!!exportStatus?.extras && exportStatus.extras > 0 && (
@@ -365,8 +365,16 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
                 Plus {exportStatus.extras} extra {exportStatus.extras === 1 ? "export" : "exports"} that never expire
               </p>
             )}
+            {exportStatus?.trial && !exportStatus.watermark && (
+              <p className="mt-1 text-[13px] font-medium text-primary">Your first reel is on us — no watermark.</p>
+            )}
             {exportStatus?.watermark && (
-              <p className="mt-1 text-[13px] text-secondary-text">Trial exports carry a small Gravity Pants mark. Pick a plan to remove it.</p>
+              <p className="mt-1 text-[13px] text-secondary-text">
+                This export will carry a small Gravity Pants mark.{" "}
+                <button type="button" className="font-medium text-primary underline-offset-2 hover:underline" onClick={() => setPlanSheet("no_plan")}>
+                  Remove the watermark — Simple, $35/month
+                </button>
+              </p>
             )}
           </div>
 
@@ -431,13 +439,13 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
       <Dialog open={!!planSheet} onOpenChange={(o) => !o && setPlanSheet(null)}>
         <DialogContent className="max-w-[900px]">
           <DialogHeader>
-            <DialogTitle>{planSheet === "limit_reached" ? (exportStatus?.watermark ? `You've used your ${TRIAL.exports} trial exports` : "You've used this month's exports") : planSheet === "payment_problem" ? "There's a problem with your payment" : "Choose a plan"}</DialogTitle>
+            <DialogTitle>{planSheet === "limit_reached" ? (exportStatus?.trial ? `You've used your ${TRIAL.exports} trial exports` : "You've used this month's exports") : planSheet === "payment_problem" ? "There's a problem with your payment" : "Choose a plan"}</DialogTitle>
             <DialogDescription>
               {planSheet === "limit_reached"
                 ? "Your monthly exports are used up. Buy a top-up of 5 extra exports for $12.50 on the Billing page — they never expire — or move up a plan."
                 : planSheet === "payment_problem"
                   ? "We couldn't take your last payment. Update your card in Manage Billing to keep exporting."
-                   : `Your free trial has ended or its ${TRIAL.exports} exports are used. Your ads are safe — choose a plan to keep exporting without a watermark.${preferredPlan ? ` You selected ${preferredPlan} when you joined.` : ""}`}
+                   : `Your ${TRIAL.exports} free trial exports are used. Your ads and brand kit are saved and you can keep editing — choose a plan to keep exporting without a watermark.${preferredPlan ? ` You selected ${preferredPlan} when you joined.` : ""}`}
             </DialogDescription>
           </DialogHeader>
           <PlanCards compact />

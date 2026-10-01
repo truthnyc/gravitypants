@@ -98,8 +98,12 @@ function BillingPage() {
           <dl className="mt-5 grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-[14px]">
             <dt className="text-secondary-text">Plan</dt>
             <dd className="font-medium">{planName(billing.plan)}</dd>
-            <dt className="text-secondary-text">{paid ? (billing.cancel_at_period_end || billing.status === "canceled" ? "Ends on" : "Renews on") : "Trial ends"}</dt>
-            <dd className="nums">{longDate(paid ? billing.current_period_end : billing.trial_ends_at)}</dd>
+            {paid && (
+              <>
+                <dt className="text-secondary-text">{billing.cancel_at_period_end || billing.status === "canceled" ? "Ends on" : "Renews on"}</dt>
+                <dd className="nums">{longDate(billing.current_period_end)}</dd>
+              </>
+            )}
             <dt className="text-secondary-text">Exports left</dt>
             <dd className="nums">{exportsLeft(status)}</dd>
           </dl>
@@ -108,7 +112,7 @@ function BillingPage() {
         {status?.limit != null && (
           <div className="mt-5">
             <p className="text-[14px] nums">
-              {status.used ?? 0} of {status.limit} exports used {limited ? "this month" : "in your trial"}{status.watermark ? " · watermarked" : ""}
+              {status.used ?? 0} of {status.limit} exports used {limited ? "this month" : "in your trial"}{status.trial ? " · first one has no watermark" : ""}
             </p>
             <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-control-fill">
               <div className="h-full rounded-full bg-primary" style={{ width: `${Math.min(100, ((status.used ?? 0) / (status.limit || 1)) * 100)}%` }} />
@@ -154,5 +158,5 @@ function exportsLeft(st: ExportStatus | null | undefined): string {
     if (extras > 0) return `${extras} extra`;
     return st.reason === "no_plan" || st.reason === "limit_reached" ? "None — pick a plan" : "—";
   }
-  return `${Math.max(0, st.limit - (st.used ?? 0))} of ${st.limit}${extra}${st.watermark ? " · watermarked" : ""}`;
+  return `${Math.max(0, st.limit - (st.used ?? 0))} of ${st.limit}${extra}${st.trial ? (st.watermark ? " · watermarked" : " · next one has no watermark") : ""}`;
 }

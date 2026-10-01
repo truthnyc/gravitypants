@@ -3,6 +3,7 @@ import { PLANS } from "./plans-config";
 /** Single source for how payment prices map to app plans. Used by the webhook, the portal and the billing checks. */
 export const PLAN_BY_PRICE: Record<string, string> = {
   simple_monthly: "simple",
+  simple_yearly: "simple_yearly",
   business_monthly: "business",
   business_yearly: "business_yearly",
   team_monthly: "team",

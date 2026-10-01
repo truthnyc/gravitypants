@@ -558,7 +558,7 @@ function Home() {
             <p className="home-note">
               <span className="home-desktop-only">No video editing experience needed. </span>
               <span className="home-mobile-only">No video editing needed. </span>No editing skills needed. Start free
-              and make your first reel in the next few minutes. Try every feature and make 3 watermarked exports.
+              and make your first reel in the next few minutes. Your first reel is free, with no watermark.
             </p>
           </div>
           <div className="home-hero-visual" aria-hidden="true">
