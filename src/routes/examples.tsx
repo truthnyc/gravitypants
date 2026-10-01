@@ -12,14 +12,12 @@ import { Button } from "@/components/ui/button";
 import type { GalleryExample } from "@/lib/site/examples";
 import { siteHead } from "@/lib/site/seo";
 import { listSiteReels } from "@/lib/site/reels.functions";
-import type { SiteReel } from "@/lib/site/reels";
+import { categoryLabel, type SiteReel } from "@/lib/site/reels";
 
 const reelToExample = (r: SiteReel): GalleryExample => ({ id: r.id, name: r.title, category: r.category, format: r.format, photos: r.photos, seconds: r.seconds, headline: r.title, sub: r.brand, logo: r.brand, video: r.video, ...(r.videoWebm ? { videoWebm: r.videoWebm } : {}), ...(r.poster ? { poster: r.poster } : {}), ...(r.href ? { href: r.href } : {}), frames: [] });
 
-const categories = [{ id: "all", label: "All" }, { id: "fashion", label: "Fashion" }, { id: "food", label: "Food & drink" }, { id: "beauty", label: "Beauty" }, { id: "home", label: "Home" }] as const;
 const formats = [{ id: "all", label: "All formats", short: "All" }, { id: "916", label: "9:16", short: "9:16" }, { id: "11", label: "1:1", short: "1:1" }, { id: "169", label: "16:9", short: "16:9" }] as const;
-const formatLabel = { "916": "9:16", "11": "1:1", "169": "16:9" } as const;
-const categoryLabel = { fashion: "Fashion", food: "Food & drink", beauty: "Beauty", home: "Home" } as const;
+const formatLabel: Record<string, string> = { "916": "9:16", "11": "1:1", "169": "16:9" };
 
 function GalleryReel({ example }: { example: GalleryExample }) {
   if (example.video) {
