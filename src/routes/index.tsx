@@ -767,9 +767,9 @@ function Home() {
               template.""
             </p>
             <div className="home-person">
-              <span>Purl Soho</span>
+              <span></span>
               <div>
-                <b> </b>
+                <b>Purl Soho </b>
                 <small> </small>
               </div>
             </div>
