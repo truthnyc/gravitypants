@@ -10,7 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { Card, PageTitle, Pill } from "@/components/admin/AdminShell";
 import { supabase } from "@/integrations/supabase/client";
 import { deleteSiteReel, listAdminReels, moveSiteReel, saveSiteReel, type AdminReel } from "@/lib/stillframe/admin-reels.functions";
-import { FORMAT_LABEL, type ReelFormat } from "@/lib/site/reels";
+import { CATEGORY_LABEL, FORMAT_LABEL, categoryLabel, type ReelFormat } from "@/lib/site/reels";
 
 export const Route = createFileRoute("/_authenticated/admin/reels")({
   head: () => ({ meta: [
@@ -25,7 +25,7 @@ export const Route = createFileRoute("/_authenticated/admin/reels")({
   component: Reels,
 });
 
-const CATEGORIES = [["fashion", "Fashion"], ["food", "Food & drink"], ["beauty", "Beauty"], ["home", "Home"]] as const;
+const DEFAULT_CATEGORIES = Object.keys(CATEGORY_LABEL);
 
 type Probe = { format: ReelFormat; seconds: number; poster: Blob | null };
 
