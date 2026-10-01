@@ -75,8 +75,11 @@ export function ReelVideo({ video, videoWebm, poster, label, className, onPlayin
     if (typeof IntersectionObserver === "undefined") { setActive(true); return; }
     const observer = new IntersectionObserver(entries => {
       for (const entry of entries) {
-        if (entry.isIntersecting) setActive(true);
-        else element.pause();
+        if (entry.isIntersecting) {
+          setActive(true);
+          // Resume playback when the reel scrolls back into view.
+          if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) void element.play().catch(() => {});
+        } else element.pause();
       }
     }, { rootMargin: "200px" });
     observer.observe(element);
