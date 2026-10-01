@@ -10,7 +10,7 @@ import { SITE_ORIGIN, siteHead } from "@/lib/site/seo";
 
 export const Route = createFileRoute("/pricing")({
   head: () => ({
-    ...siteHead({ path: "/pricing", title: "Pricing — Gravity Pants", description: "Simple, Business and Team plans for turning photos into video ads and GIFs. Every account starts with a 7-day free trial." }),
+    ...siteHead({ path: "/pricing", title: "Video Ad Maker Pricing — Gravity Pants", description: "Simple, Business and Team plans for turning photos into video ads and GIFs. Try it free with 3 exports, no card needed." }),
     scripts: [{
       type: "application/ld+json",
       children: JSON.stringify({

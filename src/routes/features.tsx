@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { siteHead } from "@/lib/site/seo";
 
 export const Route = createFileRoute("/features")({
-  head: () => siteHead({ path: "/features", title: "Features — Gravity Pants", description: "Every Gravity Pants feature in one list: photo frames, text and fonts, brand kits, motion, three formats, MP4 and GIF export, templates and teams." }),
+  head: () => siteHead({ path: "/features", title: "Product Video Maker Features — Gravity Pants", description: "Everything in the Gravity Pants product video maker: photo frames, text and fonts, brand kits, motion, three formats, MP4 and GIF export, templates and teams." }),
   component: FeaturesPage,
 });
 

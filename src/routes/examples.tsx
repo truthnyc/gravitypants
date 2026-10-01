@@ -44,7 +44,7 @@ function GalleryCard({ example }: { example: GalleryExample }) {
 
 export const Route = createFileRoute("/examples")({
   validateSearch: z.object({ cat: z.string().optional(), format: z.coerce.number().optional() }),
-  head: () => siteHead({ path: "/examples", title: "Examples — Gravity Pants", description: "Browse Gravity Pants video ad examples across fashion, food, beauty, and home. Find a style for your photos." }),
+  head: () => siteHead({ path: "/examples", title: "Video Ad Examples Made from Product Photos — Gravity Pants", description: "Browse Gravity Pants video ad examples across fashion, food, beauty, and home. Find a style for your photos." }),
   loader: () => listSiteReels().catch(() => [] as SiteReel[]),
   component: ExamplesPage,
 });
