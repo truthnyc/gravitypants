@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { closeUpgrade, FREE_EXPORTS, useUpgradeFeature, type Feature } from "@/lib/stillframe/plan";
 
 const COPY: Record<Feature, { title: string; body: string }> = {
-  export: { title: "You've used your exports", body: `The free trial includes ${FREE_EXPORTS} exports. Pick a plan, or add a pack of 5 extra exports on the Billing page.` },
+  export: { title: "You've used your exports", body: `The free trial includes ${FREE_EXPORTS} exports. Pick a plan, or add a pack of extra exports on the Billing page.` },
   gif: { title: "Animated GIFs come with a paid plan", body: "Every plan from Simple up saves your ads as GIFs as well as videos." },
   brand_kits: { title: "Brand kits come with a paid plan", body: "Save your logos, colors and fonts once and put them on any ad in one tap." },
   templates: { title: "Templates come with a paid plan", body: "Save an ad's look as a template and reuse it with new photos." },

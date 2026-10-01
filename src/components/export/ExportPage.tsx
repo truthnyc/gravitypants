@@ -442,7 +442,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
             <DialogTitle>{planSheet === "limit_reached" ? (exportStatus?.trial ? `You've used your ${TRIAL.exports} trial exports` : "You've used this month's exports") : planSheet === "payment_problem" ? "There's a problem with your payment" : "Choose a plan"}</DialogTitle>
             <DialogDescription>
               {planSheet === "limit_reached"
-                ? "Your monthly exports are used up. Buy a top-up of 5 extra exports for $12.50 on the Billing page — they never expire — or move up a plan."
+                ? "Your monthly exports are used up. Buy a pack of 5, 10 or 20 extra exports on the Billing page — they never expire — or move up a plan."
                 : planSheet === "payment_problem"
                   ? "We couldn't take your last payment. Update your card in Manage Billing to keep exporting."
                    : `Your ${TRIAL.exports} free trial exports are used. Your ads and brand kit are saved and you can keep editing — choose a plan to keep exporting without a watermark.${preferredPlan ? ` You selected ${preferredPlan} when you joined.` : ""}`}
