@@ -15,6 +15,7 @@ import { WorkspaceSwitcher, WorkspaceList } from "./WorkspaceSwitcher";
 const navItems = [
   { to: "/app/ads", label: "Your Ads" },
   { to: "/app/brand", label: "Brand Kit" },
+  { to: "/app/exports", label: "Previous Exports" },
 ] as const;
 
 export function AppHeader() {
