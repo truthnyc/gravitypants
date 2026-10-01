@@ -678,7 +678,7 @@ function LogoPanel({
     );
   }
   const size = logo.size_pct ?? 16;
-  const posScope = posScopeState[0] ?? (logo.frame_positions?.[frame.id]?.[format] || show === "selected" ? "frame" : "all");
+  const posScope = posScopeState[0] ?? (logo.frame_positions?.[frame.id]?.[format] || logo.show_on === "selected" ? "frame" : "all");
   const setPosScope = posScopeState[1];
   const version = frame.logo_variant ?? logo.version ?? "auto";
   const show = logo.show_on ?? "all";
