@@ -23,7 +23,7 @@ export type Billing = {
   source_workspace_name?: string | null;
 };
 
-export type ExportStatus = { allowed: boolean; reason: "no_plan" | "limit_reached" | "payment_problem" | "no_access" | null; used?: number; limit?: number; resets_at?: string | null; watermark?: boolean; trial?: boolean; clean_left?: number; extras?: number };
+export type ExportStatus = { allowed: boolean; reason: "no_plan" | "limit_reached" | "payment_problem" | "no_access" | null; used?: number; limit?: number; resets_at?: string | null; watermark?: boolean; trial?: boolean; clean_left?: number; extras?: number; staff?: boolean };
 
 export const billingKey = ["billing"] as const;
 
