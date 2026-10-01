@@ -556,7 +556,17 @@ function LogoEditor({ style, onChange, upload }: { style: TemplateDoc["style"]; 
           </div>
           <Seg value={style.logo_opacity ?? "solid"} options={["solid", "soft"]} onChange={(v) => onChange({ logo_opacity: v })} small />
           <Field label="Show logo on">
-            <Seg value={style.logo_show_on ?? "all"} options={["all", "first_last", "selected"]} onChange={(v) => onChange({ logo_show_on: v })} small />
+            <div className="flex gap-0.5 rounded-lg bg-control-fill p-0.5" role="radiogroup">
+              {([
+                ["all", "All frames"],
+                ["first_last", "First & last"],
+                ["selected", "This frame"],
+              ] as const).map(([value, label]) => (
+                <button key={value} type="button" role="radio" aria-checked={(style.logo_show_on ?? "all") === value} onClick={() => onChange({ logo_show_on: value })} className={cn("h-8 flex-1 rounded-md px-2 text-[12px] font-medium", (style.logo_show_on ?? "all") === value ? "bg-card font-semibold shadow-segment" : "text-secondary-text")}>
+                  {label}
+                </button>
+              ))}
+            </div>
             <p className="mt-1 text-[11px] text-secondary-text">
               {(style.logo_show_on ?? "all") === "all" ? "All slides" : style.logo_show_on === "first_last" ? "First and last slides" : "Choose inside each slide"}
             </p>

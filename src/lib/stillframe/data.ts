@@ -266,6 +266,7 @@ async function insertCopy(source: ProjectWithFrames, name: string, photos?: Uplo
       headline: frame.headline,
       subline: frame.subline,
       logo_visible: frame.logo_visible,
+      logo_variant: frame.logo_variant ?? null,
     };
   });
 
