@@ -1,5 +1,5 @@
 /* Editable shape of a ready-made template, shared by the admin builder, the server fns and the preview. */
-import type { Frame, Format, ProjectWithFrames } from "./types";
+import type { Frame, Format, ProjectWithFrames, TextSettings } from "./types";
 import { DEFAULT_LOGO } from "./types";
 import type { Template, TemplateSettings, TemplateSlide } from "./data";
 
@@ -7,6 +7,12 @@ export type DocSlide = TemplateSlide & {
   sample_photo?: string | null;
   photo_focus?: { x: number; y: number };
   photo_zoom?: number;
+  photo_background_color?: string | null;
+  transition_speed?: Frame["transition_in"]["speed"];
+  headline_style?: Omit<TextSettings, "text" | "same_on_all">;
+  subline_style?: Omit<TextSettings, "text" | "same_on_all"> | null;
+  logo_visible?: boolean;
+  logo_variant?: Frame["logo_variant"];
 };
 export type DocStyle = {
   background_color: string;
@@ -17,6 +23,8 @@ export type DocStyle = {
   logo_path?: string | null;
   logo_size_pct?: number;
   logo_opacity?: "solid" | "soft";
+  logo_show_on?: "all" | "first_last" | "selected";
+  logo_version?: "auto" | "light" | "dark";
 };
 export type TemplateDoc = {
   name: string;
@@ -38,7 +46,7 @@ export const PLAN_AUDIENCE = [
 ] as const;
 
 export const TRANSITIONS: [TemplateSlide["transition_in"], string][] = [
-  ["none", "None"], ["fade", "Fade"], ["slide", "Slide"], ["swipe-left", "Swipe left"], ["zoom", "Zoom"], ["cut", "Cut"],
+  ["none", "None"], ["fade", "Fade"], ["slide", "Slide"], ["swipe-left", "Swipe left"], ["zoom", "Zoom"], ["cut", "Cut"], ["dip-black", "Dip to black"],
 ];
 export const TEXT_ANIMS: [TemplateSlide["text_animation"], string][] = [
   ["none", "None"], ["rise-up", "Rise up"], ["fade-in", "Fade in"], ["typewriter", "Typewriter"], ["zoom", "Pop"],
@@ -57,6 +65,8 @@ export const DEFAULT_STYLE: DocStyle = {
   logo_path: null,
   logo_size_pct: 16,
   logo_opacity: "solid",
+  logo_show_on: "all",
+  logo_version: "auto",
 };
 
 export const blankSlide = (n: number): DocSlide => ({
@@ -70,6 +80,8 @@ export const blankSlide = (n: number): DocSlide => ({
   sample_photo: null,
   photo_focus: { x: 0.5, y: 0.5 },
   photo_zoom: 1,
+  logo_visible: true,
+  logo_variant: null,
 });
 
 type Row = Template & { draft?: TemplateDoc | null; featured?: boolean };
@@ -95,12 +107,14 @@ export function docFromRow(t: Row): TemplateDoc {
       logo_path: s.logo_path ?? null,
       logo_size_pct: s.logo_size_pct ?? 16,
       logo_opacity: s.logo_opacity ?? "solid",
+      logo_show_on: s.logo_show_on ?? "all",
+      logo_version: s.logo_version ?? "auto",
     },
     slides: (t.slides ?? []).map((x) => ({ ...x })),
   };
 }
 
-const TR: Record<TemplateSlide["transition_in"], Frame["transition_in"]["type"]> = { none: "cut", cut: "cut", fade: "fade", slide: "slide", "swipe-left": "wipe", zoom: "zoom" };
+const TR: Record<TemplateSlide["transition_in"], Frame["transition_in"]["type"]> = { none: "cut", cut: "cut", fade: "fade", slide: "slide", "swipe-left": "wipe", zoom: "zoom", "dip-black": "dip_black" };
 const TA: Record<TemplateSlide["text_animation"], NonNullable<NonNullable<Frame["headline"]>["animation"]>> = { none: "none", "rise-up": "rise", "fade-in": "fade", typewriter: "typewriter", zoom: "pop" };
 const PM: Record<TemplateSlide["photo_motion"], NonNullable<Frame["photo"]["movement"]>> = { none: "none", "slow-zoom-in": "slow_zoom_in", pan: "pan_left" };
 
@@ -113,8 +127,9 @@ export function framesFromDoc(doc: TemplateDoc, { samples = false } = {}): Frame
     project_id: "",
     sort_order: i,
     duration_sec: s.duration_sec,
-    logo_visible: true,
-    transition_in: { type: i === 0 ? "cut" : TR[s.transition_in], speed: s.transition_in === "cut" ? "quick" : "smooth" },
+    logo_visible: s.logo_visible ?? true,
+    logo_variant: s.logo_variant ?? null,
+    transition_in: { type: i === 0 ? "cut" : TR[s.transition_in], speed: s.transition_speed ?? (s.transition_in === "cut" ? "quick" : "smooth") },
     photo: {
       fit: "fill",
       focus: s.photo_focus ?? { x: 0.5, y: 0.5 },
@@ -122,30 +137,30 @@ export function framesFromDoc(doc: TemplateDoc, { samples = false } = {}): Frame
       movement: PM[s.photo_motion],
       brightness: 0,
       darken_for_text: false,
-      background_color: st.background_color,
+      background_color: s.photo_background_color ?? st.background_color,
       ...(samples && s.sample_photo ? { path: s.sample_photo } : {}),
     },
     headline: {
       text: s.headline_placeholder,
-      color: st.headline.color,
-      size_px: st.headline.size_px,
-      font_family: st.headline.font,
-      font_weight: st.headline.weight,
-      position: st.text_position,
-      animation: TA[s.text_animation],
+      color: s.headline_style?.color ?? st.headline.color,
+      size_px: s.headline_style?.size_px ?? st.headline.size_px,
+      font_family: s.headline_style?.font_family ?? st.headline.font,
+      font_weight: s.headline_style?.font_weight ?? st.headline.weight,
+      position: s.headline_style?.position ?? st.text_position,
+      animation: s.headline_style?.animation ?? TA[s.text_animation],
       same_on_all: false,
     },
     subline: s.subline_placeholder
       ? {
           text: s.subline_placeholder,
-          color: st.subline.color,
-          size_px: st.subline.size_px,
-          font_family: st.subline.font,
-          font_weight: st.subline.weight ?? 500,
-          position: under ? st.text_position : "bottom-center",
-          animation: TA[s.text_animation],
+          color: s.subline_style?.color ?? st.subline.color,
+          size_px: s.subline_style?.size_px ?? st.subline.size_px,
+          font_family: s.subline_style?.font_family ?? st.subline.font,
+          font_weight: s.subline_style?.font_weight ?? st.subline.weight ?? 500,
+          position: s.subline_style?.position ?? (under ? st.text_position : "bottom-center"),
+          animation: s.subline_style?.animation ?? TA[s.text_animation],
           same_on_all: false,
-          keep_under_headline: true,
+          keep_under_headline: s.subline_style?.keep_under_headline ?? true,
         }
       : null,
   }));
@@ -156,7 +171,7 @@ export function settingsFromDoc(doc: TemplateDoc): TemplateSettings {
     formats: [doc.format],
     primary_format: doc.format,
     pace: "standard",
-    logo: { path: doc.style.logo_path ?? null, size_pct: doc.style.logo_size_pct ?? 16, opacity: doc.style.logo_opacity ?? "solid", positions: { [doc.format]: doc.style.logo_position } },
+    logo: { path: doc.style.logo_path ?? null, size_pct: doc.style.logo_size_pct ?? 16, opacity: doc.style.logo_opacity ?? "solid", show_on: doc.style.logo_show_on ?? "all", version: doc.style.logo_version ?? "auto", positions: { [doc.format]: doc.style.logo_position } },
     end_card: {},
     frame_count: doc.slides.length,
     frames: framesFromDoc(doc).map(({ id: _i, project_id: _p, sort_order: _s, ...f }) => f),
@@ -173,7 +188,7 @@ export function previewProject(doc: TemplateDoc): ProjectWithFrames {
     primary_format: doc.format,
     formats: [doc.format],
     pace: "standard",
-    logo: { ...DEFAULT_LOGO, path: doc.style.logo_path ?? null, size_pct: doc.style.logo_size_pct ?? 16, opacity: doc.style.logo_opacity ?? "solid", positions: { "9:16": doc.style.logo_position, "1:1": doc.style.logo_position, "16:9": doc.style.logo_position } },
+    logo: { ...DEFAULT_LOGO, path: doc.style.logo_path ?? null, size_pct: doc.style.logo_size_pct ?? 16, opacity: doc.style.logo_opacity ?? "solid", show_on: doc.style.logo_show_on ?? "all", version: doc.style.logo_version ?? "auto", positions: { "9:16": doc.style.logo_position, "1:1": doc.style.logo_position, "16:9": doc.style.logo_position } },
     end_card: {},
     is_template: false,
     deleted_at: null,
