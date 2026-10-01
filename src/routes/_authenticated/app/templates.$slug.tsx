@@ -21,6 +21,8 @@ import { isAcceptedImage, uploadMedia } from "@/lib/stillframe/media";
 import { cn } from "@/lib/utils";
 import { openUpgrade, usePlanAccess } from "@/lib/stillframe/plan";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
+import { RenderCanvas, customizedProject } from "@/components/templates/TemplateRender";
+import { restTime } from "@/render/renderFrame";
 
 export const Route = createFileRoute("/_authenticated/app/templates/$slug")({
   head: () => ({
@@ -223,7 +225,7 @@ function CustomizeTemplate({ template: t, slug, fromAd }: { template: Template; 
           <FormatSwitch value={draft.format} onChange={(f) => setDraft((d) => ({ ...d, format: f }))} />
           <div className="mt-3 flex h-[470px] items-center justify-center rounded-sm bg-card p-5 shadow-card">
             <div className={cn("relative", draft.format === "16:9" ? "w-full" : "h-full")} style={{ aspectRatio: RATIO[draft.format], maxHeight: "100%" }}>
-              <Stage slides={slides} values={draft.slides} format={draft.format} bg={bg} pb={pb} className="h-full w-full shadow-popover" />
+              <Stage template={t} values={draft.slides} format={draft.format} bg={bg} pb={pb} className="h-full w-full shadow-popover" />
               <div className="absolute inset-x-3 bottom-3 flex items-center justify-between">
                 <button type="button" onClick={pb.toggle} aria-label={pb.playing ? "Pause" : "Play"} className="flex size-9 items-center justify-center rounded-full bg-card/25 text-primary-foreground backdrop-blur">
                   {pb.playing ? <Pause className="size-3.5 fill-current" strokeWidth={1.7} /> : <Play className="size-3.5 fill-current" strokeWidth={1.7} />}
@@ -241,7 +243,7 @@ function CustomizeTemplate({ template: t, slug, fromAd }: { template: Template; 
       <div className="fixed inset-x-0 bottom-0 z-30 bg-card px-4 pt-3 hairline-t md:hidden" style={{ paddingBottom: "max(12px, env(safe-area-inset-bottom))" }}>
         <div className="flex items-center gap-3">
           <button type="button" onClick={() => setSheet(true)} aria-label="Open full-screen preview" className="flex h-14 min-w-11 shrink-0 items-center justify-center">
-            <Stage slides={slides} values={draft.slides} format={draft.format} bg={bg} pb={pb} className={draft.format === "16:9" ? "w-[88px]" : "h-14"} />
+            <Stage template={t} values={draft.slides} format={draft.format} bg={bg} pb={pb} className={draft.format === "16:9" ? "w-[88px]" : "h-14"} />
           </button>
           <div className="min-w-0 flex-1">
             <p className="nums truncate text-[14px] font-medium">Slide {pb.index + 1} of {slides.length}</p>
@@ -259,7 +261,7 @@ function CustomizeTemplate({ template: t, slug, fromAd }: { template: Template; 
           <SheetTitle className="text-[17px] font-semibold">Preview</SheetTitle>
           <FormatSwitch value={draft.format} onChange={(f) => setDraft((d) => ({ ...d, format: f }))} />
           <div className="flex min-h-0 flex-1 items-center justify-center rounded-sm bg-site-panel p-4">
-            <Stage slides={slides} values={draft.slides} format={draft.format} bg={bg} pb={pb} className={draft.format === "9:16" ? "h-full" : "w-full"} />
+            <Stage template={t} values={draft.slides} format={draft.format} bg={bg} pb={pb} className={draft.format === "9:16" ? "h-full" : "w-full"} />
           </div>
           <PlayControls pb={pb} />
         </SheetContent>
