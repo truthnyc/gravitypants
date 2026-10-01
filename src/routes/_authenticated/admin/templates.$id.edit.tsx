@@ -211,6 +211,7 @@ function Builder({ row, refetch }: { row: any; refetch: () => void }) {
                   upload={uploadImage}
                   format={doc.format}
                   logoShowOn={doc.style.logo_show_on ?? "all"}
+                  textPosition={doc.style.text_position}
                   previewOn={doc.slides.filter((x) => x.preview !== false).length}
                   dragging={dragFrom === i}
                   onDragStart={() => setDragFrom(i)}
@@ -400,11 +401,12 @@ function PosGrid({ title, note, value, onChange, only = () => true }: { title: s
   );
 }
 
-function SlideCard({ index, slide: s, count, open, onToggle, onChange, onMove, onDuplicate, onDelete, upload, format, logoShowOn, previewOn, dragging, onDragStart, onDragEnd, onDrop }: {
+function SlideCard({ index, slide: s, count, open, onToggle, onChange, onMove, onDuplicate, onDelete, upload, format, logoShowOn, textPosition, previewOn, dragging, onDragStart, onDragEnd, onDrop }: {
   index: number; slide: DocSlide; count: number; open: boolean; onToggle: () => void; onChange: (p: Partial<DocSlide>) => void;
   onMove: (by: number) => void; onDuplicate: () => void; onDelete: () => void; upload: (f: File) => Promise<string>;
   format: Format;
   logoShowOn: NonNullable<TemplateDoc["style"]["logo_show_on"]>;
+  textPosition: string;
   previewOn: number;
   dragging: boolean; onDragStart: () => void; onDragEnd: () => void; onDrop: () => void;
 }) {
@@ -466,6 +468,7 @@ function SlideCard({ index, slide: s, count, open, onToggle, onChange, onMove, o
           <div className="space-y-3 sm:col-span-2">
             <Field label="Headline placeholder"><input className={cn(inp, "font-semibold")} value={s.headline_placeholder} maxLength={120} onChange={(e) => onChange({ headline_placeholder: e.target.value })} /></Field>
             <Field label="Subline placeholder"><input className={inp} value={s.subline_placeholder} maxLength={160} onChange={(e) => onChange({ subline_placeholder: e.target.value })} /></Field>
+            <PosGrid title="Headline position" note={s.headline_style?.position ? "this slide" : "template default"} value={s.headline_style?.position ?? textPosition} onChange={(v) => onChange({ headline_style: { ...(s.headline_style ?? {}), position: v as never } })} />
             <div className="space-y-2">
               <Toggle label="Keep subline under headline" sub="subline position" checked={s.subline_style?.keep_under_headline ?? true} onChange={(v) => onChange({ subline_style: { ...(s.subline_style ?? {}), keep_under_headline: v, ...(v ? {} : { position: s.subline_style?.position ?? "bottom-center" }) } })} />
               {(s.subline_style?.keep_under_headline ?? true) === false && (
