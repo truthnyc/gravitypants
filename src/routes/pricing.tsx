@@ -99,7 +99,7 @@ function Pricing() {
               );
             })}
           </div>
-          <p className="pr-fine">Prices in [USD]. [Taxes may apply.] One export is one reel, whatever the number of formats and files. Export counts reset on each billing date. Need more seats? <Link to="/app/help">Talk to us</Link>.</p>
+          <p className="pr-fine">Prices in [USD]. [Taxes may apply.] One export is one reel, whatever the number of formats and files. Export counts reset on each billing date. Run out early? Add 5 extra exports for $12.50, any plan, never expire. Need more seats? <Link to="/app/help">Talk to us</Link>.</p>
         </section>
 
         <section className="pr-compare">
