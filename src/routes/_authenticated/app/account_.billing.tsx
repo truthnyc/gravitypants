@@ -158,5 +158,5 @@ function exportsLeft(st: ExportStatus | null | undefined): string {
     if (extras > 0) return `${extras} extra`;
     return st.reason === "no_plan" || st.reason === "limit_reached" ? "None — pick a plan" : "—";
   }
-  return `${Math.max(0, st.limit - (st.used ?? 0))} of ${st.limit}${extra}${st.watermark ? " · watermarked" : ""}`;
+  return `${Math.max(0, st.limit - (st.used ?? 0))} of ${st.limit}${extra}${st.trial ? (st.watermark ? " · watermarked" : " · next one has no watermark") : ""}`;
 }
