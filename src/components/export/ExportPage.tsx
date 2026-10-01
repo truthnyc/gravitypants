@@ -274,7 +274,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
         else {
           console.error(e);
           failure = e instanceof Error ? e.message : String(e);
-          set(key, { status: "error", note: "Something went wrong making this file. Try again, or pick a smaller GIF size." });
+          set(key, { status: "error", note: job.kind === "mp4" ? "Something went wrong making this video. Try again, or try on a computer." : "Something went wrong making this file. Try again, or pick a smaller GIF size." });
         }
       }
     }

@@ -122,31 +122,38 @@ async function run(ff: FFmpeg, args: string[], signal: AbortSignal, onProgress: 
 /* ------------------------------------------------------------------ MP4 */
 
 export async function exportMp4(input: RenderInput, fps: number, signal: AbortSignal, onProgress: Progress): Promise<Blob> {
-  const bitrate = fps >= 60 ? 20_000_000 : 12_000_000;
   const mb = await import("mediabunny");
-  const supported =
-    typeof VideoEncoder !== "undefined" &&
-    (await mb.canEncodeVideo("avc", { width: input.width, height: input.height, bitrate }).catch(() => false));
-
-  if (supported) {
-    const { canvas, ctx } = makeCanvas(input.width, input.height);
-    const output = new mb.Output({ format: new mb.Mp4OutputFormat({ fastStart: "in-memory" }), target: new mb.BufferTarget() });
-    const source = new mb.CanvasSource(canvas, { codec: "avc", bitrate, keyFrameInterval: 2 });
-    output.addVideoTrack(source, { frameRate: fps });
-    await output.start();
-    const n = frameCount(input, fps);
-    for (let i = 0; i < n; i++) {
-      if (signal.aborted) {
-        await output.cancel();
-        throw new ExportCancelled();
+  // Phones (iPhone Safari especially) can claim support yet fail at high bitrates, so step down before falling back.
+  const rates = fps >= 60 ? [20_000_000, 8_000_000, 4_000_000] : [12_000_000, 6_000_000, 3_000_000];
+  for (const bitrate of rates) {
+    if (typeof VideoEncoder === "undefined") break;
+    const ok = await mb.canEncodeVideo("avc", { width: input.width, height: input.height, bitrate }).catch(() => false);
+    if (!ok) continue;
+    let output: InstanceType<typeof mb.Output> | null = null;
+    try {
+      const { canvas, ctx } = makeCanvas(input.width, input.height);
+      output = new mb.Output({ format: new mb.Mp4OutputFormat({ fastStart: "in-memory" }), target: new mb.BufferTarget() });
+      const source = new mb.CanvasSource(canvas, { codec: "avc", bitrate, keyFrameInterval: 2 });
+      output.addVideoTrack(source, { frameRate: fps });
+      await output.start();
+      const n = frameCount(input, fps);
+      for (let i = 0; i < n; i++) {
+        if (signal.aborted) throw new ExportCancelled();
+        draw(ctx, input, i / fps);
+        await source.add(i / fps, 1 / fps);
+        onProgress((i + 1) / n);
+        if (i % 6 === 0) await tick();
       }
-      draw(ctx, input, i / fps);
-      await source.add(i / fps, 1 / fps);
-      onProgress((i + 1) / n);
-      if (i % 6 === 0) await tick();
+      await output.finalize();
+      const buf = (output.target as InstanceType<typeof mb.BufferTarget>).buffer;
+      if (!buf || buf.byteLength === 0) throw new Error("Empty video");
+      return new Blob([buf], { type: "video/mp4" });
+    } catch (e) {
+      await output?.cancel().catch(() => undefined);
+      if (e instanceof ExportCancelled || signal.aborted) throw new ExportCancelled();
+      console.warn(`Video encoder failed at ${bitrate}bps, trying next option`, e);
+      onProgress(0);
     }
-    await output.finalize();
-    return new Blob([output.target.buffer!], { type: "video/mp4" });
   }
 
   // Fallback: ffmpeg.wasm with libx264
@@ -155,7 +162,7 @@ export async function exportMp4(input: RenderInput, fps: number, signal: AbortSi
   try {
     await run(
       ff,
-      ["-framerate", String(fps), "-i", "f%05d.png", "-c:v", "libx264", "-crf", "18", "-preset", "slow", "-pix_fmt", "yuv420p", "-movflags", "+faststart", "out.mp4"],
+      ["-framerate", String(fps), "-i", "f%05d.png", "-c:v", "libx264", "-crf", "20", "-preset", "veryfast", "-pix_fmt", "yuv420p", "-movflags", "+faststart", "out.mp4"],
       signal,
       onProgress,
       0.5,
