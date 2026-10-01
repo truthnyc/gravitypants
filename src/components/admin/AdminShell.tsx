@@ -1,9 +1,10 @@
 import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import { ChevronLeft, Clapperboard, FileClock, LayoutDashboard, LayoutTemplate, ShieldCheck, Users, Video } from "lucide-react";
+import { BarChart3, ChevronLeft, Clapperboard, FileClock, LayoutDashboard, LayoutTemplate, ShieldCheck, Users, Video } from "lucide-react";
 
 const NAV = [
   { to: "/admin", label: "Overview", icon: LayoutDashboard, exact: true },
+  { to: "/admin/analytics", label: "Analytics", icon: BarChart3 },
   { to: "/admin/clients", label: "Clients", icon: Users },
   { to: "/admin/templates", label: "Templates", icon: LayoutTemplate },
   { to: "/admin/reels", label: "Website Reels", icon: Clapperboard },
