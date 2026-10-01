@@ -651,6 +651,7 @@ function LogoPanel({
 }) {
   const lightRef = useRef<HTMLInputElement>(null);
   const darkRef = useRef<HTMLInputElement>(null);
+  const posScopeState = useState<"all" | "frame" | null>(null);
   const logoInput = (variant: "light" | "dark", ref: { current: HTMLInputElement | null }) => (
     <input ref={ref} type="file" accept="image/png,image/svg+xml,image/webp" className="hidden" onChange={(e) => {
       const f = e.target.files?.[0];
