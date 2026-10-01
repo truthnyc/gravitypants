@@ -4,7 +4,10 @@ import { Button } from "@/components/ui/button";
 import { GravityPantsLogo } from "@/components/GravityPantsLogo";
 import { ReelPhone } from "@/components/site/ReelPhone";
 import { lovable } from "@/integrations/lovable";
-import { galleryExamples } from "@/lib/site/examples";
+import { FeaturedAdVideo } from "@/components/site/FeaturedAdVideo";
+import photo1 from "@/assets/site/purl-soho-photo-1.webp.asset.json";
+import photo2 from "@/assets/site/purl-soho-photo-2.webp.asset.json";
+import photo3 from "@/assets/site/purl-soho-photo-3.webp.asset.json";
 
 export function safeRedirect(r: unknown): string {
   if (typeof r !== "string") return "/app/ads";
@@ -24,16 +27,14 @@ const candleFrames = ["#1F2937", "#8C2F2B", "#EBDDC6"].map((background, i) => ({
 
 function AuthVisual({ mode }: { mode: "signup" | "signin" }) {
   if (mode === "signin") {
-    const reels = ["purl-soho", "skincare", "sneaker", "aro", "jewel", "purl-soho"];
-    return <div className="auth-visual auth-reels" aria-hidden="true">
-      {[false, true].map((reverse) => <div className={`auth-reel-row${reverse ? " auth-reel-reverse" : ""}`} key={String(reverse)}>
-        {[...reels, ...reels].map((id, i) => {
-          const example = galleryExamples.find((item) => item.id === id);
-          if (!example) return null;
-          const stills = example.frames.length ? example.frames : example.poster ? [example.poster] : [];
-          return <ReelPhone key={`${id}-${i}`} size="small" frames={stills.map((src) => ({ background: "var(--site-ink)", artwork: <img src={src} alt="" /> }))} headline={example.headline} subline={example.sub} />;
-        })}
-      </div>)}
+    return <div className="auth-visual auth-hero" aria-hidden="true">
+      {[photo1, photo2, photo3].map((p, i) => <div key={p.url} className={`auth-hero-drop auth-hero-drop-${i + 1}`}><img src={p.url} alt="" /></div>)}
+      <div className="auth-hero-phone"><FeaturedAdVideo tapToggle /></div>
+      <div className="auth-hero-exported">
+        <span>Exported</span>
+        <div><span>9:16</span><span>1:1</span><span>16:9</span></div>
+        <b><Check size={14} strokeWidth={2} /> MP4 + GIF ready</b>
+      </div>
     </div>;
   }
   return (
