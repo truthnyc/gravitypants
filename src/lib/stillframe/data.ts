@@ -573,7 +573,7 @@ export function effectiveKit(settings: BrandKit, named: NamedBrandKit | null | u
 
 /* ---------------- Templates (no photos; private or shared with the team) */
 
-export type TemplateFrame = Pick<Frame, "duration_sec" | "transition_in" | "headline" | "subline" | "logo_visible"> & {
+export type TemplateFrame = Pick<Frame, "duration_sec" | "transition_in" | "headline" | "subline" | "logo_visible" | "logo_variant"> & {
   photo: Frame["photo"];
 };
 export type TemplateSettings = Pick<Project, "formats" | "primary_format" | "pace" | "logo" | "end_card"> & {
@@ -631,6 +631,7 @@ export function templateFromProject(p: ProjectWithFrames): TemplateSettings {
       headline: f.headline,
       subline: f.subline,
       logo_visible: f.logo_visible,
+      logo_variant: f.logo_variant ?? null,
       // Photo style only — the picture itself is never saved.
       photo: Object.fromEntries(
         ([
@@ -750,6 +751,7 @@ function sourceFromTemplate(t: Template, count: number): ProjectWithFrames {
         sort_order: i,
         transition_in: i === 0 ? { ...f.transition_in, type: "cut" } : f.transition_in,
         photo: { ...f.photo },
+        logo_variant: f.logo_variant ?? null,
       } as Frame;
     }),
   };

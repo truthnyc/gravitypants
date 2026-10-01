@@ -26,6 +26,7 @@
 
 ## Outstanding
 - [x] Default photo darkening off; add admin template photo crop/zoom and replaceable logos
+- [x] Match imported reel settings in admin templates, including selected-slide logo visibility
 - [ ] Publish (fixes email header on sent mail, activates lifecycle emails, syncs Team products to live)
 - [ ] Live-check checkout, export limits, Customer Portal after publish
 

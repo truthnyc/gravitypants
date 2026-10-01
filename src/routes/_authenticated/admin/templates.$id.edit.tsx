@@ -189,7 +189,7 @@ function Builder({ row, refetch }: { row: any; refetch: () => void }) {
             </div>
             <div className="mt-5 flex flex-wrap gap-8">
               <PosGrid title="Text position" value={doc.style.text_position} onChange={(v) => setStyle({ text_position: v })} />
-              <PosGrid title="Logo position" note="template default" value={doc.style.logo_position} onChange={(v) => setStyle({ logo_position: v })} only={(a) => !a.startsWith("middle") && a !== "center"} />
+              <PosGrid title="Logo position" note="template default" value={doc.style.logo_position} onChange={(v) => setStyle({ logo_position: v })} />
             </div>
             <LogoEditor style={doc.style} onChange={setStyle} upload={uploadImage} />
           </Panel>
@@ -210,6 +210,7 @@ function Builder({ row, refetch }: { row: any; refetch: () => void }) {
                   onDelete={() => { if (doc.slides.length > 1) setDoc((d) => ({ ...d, slides: d.slides.filter((_, j) => j !== i) })); }}
                   upload={uploadImage}
                   format={doc.format}
+                  logoShowOn={doc.style.logo_show_on ?? "all"}
                   dragging={dragFrom === i}
                   onDragStart={() => setDragFrom(i)}
                   onDragEnd={() => setDragFrom(null)}
@@ -398,10 +399,11 @@ function PosGrid({ title, note, value, onChange, only = () => true }: { title: s
   );
 }
 
-function SlideCard({ index, slide: s, count, open, onToggle, onChange, onMove, onDuplicate, onDelete, upload, format, dragging, onDragStart, onDragEnd, onDrop }: {
+function SlideCard({ index, slide: s, count, open, onToggle, onChange, onMove, onDuplicate, onDelete, upload, format, logoShowOn, dragging, onDragStart, onDragEnd, onDrop }: {
   index: number; slide: DocSlide; count: number; open: boolean; onToggle: () => void; onChange: (p: Partial<DocSlide>) => void;
   onMove: (by: number) => void; onDuplicate: () => void; onDelete: () => void; upload: (f: File) => Promise<string>;
   format: Format;
+  logoShowOn: NonNullable<TemplateDoc["style"]["logo_show_on"]>;
   dragging: boolean; onDragStart: () => void; onDragEnd: () => void; onDrop: () => void;
 }) {
   const file = useRef<HTMLInputElement>(null);
@@ -453,7 +455,9 @@ function SlideCard({ index, slide: s, count, open, onToggle, onChange, onMove, o
               {PHOTO_MOTIONS.map(([k, l]) => <option key={k} value={k}>{l}</option>)}
             </select>
           </Field>
-          <div className="hidden sm:block" />
+          <div className="flex items-end">
+            {logoShowOn === "selected" && <Toggle label="Show logo" sub="on this slide" checked={s.logo_visible ?? true} onChange={(v) => onChange({ logo_visible: v })} />}
+          </div>
           <div className="space-y-3 sm:col-span-2">
             <Field label="Headline placeholder"><input className={cn(inp, "font-semibold")} value={s.headline_placeholder} maxLength={120} onChange={(e) => onChange({ headline_placeholder: e.target.value })} /></Field>
             <Field label="Subline placeholder"><input className={inp} value={s.subline_placeholder} maxLength={160} onChange={(e) => onChange({ subline_placeholder: e.target.value })} /></Field>
@@ -521,7 +525,7 @@ function PhotoCrop({ slide, format, onChange }: { slide: DocSlide; format: Forma
 const DEFAULT_CROP_STYLE: TemplateDoc["style"] = {
   background_color: "#1D1D1F", headline: { font: null, weight: 700, size_px: 96, color: "#FFFFFF" },
   subline: { font: null, size_px: 44, color: "#FFFFFF" }, text_position: "center", logo_position: "top-right",
-  logo_path: null, logo_size_pct: 16, logo_opacity: "solid",
+  logo_path: null, logo_size_pct: 16, logo_opacity: "solid", logo_show_on: "all", logo_version: "auto",
 };
 
 function LogoEditor({ style, onChange, upload }: { style: TemplateDoc["style"]; onChange: (p: Partial<TemplateDoc["style"]>) => void; upload: (f: File) => Promise<string> }) {
@@ -551,6 +555,12 @@ function LogoEditor({ style, onChange, upload }: { style: TemplateDoc["style"]; 
             <span className="nums w-9 text-right text-[12px]">{size}%</span>
           </div>
           <Seg value={style.logo_opacity ?? "solid"} options={["solid", "soft"]} onChange={(v) => onChange({ logo_opacity: v })} small />
+          <Field label="Show logo on">
+            <Seg value={style.logo_show_on ?? "all"} options={["all", "first_last", "selected"]} onChange={(v) => onChange({ logo_show_on: v })} small />
+            <p className="mt-1 text-[11px] text-secondary-text">
+              {(style.logo_show_on ?? "all") === "all" ? "All slides" : style.logo_show_on === "first_last" ? "First and last slides" : "Choose inside each slide"}
+            </p>
+          </Field>
         </div>
       </div>
       <input ref={file} type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; void pick(f); }} />

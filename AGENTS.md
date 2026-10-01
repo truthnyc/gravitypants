@@ -28,7 +28,7 @@
 - Pre-release billing checks: `bun run test` (unit) and `bun run check:billing` (test-mode checkout per plan, portal, plan change, DB plan values).
 - AI calls go through `src/lib/ai/gateway.server.ts`; the billing helper is `diagnoseBilling` in `billing-help.functions.ts`, owners/admins only.
 - Brand kits: named kits live in `brand_kits` (logos in private `brand-assets` bucket, paths prefixed `brand-assets:` so `getMediaUrl` picks the bucket); ads link via `projects.brand_kit_id`; `effectiveKit()` merges the kit over the legacy `brand_kit` row, which now only holds workspace ad settings (placement, size, end card). Gating via SQL `brand_kits_enabled()` in RLS.
-- Templates: `templates` are photo-less styles; gallery examples map to them in `example-template.ts`, then reuse `insertCopy` so user photos remain private. Save needs `brand_kits_enabled`, sharing needs `workspace_is_team()` in RLS.
+- Templates are photo-less styles; examples reuse `insertCopy`; imported system templates preserve per-slide overrides and logo visibility.
 
 - Plan gates: every feature check goes through `usePlanAccess().canUse(feature)` in `src/lib/stillframe/plan.ts`; blocked features call `openUpgrade()` (one shared dialog) instead of hiding — one place for plan rules.
 - Support: tickets in `support_tickets` via `submitTicket` server fn; priority set by SQL trigger from the plan (never the browser); each ticket emails help@gravitypants.com.

@@ -31,6 +31,12 @@ const slide = z.object({
   sample_photo: z.string().max(300).nullable().optional(),
   photo_focus: z.object({ x: z.number().min(0).max(1), y: z.number().min(0).max(1) }).optional(),
   photo_zoom: z.number().min(1).max(3).optional(),
+  photo_background_color: z.string().max(9).nullable().optional(),
+  transition_speed: z.enum(["smooth", "quick"]).optional(),
+  headline_style: z.object({ font_family: z.string().max(80).nullable().optional(), font_weight: z.number().min(100).max(900).nullable().optional(), size_px: z.number().min(12).max(300).optional(), color: z.string().max(9).optional(), animation: z.enum(["none", "rise", "fade", "pop", "typewriter"]).optional(), position: z.string().max(20).optional(), keep_under_headline: z.boolean().optional() }).optional(),
+  subline_style: z.object({ font_family: z.string().max(80).nullable().optional(), font_weight: z.number().min(100).max(900).nullable().optional(), size_px: z.number().min(10).max(200).optional(), color: z.string().max(9).optional(), animation: z.enum(["none", "rise", "fade", "pop", "typewriter"]).optional(), position: z.string().max(20).optional(), keep_under_headline: z.boolean().optional() }).nullable().optional(),
+  logo_visible: z.boolean().optional(),
+  logo_variant: z.enum(["auto", "light", "dark"]).nullable().optional(),
 });
 const docSchema = z.object({
   name: z.string().trim().min(1, "Give the template a name.").max(60),
@@ -49,6 +55,8 @@ const docSchema = z.object({
     logo_path: z.string().max(300).nullable().optional(),
     logo_size_pct: z.number().min(5).max(100).optional(),
     logo_opacity: z.enum(["solid", "soft"]).optional(),
+    logo_show_on: z.enum(["all", "first_last", "selected"]).optional(),
+    logo_version: z.enum(["auto", "light", "dark"]).optional(),
   }),
   slides: z.array(slide).min(1, "Add at least one slide.").max(10),
 });
@@ -108,8 +116,8 @@ export const adminTemplateCreate = createServerFn({ method: "POST" })
       is_reusable: false,
       featured: false,
       thumbnail_url: null,
-      style: { background_color: "#1D1D1F", headline: { font: null, weight: 700, size_px: 96, color: "#FFFFFF" }, subline: { font: null, size_px: 44, color: "#FFFFFF" }, text_position: "center", logo_position: "top-right", logo_path: null, logo_size_pct: 16, logo_opacity: "solid" },
-      slides: [1, 2, 3].map((n) => ({ role: ["Hook", "Detail", "Offer"][n - 1]!, duration_sec: 2.5, transition_in: n === 1 ? "none" : "fade", text_animation: "rise-up", photo_motion: "none", headline_placeholder: "Your headline", subline_placeholder: "A short line", sample_photo: null, photo_focus: { x: 0.5, y: 0.5 }, photo_zoom: 1 })),
+      style: { background_color: "#1D1D1F", headline: { font: null, weight: 700, size_px: 96, color: "#FFFFFF" }, subline: { font: null, size_px: 44, color: "#FFFFFF" }, text_position: "center", logo_position: "top-right", logo_path: null, logo_size_pct: 16, logo_opacity: "solid", logo_show_on: "all", logo_version: "auto" },
+      slides: [1, 2, 3].map((n) => ({ role: ["Hook", "Detail", "Offer"][n - 1]!, duration_sec: 2.5, transition_in: n === 1 ? "none" : "fade", text_animation: "rise-up", photo_motion: "none", headline_placeholder: "Your headline", subline_placeholder: "A short line", sample_photo: null, photo_focus: { x: 0.5, y: 0.5 }, photo_zoom: 1, logo_visible: true, logo_variant: null })),
     };
     const { data: row, error } = await db
       .from("templates")
@@ -296,6 +304,8 @@ export const adminTemplateFromAd = createServerFn({ method: "POST" })
         logo_path: null,
         logo_size_pct: Math.min(100, Math.max(5, Number(p.logo?.size_pct ?? 16))),
         logo_opacity: p.logo?.opacity === "soft" ? "soft" : "solid",
+        logo_show_on: p.logo?.show_on === "selected" || p.logo?.show_on === "first_last" ? p.logo.show_on : "all",
+        logo_version: p.logo?.version === "light" || p.logo?.version === "dark" ? p.logo.version : "auto",
       },
       slides: frames.map((f, i) => ({
         role: `Slide ${i + 1}`,
@@ -303,11 +313,17 @@ export const adminTemplateFromAd = createServerFn({ method: "POST" })
         transition_in: (i === 0 ? "none" : TR[f.transition_in?.type] ?? "fade") as any,
         text_animation: (TA[f.headline?.animation ?? "none"] ?? "none") as any,
         photo_motion: (PM[f.photo?.movement] ?? "none") as any,
-        headline_placeholder: String(f.headline?.text ?? "").slice(0, 120) || "Your headline",
+        headline_placeholder: String(f.headline?.text ?? "").slice(0, 120),
         subline_placeholder: String(f.subline?.text ?? "").slice(0, 160),
         sample_photo: null,
         photo_focus: f.photo?.focus ?? { x: 0.5, y: 0.5 },
         photo_zoom: Math.min(3, Math.max(1, Number(f.photo?.zoom ?? 1))),
+        photo_background_color: f.photo?.background_color ?? null,
+        transition_speed: f.transition_in?.speed === "quick" ? "quick" : "smooth",
+        headline_style: f.headline ? { font_family: f.headline.font_family ?? null, font_weight: f.headline.font_weight ?? null, size_px: f.headline.size_px, color: f.headline.color, animation: f.headline.animation, position: f.headline.position } : undefined,
+        subline_style: f.subline ? { font_family: f.subline.font_family ?? null, font_weight: f.subline.font_weight ?? null, size_px: f.subline.size_px, color: f.subline.color, animation: f.subline.animation, position: f.subline.position, keep_under_headline: f.subline.keep_under_headline } : null,
+        logo_visible: f.logo_visible !== false,
+        logo_variant: f.logo_variant === "light" || f.logo_variant === "dark" || f.logo_variant === "auto" ? f.logo_variant : null,
       })),
     };
     const { data: last } = await db.from("templates").select("sort_order").eq("source", "system").order("sort_order", { ascending: false }).limit(1).maybeSingle();
