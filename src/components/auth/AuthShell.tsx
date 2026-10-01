@@ -2,7 +2,6 @@ import { useState, type ReactNode } from "react";
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GravityPantsLogo } from "@/components/GravityPantsLogo";
-import { ReelPhone } from "@/components/site/ReelPhone";
 import { lovable } from "@/integrations/lovable";
 import { FeaturedAdVideo } from "@/components/site/FeaturedAdVideo";
 import photo1 from "@/assets/site/purl-soho-photo-1.webp.asset.json";
@@ -20,10 +19,6 @@ export function safeRedirect(r: unknown): string {
   }
 }
 
-const candleFrames = ["#1F2937", "#8C2F2B", "#EBDDC6"].map((background, i) => ({
-  background,
-  artwork: <img src={`/site-art/candle-${i + 1}.svg`} alt="" />,
-}));
 
 function AuthVisual({ mode }: { mode: "signup" | "signin" }) {
   return <div className="auth-visual auth-hero" aria-hidden="true">
