@@ -32,12 +32,12 @@ function BillingPage() {
   const { data: plans } = usePlans();
   const manage = useManageBilling();
   const refresh = useRefreshBilling();
-  const [thanks, setThanks] = useState(false);
+  const [thanks, setThanks] = useState<"plan" | "pack" | false>(false);
 
   // After paying, the plan arrives a moment later — check a few times.
   useEffect(() => {
-    if (checkout !== "success") return;
-    setThanks(true);
+    if (checkout !== "success" && checkout !== "pack") return;
+    setThanks(checkout === "pack" ? "pack" : "plan");
     void navigate({ to: "/app/account/billing", search: {}, replace: true });
     let n = 0;
     const t = setInterval(() => {
@@ -62,9 +62,11 @@ function BillingPage() {
 
       {thanks && (
         <section role="status" className="rounded-sm bg-card p-6 shadow-card">
-          <h2 className="text-[17px] font-semibold">Thank you for choosing Gravity Pants</h2>
-          <p className="mt-1 text-[14px] text-secondary-text">
-            Your plan is active and exporting is unlocked. A receipt is on its way to your inbox.
+          <h2 className="text-[17px] font-semibold">{thanks === "pack" ? "Extra exports added" : "Thank you for choosing Gravity Pants"}</h2>
+          <p className="mt-1 text-[14px] text-secondary-text nums">
+            {thanks === "pack"
+              ? `Payment received. You now have ${status?.extras ?? 0} extra exports, shown below. They never expire.`
+              : "Your plan is active and exporting is unlocked. A receipt is on its way to your inbox."}
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
             <Button asChild><Link to="/app/ads">Go to Your Ads</Link></Button>
@@ -104,24 +106,10 @@ function BillingPage() {
                 <dd className="nums">{longDate(billing.current_period_end)}</dd>
               </>
             )}
-            <dt className="text-secondary-text">Exports left</dt>
-            <dd className="nums">{exportsLeft(status)}</dd>
           </dl>
         )}
 
-        {status?.limit != null && (
-          <div className="mt-5">
-            <p className="text-[14px] nums">
-              {status.used ?? 0} of {status.limit} exports used {limited ? "this month" : "in your trial"}{status.trial ? " · first one has no watermark" : ""}
-            </p>
-            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-control-fill">
-              <div className="h-full rounded-full bg-primary" style={{ width: `${Math.min(100, ((status.used ?? 0) / (status.limit || 1)) * 100)}%` }} />
-            </div>
-            {limited && status.resets_at && (
-              <p className="mt-1.5 text-[12px] text-secondary-text nums">Resets on {longDate(status.resets_at)}</p>
-            )}
-          </div>
-        )}
+        {status && <ExportCounts st={status} monthly={limited} />}
 
         {canManage ? (
           <div className="mt-6 flex flex-wrap gap-2">
@@ -149,14 +137,34 @@ function longDate(s: string | null | undefined) {
   return s ? new Date(s).toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" }) : "—";
 }
 
-function exportsLeft(st: ExportStatus | null | undefined): string {
-  if (!st) return "—";
+/** Clear numbers: exports left in total, used this period, and extra exports on hand. */
+function ExportCounts({ st, monthly }: { st: ExportStatus; monthly: boolean }) {
   const extras = st.extras ?? 0;
-  const extra = extras > 0 ? ` + ${extras} extra` : "";
-  if (st.limit == null) {
-    if (st.allowed) return `Unlimited${extra}`;
-    if (extras > 0) return `${extras} extra`;
-    return st.reason === "no_plan" || st.reason === "limit_reached" ? "None — pick a plan" : "—";
-  }
-  return `${Math.max(0, st.limit - (st.used ?? 0))} of ${st.limit}${extra}${st.trial ? (st.watermark ? " · watermarked" : " · next one has no watermark") : ""}`;
+  const used = st.used ?? 0;
+  const planLeft = st.limit != null ? Math.max(0, st.limit - used) : null;
+  const total = planLeft != null ? planLeft + extras : null;
+  const cell = (label: string, value: string, note?: string) => (
+    <div className="rounded-sm bg-control-fill p-3">
+      <p className="text-[12px] text-secondary-text">{label}</p>
+      <p className="mt-0.5 text-[22px] font-semibold nums">{value}</p>
+      {note && <p className="text-[12px] text-secondary-text nums">{note}</p>}
+    </div>
+  );
+  return (
+    <div className="mt-5">
+      <div className="grid grid-cols-3 gap-2">
+        {cell("Exports left", total != null ? String(total) : st.allowed ? "Unlimited" : String(extras), total != null && extras > 0 ? `${planLeft} plan + ${extras} extra` : undefined)}
+        {cell(monthly ? "Used this month" : "Used", st.limit != null ? `${used} of ${st.limit}` : String(used))}
+        {cell("Extra exports", String(extras), "Never expire")}
+      </div>
+      {st.limit != null && (
+        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-background">
+          <div className="h-full rounded-full bg-primary" style={{ width: `${Math.min(100, (used / (st.limit || 1)) * 100)}%` }} />
+        </div>
+      )}
+      <p className="mt-1.5 text-[12px] text-secondary-text nums">
+        {monthly && st.resets_at ? `Plan exports reset on ${longDate(st.resets_at)}. Extra exports are used only after those run out.` : st.trial ? (st.watermark ? "Trial exports carry a watermark." : "Your next export has no watermark.") : "Extra exports are used only after your plan exports run out."}
+      </p>
+    </div>
+  );
 }
