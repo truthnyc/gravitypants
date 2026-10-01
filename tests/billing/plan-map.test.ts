@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { BILLING_PLAN_VALUES, PLAN_BY_PRICE, PLAN_NAMES, PLAN_PRICE_KEYS, mapStatus } from "@/lib/stillframe/plan-map";
 
-const PRICES = ["simple_monthly", "business_monthly", "business_yearly", "team_monthly", "team_yearly"];
+const PRICES = ["simple_monthly", "simple_yearly", "business_monthly", "business_yearly", "team_monthly", "team_yearly"];
 
 describe("plan mapping", () => {
   it.each(PRICES)("choosing %s maps to a named plan", (price) => {
