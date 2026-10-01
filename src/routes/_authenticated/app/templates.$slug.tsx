@@ -389,27 +389,13 @@ function usePlayback(slides: TemplateSlide[], active: number): Playback {
   return { playing, toggle: () => setPlaying((p) => !p), time, total, index, key };
 }
 
-function Stage({ slides, values, format, bg, pb, className }: { slides: TemplateSlide[]; values: CustomSlide[]; format: Aspect; bg: string; pb: Playback; className?: string }) {
-  const slide = slides[pb.index];
-  const value = values[pb.index];
+/** Drawn by renderAt with the customer's text and photos, so it matches the ad they'll get. */
+function Stage({ template, values, format, bg, pb, className }: { template: Template; values: CustomSlide[]; format: Aspect; bg: string; pb: Playback; className?: string }) {
+  const project = useMemo(() => customizedProject(template, values), [template, values]);
+  const time = pb.playing || pb.time > 0 ? pb.time : restTime(project.frames, pb.index);
   return (
     <div className={cn("relative overflow-hidden rounded-sm", className)} style={{ aspectRatio: RATIO[format], background: bg, maxHeight: "100%" }}>
-      {slide && (
-        <div key={pb.key} className={cn("tpl-slide absolute inset-0", pb.playing && pb.index > 0 && `tpl-in-${slide.transition_in}`)} style={{ background: bg }}>
-          {value?.photo && (
-            <div className={cn("absolute inset-0", slide.photo_motion !== "none" && `tpl-photo-${slide.photo_motion}`)}>
-              <MediaImage path={value.photo.path} alt="" className="h-full w-full object-cover" />
-              <div className="absolute inset-0 bg-foreground/30" />
-            </div>
-          )}
-          <div className="tpl-text absolute inset-0 flex flex-col items-center justify-center px-[8%] text-center">
-            <p className={cn("tpl-headline font-bold leading-[1.05]", `tpl-text-${slide.text_animation}`, !value?.headline && "opacity-50")}>{value?.headline || slide.headline_placeholder}</p>
-            {(value?.subline || slide.subline_placeholder) && (
-              <p className={cn("tpl-subline mt-[4%] leading-snug", `tpl-text-${slide.text_animation}`, !value?.subline && "opacity-50")} style={{ animationDelay: "120ms" }}>{value?.subline || slide.subline_placeholder}</p>
-            )}
-          </div>
-        </div>
-      )}
+      <RenderCanvas project={project} format={format} time={time} />
     </div>
   );
 }
