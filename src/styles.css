@@ -991,7 +991,7 @@ textarea.contact-input { resize: vertical; }
 .auth-hero-exported b { display: flex; align-items: center; gap: 6px; color: var(--site-ink); font-weight: 600; }
 .auth-hero-exported svg { color: var(--site-primary); }
 @media (min-width: 960px) {
-  .auth-page-signin .auth-form-side, .auth-page-signin .auth-visual-side { flex: 0 0 50%; min-width: 0; }
+  .auth-page .auth-form-side, .auth-page .auth-visual-side { flex: 0 0 50%; min-width: 0; }
 }
 @media (max-width: 959px) {
   .auth-page-signin .auth-visual-side { height: 300px; }
