@@ -26,7 +26,7 @@
 - Price→plan mapping lives only in `src/lib/stillframe/plan-map.ts` (webhook, portal, tests share it); the `workspace_billing_plan_check` constraint must list every plan there — a missing value silently drops paid plans.
 - Billing uses `peekWorkspaceId()`, refuses duplicate subscriptions server-side, and switches via Manage Billing; `signup-choice.ts` stores only a per-user suggestion, never paid access.
 - Pre-release billing checks: `bun run test` (unit) and `bun run check:billing` (test-mode checkout per plan, portal, plan change, DB plan values).
-- AI calls go through `src/lib/ai/gateway.server.ts` (Responses, openai/gpt-6-astra, streamed, instructions via `system`); the billing helper is `diagnoseBilling` in `billing-help.functions.ts`, owners/admins only.
+- AI calls go through `src/lib/ai/gateway.server.ts`; the billing helper is `diagnoseBilling` in `billing-help.functions.ts`, owners/admins only.
 - Brand kits: named kits live in `brand_kits` (logos in private `brand-assets` bucket, paths prefixed `brand-assets:` so `getMediaUrl` picks the bucket); ads link via `projects.brand_kit_id`; `effectiveKit()` merges the kit over the legacy `brand_kit` row, which now only holds workspace ad settings (placement, size, end card). Gating via SQL `brand_kits_enabled()` in RLS.
 - Templates: `templates` are photo-less styles; gallery examples map to them in `example-template.ts`, then reuse `insertCopy` so user photos remain private. Save needs `brand_kits_enabled`, sharing needs `workspace_is_team()` in RLS.
 
