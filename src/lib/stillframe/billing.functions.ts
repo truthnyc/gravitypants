@@ -1,3 +1,4 @@
+import { EXPORT_PACKS } from "@/lib/stillframe/plans-config";
 import { createServerFn } from "@tanstack/react-start";
 import type Stripe from "stripe";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
@@ -92,12 +93,14 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
     }
   });
 
-/** One-time purchase: 5 extra exports that never expire. */
+/** One-time purchase: a pack of extra exports that never expire. */
 export const createTopUpSession = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { workspaceId: string; returnUrl: string } & Env) => {
+  .inputValidator((d: { workspaceId: string; returnUrl: string; packId?: string } & Env) => {
     if (!idRe.test(d.workspaceId)) throw new Error("Invalid input");
-    return { ...d, environment: checkEnv(d.environment) };
+    const pack = EXPORT_PACKS.find((p) => p.id === (d.packId ?? "extra_exports_5"));
+    if (!pack) throw new Error("Invalid pack");
+    return { ...d, packId: pack.id, environment: checkEnv(d.environment) };
   })
   .handler(async ({ data, context }): Promise<{ clientSecret: string } | { error: string }> => {
     const { supabase, userId } = context;
@@ -115,7 +118,7 @@ export const createTopUpSession = createServerFn({ method: "POST" })
     const { data: u } = await supabase.auth.getUser();
     try {
       const stripe = createStripeClient(data.environment);
-      const prices = await stripe.prices.list({ lookup_keys: ["extra_exports_5"] });
+      const prices = await stripe.prices.list({ lookup_keys: [data.packId] });
       const price = prices.data[0];
       if (!price) return { error: "That pack isn't available." };
       let customerId = await resolveCustomer(stripe, billing?.stripe_customer_id ?? null, payer);
@@ -132,7 +135,7 @@ export const createTopUpSession = createServerFn({ method: "POST" })
         ui_mode: "embedded_page",
         return_url: data.returnUrl,
         customer: customerId,
-        metadata: { userId, workspaceId: payer, topup: "extra_exports_5", managed_payments: "true" },
+        metadata: { userId, workspaceId: payer, topup: data.packId, managed_payments: "true" },
         managed_payments: { enabled: true },
       } as Stripe.Checkout.SessionCreateParams);
       return { clientSecret: session.client_secret ?? "" };
