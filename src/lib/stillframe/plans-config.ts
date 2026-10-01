@@ -8,10 +8,10 @@ export type Billing = "monthly" | "yearly";
 
 export const TRIAL = {
   name: "Free trial",
-  days: 7,
-  exports: 3, // in total, not per month
-  watermark: true,
-  blurb: "Try every feature and make 3 watermarked exports. Choose a paid plan only if you want to continue.",
+  exports: 3, // in total, no time limit
+  cleanExports: 1, // the first export has no watermark
+  watermark: true, // exports after the clean one
+  blurb: "Your first reel free, no watermark. Try every feature, then 2 more watermarked exports. No credit card.",
 } as const;
 
 export const YEARLY_LABEL = "Save 17%";
@@ -39,7 +39,7 @@ export const PLANS: PlanConfig[] = [
     monthlyExports: 10,
     sharedExports: false,
     monthly: 35,
-    yearly: null,
+    yearly: 350,
     team: false,
     features: ["1 seat", "10 exports a month", "9:16, 1:1 and 16:9", "MP4 and GIF", "Every Google Font", "Brand kit: logo, colors, fonts", "Duplicate with new photos", "Save as template", "No watermark"],
   },
@@ -100,10 +100,10 @@ export const COMPARE: CompareGroup[] = [
   {
     group: "Plan",
     rows: [
-      { label: "Price", cells: [`${TRIAL.days} days free`, priceCell(S), priceCell(B), priceCell(T)] },
+      { label: "Price", cells: ["Free, no card", priceCell(S), priceCell(B), priceCell(T)] },
       { label: "Seats", cells: ["1", String(S.seats), String(B.seats), String(T.seats)] },
       { label: "Exports a month", cells: [`${TRIAL.exports} in total`, String(S.monthlyExports), String(B.monthlyExports), `${T.monthlyExports}, shared`] },
-      { label: "Watermark", cells: ["Yes", "No", "No", "No"] },
+      { label: "Watermark", cells: ["After first export", "No", "No", "No"] },
     ],
   },
   {
@@ -121,10 +121,10 @@ export const COMPARE: CompareGroup[] = [
 ];
 
 export const FAQ = [
-  { q: "Can I try it before paying?", a: `Yes. Every account starts with a ${TRIAL.days}-day free trial: ${TRIAL.exports} exports with every feature, watermarked. Choose a plan when you’re ready to remove the watermark and export more.` },
+  { q: "Can I try it before paying?", a: `Yes. Every account starts with a free trial, no credit card and no time limit. Your first reel exports with no watermark, and you get ${TRIAL.exports - TRIAL.cleanExports} more watermarked exports. Your ads and brand kit stay saved when the trial exports run out.` },
   { q: "What kind of photos work best?", a: "Clear product photos with some space around the product work best. Phone photos are fine: three to five of them make a good reel." },
   { q: "Which formats can I export?", a: "Every reel exports as 9:16 for Reels, Stories and TikTok, 1:1 for feeds and 16:9 for banners and YouTube, as MP4 or GIF." },
   { q: "Can I cancel anytime?", a: "Yes. Cancel from Account → Billing in the app whenever you like. You keep full access until the end of the period you've already paid for, and we don't charge you again." },
   { q: "Do I own the reels I make?", a: "Yes. Every reel you export is yours to use wherever you like, forever — including reels made during the free trial. We never claim any rights over your photos or your finished videos." },
-  { q: "Do you offer discounts?", a: "Yearly billing already saves you 17% on Business and Team. If you're a nonprofit or a school, write to info@gravitypants.com and we'll see what we can do." },
+  { q: "Do you offer discounts?", a: "Yearly billing already saves you 17% on every plan. If you're a nonprofit or a school, write to info@gravitypants.com and we'll see what we can do." },
 ];

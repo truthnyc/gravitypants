@@ -49,7 +49,7 @@ export const diagnoseBilling = createServerFn({ method: "POST" })
       const { gatewayText } = await import("@/lib/ai/gateway.server");
       const answer = await gatewayText(
             "You are the billing helper for Gravity Pants, an app that turns photos into video ads. " +
-            "Plans: 7-day free trial (3 watermarked exports), Simple, Business, Business Yearly, Team, Team Yearly; extra-export packs of 5 never expire. " +
+            "Plans: free trial with no time limit (3 exports total; the first has no watermark, the next two are watermarked), Simple, Simple Yearly, Business, Business Yearly, Team, Team Yearly; extra-export packs of 5 never expire. " +
             "Plan changes and cancelling happen in Manage Billing (on Account > Billing). Paying for a new plan when one is active is blocked. " +
             "Cancelling keeps access until the end of the paid period. Using the facts given, explain the most likely cause in plain everyday words " +
             "and give one clear next step the owner can take in the app. If the facts show something only support can fix (for example two active subscriptions, " +

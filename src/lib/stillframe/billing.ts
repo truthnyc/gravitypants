@@ -9,7 +9,7 @@ import { createPortalSession } from "./billing.functions";
 export type Plan = { id: string; name: string; price_id: string; amount_cents: number; interval: string; monthly_exports: number | null; sort_order: number; seats?: number };
 export type Billing = {
   workspace_id: string;
-  plan: "trial" | "simple" | "business" | "business_yearly" | "team" | "team_yearly" | "none";
+  plan: "trial" | "simple" | "simple_yearly" | "business" | "business_yearly" | "team" | "team_yearly" | "none";
   status: "trialing" | "active" | "past_due" | "canceled";
   trial_ends_at: string;
   current_period_start: string | null;
@@ -23,7 +23,7 @@ export type Billing = {
   source_workspace_name?: string | null;
 };
 
-export type ExportStatus = { allowed: boolean; reason: "no_plan" | "limit_reached" | "payment_problem" | "no_access" | null; used?: number; limit?: number; resets_at?: string | null; watermark?: boolean; extras?: number };
+export type ExportStatus = { allowed: boolean; reason: "no_plan" | "limit_reached" | "payment_problem" | "no_access" | null; used?: number; limit?: number; resets_at?: string | null; watermark?: boolean; trial?: boolean; clean_left?: number; extras?: number };
 
 export const billingKey = ["billing"] as const;
 
@@ -92,6 +92,8 @@ const shortDate = (s: string | null) => (s ? new Date(s).toLocaleDateString(unde
 export function planName(id: string) {
   return id === "simple"
     ? "Simple"
+    : id === "simple_yearly"
+      ? "Simple Yearly"
     : id === "business"
       ? "Business"
       : id === "business_yearly"

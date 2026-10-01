@@ -66,7 +66,7 @@ function Pricing() {
         <section className="pr-hero">
           <span className="site-eyebrow">Pricing</span>
           <h1>Start with a free trial.<br /><span>Choose a plan later.</span></h1>
-          <p className="site-lede">Your trial includes every feature and {TRIAL.exports} watermarked exports. Paid plans add more exports and remove the watermark.</p>
+          <p className="site-lede">Your first reel is free, with no watermark and no credit card. Paid plans add more exports and never add a watermark.</p>
           <div role="group" aria-label="Billing period" className="pr-switch">
             {(["monthly", "yearly"] as const).map((b) => (
               <button key={b} className={billing === b ? "on" : ""} aria-pressed={billing === b} onClick={() => setBilling(b)}>
@@ -79,11 +79,11 @@ function Pricing() {
         <section className="pr-tiers">
           <div className="pr-grid pr-grid-4">
             <article className="pr-tier">
-              <div className="pr-tier-top"><h3>{TRIAL.name}</h3><p>Try every feature and make {TRIAL.exports} watermarked exports.</p></div>
-              <div className="pr-price"><b>$0</b><span>for {TRIAL.days} days</span></div>
-              <span className="pr-note">Then choose a plan if you want to continue</span>
+              <div className="pr-tier-top"><h3>{TRIAL.name}</h3><p>Your first reel free, no watermark.</p></div>
+              <div className="pr-price"><b>$0</b><span>no card needed</span></div>
+              <span className="pr-note">No time limit. Your ads stay saved.</span>
               <Link to="/signup" className="pr-btn sec full">Start free trial</Link>
-              <ul>{[`${TRIAL.exports} exports in total`, "Watermark on every export", "9:16, 1:1 and 16:9", "MP4 and GIF", "Brand kits", "Templates"].map((f) => <li key={f}><Tick /><span>{f}</span></li>)}</ul>
+              <ul>{["First export with no watermark", `${TRIAL.exports - TRIAL.cleanExports} more watermarked exports`, "9:16, 1:1 and 16:9", "MP4 and GIF", "Brand kits", "Templates"].map((f) => <li key={f}><Tick /><span>{f}</span></li>)}</ul>
             </article>
             {PLANS.map((p) => {
               const pr = priceFor(p, billing);
@@ -147,7 +147,7 @@ function Pricing() {
         <section className="pr-cta">
           <div>
             <h2 className="site-h2">Try Gravity Pants before you pay.</h2>
-            <p className="site-lede">You get {TRIAL.days} days, every feature and {TRIAL.exports} exports to see if it works for you.</p>
+            <p className="site-lede">Make your first reel free, with every feature and no watermark. No credit card needed.</p>
             <div className="pr-cta-actions"><Link to="/signup" className="pr-btn pri big">Start free</Link><Link to="/examples" className="pr-btn sec big white">See examples</Link></div>
           </div>
         </section>
