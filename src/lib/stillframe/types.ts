@@ -20,6 +20,8 @@ export type LogoSettings = {
   opacity?: "solid" | "soft";
   show_on?: "all" | "first_last" | "selected";
   positions?: Partial<Record<Format, LogoPosition | string>>;
+  /** Per-frame position overrides, keyed by frame id then format. */
+  frame_positions?: Record<string, Partial<Record<Format, string>>>;
   /** updated_at of the brand kit last applied, so later kit edits flow into the ad. */
   kit_stamp?: string | null;
 };

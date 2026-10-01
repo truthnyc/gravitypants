@@ -651,6 +651,7 @@ function LogoPanel({
 }) {
   const lightRef = useRef<HTMLInputElement>(null);
   const darkRef = useRef<HTMLInputElement>(null);
+  const posScopeState = useState<"all" | "frame" | null>(null);
   const logoInput = (variant: "light" | "dark", ref: { current: HTMLInputElement | null }) => (
     <input ref={ref} type="file" accept="image/png,image/svg+xml,image/webp" className="hidden" onChange={(e) => {
       const f = e.target.files?.[0];
@@ -677,6 +678,8 @@ function LogoPanel({
     );
   }
   const size = logo.size_pct ?? 16;
+  const posScope = posScopeState[0] ?? (logo.frame_positions?.[frame.id]?.[format] || logo.show_on === "selected" ? "frame" : "all");
+  const setPosScope = posScopeState[1];
   const version = frame.logo_variant ?? logo.version ?? "auto";
   const show = logo.show_on ?? "all";
   const tiles: { value: NonNullable<LogoSettings["version"]>; label: string; hint: string; path: string | null | undefined }[] = [
@@ -717,10 +720,25 @@ function LogoPanel({
       </Field>
       <Field label={`Position on ${format}`}>
         <PositionGrid
-          value={logo.positions?.[format] ?? "top-right"}
+          value={logo.frame_positions?.[frame.id]?.[format] ?? logo.positions?.[format] ?? "top-right"}
           color="var(--el-logo)"
-          onChange={(a) => actions.onLogo({ positions: { ...logo.positions, [format]: a } })}
+          onChange={(a) => {
+            if (posScope === "frame") {
+              const fp = logo.frame_positions ?? {};
+              actions.onLogo({ frame_positions: { ...fp, [frame.id]: { ...fp[frame.id], [format]: a } } });
+            } else {
+              // Applying to all frames clears per-frame overrides for this format.
+              const fp = Object.fromEntries(Object.entries(logo.frame_positions ?? {}).map(([k, v]) => { const { [format]: _x, ...rest } = v; return [k, rest]; }));
+              actions.onLogo({ positions: { ...logo.positions, [format]: a }, frame_positions: fp });
+            }
+          }}
         />
+        <div className="mt-2 grid grid-cols-2 gap-1 rounded-md bg-control-fill p-0.5" role="radiogroup" aria-label="Apply position to">
+          {([["all", "All frames"], ["frame", "This frame"]] as const).map(([v, l]) => (
+            <button key={v} type="button" role="radio" aria-checked={posScope === v} onClick={() => setPosScope(v)}
+              className={cn("h-7 rounded-md text-[12px] font-medium", posScope === v ? "bg-card shadow-card" : "text-secondary-text")}>{l}</button>
+          ))}
+        </div>
       </Field>
       <Field label="Size" value={`${size}% of width`}>
         <ElementSlider

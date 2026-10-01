@@ -254,7 +254,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
       ...d,
       project: {
         ...d.project,
-        logo: { ...d.project.logo, positions: { ...d.project.logo.positions, [format]: anchor as never } },
+        logo: d.project.logo.frame_positions?.[frame?.id ?? ""]?.[format] && frame ? { ...d.project.logo, frame_positions: { ...d.project.logo.frame_positions, [frame.id]: { ...d.project.logo.frame_positions?.[frame.id], [format]: anchor } } } : { ...d.project.logo, positions: { ...d.project.logo.positions, [format]: anchor as never } },
       },
     }));
   };

@@ -267,7 +267,7 @@ export function layoutFrame(
     const w = ((project.logo.size_pct ?? 16) / 100) * W;
     const ratio = img && img.naturalWidth ? img.naturalHeight / img.naturalWidth : 1;
     const lh = w * ratio;
-    const { col, row } = anchorParts(project.logo.positions?.[format] ?? "top-right");
+    const { col, row } = anchorParts(project.logo.frame_positions?.[frame.id]?.[format] ?? project.logo.positions?.[format] ?? "top-right");
     const p = place(col, row, w, lh, safe);
     result.logo = { ...p, w, h: lh, path };
   }
