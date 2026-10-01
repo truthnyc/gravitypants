@@ -23,7 +23,7 @@ const event = (db: any, templateId: string, userId: string, action: string, vers
 const slide = z.object({
   role: z.string().max(40),
   duration_sec: z.number().min(0.5).max(15),
-  transition_in: z.enum(["none", "fade", "slide", "swipe-left", "zoom", "cut"]),
+  transition_in: z.enum(["none", "fade", "slide", "swipe-left", "zoom", "cut", "dip-black"]),
   text_animation: z.enum(["none", "rise-up", "fade-in", "typewriter", "zoom"]),
   photo_motion: z.enum(["none", "slow-zoom-in", "pan"]),
   headline_placeholder: z.string().max(120),
@@ -279,7 +279,7 @@ export const adminTemplateFromAd = createServerFn({ method: "POST" })
     const { data: fr } = await db.from("frames").select("*").eq("project_id", p.id).order("sort_order");
     const frames = ((fr ?? []) as any[]).slice(0, 10);
     if (!frames.length) throw new Error("That ad has no slides yet.");
-    const TR: Record<string, string> = { cut: "cut", fade: "fade", slide: "slide", wipe: "swipe-left", zoom: "zoom", dip_black: "fade" };
+    const TR: Record<string, string> = { cut: "cut", fade: "fade", slide: "slide", wipe: "swipe-left", zoom: "zoom", dip_black: "dip-black" };
     const TA: Record<string, string> = { none: "none", rise: "rise-up", fade: "fade-in", typewriter: "typewriter", pop: "zoom" };
     const PM: Record<string, string> = { slow_zoom_in: "slow-zoom-in", pan_left: "pan", pan_right: "pan" };
     const hex = (c: any, d: string) => (typeof c === "string" && /^#[0-9a-fA-F]{6}$/.test(c) ? c.toUpperCase() : d);
@@ -320,7 +320,7 @@ export const adminTemplateFromAd = createServerFn({ method: "POST" })
         photo_zoom: Math.min(3, Math.max(1, Number(f.photo?.zoom ?? 1))),
         photo_background_color: f.photo?.background_color ?? null,
         transition_speed: f.transition_in?.speed === "quick" ? "quick" : "smooth",
-        headline_style: f.headline ? { font_family: f.headline.font_family ?? null, font_weight: f.headline.font_weight ?? null, size_px: f.headline.size_px, color: f.headline.color, animation: f.headline.animation, position: f.headline.position } : undefined,
+        ...(f.headline ? { headline_style: { font_family: f.headline.font_family ?? null, font_weight: f.headline.font_weight ?? null, size_px: f.headline.size_px, color: f.headline.color, animation: f.headline.animation, position: f.headline.position } } : {}),
         subline_style: f.subline ? { font_family: f.subline.font_family ?? null, font_weight: f.subline.font_weight ?? null, size_px: f.subline.size_px, color: f.subline.color, animation: f.subline.animation, position: f.subline.position, keep_under_headline: f.subline.keep_under_headline } : null,
         logo_visible: f.logo_visible !== false,
         logo_variant: f.logo_variant === "light" || f.logo_variant === "dark" || f.logo_variant === "auto" ? f.logo_variant : null,

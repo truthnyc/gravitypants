@@ -46,7 +46,7 @@ export const PLAN_AUDIENCE = [
 ] as const;
 
 export const TRANSITIONS: [TemplateSlide["transition_in"], string][] = [
-  ["none", "None"], ["fade", "Fade"], ["slide", "Slide"], ["swipe-left", "Swipe left"], ["zoom", "Zoom"], ["cut", "Cut"],
+  ["none", "None"], ["fade", "Fade"], ["slide", "Slide"], ["swipe-left", "Swipe left"], ["zoom", "Zoom"], ["cut", "Cut"], ["dip-black", "Dip to black"],
 ];
 export const TEXT_ANIMS: [TemplateSlide["text_animation"], string][] = [
   ["none", "None"], ["rise-up", "Rise up"], ["fade-in", "Fade in"], ["typewriter", "Typewriter"], ["zoom", "Pop"],
@@ -114,7 +114,7 @@ export function docFromRow(t: Row): TemplateDoc {
   };
 }
 
-const TR: Record<TemplateSlide["transition_in"], Frame["transition_in"]["type"]> = { none: "cut", cut: "cut", fade: "fade", slide: "slide", "swipe-left": "wipe", zoom: "zoom" };
+const TR: Record<TemplateSlide["transition_in"], Frame["transition_in"]["type"]> = { none: "cut", cut: "cut", fade: "fade", slide: "slide", "swipe-left": "wipe", zoom: "zoom", "dip-black": "dip_black" };
 const TA: Record<TemplateSlide["text_animation"], NonNullable<NonNullable<Frame["headline"]>["animation"]>> = { none: "none", "rise-up": "rise", "fade-in": "fade", typewriter: "typewriter", zoom: "pop" };
 const PM: Record<TemplateSlide["photo_motion"], NonNullable<Frame["photo"]["movement"]>> = { none: "none", "slow-zoom-in": "slow_zoom_in", pan: "pan_left" };
 

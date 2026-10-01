@@ -584,7 +584,7 @@ export type TemplateSettings = Pick<Project, "formats" | "primary_format" | "pac
 export type TemplateSlide = {
   role: string;
   duration_sec: number;
-  transition_in: "none" | "fade" | "slide" | "swipe-left" | "zoom" | "cut";
+  transition_in: "none" | "fade" | "slide" | "swipe-left" | "zoom" | "cut" | "dip-black";
   text_animation: "none" | "rise-up" | "fade-in" | "typewriter" | "zoom";
   photo_motion: "none" | "slow-zoom-in" | "pan";
   headline_placeholder: string;
