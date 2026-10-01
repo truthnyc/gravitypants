@@ -867,8 +867,7 @@ html:has(.features-page) { scroll-behavior: smooth; }
   .auth-page { flex-direction: column; overflow-x: clip; }
   .auth-form-side { display: contents; }
   .auth-brand { display: flex; height: 64px; flex-shrink: 0; padding: 0 24px; }
-  .auth-visual-side { display: block; order: 1; height: 230px; flex: none; padding: 0 16px; overflow: hidden; }
-  .auth-page-signin .auth-visual-side { height: 210px; }
+  .auth-visual-side { display: none; }
   .auth-visual { position: relative; height: 100%; border-radius: 8px; background: var(--site-panel); overflow: hidden; }
   .auth-form-inner { order: 2; flex: none; justify-content: flex-start; max-width: 540px; margin: 0 auto; padding: 34px 24px max(40px, env(safe-area-inset-bottom)); }
   .auth-tiles { position: absolute; inset: 0; }
