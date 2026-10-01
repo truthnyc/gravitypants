@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { firstTouch } from "@/lib/site/track";
 import { useEffect, useState } from "react";
 import { z } from "zod";
 import { ArrowRight } from "lucide-react";
