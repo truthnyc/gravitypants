@@ -46,3 +46,4 @@
 - Staff role: `user_roles` (enum app_role, admin) checked via `has_role()`; `is_platform_admin()` wraps it; staff area at `/admin` (`_authenticated/admin/`) 404s non-admins — roles never live on profiles.
 - Website reels use private `site-reels` files with signed links. Project logos support light/dark artwork plus per-frame visibility and auto/light/dark selection; `renderAt` handles preview/export.
 - Brand requests: /contact saves to `brand_requests` (anon insert only) and emails help@gravitypants.com via the `brand-request` template.
+- Free trial is usage-based (no time limit): SQL `export_status` returns `trial`, `watermark` (false only for the first export) and `clean_left`; the UI reads these flags, never `trial_ends_at`.
