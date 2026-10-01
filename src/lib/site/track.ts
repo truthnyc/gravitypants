@@ -40,7 +40,7 @@ export function trackPageView(path: string) {
       utm_medium: clip(utm.medium, 100),
       utm_campaign: clip(utm.campaign, 150),
       device: w < 768 ? "mobile" : w < 1024 ? "tablet" : "desktop",
-    } as never);
+    } as never).then(() => undefined);
   } catch {
     /* tracking must never break the page */
   }
