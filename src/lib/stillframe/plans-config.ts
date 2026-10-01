@@ -41,7 +41,7 @@ export const PLANS: PlanConfig[] = [
     monthly: 35,
     yearly: 350,
     team: false,
-    features: ["1 seat", "10 exports a month", "9:16, 1:1 and 16:9", "MP4 and GIF", "Every Google Font", "Brand kit: logo, colors, fonts", "Duplicate with new photos", "Save as template", "No watermark"],
+    features: ["1 seat", "10 exports a month", "9:16, 1:1 and 16:9", "MP4 and GIF", "Every Google Font", "Brand kit: logo, colors, fonts", "Duplicate with new photos", "Save as template", "No watermark", "Need more? 5 extra exports for $12.50"],
   },
   {
     id: "business",
@@ -122,6 +122,7 @@ export const COMPARE: CompareGroup[] = [
 
 export const FAQ = [
   { q: "Can I try it before paying?", a: `Yes. Every account starts with a free trial, no credit card and no time limit. Your first reel exports with no watermark, and you get ${TRIAL.exports - TRIAL.cleanExports} more watermarked exports. Your ads and brand kit stay saved when the trial exports run out.` },
+  { q: "What if I need more than 10 exports on Simple?", a: "Buy a pack of 5 extra exports for $12.50 from Account → Billing whenever you need it. Extra exports never expire and work on any plan, so a busy month doesn’t mean jumping to Business." },
   { q: "What kind of photos work best?", a: "Clear product photos with some space around the product work best. Phone photos are fine: three to five of them make a good reel." },
   { q: "Which formats can I export?", a: "Every reel exports as 9:16 for Reels, Stories and TikTok, 1:1 for feeds and 16:9 for banners and YouTube, as MP4 or GIF." },
   { q: "Can I cancel anytime?", a: "Yes. Cancel from Account → Billing in the app whenever you like. You keep full access until the end of the period you've already paid for, and we don't charge you again." },
