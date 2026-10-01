@@ -52,11 +52,13 @@ export const Route = createFileRoute("/examples")({
 function ExamplesPage() {
   const search = Route.useSearch();
   const navigate = useNavigate({ from: "/examples" });
-  const cat = categories.some(c => c.id === search.cat) ? search.cat : undefined;
   const format = formats.some(f => f.id === String(search.format)) ? String(search.format) : undefined;
   const reels = Route.useLoaderData();
   // Only real brand reels from /admin/reels are shown.
   const all = reels.map(reelToExample);
+  // Category filters come from the reels themselves, so new admin categories appear here.
+  const categories = [{ id: "all", label: "All" }, ...[...new Set(all.map((e) => e.category))].map((c) => ({ id: c, label: categoryLabel(c) }))];
+  const cat = categories.some(c => c.id === search.cat) ? search.cat : undefined;
   const visible = all.filter(example => (!cat || example.category === cat) && (!format || example.format === format));
   return <SiteShell><div className="examples-page">
     <section className="examples-hero examples-container"><span className="site-eyebrow">Examples</span><div><h1>See what your<br />photos can become.</h1><p className="site-lede">Each example started with a few still photos. Choose a style you like and use it with your own products.</p></div></section>
