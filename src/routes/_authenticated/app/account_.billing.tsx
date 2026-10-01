@@ -109,7 +109,7 @@ function BillingPage() {
           </dl>
         )}
 
-        {status && <ExportCounts st={status} monthly={limited} />}
+        {status && <ExportCounts st={{ ...status, extras: status.extras ?? billing?.extra_exports ?? 0 }} monthly={limited} />}
 
         {canManage ? (
           <div className="mt-6 flex flex-wrap gap-2">
