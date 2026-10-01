@@ -17,7 +17,7 @@ function TopUpCheckout({ workspaceId, packId }: { workspaceId: string; packId: s
     setState({ loading: true });
     try {
       const r = await create({
-        data: { workspaceId, packId, returnUrl: `${window.location.origin}/app/account/billing?checkout=success`, environment: getStripeEnvironment() },
+        data: { workspaceId, packId, returnUrl: `${window.location.origin}/app/account/billing?checkout=pack`, environment: getStripeEnvironment() },
       });
       if ("error" in r) setState({ loading: false, error: r.error });
       else setState({ loading: false, secret: r.clientSecret });
