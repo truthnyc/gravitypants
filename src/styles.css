@@ -1003,3 +1003,4 @@ textarea.contact-input { resize: vertical; }
 .auth-hero-phone .site-phone { width: 300px; height: 600px; }
 @media (min-width: 960px) and (max-width: 1280px) { .auth-hero-phone .site-phone { width: 240px; height: 480px; } }
 @media (max-width: 959px) { .auth-hero-phone .site-phone { width: 130px; height: 260px; } .auth-hero-phone .site-phone-copy b { font-size: 14px; } .auth-hero-phone .site-phone-copy span { display: none; } }
+.auth-hero-drop-1 { left: 5%; } .auth-hero-drop-2 { left: 24%; top: 30%; } .auth-hero-drop-3 { left: 9%; top: 54%; }
