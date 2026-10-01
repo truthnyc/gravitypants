@@ -466,6 +466,12 @@ function SlideCard({ index, slide: s, count, open, onToggle, onChange, onMove, o
           <div className="space-y-3 sm:col-span-2">
             <Field label="Headline placeholder"><input className={cn(inp, "font-semibold")} value={s.headline_placeholder} maxLength={120} onChange={(e) => onChange({ headline_placeholder: e.target.value })} /></Field>
             <Field label="Subline placeholder"><input className={inp} value={s.subline_placeholder} maxLength={160} onChange={(e) => onChange({ subline_placeholder: e.target.value })} /></Field>
+            <div className="space-y-2">
+              <Toggle label="Keep subline under headline" sub="subline position" checked={s.subline_style?.keep_under_headline ?? true} onChange={(v) => onChange({ subline_style: { ...(s.subline_style ?? {}), keep_under_headline: v, ...(v ? {} : { position: s.subline_style?.position ?? "bottom-center" }) } })} />
+              {(s.subline_style?.keep_under_headline ?? true) === false && (
+                <PosGrid title="Subline position" note="this slide" value={s.subline_style?.position ?? "bottom-center"} onChange={(v) => onChange({ subline_style: { ...(s.subline_style ?? {}), keep_under_headline: false, position: v } })} />
+              )}
+            </div>
           </div>
           <div className="flex flex-col gap-1.5">
             <span className="text-[12px] font-medium text-secondary-text">Sample photo <span className="font-normal">· previews only</span></span>
