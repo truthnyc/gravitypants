@@ -153,7 +153,7 @@ function ExportCounts({ st, monthly }: { st: ExportStatus; monthly: boolean }) {
   return (
     <div className="mt-5">
       <div className="grid grid-cols-3 gap-2">
-        {cell("Exports left", total != null ? String(total) : st.allowed ? "Unlimited" : String(extras), total != null && extras > 0 ? `${planLeft} plan + ${extras} extra` : undefined)}
+        {cell("Exports left", total != null ? String(total) : st.allowed ? "Unlimited" : String(extras), st.staff ? "Staff account" : total != null && extras > 0 ? `${planLeft} plan + ${extras} extra` : undefined)}
         {cell(monthly ? "Used this month" : "Used", st.limit != null ? `${used} of ${st.limit}` : String(used))}
         {cell("Extra exports", String(extras), "Never expire")}
       </div>
@@ -163,7 +163,7 @@ function ExportCounts({ st, monthly }: { st: ExportStatus; monthly: boolean }) {
         </div>
       )}
       <p className="mt-1.5 text-[12px] text-secondary-text nums">
-        {monthly && st.resets_at ? `Plan exports reset on ${longDate(st.resets_at)}. Extra exports are used only after those run out.` : st.trial ? (st.watermark ? "Trial exports carry a watermark." : "Your next export has no watermark.") : "Extra exports are used only after your plan exports run out."}
+        {st.staff ? "Gravity Pants staff accounts have no export limit. Customers on Team get 150 shared exports a month." : monthly && st.resets_at ? `Plan exports reset on ${longDate(st.resets_at)}. Extra exports are used only after those run out.` : st.trial ? (st.watermark ? "Trial exports carry a watermark." : "Your next export has no watermark.") : "Extra exports are used only after your plan exports run out."}
       </p>
     </div>
   );
