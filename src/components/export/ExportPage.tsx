@@ -224,6 +224,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
       formats: [...new Set([...jobs.values()].map((j) => j.kind.toUpperCase()))],
     });
     let failure: string | null = null;
+    const doneFiles: { name: string; blob: Blob }[] = [];
     const set = (k: string, s: Partial<JobState>) => setState((prev) => ({ ...prev, [k]: { ...prev[k]!, ...s } }));
 
     for (const [key, job] of jobs) {
@@ -248,6 +249,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
           }
         }
         set(key, { status: "done", progress: 1, blob, ...(note ? { note } : {}) });
+        for (const f of files.filter((f) => f.job === key)) doneFiles.push({ name: f.name, blob });
         totalBytes += blob.size * files.filter((f) => f.job === key).length;
         if (!counted) {
           // Count this export once, after the first file is finished; the server refuses if not allowed.
@@ -277,6 +279,8 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
       }
     }
     track({ status: failure ? "failed" : counted ? "done" : "cancelled", error: failure, total_bytes: totalBytes });
+    // A single finished file downloads straight away — no extra click needed.
+    if (!ac.signal.aborted && doneFiles.length === 1 && files.length === 1) saveBlob(doneFiles[0]!.blob, doneFiles[0]!.name);
     setState((prev) =>
       Object.fromEntries(Object.entries(prev).map(([k, v]) => [k, v.status === "waiting" || v.status === "working" ? { ...v, status: "cancelled" } : v])),
     );
@@ -633,8 +637,13 @@ function saveBlob(blob: Blob, name: string) {
   const a = document.createElement("a");
   a.href = url;
   a.download = name;
+  a.rel = "noopener";
+  // Safari ignores clicks on anchors that aren't in the document.
+  document.body.appendChild(a);
   a.click();
-  setTimeout(() => URL.revokeObjectURL(url), 5000);
+  a.remove();
+  // Keep the URL alive well past the click — revoking too early cancels the save on some browsers.
+  setTimeout(() => URL.revokeObjectURL(url), 60_000);
 }
 
 function ProgressSheet({
