@@ -13,6 +13,8 @@ export type DocSlide = TemplateSlide & {
   subline_style?: Omit<TextSettings, "text" | "same_on_all"> | null;
   logo_visible?: boolean;
   logo_variant?: Frame["logo_variant"];
+  /** Show this slide in template previews (grid cards, "Make it yours"). Defaults to true. */
+  preview?: boolean;
 };
 export type DocStyle = {
   background_color: string;
@@ -178,8 +180,10 @@ export function settingsFromDoc(doc: TemplateDoc): TemplateSettings {
   } as TemplateSettings;
 }
 
-/** A throwaway project for drawing a doc through renderAt. */
+/** A throwaway project for drawing a doc through renderAt. Slides with preview:false are left out. */
 export function previewProject(doc: TemplateDoc): ProjectWithFrames {
+  const shown = doc.slides.filter((s) => s.preview !== false);
+  const previewDoc = shown.length === doc.slides.length ? doc : { ...doc, slides: shown.length ? shown : doc.slides };
   const now = new Date().toISOString();
   return {
     id: "preview",
@@ -195,7 +199,7 @@ export function previewProject(doc: TemplateDoc): ProjectWithFrames {
     thumbnail_url: null,
     created_at: now,
     updated_at: now,
-    frames: framesFromDoc(doc, { samples: true }),
+    frames: framesFromDoc(previewDoc, { samples: true }),
   };
 }
 
