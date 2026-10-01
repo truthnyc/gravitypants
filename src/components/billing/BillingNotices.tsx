@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import { isPaid, trialDaysLeft, useBilling, useManageBilling } from "@/lib/stillframe/billing";
+import { isPaid, useBilling, useExportStatus, useManageBilling } from "@/lib/stillframe/billing";
 
 const clientToken = import.meta.env['VITE_PAYMENTS_CLIENT_TOKEN'] as string | undefined;
 
@@ -31,11 +31,12 @@ export function PaymentProblemBanner() {
 
 export function TrialPill() {
   const { data: b } = useBilling();
+  const { data: st } = useExportStatus();
   if (!b || isPaid(b)) return null;
-  const d = trialDaysLeft(b);
+  const left = st?.trial && st.limit != null ? Math.max(0, st.limit - (st.used ?? 0)) : 0;
   return (
     <Link to="/pricing" className="rounded-lg bg-control-fill px-2.5 py-1 text-[12px] font-medium text-secondary-text nums hover:text-foreground">
-      {d > 0 ? `Trial · ${d} ${d === 1 ? "day" : "days"} left` : "Trial ended"}
+      {left > 0 ? `Trial · ${left} ${left === 1 ? "export" : "exports"} left` : "Trial exports used"}
     </Link>
   );
 }

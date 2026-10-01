@@ -109,8 +109,7 @@ export function planName(id: string) {
 
 export function statusLine(b: Billing): string {
   if (!isPaid(b)) {
-    const d = trialDaysLeft(b);
-    return d > 0 ? `Free trial · ${d} ${d === 1 ? "day" : "days"} left` : "Free trial ended · pick a plan to export";
+    return b.plan === "trial" && b.status === "trialing" ? "Free trial · no time limit" : "No plan · pick a plan to export";
   }
   if (b.status === "past_due") return "Payment problem — update your card";
   if (b.cancel_at_period_end || b.status === "canceled") return `Cancels on ${shortDate(b.current_period_end)}`;

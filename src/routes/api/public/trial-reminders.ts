@@ -12,6 +12,11 @@ export const Route = createFileRoute("/api/public/trial-reminders")({
   server: {
     handlers: {
       POST: async () => {
+        // The free trial no longer has a time limit (it ends when its exports are used),
+        // so date-based "trial ending" emails are switched off.
+        return Response.json({ sent: 0, disabled: true });
+      },
+      PUT: async () => {
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
         const now = Date.now();
