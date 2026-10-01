@@ -471,7 +471,7 @@ function SlideCard({ index, slide: s, count, open, onToggle, onChange, onMove, o
             <Field label="Headline placeholder"><input className={cn(inp, "font-semibold")} value={s.headline_placeholder} maxLength={120} onChange={(e) => onChange({ headline_placeholder: e.target.value })} /></Field>
             <Field label="Subline placeholder"><input className={inp} value={s.subline_placeholder} maxLength={160} onChange={(e) => onChange({ subline_placeholder: e.target.value })} /></Field>
             <PosGrid title="Headline position" note={s.headline_style?.position ? "this slide" : "template default"} value={s.headline_style?.position ?? textPosition} onChange={(v) => onChange({ headline_style: { ...(s.headline_style ?? {}), position: v as never } })} />
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid gap-3">
               {(["headline", "subline"] as const).map((k) => {
                 const key = k === "headline" ? "headline_style" : "subline_style";
                 const own = s[key]?.color;
