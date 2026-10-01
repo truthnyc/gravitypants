@@ -16,6 +16,7 @@ import { SearchProvider } from "@/components/stillframe/search-context";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { PaymentTestModeBanner } from "@/components/billing/BillingNotices";
+import { trackPageView } from "@/lib/site/track";
 
 function NotFoundComponent() {
   return (
@@ -142,6 +143,9 @@ function RootComponent() {
     });
     return () => data.subscription.unsubscribe();
   }, [router, queryClient]);
+
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  useEffect(() => { trackPageView(pathname); }, [pathname]);
 
   return (
     <QueryClientProvider client={queryClient}>

@@ -66,7 +66,7 @@ function SignUp() {
     const { data, error } = await supabase.auth.signUp({
       email: email.trim(),
       password,
-      options: { data: { full_name: name.trim() }, emailRedirectTo: confirmation.toString() },
+      options: { data: { full_name: name.trim(), first_touch: firstTouch() }, emailRedirectTo: confirmation.toString() },
     });
     setBusy(false);
     if (error) {
