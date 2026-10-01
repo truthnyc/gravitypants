@@ -66,3 +66,7 @@
 - [x] Support light and dark logo files with per-frame version selection
 - [x] Verify preview/export match and editor saving persists after reload
 - [x] Tighten site-reels storage reads to signed-link access only
+- [x] Usage-based free trial: first export clean, 2 watermarked, no 7-day clock
+- [x] Simple yearly plan ($350) and pricing page copy
+- [ ] Day 1/3/7 tips email series for trial users (needs your go-ahead on content)
+- [ ] Offer extra-export top-ups on the pricing page for Simple (needs your go-ahead)
