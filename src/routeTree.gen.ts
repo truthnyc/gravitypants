@@ -43,6 +43,7 @@ import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAppAccountRouteImport } from './routes/_authenticated/app/account'
 import { Route as AuthenticatedAppAdsRouteImport } from './routes/_authenticated/app/ads'
 import { Route as AuthenticatedAppBrandRouteImport } from './routes/_authenticated/app/brand'
+import { Route as AuthenticatedAppExportsRouteImport } from './routes/_authenticated/app/exports'
 import { Route as AuthenticatedAppHelpRouteImport } from './routes/_authenticated/app/help'
 import { Route as ApiPublicCleanupExportsRouteImport } from './routes/api/public/cleanup-exports'
 import { Route as ApiPublicTrialRemindersRouteImport } from './routes/api/public/trial-reminders'
@@ -235,6 +236,11 @@ const AuthenticatedAppBrandRoute = AuthenticatedAppBrandRouteImport.update({
   path: '/brand',
   getParentRoute: () => AuthenticatedAppRouteRoute,
 } as any)
+const AuthenticatedAppExportsRoute = AuthenticatedAppExportsRouteImport.update({
+  id: '/exports',
+  path: '/exports',
+  getParentRoute: () => AuthenticatedAppRouteRoute,
+} as any)
 const AuthenticatedAppHelpRoute = AuthenticatedAppHelpRouteImport.update({
   id: '/help',
   path: '/help',
@@ -377,6 +383,7 @@ export interface FileRoutesByFullPath {
   '/app/account': typeof AuthenticatedAppAccountRoute
   '/app/ads': typeof AuthenticatedAppAdsRoute
   '/app/brand': typeof AuthenticatedAppBrandRoute
+  '/app/exports': typeof AuthenticatedAppExportsRoute
   '/app/help': typeof AuthenticatedAppHelpRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
   '/api/public/trial-reminders': typeof ApiPublicTrialRemindersRoute
@@ -428,6 +435,7 @@ export interface FileRoutesByTo {
   '/app/account': typeof AuthenticatedAppAccountRoute
   '/app/ads': typeof AuthenticatedAppAdsRoute
   '/app/brand': typeof AuthenticatedAppBrandRoute
+  '/app/exports': typeof AuthenticatedAppExportsRoute
   '/app/help': typeof AuthenticatedAppHelpRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
   '/api/public/trial-reminders': typeof ApiPublicTrialRemindersRoute
@@ -484,6 +492,7 @@ export interface FileRoutesById {
   '/_authenticated/app/account': typeof AuthenticatedAppAccountRoute
   '/_authenticated/app/ads': typeof AuthenticatedAppAdsRoute
   '/_authenticated/app/brand': typeof AuthenticatedAppBrandRoute
+  '/_authenticated/app/exports': typeof AuthenticatedAppExportsRoute
   '/_authenticated/app/help': typeof AuthenticatedAppHelpRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
   '/api/public/trial-reminders': typeof ApiPublicTrialRemindersRoute
@@ -540,6 +549,7 @@ export interface FileRouteTypes {
     | '/app/account'
     | '/app/ads'
     | '/app/brand'
+    | '/app/exports'
     | '/app/help'
     | '/api/public/cleanup-exports'
     | '/api/public/trial-reminders'
@@ -591,6 +601,7 @@ export interface FileRouteTypes {
     | '/app/account'
     | '/app/ads'
     | '/app/brand'
+    | '/app/exports'
     | '/app/help'
     | '/api/public/cleanup-exports'
     | '/api/public/trial-reminders'
@@ -646,6 +657,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/account'
     | '/_authenticated/app/ads'
     | '/_authenticated/app/brand'
+    | '/_authenticated/app/exports'
     | '/_authenticated/app/help'
     | '/api/public/cleanup-exports'
     | '/api/public/trial-reminders'
@@ -937,6 +949,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppBrandRouteImport
       parentRoute: typeof AuthenticatedAppRouteRoute
     }
+    '/_authenticated/app/exports': {
+      id: '/_authenticated/app/exports'
+      path: '/exports'
+      fullPath: '/app/exports'
+      preLoaderRoute: typeof AuthenticatedAppExportsRouteImport
+      parentRoute: typeof AuthenticatedAppRouteRoute
+    }
     '/_authenticated/app/help': {
       id: '/_authenticated/app/help'
       path: '/help'
@@ -1126,6 +1145,7 @@ interface AuthenticatedAppRouteRouteChildren {
   AuthenticatedAppAccountRoute: typeof AuthenticatedAppAccountRoute
   AuthenticatedAppAdsRoute: typeof AuthenticatedAppAdsRoute
   AuthenticatedAppBrandRoute: typeof AuthenticatedAppBrandRoute
+  AuthenticatedAppExportsRoute: typeof AuthenticatedAppExportsRoute
   AuthenticatedAppHelpRoute: typeof AuthenticatedAppHelpRoute
   AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
   AuthenticatedAppAccountBillingRoute: typeof AuthenticatedAppAccountBillingRoute
@@ -1141,6 +1161,7 @@ const AuthenticatedAppRouteRouteChildren: AuthenticatedAppRouteRouteChildren = {
   AuthenticatedAppAccountRoute: AuthenticatedAppAccountRoute,
   AuthenticatedAppAdsRoute: AuthenticatedAppAdsRoute,
   AuthenticatedAppBrandRoute: AuthenticatedAppBrandRoute,
+  AuthenticatedAppExportsRoute: AuthenticatedAppExportsRoute,
   AuthenticatedAppHelpRoute: AuthenticatedAppHelpRoute,
   AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
   AuthenticatedAppAccountBillingRoute: AuthenticatedAppAccountBillingRoute,
