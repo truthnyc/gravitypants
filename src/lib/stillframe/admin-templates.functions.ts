@@ -36,6 +36,7 @@ const slide = z.object({
   headline_style: z.object({ font_family: z.string().max(80).nullable().optional(), font_weight: z.number().min(100).max(900).nullable().optional(), size_px: z.number().min(12).max(300).optional(), color: z.string().max(9).optional(), animation: z.enum(["none", "rise", "fade", "pop", "typewriter"]).optional(), position: z.string().max(20).optional(), keep_under_headline: z.boolean().optional() }).optional(),
   subline_style: z.object({ font_family: z.string().max(80).nullable().optional(), font_weight: z.number().min(100).max(900).nullable().optional(), size_px: z.number().min(10).max(200).optional(), color: z.string().max(9).optional(), animation: z.enum(["none", "rise", "fade", "pop", "typewriter"]).optional(), position: z.string().max(20).optional(), keep_under_headline: z.boolean().optional() }).nullable().optional(),
   logo_visible: z.boolean().optional(),
+  preview: z.boolean().optional(),
   logo_variant: z.enum(["auto", "light", "dark"]).nullable().optional(),
 });
 const docSchema = z.object({
