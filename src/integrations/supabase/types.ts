@@ -44,6 +44,24 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_report_prefs: {
+        Row: {
+          updated_at: string
+          user_id: string
+          weekly_email: boolean
+        }
+        Insert: {
+          updated_at?: string
+          user_id: string
+          weekly_email?: boolean
+        }
+        Update: {
+          updated_at?: string
+          user_id?: string
+          weekly_email?: boolean
+        }
+        Relationships: []
+      }
       assets: {
         Row: {
           created_at: string
@@ -342,6 +360,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      page_views: {
+        Row: {
+          created_at: string
+          device: string | null
+          id: string
+          path: string
+          referrer: string | null
+          session_id: string
+          utm_campaign: string | null
+          utm_medium: string | null
+          utm_source: string | null
+          visitor_id: string
+        }
+        Insert: {
+          created_at?: string
+          device?: string | null
+          id?: string
+          path: string
+          referrer?: string | null
+          session_id: string
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          visitor_id: string
+        }
+        Update: {
+          created_at?: string
+          device?: string | null
+          id?: string
+          path?: string
+          referrer?: string | null
+          session_id?: string
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          visitor_id?: string
+        }
+        Relationships: []
       }
       plans: {
         Row: {
