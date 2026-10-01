@@ -1,5 +1,8 @@
 export type ReelFormat = "916" | "11" | "169";
-export type ReelCategory = "fashion" | "food" | "beauty" | "home";
+/** Categories are free-text, managed from /admin/reels; known ones get nice labels. */
+export type ReelCategory = string;
+export const CATEGORY_LABEL: Record<string, string> = { fashion: "Fashion", food: "Food & drink", beauty: "Beauty", home: "Home" };
+export const categoryLabel = (c: string) => CATEGORY_LABEL[c] ?? c.replace(/[-_]/g, " ").replace(/\b\w/g, (m) => m.toUpperCase());
 
 /** A brand reel managed from /admin/reels; drives home, Examples and Showcase. */
 export type SiteReel = {

@@ -12,14 +12,12 @@ import { Button } from "@/components/ui/button";
 import type { GalleryExample } from "@/lib/site/examples";
 import { siteHead } from "@/lib/site/seo";
 import { listSiteReels } from "@/lib/site/reels.functions";
-import type { SiteReel } from "@/lib/site/reels";
+import { categoryLabel, type SiteReel } from "@/lib/site/reels";
 
 const reelToExample = (r: SiteReel): GalleryExample => ({ id: r.id, name: r.title, category: r.category, format: r.format, photos: r.photos, seconds: r.seconds, headline: r.title, sub: r.brand, logo: r.brand, video: r.video, ...(r.videoWebm ? { videoWebm: r.videoWebm } : {}), ...(r.poster ? { poster: r.poster } : {}), ...(r.href ? { href: r.href } : {}), frames: [] });
 
-const categories = [{ id: "all", label: "All" }, { id: "fashion", label: "Fashion" }, { id: "food", label: "Food & drink" }, { id: "beauty", label: "Beauty" }, { id: "home", label: "Home" }] as const;
 const formats = [{ id: "all", label: "All formats", short: "All" }, { id: "916", label: "9:16", short: "9:16" }, { id: "11", label: "1:1", short: "1:1" }, { id: "169", label: "16:9", short: "16:9" }] as const;
-const formatLabel = { "916": "9:16", "11": "1:1", "169": "16:9" } as const;
-const categoryLabel = { fashion: "Fashion", food: "Food & drink", beauty: "Beauty", home: "Home" } as const;
+const formatLabel: Record<string, string> = { "916": "9:16", "11": "1:1", "169": "16:9" };
 
 function GalleryReel({ example }: { example: GalleryExample }) {
   if (example.video) {
@@ -39,7 +37,7 @@ function GalleryReel({ example }: { example: GalleryExample }) {
 function GalleryCard({ example }: { example: GalleryExample }) {
   return <article className="examples-card">
     <div className="examples-card-media">{example.href ? <a className="site-reel-link" href={example.href} target="_blank" rel="noreferrer" aria-label={example.frames?.length ? undefined : `Visit ${example.logo ?? example.name}`}><GalleryReel example={example} /></a> : <GalleryReel example={example} />}</div>
-    <div className="examples-card-info"><div><h3>{example.name}</h3><p className="examples-card-meta-desktop">{categoryLabel[example.category]} · {formatLabel[example.format]} · {example.photos} photos · {example.seconds} sec</p><p className="examples-card-meta-mobile">{categoryLabel[example.category]} · {formatLabel[example.format]}</p></div>
+    <div className="examples-card-info"><div><h3>{example.name}</h3><p className="examples-card-meta-desktop">{categoryLabel(example.category)} · {formatLabel[example.format]} · {example.photos} photos · {example.seconds} sec</p><p className="examples-card-meta-mobile">{categoryLabel(example.category)} · {formatLabel[example.format]}</p></div>
     </div>
   </article>;
 }
@@ -54,11 +52,13 @@ export const Route = createFileRoute("/examples")({
 function ExamplesPage() {
   const search = Route.useSearch();
   const navigate = useNavigate({ from: "/examples" });
-  const cat = categories.some(c => c.id === search.cat) ? search.cat : undefined;
   const format = formats.some(f => f.id === String(search.format)) ? String(search.format) : undefined;
   const reels = Route.useLoaderData();
   // Only real brand reels from /admin/reels are shown.
   const all = reels.map(reelToExample);
+  // Category filters come from the reels themselves, so new admin categories appear here.
+  const categories = [{ id: "all", label: "All" }, ...[...new Set(all.map((e) => e.category))].map((c) => ({ id: c, label: categoryLabel(c) }))];
+  const cat = categories.some(c => c.id === search.cat) ? search.cat : undefined;
   const visible = all.filter(example => (!cat || example.category === cat) && (!format || example.format === format));
   return <SiteShell><div className="examples-page">
     <section className="examples-hero examples-container"><span className="site-eyebrow">Examples</span><div><h1>See what your<br />photos can become.</h1><p className="site-lede">Each example started with a few still photos. Choose a style you like and use it with your own products.</p></div></section>
