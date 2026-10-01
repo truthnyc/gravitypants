@@ -26,39 +26,23 @@ const candleFrames = ["#1F2937", "#8C2F2B", "#EBDDC6"].map((background, i) => ({
 }));
 
 function AuthVisual({ mode }: { mode: "signup" | "signin" }) {
-  if (mode === "signin") {
-    return <div className="auth-visual auth-hero" aria-hidden="true">
-      {[photo1, photo2, photo3].map((p, i) => <div key={p.url} className={`auth-hero-drop auth-hero-drop-${i + 1}`}><img src={p.url} alt="" /></div>)}
-      <div className="auth-hero-phone"><FeaturedAdVideo tapToggle /></div>
+  return <div className="auth-visual auth-hero" aria-hidden="true">
+    {[photo1, photo2, photo3].map((p, i) => <div key={p.url} className={`auth-hero-drop auth-hero-drop-${i + 1}`}><img src={p.url} alt="" /></div>)}
+    <div className="auth-hero-phone"><FeaturedAdVideo tapToggle /></div>
+    {mode === "signup" ? (
+      <div className="auth-hero-exported auth-hero-trial">
+        <span>Your free trial includes</span>
+        <div><span>3 exports</span><span>Every format</span></div>
+        <b><Check size={14} strokeWidth={2} /> Every feature, incl. brand kit</b>
+      </div>
+    ) : (
       <div className="auth-hero-exported">
         <span>Exported</span>
         <div><span>9:16</span><span>1:1</span><span>16:9</span></div>
         <b><Check size={14} strokeWidth={2} /> MP4 + GIF ready</b>
       </div>
-    </div>;
-  }
-  return (
-    <div className="auth-visual" aria-hidden="true">
-      <div className="auth-tiles">
-        <span className="auth-tile auth-tile-one"><img src="/site-art/candle-1.svg" alt="" /></span>
-        <span className="auth-tile auth-tile-two"><img src="/site-art/candle-2.svg" alt="" /></span>
-        <span className="auth-tile auth-tile-three"><img src="/site-art/candle-3.svg" alt="" /></span>
-        <svg className="auth-arrow" width="90" height="48" viewBox="0 0 90 48" fill="none">
-          <path d="M4 40 C 30 10, 55 8, 80 18" stroke="var(--site-primary)" strokeWidth="2.5" strokeDasharray="1 7" strokeLinecap="round" />
-          <path d="M72 10 L 82 18 L 71 24" stroke="var(--site-primary)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-        </svg>
-      </div>
-      <div className="auth-phone">
-        <ReelPhone size="medium" frames={candleFrames} headline={"Light up the\nlong nights."} subline="Winter scents · Shop now" />
-      </div>
-      <div className="auth-trial-card">
-        <b>Your free trial includes</b>
-        <span><Check size={15} strokeWidth={2.2} /> 7 days of Gravity Pants</span>
-        <span><Check size={15} strokeWidth={2.2} /> 3 exports in every format</span>
-        <span><Check size={15} strokeWidth={2.2} /> Every feature, including brand kit</span>
-      </div>
-    </div>
-  );
+    )}
+  </div>;
 }
 
 export function AuthShell({ eyebrow, title, subtitle, children, mode = "signup", beforeForm }: { eyebrow?: string; title: string; subtitle: string; children: ReactNode; mode?: "signup" | "signin"; beforeForm?: ReactNode }) {
