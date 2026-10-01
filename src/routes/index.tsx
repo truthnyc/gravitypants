@@ -30,13 +30,26 @@ export const Route = createFileRoute("/")({
     const head = siteHead({
       path: "/",
       title: "Gravity Pants – Turn Product Photos into Video Ads & GIFs",
-      description: "Turn product photos into short MP4 video ads and animated GIFs for Instagram, TikTok and Facebook in minutes. No editing skills needed. Start a free trial.",
+      description:
+        "Turn product photos into short MP4 video ads and animated GIFs for Instagram, TikTok and Facebook in minutes. No editing skills needed. Start a free trial.",
     });
     const jsonLd = {
       "@context": "https://schema.org",
       "@graph": [
-        { "@type": "Organization", "@id": `${SITE_ORIGIN}/#org`, name: "Gravity Pants", url: `${SITE_ORIGIN}/`, logo: `${SITE_ORIGIN}/apple-touch-icon.png`, email: "help@gravitypants.com" },
-        { "@type": "WebSite", name: "Gravity Pants", url: `${SITE_ORIGIN}/`, publisher: { "@id": `${SITE_ORIGIN}/#org` } },
+        {
+          "@type": "Organization",
+          "@id": `${SITE_ORIGIN}/#org`,
+          name: "Gravity Pants",
+          url: `${SITE_ORIGIN}/`,
+          logo: `${SITE_ORIGIN}/apple-touch-icon.png`,
+          email: "help@gravitypants.com",
+        },
+        {
+          "@type": "WebSite",
+          name: "Gravity Pants",
+          url: `${SITE_ORIGIN}/`,
+          publisher: { "@id": `${SITE_ORIGIN}/#org` },
+        },
         {
           "@type": "SoftwareApplication",
           name: "Gravity Pants",
@@ -268,13 +281,25 @@ function BeforeAfter({
         <div className="home-stills examples-featured-stills">
           <small>{imageLabel}</small>
           {stills.map((src, i) => (
-            <img key={src} src={src} alt={`${title} ${imageLabel === "Video frames" ? "video frame" : "original photo"} ${i + 1}`} loading="lazy" />
+            <img
+              key={src}
+              src={src}
+              alt={`${title} ${imageLabel === "Video frames" ? "video frame" : "original photo"} ${i + 1}`}
+              loading="lazy"
+            />
           ))}
         </div>
         <ArrowRight className="home-arrow" strokeWidth={1.7} />
         <div className="home-before-video examples-featured-phone">
           <small>Video ad</small>
-          <FeaturedAdVideo controls video={video} videoWebm={videoWebm} poster={poster} label={`${title} video ad`} format={format} />
+          <FeaturedAdVideo
+            controls
+            video={video}
+            videoWebm={videoWebm}
+            poster={poster}
+            label={`${title} video ad`}
+            format={format}
+          />
         </div>
       </div>
       <div className="home-before-caption">
@@ -738,11 +763,11 @@ function Home() {
           <div className="home-quote">
             <span className="home-quote-mark">“</span>
             <p>
-              "We used a few photos of our products and had a finished reel for Instagram in minutes. It looks like our
-              brand, not a template, and we didn't need a video editor to get there."
+              "A few product photos, and a finished Instagram reel in minutes. It looks like our brand, not a
+              template.""
             </p>
             <div className="home-person">
-              <span> </span>
+              <span>Purl Soho</span>
               <div>
                 <b> </b>
                 <small> </small>
