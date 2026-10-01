@@ -999,3 +999,7 @@ textarea.contact-input { resize: vertical; }
   .auth-hero-exported { padding: 8px 10px; font-size: 10px; gap: 4px; }
   .auth-hero-exported div span { padding: 2px 5px; }
 }
+.auth-hero-phone { width: auto; }
+.auth-hero-phone .site-phone { width: 300px; height: 600px; }
+@media (min-width: 960px) and (max-width: 1280px) { .auth-hero-phone .site-phone { width: 240px; height: 480px; } }
+@media (max-width: 959px) { .auth-hero-phone .site-phone { width: 130px; height: 260px; } .auth-hero-phone .site-phone-copy b { font-size: 14px; } .auth-hero-phone .site-phone-copy span { display: none; } }
