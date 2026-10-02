@@ -24,9 +24,11 @@ import jewelryFrame3 from "@/assets/site/fine-jewelry-frame-3.webp.asset.json";
 import { SITE_ORIGIN, siteHead } from "@/lib/site/seo";
 import { listSiteReels } from "@/lib/site/reels.functions";
 import { FORMAT_LABEL, type SiteReel } from "@/lib/site/reels";
+import { getHomepageContent } from "@/lib/site/homepage.functions";
+import { DEFAULT_CONTENT, featuredVideo, photoSrc } from "@/lib/site/homepage";
 
 export const Route = createFileRoute("/")({
-  head: () => {
+  head: ({ loaderData }) => {
     const head = siteHead({
       path: "/",
       title: "Turn Photos into Video Ads, Reels & GIFs – Gravity Pants",
@@ -65,11 +67,14 @@ export const Route = createFileRoute("/")({
     // Preload the hero reel's still frame so the largest element paints early.
     return {
       ...head,
-      links: [...(head.links ?? []), { rel: "preload", as: "image", href: heroPoster.url, type: "image/webp" }],
+      links: [...(head.links ?? []), { rel: "preload", as: "image", href: loaderData ? featuredVideo(loaderData.content.hero.reelId, loaderData.reels, 3).poster : heroPoster.url }],
       scripts: [{ type: "application/ld+json", children: JSON.stringify(jsonLd) }],
     };
   },
-  loader: () => listSiteReels().catch(() => [] as SiteReel[]),
+  loader: async () => {
+    const [reels, content] = await Promise.all([listSiteReels().catch(() => [] as SiteReel[]), getHomepageContent().catch(() => DEFAULT_CONTENT)]);
+    return { reels, content };
+  },
   component: Home,
 });
 
@@ -554,48 +559,41 @@ function FeatureArt({ art }: { art: string }) {
   );
 }
 function Home() {
-  const examples = homeExamples(Route.useLoaderData());
+  const { reels, content } = Route.useLoaderData();
+  const examples = homeExamples(reels);
+  const hero = content.hero;
+  const heroVideo = featuredVideo(hero.reelId, reels, 3);
   return (
     <SiteShell>
       <div className="home-page">
         <section id="top" className="home-hero home-section">
           <div className="home-hero-copy">
             <a className="home-announcement" href="#features">
-              Export MP4 and GIF together <span>See how it works</span>
+              {hero.announcement} {hero.announcementLink && <span>{hero.announcementLink}</span>}
             </a>
             <h1>
-              Photos in.
-              <br />
-              <span>Reels out.</span>
+              {hero.line1}
+              {hero.line2 && <><br /><span>{hero.line2}</span></>}
             </h1>
-            <p className="site-lede home-hero-lede">
-              Turn your photos into video ads, Reels and GIFs. Add a few images and Gravity Pants makes a short video
-              with your words, logo and colors, sized for Instagram, TikTok and Facebook.
-            </p>
+            <p className="site-lede home-hero-lede">{hero.lede}</p>
             <div className="home-actions">
               <Primary>
-                Make your first reel <ArrowRight size={18} strokeWidth={1.7} />
+                {hero.primary} <ArrowRight size={18} strokeWidth={1.7} />
               </Primary>
               <Secondary to="/examples">
-                <Play size={17} fill="currentColor" /> Watch examples
+                <Play size={17} fill="currentColor" /> {hero.secondary}
               </Secondary>
             </div>
-            <p className="home-note">
-              No editing skills needed. Your first reel is free, with no watermark, and takes just a few minutes.
-            </p>
+            {hero.note && <p className="home-note">{hero.note}</p>}
           </div>
           <div className="home-hero-visual" aria-hidden="true">
-            <div className="home-drop home-drop-one">
-              <img src={photo1.url} alt="Purl Soho Japanese Denim Cotton yarn product photo" />
-            </div>
-            <div className="home-drop home-drop-two">
-              <img src={photo2.url} alt="Purl Soho knitted denim cotton sweater photo" />
-            </div>
-            <div className="home-drop home-drop-three">
-              <img src={photo3.url} alt="Purl Soho denim cotton yarn skeins photo" />
-            </div>
+            {hero.photos.slice(0, 3).map((p, i) => (
+              <div key={i} className={`home-drop home-drop-${["one", "two", "three"][i]}`}>
+                <img src={photoSrc(p)} alt={p.alt} />
+              </div>
+            ))}
             <div className="home-hero-phone">
-              <FeaturedAdVideo tapToggle />
+              <FeaturedAdVideo tapToggle video={heroVideo.video} videoWebm={heroVideo.videoWebm} poster={heroVideo.poster} label={heroVideo.label} format={heroVideo.format} />
             </div>
             <div className="site-card home-exported">
               <span>Exported</span>
