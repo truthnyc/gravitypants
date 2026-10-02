@@ -720,7 +720,7 @@ function Home() {
             <BeforeAfter
               stills={[jewelryFrame1.url, jewelryFrame2.url, jewelryFrame3.url]}
               imageLabel="Video frames"
-              title="Fine Jewelry Gifts"
+              title="Gift Guide"
               detail="8 sec reel · Katherine Grover Fine Jewelry"
               video={jewelryVideo.url}
               videoWebm={jewelryWebm.url}
