@@ -113,6 +113,10 @@ function ReelForm({ initial, categories, onDone, onCancel }: { initial: Draft; c
       <label className="grid gap-1 text-[13px] text-secondary-text">Brand link
         <Input value={d.href} onChange={(e) => setD({ ...d, href: e.target.value })} placeholder="https://brand.com" inputMode="url" className="h-11 bg-card text-[15px] text-foreground" />
       </label>
+      <label className="grid gap-1 text-[13px] text-secondary-text">Photos used
+        <Input required type="number" min={1} max={50} step={1} value={d.photos} onChange={(e) => setD({ ...d, photos: Math.max(1, Math.round(Number(e.target.value) || 1)) })} className="h-11 bg-card text-[15px] text-foreground" />
+        <span>How many photos the reel was made from — shown on Examples.</span>
+      </label>
       <label className="grid gap-1 text-[13px] text-secondary-text">Category
         <Input required list="reel-categories" value={d.category} onChange={(e) => setD({ ...d, category: e.target.value })} placeholder="fashion" className="h-11 bg-card text-[15px] text-foreground" />
         <datalist id="reel-categories">
