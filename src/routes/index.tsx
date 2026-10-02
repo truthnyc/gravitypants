@@ -25,7 +25,7 @@ import { SITE_ORIGIN, siteHead } from "@/lib/site/seo";
 import { listSiteReels } from "@/lib/site/reels.functions";
 import { FORMAT_LABEL, type SiteReel } from "@/lib/site/reels";
 import { getHomepageContent } from "@/lib/site/homepage.functions";
-import { DEFAULT_CONTENT, featuredVideo, photoSrc } from "@/lib/site/homepage";
+import { DEFAULT_CONTENT, featuredVideo as pickVideo, photoSrc } from "@/lib/site/homepage";
 
 export const Route = createFileRoute("/")({
   head: ({ loaderData }) => {
@@ -67,7 +67,7 @@ export const Route = createFileRoute("/")({
     // Preload the hero reel's still frame so the largest element paints early.
     return {
       ...head,
-      links: [...(head.links ?? []), { rel: "preload", as: "image", href: loaderData ? featuredVideo(loaderData.content.hero.reelId, loaderData.reels, 3).poster : heroPoster.url }],
+      links: [...(head.links ?? []), { rel: "preload", as: "image", href: loaderData ? pickVideo(loaderData.content.hero.reelId, loaderData.reels, 3).poster : heroPoster.url }],
       scripts: [{ type: "application/ld+json", children: JSON.stringify(jsonLd) }],
     };
   },
@@ -562,7 +562,7 @@ function Home() {
   const { reels, content } = Route.useLoaderData();
   const examples = homeExamples(reels);
   const hero = content.hero;
-  const heroVideo = featuredVideo(hero.reelId, reels, 3);
+  const heroVideo = pickVideo(hero.reelId, reels, 3);
   return (
     <SiteShell>
       <div className="home-page">
