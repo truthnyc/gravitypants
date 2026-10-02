@@ -8,11 +8,12 @@ import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, X
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Card, fmtMoney, PageTitle } from "@/components/admin/AdminShell";
+import { newsletterStats } from "@/lib/site/newsletter-stats.functions";
 import { adminAnalytics, adminSearch, getReportPrefs, setReportPrefs } from "@/lib/stillframe/admin-analytics.functions";
 
-const TABS = ["traffic", "funnel", "search", "marketing", "revenue"] as const;
+const TABS = ["traffic", "funnel", "search", "marketing", "revenue", "newsletter"] as const;
 type Tab = (typeof TABS)[number];
-const LABEL: Record<Tab, string> = { traffic: "Traffic", funnel: "Funnel", search: "Google Search", marketing: "Marketing", revenue: "Revenue" };
+const LABEL: Record<Tab, string> = { traffic: "Traffic", funnel: "Funnel", search: "Google Search", marketing: "Marketing", revenue: "Revenue", newsletter: "Newsletter" };
 
 export const Route = createFileRoute("/_authenticated/admin/analytics")({
   validateSearch: (s) => z.object({ tab: z.enum(TABS).catch("traffic") }).parse(s),
@@ -47,7 +48,7 @@ function Analytics() {
   const [from, setFrom] = useState(ago(29));
   const [to, setTo] = useState(ago(0));
   const fn = useServerFn(adminAnalytics);
-  const { data, error } = useQuery({ queryKey: ["admin", "analytics", from, to], queryFn: () => fn({ data: { from, to } }), enabled: tab !== "search" });
+  const { data, error } = useQuery({ queryKey: ["admin", "analytics", from, to], queryFn: () => fn({ data: { from, to } }), enabled: tab !== "search" && tab !== "newsletter" });
 
   return (
     <>
@@ -59,7 +60,7 @@ function Analytics() {
               className={`h-8 rounded-lg px-3 text-[13px] font-medium ${tab === t ? "bg-card shadow-card" : "text-secondary-text"}`}>{LABEL[t]}</button>
           ))}
         </div>
-        {tab !== "search" && (
+        {tab !== "search" && tab !== "newsletter" && (
           <div className="flex flex-wrap items-center gap-2 sm:ml-auto">
             {[7, 30, 90].map((n) => (
               <button key={n} onClick={() => { setFrom(ago(n - 1)); setTo(ago(0)); }} className="h-8 rounded-lg px-3 text-[13px] text-primary hover:bg-control-fill">{n} days</button>
@@ -69,7 +70,7 @@ function Analytics() {
           </div>
         )}
       </div>
-      {tab === "search" ? <SearchTab /> : error ? <p className="text-destructive">Couldn't load analytics.</p> : !data ? <div aria-busy="true" className="h-96" /> : (
+      {tab === "search" ? <SearchTab /> : tab === "newsletter" ? <NewsletterTab /> : error ? <p className="text-destructive">Couldn't load analytics.</p> : !data ? <div aria-busy="true" className="h-96" /> : (
         <>
           {tab === "traffic" && (
             <>
@@ -232,6 +233,29 @@ function SearchTab() {
           </Card>
         ))}
       </div>
+    </>
+  );
+}
+
+function NewsletterTab() {
+  const fn = useServerFn(newsletterStats);
+  const { data, error } = useQuery({ queryKey: ["admin", "newsletter"], queryFn: () => fn(), staleTime: 300_000 });
+  if (error) return <p className="text-destructive">Couldn't load newsletter data.</p>;
+  if (!data) return <div aria-busy="true" className="h-96" />;
+  if (data.status !== "ok") return <Card><p className="text-[14px] text-secondary-text">{data.message}</p></Card>;
+  const total = data.confirmed + data.pending;
+  return (
+    <>
+      <p className="mb-3 text-[13px] text-secondary-text">Live from Campaign Monitor · all time</p>
+      <Stats items={[["Signed up", total], ["Confirmed", data.confirmed], ["Waiting to confirm", data.pending], ["Confirmation rate", pct(total ? data.confirmed / total : 0)]]} />
+      <div className="mt-4"><Stats items={[["New this week", data.week], ["New this month", data.month], ["Unsubscribed", data.unsubscribes], ["Bounced", data.bounces]]} /></div>
+      <Card className="mt-4 p-0">
+        <TableHead title="Automated emails (opens)" onCsv={() => csv("newsletter-emails", data.emails)} />
+        <Table cols={["Journey", "Email", "Sent", "Opened", "Open rate", "Clicked"]}
+          rows={data.emails.map((e) => [e.journey, e.name, e.sent, e.uniqueOpened, pct(e.sent ? e.uniqueOpened / e.sent : 0), e.clicked])}
+          empty="No automated emails yet. Set up a welcome journey in Campaign Monitor to track opens here." />
+        <p className="px-4 pb-4 text-[13px] text-secondary-text">Campaign Monitor doesn't report opens for its built-in confirmation email, so "Confirmed" (people who clicked the confirm link) is the closest measure.</p>
+      </Card>
     </>
   );
 }
