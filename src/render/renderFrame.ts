@@ -335,10 +335,25 @@ function drawPhoto(
     x = (W - dw) / 2;
     y = (H - dh) / 2;
   }
-  const b = Number(photo.brightness ?? 0);
-  if (b) ctx.filter = `brightness(${1 + b})`;
+  const b = clamp(Number(photo.brightness ?? 0) || 0, -1, 1);
   ctx.drawImage(img, x + pan, y + panV, dw, dh);
-  ctx.filter = "none";
+  // Brightness without ctx.filter (unsupported in Safari): result = img * (1 + b).
+  if (b) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(x + pan, y + panV, dw, dh);
+    ctx.clip();
+    if (b > 0) {
+      ctx.globalCompositeOperation = "lighter";
+      ctx.globalAlpha = b;
+      ctx.drawImage(img, x + pan, y + panV, dw, dh);
+    } else {
+      ctx.globalAlpha = -b;
+      ctx.fillStyle = "#000";
+      ctx.fillRect(x + pan, y + panV, dw, dh);
+    }
+    ctx.restore();
+  }
 }
 
 function drawText(ctx: CanvasRenderingContext2D, b: TextBlock, localT: number, H: number) {
