@@ -57,7 +57,7 @@ function TemplatesPage() {
       <h1 className="mt-2 text-[32px] font-bold leading-tight tracking-[-0.02em] sm:text-[40px]">Pick a cut.</h1>
       <div className="mt-3 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <p className="max-w-[520px] text-[15px] leading-relaxed text-secondary-text">
-          Each template comes pre-timed with matched transitions and type. The Product Launch Kit is designed to reuse across your whole catalog.
+          Each template comes pre-timed with matched transitions and type. Reuse any of them across all your photos.
         </p>
         <StepBar step={1} />
       </div>
