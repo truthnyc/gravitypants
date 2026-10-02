@@ -24,7 +24,9 @@ export const newsletterStats = createServerFn({ method: "GET" })
       ]);
       const emails: { journey: string; name: string; sent: number; opened: number; uniqueOpened: number; clicked: number }[] = [];
       try {
-        const clients = await get("clients.json");
+        // Only the Gravity Pants client's journeys — the API key covers every client in the account.
+        const clientId = process.env["CAMPAIGN_MONITOR_CLIENT_ID"];
+        const clients = clientId ? [{ ClientID: clientId }] : await get("clients.json");
         for (const c of clients) {
           const journeys = await get(`clients/${c.ClientID}/journeys.json`);
           for (const j of journeys) {
