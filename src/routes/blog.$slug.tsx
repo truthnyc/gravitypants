@@ -1,5 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { SiteShell } from "@/components/site/SiteShell";
+import { BlogVisual } from "@/components/site/BlogVisual";
 import { POSTS, postBySlug } from "@/lib/site/blog";
 import { SITE_OG_IMAGE, SITE_ORIGIN, siteHead } from "@/lib/site/seo";
 
@@ -69,6 +70,7 @@ function BlogPostPage() {
                 <p key={j} className="mt-4 text-[17px] leading-[1.6] text-site-secondary first:mt-0">{paragraph}</p>
               ))}
             </div>
+            {block.visual && <BlogVisual kind={block.visual} />}
           </section>
         ))}
       </article>

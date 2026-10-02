@@ -1,3 +1,4 @@
+import type { BlogVisualKind } from "@/components/site/BlogVisual";
 export type BlogPost = {
   slug: string;
   title: string;
@@ -7,7 +8,7 @@ export type BlogPost = {
   date: string;
   minutes: number;
   tag: string;
-  body: { h?: string; p: string[] }[];
+  body: { h?: string; p: string[]; visual?: BlogVisualKind }[];
 };
 
 export const POSTS: BlogPost[] = [
@@ -24,6 +25,7 @@ export const POSTS: BlogPost[] = [
           "You post a photo of today's special, a new arrival or a finished job. It does fine. Then another business posts a short reel of something similar and gets much more attention.",
           "The difference may be movement. A photo is easy to pass, while a moving image gives people another reason to stop and look.",
         ],
+        visual: "photo-vs-reel",
       },
       {
         h: "You don't need footage to get motion",
@@ -38,6 +40,7 @@ export const POSTS: BlogPost[] = [
           "Movement can catch someone's attention. Words explain what they are looking at. Using the same logo, colors and fonts helps them recognize your business the next time they see it.",
           "The same reel can be exported three ways: vertical for Reels, Stories and TikTok, square for feeds and wide for banners or YouTube.",
         ],
+        visual: "formats",
       },
     ],
   },
@@ -54,6 +57,7 @@ export const POSTS: BlogPost[] = [
         p: [
           "The hardest part of any ad isn't the editing. It's standing there with a phone, wondering what to shoot. Here's the rule we use: every subject gets three photos, shot in the same order, every time.",
         ],
+        visual: "three-shots",
       },
       {
         h: "1. The wide",
@@ -101,6 +105,7 @@ export const POSTS: BlogPost[] = [
           "Instead of starting with an empty timeline, you start with a reel that already plays. Your photos have movement and the words are in place. Tap the headline to rewrite it, tap a photo to replace it or tap the words to change how they move.",
           "You do not need to manage hidden tracks or keyframes. The brand kit also keeps your logo in a consistent place.",
         ],
+        visual: "timeline-vs-tap",
       },
       {
         h: "The brand does the remembering",

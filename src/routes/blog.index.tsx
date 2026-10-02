@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteShell } from "@/components/site/SiteShell";
+import { BlogCover } from "@/components/site/BlogVisual";
 import { POSTS } from "@/lib/site/blog";
 import { siteHead } from "@/lib/site/seo";
 
@@ -21,6 +22,7 @@ function BlogIndexPage() {
 
       <section className="mx-auto max-w-[1248px] px-5 pb-24 md:px-8 lg:px-16 xl:px-24">
         <Link to="/blog/$slug" params={{ slug: featured.slug }} className="block rounded-[24px] bg-site-panel p-8 transition-colors hover:bg-site-innerPanel md:p-14">
+          <BlogCover index={0} className="mb-8 aspect-[21/9]" />
           <p className="text-[13px] font-semibold uppercase tracking-[0.08em] text-site-eyebrow">{featured.tag}</p>
           <h2 className="mt-4 max-w-[720px] text-[28px] font-semibold leading-[1.15] tracking-[-0.02em] text-site-ink md:text-[44px] md:tracking-[-0.03em]">{featured.title}</h2>
           <p className="mt-4 max-w-[560px] text-[17px] leading-[1.5] text-site-secondary">{featured.dek}</p>
@@ -28,8 +30,9 @@ function BlogIndexPage() {
         </Link>
 
         <div className="mt-6 grid gap-4 md:grid-cols-2">
-          {rest.map((post) => (
+          {rest.map((post, i) => (
             <Link key={post.slug} to="/blog/$slug" params={{ slug: post.slug }} className="block rounded-[24px] bg-site-panel p-6 transition-colors hover:bg-site-innerPanel md:p-8">
+              <BlogCover index={i + 1} className="mb-6 aspect-[16/9]" />
               <p className="text-[13px] font-semibold uppercase tracking-[0.08em] text-site-eyebrow">{post.tag}</p>
               <h3 className="mt-3 text-[20px] font-semibold leading-[1.2] tracking-[-0.01em] text-site-ink">{post.title}</h3>
               <p className="mt-2 text-[15px] leading-[1.5] text-site-secondary">{post.dek}</p>
