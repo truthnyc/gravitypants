@@ -1,5 +1,5 @@
 import { useServerFn } from "@tanstack/react-start";
-import { Loader2, X } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useEffect, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
@@ -28,7 +28,7 @@ function useSubscribe(source: "popup" | "footer") {
   return { state, error, submit };
 }
 
-function Form({ source, dark }: { source: "popup" | "footer"; dark?: boolean }) {
+function Form({ source }: { source: "popup" | "footer" }) {
   const { state, error, submit } = useSubscribe(source);
   if (state === "done") return <p className="text-[14px] text-site-ink" role="status">Thanks! Check your inbox to confirm.</p>;
   return (
@@ -36,7 +36,7 @@ function Form({ source, dark }: { source: "popup" | "footer"; dark?: boolean }) 
       <div className="flex w-full gap-2">
         <label htmlFor={`nl-${source}`} className="sr-only">Email address</label>
         <input id={`nl-${source}`} name="email" type="email" required maxLength={255} autoComplete="email" placeholder="you@brand.com"
-          className={`h-11 min-w-0 flex-1 rounded-[4px] border border-site-line px-3 text-[15px] text-site-ink outline-none focus:border-site-primary ${dark ? "bg-site-page" : "bg-site-page"}`} />
+          className={`h-11 min-w-0 flex-1 rounded-[4px] border border-site-line px-3 text-[15px] text-site-ink outline-none focus:border-site-primary bg-site-page`} />
         <Button type="submit" variant="site" size="siteHeader" className="h-11" disabled={state === "busy"}>
           {state === "busy" ? <Loader2 size={16} strokeWidth={1.7} className="animate-spin" /> : "Subscribe"}
         </Button>
@@ -80,4 +80,3 @@ export function NewsletterPopup() {
   );
 }
 
-export { X };

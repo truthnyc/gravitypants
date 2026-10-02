@@ -25,7 +25,6 @@ export const subscribeNewsletter = createServerFn({ method: "POST" })
         Resubscribe: true,
         RestartSubscriptionBasedAutoresponders: true,
         ConsentToTrack: "Yes",
-        CustomFields: [{ Key: "Source", Value: data.source }],
       }),
     });
     if (!res.ok) {
