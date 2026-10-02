@@ -16,11 +16,13 @@ import { Route as BlogRouteImport } from './routes/blog'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ExamplesRouteImport } from './routes/examples'
 import { Route as FeaturesRouteImport } from './routes/features'
+import { Route as GalleryPatternsRouteImport } from './routes/gallery-patterns'
 import { Route as HelpRouteImport } from './routes/help'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ProductRouteImport } from './routes/product'
+import { Route as ProductCategoryRouteImport } from './routes/product-category'
 import { Route as ResetRouteImport } from './routes/reset'
 import { Route as ShowcaseRouteImport } from './routes/showcase'
 import { Route as SigninRouteImport } from './routes/signin'
@@ -31,7 +33,9 @@ import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAppRouteRouteImport } from './routes/_authenticated/app/route'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
+import { Route as GalleryPatternsSplatRouteImport } from './routes/gallery-patterns.$'
 import { Route as InviteTokenRouteImport } from './routes/invite.$token'
+import { Route as ProductCategorySplatRouteImport } from './routes/product-category.$'
 import { Route as ProductSplatRouteImport } from './routes/product.$'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedAdminAdminsRouteImport } from './routes/_authenticated/admin/admins'
@@ -100,6 +104,11 @@ const FeaturesRoute = FeaturesRouteImport.update({
   path: '/features',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GalleryPatternsRoute = GalleryPatternsRouteImport.update({
+  id: '/gallery-patterns',
+  path: '/gallery-patterns',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HelpRoute = HelpRouteImport.update({
   id: '/help',
   path: '/help',
@@ -123,6 +132,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const ProductRoute = ProductRouteImport.update({
   id: '/product',
   path: '/product',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductCategoryRoute = ProductCategoryRouteImport.update({
+  id: '/product-category',
+  path: '/product-category',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetRoute = ResetRouteImport.update({
@@ -175,10 +189,20 @@ const BlogSlugRoute = BlogSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => BlogRoute,
 } as any)
+const GalleryPatternsSplatRoute = GalleryPatternsSplatRouteImport.update({
+  id: '/$',
+  path: '/$',
+  getParentRoute: () => GalleryPatternsRoute,
+} as any)
 const InviteTokenRoute = InviteTokenRouteImport.update({
   id: '/invite/$token',
   path: '/invite/$token',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ProductCategorySplatRoute = ProductCategorySplatRouteImport.update({
+  id: '/$',
+  path: '/$',
+  getParentRoute: () => ProductCategoryRoute,
 } as any)
 const ProductSplatRoute = ProductSplatRouteImport.update({
   id: '/$',
@@ -371,11 +395,13 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/examples': typeof ExamplesRoute
   '/features': typeof FeaturesRoute
+  '/gallery-patterns': typeof GalleryPatternsRouteWithChildren
   '/help': typeof HelpRoute
   '/how-it-works': typeof HowItWorksRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/product': typeof ProductRouteWithChildren
+  '/product-category': typeof ProductCategoryRouteWithChildren
   '/reset': typeof ResetRoute
   '/showcase': typeof ShowcaseRoute
   '/signin': typeof SigninRoute
@@ -385,7 +411,9 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/app': typeof AuthenticatedAppRouteRouteWithChildren
   '/blog/$slug': typeof BlogSlugRoute
+  '/gallery-patterns/$': typeof GalleryPatternsSplatRoute
   '/invite/$token': typeof InviteTokenRoute
+  '/product-category/$': typeof ProductCategorySplatRoute
   '/product/$': typeof ProductSplatRoute
   '/blog/': typeof BlogIndexRoute
   '/admin/admins': typeof AuthenticatedAdminAdminsRoute
@@ -427,11 +455,13 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/examples': typeof ExamplesRoute
   '/features': typeof FeaturesRoute
+  '/gallery-patterns': typeof GalleryPatternsRouteWithChildren
   '/help': typeof HelpRoute
   '/how-it-works': typeof HowItWorksRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/product': typeof ProductRouteWithChildren
+  '/product-category': typeof ProductCategoryRouteWithChildren
   '/reset': typeof ResetRoute
   '/showcase': typeof ShowcaseRoute
   '/signin': typeof SigninRoute
@@ -439,7 +469,9 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/gallery-patterns/$': typeof GalleryPatternsSplatRoute
   '/invite/$token': typeof InviteTokenRoute
+  '/product-category/$': typeof ProductCategorySplatRoute
   '/product/$': typeof ProductSplatRoute
   '/blog': typeof BlogIndexRoute
   '/admin/admins': typeof AuthenticatedAdminAdminsRoute
@@ -484,11 +516,13 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/examples': typeof ExamplesRoute
   '/features': typeof FeaturesRoute
+  '/gallery-patterns': typeof GalleryPatternsRouteWithChildren
   '/help': typeof HelpRoute
   '/how-it-works': typeof HowItWorksRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/product': typeof ProductRouteWithChildren
+  '/product-category': typeof ProductCategoryRouteWithChildren
   '/reset': typeof ResetRoute
   '/showcase': typeof ShowcaseRoute
   '/signin': typeof SigninRoute
@@ -498,7 +532,9 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/app': typeof AuthenticatedAppRouteRouteWithChildren
   '/blog/$slug': typeof BlogSlugRoute
+  '/gallery-patterns/$': typeof GalleryPatternsSplatRoute
   '/invite/$token': typeof InviteTokenRoute
+  '/product-category/$': typeof ProductCategorySplatRoute
   '/product/$': typeof ProductSplatRoute
   '/blog/': typeof BlogIndexRoute
   '/_authenticated/admin/admins': typeof AuthenticatedAdminAdminsRoute
@@ -543,11 +579,13 @@ export interface FileRouteTypes {
     | '/contact'
     | '/examples'
     | '/features'
+    | '/gallery-patterns'
     | '/help'
     | '/how-it-works'
     | '/pricing'
     | '/privacy'
     | '/product'
+    | '/product-category'
     | '/reset'
     | '/showcase'
     | '/signin'
@@ -557,7 +595,9 @@ export interface FileRouteTypes {
     | '/admin'
     | '/app'
     | '/blog/$slug'
+    | '/gallery-patterns/$'
     | '/invite/$token'
+    | '/product-category/$'
     | '/product/$'
     | '/blog/'
     | '/admin/admins'
@@ -599,11 +639,13 @@ export interface FileRouteTypes {
     | '/contact'
     | '/examples'
     | '/features'
+    | '/gallery-patterns'
     | '/help'
     | '/how-it-works'
     | '/pricing'
     | '/privacy'
     | '/product'
+    | '/product-category'
     | '/reset'
     | '/showcase'
     | '/signin'
@@ -611,7 +653,9 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/blog/$slug'
+    | '/gallery-patterns/$'
     | '/invite/$token'
+    | '/product-category/$'
     | '/product/$'
     | '/blog'
     | '/admin/admins'
@@ -655,11 +699,13 @@ export interface FileRouteTypes {
     | '/contact'
     | '/examples'
     | '/features'
+    | '/gallery-patterns'
     | '/help'
     | '/how-it-works'
     | '/pricing'
     | '/privacy'
     | '/product'
+    | '/product-category'
     | '/reset'
     | '/showcase'
     | '/signin'
@@ -669,7 +715,9 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/app'
     | '/blog/$slug'
+    | '/gallery-patterns/$'
     | '/invite/$token'
+    | '/product-category/$'
     | '/product/$'
     | '/blog/'
     | '/_authenticated/admin/admins'
@@ -714,11 +762,13 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   ExamplesRoute: typeof ExamplesRoute
   FeaturesRoute: typeof FeaturesRoute
+  GalleryPatternsRoute: typeof GalleryPatternsRouteWithChildren
   HelpRoute: typeof HelpRoute
   HowItWorksRoute: typeof HowItWorksRoute
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
   ProductRoute: typeof ProductRouteWithChildren
+  ProductCategoryRoute: typeof ProductCategoryRouteWithChildren
   ResetRoute: typeof ResetRoute
   ShowcaseRoute: typeof ShowcaseRoute
   SigninRoute: typeof SigninRoute
@@ -786,6 +836,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FeaturesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/gallery-patterns': {
+      id: '/gallery-patterns'
+      path: '/gallery-patterns'
+      fullPath: '/gallery-patterns'
+      preLoaderRoute: typeof GalleryPatternsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/help': {
       id: '/help'
       path: '/help'
@@ -819,6 +876,13 @@ declare module '@tanstack/react-router' {
       path: '/product'
       fullPath: '/product'
       preLoaderRoute: typeof ProductRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/product-category': {
+      id: '/product-category'
+      path: '/product-category'
+      fullPath: '/product-category'
+      preLoaderRoute: typeof ProductCategoryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset': {
@@ -891,12 +955,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogSlugRouteImport
       parentRoute: typeof BlogRoute
     }
+    '/gallery-patterns/$': {
+      id: '/gallery-patterns/$'
+      path: '/$'
+      fullPath: '/gallery-patterns/$'
+      preLoaderRoute: typeof GalleryPatternsSplatRouteImport
+      parentRoute: typeof GalleryPatternsRoute
+    }
     '/invite/$token': {
       id: '/invite/$token'
       path: '/invite/$token'
       fullPath: '/invite/$token'
       preLoaderRoute: typeof InviteTokenRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/product-category/$': {
+      id: '/product-category/$'
+      path: '/$'
+      fullPath: '/product-category/$'
+      preLoaderRoute: typeof ProductCategorySplatRouteImport
+      parentRoute: typeof ProductCategoryRoute
     }
     '/product/$': {
       id: '/product/$'
@@ -1245,6 +1323,18 @@ const BlogRouteChildren: BlogRouteChildren = {
 
 const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
 
+interface GalleryPatternsRouteChildren {
+  GalleryPatternsSplatRoute: typeof GalleryPatternsSplatRoute
+}
+
+const GalleryPatternsRouteChildren: GalleryPatternsRouteChildren = {
+  GalleryPatternsSplatRoute: GalleryPatternsSplatRoute,
+}
+
+const GalleryPatternsRouteWithChildren = GalleryPatternsRoute._addFileChildren(
+  GalleryPatternsRouteChildren,
+)
+
 interface ProductRouteChildren {
   ProductSplatRoute: typeof ProductSplatRoute
 }
@@ -1256,6 +1346,18 @@ const ProductRouteChildren: ProductRouteChildren = {
 const ProductRouteWithChildren =
   ProductRoute._addFileChildren(ProductRouteChildren)
 
+interface ProductCategoryRouteChildren {
+  ProductCategorySplatRoute: typeof ProductCategorySplatRoute
+}
+
+const ProductCategoryRouteChildren: ProductCategoryRouteChildren = {
+  ProductCategorySplatRoute: ProductCategorySplatRoute,
+}
+
+const ProductCategoryRouteWithChildren = ProductCategoryRoute._addFileChildren(
+  ProductCategoryRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
@@ -1264,11 +1366,13 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   ExamplesRoute: ExamplesRoute,
   FeaturesRoute: FeaturesRoute,
+  GalleryPatternsRoute: GalleryPatternsRouteWithChildren,
   HelpRoute: HelpRoute,
   HowItWorksRoute: HowItWorksRoute,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
   ProductRoute: ProductRouteWithChildren,
+  ProductCategoryRoute: ProductCategoryRouteWithChildren,
   ResetRoute: ResetRoute,
   ShowcaseRoute: ShowcaseRoute,
   SigninRoute: SigninRoute,
