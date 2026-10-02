@@ -4,6 +4,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { GravityPantsLogo } from "@/components/GravityPantsLogo";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { FooterNewsletter, NewsletterPopup } from "@/components/site/Newsletter";
 
 const nav = [
   { label: "How it works", to: "/how-it-works" },
@@ -66,10 +67,11 @@ function SiteFooter() {
       <div className="max-w-[320px] shrink-0"><GravityPantsLogo size={28} showWordmark /><p className="mt-3 text-[14px] leading-normal text-site-muted">Turn the product photos you already have into short video ads.</p></div>
       <div className="grid flex-1 grid-cols-2 gap-6 sm:grid-cols-4">{columns.map((column) => <div key={column.label} className="flex flex-col gap-3 text-[14px]"><span className="font-semibold">{column.label}</span>{column.links.map((link) => link.mailto ? <a key={link.label} href={link.to} className="text-site-muted hover:text-site-primary">{link.label}</a> : <Link key={link.label} to={link.to as "/"} className="text-site-muted hover:text-site-primary">{link.label}</Link>)}</div>)}</div>
     </div>
-    <p className="mx-auto mt-12 max-w-[1248px] text-[13px] text-site-muted">© 2026 Gravity Pants. All rights reserved.</p>
+    <div className="mx-auto mt-12 max-w-[1248px] border-t border-site-line pt-8"><FooterNewsletter /></div>
+    <p className="mx-auto mt-10 max-w-[1248px] text-[13px] text-site-muted">© 2026 Gravity Pants. All rights reserved.</p>
   </footer>;
 }
 
 export function SiteShell({ children }: { children: ReactNode }) {
-  return <div className="flex min-h-dvh flex-col bg-site-page font-site text-site-ink"><SiteHeader /><main className="min-h-[48dvh] flex-1">{children}</main><SiteFooter /></div>;
+  return <div className="flex min-h-dvh flex-col bg-site-page font-site text-site-ink"><SiteHeader /><main className="min-h-[48dvh] flex-1">{children}</main><SiteFooter /><NewsletterPopup /></div>;
 }
