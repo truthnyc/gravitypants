@@ -32,7 +32,10 @@ export function templateProject(t: Template): ProjectWithFrames {
 
 /** The template preview with the customer's typed text and photos laid over it. */
 export function customizedProject(t: Template, values: CustomSlide[]): ProjectWithFrames {
-  const base = templateProject(t);
+  // Every slide (matches the form's indexes) and no stock sample photos.
+  const base = t.source === "system" && t.slides?.length
+    ? previewProject(docFromRow(t), { allSlides: true, samples: false })
+    : templateProject(t);
   const frames = base.frames.map((f, i) => {
     const v = values[i];
     if (!v) return f;
