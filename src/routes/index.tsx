@@ -711,7 +711,7 @@ function Home() {
           <div className="home-before-grid">
             <BeforeAfter
               stills={[photo1.url, photo2.url, photo3.url]}
-              title="Japanese Denim Cotton"
+              title="Launch Kit"
               detail="3 photos → 7.8 sec reel · Purl Soho"
               video={featuredVideo.url}
               videoWebm={featuredWebm.url}
@@ -720,7 +720,7 @@ function Home() {
             <BeforeAfter
               stills={[jewelryFrame1.url, jewelryFrame2.url, jewelryFrame3.url]}
               imageLabel="Video frames"
-              title="Fine Jewelry Gifts"
+              title="Gift Guide"
               detail="8 sec reel · Katherine Grover Fine Jewelry"
               video={jewelryVideo.url}
               videoWebm={jewelryWebm.url}
