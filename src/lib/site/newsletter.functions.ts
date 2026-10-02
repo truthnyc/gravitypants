@@ -11,8 +11,8 @@ const schema = z.object({
 export const subscribeNewsletter = createServerFn({ method: "POST" })
   .inputValidator((data) => schema.parse(data))
   .handler(async ({ data }) => {
-    const apiKey = process.env.CAMPAIGN_MONITOR_API_KEY;
-    const listId = process.env.CAMPAIGN_MONITOR_LIST_ID;
+    const apiKey = process.env['CAMPAIGN_MONITOR_API_KEY'];
+    const listId = process.env['CAMPAIGN_MONITOR_LIST_ID'];
     if (!apiKey || !listId) throw new Error("Subscriptions are not set up yet.");
     const res = await fetch(`https://api.createsend.com/api/v3.3/subscribers/${encodeURIComponent(listId)}.json`, {
       method: "POST",
