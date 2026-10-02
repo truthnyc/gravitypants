@@ -36,7 +36,7 @@
 - Public art uses `public/site-art`; the Purl Soho video uses shared `FeaturedAdVideo` and CDN pointers, keeping site media separate from private workspace assets.
 - Reusable kits: ads made from an `is_reusable` template store `projects.template_id`; `KitAgain.tsx` (useKit/KitAgainButton) drives the label, search and "Make another" (`/app/templates/$slug?from=<ad>` prefills text, no photos) from one place.
 - Staff role: `user_roles` (enum app_role, admin) checked via `has_role()`; `is_platform_admin()` wraps it; staff area at `/admin` (`_authenticated/admin/`) 404s non-admins — roles never live on profiles.
-- Website reels use private `site-reels` files with signed links. Project logos support light/dark artwork plus per-frame visibility and auto/light/dark selection; `renderAt` handles preview/export.
+- Website reels and homepage photos use private `site-reels` files with signed links; home banner/Example of the week live in `site_settings` with bundled defaults. Project logos support light/dark artwork plus per-frame visibility and auto/light/dark selection; `renderAt` handles preview/export.
 - Brand requests: /contact saves to `brand_requests` (anon insert only) and emails help@gravitypants.com via the `brand-request` template.
 - Free trial is usage-based (no time limit): SQL `export_status` returns `trial`, `watermark` (false only for the first export) and `clean_left`; the UI reads these flags, never `trial_ends_at`.
 
