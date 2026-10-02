@@ -181,8 +181,9 @@ export function settingsFromDoc(doc: TemplateDoc): TemplateSettings {
 }
 
 /** A throwaway project for drawing a doc through renderAt. Slides with preview:false are left out. */
-export function previewProject(doc: TemplateDoc): ProjectWithFrames {
-  const shown = doc.slides.filter((s) => s.preview !== false);
+/** `allSlides` keeps hidden slides; `samples: false` leaves photos empty (customer's own ad). */
+export function previewProject(doc: TemplateDoc, { allSlides = false, samples = true } = {}): ProjectWithFrames {
+  const shown = allSlides ? doc.slides : doc.slides.filter((s) => s.preview !== false);
   const previewDoc = shown.length === doc.slides.length ? doc : { ...doc, slides: shown.length ? shown : doc.slides };
   const now = new Date().toISOString();
   return {
@@ -199,7 +200,7 @@ export function previewProject(doc: TemplateDoc): ProjectWithFrames {
     thumbnail_url: null,
     created_at: now,
     updated_at: now,
-    frames: framesFromDoc(previewDoc, { samples: true }),
+    frames: framesFromDoc(previewDoc, { samples }),
   };
 }
 
