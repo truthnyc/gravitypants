@@ -3,7 +3,7 @@ import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { ReelVideo } from "@/components/site/ReelVideo";
 import { Button } from "@/components/ui/button";
-import { siteHead } from "@/lib/site/seo";
+import { SHOWCASE_OG_IMAGE, siteHead } from "@/lib/site/seo";
 import { listSiteReels } from "@/lib/site/reels.functions";
 import { FORMAT_LABEL, type SiteReel } from "@/lib/site/reels";
 
@@ -14,6 +14,7 @@ export const Route = createFileRoute("/showcase")({
       title: "Showcase — Brands on Gravity Pants",
       description:
         "Real video ads made with Gravity Pants by brands like Purl Soho, Aro, Agnona, Sachajuan and Katherine Grover.",
+      image: SHOWCASE_OG_IMAGE,
     }),
   loader: () => listSiteReels().catch(() => [] as SiteReel[]),
   component: Showcase,

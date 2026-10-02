@@ -3,6 +3,8 @@ export const SITE_ORIGIN = "https://gravitypants.com";
 export const SITE_NAME = "Gravity Pants";
 /** Absolute URL: social networks never resolve bundled or relative image paths. */
 export const SITE_OG_IMAGE = `${SITE_ORIGIN}/og-cover.jpg`;
+export const SHOWCASE_OG_IMAGE = `${SITE_ORIGIN}/og-showcase.jpg`;
+export const EXAMPLES_OG_IMAGE = `${SITE_ORIGIN}/og-examples.jpg`;
 
 type HeadInput = {
   /** Route path starting with a slash, e.g. "/pricing". */
