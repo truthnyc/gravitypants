@@ -29,9 +29,9 @@ export const Route = createFileRoute("/")({
   head: () => {
     const head = siteHead({
       path: "/",
-      title: "Video Ad Maker for Product Photos – Gravity Pants",
+      title: "Turn Photos into Video Ads, Reels & GIFs – Gravity Pants",
       description:
-        "Gravity Pants is a video ad maker that turns product photos into short MP4 video ads, Reels and GIFs for Instagram, TikTok and Facebook. No editing skills needed. Try it free.",
+        "Gravity Pants turns your photos into short video ads, Reels and GIFs for Instagram, TikTok and Facebook. No editing skills needed. Your first reel is free.",
     });
     const jsonLd = {
       "@context": "https://schema.org",
@@ -569,8 +569,8 @@ function Home() {
               <span>Reels out.</span>
             </h1>
             <p className="site-lede home-hero-lede">
-              Turn product photos into video ads and GIFs. Add a few photos and Gravity Pants makes a short ad with your
-              words, logo and colors. Download it in every size you need.
+              Turn your photos into video ads, Reels and GIFs. Add a few images and Gravity Pants makes a short video
+              with your words, logo and colors, sized for Instagram, TikTok and Facebook.
             </p>
             <div className="home-actions">
               <Primary>
@@ -581,9 +581,7 @@ function Home() {
               </Secondary>
             </div>
             <p className="home-note">
-              <span className="home-desktop-only">No video editing experience needed. </span>
-              <span className="home-mobile-only">No video editing needed. </span>No editing skills needed. Start free
-              and make your first reel in the next few minutes. Your first reel is free, with no watermark.
+              No editing skills needed. Your first reel is free, with no watermark, and takes just a few minutes.
             </p>
           </div>
           <div className="home-hero-visual" aria-hidden="true">
