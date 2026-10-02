@@ -8,6 +8,30 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { rememberSignupChoice } from "@/lib/stillframe/signup-choice";
 import { PLANS } from "@/lib/stillframe/plans-config";
+import { useExportStatus } from "@/lib/stillframe/billing";
+import { Check, X } from "lucide-react";
+
+// Shown once after signup: presents the usage-based trial (no clock) as something the user just unlocked.
+function TrialUnlocked({ onClose }: { onClose: () => void }) {
+  const { data: s } = useExportStatus();
+  const total = s?.trial ? (s.limit ?? 3) : 3;
+  const left = s?.trial && s.limit != null ? Math.max(0, s.limit - (s.used ?? 0)) : total;
+  return (
+    <section role="status" className="relative mb-5 rounded-sm bg-card px-5 py-5 shadow-card">
+      <button type="button" onClick={onClose} aria-label="Close" className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full text-secondary-text">
+        <X size={18} strokeWidth={1.7} />
+      </button>
+      <p className="text-[13px] font-semibold uppercase tracking-[0.06em] text-link">Free trial unlocked</p>
+      <h2 className="mt-1 text-[22px] font-bold tracking-[-0.02em]">You've earned <span className="tabular-nums">{left}</span> free exports</h2>
+      <ul className="mt-3 grid gap-1.5 text-[15px] text-secondary-text sm:grid-cols-3">
+        <li className="flex items-center gap-2"><Check size={16} strokeWidth={1.7} className="text-link" />First export with no watermark</li>
+        <li className="flex items-center gap-2"><Check size={16} strokeWidth={1.7} className="text-link" />Every format and feature</li>
+        <li className="flex items-center gap-2"><Check size={16} strokeWidth={1.7} className="text-link" />No time limit, no card</li>
+      </ul>
+      <p className="mt-3 text-[15px] font-medium">Drop in your first photos to start.</p>
+    </section>
+  );
+}
 
 export const Route = createFileRoute("/_authenticated/app/ads")({
   validateSearch: z.object({ welcome: z.string().optional(), template: z.string().optional(), plan: z.string().optional(), billing: z.string().optional() }),
@@ -69,7 +93,7 @@ function YourAds() {
 
   return (
     <main className="px-4 py-7 sm:px-8 sm:py-10 lg:px-16">
-      {welcome && <p role="status" className="mb-5 rounded-sm bg-card px-5 py-4 text-[16px] font-medium">Welcome to Gravity Pants. Drop in your first photos.</p>}
+      {welcome && <TrialUnlocked onClose={() => setWelcome(false)} />}
       <div className="mb-6 flex items-end justify-between lg:mb-4 lg:justify-end">
         <h1 className="text-[36px] font-bold leading-none lg:hidden">Your ads</h1>
         <Link to="/app/templates" className="flex h-11 items-center text-[14px] font-medium text-link">Templates</Link>
