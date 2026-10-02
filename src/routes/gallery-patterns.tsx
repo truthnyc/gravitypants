@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { goneHandlers } from "@/lib/site/gone";
 
-/** Permanently removed page: real HTTP 410 Gone, never a redirect or 404. */
-export const Route = createFileRoute("/product")({
+/** Old WordPress gallery index: real HTTP 410 Gone. */
+export const Route = createFileRoute("/gallery-patterns")({
   server: { handlers: goneHandlers },
 });
