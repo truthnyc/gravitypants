@@ -299,6 +299,5 @@ export const reviewDirectoryReel = createServerFn({ method: "POST" })
       const { error } = await sb.from("directory_reels").update({ status: "hidden" }).eq("id", data.id);
       if (error) throw new Error(error.message);
     }
-    await sb.from("admin_audit_log").insert({ admin_user_id: context.userId, action: `directory.${data.action}`, target: data.id });
     return { ok: true };
   });
