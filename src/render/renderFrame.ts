@@ -133,6 +133,9 @@ export type TextBlock = Box & {
   font: string;
   color: string;
   animation: NonNullable<TextSettings["animation"]>;
+  spacingPx: number;
+  /** Set when the block is an image (subline badge) instead of text. */
+  image?: string;
 };
 export type FrameLayout = {
   safe: Rect;
@@ -175,12 +178,21 @@ function measure(
 ) {
   const fontPx = ((t.size_px ?? defaults.size) * W) / 1080;
   const font = fontString(t, fontPx, defaults.weight);
+  const spacingPx = ((t.letter_spacing ?? 0) / 100) * fontPx;
   ctx.font = font;
+  setSpacing(ctx, spacingPx);
   const maxW = Math.min(W * 0.84, safe.w);
   const lines = wrap(ctx, t.text ?? "", maxW);
-  const width = Math.min(maxW, Math.max(1, ...lines.map((l) => ctx.measureText(l).width)));
-  const lineH = fontPx * defaults.lineH;
-  return { fontPx, font, lines, w: width, h: lines.length * lineH, lineH };
+  // measureText includes trailing tracking after the last glyph; drop it.
+  const width = Math.min(maxW, Math.max(1, ...lines.map((l) => ctx.measureText(l).width - spacingPx)));
+  setSpacing(ctx, 0);
+  const lineH = fontPx * (t.line_height ?? defaults.lineH);
+  return { fontPx, font, lines, w: width, h: lines.length * lineH, lineH, spacingPx };
+}
+
+function setSpacing(ctx: CanvasRenderingContext2D, px: number) {
+  const c = ctx as CanvasRenderingContext2D & { letterSpacing?: string };
+  if ("letterSpacing" in c) c.letterSpacing = `${px}px`;
 }
 
 function place(col: number, row: number, w: number, h: number, safe: Rect) {
@@ -220,9 +232,17 @@ export function layoutFrame(
   if (!frame) return result;
 
   const h = frame.headline?.text?.trim() ? frame.headline : null;
-  const s = frame.subline?.text?.trim() ? frame.subline : null;
+  const sub = frame.subline;
+  const subImage = sub?.mode === "image" && sub.image_path ? sub.image_path : null;
+  const s = subImage || (sub?.mode !== "image" && sub?.text?.trim()) ? sub : null;
   const hm = h ? measure(ctx, h, W, safe, { size: 108, weight: 700, lineH: 1.08 }) : null;
-  const sm = s ? measure(ctx, s, W, safe, { size: 48, weight: 500, lineH: 1.25 }) : null;
+  let sm = s && !subImage ? measure(ctx, s, W, safe, { size: 48, weight: 500, lineH: 1.25 }) : null;
+  if (s && subImage) {
+    const img = images?.get(subImage);
+    const w = Math.min(safe.w, ((s.image_size_pct ?? 30) / 100) * W);
+    const ratio = img && img.naturalWidth ? img.naturalHeight / img.naturalWidth : 0.4;
+    sm = { fontPx: W * 0.044, font: "", lines: [], w, h: w * ratio, lineH: 0, spacingPx: 0 };
+  }
 
   const block = (
     t: TextSettings,
@@ -239,9 +259,11 @@ export function layoutFrame(
     fontPx: m.fontPx,
     lineH: m.lineH,
     font: m.font,
+    spacingPx: m.spacingPx,
     align: ALIGN[col] ?? "center",
     color: t.color ?? "#FFFFFF",
     animation: t.animation ?? "none",
+    ...(t === s && subImage ? { image: subImage } : {}),
   });
 
   if (h && hm) {
@@ -357,7 +379,7 @@ function drawPhoto(
   }
 }
 
-function drawText(ctx: CanvasRenderingContext2D, b: TextBlock, localT: number, H: number) {
+function drawText(ctx: CanvasRenderingContext2D, b: TextBlock, localT: number, H: number, images?: Map<string, HTMLImageElement>) {
   const p = clamp(localT / 0.5);
   const e = easeOut(p);
   ctx.save();
@@ -365,7 +387,7 @@ function drawText(ctx: CanvasRenderingContext2D, b: TextBlock, localT: number, H
   if (b.animation === "rise") {
     alpha = e;
     ctx.translate(0, (1 - e) * 0.04 * H);
-  } else if (b.animation === "fade") alpha = e;
+  } else if (b.animation === "fade" || (b.image && b.animation === "typewriter")) alpha = e;
   else if (b.animation === "pop") {
     alpha = e;
     const cx = b.x + b.w / 2;
@@ -376,7 +398,14 @@ function drawText(ctx: CanvasRenderingContext2D, b: TextBlock, localT: number, H
     ctx.translate(-cx, -cy);
   }
   ctx.globalAlpha *= alpha;
+  if (b.image) {
+    const img = images?.get(b.image);
+    if (img && img.naturalWidth) ctx.drawImage(img, b.x, b.y, b.w, b.h);
+    ctx.restore();
+    return;
+  }
   ctx.font = b.font;
+  setSpacing(ctx, b.spacingPx);
   ctx.fillStyle = b.color;
   ctx.textAlign = b.align;
   ctx.textBaseline = "alphabetic";
@@ -386,7 +415,9 @@ function drawText(ctx: CanvasRenderingContext2D, b: TextBlock, localT: number, H
     const total = b.lines.reduce((n, l) => n + l.length, 0);
     remaining = Math.floor(p * total);
   }
-  const ax = b.align === "left" ? b.x : b.align === "right" ? b.x + b.w : b.x + b.w / 2;
+  // Canvas adds tracking after every glyph (including the last); shift so alignment stays optical.
+  const trail = b.spacingPx;
+  const ax = b.align === "left" ? b.x : b.align === "right" ? b.x + b.w + trail : b.x + b.w / 2 + trail / 2;
   b.lines.forEach((line, i) => {
     if (remaining <= 0) return;
     const shown = line.slice(0, remaining);
@@ -394,6 +425,7 @@ function drawText(ctx: CanvasRenderingContext2D, b: TextBlock, localT: number, H
     const baseline = b.y + i * b.lineH + b.lineH * 0.5 + b.fontPx * 0.35;
     ctx.fillText(shown, ax, baseline);
   });
+  setSpacing(ctx, 0);
   ctx.restore();
 }
 
@@ -462,7 +494,7 @@ function drawFrame(
     }
   }
 
-  for (const t of texts) drawText(ctx, t, localT, H);
+  for (const t of texts) drawText(ctx, t, localT, H, images);
 }
 
 /** Draws exactly what the viewer sees at timeSec. Pure: the same call serves preview and export. */
@@ -659,6 +691,7 @@ export async function ensureFonts(frames: Frame[], brand?: BrandStyle) {
 export function mediaPaths(project: Project, frames: Frame[]) {
   const paths = new Set<string>();
   for (const f of frames) if (f.photo?.path) paths.add(f.photo.path);
+  for (const f of frames) if (f.subline?.mode === "image" && f.subline.image_path) paths.add(f.subline.image_path);
   for (const p of [project.logo.path, project.logo.light_path, project.logo.dark_path])
     if (p) paths.add(p);
   return [...paths];
