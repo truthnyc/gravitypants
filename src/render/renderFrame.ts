@@ -345,10 +345,11 @@ function drawPhoto(
     ctx.clip();
     if (b > 0) {
       ctx.globalCompositeOperation = "lighter";
-      ctx.globalAlpha = b;
+      // Multiply so the overlay also respects a transition's fade alpha.
+      ctx.globalAlpha *= b;
       ctx.drawImage(img, x + pan, y + panV, dw, dh);
     } else {
-      ctx.globalAlpha = -b;
+      ctx.globalAlpha *= -b;
       ctx.fillStyle = "#000";
       ctx.fillRect(x + pan, y + panV, dw, dh);
     }
