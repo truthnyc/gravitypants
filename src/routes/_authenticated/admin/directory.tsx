@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { adminSaveBrandSlug, listDirectoryBrands, listDirectoryReview, resolveReport, reviewDirectoryReel } from "@/lib/directory/directory.functions";
+import { adminBrandDetail, adminRenameReel, adminSaveBrand, adminSaveBrandSlug, setBrandLogo, listDirectoryBrands, listDirectoryReview, resolveReport, reviewDirectoryReel } from "@/lib/directory/directory.functions";
 import { CATEGORIES, MOODS, STATUS_LABEL, type Category } from "@/lib/directory/directory";
 import { cn } from "@/lib/utils";
 
@@ -99,6 +99,7 @@ function BrandAddresses() {
   const qc = useQueryClient();
   const q = useQuery({ queryKey: ["admin", "directory-brands"], queryFn: () => list() });
   const [editing, setEditing] = useState<string | null>(null);
+  const [open, setOpen] = useState<string | null>(null);
   const [value, setValue] = useState("");
   const [busy, setBusy] = useState(false);
   const brands = q.data ?? [];
@@ -117,13 +118,14 @@ function BrandAddresses() {
   };
   return (
     <section>
-      <h2 className="mb-1 text-[15px] font-semibold">Brand page addresses</h2>
-      <p className="mb-3 text-[13px] text-secondary-text">Every brand's Directory address. Changing one keeps the old address redirecting for 12 months.</p>
+      <h2 className="mb-1 text-[15px] font-semibold nums">Brand pages · {brands.length}</h2>
+      <p className="mb-3 text-[13px] text-secondary-text">Every brand page, approved or not. Open Manage to edit its details, logo and reels. Changing an address keeps the old one redirecting for 12 months.</p>
       <table className="w-full text-left text-[13px]">
         <thead><tr className="text-secondary-text"><th className="py-1.5">Brand</th><th>Workspace</th><th>Address</th><th /></tr></thead>
         <tbody>
           {brands.map((b) => (
-            <tr key={b.id} className="border-t">
+            <Fragment key={b.id}>
+            <tr className="border-t">
               <td className="py-2 font-medium">{b.name}{!b.approved && <span className="ml-1.5 font-normal text-secondary-text">(not approved yet)</span>}</td>
               <td className="text-secondary-text">{b.workspace ?? "—"}</td>
               <td>
@@ -139,8 +141,11 @@ function BrandAddresses() {
               </td>
               <td className="py-1.5 text-right">
                 {editing !== b.id && <Button size="sm" variant="plain" onClick={() => startEdit(b.id, b.slug)}>Change address</Button>}
+                <Button size="sm" variant="plain" onClick={() => setOpen(open === b.id ? null : b.id)}>{open === b.id ? "Close" : "Manage"}</Button>
               </td>
             </tr>
+            {open === b.id && <tr><td colSpan={4} className="pb-4"><BrandPanel brandId={b.id} onChanged={() => void qc.invalidateQueries({ queryKey: ["admin", "directory-brands"] })} /></td></tr>}
+            </Fragment>
           ))}
           {!brands.length && <tr className="border-t"><td colSpan={4} className="py-3 text-secondary-text">No brands yet.</td></tr>}
         </tbody>
@@ -183,6 +188,119 @@ function ReviewCard({ r, act }: { r: Row; act: (a: Act, msg: string) => Promise<
           {rejecting
             ? <Button size="sm" variant="plain" disabled={!reason.trim()} onClick={() => void act({ id: r.id, action: "reject", reason }, "Not approved. The brand was emailed the reason.")}>Send rejection</Button>
             : <Button size="sm" variant="plain" onClick={() => setRejecting(true)}>Reject</Button>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const field = "h-8 w-full rounded-sm bg-control-fill px-2 text-[13px]";
+
+function BrandPanel({ brandId, onChanged }: { brandId: string; onChanged: () => void }) {
+  const load = useServerFn(adminBrandDetail);
+  const qc = useQueryClient();
+  const key = ["admin", "directory-brand", brandId];
+  const q = useQuery({ queryKey: key, queryFn: () => load({ data: { brandId } }) });
+  const refresh = () => { void qc.invalidateQueries({ queryKey: key }); void qc.invalidateQueries({ queryKey: ["admin", "directory"] }); onChanged(); };
+  if (q.isLoading) return <div className="h-32 rounded-sm bg-control-fill" aria-busy="true" />;
+  if (!q.data) return <p className="text-secondary-text">Couldn't load this brand.</p>;
+  const d = q.data;
+  return (
+    <div className="space-y-4 rounded-sm bg-card p-4 shadow-card">
+      <BrandForm key={JSON.stringify(d.brand)} b={d.brand} onSaved={refresh} />
+      <div>
+        <div className="mb-2 font-semibold nums">Reels · {d.reels.length}</div>
+        <div className="space-y-2">
+          {d.reels.map((r) => <AdminReel key={r.id} r={r} onChanged={refresh} />)}
+          {!d.reels.length && <p className="text-secondary-text">No reels shared yet.</p>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+type Detail = Awaited<ReturnType<typeof adminBrandDetail>>;
+
+function BrandForm({ b, onSaved }: { b: Detail["brand"]; onSaved: () => void }) {
+  const save = useServerFn(adminSaveBrand);
+  const logo = useServerFn(setBrandLogo);
+  const [f, setF] = useState({ name: b.name, website: b.website, category: b.category as Category, description: b.description });
+  const [busy, setBusy] = useState(false);
+  const run = async (fn: () => Promise<unknown>, msg: string) => {
+    setBusy(true);
+    try { await fn(); toast.success(msg); onSaved(); } catch (e) { toast.error(e instanceof Error ? e.message : "That didn't work"); } finally { setBusy(false); }
+  };
+  const upload = (file: File) => run(async () => {
+    if (file.size > 2_000_000) throw new Error("Use a logo under 2 MB");
+    const buf = new Uint8Array(await file.arrayBuffer());
+    let bin = "";
+    for (let i = 0; i < buf.length; i += 0x8000) bin += String.fromCharCode(...buf.subarray(i, i + 0x8000));
+    await logo({ data: { brandId: b.id, file: { base64: btoa(bin), type: file.type as "image/png" } } });
+  }, "Logo updated");
+  return (
+    <div className="flex flex-col gap-4 sm:flex-row">
+      <div className="flex shrink-0 flex-col items-center gap-2">
+        <div className="flex size-24 items-center justify-center overflow-hidden rounded-sm bg-control-fill text-[24px] font-semibold text-secondary-text">
+          {b.logo ? <img src={b.logo} alt={`${b.name} logo`} className="size-full object-contain" /> : b.name.slice(0, 1).toUpperCase()}
+        </div>
+        <label className="cursor-pointer text-[12px] text-link">
+          {b.logo ? "Replace logo" : "Upload logo"}
+          <input type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" className="sr-only" disabled={busy} onChange={(e) => { const x = e.target.files?.[0]; e.target.value = ""; if (x) void upload(x); }} />
+        </label>
+        {b.logo && <button type="button" disabled={busy} className="text-[12px] text-secondary-text" onClick={() => void run(() => logo({ data: { brandId: b.id, file: null } }), "Logo removed")}>Remove</button>}
+      </div>
+      <div className="grid flex-1 gap-2 sm:grid-cols-2">
+        <label className="space-y-1"><span className="text-[12px] text-secondary-text">Brand name</span><input value={f.name} maxLength={80} onChange={(e) => setF({ ...f, name: e.target.value })} className={field} /></label>
+        <label className="space-y-1"><span className="text-[12px] text-secondary-text">Website</span><input value={f.website} maxLength={200} placeholder="https://" onChange={(e) => setF({ ...f, website: e.target.value })} className={field} /></label>
+        <label className="space-y-1"><span className="text-[12px] text-secondary-text">Category</span><select value={f.category} onChange={(e) => setF({ ...f, category: e.target.value as Category })} className={field}>{CATEGORIES.map((c) => <option key={c}>{c}</option>)}</select></label>
+        <div className="space-y-1 text-[12px] text-secondary-text">
+          <div>Status: {b.approved ? `Approved ${new Date(b.approved).toLocaleDateString()}` : "Not approved yet"}</div>
+          {b.planEnded && <div>Plan ended {new Date(b.planEnded).toLocaleDateString()}</div>}
+          <a href={`/directory/${b.slug}`} target="_blank" rel="noreferrer" className="text-link">View brand page</a>
+        </div>
+        <label className="space-y-1 sm:col-span-2"><span className="text-[12px] text-secondary-text">Description</span><textarea value={f.description} maxLength={500} rows={2} onChange={(e) => setF({ ...f, description: e.target.value })} className="w-full rounded-sm bg-control-fill px-2 py-1.5 text-[13px]" /></label>
+        <div className="sm:col-span-2"><Button size="sm" disabled={busy || !f.name.trim()} onClick={() => void run(() => save({ data: { brandId: b.id, ...f } }), "Brand page saved")}>Save details</Button></div>
+      </div>
+    </div>
+  );
+}
+
+function AdminReel({ r, onChanged }: { r: Detail["reels"][number]; onChanged: () => void }) {
+  const rename = useServerFn(adminRenameReel);
+  const review = useServerFn(reviewDirectoryReel);
+  const [title, setTitle] = useState(r.title);
+  const [tags, setTags] = useState(r.tags.join(", "));
+  const [moods, setMoods] = useState<string[]>(r.moods);
+  const [busy, setBusy] = useState(false);
+  const run = async (fn: () => Promise<unknown>, msg: string) => {
+    setBusy(true);
+    try { await fn(); toast.success(msg); onChanged(); } catch (e) { toast.error(e instanceof Error ? e.message : "That didn't work"); } finally { setBusy(false); }
+  };
+  const save = () => run(async () => {
+    if (title.trim() && title.trim() !== r.title) await rename({ data: { reelId: r.id, title: title.trim() } });
+    await review({ data: { id: r.id, action: "edit", tags: tags.split(",").map((t) => t.trim()).filter(Boolean), moods: moods as (typeof MOODS)[number][] } });
+  }, "Reel saved");
+  return (
+    <div className="flex gap-3 rounded-sm border border-border p-3">
+      <div className="size-20 shrink-0 overflow-hidden rounded-sm bg-control-fill">{r.poster && <img src={r.poster} alt="" className="size-full object-contain" />}</div>
+      <div className="min-w-0 flex-1 space-y-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <input value={title} maxLength={80} onChange={(e) => setTitle(e.target.value)} aria-label="Reel title" className={cn(field, "max-w-[280px] font-medium")} />
+          <span className="text-secondary-text">{STATUS_LABEL[r.status]}{r.note ? ` · ${r.note}` : ""}</span>
+          <span className="text-secondary-text">Ad: {r.ad}{r.formats.length ? ` · ${r.formats.join(", ")}` : ""}</span>
+        </div>
+        <input value={tags} onChange={(e) => setTags(e.target.value)} aria-label="Tags" placeholder="Tags, comma separated" className={field} />
+        <div className="flex flex-wrap gap-1">
+          {MOODS.map((m) => {
+            const on = moods.includes(m);
+            return <button key={m} type="button" disabled={!on && moods.length >= 3} onClick={() => setMoods(on ? moods.filter((x) => x !== m) : [...moods, m])} className={cn("rounded-lg border px-2 py-0.5 text-[12px] disabled:opacity-40", on ? "border-primary text-primary" : "border-border")}>{m}</button>;
+          })}
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Button size="sm" disabled={busy} onClick={() => void save()}>Save reel</Button>
+          {r.status === "in_review" && <Button size="sm" variant="plain" disabled={busy} onClick={() => void run(() => review({ data: { id: r.id, action: "approve" } }), "Approved")}>Approve</Button>}
+          {r.status === "live" && <Button size="sm" variant="plain" disabled={busy} onClick={() => void run(() => review({ data: { id: r.id, action: "review" } }), "Pulled back into review")}>Pull back into review</Button>}
+          {r.status === "live" && <Button size="sm" variant="plain" disabled={busy} onClick={() => void run(() => review({ data: { id: r.id, action: "hide" } }), "Hidden")}>Hide</Button>}
         </div>
       </div>
     </div>
