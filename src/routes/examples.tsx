@@ -1,7 +1,7 @@
 import { ReelVideo } from "@/components/site/ReelVideo";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { FeaturedAdVideo } from "@/components/site/FeaturedAdVideo";
 import { GravityPantsLogo } from "@/components/GravityPantsLogo";
@@ -36,7 +36,7 @@ function GalleryReel({ example }: { example: GalleryExample }) {
 function GalleryCard({ example }: { example: GalleryExample }) {
   return <article className="examples-card">
     <div className="examples-card-media">{example.href ? <a className="site-reel-link" href={example.href} target="_blank" rel="noreferrer" aria-label={example.frames?.length ? undefined : `Visit ${example.logo ?? example.name}`}><GalleryReel example={example} /></a> : <GalleryReel example={example} />}</div>
-    <div className="examples-card-info"><div><h3>{example.name}</h3><p className="examples-card-meta-desktop">{categoryLabel(example.category)} · {formatLabel[example.format]} · {example.photos} photos · {example.seconds} sec</p><p className="examples-card-meta-mobile">{categoryLabel(example.category)} · {formatLabel[example.format]}</p></div>
+    <div className="examples-card-info"><div><h3>{example.name}</h3><p className="examples-card-meta-desktop">{categoryLabel(example.category)} · {formatLabel[example.format]} · {example.photos} photos · {example.seconds} sec</p><p className="examples-card-meta-mobile">{categoryLabel(example.category)} · {formatLabel[example.format]}</p>{example.href && <a className="showcase-visit" href={example.href} target="_blank" rel="noreferrer">Visit {example.logo ?? example.name} <ArrowUpRight size={13} strokeWidth={1.7} /></a>}</div>
     </div>
   </article>;
 }

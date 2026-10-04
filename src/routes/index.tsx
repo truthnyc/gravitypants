@@ -3,7 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { ReelVideo } from "@/components/site/ReelVideo";
 
-import { ArrowRight, Check, Play } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Check, Play } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { ReelPhone, type ReelFrame } from "@/components/site/ReelPhone";
 import { FeaturedAdVideo } from "@/components/site/FeaturedAdVideo";
@@ -698,6 +698,11 @@ function Home() {
                   <figcaption>
                     <b>{ex.name}</b>
                     <span>{ex.detail}</span>
+                    {ex.href && (
+                      <a className="showcase-visit" href={ex.href} target="_blank" rel="noreferrer" tabIndex={i >= examples.length ? -1 : undefined}>
+                        Visit {ex.logo ?? ex.name} <ArrowUpRight size={13} strokeWidth={1.7} />
+                      </a>
+                    )}
                   </figcaption>
                 </figure>
               ))}
