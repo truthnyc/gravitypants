@@ -5,14 +5,20 @@ export const MOODS = ["soothing", "cozy", "calm", "playful", "energizing", "luxu
 export const RESERVED_SLUGS = ["directory", "admin", "search", "new", "edit", "api", "app"];
 export const WORDING_VERSION = "v1.0";
 export const GRACE_DAYS = 30;
+export const BRAND_NAME_MAX = 50;
+export const BRAND_DESCRIPTION_MAX = 300;
+export const REEL_DESCRIPTION_MAX = 120;
+export const SLUG_MAX = 30;
+
+export const nearLimit = (length: number, limit: number) => length >= Math.ceil(limit * 0.85);
 
 export function permissionWording(brand: string) {
   return `I confirm that I'm authorized to act for ${brand}, and that we own or have permission to use the photos, logo, words and music in this reel. I give Gravity Pants permission to publish it in the Gravity Pants Directory and on our brand page, with a link to our website. I understand that other people can start their own reel from its template (never our photos, logo, words, colors or fonts), and that we can remove it from the Directory at any time.`;
 }
 
 export function toSlug(name: string) {
-  const s = name.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40).replace(/-+$/, "");
-  return s.length >= 3 ? s : `${s || "brand"}-reels`.slice(0, 40);
+  const s = name.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, SLUG_MAX).replace(/-+$/, "");
+  return s.length >= 3 ? s : `${s || "brand"}-reels`.slice(0, SLUG_MAX);
 }
 
 export const validFullName = (n: string) => n.trim().split(/\s+/).filter((w) => w.length > 0).length >= 2;

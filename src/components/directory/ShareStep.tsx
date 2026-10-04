@@ -9,7 +9,7 @@ import { ReelCard, StepActions, StepShell, StepTitle } from "@/components/app-ui
 import { useReelPlayer } from "@/components/editor/ReelPreview";
 import { supabase } from "@/integrations/supabase/client";
 import { getShareContext, shareReel } from "@/lib/directory/directory.functions";
-import { CATEGORIES, GRACE_DAYS, MOODS, permissionWording, validFullName, type Category } from "@/lib/directory/directory";
+import { BRAND_NAME_MAX, CATEGORIES, GRACE_DAYS, MOODS, REEL_DESCRIPTION_MAX, nearLimit, permissionWording, validFullName, type Category } from "@/lib/directory/directory";
 import { MEDIA_BUCKET } from "@/lib/stillframe/media";
 import { useTemplateName, type EditorDoc } from "@/lib/stillframe/data";
 import type { Format } from "@/lib/stillframe/types";
@@ -67,7 +67,7 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
   const [name, setName] = useState(ctx.brand.name);
   const [site, setSite] = useState(ctx.brand.website_url);
   const [category, setCategory] = useState<Category>(ctx.brand.category);
-  const [desc, setDesc] = useState(ctx.brand.description);
+  const [desc, setDesc] = useState(ctx.reel?.description ?? "");
   const [tags, setTags] = useState<string[]>(ctx.prefill.tags);
   const [draft, setDraft] = useState("");
   const [moods, setMoods] = useState<string[]>(ctx.prefill.moods);
@@ -107,7 +107,7 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
         }
       }
       const res = await save({ data: {
-        adId: doc.project.id, brand: { name: name.trim(), website_url: site.trim(), category, description: desc.trim() },
+        adId: doc.project.id, brand: { name: name.trim(), website_url: site.trim(), category }, description: desc.trim(),
         tags, moods: moods as (typeof MOODS)[number][], show, fullName, jobTitle: title, agreed, posterPath,
       } });
       if (res.status === "live") toast.success("Published. It's live in the Directory. Permission saved to your log.");
@@ -177,16 +177,19 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
 
       <fieldset disabled={locked} className="transition-opacity disabled:opacity-40">
         <div className="grid gap-x-3.5 sm:grid-cols-2">
-          <AppField label="Brand name" htmlFor="d-name" className="mb-[18px]"><AppInput id="d-name" value={name} maxLength={80} onChange={(e) => setName(e.target.value)} /></AppField>
+          <AppField label="Brand name" htmlFor="d-name" className="mb-[18px]">
+            <AppInput id="d-name" value={name} maxLength={BRAND_NAME_MAX} onChange={(e) => setName(e.target.value)} />
+            <FieldCount value={name} max={BRAND_NAME_MAX} />
+          </AppField>
           <AppField label="Link to your site" htmlFor="d-site" className="mb-[18px]"><AppInput id="d-site" value={site} placeholder="https://" maxLength={300} onChange={(e) => setSite(e.target.value)} /></AppField>
           <AppField label="Category" htmlFor="d-cat" className="mb-[18px]">
             <AppSelect id="d-cat" value={category} onChange={(e) => setCategory(e.target.value as Category)}>
               {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
             </AppSelect>
           </AppField>
-          <AppField label="Short description" htmlFor="d-desc" className="mb-[18px]">
-            <AppInput id="d-desc" value={desc} maxLength={160} onChange={(e) => setDesc(e.target.value)} />
-            <small className="text-[12px] text-ap-muted nums">Up to 160 characters. {160 - desc.length} left.</small>
+          <AppField label="Reel description" htmlFor="d-desc" className="mb-[18px]">
+            <AppInput id="d-desc" value={desc} maxLength={REEL_DESCRIPTION_MAX} onChange={(e) => setDesc(e.target.value)} />
+            <FieldCount value={desc} max={REEL_DESCRIPTION_MAX} />
           </AppField>
         </div>
 
@@ -278,6 +281,10 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
       </StepActions>
     </StepShell>
   );
+}
+
+function FieldCount({ value, max }: { value: string; max: number }) {
+  return <small className={cn("block text-right text-[12px] nums", nearLimit(value.length, max) ? "text-ap-amber" : "text-ap-muted")}>{value.length} / {max}</small>;
 }
 
 function Notice({ children, action, tone }: { children: React.ReactNode; action: React.ReactNode; tone?: "amber" }) {

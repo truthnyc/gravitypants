@@ -3,7 +3,8 @@ import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
-  CATEGORIES, GRACE_DAYS, MOODS, WORDING_VERSION, permissionWording, toSlug, validFullName,
+  BRAND_DESCRIPTION_MAX, BRAND_NAME_MAX, CATEGORIES, GRACE_DAYS, MOODS, REEL_DESCRIPTION_MAX, SLUG_MAX,
+  WORDING_VERSION, permissionWording, toSlug, validFullName,
   type DirStatus, type DirectoryCard, type PlanTag, type ShareBrand,
 } from "./directory";
 
@@ -74,7 +75,7 @@ export const getShareContext = createServerFn({ method: "POST" })
     const { data: ad } = await sb.from("projects").select("id, workspace_id, name, template_id, formats").eq("id", data.adId).maybeSingle();
     if (!ad) throw new Error("This ad isn't available");
     const { data: b } = await sb.from("directory_brands").select("*").eq("workspace_id", ad.workspace_id).maybeSingle();
-    const { data: reel } = b ? await sb.from("directory_reels").select("id, status, tags, moods, title").eq("ad_id", ad.id).maybeSingle() : { data: null };
+    const { data: reel } = b ? await sb.from("directory_reels").select("id, status, tags, moods, title, description").eq("ad_id", ad.id).maybeSingle() : { data: null };
     const { data: last } = b && !reel ? await sb.from("directory_reels").select("tags, moods").eq("brand_id", b.id).order("updated_at", { ascending: false }).limit(1).maybeSingle() : { data: null };
     const { data: kit } = await sb.from("brand_kits").select("name").eq("workspace_id", ad.workspace_id).order("is_default", { ascending: false }).limit(1).maybeSingle();
     const { data: ws } = await sb.from("workspaces").select("name").eq("id", ad.workspace_id).maybeSingle();
@@ -87,7 +88,7 @@ export const getShareContext = createServerFn({ method: "POST" })
       : { id: null, name: fallbackName, website_url: "", category: "Other", description: "", slug: toSlug(fallbackName || "brand"), first_approved_at: null };
     return {
       brand,
-      reel: reel ? { id: reel.id as string, status: reel.status as DirStatus, tags: reel.tags as string[], moods: reel.moods as string[], title: (reel.title as string | null) ?? null } : null,
+      reel: reel ? { id: reel.id as string, status: reel.status as DirStatus, tags: reel.tags as string[], moods: reel.moods as string[], title: (reel.title as string | null) ?? null, description: (reel.description as string | null) ?? "" } : null,
       prefill: { tags: (reel?.tags ?? last?.tags ?? []) as string[], moods: (reel?.moods ?? last?.moods ?? []) as string[] },
       plan,
       email: (context.claims as any)?.email ?? "",
@@ -98,21 +99,22 @@ export const getShareContext = createServerFn({ method: "POST" })
 
 async function uniqueSlug(sb: any, base: string) {
   for (let i = 0; i < 20; i++) {
-    const s = i ? `${base.slice(0, 36)}-${i + 1}` : base;
+    const suffix = `-${i + 1}`;
+    const s = i ? `${base.slice(0, SLUG_MAX - suffix.length)}${suffix}` : base.slice(0, SLUG_MAX);
     const { data } = await sb.rpc("slug_status", { _slug: s, _brand: null });
     if (data === "available") return s;
   }
-  return `${base.slice(0, 30)}-${crypto.randomUUID().slice(0, 6)}`;
+  return `${base.slice(0, 23)}-${crypto.randomUUID().slice(0, 6)}`;
 }
 
 const shareSchema = z.object({
   adId: z.string().uuid(),
   brand: z.object({
-    name: z.string().trim().min(1).max(80),
+    name: z.string().trim().min(1).max(BRAND_NAME_MAX),
     website_url: z.string().trim().max(300),
     category: z.enum(CATEGORIES),
-    description: z.string().trim().max(160),
   }),
+  description: z.string().trim().max(REEL_DESCRIPTION_MAX),
   tags: z.array(z.string().trim().min(1).max(40)).max(20),
   moods: z.array(z.enum(MOODS)).max(3),
   show: z.boolean(),
@@ -138,7 +140,7 @@ export const shareReel = createServerFn({ method: "POST" })
     if (website) { try { new URL(website); } catch { throw new Error("That website link doesn't look right."); } }
 
     let { data: brand } = await sb.from("directory_brands").select("id, name, first_approved_at").eq("workspace_id", ad.workspace_id).maybeSingle();
-    const fields = { name: data.brand.name, website_url: website || null, category: data.brand.category, description: data.brand.description || null };
+    const fields = { name: data.brand.name, website_url: website || null, category: data.brand.category };
     if (brand) {
       const { error } = await sb.from("directory_brands").update(fields).eq("id", brand.id);
       if (error) throw new Error(error.message);
@@ -153,6 +155,7 @@ export const shareReel = createServerFn({ method: "POST" })
     const tags = [...new Set(data.tags.map((t) => t.toLowerCase()))];
     const row = {
       ad_id: ad.id, brand_id: brand.id, status, tags, moods: data.moods, template_id: ad.template_id, formats: (ad.formats as string[]).map((f) => f.replace(":", "x")),
+      description: data.description || null,
       ...(prev?.title ? {} : { title: ad.name as string }),
       ...(data.posterPath ? { poster_url: `${POSTER_PREFIX}${data.posterPath}` } : {}),
     };
@@ -240,7 +243,7 @@ export const getDirectoryAccount = createServerFn({ method: "POST" })
 /** Brands can edit the short description shown in their public page header. */
 export const saveBrandDescription = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ brandId: z.string().uuid(), description: z.string().trim().max(160) }).parse(d))
+  .inputValidator((d: unknown) => z.object({ brandId: z.string().uuid(), description: z.string().trim().max(BRAND_DESCRIPTION_MAX) }).parse(d))
   .handler(async ({ data, context }) => {
     const { error } = await (context.supabase as any).from("directory_brands")
       .update({ description: data.description || null })
@@ -264,7 +267,7 @@ export const renameDirectoryReel = createServerFn({ method: "POST" })
 
 export const checkSlug = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ slug: z.string().max(60), brandId: z.string().uuid() }).parse(d))
+  .inputValidator((d: unknown) => z.object({ slug: z.string().max(SLUG_MAX), brandId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const { data: st } = await (context.supabase as any).rpc("slug_status", { _slug: data.slug, _brand: data.brandId });
     return st as "invalid" | "reserved" | "yours" | "taken" | "available";
@@ -272,7 +275,7 @@ export const checkSlug = createServerFn({ method: "POST" })
 
 export const saveSlug = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ slug: z.string().regex(/^[a-z0-9-]{3,40}$/), brandId: z.string().uuid() }).parse(d))
+  .inputValidator((d: unknown) => z.object({ slug: z.string().regex(/^[a-z0-9-]{3,30}$/), brandId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const sb = context.supabase as any;
     const { data: st } = await sb.rpc("slug_status", { _slug: data.slug, _brand: data.brandId });
@@ -364,7 +367,7 @@ export const listDirectoryReview = createServerFn({ method: "POST" })
   .handler(async ({ context }) => {
     const sb = context.supabase as any;
     await assertAdmin(sb);
-    const { data } = await sb.from("directory_reels").select("id, ad_id, brand_id, status, tags, moods, poster_url, updated_at, review_note, hidden_reason, title, directory_brands(name, slug, website_url, category, description, first_approved_at), projects(name)").order("updated_at", { ascending: false }).limit(300);
+    const { data } = await sb.from("directory_reels").select("id, ad_id, brand_id, status, tags, moods, poster_url, updated_at, review_note, hidden_reason, title, description, directory_brands(name, slug, website_url, category, description, first_approved_at), projects(name)").order("updated_at", { ascending: false }).limit(300);
     const rows = await signPosters(data ?? []);
     const ids = rows.map((r: any) => r.id);
     const { data: logs } = ids.length ? await sb.from("permission_log").select("directory_reel_id, full_name, job_title, email, created_at, wording_version, action").in("directory_reel_id", ids).order("created_at", { ascending: false }) : { data: [] };
@@ -453,7 +456,7 @@ export const listDirectoryBrands = createServerFn({ method: "POST" })
 /** Admin: change any brand's Directory address. Old address redirects for 12 months. */
 export const adminSaveBrandSlug = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ slug: z.string().regex(/^[a-z0-9-]{3,40}$/), brandId: z.string().uuid() }).parse(d))
+  .inputValidator((d: unknown) => z.object({ slug: z.string().regex(/^[a-z0-9-]{3,30}$/), brandId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const sb = context.supabase as any;
     await assertAdmin(sb);
@@ -476,11 +479,11 @@ export const adminBrandDetail = createServerFn({ method: "POST" })
     await assertAdmin(sb);
     const { data: b, error } = await sb.from("directory_brands").select("id, name, slug, website_url, category, description, logo_url, first_approved_at, plan_ended_at, created_at").eq("id", data.brandId).single();
     if (error) throw new Error(error.message);
-    const { data: reels } = await sb.from("directory_reels").select("id, ad_id, title, status, tags, moods, formats, poster_url, published_at, review_note, hidden_reason, projects(name)").eq("brand_id", b.id).order("created_at", { ascending: false });
+    const { data: reels } = await sb.from("directory_reels").select("id, ad_id, title, description, status, tags, moods, formats, poster_url, published_at, review_note, hidden_reason, projects(name)").eq("brand_id", b.id).order("created_at", { ascending: false });
     const signed = await signPosters((reels ?? []) as any[]);
     return {
       brand: { id: b.id as string, name: b.name as string, slug: b.slug as string, website: (b.website_url ?? "") as string, category: b.category as string, description: (b.description ?? "") as string, logo: await signLogo(b.logo_url), approved: b.first_approved_at as string | null, planEnded: b.plan_ended_at as string | null },
-      reels: signed.map((r: any) => ({ id: r.id as string, title: (r.title ?? r.projects?.name ?? "Untitled") as string, ad: (r.projects?.name ?? "Removed ad") as string, status: r.status as DirStatus, tags: (r.tags ?? []) as string[], moods: (r.moods ?? []) as string[], formats: (r.formats ?? []) as string[], poster: r.poster as string | null, published: r.published_at as string | null, note: (r.review_note ?? r.hidden_reason ?? null) as string | null })),
+      reels: signed.map((r: any) => ({ id: r.id as string, title: (r.title ?? r.projects?.name ?? "Untitled") as string, description: (r.description ?? "") as string, ad: (r.projects?.name ?? "Removed ad") as string, status: r.status as DirStatus, tags: (r.tags ?? []) as string[], moods: (r.moods ?? []) as string[], formats: (r.formats ?? []) as string[], poster: r.poster as string | null, published: r.published_at as string | null, note: (r.review_note ?? r.hidden_reason ?? null) as string | null })),
     };
   });
 
@@ -488,9 +491,9 @@ export const adminBrandDetail = createServerFn({ method: "POST" })
 export const adminSaveBrand = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({
-    brandId: z.string().uuid(), name: z.string().trim().min(1).max(80),
+    brandId: z.string().uuid(), name: z.string().trim().min(1).max(BRAND_NAME_MAX),
     website: z.string().trim().max(200).refine((v) => !v || /^https?:\/\//.test(v), "Website must start with http:// or https://"),
-    category: z.enum(CATEGORIES), description: z.string().trim().max(160),
+    category: z.enum(CATEGORIES), description: z.string().trim().max(BRAND_DESCRIPTION_MAX),
   }).parse(d))
   .handler(async ({ data, context }) => {
     const sb = context.supabase as any;

@@ -15,7 +15,7 @@ export async function toCards(rows: any[]): Promise<DirectoryCard[]> {
   const sb = await admin();
   const ids = rows.map((r) => r.reel_id ?? r.id);
   const { data: extra } = await sb.from("directory_reels")
-    .select("id, ad_id, template_id, poster_url, title, directory_brands(description, website_url)")
+    .select("id, ad_id, template_id, poster_url, title, description, directory_brands(website_url)")
     .in("id", ids);
   const ex = new Map<string, any>((extra ?? []).map((e: any) => [e.id, e]));
   const adIds = (extra ?? []).map((e: any) => e.ad_id);
@@ -53,7 +53,7 @@ export async function toCards(rows: any[]): Promise<DirectoryCard[]> {
       featured: !!r.featured,
       seconds: Math.round(l.sec * 10) / 10,
       photos: l.n,
-      description: e?.directory_brands?.description ?? null,
+      description: e?.description ?? null,
       website_url: e?.directory_brands?.website_url ?? null,
     };
   });
