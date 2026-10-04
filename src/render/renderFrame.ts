@@ -270,8 +270,8 @@ export function layoutFrame(
     const { col, row } = anchorParts(h.position);
     const stacked = s && sm && s.keep_under_headline;
     const gap = sm ? sm.fontPx * 0.45 : 0;
-    const groupW = stacked ? Math.max(hm.w, sm.w) : hm.w;
-    const groupH = stacked ? hm.h + gap + sm.h : hm.h;
+    const groupW = stacked && sm ? Math.max(hm.w, sm.w) : hm.w;
+    const groupH = stacked && sm ? hm.h + gap + sm.h : hm.h;
     const p = place(col, row, groupW, groupH, safe);
     const alignX = (w: number) => p.x + ((groupW - w) * col) / 2;
     result.headline = block(h, hm, col, alignX(hm.w), p.y);
