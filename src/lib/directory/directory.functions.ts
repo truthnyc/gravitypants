@@ -153,6 +153,8 @@ export const shareReel = createServerFn({ method: "POST" })
     const { data: prev } = await sb.from("directory_reels").select("id, status, title").eq("ad_id", ad.id).maybeSingle();
     const status: DirStatus = data.show ? (brand.first_approved_at ? "live" : "in_review") : prev?.status === "hidden" ? "hidden" : "private";
     const tags = [...new Set(data.tags.map((t) => t.toLowerCase()))];
+    const { findLatestVideo } = await import("./directory.server");
+    const videoUrl = await findLatestVideo(sb, ad.workspace_id, ad.id).catch(() => null);
     const row = {
       ad_id: ad.id, brand_id: brand.id, status, tags, moods: data.moods, template_id: ad.template_id, formats: (ad.formats as string[]).map((f) => f.replace(":", "x")),
       description: data.description || null,
