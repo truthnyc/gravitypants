@@ -495,6 +495,7 @@
 .home-example-viewport { overflow:hidden; width:100%; }
 .home-example-track { width:max-content; display:flex; align-items:flex-start; animation:home-scroll 70s linear infinite; }
 .home-example-viewport:hover .home-example-track,.home-example-viewport:focus-within .home-example-track { animation-play-state:paused; }
+.home-example-static { overflow-x:auto; scrollbar-width:none; } .home-example-static .home-example-track { animation:none; }
 @keyframes home-scroll { to { transform:translateX(-50%); } }
 .home-example-figure { width:250px; flex:0 0 250px; margin-right:56px !important; display:flex; flex-direction:column; gap:16px; }
 .home-example-figure:nth-child(even) { padding-top:56px; }
