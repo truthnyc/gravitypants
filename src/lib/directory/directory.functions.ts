@@ -39,7 +39,7 @@ export const getShareContext = createServerFn({ method: "POST" })
     const { data: ad } = await sb.from("projects").select("id, workspace_id, name, template_id, formats").eq("id", data.adId).maybeSingle();
     if (!ad) throw new Error("This ad isn't available");
     const { data: b } = await sb.from("directory_brands").select("*").eq("workspace_id", ad.workspace_id).maybeSingle();
-    const { data: reel } = b ? await sb.from("directory_reels").select("id, status, tags, moods").eq("ad_id", ad.id).maybeSingle() : { data: null };
+    const { data: reel } = b ? await sb.from("directory_reels").select("id, status, tags, moods, title").eq("ad_id", ad.id).maybeSingle() : { data: null };
     const { data: last } = b && !reel ? await sb.from("directory_reels").select("tags, moods").eq("brand_id", b.id).order("updated_at", { ascending: false }).limit(1).maybeSingle() : { data: null };
     const { data: kit } = await sb.from("brand_kits").select("name").eq("workspace_id", ad.workspace_id).order("is_default", { ascending: false }).limit(1).maybeSingle();
     const { data: ws } = await sb.from("workspaces").select("name").eq("id", ad.workspace_id).maybeSingle();
@@ -52,7 +52,7 @@ export const getShareContext = createServerFn({ method: "POST" })
       : { id: null, name: fallbackName, website_url: "", category: "Other", description: "", slug: toSlug(fallbackName || "brand"), first_approved_at: null };
     return {
       brand,
-      reel: reel ? { id: reel.id as string, status: reel.status as DirStatus, tags: reel.tags as string[], moods: reel.moods as string[] } : null,
+      reel: reel ? { id: reel.id as string, status: reel.status as DirStatus, tags: reel.tags as string[], moods: reel.moods as string[], title: (reel.title as string | null) ?? null } : null,
       prefill: { tags: (reel?.tags ?? last?.tags ?? []) as string[], moods: (reel?.moods ?? last?.moods ?? []) as string[] },
       plan,
       email: (context.claims as any)?.email ?? "",
@@ -93,7 +93,7 @@ export const shareReel = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => shareSchema.parse(d))
   .handler(async ({ data, context }) => {
     const sb = context.supabase as any;
-    const { data: ad } = await sb.from("projects").select("id, workspace_id, template_id, formats").eq("id", data.adId).maybeSingle();
+    const { data: ad } = await sb.from("projects").select("id, workspace_id, name, template_id, formats").eq("id", data.adId).maybeSingle();
     if (!ad) throw new Error("This ad isn't available");
     const plan = await planState(sb, ad.workspace_id, null);
     if (plan.tag === "trial" || plan.tag === "ended") throw new Error("Sharing to the Directory is part of paid plans.");
@@ -113,11 +113,12 @@ export const shareReel = createServerFn({ method: "POST" })
       if (error) throw new Error(error.message);
       brand = created;
     }
-    const { data: prev } = await sb.from("directory_reels").select("id, status").eq("ad_id", ad.id).maybeSingle();
+    const { data: prev } = await sb.from("directory_reels").select("id, status, title").eq("ad_id", ad.id).maybeSingle();
     const status: DirStatus = data.show ? (brand.first_approved_at ? "live" : "in_review") : prev?.status === "hidden" ? "hidden" : "private";
     const tags = [...new Set(data.tags.map((t) => t.toLowerCase()))];
     const row = {
       ad_id: ad.id, brand_id: brand.id, status, tags, moods: data.moods, template_id: ad.template_id, formats: (ad.formats as string[]).map((f) => f.replace(":", "x")),
+      ...(prev?.title ? {} : { title: ad.name as string }),
       ...(data.posterPath ? { poster_url: `${POSTER_PREFIX}${data.posterPath}` } : {}),
     };
     const { data: reel, error } = prev
@@ -189,12 +190,12 @@ export const getDirectoryAccount = createServerFn({ method: "POST" })
     const sb = context.supabase as any;
     const { data: b } = await sb.from("directory_brands").select("*").eq("workspace_id", data.workspaceId).maybeSingle();
     if (!b) return null;
-    const { data: reels } = await sb.from("directory_reels").select("id, ad_id, status, updated_at, projects(name)").eq("brand_id", b.id).order("updated_at", { ascending: false });
+    const { data: reels } = await sb.from("directory_reels").select("id, ad_id, status, updated_at, title, projects(name)").eq("brand_id", b.id).order("updated_at", { ascending: false });
     const { data: log } = await sb.from("permission_log").select("id, created_at, ad_id, action, full_name, job_title, email, wording_version, wording_text").eq("brand_id", b.id).order("created_at", { ascending: false }).limit(500);
-    const names = new Map<string, string>((reels ?? []).map((r: any) => [r.ad_id, r.projects?.name ?? "Untitled"]));
+    const names = new Map<string, string>((reels ?? []).map((r: any) => [r.ad_id, r.title ?? r.projects?.name ?? "Untitled"]));
     return {
       brand: { id: b.id as string, name: b.name as string, slug: b.slug as string },
-      reels: ((reels ?? []) as any[]).map((r: any) => ({ adId: r.ad_id as string, name: names.get(r.ad_id) ?? "Untitled", status: r.status as DirStatus, updated: r.updated_at as string })),
+      reels: ((reels ?? []) as any[]).map((r: any) => ({ adId: r.ad_id as string, name: (r.title as string | null) ?? r.projects?.name ?? "Untitled", status: r.status as DirStatus, updated: r.updated_at as string })),
       log: (log ?? []).map((l: any) => ({ ...l, reel: names.get(l.ad_id) ?? "Removed ad" })) as {
         id: string; created_at: string; reel: string; action: "granted" | "withdrawn"; full_name: string; job_title: string | null; email: string; wording_version: string; wording_text: string;
       }[],
