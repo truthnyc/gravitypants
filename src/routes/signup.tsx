@@ -42,7 +42,7 @@ function InvitedSignUp() {
     const apply = (session: { user: { email?: string; user_metadata?: Record<string, unknown> } } | null) => {
       if (!session) return false;
       setEmail(session.user.email ?? "");
-      const n = session.user.user_metadata?.full_name;
+      const n = session.user.user_metadata?.["full_name"];
       if (typeof n === "string") setName((v) => v || n);
       setState("ready");
       return true;
@@ -98,7 +98,7 @@ function InvitedSignUp() {
   );
 }
 
-function RegularSignUp({ redirect, plan, billing, template }: { redirect?: string; plan?: "simple" | "business" | "team"; billing?: "monthly" | "yearly"; template?: string }) {
+function RegularSignUp({ redirect, plan, billing, template }: { redirect?: string | undefined; plan?: "simple" | "business" | "team" | undefined; billing?: "monthly" | "yearly" | undefined; template?: string | undefined }) {
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
