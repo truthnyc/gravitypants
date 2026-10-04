@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import { BarChart3, ChevronLeft, Clapperboard, FileClock, Home, LayoutDashboard, LayoutTemplate, ShieldCheck, Users, Video } from "lucide-react";
+import { BarChart3, ChevronLeft, Clapperboard, FileClock, Home, LayoutDashboard, LayoutTemplate, Mail, ShieldCheck, Users, Video } from "lucide-react";
 
 const NAV = [
   { to: "/admin", label: "Overview", icon: LayoutDashboard, exact: true },
