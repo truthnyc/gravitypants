@@ -194,7 +194,7 @@ export const getDirectoryAccount = createServerFn({ method: "POST" })
     const names = new Map<string, string>((reels ?? []).map((r: any) => [r.ad_id, r.projects?.name ?? "Untitled"]));
     return {
       brand: { id: b.id as string, name: b.name as string, slug: b.slug as string },
-      reels: (reels ?? []).map((r: any) => ({ adId: r.ad_id as string, name: names.get(r.ad_id) ?? "Untitled", status: r.status as DirStatus, updated: r.updated_at as string })),
+      reels: ((reels ?? []) as any[]).map((r: any) => ({ adId: r.ad_id as string, name: names.get(r.ad_id) ?? "Untitled", status: r.status as DirStatus, updated: r.updated_at as string })),
       log: (log ?? []).map((l: any) => ({ ...l, reel: names.get(l.ad_id) ?? "Removed ad" })) as {
         id: string; created_at: string; reel: string; action: "granted" | "withdrawn"; full_name: string; job_title: string | null; email: string; wording_version: string; wording_text: string;
       }[],

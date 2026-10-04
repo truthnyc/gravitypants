@@ -31,9 +31,11 @@ import {
 import { formatSeconds, type ProjectWithFrames } from "@/lib/stillframe/types";
 import { isAcceptedImage } from "@/lib/stillframe/media";
 import { FramePreview } from "./FramePreview";
+import { cn } from "@/lib/utils";
 import { SaveTemplateDialog } from "@/components/templates/TemplateDialogs";
+import { STATUS_LABEL, type DirStatus } from "@/lib/directory/directory";
 
-export function AdCard({ project }: { project: ProjectWithFrames }) {
+export function AdCard({ project, dirStatus, liveUntil, onHide }: { project: ProjectWithFrames; dirStatus?: DirStatus | undefined; liveUntil?: string | null | undefined; onHide?: (() => void) | undefined }) {
   const kit = useKit(project.template_id);
   const navigate = useNavigate();
   const globalTpl = useMakeGlobalTemplate();
@@ -104,6 +106,9 @@ export function AdCard({ project }: { project: ProjectWithFrames }) {
           <p className="truncate text-[16px] font-semibold lg:text-[14px]">{project.name}</p>
           {kit && <span className="mt-1 inline-flex max-w-full truncate rounded-lg bg-control-fill px-2 py-0.5 text-[12px] font-medium text-secondary-text">{kit.name}</span>}
           <p className="nums mt-0.5 truncate text-[13px] text-secondary-text lg:text-[12px]">{meta}<span className="hidden lg:inline"> · {project.formats.join(", ")}</span></p>
+          <p className={cn("mt-0.5 truncate text-[12px]", dirStatus === "live" ? "text-ap-green" : dirStatus === "in_review" ? "text-ap-blue" : "text-secondary-text")}>
+            {dirStatus === "live" && liveUntil ? `Live until ${new Date(liveUntil).toLocaleDateString(undefined, { dateStyle: "medium" })}` : STATUS_LABEL[dirStatus ?? "private"]}
+          </p>
         </div>
       </Link>
 
@@ -121,6 +126,8 @@ export function AdCard({ project }: { project: ProjectWithFrames }) {
             <DropdownMenuItem onSelect={() => navigate({ to: "/app/ad/$id/edit", params: { id: project.id } })}>
               Open
             </DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => navigate({ to: "/app/ad/$id/share", params: { id: project.id } })}>Share to the Directory</DropdownMenuItem>
+            {(dirStatus === "live" || dirStatus === "in_review") && onHide && <DropdownMenuItem onSelect={onHide}>Hide from the Directory</DropdownMenuItem>}
             <DropdownMenuItem onSelect={() => void handleDuplicate()}>Duplicate</DropdownMenuItem>
             <DropdownMenuItem onSelect={() => fileInput.current?.click()}>
               Duplicate with New Photos…

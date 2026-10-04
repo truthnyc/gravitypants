@@ -33,6 +33,8 @@ import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAppRouteRouteImport } from './routes/_authenticated/app/route'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
+import { Route as DirectoryIndexRouteImport } from './routes/directory.index'
+import { Route as DirectorySlugRouteImport } from './routes/directory.$slug'
 import { Route as GalleryPatternsSplatRouteImport } from './routes/gallery-patterns.$'
 import { Route as InviteTokenRouteImport } from './routes/invite.$token'
 import { Route as ProductCategorySplatRouteImport } from './routes/product-category.$'
@@ -42,6 +44,7 @@ import { Route as AuthenticatedAdminAdminsRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin/analytics'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin/audit'
 import { Route as AuthenticatedAdminClientsRouteImport } from './routes/_authenticated/admin/clients'
+import { Route as AuthenticatedAdminDirectoryRouteImport } from './routes/_authenticated/admin/directory'
 import { Route as AuthenticatedAdminExportsRouteImport } from './routes/_authenticated/admin/exports'
 import { Route as AuthenticatedAdminHomepageRouteImport } from './routes/_authenticated/admin/homepage'
 import { Route as AuthenticatedAdminNewsletterRouteImport } from './routes/_authenticated/admin/newsletter'
@@ -60,6 +63,7 @@ import { Route as AuthenticatedAdminTemplatesIndexRouteImport } from './routes/_
 import { Route as AuthenticatedAdminTemplatesIdRouteImport } from './routes/_authenticated/admin/templates.$id'
 import { Route as AuthenticatedAdminTemplatesNewRouteImport } from './routes/_authenticated/admin/templates.new'
 import { Route as AuthenticatedAppAccountBillingRouteImport } from './routes/_authenticated/app/account_.billing'
+import { Route as AuthenticatedAppAccountDirectoryRouteImport } from './routes/_authenticated/app/account_.directory'
 import { Route as AuthenticatedAppAccountMembersRouteImport } from './routes/_authenticated/app/account_.members'
 import { Route as AuthenticatedAppAdminSplatRouteImport } from './routes/_authenticated/app/admin.$'
 import { Route as AuthenticatedAppTemplatesIndexRouteImport } from './routes/_authenticated/app/templates.index'
@@ -72,6 +76,7 @@ import { Route as AuthenticatedAdminTemplatesIdEditRouteImport } from './routes/
 import { Route as AuthenticatedAppAdIdEditRouteImport } from './routes/_authenticated/app/ad.$id.edit'
 import { Route as AuthenticatedAppAdIdExportRouteImport } from './routes/_authenticated/app/ad.$id.export'
 import { Route as AuthenticatedAppAdIdPhotosRouteImport } from './routes/_authenticated/app/ad.$id.photos'
+import { Route as AuthenticatedAppAdIdShareRouteImport } from './routes/_authenticated/app/ad.$id.share'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -192,6 +197,16 @@ const BlogSlugRoute = BlogSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => BlogRoute,
 } as any)
+const DirectoryIndexRoute = DirectoryIndexRouteImport.update({
+  id: '/directory/',
+  path: '/directory/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DirectorySlugRoute = DirectorySlugRouteImport.update({
+  id: '/directory/$slug',
+  path: '/directory/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GalleryPatternsSplatRoute = GalleryPatternsSplatRouteImport.update({
   id: '/$',
   path: '/$',
@@ -238,6 +253,12 @@ const AuthenticatedAdminClientsRoute =
   AuthenticatedAdminClientsRouteImport.update({
     id: '/clients',
     path: '/clients',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminDirectoryRoute =
+  AuthenticatedAdminDirectoryRouteImport.update({
+    id: '/directory',
+    path: '/directory',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
 const AuthenticatedAdminExportsRoute =
@@ -338,6 +359,12 @@ const AuthenticatedAppAccountBillingRoute =
     path: '/account/billing',
     getParentRoute: () => AuthenticatedAppRouteRoute,
   } as any)
+const AuthenticatedAppAccountDirectoryRoute =
+  AuthenticatedAppAccountDirectoryRouteImport.update({
+    id: '/account_/directory',
+    path: '/account/directory',
+    getParentRoute: () => AuthenticatedAppRouteRoute,
+  } as any)
 const AuthenticatedAppAccountMembersRoute =
   AuthenticatedAppAccountMembersRouteImport.update({
     id: '/account_/members',
@@ -408,6 +435,12 @@ const AuthenticatedAppAdIdPhotosRoute =
     path: '/ad/$id/photos',
     getParentRoute: () => AuthenticatedAppRouteRoute,
   } as any)
+const AuthenticatedAppAdIdShareRoute =
+  AuthenticatedAppAdIdShareRouteImport.update({
+    id: '/ad/$id/share',
+    path: '/ad/$id/share',
+    getParentRoute: () => AuthenticatedAppRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -432,15 +465,18 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/app': typeof AuthenticatedAppRouteRouteWithChildren
   '/blog/$slug': typeof BlogSlugRoute
+  '/directory/$slug': typeof DirectorySlugRoute
   '/gallery-patterns/$': typeof GalleryPatternsSplatRoute
   '/invite/$token': typeof InviteTokenRoute
   '/product-category/$': typeof ProductCategorySplatRoute
   '/product/$': typeof ProductSplatRoute
   '/blog/': typeof BlogIndexRoute
+  '/directory/': typeof DirectoryIndexRoute
   '/admin/admins': typeof AuthenticatedAdminAdminsRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/clients': typeof AuthenticatedAdminClientsRoute
+  '/admin/directory': typeof AuthenticatedAdminDirectoryRoute
   '/admin/exports': typeof AuthenticatedAdminExportsRoute
   '/admin/homepage': typeof AuthenticatedAdminHomepageRoute
   '/admin/newsletter': typeof AuthenticatedAdminNewsletterRoute
@@ -459,6 +495,7 @@ export interface FileRoutesByFullPath {
   '/admin/templates/$id': typeof AuthenticatedAdminTemplatesIdRouteWithChildren
   '/admin/templates/new': typeof AuthenticatedAdminTemplatesNewRoute
   '/app/account/billing': typeof AuthenticatedAppAccountBillingRoute
+  '/app/account/directory': typeof AuthenticatedAppAccountDirectoryRoute
   '/app/account/members': typeof AuthenticatedAppAccountMembersRoute
   '/app/admin/$': typeof AuthenticatedAppAdminSplatRoute
   '/app/templates/$slug': typeof AuthenticatedAppTemplatesSlugRoute
@@ -472,6 +509,7 @@ export interface FileRoutesByFullPath {
   '/app/ad/$id/edit': typeof AuthenticatedAppAdIdEditRoute
   '/app/ad/$id/export': typeof AuthenticatedAppAdIdExportRoute
   '/app/ad/$id/photos': typeof AuthenticatedAppAdIdPhotosRoute
+  '/app/ad/$id/share': typeof AuthenticatedAppAdIdShareRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -493,15 +531,18 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/directory/$slug': typeof DirectorySlugRoute
   '/gallery-patterns/$': typeof GalleryPatternsSplatRoute
   '/invite/$token': typeof InviteTokenRoute
   '/product-category/$': typeof ProductCategorySplatRoute
   '/product/$': typeof ProductSplatRoute
   '/blog': typeof BlogIndexRoute
+  '/directory': typeof DirectoryIndexRoute
   '/admin/admins': typeof AuthenticatedAdminAdminsRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/clients': typeof AuthenticatedAdminClientsRoute
+  '/admin/directory': typeof AuthenticatedAdminDirectoryRoute
   '/admin/exports': typeof AuthenticatedAdminExportsRoute
   '/admin/homepage': typeof AuthenticatedAdminHomepageRoute
   '/admin/newsletter': typeof AuthenticatedAdminNewsletterRoute
@@ -520,6 +561,7 @@ export interface FileRoutesByTo {
   '/admin/templates/$id': typeof AuthenticatedAdminTemplatesIdRouteWithChildren
   '/admin/templates/new': typeof AuthenticatedAdminTemplatesNewRoute
   '/app/account/billing': typeof AuthenticatedAppAccountBillingRoute
+  '/app/account/directory': typeof AuthenticatedAppAccountDirectoryRoute
   '/app/account/members': typeof AuthenticatedAppAccountMembersRoute
   '/app/admin/$': typeof AuthenticatedAppAdminSplatRoute
   '/app/templates/$slug': typeof AuthenticatedAppTemplatesSlugRoute
@@ -533,6 +575,7 @@ export interface FileRoutesByTo {
   '/app/ad/$id/edit': typeof AuthenticatedAppAdIdEditRoute
   '/app/ad/$id/export': typeof AuthenticatedAppAdIdExportRoute
   '/app/ad/$id/photos': typeof AuthenticatedAppAdIdPhotosRoute
+  '/app/ad/$id/share': typeof AuthenticatedAppAdIdShareRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -559,15 +602,18 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/app': typeof AuthenticatedAppRouteRouteWithChildren
   '/blog/$slug': typeof BlogSlugRoute
+  '/directory/$slug': typeof DirectorySlugRoute
   '/gallery-patterns/$': typeof GalleryPatternsSplatRoute
   '/invite/$token': typeof InviteTokenRoute
   '/product-category/$': typeof ProductCategorySplatRoute
   '/product/$': typeof ProductSplatRoute
   '/blog/': typeof BlogIndexRoute
+  '/directory/': typeof DirectoryIndexRoute
   '/_authenticated/admin/admins': typeof AuthenticatedAdminAdminsRoute
   '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/admin/clients': typeof AuthenticatedAdminClientsRoute
+  '/_authenticated/admin/directory': typeof AuthenticatedAdminDirectoryRoute
   '/_authenticated/admin/exports': typeof AuthenticatedAdminExportsRoute
   '/_authenticated/admin/homepage': typeof AuthenticatedAdminHomepageRoute
   '/_authenticated/admin/newsletter': typeof AuthenticatedAdminNewsletterRoute
@@ -586,6 +632,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/templates/$id': typeof AuthenticatedAdminTemplatesIdRouteWithChildren
   '/_authenticated/admin/templates/new': typeof AuthenticatedAdminTemplatesNewRoute
   '/_authenticated/app/account_/billing': typeof AuthenticatedAppAccountBillingRoute
+  '/_authenticated/app/account_/directory': typeof AuthenticatedAppAccountDirectoryRoute
   '/_authenticated/app/account_/members': typeof AuthenticatedAppAccountMembersRoute
   '/_authenticated/app/admin/$': typeof AuthenticatedAppAdminSplatRoute
   '/_authenticated/app/templates/$slug': typeof AuthenticatedAppTemplatesSlugRoute
@@ -599,6 +646,7 @@ export interface FileRoutesById {
   '/_authenticated/app/ad/$id/edit': typeof AuthenticatedAppAdIdEditRoute
   '/_authenticated/app/ad/$id/export': typeof AuthenticatedAppAdIdExportRoute
   '/_authenticated/app/ad/$id/photos': typeof AuthenticatedAppAdIdPhotosRoute
+  '/_authenticated/app/ad/$id/share': typeof AuthenticatedAppAdIdShareRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -625,15 +673,18 @@ export interface FileRouteTypes {
     | '/admin'
     | '/app'
     | '/blog/$slug'
+    | '/directory/$slug'
     | '/gallery-patterns/$'
     | '/invite/$token'
     | '/product-category/$'
     | '/product/$'
     | '/blog/'
+    | '/directory/'
     | '/admin/admins'
     | '/admin/analytics'
     | '/admin/audit'
     | '/admin/clients'
+    | '/admin/directory'
     | '/admin/exports'
     | '/admin/homepage'
     | '/admin/newsletter'
@@ -652,6 +703,7 @@ export interface FileRouteTypes {
     | '/admin/templates/$id'
     | '/admin/templates/new'
     | '/app/account/billing'
+    | '/app/account/directory'
     | '/app/account/members'
     | '/app/admin/$'
     | '/app/templates/$slug'
@@ -665,6 +717,7 @@ export interface FileRouteTypes {
     | '/app/ad/$id/edit'
     | '/app/ad/$id/export'
     | '/app/ad/$id/photos'
+    | '/app/ad/$id/share'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -686,15 +739,18 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/blog/$slug'
+    | '/directory/$slug'
     | '/gallery-patterns/$'
     | '/invite/$token'
     | '/product-category/$'
     | '/product/$'
     | '/blog'
+    | '/directory'
     | '/admin/admins'
     | '/admin/analytics'
     | '/admin/audit'
     | '/admin/clients'
+    | '/admin/directory'
     | '/admin/exports'
     | '/admin/homepage'
     | '/admin/newsletter'
@@ -713,6 +769,7 @@ export interface FileRouteTypes {
     | '/admin/templates/$id'
     | '/admin/templates/new'
     | '/app/account/billing'
+    | '/app/account/directory'
     | '/app/account/members'
     | '/app/admin/$'
     | '/app/templates/$slug'
@@ -726,6 +783,7 @@ export interface FileRouteTypes {
     | '/app/ad/$id/edit'
     | '/app/ad/$id/export'
     | '/app/ad/$id/photos'
+    | '/app/ad/$id/share'
   id:
     | '__root__'
     | '/'
@@ -751,15 +809,18 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/app'
     | '/blog/$slug'
+    | '/directory/$slug'
     | '/gallery-patterns/$'
     | '/invite/$token'
     | '/product-category/$'
     | '/product/$'
     | '/blog/'
+    | '/directory/'
     | '/_authenticated/admin/admins'
     | '/_authenticated/admin/analytics'
     | '/_authenticated/admin/audit'
     | '/_authenticated/admin/clients'
+    | '/_authenticated/admin/directory'
     | '/_authenticated/admin/exports'
     | '/_authenticated/admin/homepage'
     | '/_authenticated/admin/newsletter'
@@ -778,6 +839,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/templates/$id'
     | '/_authenticated/admin/templates/new'
     | '/_authenticated/app/account_/billing'
+    | '/_authenticated/app/account_/directory'
     | '/_authenticated/app/account_/members'
     | '/_authenticated/app/admin/$'
     | '/_authenticated/app/templates/$slug'
@@ -791,6 +853,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/ad/$id/edit'
     | '/_authenticated/app/ad/$id/export'
     | '/_authenticated/app/ad/$id/photos'
+    | '/_authenticated/app/ad/$id/share'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -814,7 +877,9 @@ export interface RootRouteChildren {
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
+  DirectorySlugRoute: typeof DirectorySlugRoute
   InviteTokenRoute: typeof InviteTokenRoute
+  DirectoryIndexRoute: typeof DirectoryIndexRoute
   ApiPublicCleanupExportsRoute: typeof ApiPublicCleanupExportsRoute
   ApiPublicTrialRemindersRoute: typeof ApiPublicTrialRemindersRoute
   ApiPublicWeeklyReportRoute: typeof ApiPublicWeeklyReportRoute
@@ -994,6 +1059,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogSlugRouteImport
       parentRoute: typeof BlogRoute
     }
+    '/directory/': {
+      id: '/directory/'
+      path: '/directory'
+      fullPath: '/directory/'
+      preLoaderRoute: typeof DirectoryIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/directory/$slug': {
+      id: '/directory/$slug'
+      path: '/directory/$slug'
+      fullPath: '/directory/$slug'
+      preLoaderRoute: typeof DirectorySlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/gallery-patterns/$': {
       id: '/gallery-patterns/$'
       path: '/$'
@@ -1055,6 +1134,13 @@ declare module '@tanstack/react-router' {
       path: '/clients'
       fullPath: '/admin/clients'
       preLoaderRoute: typeof AuthenticatedAdminClientsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/directory': {
+      id: '/_authenticated/admin/directory'
+      path: '/directory'
+      fullPath: '/admin/directory'
+      preLoaderRoute: typeof AuthenticatedAdminDirectoryRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
     '/_authenticated/admin/exports': {
@@ -1183,6 +1269,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppAccountBillingRouteImport
       parentRoute: typeof AuthenticatedAppRouteRoute
     }
+    '/_authenticated/app/account_/directory': {
+      id: '/_authenticated/app/account_/directory'
+      path: '/account/directory'
+      fullPath: '/app/account/directory'
+      preLoaderRoute: typeof AuthenticatedAppAccountDirectoryRouteImport
+      parentRoute: typeof AuthenticatedAppRouteRoute
+    }
     '/_authenticated/app/account_/members': {
       id: '/_authenticated/app/account_/members'
       path: '/account/members'
@@ -1267,6 +1360,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppAdIdPhotosRouteImport
       parentRoute: typeof AuthenticatedAppRouteRoute
     }
+    '/_authenticated/app/ad/$id/share': {
+      id: '/_authenticated/app/ad/$id/share'
+      path: '/ad/$id/share'
+      fullPath: '/app/ad/$id/share'
+      preLoaderRoute: typeof AuthenticatedAppAdIdShareRouteImport
+      parentRoute: typeof AuthenticatedAppRouteRoute
+    }
   }
 }
 
@@ -1290,6 +1390,7 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminAnalyticsRoute: typeof AuthenticatedAdminAnalyticsRoute
   AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
   AuthenticatedAdminClientsRoute: typeof AuthenticatedAdminClientsRoute
+  AuthenticatedAdminDirectoryRoute: typeof AuthenticatedAdminDirectoryRoute
   AuthenticatedAdminExportsRoute: typeof AuthenticatedAdminExportsRoute
   AuthenticatedAdminHomepageRoute: typeof AuthenticatedAdminHomepageRoute
   AuthenticatedAdminNewsletterRoute: typeof AuthenticatedAdminNewsletterRoute
@@ -1307,6 +1408,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminAnalyticsRoute: AuthenticatedAdminAnalyticsRoute,
     AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
     AuthenticatedAdminClientsRoute: AuthenticatedAdminClientsRoute,
+    AuthenticatedAdminDirectoryRoute: AuthenticatedAdminDirectoryRoute,
     AuthenticatedAdminExportsRoute: AuthenticatedAdminExportsRoute,
     AuthenticatedAdminHomepageRoute: AuthenticatedAdminHomepageRoute,
     AuthenticatedAdminNewsletterRoute: AuthenticatedAdminNewsletterRoute,
@@ -1333,6 +1435,7 @@ interface AuthenticatedAppRouteRouteChildren {
   AuthenticatedAppHelpRoute: typeof AuthenticatedAppHelpRoute
   AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
   AuthenticatedAppAccountBillingRoute: typeof AuthenticatedAppAccountBillingRoute
+  AuthenticatedAppAccountDirectoryRoute: typeof AuthenticatedAppAccountDirectoryRoute
   AuthenticatedAppAccountMembersRoute: typeof AuthenticatedAppAccountMembersRoute
   AuthenticatedAppAdminSplatRoute: typeof AuthenticatedAppAdminSplatRoute
   AuthenticatedAppTemplatesSlugRoute: typeof AuthenticatedAppTemplatesSlugRoute
@@ -1340,6 +1443,7 @@ interface AuthenticatedAppRouteRouteChildren {
   AuthenticatedAppAdIdEditRoute: typeof AuthenticatedAppAdIdEditRoute
   AuthenticatedAppAdIdExportRoute: typeof AuthenticatedAppAdIdExportRoute
   AuthenticatedAppAdIdPhotosRoute: typeof AuthenticatedAppAdIdPhotosRoute
+  AuthenticatedAppAdIdShareRoute: typeof AuthenticatedAppAdIdShareRoute
 }
 
 const AuthenticatedAppRouteRouteChildren: AuthenticatedAppRouteRouteChildren = {
@@ -1350,6 +1454,7 @@ const AuthenticatedAppRouteRouteChildren: AuthenticatedAppRouteRouteChildren = {
   AuthenticatedAppHelpRoute: AuthenticatedAppHelpRoute,
   AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
   AuthenticatedAppAccountBillingRoute: AuthenticatedAppAccountBillingRoute,
+  AuthenticatedAppAccountDirectoryRoute: AuthenticatedAppAccountDirectoryRoute,
   AuthenticatedAppAccountMembersRoute: AuthenticatedAppAccountMembersRoute,
   AuthenticatedAppAdminSplatRoute: AuthenticatedAppAdminSplatRoute,
   AuthenticatedAppTemplatesSlugRoute: AuthenticatedAppTemplatesSlugRoute,
@@ -1357,6 +1462,7 @@ const AuthenticatedAppRouteRouteChildren: AuthenticatedAppRouteRouteChildren = {
   AuthenticatedAppAdIdEditRoute: AuthenticatedAppAdIdEditRoute,
   AuthenticatedAppAdIdExportRoute: AuthenticatedAppAdIdExportRoute,
   AuthenticatedAppAdIdPhotosRoute: AuthenticatedAppAdIdPhotosRoute,
+  AuthenticatedAppAdIdShareRoute: AuthenticatedAppAdIdShareRoute,
 }
 
 const AuthenticatedAppRouteRouteWithChildren =
@@ -1445,7 +1551,9 @@ const rootRouteChildren: RootRouteChildren = {
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
+  DirectorySlugRoute: DirectorySlugRoute,
   InviteTokenRoute: InviteTokenRoute,
+  DirectoryIndexRoute: DirectoryIndexRoute,
   ApiPublicCleanupExportsRoute: ApiPublicCleanupExportsRoute,
   ApiPublicTrialRemindersRoute: ApiPublicTrialRemindersRoute,
   ApiPublicWeeklyReportRoute: ApiPublicWeeklyReportRoute,

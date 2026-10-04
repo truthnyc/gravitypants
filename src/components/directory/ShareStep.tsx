@@ -1,4 +1,4 @@
-import { useMemo, useState, type KeyboardEvent } from "react";
+import { useEffect, useMemo, useState, type KeyboardEvent } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -122,6 +122,12 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
     }
   };
 
+  const [thumb, setThumb] = useState<string | null>(null);
+  useEffect(() => {
+    let url: string | null = null;
+    void makePoster(doc, player.brand).then((b) => { if (b) { url = URL.createObjectURL(b); setThumb(url); } }).catch(() => undefined);
+    return () => { if (url) URL.revokeObjectURL(url); };
+  }, [doc, player.brand]);
   const graceEnd = ctx.plan.endedAt ? new Date(new Date(ctx.plan.endedAt).getTime() + GRACE_DAYS * 86_400_000) : null;
 
   return (
@@ -252,7 +258,7 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
         <p className="mb-2 text-[12px] font-semibold tracking-[0.06em] text-ap-body uppercase">How it will look in search</p>
         {show ? (
           <div className="grid grid-cols-[110px_1fr] items-center gap-4">
-            <div className="aspect-square overflow-hidden rounded-lg bg-ap-media">{player.preview && <div className="pointer-events-none size-full scale-100">{null}</div>}</div>
+            <div className="aspect-square overflow-hidden rounded-lg bg-ap-media">{thumb && <img src={thumb} alt="" className="size-full object-cover" />}</div>
             <div>
               <div className="font-semibold">{brandName}</div>
               <div className="mt-0.5 mb-2 text-[13px] text-ap-muted nums">{[templateName, doc.project.formats.join(" · "), `${player.total.toFixed(1)} sec`].filter(Boolean).join(" · ")}</div>

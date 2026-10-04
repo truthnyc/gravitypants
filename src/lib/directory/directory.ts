@@ -18,6 +18,7 @@ export function toSlug(name: string) {
 export const validFullName = (n: string) => n.trim().split(/\s+/).filter((w) => w.length > 0).length >= 2;
 
 export type DirStatus = "private" | "in_review" | "live" | "hidden";
+export const STATUS_LABEL: Record<DirStatus, string> = { private: "Private", in_review: "In review", live: "Live in the Directory", hidden: "Hidden" };
 export type PlanTag = "business" | "simple" | "trial" | "ended";
 
 export type ShareBrand = {
