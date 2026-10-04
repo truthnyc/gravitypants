@@ -10,6 +10,7 @@ const PAGES: { path: string; priority: string; changefreq: string; lastmod: stri
   { path: "/features", priority: "0.9", changefreq: "monthly", lastmod: "2026-09-30" },
   { path: "/examples", priority: "0.9", changefreq: "weekly", lastmod: "2026-09-30" },
   { path: "/showcase", priority: "0.8", changefreq: "weekly", lastmod: "2026-09-30" },
+  { path: "/directory", priority: "0.8", changefreq: "daily", lastmod: "2026-10-04" },
   { path: "/contact", priority: "0.6", changefreq: "monthly", lastmod: "2026-09-30" },
   { path: "/pricing", priority: "0.9", changefreq: "monthly", lastmod: "2026-09-30" },
   { path: "/about", priority: "0.6", changefreq: "yearly", lastmod: "2026-09-30" },
@@ -27,8 +28,18 @@ function isoDate(value: string): string {
 export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
-      GET: () => {
+      GET: async () => {
+        // Live, visible brand pages only; hidden brands drop out automatically.
+        let brands: { loc: string; lastmod: string; changefreq: string; priority: string }[] = [];
+        try {
+          const { publicClient } = await import("@/lib/site/reels.server");
+          const { data } = await (publicClient() as any).rpc("search_directory", { q: "", size: null }); // eslint-disable-line @typescript-eslint/no-explicit-any
+          const seen = new Set<string>();
+          brands = ((data ?? []) as { brand_slug: string }[]).filter((r) => !seen.has(r.brand_slug) && seen.add(r.brand_slug))
+            .map((r) => ({ loc: `${SITE_ORIGIN}/directory/${r.brand_slug}`, lastmod: new Date().toISOString().slice(0, 10), changefreq: "weekly", priority: "0.6" }));
+        } catch { brands = []; }
         const entries = [
+          ...brands,
           ...PAGES.map(page => ({ loc: `${SITE_ORIGIN}${page.path}`, lastmod: page.lastmod, changefreq: page.changefreq, priority: page.priority })),
           ...POSTS.map(post => ({ loc: `${SITE_ORIGIN}/blog/${post.slug}`, lastmod: isoDate(post.date), changefreq: "yearly", priority: "0.5" })),
         ];
