@@ -118,7 +118,13 @@ function DetailBody({ card, onClose }: { card: DirectoryCard; onClose: () => voi
 
   return (
     <div className="grid text-ap-ink sm:grid-cols-[1fr_1fr]">
-      <ReelPoster card={card} className="aspect-square sm:aspect-auto sm:min-h-[460px]" />
+      {card.video ? (
+        <div className="grid aspect-square place-items-center bg-ap-panel p-[10%] sm:aspect-auto sm:min-h-[460px]">
+          <video src={card.video} poster={card.poster ?? undefined} controls autoPlay loop muted playsInline className={`max-h-full max-w-full rounded-lg object-contain shadow-ap-soft ${shape(card.formats[0])}`} />
+        </div>
+      ) : (
+        <ReelPoster card={card} className="aspect-square sm:aspect-auto sm:min-h-[460px]" />
+      )}
       <div className="flex flex-col gap-3 p-6 sm:p-8">
         <p className="text-[14px] font-semibold text-ap-badge">{card.category}</p>
         <h2 className="text-[26px] leading-tight font-semibold tracking-[-0.02em]">{card.title ?? card.template_name ?? "Custom reel"}</h2>

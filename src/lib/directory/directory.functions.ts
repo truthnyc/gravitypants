@@ -160,6 +160,7 @@ export const shareReel = createServerFn({ method: "POST" })
       description: data.description || null,
       ...(prev?.title ? {} : { title: ad.name as string }),
       ...(data.posterPath ? { poster_url: `${POSTER_PREFIX}${data.posterPath}` } : {}),
+      ...(videoUrl ? { video_url: videoUrl } : {}),
     };
     const { data: reel, error } = prev
       ? await sb.from("directory_reels").update(row).eq("id", prev.id).select("id, status").single()
