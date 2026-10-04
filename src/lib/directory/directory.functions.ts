@@ -162,7 +162,7 @@ export const hideReel = createServerFn({ method: "POST" })
       ip_address: req?.headers.get("cf-connecting-ip") ?? null, user_agent: req?.headers.get("user-agent")?.slice(0, 400) ?? null,
     });
     if (logErr) throw new Error(logErr.message);
-    const { error } = await sb.from("directory_reels").update({ status: "hidden" }).eq("id", reel.id);
+    const { error } = await sb.from("directory_reels").update({ status: "hidden", hidden_reason: "brand" }).eq("id", reel.id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
@@ -224,43 +224,71 @@ export const saveSlug = createServerFn({ method: "POST" })
     return { slug: data.slug };
   });
 
+
 /* ---------------- public */
 
 export const searchDirectory = createServerFn({ method: "GET" })
   .inputValidator((d: unknown) => z.object({ q: z.string().max(200).default(""), size: z.enum(["9x16", "1x1", "16x9"]).nullable().default(null) }).parse(d))
   .handler(async ({ data }): Promise<DirectoryCard[]> => {
     const { publicClient } = await import("@/lib/site/reels.server");
+    const { toCards } = await import("./directory.server");
     const { data: rows, error } = await (publicClient() as any).rpc("search_directory", { q: data.q, size: data.size });
     if (error) { console.error(error); return []; }
-    const signed = await signPosters(rows ?? []);
-    return signed.map((r: any) => ({
-      reel_id: r.reel_id, brand_name: r.brand_name, brand_slug: r.brand_slug, category: r.category, tags: r.tags ?? [], moods: r.moods ?? [],
-      formats: r.formats ?? [], poster: r.poster, template_name: r.template_name, featured: !!r.featured,
-    }));
+    return toCards(rows ?? []);
   });
 
 export const getBrandPage = createServerFn({ method: "GET" })
   .inputValidator((d: unknown) => z.object({ slug: z.string().max(60) }).parse(d))
   .handler(async ({ data }) => {
     const { publicClient } = await import("@/lib/site/reels.server");
+    const { toCards } = await import("./directory.server");
     const pc = publicClient() as any;
-    const { data: b } = await pc.from("directory_brands").select("id, name, website_url, category, description, slug").eq("slug", data.slug).maybeSingle();
+    const empty = { redirect: null as string | null, brand: null, reels: [] as DirectoryCard[], more: [] as { name: string; slug: string; poster: string | null }[] };
+    const { data: b } = await pc.from("directory_brands").select("id, name, website_url, category, description, slug, logo_url").eq("slug", data.slug).maybeSingle();
     if (!b) {
       const { data: h } = await pc.from("directory_slug_history").select("brand_id").eq("old_slug", data.slug).order("changed_at", { ascending: false }).limit(1).maybeSingle();
       if (h) {
         const { data: nb } = await pc.from("directory_brands").select("slug").eq("id", h.brand_id).maybeSingle();
-        if (nb) return { redirect: nb.slug as string, brand: null, reels: [] as DirectoryCard[] };
+        if (nb) return { ...empty, redirect: nb.slug as string };
       }
-      return { redirect: null, brand: null, reels: [] as DirectoryCard[] };
+      return empty;
     }
-    const { data: reels } = await pc.from("directory_reels").select("id, tags, moods, formats, poster_url, published_at, templates(name)").eq("brand_id", b.id).eq("status", "live").order("published_at", { ascending: false });
+    const { data: reels } = await pc.from("directory_reels").select("id, tags, moods, formats, published_at, templates(name)").eq("brand_id", b.id).eq("status", "live").order("published_at", { ascending: false });
+    if (!reels?.length) return empty;
     const { data: featured } = await pc.rpc("is_featured_brand", { _brand: b.id });
-    const signed = await signPosters(reels ?? []);
+    const cards = await toCards(reels.map((r: any) => ({ id: r.id, brand_name: b.name, brand_slug: b.slug, category: b.category, tags: r.tags, moods: r.moods, formats: r.formats, template_name: r.templates?.name ?? null, featured })));
+    const { data: similar } = await pc.rpc("search_directory", { q: "", size: null });
+    const seen = new Set<string>([b.slug]);
+    const moreRows = ((similar ?? []) as any[]).filter((r) => r.category === b.category && !seen.has(r.brand_slug) && seen.add(r.brand_slug)).slice(0, 12);
+    const moreCards = await toCards(moreRows);
     return {
       redirect: null,
-      brand: { name: b.name as string, website_url: b.website_url as string | null, category: b.category as string, description: b.description as string | null, slug: b.slug as string, featured: !!featured },
-      reels: signed.map((r: any) => ({ reel_id: r.id, brand_name: b.name, brand_slug: b.slug, category: b.category, tags: r.tags, moods: r.moods, formats: r.formats, poster: r.poster, template_name: r.templates?.name ?? null, featured: !!featured })) as DirectoryCard[],
+      brand: { name: b.name as string, website_url: b.website_url as string | null, category: b.category as string, description: b.description as string | null, slug: b.slug as string, logo_url: b.logo_url as string | null, featured: !!featured },
+      reels: cards,
+      more: moreCards.map((c) => ({ name: c.brand_name, slug: c.brand_slug, poster: c.poster })),
     };
+  });
+
+/** Public: report a live reel. */
+export const reportReel = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => z.object({ reelId: z.string().uuid(), reason: z.string().trim().min(1).max(500), email: z.string().trim().email().max(200).optional().or(z.literal("")) }).parse(d))
+  .handler(async ({ data }) => {
+    const { publicClient } = await import("@/lib/site/reels.server");
+    const { error } = await (publicClient() as any).from("directory_reports").insert({ directory_reel_id: data.reelId, reason: data.reason, reporter_email: data.email || null });
+    if (error) throw new Error("That report couldn't be sent. Try again.");
+    return { ok: true };
+  });
+
+/** "Make one like this": a new ad from the reel's template only, logged for analytics. */
+export const makeOneLikeThis = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ reelId: z.string().uuid().nullable(), templateId: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const sb = context.supabase as any;
+    const { data: t } = await sb.from("templates").select("id, name, slug").eq("id", data.templateId).maybeSingle();
+    if (!t) throw new Error("This template isn't available anymore.");
+    await sb.from("directory_make_events").insert({ directory_reel_id: data.reelId, template_id: t.id, user_id: context.userId });
+    return { slug: t.slug as string | null, name: t.name as string, id: t.id as string };
   });
 
 /* ---------------- admin review */
@@ -275,29 +303,74 @@ export const listDirectoryReview = createServerFn({ method: "POST" })
   .handler(async ({ context }) => {
     const sb = context.supabase as any;
     await assertAdmin(sb);
-    const { data } = await sb.from("directory_reels").select("id, ad_id, status, tags, moods, poster_url, updated_at, directory_brands(name, slug, website_url, first_approved_at), projects(name)").order("updated_at", { ascending: false }).limit(200);
-    const signed = await signPosters(data ?? []);
-    return signed.map((r: any) => ({
-      id: r.id as string, adId: r.ad_id as string, status: r.status as DirStatus, tags: r.tags as string[], moods: r.moods as string[], poster: r.poster as string | null,
-      updated: r.updated_at as string, brand: r.directory_brands?.name as string, slug: r.directory_brands?.slug as string, website: r.directory_brands?.website_url as string | null,
-      approved: !!r.directory_brands?.first_approved_at, ad: r.projects?.name as string,
-    }));
+    const { data } = await sb.from("directory_reels").select("id, ad_id, brand_id, status, tags, moods, poster_url, updated_at, review_note, hidden_reason, directory_brands(name, slug, website_url, category, description, first_approved_at), projects(name)").order("updated_at", { ascending: false }).limit(300);
+    const rows = await signPosters(data ?? []);
+    const ids = rows.map((r: any) => r.id);
+    const { data: logs } = ids.length ? await sb.from("permission_log").select("directory_reel_id, full_name, job_title, email, created_at, wording_version, action").in("directory_reel_id", ids).order("created_at", { ascending: false }) : { data: [] };
+    const last = new Map<string, any>();
+    for (const l of logs ?? []) if (!last.has(l.directory_reel_id)) last.set(l.directory_reel_id, l);
+    const { data: reports } = await sb.from("directory_reports").select("id, directory_reel_id, reason, reporter_email, created_at").is("resolved_at", null).order("created_at", { ascending: false });
+    return {
+      reels: rows.map((r: any) => ({
+        id: r.id as string, adId: r.ad_id as string, status: r.status as DirStatus, tags: r.tags as string[], moods: r.moods as string[], poster: r.poster as string | null,
+        updated: r.updated_at as string, note: r.review_note as string | null, brand: r.directory_brands?.name as string, slug: r.directory_brands?.slug as string,
+        website: r.directory_brands?.website_url as string | null, category: r.directory_brands?.category as string, description: r.directory_brands?.description as string | null,
+        approved: !!r.directory_brands?.first_approved_at, ad: (r.projects?.name as string) ?? "Untitled",
+        permission: (last.get(r.id) ?? null) as null | { full_name: string; job_title: string | null; email: string; created_at: string; wording_version: string; action: string },
+      })),
+      reports: ((reports ?? []) as any[]).map((x) => ({ id: x.id as string, reelId: x.directory_reel_id as string, reason: x.reason as string, email: x.reporter_email as string | null, created: x.created_at as string })),
+    };
   });
 
 export const reviewDirectoryReel = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ id: z.string().uuid(), action: z.enum(["approve", "hide"]) }).parse(d))
+  .inputValidator((d: unknown) => z.object({
+    id: z.string().uuid(),
+    action: z.enum(["approve", "reject", "hide", "review", "edit"]),
+    reason: z.string().trim().max(500).optional(),
+    tags: z.array(z.string().trim().min(1).max(40)).max(20).optional(),
+    moods: z.array(z.enum(MOODS)).max(3).optional(),
+    category: z.enum(CATEGORIES).optional(),
+  }).parse(d))
   .handler(async ({ data, context }) => {
     const sb = context.supabase as any;
     await assertAdmin(sb);
     const { data: reel } = await sb.from("directory_reels").select("id, brand_id").eq("id", data.id).single();
-    if (data.action === "approve") {
-      await sb.from("directory_brands").update({ first_approved_at: new Date().toISOString() }).eq("id", reel.brand_id).is("first_approved_at", null);
-      const { error } = await sb.from("directory_reels").update({ status: "live" }).eq("id", data.id);
-      if (error) throw new Error(error.message);
-    } else {
-      const { error } = await sb.from("directory_reels").update({ status: "hidden" }).eq("id", data.id);
+    const { brandOwnerEmail, sendDirectoryEmail, SITE } = await import("./directory.server");
+    if (data.tags || data.moods) {
+      const { error } = await sb.from("directory_reels").update({ ...(data.tags ? { tags: data.tags.map((t) => t.toLowerCase()) } : {}), ...(data.moods ? { moods: data.moods } : {}) }).eq("id", data.id);
       if (error) throw new Error(error.message);
     }
+    if (data.category) await sb.from("directory_brands").update({ category: data.category }).eq("id", reel.brand_id);
+    if (data.action === "edit") return { ok: true };
+    const patch =
+      data.action === "approve" ? { status: "live", review_note: null, hidden_reason: null }
+      : data.action === "reject" ? { status: "private", review_note: data.reason || null }
+      : data.action === "review" ? { status: "in_review" }
+      : { status: "hidden", hidden_reason: "admin" };
+    if (data.action === "reject" && !data.reason) throw new Error("Add a short reason.");
+    if (data.action === "approve") await sb.from("directory_brands").update({ first_approved_at: new Date().toISOString() }).eq("id", reel.brand_id).is("first_approved_at", null);
+    const { error } = await sb.from("directory_reels").update(patch).eq("id", data.id);
+    if (error) throw new Error(error.message);
+    if (data.action === "approve" || data.action === "reject") {
+      const o = await brandOwnerEmail(reel.brand_id);
+      if (o?.email) {
+        const page = `${SITE}/directory/${o.slug}`;
+        await sendDirectoryEmail(o.email, `dir-${data.action}-${data.id}-${Date.now()}`, data.action === "approve"
+          ? { subject: "Your reel is live in the Directory", heading: "Your reel is live in the Directory", paragraphs: [`People can now find ${o.name}'s reel in Gravity Pants search and on your brand page. New reels you share from now on go live straight away.`], buttonLabel: "See your reel", buttonUrl: `${page}?reel=${data.id}`, secondaryLabel: "Open your brand page", secondaryUrl: page }
+          : { subject: "Your reel wasn't added to the Directory", heading: "Your reel needs a change", paragraphs: [`We couldn't add ${o.name}'s reel to the Directory yet.`, `Reason: ${data.reason}`, "Make the change and share it again from the Share step."], buttonLabel: "Open Your Ads", buttonUrl: `${SITE}/app/ads` });
+      }
+    }
+    return { ok: true };
+  });
+
+export const resolveReport = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const sb = context.supabase as any;
+    await assertAdmin(sb);
+    const { error } = await sb.from("directory_reports").update({ resolved_at: new Date().toISOString() }).eq("id", data.id);
+    if (error) throw new Error(error.message);
     return { ok: true };
   });

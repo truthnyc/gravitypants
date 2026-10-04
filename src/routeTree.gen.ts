@@ -56,6 +56,7 @@ import { Route as AuthenticatedAppBrandRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAppExportsRouteImport } from './routes/_authenticated/app/exports'
 import { Route as AuthenticatedAppHelpRouteImport } from './routes/_authenticated/app/help'
 import { Route as ApiPublicCleanupExportsRouteImport } from './routes/api/public/cleanup-exports'
+import { Route as ApiPublicDirectoryDailyRouteImport } from './routes/api/public/directory-daily'
 import { Route as ApiPublicTrialRemindersRouteImport } from './routes/api/public/trial-reminders'
 import { Route as ApiPublicWeeklyReportRouteImport } from './routes/api/public/weekly-report'
 import { Route as AuthenticatedAdminClientsIdRouteImport } from './routes/_authenticated/admin/clients_.$id'
@@ -319,6 +320,11 @@ const ApiPublicCleanupExportsRoute = ApiPublicCleanupExportsRouteImport.update({
   path: '/api/public/cleanup-exports',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicDirectoryDailyRoute = ApiPublicDirectoryDailyRouteImport.update({
+  id: '/api/public/directory-daily',
+  path: '/api/public/directory-daily',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicTrialRemindersRoute = ApiPublicTrialRemindersRouteImport.update({
   id: '/api/public/trial-reminders',
   path: '/api/public/trial-reminders',
@@ -487,6 +493,7 @@ export interface FileRoutesByFullPath {
   '/app/exports': typeof AuthenticatedAppExportsRoute
   '/app/help': typeof AuthenticatedAppHelpRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
+  '/api/public/directory-daily': typeof ApiPublicDirectoryDailyRoute
   '/api/public/trial-reminders': typeof ApiPublicTrialRemindersRoute
   '/api/public/weekly-report': typeof ApiPublicWeeklyReportRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -553,6 +560,7 @@ export interface FileRoutesByTo {
   '/app/exports': typeof AuthenticatedAppExportsRoute
   '/app/help': typeof AuthenticatedAppHelpRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
+  '/api/public/directory-daily': typeof ApiPublicDirectoryDailyRoute
   '/api/public/trial-reminders': typeof ApiPublicTrialRemindersRoute
   '/api/public/weekly-report': typeof ApiPublicWeeklyReportRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -624,6 +632,7 @@ export interface FileRoutesById {
   '/_authenticated/app/exports': typeof AuthenticatedAppExportsRoute
   '/_authenticated/app/help': typeof AuthenticatedAppHelpRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
+  '/api/public/directory-daily': typeof ApiPublicDirectoryDailyRoute
   '/api/public/trial-reminders': typeof ApiPublicTrialRemindersRoute
   '/api/public/weekly-report': typeof ApiPublicWeeklyReportRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -695,6 +704,7 @@ export interface FileRouteTypes {
     | '/app/exports'
     | '/app/help'
     | '/api/public/cleanup-exports'
+    | '/api/public/directory-daily'
     | '/api/public/trial-reminders'
     | '/api/public/weekly-report'
     | '/admin/'
@@ -761,6 +771,7 @@ export interface FileRouteTypes {
     | '/app/exports'
     | '/app/help'
     | '/api/public/cleanup-exports'
+    | '/api/public/directory-daily'
     | '/api/public/trial-reminders'
     | '/api/public/weekly-report'
     | '/admin'
@@ -831,6 +842,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/exports'
     | '/_authenticated/app/help'
     | '/api/public/cleanup-exports'
+    | '/api/public/directory-daily'
     | '/api/public/trial-reminders'
     | '/api/public/weekly-report'
     | '/_authenticated/admin/'
@@ -881,6 +893,7 @@ export interface RootRouteChildren {
   InviteTokenRoute: typeof InviteTokenRoute
   DirectoryIndexRoute: typeof DirectoryIndexRoute
   ApiPublicCleanupExportsRoute: typeof ApiPublicCleanupExportsRoute
+  ApiPublicDirectoryDailyRoute: typeof ApiPublicDirectoryDailyRoute
   ApiPublicTrialRemindersRoute: typeof ApiPublicTrialRemindersRoute
   ApiPublicWeeklyReportRoute: typeof ApiPublicWeeklyReportRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
@@ -1220,6 +1233,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicCleanupExportsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/directory-daily': {
+      id: '/api/public/directory-daily'
+      path: '/api/public/directory-daily'
+      fullPath: '/api/public/directory-daily'
+      preLoaderRoute: typeof ApiPublicDirectoryDailyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/trial-reminders': {
       id: '/api/public/trial-reminders'
       path: '/api/public/trial-reminders'
@@ -1555,6 +1575,7 @@ const rootRouteChildren: RootRouteChildren = {
   InviteTokenRoute: InviteTokenRoute,
   DirectoryIndexRoute: DirectoryIndexRoute,
   ApiPublicCleanupExportsRoute: ApiPublicCleanupExportsRoute,
+  ApiPublicDirectoryDailyRoute: ApiPublicDirectoryDailyRoute,
   ApiPublicTrialRemindersRoute: ApiPublicTrialRemindersRoute,
   ApiPublicWeeklyReportRoute: ApiPublicWeeklyReportRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,

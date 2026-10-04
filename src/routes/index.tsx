@@ -1,4 +1,5 @@
 // TODO before launch: replace the reference placeholders [LOGO], [Your product line], [Customer logo], [Roaster name], [A customer quote about how fast they made their first reel, and what it did for their sales.], [Photo], [Customer name], [Role, Company], [X], [X] min, [X]%, [Result metric], [One-line result, e.g. how many ads they shipped for a launch], [One-line result, e.g. time saved each week], and [One-line result, e.g. lift in click-through].
+import { ReelCarousel } from "@/components/site/ReelCarousel";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { ReelVideo } from "@/components/site/ReelVideo";
@@ -686,28 +687,16 @@ function Home() {
               </Primary>
             </div>
           </div>
-          <div className="home-example-viewport" aria-label="Example reels made with Gravity Pants">
-            <div className="home-example-track">
-              {[...examples, ...examples].map((ex, i) => (
-                <figure
-                  key={`${ex.name}-${i}`}
-                  className="home-example-figure"
-                  aria-hidden={i >= examples.length ? true : undefined}
-                >
-                  <HomeExampleMedia example={ex} index={i} count={examples.length} />
-                  <figcaption>
-                    <b>{ex.name}</b>
-                    <span>{ex.detail}</span>
-                    {ex.href && (
-                      <a className="showcase-visit" href={ex.href} target="_blank" rel="noreferrer" tabIndex={i >= examples.length ? -1 : undefined}>
-                        Visit {ex.logo ?? ex.name} <ArrowUpRight size={13} strokeWidth={1.7} />
-                      </a>
-                    )}
-                  </figcaption>
-                </figure>
-              ))}
-            </div>
-          </div>
+          <ReelCarousel
+            label="Example reels made with Gravity Pants"
+            items={examples.map((ex, i) => ({
+              key: ex.name,
+              media: () => <HomeExampleMedia example={ex} index={i} count={examples.length} />,
+              title: ex.name,
+              detail: ex.detail,
+              visit: ex.href ? { href: ex.href, label: `Visit ${ex.logo ?? ex.name}` } : undefined,
+            }))}
+          />
           <p className="site-gallery-cta home-section">
             Want a reel like these for your brand?{" "}
             <Link to="/contact">
