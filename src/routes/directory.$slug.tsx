@@ -28,6 +28,7 @@ export const Route = createFileRoute("/directory/$slug")({
       description: b.description || `Reels and video ads by ${b.name}, made with Gravity Pants.`,
       ...(image ? { image } : {}),
     });
+    head.meta = [...(head.meta ?? []), { name: "robots", content: "noindex" }]; // Directory isn't on the marketing site yet
     const ld = {
       "@context": "https://schema.org",
       "@graph": [
