@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { Body, Container, Head, Heading, Html, Preview, Text } from '@react-email/components'
+import { Body, Button, Container, Head, Heading, Html, Preview, Text } from '@react-email/components'
 import type { TemplateEntry } from './registry'
-import { EmailHeader, brandContainer, brandFooter, brandH1, brandMain, brandText } from './brand'
+import { EmailHeader, brandButton, brandContainer, brandFooter, brandH1, brandMain, brandText } from './brand'
 
 interface Props {
   clientEmail?: string
@@ -31,6 +31,9 @@ const Email = ({ clientEmail, clientName, plan, until, reason, adminEmail }: Pro
           <strong>Reason:</strong> {reason || '—'}<br />
           <strong>Invited by:</strong> {adminEmail || '—'}
         </Text>
+        <Button style={brandButton} href="https://gravitypants.com/admin/clients">
+          Open Admin → Clients
+        </Button>
         <Text style={brandFooter}>Gravity Pants admin · This is a copy of a client invite for your records.</Text>
       </Container>
     </Body>
