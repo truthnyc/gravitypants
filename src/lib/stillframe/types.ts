@@ -68,6 +68,15 @@ export type TextSettings = {
   position?: string;
   same_on_all?: boolean;
   keep_under_headline?: boolean;
+  /** Tracking in 1/100 em (e.g. 10 = 0.1em). */
+  letter_spacing?: number;
+  /** Line height multiplier of font size. */
+  line_height?: number;
+  /** Subline only: show an image (second logo / badge) instead of text. */
+  mode?: "text" | "image";
+  image_path?: string | null;
+  /** Image width as % of frame width. */
+  image_size_pct?: number;
 };
 
 export type Frame = {
