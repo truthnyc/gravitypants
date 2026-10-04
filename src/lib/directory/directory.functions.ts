@@ -388,3 +388,34 @@ export const resolveReport = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+/** Admin: list every Directory brand with its page address. */
+export const listDirectoryBrands = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const sb = context.supabase as any;
+    await assertAdmin(sb);
+    const { data, error } = await sb.from("directory_brands").select("id, name, slug, website_url, category, first_approved_at, workspaces(name)").order("name");
+    if (error) throw new Error(error.message);
+    return ((data ?? []) as any[]).map((b) => ({
+      id: b.id as string, name: b.name as string, slug: b.slug as string, website: b.website_url as string | null,
+      category: b.category as string, approved: !!b.first_approved_at, workspace: b.workspaces?.name as string | null,
+    }));
+  });
+
+/** Admin: change any brand's Directory address. Old address redirects for 12 months. */
+export const adminSaveBrandSlug = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ slug: z.string().regex(/^[a-z0-9-]{3,40}$/), brandId: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const sb = context.supabase as any;
+    await assertAdmin(sb);
+    const { data: st } = await sb.rpc("slug_status", { _slug: data.slug, _brand: data.brandId });
+    if (st !== "available") throw new Error(st === "yours" ? "That's already this brand's address." : "That address is taken. Try another.");
+    const { data: b } = await sb.from("directory_brands").select("slug").eq("id", data.brandId).single();
+    const { error: hErr } = await sb.from("directory_slug_history").insert({ brand_id: data.brandId, old_slug: b.slug });
+    if (hErr) throw new Error(hErr.message);
+    const { error } = await sb.from("directory_brands").update({ slug: data.slug }).eq("id", data.brandId);
+    if (error) throw new Error(error.message);
+    return { slug: data.slug };
+  });
