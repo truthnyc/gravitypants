@@ -5,7 +5,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full text-[14px] font-medium cursor-pointer transition-colors focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed [&_svg]:pointer-events-none [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-[14px] font-medium cursor-pointer transition-colors focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed [&_svg]:pointer-events-none [&_svg]:shrink-0",
   {
     variants: {
       variant: {
@@ -28,10 +28,10 @@ const buttonVariants = cva(
         main: "h-10 px-5",
         large: "h-[50px] px-7 text-[15px]",
         sm: "h-8 px-3 text-[13px]",
-        icon: "h-[34px] w-[34px] rounded-full",
-        siteHeader: "h-10 rounded-full px-[18px] text-[15px] font-normal max-md:h-11",
-        site: "h-12 rounded-full px-6 text-[17px] font-normal",
-        siteTab: "h-10 rounded-full px-[18px] text-[15px] font-medium",
+        icon: "h-[34px] w-[34px] rounded-lg",
+        siteHeader: "h-10 rounded-lg px-[18px] text-[15px] font-normal max-md:h-11",
+        site: "h-12 rounded-lg px-6 text-[17px] font-normal",
+        siteTab: "h-10 rounded-lg px-[18px] text-[15px] font-medium",
       },
     },
     defaultVariants: {
