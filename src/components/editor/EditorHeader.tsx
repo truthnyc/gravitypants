@@ -116,7 +116,7 @@ export function EditorHeader({
 }
 
 /** ••• menu with staff-only actions; hidden for everyone else. */
-function StaffMenu({ adId }: { adId: string }) {
+export function StaffMenu({ adId }: { adId: string }) {
   const g = useMakeGlobalTemplate();
   if (!g.isAdmin) return null;
   return (

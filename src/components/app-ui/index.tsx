@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Check } from "lucide-react";
+import { Slot } from "@radix-ui/react-slot";
 import { cn } from "@/lib/utils";
 
 /* AppCard: white, 24px radius, 24px padding, no border. */
@@ -11,13 +12,16 @@ export function AppCard({ className, ...p }: React.HTMLAttributes<HTMLDivElement
 type BtnProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: "primary" | "ghost";
   size?: "sm" | "md" | "lg";
+  asChild?: boolean;
 };
 export const AppButton = React.forwardRef<HTMLButtonElement, BtnProps>(
-  ({ variant = "primary", size = "md", className, ...p }, ref) => (
-    <button
+  ({ variant = "primary", size = "md", asChild = false, className, ...p }, ref) => {
+    const Comp = asChild ? Slot : "button";
+    return (
+    <Comp
       ref={ref}
       className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-lg px-4 font-ap text-[15px] font-medium transition-colors outline-hidden focus-visible:shadow-ap-focus disabled:opacity-50",
+        "inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg px-4 font-ap text-[15px] font-medium whitespace-nowrap transition-colors outline-hidden focus-visible:shadow-ap-focus disabled:pointer-events-none disabled:opacity-50",
         size === "sm" ? "h-9 px-3.5 text-[14px]" : size === "md" ? "h-10" : "h-[46px] px-5",
         variant === "primary"
           ? "bg-ap-blue text-ap-card hover:bg-ap-blue-hover"
@@ -26,7 +30,8 @@ export const AppButton = React.forwardRef<HTMLButtonElement, BtnProps>(
       )}
       {...p}
     />
-  ),
+    );
+  },
 );
 AppButton.displayName = "AppButton";
 
@@ -127,7 +132,8 @@ export function AppSteps({ current, steps = AD_STEPS as unknown as string[], onS
 }
 
 /* AppSwitch: 52x32, blue when on. */
-export function AppSwitch({ checked, onCheckedChange, className, ...p }: {
+export function AppSwitch({ checked, onCheckedChange, small = false, className, ...p }: {
+  small?: boolean;
   checked: boolean;
   onCheckedChange: (v: boolean) => void;
 } & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "onChange">) {
@@ -138,13 +144,13 @@ export function AppSwitch({ checked, onCheckedChange, className, ...p }: {
       aria-checked={checked}
       onClick={() => onCheckedChange(!checked)}
       className={cn(
-        "relative h-8 w-[52px] shrink-0 rounded-full transition-colors outline-hidden focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ap-blue/40",
+        "relative shrink-0 rounded-full disabled:opacity-50", small ? "h-5 w-8" : "h-8 w-[52px]", " transition-colors outline-hidden focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ap-blue/40",
         checked ? "bg-ap-blue" : "bg-ap-switch-off",
         className,
       )}
       {...p}
     >
-      <span className={cn("absolute top-0.5 left-0.5 size-7 rounded-full bg-ap-card shadow-ap-knob transition-transform", checked && "translate-x-5")} />
+      <span className={cn("absolute top-0.5 left-0.5 rounded-full bg-ap-card shadow-ap-knob transition-transform", small ? "size-4" : "size-7", checked && (small ? "translate-x-3" : "translate-x-5"))} />
     </button>
   );
 }

@@ -71,6 +71,7 @@ import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/l
 import { Route as AuthenticatedAdminTemplatesIdEditRouteImport } from './routes/_authenticated/admin/templates.$id.edit'
 import { Route as AuthenticatedAppAdIdEditRouteImport } from './routes/_authenticated/app/ad.$id.edit'
 import { Route as AuthenticatedAppAdIdExportRouteImport } from './routes/_authenticated/app/ad.$id.export'
+import { Route as AuthenticatedAppAdIdPhotosRouteImport } from './routes/_authenticated/app/ad.$id.photos'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -401,6 +402,12 @@ const AuthenticatedAppAdIdExportRoute =
     path: '/ad/$id/export',
     getParentRoute: () => AuthenticatedAppRouteRoute,
   } as any)
+const AuthenticatedAppAdIdPhotosRoute =
+  AuthenticatedAppAdIdPhotosRouteImport.update({
+    id: '/ad/$id/photos',
+    path: '/ad/$id/photos',
+    getParentRoute: () => AuthenticatedAppRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -464,6 +471,7 @@ export interface FileRoutesByFullPath {
   '/admin/templates/$id/edit': typeof AuthenticatedAdminTemplatesIdEditRoute
   '/app/ad/$id/edit': typeof AuthenticatedAppAdIdEditRoute
   '/app/ad/$id/export': typeof AuthenticatedAppAdIdExportRoute
+  '/app/ad/$id/photos': typeof AuthenticatedAppAdIdPhotosRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -524,6 +532,7 @@ export interface FileRoutesByTo {
   '/admin/templates/$id/edit': typeof AuthenticatedAdminTemplatesIdEditRoute
   '/app/ad/$id/edit': typeof AuthenticatedAppAdIdEditRoute
   '/app/ad/$id/export': typeof AuthenticatedAppAdIdExportRoute
+  '/app/ad/$id/photos': typeof AuthenticatedAppAdIdPhotosRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -589,6 +598,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/templates/$id/edit': typeof AuthenticatedAdminTemplatesIdEditRoute
   '/_authenticated/app/ad/$id/edit': typeof AuthenticatedAppAdIdEditRoute
   '/_authenticated/app/ad/$id/export': typeof AuthenticatedAppAdIdExportRoute
+  '/_authenticated/app/ad/$id/photos': typeof AuthenticatedAppAdIdPhotosRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -654,6 +664,7 @@ export interface FileRouteTypes {
     | '/admin/templates/$id/edit'
     | '/app/ad/$id/edit'
     | '/app/ad/$id/export'
+    | '/app/ad/$id/photos'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -714,6 +725,7 @@ export interface FileRouteTypes {
     | '/admin/templates/$id/edit'
     | '/app/ad/$id/edit'
     | '/app/ad/$id/export'
+    | '/app/ad/$id/photos'
   id:
     | '__root__'
     | '/'
@@ -778,6 +790,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/templates/$id/edit'
     | '/_authenticated/app/ad/$id/edit'
     | '/_authenticated/app/ad/$id/export'
+    | '/_authenticated/app/ad/$id/photos'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1247,6 +1260,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppAdIdExportRouteImport
       parentRoute: typeof AuthenticatedAppRouteRoute
     }
+    '/_authenticated/app/ad/$id/photos': {
+      id: '/_authenticated/app/ad/$id/photos'
+      path: '/ad/$id/photos'
+      fullPath: '/app/ad/$id/photos'
+      preLoaderRoute: typeof AuthenticatedAppAdIdPhotosRouteImport
+      parentRoute: typeof AuthenticatedAppRouteRoute
+    }
   }
 }
 
@@ -1319,6 +1339,7 @@ interface AuthenticatedAppRouteRouteChildren {
   AuthenticatedAppTemplatesIndexRoute: typeof AuthenticatedAppTemplatesIndexRoute
   AuthenticatedAppAdIdEditRoute: typeof AuthenticatedAppAdIdEditRoute
   AuthenticatedAppAdIdExportRoute: typeof AuthenticatedAppAdIdExportRoute
+  AuthenticatedAppAdIdPhotosRoute: typeof AuthenticatedAppAdIdPhotosRoute
 }
 
 const AuthenticatedAppRouteRouteChildren: AuthenticatedAppRouteRouteChildren = {
@@ -1335,6 +1356,7 @@ const AuthenticatedAppRouteRouteChildren: AuthenticatedAppRouteRouteChildren = {
   AuthenticatedAppTemplatesIndexRoute: AuthenticatedAppTemplatesIndexRoute,
   AuthenticatedAppAdIdEditRoute: AuthenticatedAppAdIdEditRoute,
   AuthenticatedAppAdIdExportRoute: AuthenticatedAppAdIdExportRoute,
+  AuthenticatedAppAdIdPhotosRoute: AuthenticatedAppAdIdPhotosRoute,
 }
 
 const AuthenticatedAppRouteRouteWithChildren =

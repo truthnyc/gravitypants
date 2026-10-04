@@ -819,3 +819,16 @@ export function useCreateAdFromCustomization() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: projectKeys.all }),
   });
 }
+
+/** Name of the template an ad was made from, for the step pages' reel card. */
+export function useTemplateName(id: string | null | undefined) {
+  return useQuery({
+    queryKey: ["template-name", id],
+    enabled: !!id,
+    staleTime: 10 * 60_000,
+    queryFn: async () => {
+      const { data } = await supabase.from("templates").select("name").eq("id", id!).maybeSingle();
+      return (data?.name as string | undefined) ?? null;
+    },
+  }).data ?? null;
+}

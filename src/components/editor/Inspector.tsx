@@ -96,6 +96,7 @@ export function Inspector({
   actions,
   endSeconds = 0,
   mobile = false,
+  embedded = false,
 }: {
   endSeconds?: number;
   doc: EditorDoc;
@@ -110,6 +111,7 @@ export function Inspector({
   onSelect: (el: ElementKey) => void;
   actions: InspectorActions;
   mobile?: boolean;
+  embedded?: boolean;
 }) {
   const hasLogo = Boolean(doc.project.logo.path || doc.project.logo.light_path || doc.project.logo.dark_path);
   const values: Record<ElementKey, string> = {
@@ -125,9 +127,9 @@ export function Inspector({
   const colors = [...new Set([...(kit?.colors ?? []), ...TEXT_COLORS].map((c) => c.toUpperCase()))];
 
   return (
-    <aside className={cn("flex shrink-0 flex-col overflow-y-auto bg-inspector p-4", mobile ? "h-full w-full" : "hidden w-[344px] lg:flex")}>
-      <BrandKitRow kits={kits} kitId={kitId} onKit={actions.onKit} />
-      <div className={cn(mobile ? "flex gap-2 overflow-x-auto pb-1" : "grid grid-cols-3 gap-2")}>
+    <aside className={cn("flex shrink-0 flex-col", embedded ? "w-full" : "overflow-y-auto bg-inspector p-4", mobile ? "h-full w-full" : embedded ? "" : "hidden w-[344px] lg:flex")}>
+      <BrandKitRow embedded={embedded} kits={kits} kitId={kitId} onKit={actions.onKit} />
+      <div className={cn(mobile ? "flex gap-2 overflow-x-auto pb-1" : embedded ? "grid grid-cols-3 gap-2 sm:grid-cols-6" : "grid grid-cols-3 gap-2")}>
         {(Object.keys(ELEMENT_META) as ElementKey[]).map((el) => {
           const m = ELEMENT_META[el];
           const Icon = ICONS[el];
@@ -137,8 +139,8 @@ export function Inspector({
               key={el}
               type="button"
               onClick={() => onSelect(el)}
-              className={cn("flex shrink-0 rounded-sm bg-card text-left shadow-card transition-shadow", mobile ? "h-11 flex-row items-center gap-2 px-3" : "flex-col items-start gap-1.5 p-2.5")}
-              style={active ? { boxShadow: `0 0 0 2px ${m.color}`, background: `color-mix(in srgb, ${m.color} 7%, var(--card))` } : undefined}
+              className={cn("flex shrink-0 bg-card text-left transition-shadow", embedded ? "min-w-0 rounded-[12px] border border-ap-hairline" : "rounded-sm shadow-card", mobile ? "h-11 flex-row items-center gap-2 px-3" : "flex-col items-start gap-1.5 p-2.5")}
+              style={active ? (embedded ? { boxShadow: "0 0 0 2px var(--ap-blue)", borderColor: "var(--ap-blue)" } : { boxShadow: `0 0 0 2px ${m.color}`, background: `color-mix(in srgb, ${m.color} 7%, var(--card))` }) : undefined}
             >
               <span className="flex size-[22px] items-center justify-center rounded-full" style={{ background: m.color }}>
                 <Icon className="size-3 text-primary-foreground" strokeWidth={1.7} />
@@ -150,13 +152,20 @@ export function Inspector({
         })}
       </div>
 
+      {embedded ? (
+        <div className="mt-6 flex items-center gap-2 text-[12px] font-semibold tracking-[0.06em] text-ap-body uppercase">
+          {meta.label} · Frame {frameIndex + 1}
+          <span className="ml-auto font-normal tracking-normal normal-case nums">{scope}</span>
+        </div>
+      ) : (
       <div className="mt-4 flex items-center gap-2">
         <span className="size-2 rounded-full" style={{ background: meta.color }} />
         <span className="text-[15px] font-semibold">{meta.label}</span>
         <span className="ml-auto text-[12px] text-secondary-text nums">{scope}</span>
       </div>
+      )}
 
-      <div className="mt-3 space-y-4 rounded-sm bg-card p-4 shadow-card">
+      <div className={cn("mt-3 space-y-4", embedded ? "" : "rounded-sm bg-card p-4 shadow-card")}>
         {selected === "photo" && <PhotoPanel photo={frame.photo ?? {}} adjusting={adjusting} actions={actions} />}
         {(selected === "headline" || selected === "subline") && (
           <TextPanel key={selected} el={selected} text={frame[selected]} colors={colors} onChange={(p, k) => actions.onText(selected, p, k)} />
@@ -173,17 +182,17 @@ export function Inspector({
 
 /* ---------------- Brand kit */
 
-function BrandKitRow({ kits, kitId, onKit }: { kits: NamedBrandKit[]; kitId: string | null; onKit: (id: string | null) => void }) {
+function BrandKitRow({ kits, kitId, onKit, embedded }: { kits: NamedBrandKit[]; kitId: string | null; onKit: (id: string | null) => void; embedded?: boolean }) {
   const current = kits.find((k) => k.id === kitId);
   return (
-    <div className="mb-3 flex items-center gap-3 rounded-sm bg-card px-3 py-2 shadow-card">
+    <div className={cn("mb-3 flex items-center gap-3", embedded ? "mb-4 rounded-[14px] bg-ap-panel px-4 py-2.5" : "rounded-sm bg-card px-3 py-2 shadow-card")}>
       <span className="text-[13px] font-semibold">Brand kit</span>
       {kits.length ? (
         <select
           aria-label="Brand kit"
           value={current?.id ?? ""}
           onChange={(e) => onKit(e.target.value || null)}
-          className="ml-auto h-11 min-w-0 max-w-[60%] truncate rounded-sm bg-control-fill px-2 text-[16px] lg:h-8 lg:text-[13px]"
+          className={cn("ml-auto min-w-0 max-w-[60%] truncate", embedded ? "h-10 rounded-[12px] border border-ap-hairline bg-ap-card px-3 text-[14px]" : "h-11 rounded-sm bg-control-fill px-2 text-[16px] lg:h-8 lg:text-[13px]")}
         >
           <option value="">None</option>
           {kits.map((k) => (
@@ -532,7 +541,7 @@ function TextPanel({
 }) {
   const isHead = el === "headline";
   const t = text ?? {};
-  const color = isHead ? "var(--el-headline)" : "var(--el-subline)";
+  const color = "var(--accent-blue)";
   const size = t.size_px ?? (isHead ? 108 : 48);
   const family = t.font_family ?? DEFAULT_FONT;
   const weight = t.font_weight ?? (isHead ? 700 : 500);
@@ -804,7 +813,7 @@ function LogoPanel({
                 title={disabled ? "Add this version in your Brand Kit" : undefined}
                 className={cn(
                   "flex flex-col items-center gap-1 rounded-sm p-2 text-center disabled:opacity-40",
-                  version === t.value ? "ring-2 ring-el-logo" : "ring-1 ring-border",
+                  version === t.value ? "ring-2 ring-primary" : "ring-1 ring-border",
                 )}
               >
                 <span className={cn("flex h-9 w-full items-center justify-center rounded-sm", t.value === "light" ? "bg-foreground" : "bg-control-fill")}>
@@ -823,7 +832,7 @@ function LogoPanel({
       <Field label={`Position on ${format}`}>
         <PositionGrid
           value={logo.frame_positions?.[frame.id]?.[format] ?? logo.positions?.[format] ?? "top-right"}
-          color="var(--el-logo)"
+          color="var(--accent-blue)"
           onChange={(a) => {
             if (posScope === "frame") {
               const fp = logo.frame_positions ?? {};
@@ -845,7 +854,7 @@ function LogoPanel({
       <Field label="Size" value={`${size}% of width`}>
         <ElementSlider
           name="Logo size"
-          color="var(--el-logo)"
+          color="var(--accent-blue)"
           min={5}
           max={100}
           value={size}
@@ -880,7 +889,7 @@ function LogoPanel({
               onClick={() => {
                 actions.onLogoScope(o.value);
               }}
-              className={cn("h-7 rounded-lg px-2.5 text-[12px] font-medium", show === o.value ? "bg-el-logo text-primary-foreground" : "bg-control-fill")}
+              className={cn("h-7 rounded-lg px-2.5 text-[12px] font-medium", show === o.value ? "bg-primary text-primary-foreground" : "bg-control-fill")}
             >
               {o.label}
             </button>
@@ -985,7 +994,7 @@ function TransitionPanel({ frames, frame, first, actions }: { frames: Frame[]; f
             data-type={type}
             aria-pressed={tr.type === type}
             onClick={() => actions.onTransition({ type })}
-            className={cn("tr-tile flex flex-col items-center gap-1.5 rounded-sm p-1.5", tr.type === type ? "ring-2 ring-el-timing" : "ring-1 ring-border")}
+            className={cn("tr-tile flex flex-col items-center gap-1.5 rounded-sm p-1.5", tr.type === type ? "ring-2 ring-primary" : "ring-1 ring-border")}
             style={{ "--tr-anim": TR_ANIM[type] } as React.CSSProperties}
           >
             <span className="relative block h-12 w-full overflow-hidden rounded-[3px] bg-secondary-text/40">

@@ -55,7 +55,9 @@ export function FrameRail({
   onCopyStyle,
   onPasteStyle,
   onDelete,
+  horizontal = false,
 }: {
+  horizontal?: boolean;
   doc: EditorDoc;
   format: Format;
   frameIndex: number;
@@ -78,15 +80,16 @@ export function FrameRail({
   const [over, setOver] = useState<number | null>(null);
 
   return (
-    <nav className="flex h-full w-[132px] shrink-0 flex-col items-center overflow-y-auto border-r bg-rail py-4" aria-label="Frames">
-      <div className="mb-3 self-start px-4 text-[11px] font-semibold tracking-[0.06em] text-secondary-text">FRAMES</div>
+    <nav className={horizontal ? "-mx-1 flex items-start gap-1 overflow-x-auto px-1 pt-1 pb-2" : "flex h-full w-[132px] shrink-0 flex-col items-center overflow-y-auto border-r bg-rail py-4"} aria-label="Frames">
+      {!horizontal && <div className="mb-3 self-start px-4 text-[11px] font-semibold tracking-[0.06em] text-secondary-text">FRAMES</div>}
       {doc.frames.map((f, i) => (
-        <div key={f.id} className="flex flex-col items-center">
+        <div key={f.id} className={horizontal ? "flex shrink-0 items-start gap-1" : "flex flex-col items-center"}>
           {i > 0 && (
-            <div className="my-1.5">
+            <div className={horizontal ? "mt-[22px]" : "my-1.5"}>
               <TransitionChip frame={f} onClick={() => onSelectTransition(i)} />
             </div>
           )}
+          <div className="flex flex-col items-center">
           <ContextMenu>
           <ContextMenuTrigger asChild>
           <button
@@ -110,8 +113,9 @@ export function FrameRail({
             }}
             onClick={() => onSelect(i)}
             className={cn(
-              "relative h-[100px] w-[56px] overflow-hidden rounded-sm bg-control-fill",
-              i === frameIndex && "ring-2 ring-primary ring-offset-2 ring-offset-rail",
+              "relative overflow-hidden bg-control-fill",
+              horizontal ? "size-16 rounded-lg" : "h-[100px] w-[56px] rounded-sm",
+              i === frameIndex && (horizontal ? "ring-3 ring-ap-blue ring-offset-2 ring-offset-ap-card" : "ring-2 ring-primary ring-offset-2 ring-offset-rail"),
               over === i && dragFrom !== i && "ring-2 ring-primary/40",
               dragFrom === i && "opacity-50",
             )}
@@ -134,6 +138,7 @@ export function FrameRail({
           </ContextMenuContent>
           </ContextMenu>
           <span className="mt-1 text-[11px] text-secondary-text nums">{f.duration_sec.toFixed(1)}s</span>
+          </div>
         </div>
       ))}
       <button
@@ -141,7 +146,7 @@ export function FrameRail({
         onClick={() => inputRef.current?.click()}
         disabled={uploading}
         aria-label="Add photos"
-        className="mt-4 flex h-[100px] w-[56px] shrink-0 items-center justify-center rounded-sm border border-dashed border-placeholder-border text-icon disabled:opacity-50"
+        className={cn("flex shrink-0 items-center justify-center border border-dashed border-placeholder-border text-icon disabled:opacity-50", horizontal ? "ml-2 size-16 rounded-lg" : "mt-4 h-[100px] w-[56px] rounded-sm")}
       >
         <Plus className={cn("size-5", uploading && "animate-pulse")} strokeWidth={1.7} />
       </button>

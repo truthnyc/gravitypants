@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Copy, Pause, Play, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import { effectiveKit, framePayloadFromPhoto, useBrandKit, useBrandKits, type EditorDoc } from "@/lib/stillframe/data";
+import { ChevronLeft, ChevronRight, Play, Square, Undo2 } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { AppButton } from "@/components/app-ui";
+import { ReelCard, StepActions, StepShell, StepTitle } from "@/components/app-ui/StepShell";
+import { KitAgainButton } from "@/components/templates/KitAgain";
+import { effectiveKit, framePayloadFromPhoto, useBrandKit, useBrandKits, useTemplateName, type EditorDoc } from "@/lib/stillframe/data";
 import type { NamedBrandKit } from "@/lib/stillframe/types";
 import { ACCEPTED_IMAGE_TYPES, uploadMedia } from "@/lib/stillframe/media";
 import { registerCustomFonts } from "@/lib/stillframe/fonts";
@@ -17,17 +19,14 @@ import {
   type TextSettings,
   type TransitionSettings,
 } from "@/lib/stillframe/types";
-import { ALL_FORMATS, FORMAT_SIZE } from "@/render/formats";
+import { ALL_FORMATS } from "@/render/formats";
 import { DEFAULT_FONT, END_CARD_SECONDS, endCardOf, frameIndexAt, restTime, videoDuration, type Anchor, type BrandStyle } from "@/render/renderFrame";
-import { EditorHeader } from "./EditorHeader";
+import { StaffMenu } from "./EditorHeader";
 import { FrameRail } from "./FrameRail";
 import { Inspector, type InspectorActions } from "./Inspector";
 import { Stage } from "./Stage";
-import { Timeline } from "./Timeline";
-import { ELEMENT_META, useAutosave, useEditorDoc, useRenderAssets, type ElementKey } from "./use-editor";
+import { useAutosave, useEditorDoc, useRenderAssets, type ElementKey } from "./use-editor";
 import { cn } from "@/lib/utils";
-import { Drawer, DrawerContent, DrawerTitle } from "@/components/ui/drawer";
-import { MobileFrameStrip, MobileToolBar } from "./MobileEditorControls";
 
 const NEW_HEADLINE: TextSettings = {
   text: "",
@@ -88,13 +87,13 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
   const [uploading, setUploading] = useState(false);
   const [adjusting, setAdjusting] = useState(false);
   const [styleClip, setStyleClip] = useState<FrameStyle | null>(null);
-  const [mobileSheetOpen, setMobileSheetOpen] = useState(false);
   const [sameLength, setSameLength] = useState(false);
   const [sameTransition, setSameTransition] = useState(false);
   const replaceRef = useRef<HTMLInputElement>(null);
   const replaceAt = useRef(0);
   const { data: settings } = useBrandKit();
   const { data: kits } = useBrandKits();
+  const templateName = useTemplateName(initial.project.template_id);
   const named = kits?.find((k) => k.id === doc.project.brand_kit_id) ?? null;
   const kit = useMemo(() => (settings ? effectiveKit(settings, named) : settings), [settings, named]);
 
@@ -497,23 +496,60 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
 
   if (!frame) return null;
 
+  const meta = [templateName, `${frames.length} ${frames.length === 1 ? "photo" : "photos"}`, `${total.toFixed(1)} sec`].filter(Boolean).join(" · ");
+  const segments = [...frames.map((f) => f.duration_sec), ...(endSeconds ? [endSeconds] : [])];
+
   return (
-    <div className="flex h-full flex-col overflow-hidden bg-canvas">
-      <EditorHeader
-        id={doc.project.id}
-        name={doc.project.name}
-        templateId={doc.project.template_id}
-        status={status}
-        canUndo={canUndo}
-        playing={playing}
-        onRename={(name) => apply((d) => ({ ...d, project: { ...d.project, name } }))}
-        onUndo={undo}
-        onPlayVideo={playVideo}
-        exportDisabled={exportDisabled}
-      />
-      {banner}
-      <div className={cn("flex min-h-0 flex-1 flex-col lg:flex-row", readOnly && "pointer-events-none select-none")} aria-readonly={readOnly || undefined}>
-        <div className="hidden min-h-0 lg:block"><FrameRail
+    <StepShell
+      adId={doc.project.id}
+      step="edit"
+      banner={banner}
+      left={
+        <ReelCard
+          preview={
+            <div className={cn("h-full w-full", readOnly && "pointer-events-none select-none")}>
+              <Stage
+                doc={doc}
+                brand={brand}
+                frameIndex={idx}
+                format={format}
+                time={time}
+                playing={playing}
+                selected={selected}
+                images={images}
+                version={version}
+                onSelect={setSelected}
+                onMove={moveElement}
+                onText={setText}
+                adjusting={adjusting && selected === "photo"}
+                sizeOf={sizeOf}
+                onResize={resizeEl}
+                onFocus={(patch, key) => updatePhoto(patch, key)}
+                onAdjustDone={() => setAdjusting(false)}
+              />
+            </div>
+          }
+          playing={playing}
+          onTogglePlay={togglePlay}
+          segments={segments}
+          time={time}
+          total={total}
+          name={doc.project.name}
+          onRename={(name) => apply((d) => ({ ...d, project: { ...d.project, name } }))}
+          readOnly={readOnly}
+          meta={meta}
+          status={readOnly ? undefined : status}
+          formats={doc.project.formats}
+          format={format}
+          onFormat={(f) => setFormat(f as Format)}
+          onToggleFormat={(f, on) => toggleFormat(f as Format, on)}
+        />
+      }
+    >
+      <StepTitle title="Edit" lead="Tap a frame, then change its photo, words, logo, timing or transition." />
+      <div className={cn(readOnly && "pointer-events-none select-none")} aria-readonly={readOnly || undefined}>
+        <FrameRail
+          horizontal
           doc={doc}
           format={format}
           frameIndex={idx}
@@ -533,7 +569,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
           onCopyStyle={copyStyle}
           onPasteStyle={pasteStyle}
           onDelete={(i) => deleteFrame(i)}
-        /></div>
+        />
         <input
           ref={replaceRef}
           type="file"
@@ -545,84 +581,13 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
             if (f) void onReplaceFile(f);
           }}
         />
-
-        <main className="flex min-h-0 min-w-0 flex-1 flex-col px-3 py-2 sm:px-8 sm:py-4 lg:pb-4 lg:pt-4">
-          <div className="hidden items-center gap-2 lg:flex">
-            <span className="text-[13px] font-semibold nums">
-              Frame {idx + 1} of {frames.length}
-            </span>
-            <Button variant="plain" size="sm" onClick={() => duplicateFrame()}>
-              <Copy strokeWidth={1.7} /> Duplicate
-            </Button>
-            <Button variant="destructive-plain" size="sm" onClick={() => deleteFrame()}>
-              <Trash2 strokeWidth={1.7} /> Delete
-            </Button>
-          </div>
-
-          <div className={cn("min-h-0 flex-1 py-2 sm:py-4 lg:py-8", mobileSheetOpen && "max-h-[34dvh]")}>
-            <Stage
-              doc={doc}
-              brand={brand}
-              frameIndex={idx}
-              format={format}
-              time={time}
-              playing={playing}
-              selected={selected}
-              images={images}
-              version={version}
-              onSelect={(el) => { setSelected(el); if (window.matchMedia("(max-width: 1023px)").matches) setMobileSheetOpen(true); }}
-              onMove={moveElement}
-              onText={setText}
-              adjusting={adjusting && selected === "photo"}
-              sizeOf={sizeOf}
-              onResize={resizeEl}
-              onFocus={(patch, key) => updatePhoto(patch, key)}
-              onAdjustDone={() => setAdjusting(false)}
-            />
-          </div>
-
-          <div className="hidden items-end justify-center gap-4 lg:flex">
-            {ALL_FORMATS.map((f) => {
-              const s = FORMAT_SIZE[f];
-              const included = doc.project.formats.includes(f);
-              const active = f === format;
-              return (
-                <div key={f} className="flex flex-col items-center gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => setFormat(f)}
-                    className={cn(
-                      "flex h-[54px] w-[64px] items-center justify-center rounded-sm",
-                      active ? "bg-primary/10 ring-2 ring-primary" : "bg-card shadow-card",
-                    )}
-                    aria-label={`Preview ${f}`}
-                    aria-pressed={active}
-                  >
-                    <span
-                      className={cn("rounded-[2px]", active ? "bg-primary/60" : "bg-control-fill", !included && "opacity-40")}
-                      style={{ width: (s.width / Math.max(s.width, s.height)) * 34, height: (s.height / Math.max(s.width, s.height)) * 34 }}
-                    />
-                  </button>
-                  <label className="flex items-center gap-1.5 text-[12px] font-medium nums">
-                    <Switch
-                      checked={included}
-                      onCheckedChange={(v) => toggleFormat(f, v)}
-                      className="h-4 w-7 data-[state=checked]:bg-toggle-on [&>span]:size-3 [&>span]:data-[state=checked]:translate-x-3"
-                      aria-label={`Include ${f} in export`}
-                    />
-                    {f}
-                  </label>
-                </div>
-              );
-            })}
-          </div>
-          <div className="flex shrink-0 items-center justify-center gap-3 pb-2 lg:hidden">
-            <Button size="icon" className="size-12 rounded-full bg-foreground text-background" onClick={togglePlay} aria-label={playing ? "Pause" : "Play"}>{playing ? <Pause className="size-5" fill="currentColor" /> : <Play className="ml-0.5 size-5" fill="currentColor" />}</Button>
-            <div className="flex rounded-lg bg-control-fill p-0.5">{ALL_FORMATS.map((f) => <button key={f} type="button" onClick={() => setFormat(f)} aria-pressed={format === f} className={cn("h-11 rounded-lg px-4 text-[15px] font-medium nums", format === f && "bg-card shadow-segment")}>{f}</button>)}</div>
-          </div>
-        </main>
-
+        <div className="mt-5 mb-4 flex items-center gap-2">
+          <span className="mr-auto text-[15px] font-semibold nums">Frame {idx + 1} of {frames.length}</span>
+          <AppButton variant="ghost" size="sm" onClick={() => duplicateFrame()}>Duplicate</AppButton>
+          <AppButton variant="ghost" size="sm" className="bg-destructive/10 text-destructive hover:bg-destructive/15" onClick={() => deleteFrame()}>Delete</AppButton>
+        </div>
         <Inspector
+          embedded
           doc={doc}
           endSeconds={endSeconds}
           frame={frame}
@@ -638,35 +603,19 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
           actions={actions}
         />
       </div>
-
-      <MobileFrameStrip doc={doc} format={format} frameIndex={idx} images={images} version={version} uploading={uploading} onSelect={selectFrame} onReorder={reorder} onAddFiles={addFiles} />
-      <MobileToolBar selected={selected} onSelect={(el) => { setSelected(el); if (el !== "photo") setAdjusting(false); setMobileSheetOpen(true); }} />
-
-      <Drawer open={mobileSheetOpen} onOpenChange={setMobileSheetOpen} shouldScaleBackground={false}>
-        <DrawerContent className="h-[60dvh] lg:hidden">
-          <DrawerTitle className="sr-only">Edit {selected}</DrawerTitle>
-          <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-            <div className="flex h-12 shrink-0 items-center justify-between px-4"><span className="font-semibold">{ELEMENT_META[selected].label} <span className="ml-2 font-normal text-secondary-text nums">Frame {idx + 1}</span></span><button type="button" onClick={() => setMobileSheetOpen(false)} className="font-semibold text-link">Done</button></div>
-            <Inspector mobile doc={doc} endSeconds={endSeconds} frame={frame} frameIndex={idx} format={format} selected={selected} kit={kit} kits={kits ?? []} kitId={doc.project.brand_kit_id ?? null} adjusting={adjusting} onSelect={(el) => { setSelected(el); if (el !== "photo") setAdjusting(false); }} actions={actions} />
-          </div>
-        </DrawerContent>
-      </Drawer>
-
-      <Timeline
-        frames={frames}
-        endSeconds={endSeconds}
-        frameIndex={idx}
-        time={time}
-        playing={playing}
-        onTogglePlay={togglePlay}
-        onSeek={(t) => {
-          setPlaying(false);
-          setTime(t);
-          setFrameIndex(frameIndexAt(frames, t));
-        }}
-        onSelectFrame={selectFrame}
-        onDuration={setDuration}
-      />
-    </div>
+      <StepActions>
+        <AppButton variant="ghost" size="sm" onClick={undo} disabled={!canUndo || readOnly} aria-label="Undo"><Undo2 className="size-4" strokeWidth={1.7} /> Undo</AppButton>
+        <KitAgainButton adId={doc.project.id} templateId={doc.project.template_id} />
+        <StaffMenu adId={doc.project.id} />
+        <span className="flex-1" />
+        <AppButton asChild variant="ghost" size="lg"><Link to="/app/ad/$id/photos" params={{ id: doc.project.id }}><ChevronLeft className="size-4" strokeWidth={1.7} /> Photos</Link></AppButton>
+        <AppButton variant="ghost" size="lg" onClick={playVideo}>{playing ? <Square className="size-4" strokeWidth={1.7} /> : <Play className="size-4" strokeWidth={1.7} />} {playing ? "Stop" : "Play Video"}</AppButton>
+        {exportDisabled ? (
+          <AppButton size="lg" disabled>Next: Export <ChevronRight className="size-4" strokeWidth={1.7} /></AppButton>
+        ) : (
+          <AppButton asChild size="lg"><Link to="/app/ad/$id/export" params={{ id: doc.project.id }}>Next: Export <ChevronRight className="size-4" strokeWidth={1.7} /></Link></AppButton>
+        )}
+      </StepActions>
+    </StepShell>
   );
 }
