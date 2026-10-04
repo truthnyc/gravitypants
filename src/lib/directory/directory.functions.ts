@@ -454,3 +454,48 @@ export const adminSaveBrandSlug = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { slug: data.slug };
   });
+
+/** Admin: full settings for one brand page and its reels. */
+export const adminBrandDetail = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ brandId: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const sb = context.supabase as any;
+    await assertAdmin(sb);
+    const { data: b, error } = await sb.from("directory_brands").select("id, name, slug, website_url, category, description, logo_url, first_approved_at, plan_ended_at, created_at").eq("id", data.brandId).single();
+    if (error) throw new Error(error.message);
+    const { data: reels } = await sb.from("directory_reels").select("id, ad_id, title, status, tags, moods, formats, poster_url, published_at, review_note, hidden_reason, projects(name)").eq("brand_id", b.id).order("created_at", { ascending: false });
+    const signed = await signPosters((reels ?? []) as any[]);
+    return {
+      brand: { id: b.id as string, name: b.name as string, slug: b.slug as string, website: (b.website_url ?? "") as string, category: b.category as string, description: (b.description ?? "") as string, logo: await signLogo(b.logo_url), approved: b.first_approved_at as string | null, planEnded: b.plan_ended_at as string | null },
+      reels: signed.map((r: any) => ({ id: r.id as string, title: (r.title ?? r.projects?.name ?? "Untitled") as string, ad: (r.projects?.name ?? "Removed ad") as string, status: r.status as DirStatus, tags: (r.tags ?? []) as string[], moods: (r.moods ?? []) as string[], formats: (r.formats ?? []) as string[], poster: r.poster as string | null, published: r.published_at as string | null, note: (r.review_note ?? r.hidden_reason ?? null) as string | null })),
+    };
+  });
+
+/** Admin: edit a brand page's name, website, category and description. */
+export const adminSaveBrand = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({
+    brandId: z.string().uuid(), name: z.string().trim().min(1).max(80),
+    website: z.string().trim().max(200).refine((v) => !v || /^https?:\/\//.test(v), "Website must start with http:// or https://"),
+    category: z.enum(CATEGORIES), description: z.string().trim().max(500),
+  }).parse(d))
+  .handler(async ({ data, context }) => {
+    const sb = context.supabase as any;
+    await assertAdmin(sb);
+    const { error } = await sb.from("directory_brands").update({ name: data.name, website_url: data.website || null, category: data.category, description: data.description || null }).eq("id", data.brandId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+/** Admin: rename any Directory reel's public title. */
+export const adminRenameReel = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ reelId: z.string().uuid(), title: z.string().trim().min(1).max(80) }).parse(d))
+  .handler(async ({ data, context }) => {
+    const sb = context.supabase as any;
+    await assertAdmin(sb);
+    const { error } = await sb.from("directory_reels").update({ title: data.title }).eq("id", data.reelId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
