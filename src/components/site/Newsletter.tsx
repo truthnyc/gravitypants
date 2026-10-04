@@ -94,7 +94,7 @@ export function NewsletterPopup() {
         </DialogDescription>
       )}
       <div className="mt-8">
-        <Form source="popup" stacked={!split} />
+        <Form source="popup" stacked />
       </div>
       {c.note && <p className="mt-4 text-[12px] font-medium text-site-muted">{c.note}</p>}
     </div>
