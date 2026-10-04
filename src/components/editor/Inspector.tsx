@@ -26,6 +26,8 @@ import { MediaImage } from "@/components/stillframe/MediaImage";
 import { ELEMENT_META, type ElementKey } from "./use-editor";
 import { cn } from "@/lib/utils";
 import { Link } from "@tanstack/react-router";
+import { toast } from "sonner";
+import { uploadMedia } from "@/lib/stillframe/media";
 
 const ICONS: Record<ElementKey, typeof Type> = {
   photo: ImageIcon,
@@ -538,9 +540,29 @@ function TextPanel({
   const current = (t.color ?? "#FFFFFF").toUpperCase();
   const [extra, setExtra] = useState<string[]>([]);
   const swatches = [...new Set([...colors.map((c) => c.toUpperCase()), ...extra, ...(colors.map((c) => c.toUpperCase()).includes(current) ? [] : [current])])];
+  const spacing = t.letter_spacing ?? 0;
+  const lineHeight = t.line_height ?? (isHead ? 1.08 : 1.25);
+  const imageMode = !isHead && t.mode === "image";
+  const imgSize = t.image_size_pct ?? 30;
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [busy, setBusy] = useState(false);
 
   return (
     <>
+      {!isHead && (
+        <Field label="Show">
+          <Segmented
+            value={imageMode ? "image" : "text"}
+            options={[
+              { value: "text", label: "Text" },
+              { value: "image", label: "Logo / Badge" },
+            ]}
+            onChange={(v) => onChange({ mode: v as "text" | "image" })}
+          />
+        </Field>
+      )}
+      {!imageMode && (
+      <>
       <Field label="Text">
         <Textarea
           value={t.text ?? ""}
@@ -682,6 +704,7 @@ function TextPanel({
           />
         </div>
       </Field>
+      )}
       <Field label="Animation">
         <div className="flex flex-wrap gap-1.5">
           {ANIMATIONS.map((a) => (
