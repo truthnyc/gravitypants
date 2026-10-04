@@ -9,14 +9,37 @@ async function admin() {
   return supabaseAdmin as any;
 }
 
-/** Turns live reel rows into public cards: signed posters, seconds and photo counts (never other ad content). */
+/** Newest exported MP4 for an ad, as a media: path, or null when the ad was never exported. */
+export async function findLatestVideo(sb: any, wsId: string, adId: string): Promise<string | null> {
+  const root = `${wsId}/exports/${adId}`;
+  const { data: stamps } = await sb.storage.from("media").list(root, { limit: 100, sortBy: { column: "name", order: "desc" } });
+  for (const s of stamps ?? []) {
+    if (!s.name || s.name.startsWith(".")) continue;
+    const { data: files } = await sb.storage.from("media").list(`${root}/${s.name}`, { limit: 100 });
+    const mp4 = (files ?? []).filter((f: any) => f.name?.endsWith(".mp4")).sort((a: any, b: any) => a.name.localeCompare(b.name)).pop();
+    if (mp4) return `${POSTER_PREFIX}${root}/${s.name}/${mp4.name}`;
+  }
+  return null;
+}
+
+/** Turns live reel rows into public cards: signed posters and videos, seconds and photo counts (never other ad content). */
 export async function toCards(rows: any[]): Promise<DirectoryCard[]> {
   if (!rows.length) return [];
   const sb = await admin();
   const ids = rows.map((r) => r.reel_id ?? r.id);
   const { data: extra } = await sb.from("directory_reels")
-    .select("id, ad_id, template_id, poster_url, title, description, directory_brands(website_url)")
+    .select("id, ad_id, template_id, poster_url, video_url, title, description, directory_brands(website_url, workspace_id)")
     .in("id", ids);
+  // Reels shared before videos were stored get theirs found now, once.
+  for (const e of extra ?? []) {
+    if (!e.video_url && e.ad_id && e.directory_brands?.workspace_id) {
+      const v = await findLatestVideo(sb, e.directory_brands.workspace_id, e.ad_id);
+      if (v) {
+        await sb.from("directory_reels").update({ video_url: v }).eq("id", e.id);
+        e.video_url = v;
+      }
+    }
+  }
   const ex = new Map<string, any>((extra ?? []).map((e: any) => [e.id, e]));
   const adIds = (extra ?? []).map((e: any) => e.ad_id);
   const { data: frames } = adIds.length ? await sb.from("frames").select("project_id, duration_sec").in("project_id", adIds) : { data: [] };
@@ -27,7 +50,7 @@ export async function toCards(rows: any[]): Promise<DirectoryCard[]> {
     v.n += 1;
     len.set(f.project_id, v);
   }
-  const paths = (extra ?? []).map((e: any) => e.poster_url).filter((p: string | null) => p?.startsWith(POSTER_PREFIX)).map((p: string) => p.slice(POSTER_PREFIX.length));
+  const paths = (extra ?? []).flatMap((e: any) => [e.poster_url, e.video_url]).filter((p: string | null) => p?.startsWith(POSTER_PREFIX)).map((p: string) => p.slice(POSTER_PREFIX.length));
   const signed = new Map<string, string>();
   if (paths.length) {
     const { data } = await sb.storage.from("media").createSignedUrls(paths, 60 * 60 * 24);
@@ -38,6 +61,7 @@ export async function toCards(rows: any[]): Promise<DirectoryCard[]> {
     const e = ex.get(id);
     const l = len.get(e?.ad_id) ?? { sec: 0, n: 0 };
     const p: string | null = e?.poster_url ?? null;
+    const v: string | null = e?.video_url ?? null;
     return {
       reel_id: id,
       brand_name: r.brand_name,
@@ -47,6 +71,7 @@ export async function toCards(rows: any[]): Promise<DirectoryCard[]> {
       moods: r.moods ?? [],
       formats: r.formats ?? [],
       poster: p?.startsWith(POSTER_PREFIX) ? signed.get(p.slice(POSTER_PREFIX.length)) ?? null : p,
+      video: v?.startsWith(POSTER_PREFIX) ? signed.get(v.slice(POSTER_PREFIX.length)) ?? null : v,
       title: e?.title ?? null,
       template_name: r.template_name ?? null,
       template_id: e?.template_id ?? null,
