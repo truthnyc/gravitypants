@@ -13,7 +13,7 @@ export function FramePreview({ frame, format }: { frame: Frame; format: Format }
 
   return (
     <div
-      className="h-full overflow-hidden rounded-sm bg-control-fill"
+      className="min-w-0 flex-1 overflow-hidden rounded-sm bg-control-fill"
       style={{
         aspectRatio: String(FORMAT_RATIO[format]),
         backgroundColor: frame.photo?.background_color ?? undefined,

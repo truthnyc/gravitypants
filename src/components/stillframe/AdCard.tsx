@@ -91,7 +91,7 @@ export function AdCard({ project }: { project: ProjectWithFrames }) {
         className="block rounded-sm lg:bg-card lg:p-3 lg:shadow-card lg:transition-shadow lg:hover:shadow-popover/20"
         aria-label={`Open ${project.name}`}
       >
-        <div className="flex aspect-square items-center justify-center gap-1.5 rounded-sm bg-card p-3 shadow-card lg:h-[176px] lg:aspect-auto lg:gap-2 lg:bg-inspector/60 lg:shadow-none">
+        <div className="flex aspect-square items-center justify-center gap-1.5 overflow-hidden rounded-sm bg-card p-3 shadow-card lg:h-[176px] lg:aspect-auto lg:gap-2 lg:bg-inspector/60 lg:shadow-none">
           {previewFrames.length ? (
             previewFrames.map((frame) => (
               <FramePreview key={frame.id} frame={frame} format={project.primary_format} />
