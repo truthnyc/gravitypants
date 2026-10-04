@@ -90,7 +90,6 @@ function BrandPage() {
                   Visit {brand.name} <ArrowUpRight className="size-4" strokeWidth={1.7} />
                 </a>
               )}
-              <BrandActions brandId={brand.id} name={brand.name} />
               </div>
             </div>
           </header>
