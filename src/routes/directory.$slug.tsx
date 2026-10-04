@@ -5,7 +5,7 @@ import { SiteShell } from "@/components/site/SiteShell";
 import { DirectoryGrid, ReelDetail } from "@/components/directory/DirectoryGrid";
 import { ReelCarousel } from "@/components/site/ReelCarousel";
 import { getBrandPage } from "@/lib/directory/directory.functions";
-import { ratio, type DirectoryCard } from "@/lib/directory/directory";
+import type { DirectoryCard } from "@/lib/directory/directory";
 import { siteHead } from "@/lib/site/seo";
 
 const ORIGIN = "https://gravitypants.com";
@@ -113,4 +113,3 @@ function BrandPage() {
     </SiteShell>
   );
 }
-export { ratio };
