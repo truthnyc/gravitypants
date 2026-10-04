@@ -6,7 +6,7 @@ import { REEL_PREFIX } from "./reels";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 async function sign(content: HomepageContent): Promise<HomepageContent> {
-  const all = [...content.hero.photos, ...content.example.photos];
+  const all = [...content.hero.photos, ...content.example.photos, ...(content.quote.photo ? [content.quote.photo] : [])];
   const paths = all.filter((p) => p.ref.startsWith(REEL_PREFIX)).map((p) => p.ref.slice(REEL_PREFIX.length));
   if (!paths.length) return content;
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -14,16 +14,18 @@ async function sign(content: HomepageContent): Promise<HomepageContent> {
   const m = new Map<string, string>();
   for (const x of data ?? []) if (x.path && x.signedUrl) m.set(x.path, x.signedUrl);
   const fix = (ps: SitePhoto[]) => ps.map((p) => (p.ref.startsWith(REEL_PREFIX) ? { ...p, src: m.get(p.ref.slice(REEL_PREFIX.length)) ?? "" } : p)).filter((p) => p.src !== "");
-  return { hero: { ...content.hero, photos: fix(content.hero.photos) }, example: { ...content.example, photos: fix(content.example.photos) } };
+  const fixOne = (p: SitePhoto | null) => (p ? fix([p])[0] ?? null : null);
+  return { hero: { ...content.hero, photos: fix(content.hero.photos) }, example: { ...content.example, photos: fix(content.example.photos) }, quote: { ...content.quote, photo: fixOne(content.quote.photo) } };
 }
 
 function merge(rows: { key: string; value: any }[] | null): HomepageContent {
   const get = (k: string) => rows?.find((r) => r.key === k)?.value ?? {};
   const hero = { ...DEFAULT_CONTENT.hero, ...get("home_hero") };
   const example = { ...DEFAULT_CONTENT.example, ...get("example_of_week") };
+  const quote = { ...DEFAULT_CONTENT.quote, ...get("home_quote") };
   if (!hero.photos?.length) hero.photos = DEFAULT_CONTENT.hero.photos;
   if (!example.photos?.length) example.photos = DEFAULT_CONTENT.example.photos;
-  return { hero, example };
+  return { hero, example, quote };
 }
 
 /** Public: home banner + Example of the week, falling back to the bundled Purl Soho content. */
@@ -63,9 +65,11 @@ const heroSchema = z.object({
   secondary: s(40).min(1), note: s(200), reelId: z.string().uuid().nullable(), photos: z.array(photo).length(3),
 });
 const exampleSchema = z.object({ reelId: z.string().uuid().nullable(), title: s(120).min(1), description: s(400), photos: z.array(photo).min(1).max(3) });
+const quoteSchema = z.object({ quote: s(400).min(1), name: s(80), role: s(120), photo: photo.nullable() });
 const saveSchema = z.discriminatedUnion("key", [
   z.object({ key: z.literal("home_hero"), value: heroSchema.nullable() }),
   z.object({ key: z.literal("example_of_week"), value: exampleSchema.nullable() }),
+  z.object({ key: z.literal("home_quote"), value: quoteSchema.nullable() }),
 ]);
 
 /** Admin: save a section (value null = reset to default). */
