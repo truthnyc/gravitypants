@@ -55,6 +55,52 @@
 
 
 /*
+ * App surface tokens (signed-in pages, publish.html style). Prefixed "ap-".
+ * Used by src/components/app-ui. Not applied to any page yet.
+ */
+:root {
+  --ap-ink: #1d1d1f;
+  --ap-body: #57575c;
+  --ap-muted: #6e6e73;
+  --ap-blue: #0071e3;
+  --ap-blue-hover: #0077ed;
+  --ap-badge: #0058b0;
+  --ap-soft-blue: #eef4fb;
+  --ap-panel: #f5f5f7;
+  --ap-media: #ededf0;
+  --ap-hairline: #e5e5ea;
+  --ap-inner: #e8e8ed;
+  --ap-green: #248a3d;
+  --ap-card: #ffffff;
+  --ap-focus-ring: 0 0 0 3px rgba(0, 113, 227, 0.15);
+  --ap-shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 1px rgba(0, 0, 0, 0.04);
+  --ap-shadow-thumb: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --ap-font:
+    -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", system-ui, sans-serif;
+}
+
+@theme inline {
+  --color-ap-ink: var(--ap-ink);
+  --color-ap-body: var(--ap-body);
+  --color-ap-muted: var(--ap-muted);
+  --color-ap-blue: var(--ap-blue);
+  --color-ap-blue-hover: var(--ap-blue-hover);
+  --color-ap-badge: var(--ap-badge);
+  --color-ap-soft-blue: var(--ap-soft-blue);
+  --color-ap-panel: var(--ap-panel);
+  --color-ap-media: var(--ap-media);
+  --color-ap-hairline: var(--ap-hairline);
+  --color-ap-inner: var(--ap-inner);
+  --color-ap-green: var(--ap-green);
+  --color-ap-card: var(--ap-card);
+  --shadow-ap-focus: var(--ap-focus-ring);
+  --shadow-ap-soft: var(--ap-shadow-soft);
+  --shadow-ap-thumb: var(--ap-shadow-thumb);
+  --font-ap: var(--ap-font);
+}
+
+
+/*
  * Gravity Pants design system.
  * All app colors, radii, shadows and fonts are defined here as tokens.
  * Never hardcode colors in components.
