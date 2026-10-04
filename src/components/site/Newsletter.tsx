@@ -86,7 +86,7 @@ export function FooterNewsletter() {
     <div className="max-w-[360px]">
       <p className="text-[14px] font-semibold">Get reel tips by email</p>
       <p className="mb-3 mt-1 text-[13px] text-site-muted">
-        New templates, examples and ideas. No spam. Unsubscribe any time.
+        New templates, examples and ideas. <br></br>No spam. Unsubscribe any time.
       </p>
       <Form source="footer" />
     </div>
