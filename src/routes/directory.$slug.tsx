@@ -68,6 +68,9 @@ function BrandPage() {
         <div className="mx-auto max-w-[1280px] px-6 pt-12 pb-16">
           <Link to="/directory" className="text-[14px] text-ap-blue">← Directory</Link>
           <header className="mt-6 mb-12 flex flex-col gap-6 sm:flex-row sm:items-start">
+            <div className="flex items-center justify-end gap-2 sm:order-3 sm:flex-col">
+              <BrandActions brandId={brand.id} name={brand.name} />
+            </div>
             {brand.logo_url?.startsWith("https://")
               ? <img src={brand.logo_url} alt={`${brand.name} logo`} className="size-24 rounded-[16px] object-contain" />
               : <div className="grid size-24 shrink-0 place-items-center rounded-[16px] bg-ap-blue text-[30px] font-semibold text-ap-card">{initials}</div>}
@@ -87,7 +90,6 @@ function BrandPage() {
                   Visit {brand.name} <ArrowUpRight className="size-4" strokeWidth={1.7} />
                 </a>
               )}
-              <BrandActions brandId={brand.id} name={brand.name} />
               </div>
             </div>
           </header>
