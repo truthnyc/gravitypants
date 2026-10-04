@@ -83,6 +83,7 @@ function YourAds() {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const { query } = useSearch();
   const { data: projects, isLoading } = useProjects();
+  const dir = useDirectoryStatuses();
 
   const term = query.trim().toLowerCase();
   const { data: templates = [] } = useTemplates();
