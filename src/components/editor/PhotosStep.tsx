@@ -58,7 +58,10 @@ export function PhotosStep({ initial, readOnly = false }: { initial: EditorDoc; 
   };
 
   const remove = (i: number) => {
-    if (frames.length <= 1) return toast("An ad needs at least one photo.");
+    if (frames.length <= 1) {
+      toast("An ad needs at least one photo.");
+      return;
+    }
     apply((d) => ({ ...d, frames: d.frames.filter((_, j) => j !== i) }));
   };
   const reorder = (from: number, to: number) =>
