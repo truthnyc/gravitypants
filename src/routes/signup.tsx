@@ -69,7 +69,7 @@ function InvitedSignUp() {
     window.location.href = "/app/ads?welcome=1";
   }
 
-  if (state === "loading") return <AuthShell title="Opening your invite…" subtitle="One moment." />;
+  if (state === "loading") return <AuthShell title="Opening your invite…" subtitle="One moment."><span /></AuthShell>;
   if (state === "expired") {
     return (
       <AuthShell title="This invite link has expired" subtitle="Invite links work once and for a limited time. If you already set a password, sign in. Otherwise, ask us to send a new invite or reset your password.">
