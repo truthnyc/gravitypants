@@ -1,9 +1,11 @@
 import { useServerFn } from "@tanstack/react-start";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState, type FormEvent } from "react";
+import photo1 from "@/assets/site/purl-soho-photo-1.webp.asset.json";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { subscribeNewsletter } from "@/lib/site/newsletter.functions";
+import { cn } from "@/lib/utils";
 
 const KEY = "gp-newsletter";
 
@@ -28,19 +30,17 @@ function useSubscribe(source: "popup" | "footer") {
   return { state, error, submit };
 }
 
-function Form({ source }: { source: "popup" | "footer" }) {
+function Form({ source, stacked = false }: { source: "popup" | "footer"; stacked?: boolean }) {
   const { state, error, submit } = useSubscribe(source);
   if (state === "done") return <p className="text-[14px] text-site-ink" role="status">Thanks! Check your inbox to confirm.</p>;
   return (
-    <form onSubmit={submit} noValidate className="flex w-full flex-col gap-2">
-      <div className="flex w-full gap-2">
-        <label htmlFor={`nl-${source}`} className="sr-only">Email address</label>
-        <input id={`nl-${source}`} name="email" type="email" required maxLength={255} autoComplete="email" placeholder="you@brand.com"
-          className={`h-11 min-w-0 flex-1 rounded-[4px] border border-site-line px-3 text-[15px] text-site-ink outline-none focus:border-site-primary bg-site-page`} />
-        <Button type="submit" variant="site" size="siteHeader" className="h-11" disabled={state === "busy"}>
-          {state === "busy" ? <Loader2 size={16} strokeWidth={1.7} className="animate-spin" /> : "Subscribe"}
-        </Button>
-      </div>
+    <form onSubmit={submit} noValidate className={cn("flex w-full gap-2", stacked ? "flex-col" : "flex-col sm:flex-row")}>
+      <label htmlFor={`nl-${source}`} className="sr-only">Email address</label>
+      <input id={`nl-${source}`} name="email" type="email" required maxLength={255} autoComplete="email" placeholder="you@brand.com"
+        className={`h-11 min-w-0 flex-1 rounded-[4px] border border-site-line px-3 text-[15px] text-site-ink outline-none focus:border-site-primary bg-site-page`} />
+      <Button type="submit" variant="site" size="siteHeader" className={cn("h-11", stacked ? "w-full" : "sm:w-auto")} disabled={state === "busy"}>
+        {state === "busy" ? <Loader2 size={16} strokeWidth={1.7} className="animate-spin" /> : "Subscribe"}
+      </Button>
       {state === "error" && <p className="text-[13px] text-destructive" role="alert">{error}</p>}
     </form>
   );
@@ -69,14 +69,34 @@ export function NewsletterPopup() {
   };
   return (
     <Dialog open={open} onOpenChange={close}>
-      <DialogContent className="max-w-[420px] rounded-[4px] bg-site-page p-7 font-site">
-        <DialogTitle className="text-[22px] font-semibold text-site-ink">Better reels, in your inbox</DialogTitle>
-        <DialogDescription className="text-[15px] text-site-muted">
-          Get new templates, real brand examples and quick tips for turning photos into ads.
-        </DialogDescription>
-        <Form source="popup" />
+      <DialogContent className="max-w-[640px] overflow-hidden rounded-[4px] bg-site-page p-0 font-site">
+        <div className="flex">
+          <div className="flex-1 px-7 py-8 sm:px-9 sm:py-10">
+            <span className="inline-block rounded-full bg-site-soft-blue px-2.5 py-1 text-[11px] font-semibold uppercase tracking-widest text-site-eyebrow">
+              Reel tips
+            </span>
+            <DialogTitle className="mt-4 text-[30px] font-bold leading-[1.1] tracking-[-0.02em] text-site-ink">
+              Better reels,<br /><span className="text-site-primary">in your inbox</span>
+            </DialogTitle>
+            <DialogDescription className="mt-3 max-w-[280px] text-[15px] leading-relaxed text-site-muted">
+              Get new templates, real brand examples and quick tips for turning photos into ads.
+            </DialogDescription>
+            <div className="mt-7">
+              <Form source="popup" stacked />
+            </div>
+            <p className="mt-4 text-[12px] font-medium text-site-muted">Join the Gravity Pants creative community.</p>
+          </div>
+          <div className="hidden w-[220px] shrink-0 items-center justify-center border-l border-site-line bg-site-panel p-8 md:flex">
+            <div className="relative aspect-[9/19] w-full overflow-hidden rounded-[4px] border border-site-line bg-site-inner shadow-[0_20px_40px_rgb(0_0_0/0.12)]">
+              <img src={photo1} alt="Reel frame from a Gravity Pants ad" className="absolute inset-0 h-full w-full object-cover" />
+              <div className="absolute inset-x-4 bottom-4 flex h-1.5 gap-1.5">
+                <span className="h-full w-1/3 rounded-full bg-white/60" />
+                <span className="h-full flex-1 rounded-full bg-white/30" />
+              </div>
+            </div>
+          </div>
+        </div>
       </DialogContent>
     </Dialog>
   );
 }
-
