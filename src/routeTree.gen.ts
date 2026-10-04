@@ -60,6 +60,7 @@ import { Route as AuthenticatedAdminTemplatesIndexRouteImport } from './routes/_
 import { Route as AuthenticatedAdminTemplatesIdRouteImport } from './routes/_authenticated/admin/templates.$id'
 import { Route as AuthenticatedAdminTemplatesNewRouteImport } from './routes/_authenticated/admin/templates.new'
 import { Route as AuthenticatedAppAccountBillingRouteImport } from './routes/_authenticated/app/account_.billing'
+import { Route as AuthenticatedAppAccountDirectoryRouteImport } from './routes/_authenticated/app/account_.directory'
 import { Route as AuthenticatedAppAccountMembersRouteImport } from './routes/_authenticated/app/account_.members'
 import { Route as AuthenticatedAppAdminSplatRouteImport } from './routes/_authenticated/app/admin.$'
 import { Route as AuthenticatedAppTemplatesIndexRouteImport } from './routes/_authenticated/app/templates.index'
@@ -72,6 +73,7 @@ import { Route as AuthenticatedAdminTemplatesIdEditRouteImport } from './routes/
 import { Route as AuthenticatedAppAdIdEditRouteImport } from './routes/_authenticated/app/ad.$id.edit'
 import { Route as AuthenticatedAppAdIdExportRouteImport } from './routes/_authenticated/app/ad.$id.export'
 import { Route as AuthenticatedAppAdIdPhotosRouteImport } from './routes/_authenticated/app/ad.$id.photos'
+import { Route as AuthenticatedAppAdIdShareRouteImport } from './routes/_authenticated/app/ad.$id.share'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -338,6 +340,12 @@ const AuthenticatedAppAccountBillingRoute =
     path: '/account/billing',
     getParentRoute: () => AuthenticatedAppRouteRoute,
   } as any)
+const AuthenticatedAppAccountDirectoryRoute =
+  AuthenticatedAppAccountDirectoryRouteImport.update({
+    id: '/account_/directory',
+    path: '/account/directory',
+    getParentRoute: () => AuthenticatedAppRouteRoute,
+  } as any)
 const AuthenticatedAppAccountMembersRoute =
   AuthenticatedAppAccountMembersRouteImport.update({
     id: '/account_/members',
@@ -408,6 +416,12 @@ const AuthenticatedAppAdIdPhotosRoute =
     path: '/ad/$id/photos',
     getParentRoute: () => AuthenticatedAppRouteRoute,
   } as any)
+const AuthenticatedAppAdIdShareRoute =
+  AuthenticatedAppAdIdShareRouteImport.update({
+    id: '/ad/$id/share',
+    path: '/ad/$id/share',
+    getParentRoute: () => AuthenticatedAppRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -459,6 +473,7 @@ export interface FileRoutesByFullPath {
   '/admin/templates/$id': typeof AuthenticatedAdminTemplatesIdRouteWithChildren
   '/admin/templates/new': typeof AuthenticatedAdminTemplatesNewRoute
   '/app/account/billing': typeof AuthenticatedAppAccountBillingRoute
+  '/app/account/directory': typeof AuthenticatedAppAccountDirectoryRoute
   '/app/account/members': typeof AuthenticatedAppAccountMembersRoute
   '/app/admin/$': typeof AuthenticatedAppAdminSplatRoute
   '/app/templates/$slug': typeof AuthenticatedAppTemplatesSlugRoute
@@ -472,6 +487,7 @@ export interface FileRoutesByFullPath {
   '/app/ad/$id/edit': typeof AuthenticatedAppAdIdEditRoute
   '/app/ad/$id/export': typeof AuthenticatedAppAdIdExportRoute
   '/app/ad/$id/photos': typeof AuthenticatedAppAdIdPhotosRoute
+  '/app/ad/$id/share': typeof AuthenticatedAppAdIdShareRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -520,6 +536,7 @@ export interface FileRoutesByTo {
   '/admin/templates/$id': typeof AuthenticatedAdminTemplatesIdRouteWithChildren
   '/admin/templates/new': typeof AuthenticatedAdminTemplatesNewRoute
   '/app/account/billing': typeof AuthenticatedAppAccountBillingRoute
+  '/app/account/directory': typeof AuthenticatedAppAccountDirectoryRoute
   '/app/account/members': typeof AuthenticatedAppAccountMembersRoute
   '/app/admin/$': typeof AuthenticatedAppAdminSplatRoute
   '/app/templates/$slug': typeof AuthenticatedAppTemplatesSlugRoute
@@ -533,6 +550,7 @@ export interface FileRoutesByTo {
   '/app/ad/$id/edit': typeof AuthenticatedAppAdIdEditRoute
   '/app/ad/$id/export': typeof AuthenticatedAppAdIdExportRoute
   '/app/ad/$id/photos': typeof AuthenticatedAppAdIdPhotosRoute
+  '/app/ad/$id/share': typeof AuthenticatedAppAdIdShareRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -586,6 +604,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/templates/$id': typeof AuthenticatedAdminTemplatesIdRouteWithChildren
   '/_authenticated/admin/templates/new': typeof AuthenticatedAdminTemplatesNewRoute
   '/_authenticated/app/account_/billing': typeof AuthenticatedAppAccountBillingRoute
+  '/_authenticated/app/account_/directory': typeof AuthenticatedAppAccountDirectoryRoute
   '/_authenticated/app/account_/members': typeof AuthenticatedAppAccountMembersRoute
   '/_authenticated/app/admin/$': typeof AuthenticatedAppAdminSplatRoute
   '/_authenticated/app/templates/$slug': typeof AuthenticatedAppTemplatesSlugRoute
@@ -599,6 +618,7 @@ export interface FileRoutesById {
   '/_authenticated/app/ad/$id/edit': typeof AuthenticatedAppAdIdEditRoute
   '/_authenticated/app/ad/$id/export': typeof AuthenticatedAppAdIdExportRoute
   '/_authenticated/app/ad/$id/photos': typeof AuthenticatedAppAdIdPhotosRoute
+  '/_authenticated/app/ad/$id/share': typeof AuthenticatedAppAdIdShareRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -652,6 +672,7 @@ export interface FileRouteTypes {
     | '/admin/templates/$id'
     | '/admin/templates/new'
     | '/app/account/billing'
+    | '/app/account/directory'
     | '/app/account/members'
     | '/app/admin/$'
     | '/app/templates/$slug'
@@ -665,6 +686,7 @@ export interface FileRouteTypes {
     | '/app/ad/$id/edit'
     | '/app/ad/$id/export'
     | '/app/ad/$id/photos'
+    | '/app/ad/$id/share'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -713,6 +735,7 @@ export interface FileRouteTypes {
     | '/admin/templates/$id'
     | '/admin/templates/new'
     | '/app/account/billing'
+    | '/app/account/directory'
     | '/app/account/members'
     | '/app/admin/$'
     | '/app/templates/$slug'
@@ -726,6 +749,7 @@ export interface FileRouteTypes {
     | '/app/ad/$id/edit'
     | '/app/ad/$id/export'
     | '/app/ad/$id/photos'
+    | '/app/ad/$id/share'
   id:
     | '__root__'
     | '/'
@@ -778,6 +802,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/templates/$id'
     | '/_authenticated/admin/templates/new'
     | '/_authenticated/app/account_/billing'
+    | '/_authenticated/app/account_/directory'
     | '/_authenticated/app/account_/members'
     | '/_authenticated/app/admin/$'
     | '/_authenticated/app/templates/$slug'
@@ -791,6 +816,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/ad/$id/edit'
     | '/_authenticated/app/ad/$id/export'
     | '/_authenticated/app/ad/$id/photos'
+    | '/_authenticated/app/ad/$id/share'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1183,6 +1209,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppAccountBillingRouteImport
       parentRoute: typeof AuthenticatedAppRouteRoute
     }
+    '/_authenticated/app/account_/directory': {
+      id: '/_authenticated/app/account_/directory'
+      path: '/account/directory'
+      fullPath: '/app/account/directory'
+      preLoaderRoute: typeof AuthenticatedAppAccountDirectoryRouteImport
+      parentRoute: typeof AuthenticatedAppRouteRoute
+    }
     '/_authenticated/app/account_/members': {
       id: '/_authenticated/app/account_/members'
       path: '/account/members'
@@ -1267,6 +1300,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppAdIdPhotosRouteImport
       parentRoute: typeof AuthenticatedAppRouteRoute
     }
+    '/_authenticated/app/ad/$id/share': {
+      id: '/_authenticated/app/ad/$id/share'
+      path: '/ad/$id/share'
+      fullPath: '/app/ad/$id/share'
+      preLoaderRoute: typeof AuthenticatedAppAdIdShareRouteImport
+      parentRoute: typeof AuthenticatedAppRouteRoute
+    }
   }
 }
 
@@ -1333,6 +1373,7 @@ interface AuthenticatedAppRouteRouteChildren {
   AuthenticatedAppHelpRoute: typeof AuthenticatedAppHelpRoute
   AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
   AuthenticatedAppAccountBillingRoute: typeof AuthenticatedAppAccountBillingRoute
+  AuthenticatedAppAccountDirectoryRoute: typeof AuthenticatedAppAccountDirectoryRoute
   AuthenticatedAppAccountMembersRoute: typeof AuthenticatedAppAccountMembersRoute
   AuthenticatedAppAdminSplatRoute: typeof AuthenticatedAppAdminSplatRoute
   AuthenticatedAppTemplatesSlugRoute: typeof AuthenticatedAppTemplatesSlugRoute
@@ -1340,6 +1381,7 @@ interface AuthenticatedAppRouteRouteChildren {
   AuthenticatedAppAdIdEditRoute: typeof AuthenticatedAppAdIdEditRoute
   AuthenticatedAppAdIdExportRoute: typeof AuthenticatedAppAdIdExportRoute
   AuthenticatedAppAdIdPhotosRoute: typeof AuthenticatedAppAdIdPhotosRoute
+  AuthenticatedAppAdIdShareRoute: typeof AuthenticatedAppAdIdShareRoute
 }
 
 const AuthenticatedAppRouteRouteChildren: AuthenticatedAppRouteRouteChildren = {
@@ -1350,6 +1392,7 @@ const AuthenticatedAppRouteRouteChildren: AuthenticatedAppRouteRouteChildren = {
   AuthenticatedAppHelpRoute: AuthenticatedAppHelpRoute,
   AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
   AuthenticatedAppAccountBillingRoute: AuthenticatedAppAccountBillingRoute,
+  AuthenticatedAppAccountDirectoryRoute: AuthenticatedAppAccountDirectoryRoute,
   AuthenticatedAppAccountMembersRoute: AuthenticatedAppAccountMembersRoute,
   AuthenticatedAppAdminSplatRoute: AuthenticatedAppAdminSplatRoute,
   AuthenticatedAppTemplatesSlugRoute: AuthenticatedAppTemplatesSlugRoute,
@@ -1357,6 +1400,7 @@ const AuthenticatedAppRouteRouteChildren: AuthenticatedAppRouteRouteChildren = {
   AuthenticatedAppAdIdEditRoute: AuthenticatedAppAdIdEditRoute,
   AuthenticatedAppAdIdExportRoute: AuthenticatedAppAdIdExportRoute,
   AuthenticatedAppAdIdPhotosRoute: AuthenticatedAppAdIdPhotosRoute,
+  AuthenticatedAppAdIdShareRoute: AuthenticatedAppAdIdShareRoute,
 }
 
 const AuthenticatedAppRouteRouteWithChildren =

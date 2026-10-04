@@ -7,7 +7,7 @@ import { ArrowUpRight } from "lucide-react";
 import { AccountTabs } from "@/components/billing/AccountTabs";
 import { AppButton } from "@/components/app-ui";
 import { checkSlug, getDirectoryAccount, hideReel, saveSlug } from "@/lib/directory/directory.functions";
-import type { DirStatus } from "@/lib/directory/directory";
+import { STATUS_LABEL } from "@/lib/directory/directory";
 import { getWorkspaceId } from "@/lib/stillframe/workspace";
 import { cn } from "@/lib/utils";
 
@@ -25,7 +25,6 @@ export const Route = createFileRoute("/_authenticated/app/account_/directory")({
   component: DirectoryAccount,
 });
 
-export const STATUS_LABEL: Record<DirStatus, string> = { private: "Private", in_review: "In review", live: "Live in the Directory", hidden: "Hidden" };
 
 function DirectoryAccount() {
   const ws = getWorkspaceId();
