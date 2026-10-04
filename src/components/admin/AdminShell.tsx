@@ -9,6 +9,7 @@ const NAV = [
   { to: "/admin/templates", label: "Templates", icon: LayoutTemplate },
   { to: "/admin/reels", label: "Website Reels", icon: Clapperboard },
   { to: "/admin/homepage", label: "Homepage", icon: Home },
+  { to: "/admin/newsletter", label: "Newsletter", icon: Mail },
   { to: "/admin/exports", label: "Exports", icon: Video },
   { to: "/admin/admins", label: "Admins", icon: ShieldCheck },
   { to: "/admin/audit", label: "Audit Log", icon: FileClock },
