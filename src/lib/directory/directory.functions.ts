@@ -21,6 +21,41 @@ async function signPosters<T extends { poster_url: string | null }>(rows: T[]): 
   return rows.map((r) => ({ ...r, poster: r.poster_url?.startsWith(POSTER_PREFIX) ? m.get(r.poster_url.slice(POSTER_PREFIX.length)) ?? null : r.poster_url }));
 }
 
+const LOGO_PREFIX = "brand-assets:";
+async function signLogo(url: string | null): Promise<string | null> {
+  if (!url) return null;
+  if (!url.startsWith(LOGO_PREFIX)) return url.startsWith("https://") ? url : null;
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data } = await supabaseAdmin.storage.from("brand-assets").createSignedUrl(url.slice(LOGO_PREFIX.length), 60 * 60 * 24);
+  return data?.signedUrl ?? null;
+}
+
+/** Brand members upload (or remove) the logo shown on their Directory brand page. */
+export const setBrandLogo = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({
+    brandId: z.string().uuid(),
+    file: z.object({ base64: z.string().max(3_000_000), type: z.enum(["image/png", "image/jpeg", "image/webp", "image/svg+xml"]) }).nullable(),
+  }).parse(d))
+  .handler(async ({ data, context }) => {
+    const sb = context.supabase as any;
+    const { data: b } = await sb.from("directory_brands").select("id, workspace_id").eq("id", data.brandId).maybeSingle();
+    if (!b) throw new Error("This brand page isn't available");
+    let logo: string | null = null;
+    if (data.file) {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const ext = { "image/png": "png", "image/jpeg": "jpg", "image/webp": "webp", "image/svg+xml": "svg" }[data.file.type];
+      const path = `${b.workspace_id}/directory-logo-${Date.now()}.${ext}`;
+      const bytes = Uint8Array.from(atob(data.file.base64), (c) => c.charCodeAt(0));
+      const { error } = await supabaseAdmin.storage.from("brand-assets").upload(path, bytes, { contentType: data.file.type });
+      if (error) throw new Error("Couldn't upload the logo");
+      logo = LOGO_PREFIX + path;
+    }
+    const { error } = await sb.from("directory_brands").update({ logo_url: logo }).eq("id", b.id);
+    if (error) throw new Error("Couldn't save the logo");
+    return { ok: true };
+  });
+
 async function planState(sb: any, ws: string, brandEnded: string | null): Promise<{ tag: PlanTag; endedAt: string | null }> {
   const { data: plan } = await sb.rpc("directory_effective_plan", { _ws: ws });
   if (plan) return { tag: String(plan).startsWith("business") ? "business" : "simple", endedAt: null };
@@ -194,7 +229,7 @@ export const getDirectoryAccount = createServerFn({ method: "POST" })
     const { data: log } = await sb.from("permission_log").select("id, created_at, ad_id, action, full_name, job_title, email, wording_version, wording_text").eq("brand_id", b.id).order("created_at", { ascending: false }).limit(500);
     const names = new Map<string, string>((reels ?? []).map((r: any) => [r.ad_id, r.title ?? r.projects?.name ?? "Untitled"]));
     return {
-      brand: { id: b.id as string, name: b.name as string, slug: b.slug as string },
+      brand: { id: b.id as string, name: b.name as string, slug: b.slug as string, logo: await signLogo(b.logo_url) },
       reels: ((reels ?? []) as any[]).map((r: any) => ({ adId: r.ad_id as string, name: (r.title as string | null) ?? r.projects?.name ?? "Untitled", status: r.status as DirStatus, updated: r.updated_at as string })),
       log: (log ?? []).map((l: any) => ({ ...l, reel: names.get(l.ad_id) ?? "Removed ad" })) as {
         id: string; created_at: string; reel: string; action: "granted" | "withdrawn"; full_name: string; job_title: string | null; email: string; wording_version: string; wording_text: string;
@@ -277,7 +312,7 @@ export const getBrandPage = createServerFn({ method: "GET" })
     const moreCards = await toCards(moreRows);
     return {
       redirect: null,
-      brand: { id: b.id as string, name: b.name as string, website_url: b.website_url as string | null, category: b.category as string, description: b.description as string | null, slug: b.slug as string, logo_url: b.logo_url as string | null, featured: !!featured },
+      brand: { id: b.id as string, name: b.name as string, website_url: b.website_url as string | null, category: b.category as string, description: b.description as string | null, slug: b.slug as string, logo_url: await signLogo(b.logo_url), featured: !!featured },
       reels: cards,
       more: moreCards.map((c) => ({ name: c.brand_name, slug: c.brand_slug, poster: c.poster })),
     };
