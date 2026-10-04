@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
-const btn = "inline-flex h-11 items-center gap-1.5 rounded-lg bg-ap-panel px-4 text-[15px] font-medium text-ap-ink";
+const btn = "inline-flex size-11 items-center justify-center rounded-lg bg-ap-panel text-ap-ink transition-colors hover:text-ap-blue";
 
 /** Share / Bookmark for everyone; "Save to my favorites" for signed-in people (RLS keeps favorites private). */
 export function BrandActions({ brandId, name }: { brandId: string; name: string }) {
@@ -49,12 +49,11 @@ export function BrandActions({ brandId, name }: { brandId: string; name: string 
 
   return (
     <>
-      <button type="button" onClick={share} className={btn}><Share2 className="size-4" strokeWidth={1.7} />Share this page</button>
-      <button type="button" onClick={bookmark} className={btn}><Bookmark className="size-4" strokeWidth={1.7} />Bookmark</button>
+      <button type="button" onClick={share} aria-label="Share this page" title="Share this page" className={btn}><Share2 className="size-5" strokeWidth={1.7} /></button>
+      <button type="button" onClick={bookmark} aria-label="Bookmark" title="Bookmark" className={btn}><Bookmark className="size-5" strokeWidth={1.7} /></button>
       {userId && (
-        <button type="button" onClick={toggle} aria-pressed={saved} className={cn(btn, saved && "text-ap-blue")}>
-          <Heart className={cn("size-4", saved && "fill-current")} strokeWidth={1.7} />
-          {saved ? "Saved to my favorites" : "Save to my favorites"}
+        <button type="button" onClick={toggle} aria-pressed={saved} aria-label={saved ? "Remove from my favorites" : "Save to my favorites"} title={saved ? "Saved to my favorites" : "Save to my favorites"} className={cn(btn, saved && "text-ap-blue")}>
+          <Heart className={cn("size-5", saved && "fill-current")} strokeWidth={1.7} />
         </button>
       )}
     </>
