@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { ArrowUpRight, Pencil } from "lucide-react";
 import { AccountTabs } from "@/components/billing/AccountTabs";
 import { AppButton } from "@/components/app-ui";
-import { checkSlug, getDirectoryAccount, hideReel, renameDirectoryReel, saveSlug } from "@/lib/directory/directory.functions";
+import { checkSlug, getDirectoryAccount, hideReel, renameDirectoryReel, saveSlug, setBrandLogo } from "@/lib/directory/directory.functions";
 import { STATUS_LABEL } from "@/lib/directory/directory";
 import { getWorkspaceId } from "@/lib/stillframe/workspace";
 import { cn } from "@/lib/utils";
@@ -63,6 +63,7 @@ function DirectoryAccount() {
       ) : (
         <section className="rounded-[24px] bg-ap-card p-[26px] font-ap text-ap-ink">
           <h2 className="text-[20px] font-semibold">My reels</h2>
+          <LogoBox brandId={d.brand.id} name={d.brand.name} logo={d.brand.logo} onSaved={() => void qc.invalidateQueries({ queryKey: ["directory-account", ws] })} />
           <SlugBox brandId={d.brand.id} slug={d.brand.slug} onSaved={() => void qc.invalidateQueries({ queryKey: ["directory-account", ws] })} />
 
           <table className="mt-2 w-full text-left text-[14px]">
@@ -179,6 +180,49 @@ function SlugBox({ brandId, slug, onSaved }: { brandId: string; slug: string; on
         } catch (e) { toast.error(e instanceof Error ? e.message : "Couldn't save. Try again."); } finally { setBusy(false); }
       }}>Save address</AppButton>
       <a href={`/directory/${slug}`} target="_blank" rel="noreferrer" className="ml-auto inline-flex items-center gap-1 text-ap-blue">View page <ArrowUpRight className="size-3.5" strokeWidth={1.7} /></a>
+    </div>
+  );
+}
+
+function LogoBox({ brandId, name, logo, onSaved }: { brandId: string; name: string; logo: string | null; onSaved: () => void }) {
+  const save = useServerFn(setBrandLogo);
+  const [busy, setBusy] = useState(false);
+  const run = async (file: File | null) => {
+    if (file && file.size > 2_000_000) { toast.error("Use a logo under 2 MB"); return; }
+    setBusy(true);
+    try {
+      let payload = null;
+      if (file) {
+        const buf = new Uint8Array(await file.arrayBuffer());
+        let bin = "";
+        for (let i = 0; i < buf.length; i += 0x8000) bin += String.fromCharCode(...buf.subarray(i, i + 0x8000));
+        payload = { base64: btoa(bin), type: file.type as "image/png" };
+      }
+      await save({ data: { brandId, file: payload } });
+      toast.success(file ? "Logo updated on your brand page" : "Logo removed");
+      onSaved();
+    } catch (e) { toast.error(e instanceof Error ? e.message : "Couldn't save the logo"); }
+    finally { setBusy(false); }
+  };
+  return (
+    <div className="mt-4 flex items-center gap-4">
+      <div className="flex size-16 items-center justify-center overflow-hidden rounded-[12px] bg-ap-panel text-[20px] font-semibold text-ap-muted">
+        {logo ? <img src={logo} alt={`${name} logo`} className="size-full object-contain" /> : name.slice(0, 1).toUpperCase()}
+      </div>
+      <div className="flex flex-col gap-1">
+        <span className="text-[14px] font-medium">Brand logo</span>
+        <span className="text-[12px] text-ap-muted">PNG, JPG, WebP or SVG, up to 2 MB. Shown on your brand page.</span>
+        <div className="mt-1 flex gap-2">
+          <AppButton asChild size="sm" disabled={busy}>
+            <label className="cursor-pointer">
+              {busy ? "Saving..." : logo ? "Replace logo" : "Upload logo"}
+              <input type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" className="sr-only" disabled={busy}
+                onChange={(e) => { const f = e.target.files?.[0] ?? null; e.target.value = ""; if (f) void run(f); }} />
+            </label>
+          </AppButton>
+          {logo && <AppButton variant="ghost" size="sm" disabled={busy} onClick={() => void run(null)}>Remove</AppButton>}
+        </div>
+      </div>
     </div>
   );
 }
