@@ -41,5 +41,11 @@ export type DirectoryCard = {
   formats: string[];
   poster: string | null;
   template_name: string | null;
+  template_id: string | null;
   featured: boolean;
+  seconds: number;
+  photos: number;
+  description: string | null;
+  website_url: string | null;
 };
+export const ratio = (f: string) => f.replace("x", ":");
