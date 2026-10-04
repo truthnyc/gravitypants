@@ -411,5 +411,22 @@ export const adminInviteClient = createServerFn({ method: "POST" })
     if (bill) await db.from("workspace_billing").update(comp).eq("workspace_id", ws.id);
     else await db.from("workspace_billing").insert({ workspace_id: ws.id, ...comp });
     await log(db, ctx.userId, "invite_client", ws.id, `${data.email} · ${data.plan} until ${data.until.slice(0, 10)}`, data.reason);
+    try {
+      const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
+      const { data: adminUser } = await db.auth.admin.getUserById(ctx.userId);
+      await sendTemplateEmail("client-invite-copy", "help@gravitypants.com", {
+        templateData: {
+          clientEmail: data.email,
+          clientName: data.name || undefined,
+          plan: data.plan.charAt(0).toUpperCase() + data.plan.slice(1),
+          until: data.until.slice(0, 10),
+          reason: data.reason || undefined,
+          adminEmail: adminUser?.user?.email ?? undefined,
+        },
+        idempotencyKey: `client-invite-copy-${ws.id}`,
+      });
+    } catch {
+      // The client invite itself was sent; the staff copy is best-effort.
+    }
     return { ok: true, workspaceId: ws.id };
   });
