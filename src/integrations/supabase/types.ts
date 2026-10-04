@@ -232,6 +232,7 @@ export type Database = {
           created_at: string
           description: string | null
           first_approved_at: string | null
+          grace_emails_sent: number
           id: string
           logo_url: string | null
           name: string
@@ -246,6 +247,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           first_approved_at?: string | null
+          grace_emails_sent?: number
           id?: string
           logo_url?: string | null
           name: string
@@ -260,6 +262,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           first_approved_at?: string | null
+          grace_emails_sent?: number
           id?: string
           logo_url?: string | null
           name?: string
@@ -279,6 +282,41 @@ export type Database = {
           },
         ]
       }
+      directory_make_events: {
+        Row: {
+          created_at: string
+          directory_reel_id: string | null
+          id: string
+          project_id: string | null
+          template_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          directory_reel_id?: string | null
+          id?: string
+          project_id?: string | null
+          template_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          directory_reel_id?: string | null
+          id?: string
+          project_id?: string | null
+          template_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "directory_make_events_directory_reel_id_fkey"
+            columns: ["directory_reel_id"]
+            isOneToOne: false
+            referencedRelation: "directory_reels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       directory_reels: {
         Row: {
           ad_id: string
@@ -286,11 +324,13 @@ export type Database = {
           created_at: string
           formats: string[]
           hidden_at: string | null
+          hidden_reason: string | null
           id: string
           moods: string[]
           poster_url: string | null
           preview_url: string | null
           published_at: string | null
+          review_note: string | null
           search_text: unknown
           status: string
           tags: string[]
@@ -303,11 +343,13 @@ export type Database = {
           created_at?: string
           formats?: string[]
           hidden_at?: string | null
+          hidden_reason?: string | null
           id?: string
           moods?: string[]
           poster_url?: string | null
           preview_url?: string | null
           published_at?: string | null
+          review_note?: string | null
           search_text?: unknown
           status?: string
           tags?: string[]
@@ -320,11 +362,13 @@ export type Database = {
           created_at?: string
           formats?: string[]
           hidden_at?: string | null
+          hidden_reason?: string | null
           id?: string
           moods?: string[]
           poster_url?: string | null
           preview_url?: string | null
           published_at?: string | null
+          review_note?: string | null
           search_text?: unknown
           status?: string
           tags?: string[]
@@ -351,6 +395,41 @@ export type Database = {
             columns: ["template_id"]
             isOneToOne: false
             referencedRelation: "templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      directory_reports: {
+        Row: {
+          created_at: string
+          directory_reel_id: string
+          id: string
+          reason: string
+          reporter_email: string | null
+          resolved_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          directory_reel_id: string
+          id?: string
+          reason: string
+          reporter_email?: string | null
+          resolved_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          directory_reel_id?: string
+          id?: string
+          reason?: string
+          reporter_email?: string | null
+          resolved_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "directory_reports_directory_reel_id_fkey"
+            columns: ["directory_reel_id"]
+            isOneToOne: false
+            referencedRelation: "directory_reels"
             referencedColumns: ["id"]
           },
         ]
