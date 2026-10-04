@@ -39,8 +39,8 @@ function Form({ source, stacked = false }: { source: "popup" | "footer"; stacked
     <form onSubmit={submit} noValidate className={cn("flex w-full", stacked ? "flex-col gap-3" : "flex-col gap-2 sm:flex-row")}>
       <label htmlFor={`nl-${source}`} className="sr-only">Email address</label>
       <input id={`nl-${source}`} name="email" type="email" required maxLength={255} autoComplete="email" placeholder="you@brand.com"
-        className="h-12 min-w-0 flex-1 rounded-[4px] border border-site-line bg-site-page px-3.5 text-[15px] text-site-ink outline-none focus:border-site-primary" />
-      <Button type="submit" variant="site" size="siteHeader" className={cn("h-12", stacked ? "mt-1 w-full" : "sm:w-auto")} disabled={state === "busy"}>
+        className="h-12 min-h-12 min-w-0 w-full shrink-0 rounded-[4px] border border-site-line bg-site-page px-3.5 text-[15px] text-site-ink outline-none focus:border-site-primary sm:w-auto sm:flex-1" />
+      <Button type="submit" variant="site" size="siteHeader" className={cn("h-12 min-h-12", stacked ? "mt-1 w-full" : "sm:w-auto")} disabled={state === "busy"}>
         {state === "busy" ? <Loader2 size={16} strokeWidth={1.7} className="animate-spin" /> : "Subscribe"}
       </Button>
       {state === "error" && <p className="text-[13px] text-destructive" role="alert">{error}</p>}
