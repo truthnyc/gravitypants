@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { ArrowUpRight, Pencil } from "lucide-react";
 import { AccountTabs } from "@/components/billing/AccountTabs";
 import { AppButton } from "@/components/app-ui";
-import { checkSlug, getDirectoryAccount, hideReel, renameDirectoryReel, saveSlug, setBrandLogo } from "@/lib/directory/directory.functions";
+import { checkSlug, getDirectoryAccount, hideReel, renameDirectoryReel, saveBrandDescription, saveSlug, setBrandLogo } from "@/lib/directory/directory.functions";
 import { STATUS_LABEL } from "@/lib/directory/directory";
 import { getWorkspaceId } from "@/lib/stillframe/workspace";
 import { cn } from "@/lib/utils";
@@ -64,6 +64,7 @@ function DirectoryAccount() {
         <section className="rounded-[24px] bg-ap-card p-[26px] font-ap text-ap-ink">
           <h2 className="text-[20px] font-semibold">My reels</h2>
           <LogoBox brandId={d.brand.id} name={d.brand.name} logo={d.brand.logo} onSaved={() => void qc.invalidateQueries({ queryKey: ["directory-account", ws] })} />
+          <DescriptionBox brandId={d.brand.id} description={d.brand.description} onSaved={() => void qc.invalidateQueries({ queryKey: ["directory-account", ws] })} />
           <SlugBox brandId={d.brand.id} slug={d.brand.slug} onSaved={() => void qc.invalidateQueries({ queryKey: ["directory-account", ws] })} />
 
           <table className="mt-2 w-full text-left text-[14px]">
@@ -118,6 +119,33 @@ function DirectoryAccount() {
         </section>
       )}
     </main>
+  );
+}
+
+function DescriptionBox({ brandId, description, onSaved }: { brandId: string; description: string; onSaved: () => void }) {
+  const save = useServerFn(saveBrandDescription);
+  const [value, setValue] = useState(description);
+  const [busy, setBusy] = useState(false);
+  const changed = value.trim() !== description;
+  const commit = async () => {
+    setBusy(true);
+    try {
+      await save({ data: { brandId, description: value } });
+      toast.success("Brand description saved.");
+      onSaved();
+    } catch (e) { toast.error(e instanceof Error ? e.message : "Couldn't save the description"); }
+    finally { setBusy(false); }
+  };
+  return (
+    <div className="mt-[18px]">
+      <label htmlFor="brand-description" className="text-[14px] font-semibold">Brand description</label>
+      <p className="mt-0.5 text-[12px] text-ap-muted">Shown below your brand name in the page header.</p>
+      <textarea id="brand-description" value={value} maxLength={160} rows={3} onChange={(e) => setValue(e.target.value)} className="mt-2 w-full resize-none rounded-lg border border-ap-hairline bg-ap-card px-3 py-2 text-[14px] outline-hidden focus:border-ap-blue" />
+      <div className="mt-1.5 flex items-center justify-between gap-3">
+        <span className="text-[12px] text-ap-muted nums">{value.length}/160</span>
+        <AppButton size="sm" disabled={busy || !changed} onClick={() => void commit()}>{busy ? "Saving..." : "Save description"}</AppButton>
+      </div>
+    </div>
   );
 }
 

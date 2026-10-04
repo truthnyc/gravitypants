@@ -111,7 +111,7 @@ const shareSchema = z.object({
     name: z.string().trim().min(1).max(80),
     website_url: z.string().trim().max(300),
     category: z.enum(CATEGORIES),
-    description: z.string().trim().max(120),
+    description: z.string().trim().max(160),
   }),
   tags: z.array(z.string().trim().min(1).max(40)).max(20),
   moods: z.array(z.enum(MOODS)).max(3),
@@ -229,12 +229,24 @@ export const getDirectoryAccount = createServerFn({ method: "POST" })
     const { data: log } = await sb.from("permission_log").select("id, created_at, ad_id, action, full_name, job_title, email, wording_version, wording_text").eq("brand_id", b.id).order("created_at", { ascending: false }).limit(500);
     const names = new Map<string, string>((reels ?? []).map((r: any) => [r.ad_id, r.title ?? r.projects?.name ?? "Untitled"]));
     return {
-      brand: { id: b.id as string, name: b.name as string, slug: b.slug as string, logo: await signLogo(b.logo_url) },
+      brand: { id: b.id as string, name: b.name as string, slug: b.slug as string, description: (b.description ?? "") as string, logo: await signLogo(b.logo_url) },
       reels: ((reels ?? []) as any[]).map((r: any) => ({ adId: r.ad_id as string, name: (r.title as string | null) ?? r.projects?.name ?? "Untitled", status: r.status as DirStatus, updated: r.updated_at as string })),
       log: (log ?? []).map((l: any) => ({ ...l, reel: names.get(l.ad_id) ?? "Removed ad" })) as {
         id: string; created_at: string; reel: string; action: "granted" | "withdrawn"; full_name: string; job_title: string | null; email: string; wording_version: string; wording_text: string;
       }[],
     };
+  });
+
+/** Brands can edit the short description shown in their public page header. */
+export const saveBrandDescription = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ brandId: z.string().uuid(), description: z.string().trim().max(160) }).parse(d))
+  .handler(async ({ data, context }) => {
+    const { error } = await (context.supabase as any).from("directory_brands")
+      .update({ description: data.description || null })
+      .eq("id", data.brandId);
+    if (error) throw new Error("Couldn't save the brand description");
+    return { ok: true };
   });
 
 /** Brands can rename their own Directory reel (the title shown publicly). */
@@ -478,7 +490,7 @@ export const adminSaveBrand = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({
     brandId: z.string().uuid(), name: z.string().trim().min(1).max(80),
     website: z.string().trim().max(200).refine((v) => !v || /^https?:\/\//.test(v), "Website must start with http:// or https://"),
-    category: z.enum(CATEGORIES), description: z.string().trim().max(500),
+    category: z.enum(CATEGORIES), description: z.string().trim().max(160),
   }).parse(d))
   .handler(async ({ data, context }) => {
     const sb = context.supabase as any;

@@ -258,7 +258,10 @@ function BrandForm({ b, onSaved }: { b: Detail["brand"]; onSaved: () => void }) 
           {b.planEnded && <div>Plan ended {new Date(b.planEnded).toLocaleDateString()}</div>}
           <a href={`/directory/${b.slug}`} target="_blank" rel="noreferrer" className="text-link">View brand page</a>
         </div>
-        <label className="space-y-1 sm:col-span-2"><span className="text-[12px] text-secondary-text">Description</span><textarea value={f.description} maxLength={500} rows={2} onChange={(e) => setF({ ...f, description: e.target.value })} className="w-full rounded-sm bg-control-fill px-2 py-1.5 text-[13px]" /></label>
+        <label className="space-y-1 sm:col-span-2">
+          <span className="flex justify-between text-[12px] text-secondary-text"><span>Brand description</span><span className="nums">{f.description.length}/160</span></span>
+          <textarea value={f.description} maxLength={160} rows={2} onChange={(e) => setF({ ...f, description: e.target.value })} className="w-full rounded-sm bg-control-fill px-2 py-1.5 text-[13px]" />
+        </label>
         <div className="sm:col-span-2"><Button size="sm" disabled={busy || !f.name.trim()} onClick={() => void run(() => save({ data: { brandId: b.id, ...f } }), "Brand page saved")}>Save details</Button></div>
       </div>
     </div>
