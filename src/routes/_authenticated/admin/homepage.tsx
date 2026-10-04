@@ -11,7 +11,7 @@ import { Card, PageTitle } from "@/components/admin/AdminShell";
 import { supabase } from "@/integrations/supabase/client";
 import { getHomepageAdmin, saveHomepageSection } from "@/lib/site/homepage.functions";
 import { listAdminReels, type AdminReel } from "@/lib/stillframe/admin-reels.functions";
-import { DEFAULT_EXAMPLE, DEFAULT_HERO, photoSrc, type ExampleOfWeek, type HomeHero, type SitePhoto } from "@/lib/site/homepage";
+import { DEFAULT_EXAMPLE, DEFAULT_HERO, DEFAULT_QUOTE, photoSrc, type ExampleOfWeek, type HomeHero, type HomeQuote, type SitePhoto } from "@/lib/site/homepage";
 
 export const Route = createFileRoute("/_authenticated/admin/homepage")({
   head: () => ({ meta: [
@@ -84,11 +84,12 @@ function HomepageAdmin() {
   const reels = useQuery({ queryKey: ["admin", "reels"], queryFn: () => loadReels() });
   const [hero, setHero] = useState<HomeHero>(DEFAULT_HERO);
   const [ex, setEx] = useState<ExampleOfWeek>(DEFAULT_EXAMPLE);
+  const [quote, setQuote] = useState<HomeQuote>(DEFAULT_QUOTE);
   const [saving, setSaving] = useState<string | null>(null);
-  useEffect(() => { if (content.data) { setHero(content.data.hero); setEx(content.data.example); } }, [content.data]);
+  useEffect(() => { if (content.data) { setHero(content.data.hero); setEx(content.data.example); setQuote(content.data.quote); } }, [content.data]);
 
   const strip = (ps: SitePhoto[]) => ps.map(({ ref, alt }) => ({ ref, alt }));
-  async function run(key: "home_hero" | "example_of_week", value: unknown, msg: string) {
+  async function run(key: "home_hero" | "example_of_week" | "home_quote", value: unknown, msg: string) {
     setSaving(key);
     try {
       await save({ data: { key, value } as never });
@@ -133,6 +134,40 @@ function HomepageAdmin() {
         <div className="flex flex-wrap gap-2">
           <Button disabled={saving !== null || !ex.photos.length} onClick={() => run("example_of_week", { ...ex, photos: strip(ex.photos) }, "Example of the week saved")}>{saving === "example_of_week" ? "Saving…" : "Save"}</Button>
           <Button variant="outline" disabled={saving !== null} onClick={() => run("example_of_week", null, "Example of the week reset")}>Reset to default</Button>
+        </div>
+      </Card>
+      <Card className="space-y-4">
+        <h2 className="text-[17px] font-semibold">Customer quote</h2>
+        <Field label="The quote"><Textarea value={quote.quote} maxLength={400} rows={3} onChange={(e) => setQuote({ ...quote, quote: e.target.value })} /></Field>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field label="Name"><Input value={quote.name} maxLength={80} onChange={(e) => setQuote({ ...quote, name: e.target.value })} /></Field>
+          <Field label="Role or company"><Input value={quote.role} maxLength={120} onChange={(e) => setQuote({ ...quote, role: e.target.value })} /></Field>
+        </div>
+        <Field label="Photo or logo">
+          <div className="flex items-start gap-3">
+            <label className="relative flex size-20 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-sm bg-control-fill">
+              {quote.photo ? <img src={photoSrc(quote.photo)} alt={quote.photo.alt} className="size-full object-cover" /> : <Upload className="size-5 text-secondary-text" strokeWidth={1.7} />}
+              <span className="absolute bottom-1 left-1 rounded-lg bg-card/90 px-1.5 py-0.5 text-[11px] font-medium">{quote.photo ? "Replace" : "Add"}</span>
+              <input type="file" accept="image/*" className="sr-only" onChange={async (e) => {
+                const f = e.target.files?.[0]; e.target.value = "";
+                if (!f) return;
+                try {
+                  const up = await uploadPhoto(f);
+                  setQuote({ ...quote, photo: { ...up, alt: quote.photo?.alt ?? "" } });
+                } catch (err) { toast.error(err instanceof Error ? err.message : "Upload failed"); }
+              }} />
+            </label>
+            {quote.photo && (
+              <div className="flex-1 space-y-2">
+                <Input placeholder="Describe the image" value={quote.photo.alt} maxLength={200} onChange={(e) => setQuote({ ...quote, photo: { ...quote.photo!, alt: e.target.value } })} />
+                <button type="button" className="text-[13px] text-destructive" onClick={() => setQuote({ ...quote, photo: null })}>Remove</button>
+              </div>
+            )}
+          </div>
+        </Field>
+        <div className="flex flex-wrap gap-2">
+          <Button disabled={saving !== null || !quote.quote.trim()} onClick={() => run("home_quote", { ...quote, photo: quote.photo ? { ref: quote.photo.ref, alt: quote.photo.alt } : null }, "Quote saved")}>{saving === "home_quote" ? "Saving…" : "Save"}</Button>
+          <Button variant="outline" disabled={saving !== null} onClick={() => run("home_quote", null, "Quote reset")}>Reset to default</Button>
         </div>
       </Card>
     </div>
