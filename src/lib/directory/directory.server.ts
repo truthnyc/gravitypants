@@ -15,7 +15,7 @@ export async function toCards(rows: any[]): Promise<DirectoryCard[]> {
   const sb = await admin();
   const ids = rows.map((r) => r.reel_id ?? r.id);
   const { data: extra } = await sb.from("directory_reels")
-    .select("id, ad_id, template_id, poster_url, directory_brands(description, website_url)")
+    .select("id, ad_id, template_id, poster_url, title, directory_brands(description, website_url)")
     .in("id", ids);
   const ex = new Map<string, any>((extra ?? []).map((e: any) => [e.id, e]));
   const adIds = (extra ?? []).map((e: any) => e.ad_id);
@@ -47,6 +47,7 @@ export async function toCards(rows: any[]): Promise<DirectoryCard[]> {
       moods: r.moods ?? [],
       formats: r.formats ?? [],
       poster: p?.startsWith(POSTER_PREFIX) ? signed.get(p.slice(POSTER_PREFIX.length)) ?? null : p,
+      title: e?.title ?? null,
       template_name: r.template_name ?? null,
       template_id: e?.template_id ?? null,
       featured: !!r.featured,
