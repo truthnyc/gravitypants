@@ -39,7 +39,8 @@ export const Route = createFileRoute("/directory/")({
       title: loaderData?.q ? `“${loaderData.q}” video ads — Gravity Pants Directory` : "Gravity Pants Directory — Video ad ideas by mood and brand",
       description: "Search real video ads and Reels made with Gravity Pants by mood, product or brand, and start your own from the same template.",
     });
-    return loaderData?.q ? { ...base, meta: [...(base.meta ?? []).filter((m: any) => m?.name !== "robots"), { name: "robots", content: "noindex, follow" }] } : base; // eslint-disable-line @typescript-eslint/no-explicit-any
+    // The Directory isn't part of the marketing site yet — keep all pages out of search results.
+    return { ...base, meta: [...(base.meta ?? []).filter((m: any) => m?.name !== "robots"), { name: "robots", content: "noindex, follow" }] }; // eslint-disable-line @typescript-eslint/no-explicit-any
   },
   errorComponent: () => <SiteShell><p className="py-20 text-center">The Directory couldn't load. Try again.</p></SiteShell>,
   component: DirectoryPage,
