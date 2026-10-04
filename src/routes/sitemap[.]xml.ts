@@ -29,17 +29,8 @@ export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
       GET: async () => {
-        // Live, visible brand pages only; hidden brands drop out automatically.
-        let brands: { loc: string; lastmod: string; changefreq: string; priority: string }[] = [];
-        try {
-          const { publicClient } = await import("@/lib/site/reels.server");
-          const { data } = await (publicClient() as any).rpc("search_directory", { q: "", size: null }); // eslint-disable-line @typescript-eslint/no-explicit-any
-          const seen = new Set<string>();
-          brands = ((data ?? []) as { brand_slug: string }[]).filter((r) => !seen.has(r.brand_slug) && seen.add(r.brand_slug))
-            .map((r) => ({ loc: `${SITE_ORIGIN}/directory/${r.brand_slug}`, lastmod: new Date().toISOString().slice(0, 10), changefreq: "weekly", priority: "0.6" }));
-        } catch { brands = []; }
+        // Directory pages intentionally not listed yet — the public Directory is not part of the marketing site.
         const entries = [
-          ...brands,
           ...PAGES.map(page => ({ loc: `${SITE_ORIGIN}${page.path}`, lastmod: page.lastmod, changefreq: page.changefreq, priority: page.priority })),
           ...POSTS.map(post => ({ loc: `${SITE_ORIGIN}/blog/${post.slug}`, lastmod: isoDate(post.date), changefreq: "yearly", priority: "0.5" })),
         ];
