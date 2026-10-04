@@ -202,6 +202,19 @@ export const getDirectoryAccount = createServerFn({ method: "POST" })
     };
   });
 
+/** Brands can rename their own Directory reel (the title shown publicly). */
+export const renameDirectoryReel = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ adId: z.string().uuid(), title: z.string().trim().min(1).max(80) }).parse(d))
+  .handler(async ({ data, context }) => {
+    const sb = context.supabase as any;
+    const { data: reel } = await sb.from("directory_reels").select("id").eq("ad_id", data.adId).maybeSingle();
+    if (!reel) throw new Error("This reel isn't in the Directory yet.");
+    const { error } = await sb.from("directory_reels").update({ title: data.title }).eq("id", reel.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
 export const checkSlug = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ slug: z.string().max(60), brandId: z.string().uuid() }).parse(d))
@@ -304,7 +317,7 @@ export const listDirectoryReview = createServerFn({ method: "POST" })
   .handler(async ({ context }) => {
     const sb = context.supabase as any;
     await assertAdmin(sb);
-    const { data } = await sb.from("directory_reels").select("id, ad_id, brand_id, status, tags, moods, poster_url, updated_at, review_note, hidden_reason, directory_brands(name, slug, website_url, category, description, first_approved_at), projects(name)").order("updated_at", { ascending: false }).limit(300);
+    const { data } = await sb.from("directory_reels").select("id, ad_id, brand_id, status, tags, moods, poster_url, updated_at, review_note, hidden_reason, title, directory_brands(name, slug, website_url, category, description, first_approved_at), projects(name)").order("updated_at", { ascending: false }).limit(300);
     const rows = await signPosters(data ?? []);
     const ids = rows.map((r: any) => r.id);
     const { data: logs } = ids.length ? await sb.from("permission_log").select("directory_reel_id, full_name, job_title, email, created_at, wording_version, action").in("directory_reel_id", ids).order("created_at", { ascending: false }) : { data: [] };
@@ -316,7 +329,7 @@ export const listDirectoryReview = createServerFn({ method: "POST" })
         id: r.id as string, adId: r.ad_id as string, status: r.status as DirStatus, tags: r.tags as string[], moods: r.moods as string[], poster: r.poster as string | null,
         updated: r.updated_at as string, note: r.review_note as string | null, brand: r.directory_brands?.name as string, slug: r.directory_brands?.slug as string,
         website: r.directory_brands?.website_url as string | null, category: r.directory_brands?.category as string, description: r.directory_brands?.description as string | null,
-        approved: !!r.directory_brands?.first_approved_at, ad: (r.projects?.name as string) ?? "Untitled",
+        approved: !!r.directory_brands?.first_approved_at, ad: (r.title as string | null) ?? (r.projects?.name as string) ?? "Untitled",
         permission: (last.get(r.id) ?? null) as null | { full_name: string; job_title: string | null; email: string; created_at: string; wording_version: string; action: string },
       })),
       reports: ((reports ?? []) as any[]).map((x) => ({ id: x.id as string, reelId: x.directory_reel_id as string, reason: x.reason as string, email: x.reporter_email as string | null, created: x.created_at as string })),
