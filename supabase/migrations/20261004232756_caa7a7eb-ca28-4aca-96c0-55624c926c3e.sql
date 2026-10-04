@@ -1,0 +1,1 @@
+ALTER TABLE public.directory_reels ADD COLUMN IF NOT EXISTS video_url text;

@@ -364,6 +364,7 @@ export type Database = {
           template_id: string | null
           title: string | null
           updated_at: string
+          video_url: string | null
         }
         Insert: {
           ad_id: string
@@ -385,6 +386,7 @@ export type Database = {
           template_id?: string | null
           title?: string | null
           updated_at?: string
+          video_url?: string | null
         }
         Update: {
           ad_id?: string
@@ -406,6 +408,7 @@ export type Database = {
           template_id?: string | null
           title?: string | null
           updated_at?: string
+          video_url?: string | null
         }
         Relationships: [
           {
