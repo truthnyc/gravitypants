@@ -62,6 +62,9 @@ export function UserMenu() {
         <DropdownMenuItem asChild>
           <Link to="/app/brand">Brand Kit</Link>
         </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link to="/app/account/directory">Directory</Link>
+        </DropdownMenuItem>
         {adm?.admin && (
           <DropdownMenuItem asChild>
             <Link to="/admin">Admin</Link>
