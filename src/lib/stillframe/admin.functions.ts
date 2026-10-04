@@ -233,7 +233,7 @@ export const adminAction = createServerFn({ method: "POST" })
       action: z.enum(["extend_trial", "comp_plan", "end_comp", "reset_exports", "suspend", "unsuspend", "delete"]),
       reason,
       days: z.number().int().min(1).max(365).optional(),
-      plan: z.enum(["simple", "business"]).optional(),
+      plan: z.enum(["simple", "business", "team"]).optional(),
       until: z.string().optional(),
       confirmName: z.string().optional(),
     }).parse(d),
@@ -375,4 +375,41 @@ export const adminAudit = createServerFn({ method: "GET" })
       reason: r.reason as string | null,
       created_at: r.created_at as string,
     }));
+  });
+
+/** Invites a new client by email with a complimentary plan (no payment). Creates their workspace up front. */
+export const adminInviteClient = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) =>
+    z.object({
+      email: z.string().trim().toLowerCase().email(),
+      name: z.string().trim().max(80).optional(),
+      plan: z.enum(["simple", "business", "team"]),
+      until: z.string().refine((v) => !isNaN(Date.parse(v)) && Date.parse(v) > Date.now(), "Pick a future end date"),
+      reason,
+    }).parse(d),
+  )
+  .handler(async ({ data, context }): Promise<{ ok: true; workspaceId: string } | { error: string }> => {
+    const ctx = context as any as Ctx;
+    const db = await adminDb(ctx);
+    const existing = (await allUsers(db)).find((u) => u.email.toLowerCase() === data.email);
+    if (existing) return { error: "That email already has an account. Open the client and use Give free plan instead." };
+    const { data: inv, error } = await db.auth.admin.inviteUserByEmail(data.email, {
+      redirectTo: "https://gravitypants.com/app/ads?welcome=1",
+      data: data.name ? { full_name: data.name } : {},
+    });
+    if (error || !inv?.user) return { error: "Couldn't send the invite email. Please try again." };
+    const uid = inv.user.id;
+    await db.from("profiles").upsert({ user_id: uid, display_name: data.name || null }, { onConflict: "user_id" });
+    const wsName = `${data.name || data.email.split("@")[0]}'s ads`;
+    const { data: ws, error: wErr } = await db.from("workspaces").insert({ name: wsName, owner_id: uid }).select("id").single();
+    if (wErr || !ws) return { error: "Invite sent, but the workspace couldn't be created." };
+    await db.from("brand_kit").insert({ workspace_id: ws.id });
+    await db.from("workspace_members").insert({ workspace_id: ws.id, user_id: uid, role: "owner" });
+    const { data: bill } = await db.from("workspace_billing").select("workspace_id").eq("workspace_id", ws.id).maybeSingle();
+    const comp = { comp_plan: data.plan, comp_until: new Date(data.until).toISOString() };
+    if (bill) await db.from("workspace_billing").update(comp).eq("workspace_id", ws.id);
+    else await db.from("workspace_billing").insert({ workspace_id: ws.id, ...comp });
+    await log(db, ctx.userId, "invite_client", ws.id, `${data.email} · ${data.plan} until ${data.until.slice(0, 10)}`, data.reason);
+    return { ok: true, workspaceId: ws.id };
   });
