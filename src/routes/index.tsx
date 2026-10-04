@@ -67,12 +67,22 @@ export const Route = createFileRoute("/")({
     // Preload the hero reel's still frame so the largest element paints early.
     return {
       ...head,
-      links: [...(head.links ?? []), { rel: "preload", as: "image", href: loaderData ? pickVideo(loaderData.content.hero.reelId, loaderData.reels, 3).poster : heroPoster.url }],
+      links: [
+        ...(head.links ?? []),
+        {
+          rel: "preload",
+          as: "image",
+          href: loaderData ? pickVideo(loaderData.content.hero.reelId, loaderData.reels, 3).poster : heroPoster.url,
+        },
+      ],
       scripts: [{ type: "application/ld+json", children: JSON.stringify(jsonLd) }],
     };
   },
   loader: async () => {
-    const [reels, content] = await Promise.all([listSiteReels().catch(() => [] as SiteReel[]), getHomepageContent().catch(() => DEFAULT_CONTENT)]);
+    const [reels, content] = await Promise.all([
+      listSiteReels().catch(() => [] as SiteReel[]),
+      getHomepageContent().catch(() => DEFAULT_CONTENT),
+    ]);
     return { reels, content };
   },
   component: Home,
@@ -573,7 +583,12 @@ function Home() {
             </a>
             <h1>
               {hero.line1}
-              {hero.line2 && <><br /><span>{hero.line2}</span></>}
+              {hero.line2 && (
+                <>
+                  <br />
+                  <span>{hero.line2}</span>
+                </>
+              )}
             </h1>
             <p className="site-lede home-hero-lede">{hero.lede}</p>
             <div className="home-actions">
@@ -593,7 +608,14 @@ function Home() {
               </div>
             ))}
             <div className="home-hero-phone">
-              <FeaturedAdVideo tapToggle video={heroVideo.video} videoWebm={heroVideo.videoWebm} poster={heroVideo.poster} label={heroVideo.label} format={heroVideo.format} />
+              <FeaturedAdVideo
+                tapToggle
+                video={heroVideo.video}
+                videoWebm={heroVideo.videoWebm}
+                poster={heroVideo.poster}
+                label={heroVideo.label}
+                format={heroVideo.format}
+              />
             </div>
             <div className="site-card home-exported">
               <span>Exported</span>
@@ -763,9 +785,9 @@ function Home() {
               template.""
             </p>
             <div className="home-person">
-              <span></span>
+              <span>Purl Soho </span>
               <div>
-                <b>Purl Soho </b>
+                <b></b>
                 <small> </small>
               </div>
             </div>
