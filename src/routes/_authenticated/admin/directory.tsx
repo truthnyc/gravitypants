@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { listDirectoryReview, resolveReport, reviewDirectoryReel } from "@/lib/directory/directory.functions";
+import { adminSaveBrandSlug, listDirectoryBrands, listDirectoryReview, resolveReport, reviewDirectoryReel } from "@/lib/directory/directory.functions";
 import { CATEGORIES, MOODS, STATUS_LABEL, type Category } from "@/lib/directory/directory";
 import { cn } from "@/lib/utils";
 
@@ -87,7 +87,65 @@ function AdminDirectory() {
           </tbody>
         </table>
       </section>
+
+      <BrandAddresses />
     </div>
+  );
+}
+
+function BrandAddresses() {
+  const list = useServerFn(listDirectoryBrands);
+  const save = useServerFn(adminSaveBrandSlug);
+  const qc = useQueryClient();
+  const q = useQuery({ queryKey: ["admin", "directory-brands"], queryFn: () => list() });
+  const [editing, setEditing] = useState<string | null>(null);
+  const [value, setValue] = useState("");
+  const [busy, setBusy] = useState(false);
+  const brands = q.data ?? [];
+  const startEdit = (id: string, slug: string) => { setEditing(id); setValue(slug); };
+  const commit = async (id: string, old: string) => {
+    const v = value.trim().toLowerCase();
+    if (!v || v === old) return setEditing(null);
+    setBusy(true);
+    try {
+      await save({ data: { brandId: id, slug: v } });
+      toast.success(`Address is now gravitypants.com/directory/${v}. The old address redirects for 12 months.`);
+      void qc.invalidateQueries({ queryKey: ["admin", "directory-brands"] });
+      void qc.invalidateQueries({ queryKey: ["admin", "directory"] });
+    } catch (e) { toast.error(e instanceof Error ? e.message : "Couldn't save the address."); }
+    finally { setBusy(false); setEditing(null); }
+  };
+  return (
+    <section>
+      <h2 className="mb-1 text-[15px] font-semibold">Brand page addresses</h2>
+      <p className="mb-3 text-[13px] text-secondary-text">Every brand's Directory address. Changing one keeps the old address redirecting for 12 months.</p>
+      <table className="w-full text-left text-[13px]">
+        <thead><tr className="text-secondary-text"><th className="py-1.5">Brand</th><th>Workspace</th><th>Address</th><th /></tr></thead>
+        <tbody>
+          {brands.map((b) => (
+            <tr key={b.id} className="border-t">
+              <td className="py-2 font-medium">{b.name}{!b.approved && <span className="ml-1.5 font-normal text-secondary-text">(not approved yet)</span>}</td>
+              <td className="text-secondary-text">{b.workspace ?? "—"}</td>
+              <td>
+                {editing === b.id ? (
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="text-secondary-text">/directory/</span>
+                    <input autoFocus value={value} maxLength={40} onChange={(e) => setValue(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))} onKeyDown={(e) => { if (e.key === "Enter") void commit(b.id, b.slug); if (e.key === "Escape") setEditing(null); }} aria-label={`Address for ${b.name}`} className="h-8 w-[180px] rounded-lg border border-border bg-card px-2 text-[13px] outline-hidden focus:border-primary" />
+                    <Button size="sm" disabled={busy || !/^[a-z0-9-]{3,40}$/.test(value.trim())} onClick={() => void commit(b.id, b.slug)}>Save</Button>
+                  </span>
+                ) : (
+                  <a href={`/directory/${b.slug}`} target="_blank" rel="noreferrer" className="text-link">/directory/{b.slug}</a>
+                )}
+              </td>
+              <td className="py-1.5 text-right">
+                {editing !== b.id && <Button size="sm" variant="plain" onClick={() => startEdit(b.id, b.slug)}>Change address</Button>}
+              </td>
+            </tr>
+          ))}
+          {!brands.length && <tr className="border-t"><td colSpan={4} className="py-3 text-secondary-text">No brands yet.</td></tr>}
+        </tbody>
+      </table>
+    </section>
   );
 }
 
