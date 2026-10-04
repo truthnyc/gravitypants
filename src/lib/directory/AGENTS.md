@@ -1,0 +1,1 @@
+- Sharing writes the append-only `permission_log` row in the same request as the listing, so a reel is never public without a recorded permission.

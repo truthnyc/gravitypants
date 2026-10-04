@@ -42,4 +42,4 @@
 
 - Folder rules: see `AGENTS.md` in src/components/editor, src/render, src/lib/stillframe and src/routes/_authenticated/admin.
 - Admin analytics: public visits go to `page_views` (anon insert) via `src/lib/site/track.ts`; sign-up UTM in user metadata; `analytics.server.ts` feeds the Analytics page and deduped Monday `/api/public/weekly-report`.
-- Directory: listings in `directory_reels`/`directory_brands`; all reads/writes go through `src/lib/directory/directory.functions.ts`, and sharing writes the permission row in the same request (append-only `permission_log`) so a reel is never public without a recorded permission.
+- Directory: all access via `src/lib/directory/directory.functions.ts` (see its AGENTS.md).
