@@ -88,7 +88,7 @@ export function NewsletterPopup() {
           </div>
           <div className="hidden w-[220px] shrink-0 items-center justify-center border-l border-site-line bg-site-panel p-8 md:flex">
             <div className="relative aspect-[9/19] w-full overflow-hidden rounded-[4px] border border-site-line bg-site-inner shadow-[0_20px_40px_rgb(0_0_0/0.12)]">
-              <img src={photo1} alt="Reel frame from a Gravity Pants ad" className="absolute inset-0 h-full w-full object-cover" />
+              <img src={photo1.url} alt="Reel frame from a Gravity Pants ad" className="absolute inset-0 h-full w-full object-cover" />
               <div className="absolute inset-x-4 bottom-4 flex h-1.5 gap-1.5">
                 <span className="h-full w-1/3 rounded-full bg-white/60" />
                 <span className="h-full flex-1 rounded-full bg-white/30" />
