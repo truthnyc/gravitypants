@@ -16,7 +16,8 @@ export type HomeHero = {
   reelId: string | null; photos: SitePhoto[];
 };
 export type ExampleOfWeek = { reelId: string | null; title: string; description: string; photos: SitePhoto[] };
-export type HomepageContent = { hero: HomeHero; example: ExampleOfWeek };
+export type HomeQuote = { quote: string; name: string; role: string; photo: SitePhoto | null };
+export type HomepageContent = { hero: HomeHero; example: ExampleOfWeek; quote: HomeQuote };
 
 const purl: SitePhoto[] = [
   { ref: photo1.url, alt: "Purl Soho Japanese Denim Cotton yarn product photo" },
@@ -37,7 +38,13 @@ export const DEFAULT_EXAMPLE: ExampleOfWeek = {
   description: "A Purl Soho ad, from textured yarn and product details to a simple invitation to shop.",
   photos: purl,
 };
-export const DEFAULT_CONTENT: HomepageContent = { hero: DEFAULT_HERO, example: DEFAULT_EXAMPLE };
+export const DEFAULT_QUOTE: HomeQuote = {
+  quote: "A few product photos, and a finished Instagram reel in minutes. It looks like our brand, not a template.",
+  name: "",
+  role: "Purl Soho",
+  photo: null,
+};
+export const DEFAULT_CONTENT: HomepageContent = { hero: DEFAULT_HERO, example: DEFAULT_EXAMPLE, quote: DEFAULT_QUOTE };
 
 export const photoSrc = (p: SitePhoto) => p.src ?? p.ref;
 

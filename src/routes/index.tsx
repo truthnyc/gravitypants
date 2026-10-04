@@ -785,14 +785,16 @@ function Home() {
         <section className="home-section home-proof">
           <div className="home-quote">
             <span className="home-quote-mark">“</span>
-            <p>
-              "A few product photos, and a finished Instagram reel in minutes. It looks like our brand, not a template."
-            </p>
+            <p>"{content.quote.quote}"</p>
             <div className="home-person">
-              <span> </span>
+              {content.quote.photo ? (
+                <img src={photoSrc(content.quote.photo)} alt={content.quote.photo.alt} />
+              ) : (
+                <span> </span>
+              )}
               <div>
-                <b></b>
-                <small>Purl Soho</small>
+                <b>{content.quote.name}</b>
+                <small>{content.quote.role}</small>
               </div>
             </div>
           </div>
