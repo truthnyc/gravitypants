@@ -185,8 +185,8 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
             </AppSelect>
           </AppField>
           <AppField label="Short description" htmlFor="d-desc" className="mb-[18px]">
-            <AppInput id="d-desc" value={desc} maxLength={120} onChange={(e) => setDesc(e.target.value)} />
-            <small className="text-[12px] text-ap-muted nums">Up to 120 characters. {120 - desc.length} left.</small>
+            <AppInput id="d-desc" value={desc} maxLength={160} onChange={(e) => setDesc(e.target.value)} />
+            <small className="text-[12px] text-ap-muted nums">Up to 160 characters. {160 - desc.length} left.</small>
           </AppField>
         </div>
 
