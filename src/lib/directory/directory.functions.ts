@@ -263,7 +263,7 @@ export const getBrandPage = createServerFn({ method: "GET" })
     const moreCards = await toCards(moreRows);
     return {
       redirect: null,
-      brand: { name: b.name as string, website_url: b.website_url as string | null, category: b.category as string, description: b.description as string | null, slug: b.slug as string, logo_url: b.logo_url as string | null, featured: !!featured },
+      brand: { id: b.id as string, name: b.name as string, website_url: b.website_url as string | null, category: b.category as string, description: b.description as string | null, slug: b.slug as string, logo_url: b.logo_url as string | null, featured: !!featured },
       reels: cards,
       more: moreCards.map((c) => ({ name: c.brand_name, slug: c.brand_slug, poster: c.poster })),
     };
