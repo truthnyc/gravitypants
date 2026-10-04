@@ -418,7 +418,7 @@ export const adminInviteClient = createServerFn({ method: "POST" })
         templateData: {
           clientEmail: data.email,
           clientName: data.name || undefined,
-          plan: data.plan[0].toUpperCase() + data.plan.slice(1),
+          plan: data.plan.charAt(0).toUpperCase() + data.plan.slice(1),
           until: data.until.slice(0, 10),
           reason: data.reason || undefined,
           adminEmail: adminUser?.user?.email ?? undefined,
