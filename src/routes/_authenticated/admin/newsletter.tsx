@@ -56,7 +56,7 @@ function PopupPreview({ c }: { c: NewsletterPopupContent }) {
       {c.description && <p className="mt-2 max-w-[240px] text-[11px] leading-relaxed text-site-muted">{c.description}</p>}
       <div className="mt-5 flex flex-col gap-2">
         <div className="flex h-9 items-center rounded-[4px] border border-site-line bg-site-page px-3 text-[11px] text-site-muted">you@brand.com</div>
-        <div className="flex h-9 items-center justify-center rounded-full bg-site-primary text-[12px] font-semibold text-white">Subscribe</div>
+        <div className="flex h-9 items-center justify-center rounded-lg bg-site-primary text-[12px] font-semibold text-white">Subscribe</div>
       </div>
       {c.note && <p className="mt-3 text-[10px] font-medium text-site-muted">{c.note}</p>}
     </div>
