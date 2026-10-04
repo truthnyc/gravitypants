@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { getNewsletterPopupAdmin, saveNewsletterPopup } from "@/lib/site/newsletter.functions";
 import { DEFAULT_POPUP, type NewsletterPopupContent } from "@/lib/site/newsletter";
 import { photoSrc } from "@/lib/site/homepage";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/admin/newsletter")({
   head: () => ({ meta: [
@@ -41,6 +42,51 @@ function Toggle({ label, hint, checked, onChange }: { label: string; hint: strin
   );
 }
 
+function PopupPreview({ c }: { c: NewsletterPopupContent }) {
+  const showImage = c.showImage && c.image;
+  const split = c.layout === "split" && showImage;
+  const text = (
+    <div className={cn("flex-1", split ? "px-5 py-6" : "px-5 py-7")}>
+      {c.eyebrow && (
+        <span className="inline-block rounded-full bg-site-soft-blue px-2 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-site-eyebrow">{c.eyebrow}</span>
+      )}
+      <p className="mt-2.5 text-[20px] font-bold leading-[1.1] tracking-[-0.02em] text-site-ink">
+        {c.line1}{c.line2 && <><br /><span className="text-site-primary">{c.line2}</span></>}
+      </p>
+      {c.description && <p className="mt-2 max-w-[240px] text-[11px] leading-relaxed text-site-muted">{c.description}</p>}
+      <div className="mt-5 flex flex-col gap-2">
+        <div className="flex h-9 items-center rounded-[4px] border border-site-line bg-site-page px-3 text-[11px] text-site-muted">you@brand.com</div>
+        <div className="flex h-9 items-center justify-center rounded-lg bg-site-primary text-[12px] font-semibold text-white">Subscribe</div>
+      </div>
+      {c.note && <p className="mt-3 text-[10px] font-medium text-site-muted">{c.note}</p>}
+    </div>
+  );
+  const image = showImage && c.image && (
+    <div className={cn("shrink-0 items-center justify-center bg-site-panel", split ? "hidden w-[140px] border-l border-site-line p-5 md:flex" : "flex border-t border-site-line p-4")}>
+      <div className={cn("relative overflow-hidden rounded-[4px] border border-site-line bg-site-inner shadow-[0_12px_24px_rgb(0_0_0/0.12)]", split ? "aspect-[9/19] w-full" : "aspect-[16/9] w-full max-w-[320px]")}>
+        <img src={photoSrc(c.image)} alt={c.image.alt} className="absolute inset-0 h-full w-full object-cover" />
+        {split && (
+          <div className="absolute inset-x-3 bottom-3 flex h-1 gap-1">
+            <span className="h-full w-1/3 rounded-full bg-white/60" />
+            <span className="h-full flex-1 rounded-full bg-white/30" />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+  return (
+    <Card className="space-y-3">
+      <h2 className="text-[17px] font-semibold">Preview</h2>
+      <div className="rounded-sm border border-border bg-control-fill/40 p-4">
+        <div className={cn("mx-auto overflow-hidden rounded-[4px] bg-site-page font-site shadow-[0_16px_40px_rgb(0_0_0/0.15)]", split ? "max-w-[440px]" : "max-w-[340px]")}>
+          {split ? <div className="flex">{text}{image}</div> : <div>{text}{image}</div>}
+        </div>
+      </div>
+      <p className="text-[12px] text-secondary-text">Updates as you type. Save to make it live on the site.</p>
+    </Card>
+  );
+}
+
 function NewsletterAdmin() {
   const qc = useQueryClient();
   const load = useServerFn(getNewsletterPopupAdmin);
@@ -67,6 +113,7 @@ function NewsletterAdmin() {
   return (
     <div className="space-y-6">
       <PageTitle title="Newsletter pop-up" sub="The sign-up pop-up visitors see on the site. Changes show as soon as you save." />
+      <PopupPreview c={c} />
       <Card className="space-y-4">
         <h2 className="text-[17px] font-semibold">Behaviour</h2>
         <Toggle label="Show the pop-up" hint="Turn off to stop showing it to visitors." checked={c.enabled} onChange={(enabled) => setC({ ...c, enabled })} />

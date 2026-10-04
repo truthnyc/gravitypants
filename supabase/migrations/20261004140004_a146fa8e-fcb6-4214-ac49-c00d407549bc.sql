@@ -1,0 +1,2 @@
+ALTER TABLE public.site_settings DROP CONSTRAINT site_settings_key_check;
+ALTER TABLE public.site_settings ADD CONSTRAINT site_settings_key_check CHECK (char_length(key) BETWEEN 1 AND 50 AND key ~ '^[a-z0-9_]+$');
