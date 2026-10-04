@@ -35,6 +35,7 @@ export function Stage({
   onResize,
   onFocus,
   onAdjustDone,
+  interactive = true,
   brand,
 }: {
   brand?: BrandStyle;
@@ -54,6 +55,7 @@ export function Stage({
   onResize: (el: DragEl, value: number, key: string) => void;
   onFocus: (patch: { focus?: { x: number; y: number }; zoom?: number }, key: string) => void;
   onAdjustDone: () => void;
+  interactive?: boolean;
 }) {
   const [resize, setResize] = useState<{ el: DragEl; x: number; w: number; v: number; id: number } | null>(null);
   const [pan, setPan] = useState<{ x: number; y: number; fx: number; fy: number; id: number } | null>(null);
@@ -130,7 +132,7 @@ export function Stage({
   };
 
   const frame = doc.frames[frameIndex];
-  const showTags = !playing && !adjusting && layout;
+  const showTags = interactive && !playing && !adjusting && layout;
 
   const tag = (el: ElementKey, b: Box | null, draggable: boolean, text?: TextSettings | null) => {
     if (!b) return null;
@@ -147,7 +149,7 @@ export function Stage({
           top: css.top - pad,
           width: css.width + pad * 2,
           height: css.height + pad * 2,
-          outline: `2px ${active ? "solid" : "dashed"} ${meta.color}`,
+          outline: `2px ${active ? "solid" : "dashed"} var(--accent-blue)`,
           outlineOffset: 0,
           borderRadius: 4,
           opacity: active ? 1 : 0.85,
@@ -163,7 +165,7 @@ export function Stage({
             role="presentation"
             aria-hidden
             className="absolute -bottom-[5px] -right-[5px] size-2.5 cursor-nwse-resize rounded-[2px] border-2 bg-card"
-            style={{ borderColor: meta.color }}
+            style={{ borderColor: "var(--accent-blue)" }}
             onPointerDown={(e) => {
               e.stopPropagation();
               (e.target as HTMLElement).setPointerCapture(e.pointerId);
@@ -209,11 +211,11 @@ export function Stage({
   return (
     <div ref={wrapRef} className="flex h-full w-full items-center justify-center">
       <div
-        className="relative rounded-sm shadow-card"
-        style={{ width: box.w, height: box.h, outline: selected === "photo" && showTags ? `2px solid ${ELEMENT_META.photo.color}` : undefined, outlineOffset: 3 }}
+        className="relative rounded-lg shadow-ap-thumb"
+        style={{ width: box.w, height: box.h, outline: selected === "photo" && showTags ? `2px solid var(--accent-blue)` : undefined, outlineOffset: 3 }}
         onPointerDown={() => onSelect("photo")}
       >
-        <canvas ref={canvasRef} width={W || 1} height={H || 1} className="block h-full w-full rounded-sm" aria-label="Ad preview" role="img" />
+        <canvas ref={canvasRef} width={W || 1} height={H || 1} className="block h-full w-full rounded-lg" aria-label="Ad preview" role="img" />
         {showTags && frame && (
           <>
             <button
@@ -233,7 +235,7 @@ export function Stage({
         )}
         {adjusting && frame && (
           <div
-            className="absolute inset-0 cursor-move rounded-sm ring-2 ring-el-photo"
+            className="absolute inset-0 cursor-move rounded-sm ring-2 ring-primary"
             onPointerDown={(e) => {
               e.stopPropagation();
               (e.target as HTMLElement).setPointerCapture(e.pointerId);
@@ -311,7 +313,7 @@ export function Tag({ el, active, className }: { el: ElementKey; active: boolean
   return (
     <span
       className={cn("inline-flex h-5 items-center whitespace-nowrap rounded-sm px-1.5 text-[11px] font-semibold shadow-segment", className)}
-      style={active ? { background: meta.color, color: "var(--on-accent)" } : { background: "var(--card)", color: meta.color }}
+      style={active ? { background: "var(--accent-blue)", color: "var(--on-accent)" } : { background: "var(--card)", color: "var(--accent-blue)" }}
     >
       {meta.label}
     </span>

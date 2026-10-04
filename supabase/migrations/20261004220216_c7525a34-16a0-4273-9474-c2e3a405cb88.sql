@@ -1,0 +1,12 @@
+alter function public.directory_paid_plans() set search_path = public;
+alter function public.featured_plans() set search_path = public;
+alter function public.tags_text(text[]) set search_path = public;
+alter function public.permission_log_readonly() set search_path = public;
+revoke execute on function public.directory_reel_search() from public, anon, authenticated;
+revoke execute on function public.permission_log_defaults() from public, anon, authenticated;
+revoke execute on function public.guard_brand_approval() from public, anon, authenticated;
+revoke execute on function public.guard_reel_status() from public, anon, authenticated;
+revoke execute on function public.directory_effective_plan(uuid) from public, anon;
+revoke execute on function public.is_brand_member(uuid) from public, anon;
+grant execute on function public.is_brand_member(uuid) to authenticated;
+grant execute on function public.directory_effective_plan(uuid) to authenticated;

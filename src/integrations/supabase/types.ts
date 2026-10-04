@@ -226,6 +226,164 @@ export type Database = {
         }
         Relationships: []
       }
+      directory_brands: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          first_approved_at: string | null
+          id: string
+          logo_url: string | null
+          name: string
+          plan_ended_at: string | null
+          slug: string
+          updated_at: string
+          website_url: string | null
+          workspace_id: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          first_approved_at?: string | null
+          id?: string
+          logo_url?: string | null
+          name: string
+          plan_ended_at?: string | null
+          slug: string
+          updated_at?: string
+          website_url?: string | null
+          workspace_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          first_approved_at?: string | null
+          id?: string
+          logo_url?: string | null
+          name?: string
+          plan_ended_at?: string | null
+          slug?: string
+          updated_at?: string
+          website_url?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "directory_brands_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: true
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      directory_reels: {
+        Row: {
+          ad_id: string
+          brand_id: string
+          created_at: string
+          formats: string[]
+          hidden_at: string | null
+          id: string
+          moods: string[]
+          poster_url: string | null
+          preview_url: string | null
+          published_at: string | null
+          search_text: unknown
+          status: string
+          tags: string[]
+          template_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          ad_id: string
+          brand_id: string
+          created_at?: string
+          formats?: string[]
+          hidden_at?: string | null
+          id?: string
+          moods?: string[]
+          poster_url?: string | null
+          preview_url?: string | null
+          published_at?: string | null
+          search_text?: unknown
+          status?: string
+          tags?: string[]
+          template_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          ad_id?: string
+          brand_id?: string
+          created_at?: string
+          formats?: string[]
+          hidden_at?: string | null
+          id?: string
+          moods?: string[]
+          poster_url?: string | null
+          preview_url?: string | null
+          published_at?: string | null
+          search_text?: unknown
+          status?: string
+          tags?: string[]
+          template_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "directory_reels_ad_id_fkey"
+            columns: ["ad_id"]
+            isOneToOne: true
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "directory_reels_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "directory_brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "directory_reels_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      directory_slug_history: {
+        Row: {
+          brand_id: string
+          changed_at: string
+          id: string
+          old_slug: string
+        }
+        Insert: {
+          brand_id: string
+          changed_at?: string
+          id?: string
+          old_slug: string
+        }
+        Update: {
+          brand_id?: string
+          changed_at?: string
+          id?: string
+          old_slug?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "directory_slug_history_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "directory_brands"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       export_usage: {
         Row: {
           created_at: string
@@ -399,6 +557,72 @@ export type Database = {
           visitor_id?: string
         }
         Relationships: []
+      }
+      permission_log: {
+        Row: {
+          action: string
+          ad_id: string | null
+          brand_id: string
+          created_at: string
+          directory_reel_id: string | null
+          email: string
+          full_name: string
+          id: string
+          ip_address: string | null
+          job_title: string | null
+          user_agent: string | null
+          user_id: string
+          wording_text: string
+          wording_version: string
+        }
+        Insert: {
+          action: string
+          ad_id?: string | null
+          brand_id: string
+          created_at?: string
+          directory_reel_id?: string | null
+          email?: string
+          full_name: string
+          id?: string
+          ip_address?: string | null
+          job_title?: string | null
+          user_agent?: string | null
+          user_id?: string
+          wording_text: string
+          wording_version: string
+        }
+        Update: {
+          action?: string
+          ad_id?: string | null
+          brand_id?: string
+          created_at?: string
+          directory_reel_id?: string | null
+          email?: string
+          full_name?: string
+          id?: string
+          ip_address?: string | null
+          job_title?: string | null
+          user_agent?: string | null
+          user_id?: string
+          wording_text?: string
+          wording_version?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "permission_log_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "directory_brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "permission_log_directory_reel_id_fkey"
+            columns: ["directory_reel_id"]
+            isOneToOne: false
+            referencedRelation: "directory_reels"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       plans: {
         Row: {
@@ -1013,14 +1237,18 @@ export type Database = {
       billing_covered: { Args: { _src: string }; Returns: string[] }
       billing_source: { Args: { _ws: string }; Returns: string }
       brand_kits_enabled: { Args: { _ws: string }; Returns: boolean }
+      brand_visible: { Args: { _brand: string }; Returns: boolean }
       can_save_export: {
         Args: { _stamp: string; _ws: string }
         Returns: boolean
       }
       delete_workspace: { Args: { _ws: string }; Returns: undefined }
+      directory_effective_plan: { Args: { _ws: string }; Returns: string }
+      directory_paid_plans: { Args: never; Returns: string[] }
       effective_billing: { Args: { _ws: string }; Returns: Json }
       ensure_workspace: { Args: never; Returns: string }
       export_status: { Args: { _ws: string }; Returns: Json }
+      featured_plans: { Args: never; Returns: string[] }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1030,6 +1258,8 @@ export type Database = {
       }
       has_support_session: { Args: { _ws: string }; Returns: boolean }
       in_other_team: { Args: { _uid: string; _ws: string }; Returns: string }
+      is_brand_member: { Args: { _brand: string }; Returns: boolean }
+      is_featured_brand: { Args: { _brand: string }; Returns: boolean }
       is_platform_admin: { Args: never; Returns: boolean }
       is_workspace_admin: { Args: { _ws: string }; Returns: boolean }
       is_workspace_member: { Args: { _ws: string }; Returns: boolean }
@@ -1039,10 +1269,30 @@ export type Database = {
         Args: { _project: string; _stamp: string; _ws: string }
         Returns: boolean
       }
+      search_directory: {
+        Args: { q?: string; size?: string }
+        Returns: {
+          ad_id: string
+          brand_id: string
+          brand_name: string
+          brand_slug: string
+          category: string
+          featured: boolean
+          formats: string[]
+          moods: string[]
+          poster_url: string
+          preview_url: string
+          reel_id: string
+          score: number
+          tags: string[]
+          template_name: string
+        }[]
+      }
       set_default_brand_kit: {
         Args: { _kit: string; _ws: string }
         Returns: undefined
       }
+      slug_status: { Args: { _brand?: string; _slug: string }; Returns: string }
       workspace_is_team: { Args: { _ws: string }; Returns: boolean }
       workspace_member_list: {
         Args: { _ws: string }
