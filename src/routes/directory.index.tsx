@@ -1,61 +1,171 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
-import { Search } from "lucide-react";
+import { X } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
-import { DirectoryGrid } from "@/components/directory/DirectoryGrid";
+import { ReelCarousel } from "@/components/site/ReelCarousel";
+import { ReelVideo } from "@/components/site/ReelVideo";
+import { CardCarousel, DirectoryGrid, ReelDetail } from "@/components/directory/DirectoryGrid";
 import { searchDirectory } from "@/lib/directory/directory.functions";
-import { MOODS, type DirectoryCard } from "@/lib/directory/directory";
+import type { DirectoryCard } from "@/lib/directory/directory";
+import { listSiteReels } from "@/lib/site/reels.functions";
+import { FORMAT_LABEL, type SiteReel } from "@/lib/site/reels";
 import { siteHead } from "@/lib/site/seo";
+import { cn } from "@/lib/utils";
+
+const ROTATING = ["soothing", "energizing", "hopeful", "inspiring", "cozy", "luxurious", "playful"];
+const STARTERS: { label: string; q: string; mood?: boolean }[] = [
+  { label: "soothing", q: "soothing", mood: true }, { label: "energizing", q: "energizing", mood: true }, { label: "cozy", q: "cozy", mood: true }, { label: "luxurious", q: "luxurious", mood: true },
+  { label: "coffee", q: "coffee" }, { label: "wine", q: "wine" }, { label: "jewelry", q: "jewelry" }, { label: "holiday gifts", q: "holiday gifts" },
+  { label: "square reels", q: "square" }, { label: "vertical for TikTok", q: "tiktok" },
+];
+const SIZES = [{ v: undefined, l: "All" }, { v: "9x16", l: "9:16" }, { v: "1x1", l: "1:1" }, { v: "16x9", l: "16:9" }] as const;
 
 export const Route = createFileRoute("/directory/")({
-  validateSearch: z.object({ q: z.string().optional() }),
-  loaderDeps: ({ search }) => ({ q: search.q ?? "" }),
-  loader: ({ deps }) => searchDirectory({ data: { q: deps.q, size: null } }).catch(() => [] as DirectoryCard[]),
-  head: () =>
-    siteHead({
+  validateSearch: z.object({ q: z.string().optional(), size: z.string().optional() }),
+  loaderDeps: ({ search }) => ({ q: (search.q ?? "").slice(0, 200), size: search.size }),
+  loader: async ({ deps }) => {
+    const size = deps.size === "9x16" || deps.size === "1x1" || deps.size === "16x9" ? deps.size : null;
+    const [cards, reels, fallback] = await Promise.all([
+      searchDirectory({ data: { q: deps.q, size } }).catch(() => [] as DirectoryCard[]),
+      deps.q ? Promise.resolve([] as SiteReel[]) : listSiteReels().catch(() => [] as SiteReel[]),
+      deps.q ? searchDirectory({ data: { q: "", size: null } }).catch(() => [] as DirectoryCard[]) : Promise.resolve([] as DirectoryCard[]),
+    ]);
+    return { q: deps.q, cards, reels, fallback };
+  },
+  head: ({ loaderData }) => {
+    const base = siteHead({
       path: "/directory",
-      title: "Gravity Pants Directory — Video ad ideas by mood and brand",
+      title: loaderData?.q ? `“${loaderData.q}” video ads — Gravity Pants Directory` : "Gravity Pants Directory — Video ad ideas by mood and brand",
       description: "Search real video ads and Reels made with Gravity Pants by mood, product or brand, and start your own from the same template.",
-    }),
+    });
+    return loaderData?.q ? { ...base, meta: [...(base.meta ?? []).filter((m: any) => m?.name !== "robots"), { name: "robots", content: "noindex, follow" }] } : base; // eslint-disable-line @typescript-eslint/no-explicit-any
+  },
   errorComponent: () => <SiteShell><p className="py-20 text-center">The Directory couldn't load. Try again.</p></SiteShell>,
   component: DirectoryPage,
 });
 
+function useWeekdayMood() {
+  const [i, setI] = useState(0);
+  const [day, setDay] = useState("today");
+  useEffect(() => {
+    setDay(new Date().toLocaleDateString("en-US", { weekday: "long" }));
+    const t = setInterval(() => setI((x) => (x + 1) % ROTATING.length), 2200);
+    return () => clearInterval(t);
+  }, []);
+  return { day, mood: ROTATING[i]! };
+}
+
 function DirectoryPage() {
-  const cards = Route.useLoaderData();
-  const { q = "" } = Route.useSearch();
+  const { q, cards, reels, fallback } = Route.useLoaderData();
+  const { size } = Route.useSearch();
   const navigate = useNavigate({ from: "/directory/" });
   const [value, setValue] = useState(q);
+  const [open, setOpen] = useState<DirectoryCard | null>(null);
+  const { day, mood } = useWeekdayMood();
+  useEffect(() => setValue(q), [q]);
+  const go = (v: string) => void navigate({ search: { q: v.trim() || undefined } });
   const featured = cards.filter((c) => c.featured);
-  const go = (v: string) => void navigate({ search: { q: v || undefined } });
+  const rest = cards.filter((c) => !c.featured);
+  const also = useMemo(() => {
+    const words = new Set(q.toLowerCase().split(/\s+/));
+    const counts = new Map<string, number>();
+    for (const c of cards.slice(0, 10)) for (const t of [...c.moods, ...c.tags]) if (!words.has(t)) counts.set(t, (counts.get(t) ?? 0) + 1);
+    return [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6).map(([t]) => t);
+  }, [cards, q]);
+
   return (
     <SiteShell>
-      <main className="mx-auto max-w-[1280px] px-6 pb-20 font-ap text-ap-ink">
-        <section className="pt-20 pb-10 text-center">
-          <p className="mb-3.5 text-[15px] font-semibold text-ap-badge">Gravity Pants Directory</p>
-          <h1 className="mb-7 text-[clamp(30px,5vw,56px)] leading-[1.08] font-semibold tracking-[-0.035em]">Find a reel that feels right.</h1>
-          <form onSubmit={(e) => { e.preventDefault(); go(value.trim()); }} className="mx-auto flex max-w-[620px] items-center gap-2 rounded-[14px] border border-ap-hairline bg-ap-card px-4 focus-within:border-ap-blue focus-within:shadow-ap-focus">
-            <Search className="size-5 text-ap-muted" strokeWidth={1.7} />
-            <input value={value} onChange={(e) => setValue(e.target.value)} placeholder="Try: cozy knitwear, square, TikTok" aria-label="Search the Directory" className="h-12 flex-1 bg-transparent text-[16px] outline-hidden" />
+      <main className="font-ap text-ap-ink">
+        <section className="mx-auto max-w-[900px] px-6 pt-20 pb-12 text-center">
+          <p className="mb-3.5 text-[15px] font-semibold text-ap-badge">Directory</p>
+          <h1 className="mb-7 text-[clamp(30px,5vw,52px)] leading-[1.1] font-semibold tracking-[-0.035em]">
+            It's {day}. Show me something: <span className="text-ap-blue" aria-live="polite">{mood}</span>
+          </h1>
+          <form role="search" onSubmit={(e) => { e.preventDefault(); go(value); }} className="mx-auto flex h-[60px] max-w-[640px] items-center gap-2 rounded-[12px] border border-ap-hairline bg-ap-card pr-2 pl-4 focus-within:border-ap-blue focus-within:shadow-ap-focus">
+            <input value={value} onChange={(e) => setValue(e.target.value)} placeholder="Try: cozy knitwear, square, TikTok" aria-label="Search the Directory" className="h-full min-w-0 flex-1 bg-transparent text-[17px] outline-hidden" />
+            {value && <button type="button" aria-label="Clear search" onClick={() => { setValue(""); go(""); }} className="grid size-8 place-items-center text-ap-muted"><X className="size-4" strokeWidth={1.7} /></button>}
+            <button type="submit" className="h-11 rounded-lg bg-ap-blue px-5 text-[15px] font-semibold text-ap-card">Search</button>
           </form>
           <div className="mt-4 flex flex-wrap justify-center gap-1.5">
-            {MOODS.map((m) => (
-              <button key={m} type="button" onClick={() => { setValue(m); go(m); }} className="rounded-lg border border-ap-hairline bg-ap-card px-3 py-1.5 text-[14px] hover:border-ap-blue hover:text-ap-blue">{m}</button>
+            {STARTERS.map((s) => (
+              <button key={s.label} type="button" onClick={() => go(s.q)} className={cn("rounded-lg bg-ap-panel px-3 py-1.5 text-[14px]", s.mood && "text-ap-blue")}>{s.label}</button>
             ))}
           </div>
         </section>
-        {featured.length > 0 && (
-          <section className="mb-12">
-            <h2 className="mb-4 text-[22px] font-semibold">Featured</h2>
-            <DirectoryGrid cards={featured.slice(0, 8)} />
+
+        {!q ? (
+          <>
+            {reels.length > 0 && (
+              <section className="home-examples !min-h-0 !gap-8 py-14">
+                <p className="mx-auto w-full max-w-[1280px] px-6 text-[15px] font-semibold text-ap-badge">Made with Gravity Pants</p>
+                <ReelCarousel
+                  label="Reels made with Gravity Pants"
+                  items={reels.map((r) => ({
+                    key: r.id,
+                    media: () => (
+                      <div className={`home-example-video home-example-video-${r.format}`}>
+                        <ReelVideo video={r.video} videoWebm={r.videoWebm ?? undefined} poster={r.poster ?? undefined} label={`${r.title} video ad`} />
+                      </div>
+                    ),
+                    title: r.title,
+                    detail: `${r.photos} photos · ${r.seconds} sec · ${FORMAT_LABEL[r.format]} · ${r.brand}`,
+                    visit: r.href ? { href: r.href, label: `Visit ${r.brand}` } : undefined,
+                  }))}
+                />
+              </section>
+            )}
+            <section className="mx-auto max-w-[1280px] px-6 py-14">
+              <h2 className="mb-5 text-[24px] font-semibold tracking-[-0.02em]">Browse the directory</h2>
+              {cards.length ? <DirectoryGrid cards={cards} onOpen={setOpen} /> : <p className="text-ap-muted">The first reels are on their way.</p>}
+            </section>
+          </>
+        ) : cards.length === 0 ? (
+          <section className="mx-auto max-w-[1280px] px-6 pb-16 text-center">
+            <h2 className="text-[24px] font-semibold">Nothing for “{q}” yet.</h2>
+            <div className="mt-4 flex flex-wrap justify-center gap-1.5">
+              {STARTERS.slice(0, 6).map((s) => <button key={s.label} type="button" onClick={() => go(s.q)} className="rounded-lg bg-ap-panel px-3 py-1.5 text-[14px]">{s.label}</button>)}
+            </div>
+            {fallback.length > 0 && (
+              <div className="mt-12 text-left">
+                <h3 className="mb-5 px-6 text-[20px] font-semibold">You might like these</h3>
+                <CardCarousel cards={fallback.slice(0, 12)} label="Reels you might like" onOpen={setOpen} />
+              </div>
+            )}
           </section>
+        ) : (
+          <>
+            <section className="mx-auto flex max-w-[1280px] flex-wrap items-center gap-4 px-6 pb-8">
+              <p className="text-[17px] font-semibold nums">{cards.length} {cards.length === 1 ? "reel" : "reels"} for “{q}”</p>
+              <div className="flex rounded-lg bg-ap-panel p-1" role="group" aria-label="Size">
+                {SIZES.map((s) => (
+                  <button key={s.l} type="button" aria-pressed={size === s.v} onClick={() => void navigate({ search: (p) => ({ ...p, size: s.v }) })} className={cn("h-8 rounded-md px-3 text-[13px] font-medium nums", size === s.v ? "bg-ap-card font-semibold shadow-ap-soft" : "text-ap-body")}>{s.l}</button>
+                ))}
+              </div>
+              {also.length > 0 && (
+                <p className="text-[14px] text-ap-muted">Also try: {also.map((t, i) => <span key={t}>{i > 0 && " · "}<Link to="/directory" search={{ q: t }} className="text-ap-blue">{t}</Link></span>)}</p>
+              )}
+            </section>
+            {featured.length > 0 && (
+              <section className="home-examples !min-h-0 !gap-6 py-12">
+                <div className="mx-auto w-full max-w-[1280px] px-6">
+                  <p className="text-[15px] font-semibold text-ap-badge">Featured</p>
+                  <h2 className="mt-1 text-[28px] font-semibold tracking-[-0.02em]">Top matches from Gravity Pants brands</h2>
+                  <p className="mt-1 text-[14px] text-ap-muted">Brands on the Business plan whose reels match “{q}”.</p>
+                </div>
+                <CardCarousel cards={featured} label="Featured matches" onOpen={setOpen} />
+              </section>
+            )}
+            {rest.length > 0 && (
+              <section className="mx-auto max-w-[1280px] px-6 py-12">
+                <h2 className="mb-5 text-[24px] font-semibold tracking-[-0.02em]">More reels</h2>
+                <DirectoryGrid cards={rest} q={q} onOpen={setOpen} />
+              </section>
+            )}
+          </>
         )}
-        <section>
-          <h2 className="mb-4 text-[22px] font-semibold">{q ? `Results for “${q}”` : "Latest reels"}</h2>
-          <DirectoryGrid cards={cards} />
-        </section>
       </main>
+      <ReelDetail card={open} onClose={() => setOpen(null)} />
     </SiteShell>
   );
 }
