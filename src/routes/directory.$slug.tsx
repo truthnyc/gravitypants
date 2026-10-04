@@ -6,6 +6,7 @@ import { DirectoryGrid, ReelDetail } from "@/components/directory/DirectoryGrid"
 import { ReelCarousel } from "@/components/site/ReelCarousel";
 import { getBrandPage } from "@/lib/directory/directory.functions";
 import type { DirectoryCard } from "@/lib/directory/directory";
+import { BrandActions } from "@/components/directory/BrandActions";
 import { siteHead } from "@/lib/site/seo";
 
 const ORIGIN = "https://gravitypants.com";
@@ -78,13 +79,16 @@ function BrandPage() {
               </div>
               {brand.description && <p className="mt-2 max-w-[640px] text-[17px] leading-normal text-ap-body">{brand.description}</p>}
               <div className="mt-4 flex flex-wrap gap-1.5 text-[13px] nums">
-                {[`${reels.length} public ${reels.length === 1 ? "reel" : "reels"}`, `${sizes.size} ${sizes.size === 1 ? "size" : "sizes"}`, `gravitypants.com/directory/${brand.slug}`].map((c) => <span key={c} className="rounded-lg bg-ap-panel px-2.5 py-1">{c}</span>)}
+                {[`${reels.length} public ${reels.length === 1 ? "reel" : "reels"}`, `${sizes.size} ${sizes.size === 1 ? "size" : "sizes"}`].map((c) => <span key={c} className="rounded-lg bg-ap-panel px-2.5 py-1">{c}</span>)}
               </div>
+              <div className="mt-5 flex flex-wrap gap-2">
               {brand.website_url && (
-                <a href={brand.website_url} target="_blank" rel="noreferrer" className="mt-5 inline-flex h-11 items-center gap-1.5 rounded-lg bg-ap-blue px-5 text-[15px] font-semibold text-ap-card">
+                <a href={brand.website_url} target="_blank" rel="noreferrer" className="inline-flex h-11 items-center gap-1.5 rounded-lg bg-ap-blue px-5 text-[15px] font-semibold text-ap-card">
                   Visit {brand.name} <ArrowUpRight className="size-4" strokeWidth={1.7} />
                 </a>
               )}
+              <BrandActions brandId={brand.id} name={brand.name} />
+              </div>
             </div>
           </header>
           <h2 className="mb-5 text-[24px] font-semibold tracking-[-0.02em]">Reels</h2>
