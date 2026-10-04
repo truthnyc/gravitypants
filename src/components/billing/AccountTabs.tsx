@@ -5,6 +5,7 @@ import { usePlanAccess } from "@/lib/stillframe/plan";
 const tabs = [
   { to: "/app/account", label: "Profile" },
   { to: "/app/account/billing", label: "Billing" },
+  { to: "/app/account/directory", label: "Directory" },
   { to: "/app/account/members", label: "Team" },
 ] as const;
 
