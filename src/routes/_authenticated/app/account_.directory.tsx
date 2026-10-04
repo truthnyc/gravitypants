@@ -3,10 +3,10 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Pencil } from "lucide-react";
 import { AccountTabs } from "@/components/billing/AccountTabs";
 import { AppButton } from "@/components/app-ui";
-import { checkSlug, getDirectoryAccount, hideReel, saveSlug } from "@/lib/directory/directory.functions";
+import { checkSlug, getDirectoryAccount, hideReel, renameDirectoryReel, saveSlug } from "@/lib/directory/directory.functions";
 import { STATUS_LABEL } from "@/lib/directory/directory";
 import { getWorkspaceId } from "@/lib/stillframe/workspace";
 import { cn } from "@/lib/utils";
@@ -70,7 +70,7 @@ function DirectoryAccount() {
             <tbody>
               {d.reels.map((r) => (
                 <tr key={r.adId} className="border-b border-ap-hairline last:border-0">
-                  <td className="py-2.5"><Link to="/app/ad/$id/share" params={{ id: r.adId }} className="font-medium">{r.name}</Link></td>
+                  <td className="py-2.5"><ReelName adId={r.adId} name={r.name} onSaved={() => void qc.invalidateQueries({ queryKey: ["directory-account", ws] })} /></td>
                   <td className="py-2.5 text-ap-body">{STATUS_LABEL[r.status]}</td>
                   <td className="py-2.5 text-right">
                     {(r.status === "live" || r.status === "in_review") && (
@@ -117,6 +117,35 @@ function DirectoryAccount() {
         </section>
       )}
     </main>
+  );
+}
+
+function ReelName({ adId, name, onSaved }: { adId: string; name: string; onSaved: () => void }) {
+  const rename = useServerFn(renameDirectoryReel);
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState(name);
+  const [busy, setBusy] = useState(false);
+  if (!editing) {
+    return (
+      <span className="inline-flex items-center gap-1.5">
+        <Link to="/app/ad/$id/share" params={{ id: adId }} className="font-medium">{name}</Link>
+        <button type="button" aria-label={`Rename ${name}`} onClick={() => { setValue(name); setEditing(true); }} className="text-ap-muted hover:text-ap-blue"><Pencil className="size-3.5" strokeWidth={1.7} /></button>
+      </span>
+    );
+  }
+  const save = async () => {
+    const v = value.trim();
+    if (!v || v === name) return setEditing(false);
+    setBusy(true);
+    try { await rename({ data: { adId, title: v } }); toast.success("Reel renamed."); onSaved(); }
+    catch (e) { toast.error(e instanceof Error ? e.message : "Couldn't rename it. Try again."); }
+    finally { setBusy(false); setEditing(false); }
+  };
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      <input autoFocus value={value} maxLength={80} onChange={(e) => setValue(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") void save(); if (e.key === "Escape") setEditing(false); }} aria-label="Reel title" className="h-8 w-[200px] rounded-lg border border-ap-hairline bg-ap-card px-2 text-[14px] outline-hidden focus:border-ap-blue" />
+      <AppButton size="sm" disabled={busy || !value.trim()} onClick={() => void save()}>Save</AppButton>
+    </span>
   );
 }
 

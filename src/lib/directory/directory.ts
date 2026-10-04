@@ -40,6 +40,7 @@ export type DirectoryCard = {
   moods: string[];
   formats: string[];
   poster: string | null;
+  title: string | null;
   template_name: string | null;
   template_id: string | null;
   featured: boolean;

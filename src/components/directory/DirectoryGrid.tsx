@@ -40,7 +40,7 @@ export function DirectoryGrid({ cards, q = "", onOpen }: { cards: DirectoryCard[
             <ReelPoster card={c} className="size-full" />
             <span className="absolute top-2 left-2 rounded-md bg-ap-card px-1.5 py-0.5 text-[11px] font-semibold nums">{c.formats.map(ratio).join(" · ")}</span>
           </button>
-          <div className="mt-2.5 truncate font-semibold">{c.template_name ?? "Custom reel"}</div>
+          <div className="mt-2.5 truncate font-semibold">{c.title ?? c.template_name ?? "Custom reel"}</div>
           <div className="text-[13px] text-ap-muted nums">
             {c.seconds} sec · <Link to="/directory/$slug" params={{ slug: c.brand_slug }} className="text-ap-ink hover:text-ap-blue">{c.brand_name}</Link>
           </div>
@@ -62,7 +62,7 @@ export function CardCarousel({ cards, label, onOpen }: { cards: DirectoryCard[];
             <ReelPoster card={c} className="size-full" />
           </button>
         ),
-        title: c.template_name ?? c.brand_name,
+        title: c.title ?? c.template_name ?? c.brand_name,
         detail: `${c.photos} photos · ${c.seconds} sec · ${c.formats.map(ratio).join(" · ")} · ${c.brand_name}`,
         visit: c.website_url ? { href: c.website_url, label: `Visit ${c.brand_name}` } : undefined,
       }))}
@@ -121,7 +121,7 @@ function DetailBody({ card, onClose }: { card: DirectoryCard; onClose: () => voi
       <ReelPoster card={card} className="aspect-square sm:aspect-auto sm:min-h-[460px]" />
       <div className="flex flex-col gap-3 p-6 sm:p-8">
         <p className="text-[14px] font-semibold text-ap-badge">{card.category}</p>
-        <h2 className="text-[26px] leading-tight font-semibold tracking-[-0.02em]">{card.template_name ?? "Custom reel"}</h2>
+        <h2 className="text-[26px] leading-tight font-semibold tracking-[-0.02em]">{card.title ?? card.template_name ?? "Custom reel"}</h2>
         <p className="text-[15px]">by <Link to="/directory/$slug" params={{ slug: card.brand_slug }} onClick={onClose} className="font-semibold hover:text-ap-blue">{card.brand_name}</Link></p>
         {card.website_url && <a href={card.website_url} target="_blank" rel="noreferrer" className="inline-flex w-fit items-center gap-1 text-[14px] text-ap-blue">Visit {card.brand_name} <ArrowUpRight className="size-3.5" strokeWidth={1.7} /></a>}
         {card.description && <p className="text-[15px] leading-normal text-ap-body">{card.description}</p>}
