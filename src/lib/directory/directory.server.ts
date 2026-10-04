@@ -50,7 +50,7 @@ export async function toCards(rows: any[]): Promise<DirectoryCard[]> {
     v.n += 1;
     len.set(f.project_id, v);
   }
-  const paths = (extra ?? []).map((e: any) => e.poster_url).filter((p: string | null) => p?.startsWith(POSTER_PREFIX)).map((p: string) => p.slice(POSTER_PREFIX.length));
+  const paths = (extra ?? []).flatMap((e: any) => [e.poster_url, e.video_url]).filter((p: string | null) => p?.startsWith(POSTER_PREFIX)).map((p: string) => p.slice(POSTER_PREFIX.length));
   const signed = new Map<string, string>();
   if (paths.length) {
     const { data } = await sb.storage.from("media").createSignedUrls(paths, 60 * 60 * 24);
@@ -61,6 +61,7 @@ export async function toCards(rows: any[]): Promise<DirectoryCard[]> {
     const e = ex.get(id);
     const l = len.get(e?.ad_id) ?? { sec: 0, n: 0 };
     const p: string | null = e?.poster_url ?? null;
+    const v: string | null = e?.video_url ?? null;
     return {
       reel_id: id,
       brand_name: r.brand_name,
@@ -70,6 +71,7 @@ export async function toCards(rows: any[]): Promise<DirectoryCard[]> {
       moods: r.moods ?? [],
       formats: r.formats ?? [],
       poster: p?.startsWith(POSTER_PREFIX) ? signed.get(p.slice(POSTER_PREFIX.length)) ?? null : p,
+      video: v?.startsWith(POSTER_PREFIX) ? signed.get(v.slice(POSTER_PREFIX.length)) ?? null : v,
       title: e?.title ?? null,
       template_name: r.template_name ?? null,
       template_id: e?.template_id ?? null,
