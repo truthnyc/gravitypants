@@ -10,7 +10,7 @@ const PAGES: { path: string; priority: string; changefreq: string; lastmod: stri
   { path: "/features", priority: "0.9", changefreq: "monthly", lastmod: "2026-09-30" },
   { path: "/examples", priority: "0.9", changefreq: "weekly", lastmod: "2026-09-30" },
   { path: "/showcase", priority: "0.8", changefreq: "weekly", lastmod: "2026-09-30" },
-  { path: "/directory", priority: "0.8", changefreq: "daily", lastmod: "2026-10-04" },
+  // Directory intentionally not listed yet — the public Directory is not part of the marketing site.
   { path: "/contact", priority: "0.6", changefreq: "monthly", lastmod: "2026-09-30" },
   { path: "/pricing", priority: "0.9", changefreq: "monthly", lastmod: "2026-09-30" },
   { path: "/about", priority: "0.6", changefreq: "yearly", lastmod: "2026-09-30" },
