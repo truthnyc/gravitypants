@@ -583,6 +583,85 @@ function TextPanel({
           right={<span className="text-[19px] font-semibold text-secondary-text">A</span>}
         />
       </Field>
+      <Field label="Letter spacing" value={`${spacing > 0 ? "+" : ""}${spacing}`}>
+        <ElementSlider
+          name={`${isHead ? "Headline" : "Subline"} letter spacing`}
+          color={color}
+          min={-10}
+          max={50}
+          value={spacing}
+          snap={(v) => (Math.abs(v) <= 1 ? 0 : v)}
+          onChange={(v, k) => onChange({ letter_spacing: v }, k)}
+        />
+      </Field>
+      <Field label="Line height" value={lineHeight.toFixed(2)}>
+        <ElementSlider
+          name={`${isHead ? "Headline" : "Subline"} line height`}
+          color={color}
+          min={80}
+          max={200}
+          value={Math.round(lineHeight * 100)}
+          onChange={(v, k) => onChange({ line_height: v / 100 }, k)}
+        />
+      </Field>
+      </>
+      )}
+      {imageMode && (
+        <>
+          <Field label="Image">
+            <div className="flex items-center gap-3">
+              {t.image_path ? (
+                <MediaImage path={t.image_path} alt="Subline image" className="h-12 w-20 rounded-sm border bg-control-fill object-contain" />
+              ) : (
+                <div className="flex h-12 w-20 items-center justify-center rounded-sm border border-dashed border-placeholder-border text-icon">
+                  <ImageIcon className="size-4" strokeWidth={1.7} />
+                </div>
+              )}
+              <div className="flex flex-col gap-1.5">
+                <Button size="sm" variant="default" disabled={busy} onClick={() => fileRef.current?.click()}>
+                  {busy ? "Uploading…" : t.image_path ? "Replace" : "Upload logo or badge"}
+                </Button>
+                {t.image_path && (
+                  <button type="button" className="text-left text-[12px] text-secondary-text" onClick={() => onChange({ image_path: null })}>
+                    Remove
+                  </button>
+                )}
+              </div>
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                className="hidden"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  e.target.value = "";
+                  if (!file) return;
+                  setBusy(true);
+                  try {
+                    const up = await uploadMedia(file, "logo");
+                    onChange({ image_path: up.path });
+                  } catch {
+                    toast.error("That image couldn't be uploaded. Try again.");
+                  } finally {
+                    setBusy(false);
+                  }
+                }}
+              />
+            </div>
+          </Field>
+          <Field label="Size" value={`${imgSize}%`}>
+            <ElementSlider
+              name="Subline image size"
+              color={color}
+              min={5}
+              max={100}
+              value={imgSize}
+              onChange={(v, k) => onChange({ image_size_pct: v }, k)}
+            />
+          </Field>
+        </>
+      )}
+      {!imageMode && (
       <Field label="Color">
         <div className="flex flex-wrap items-center gap-2">
           {swatches.map((c) => (
