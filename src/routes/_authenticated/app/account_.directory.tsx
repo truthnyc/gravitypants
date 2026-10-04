@@ -10,6 +10,7 @@ import { checkSlug, getDirectoryAccount, hideReel, renameDirectoryReel, saveBran
 import { STATUS_LABEL } from "@/lib/directory/directory";
 import { getWorkspaceId } from "@/lib/stillframe/workspace";
 import { cn } from "@/lib/utils";
+import { BRAND_DESCRIPTION_MAX, SLUG_MAX, nearLimit } from "@/lib/directory/directory";
 
 export const Route = createFileRoute("/_authenticated/app/account_/directory")({
   head: () => ({
@@ -140,9 +141,9 @@ function DescriptionBox({ brandId, description, onSaved }: { brandId: string; de
     <div className="mt-[18px]">
       <label htmlFor="brand-description" className="text-[14px] font-semibold">Brand description</label>
       <p className="mt-0.5 text-[12px] text-ap-muted">Shown below your brand name in the page header.</p>
-      <textarea id="brand-description" value={value} maxLength={160} rows={3} onChange={(e) => setValue(e.target.value)} className="mt-2 w-full resize-none rounded-lg border border-ap-hairline bg-ap-card px-3 py-2 text-[14px] outline-hidden focus:border-ap-blue" />
+      <textarea id="brand-description" value={value} maxLength={BRAND_DESCRIPTION_MAX} rows={4} onChange={(e) => setValue(e.target.value)} className="mt-2 w-full resize-none rounded-lg border border-ap-hairline bg-ap-card px-3 py-2 text-[14px] outline-hidden focus:border-ap-blue" />
       <div className="mt-1.5 flex items-center justify-between gap-3">
-        <span className="text-[12px] text-ap-muted nums">{value.length}/160</span>
+        <span className={cn("text-[12px] nums", nearLimit(value.length, BRAND_DESCRIPTION_MAX) ? "text-ap-amber" : "text-ap-muted")}>{value.length} / {BRAND_DESCRIPTION_MAX}</span>
         <AppButton size="sm" disabled={busy || !changed} onClick={() => void commit()}>{busy ? "Saving..." : "Save description"}</AppButton>
       </div>
     </div>
@@ -186,19 +187,20 @@ function SlugBox({ brandId, slug, onSaved }: { brandId: string; slug: string; on
   const [busy, setBusy] = useState(false);
   useEffect(() => {
     const v = value.trim().toLowerCase();
-    if (!/^[a-z0-9-]{3,40}$/.test(v)) return setSt("invalid");
+    if (!/^[a-z0-9-]{3,30}$/.test(v)) return setSt("invalid");
     const t = setTimeout(() => void check({ data: { slug: v, brandId } }).then(setSt).catch(() => setSt("invalid")), 300);
     return () => clearTimeout(t);
   }, [value, brandId, check]);
-  const msg = st === "yours" ? ["✓ Yours", "text-ap-green"] : st === "available" ? ["✓ Available", "text-ap-green"] : st === "taken" || st === "reserved" ? ["✗ Taken. Try another", "text-destructive"] : ["Use 3 to 40 letters, numbers or hyphens", "text-ap-muted"];
+  const msg = st === "yours" ? ["✓ Yours", "text-ap-green"] : st === "available" ? ["✓ Available", "text-ap-green"] : st === "taken" || st === "reserved" ? ["✗ Taken. Try another", "text-destructive"] : ["Use 3 to 30 letters, numbers or hyphens", "text-ap-muted"];
   return (
     <div className="my-[18px] flex flex-wrap items-center gap-2.5 rounded-[14px] bg-ap-panel px-4 py-3.5 text-[14px]">
       <span className="mr-1 font-semibold">Brand page</span>
       <span className="inline-flex items-center overflow-hidden rounded-lg border border-ap-hairline bg-ap-card">
         <span className="pr-0.5 pl-2.5 whitespace-nowrap text-ap-muted">gravitypants.com/directory/</span>
-        <input value={value} onChange={(e) => setValue(e.target.value.toLowerCase())} aria-label="Brand page address" className="h-9 w-[150px] pr-2.5 outline-hidden" />
+        <input value={value} maxLength={SLUG_MAX} onChange={(e) => setValue(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))} aria-label="Brand page address" className="h-9 w-[150px] pr-2.5 outline-hidden" />
       </span>
       <span className={cn("text-[13px]", msg[1])}>{msg[0]}</span>
+      <span className={cn("text-[12px] nums", nearLimit(value.length, SLUG_MAX) ? "text-ap-amber" : "text-ap-muted")}>{value.length} / {SLUG_MAX}</span>
       <AppButton size="sm" disabled={st !== "available" || busy} onClick={async () => {
         setBusy(true);
         try {

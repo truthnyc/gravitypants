@@ -348,6 +348,7 @@ export type Database = {
           ad_id: string
           brand_id: string
           created_at: string
+          description: string | null
           formats: string[]
           hidden_at: string | null
           hidden_reason: string | null
@@ -368,6 +369,7 @@ export type Database = {
           ad_id: string
           brand_id: string
           created_at?: string
+          description?: string | null
           formats?: string[]
           hidden_at?: string | null
           hidden_reason?: string | null
@@ -388,6 +390,7 @@ export type Database = {
           ad_id?: string
           brand_id?: string
           created_at?: string
+          description?: string | null
           formats?: string[]
           hidden_at?: string | null
           hidden_reason?: string | null
