@@ -17,13 +17,88 @@ export const Route = createFileRoute("/signup")({
     template: z.string().optional(),
     plan: z.enum(["simple", "business", "team"]).optional(),
     billing: z.enum(["monthly", "yearly"]).optional(),
+    invited: z.coerce.string().optional(),
   }),
   head: () => siteHead({ path: "/signup", title: "Create your account — Gravity Pants", description: "Create a Gravity Pants account and turn photos into video ads and GIFs.", noindex: true }),
   component: SignUp,
 });
 
 function SignUp() {
-  const { redirect, plan, billing, template } = Route.useSearch();
+  const { redirect, plan, billing, template, invited } = Route.useSearch();
+  if (invited) return <InvitedSignUp />;
+  return <RegularSignUp redirect={redirect} plan={plan} billing={billing} template={template} />;
+}
+
+function InvitedSignUp() {
+  const [state, setState] = useState<"loading" | "ready" | "expired">("loading");
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    const hash = new URLSearchParams(window.location.hash.slice(1));
+    const apply = (session: { user: { email?: string; user_metadata?: Record<string, unknown> } } | null) => {
+      if (!session) return false;
+      setEmail(session.user.email ?? "");
+      const n = session.user.user_metadata?.["full_name"];
+      if (typeof n === "string") setName((v) => v || n);
+      setState("ready");
+      return true;
+    };
+    const { data } = supabase.auth.onAuthStateChange((_e, session) => { apply(session); });
+    void supabase.auth.getSession().then(({ data: d }) => {
+      if (apply(d.session)) return;
+      if (hash.get("error") || !hash.get("access_token")) setState("expired");
+    });
+    const t = window.setTimeout(() => setState((s) => (s === "loading" ? "expired" : s)), 6000);
+    return () => { data.subscription.unsubscribe(); window.clearTimeout(t); };
+  }, []);
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!name.trim()) return setError("Please enter your name.");
+    if (password.length < 8) return setError("Please use a password with at least 8 characters.");
+    setBusy(true);
+    setError(null);
+    const { error } = await supabase.auth.updateUser({ password, data: { full_name: name.trim() } });
+    setBusy(false);
+    if (error) return setError(plainAuthError(error.message));
+    sessionStorage.setItem("gravity-pants:welcome", "1");
+    window.location.href = "/app/ads?welcome=1";
+  }
+
+  if (state === "loading") return <AuthShell title="Opening your invite…" subtitle="One moment."><span /></AuthShell>;
+  if (state === "expired") {
+    return (
+      <AuthShell title="This invite link has expired" subtitle="Invite links work once and for a limited time. If you already set a password, sign in. Otherwise, ask us to send a new invite or reset your password.">
+        <p className="text-[15px]"><Link to="/signin" className="auth-link">Sign in</Link> · <Link to="/reset" className="auth-link">Reset password</Link></p>
+      </AuthShell>
+    );
+  }
+  return (
+    <AuthShell eyebrow="You're invited" title={"Finish setting up\nyour account."} subtitle={`Choose a password for ${email} to start making reels.`}>
+      <form onSubmit={submit} noValidate>
+        <FieldGroup
+          error={error}
+          fields={[
+            { id: "name", label: "Your name", type: "text", autoComplete: "name", value: name, placeholder: "Alex Rivera", onChange: setName },
+            { id: "password", label: "Password", type: "password", autoComplete: "new-password", value: password, placeholder: "At least 8 characters", onChange: setPassword },
+          ]}
+        />
+        <Button type="submit" variant="site" disabled={busy || !name || !password} className="auth-submit">
+          {busy ? "Saving…" : <>Create my account <ArrowRight size={17} strokeWidth={1.7} /></>}
+        </Button>
+      </form>
+      <p className="auth-legal">
+        By creating an account you agree to the <Link to="/terms" className="auth-link">Terms</Link> and <Link to="/privacy" className="auth-link">Privacy Policy</Link>.
+      </p>
+    </AuthShell>
+  );
+}
+
+function RegularSignUp({ redirect, plan, billing, template }: { redirect?: string | undefined; plan?: "simple" | "business" | "team" | undefined; billing?: "monthly" | "yearly" | undefined; template?: string | undefined }) {
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");

@@ -395,7 +395,7 @@ export const adminInviteClient = createServerFn({ method: "POST" })
     const existing = (await allUsers(db)).find((u) => u.email.toLowerCase() === data.email);
     if (existing) return { error: "That email already has an account. Open the client and use Give free plan instead." };
     const { data: inv, error } = await db.auth.admin.inviteUserByEmail(data.email, {
-      redirectTo: "https://gravitypants.com/app/ads?welcome=1",
+      redirectTo: "https://gravitypants.com/signup?invited=1",
       data: data.name ? { full_name: data.name } : {},
     });
     if (error || !inv?.user) return { error: "Couldn't send the invite email. Please try again." };
