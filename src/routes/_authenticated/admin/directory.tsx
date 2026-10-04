@@ -133,7 +133,7 @@ function BrandAddresses() {
                   <span className="inline-flex items-center gap-1.5">
                     <span className="text-secondary-text">/directory/</span>
                     <input autoFocus value={value} maxLength={SLUG_MAX} onChange={(e) => setValue(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))} onKeyDown={(e) => { if (e.key === "Enter") void commit(b.id, b.slug); if (e.key === "Escape") setEditing(null); }} aria-label={`Address for ${b.name}`} className="h-8 w-[180px] rounded-lg border border-border bg-card px-2 text-[13px] outline-hidden focus:border-primary" />
-                    <span className={cn("text-[12px] nums", nearLimit(value.length, SLUG_MAX) ? "text-warning" : "text-secondary-text")}>{value.length} / {SLUG_MAX}</span>
+                    <span className={cn("text-[12px] nums", nearLimit(value.length, SLUG_MAX) ? "text-warning-text" : "text-secondary-text")}>{value.length} / {SLUG_MAX}</span>
                     <Button size="sm" disabled={busy || !/^[a-z0-9-]{3,30}$/.test(value.trim())} onClick={() => void commit(b.id, b.slug)}>Save</Button>
                   </span>
                 ) : (
@@ -251,7 +251,7 @@ function BrandForm({ b, onSaved }: { b: Detail["brand"]; onSaved: () => void }) 
         {b.logo && <button type="button" disabled={busy} className="text-[12px] text-secondary-text" onClick={() => void run(() => logo({ data: { brandId: b.id, file: null } }), "Logo removed")}>Remove</button>}
       </div>
       <div className="grid flex-1 gap-2 sm:grid-cols-2">
-        <label className="space-y-1"><span className="flex justify-between text-[12px] text-secondary-text"><span>Brand name</span><span className={cn("nums", nearLimit(f.name.length, BRAND_NAME_MAX) && "text-warning")}>{f.name.length} / {BRAND_NAME_MAX}</span></span><input value={f.name} maxLength={BRAND_NAME_MAX} onChange={(e) => setF({ ...f, name: e.target.value })} className={field} /></label>
+        <label className="space-y-1"><span className="flex justify-between text-[12px] text-secondary-text"><span>Brand name</span><span className={cn("nums", nearLimit(f.name.length, BRAND_NAME_MAX) && "text-warning-text")}>{f.name.length} / {BRAND_NAME_MAX}</span></span><input value={f.name} maxLength={BRAND_NAME_MAX} onChange={(e) => setF({ ...f, name: e.target.value })} className={field} /></label>
         <label className="space-y-1"><span className="text-[12px] text-secondary-text">Website</span><input value={f.website} maxLength={200} placeholder="https://" onChange={(e) => setF({ ...f, website: e.target.value })} className={field} /></label>
         <label className="space-y-1"><span className="text-[12px] text-secondary-text">Category</span><select value={f.category} onChange={(e) => setF({ ...f, category: e.target.value as Category })} className={field}>{CATEGORIES.map((c) => <option key={c}>{c}</option>)}</select></label>
         <div className="space-y-1 text-[12px] text-secondary-text">
@@ -260,7 +260,7 @@ function BrandForm({ b, onSaved }: { b: Detail["brand"]; onSaved: () => void }) 
           <a href={`/directory/${b.slug}`} target="_blank" rel="noreferrer" className="text-link">View brand page</a>
         </div>
         <label className="space-y-1 sm:col-span-2">
-          <span className="flex justify-between text-[12px] text-secondary-text"><span>Brand description</span><span className={cn("nums", nearLimit(f.description.length, BRAND_DESCRIPTION_MAX) && "text-warning")}>{f.description.length} / {BRAND_DESCRIPTION_MAX}</span></span>
+          <span className="flex justify-between text-[12px] text-secondary-text"><span>Brand description</span><span className={cn("nums", nearLimit(f.description.length, BRAND_DESCRIPTION_MAX) && "text-warning-text")}>{f.description.length} / {BRAND_DESCRIPTION_MAX}</span></span>
           <textarea value={f.description} maxLength={BRAND_DESCRIPTION_MAX} rows={4} onChange={(e) => setF({ ...f, description: e.target.value })} className="w-full rounded-sm bg-control-fill px-2 py-1.5 text-[13px]" />
         </label>
         <div className="sm:col-span-2"><Button size="sm" disabled={busy || !f.name.trim()} onClick={() => void run(() => save({ data: { brandId: b.id, ...f } }), "Brand page saved")}>Save details</Button></div>
