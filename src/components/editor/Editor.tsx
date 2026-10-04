@@ -513,7 +513,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
       />
       {banner}
       <div className={cn("flex min-h-0 flex-1 flex-col lg:flex-row", readOnly && "pointer-events-none select-none")} aria-readonly={readOnly || undefined}>
-        <div className="hidden lg:block"><FrameRail
+        <div className="hidden min-h-0 lg:block"><FrameRail
           doc={doc}
           format={format}
           frameIndex={idx}

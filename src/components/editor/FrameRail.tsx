@@ -78,7 +78,7 @@ export function FrameRail({
   const [over, setOver] = useState<number | null>(null);
 
   return (
-    <nav className="flex w-[132px] shrink-0 flex-col items-center overflow-y-auto border-r bg-rail py-4" aria-label="Frames">
+    <nav className="flex h-full w-[132px] shrink-0 flex-col items-center overflow-y-auto border-r bg-rail py-4" aria-label="Frames">
       <div className="mb-3 self-start px-4 text-[11px] font-semibold tracking-[0.06em] text-secondary-text">FRAMES</div>
       {doc.frames.map((f, i) => (
         <div key={f.id} className="flex flex-col items-center">
