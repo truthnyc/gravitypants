@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
 import { AdCard } from "@/components/stillframe/AdCard";
+import { useDirectoryStatuses } from "@/lib/directory/hooks";
 import { DropZone } from "@/components/stillframe/DropZone";
 import { useSearch } from "@/components/stillframe/search-context";
 import { useProjects, useTemplates } from "@/lib/stillframe/data";
@@ -115,7 +116,7 @@ function YourAds() {
           ) : visible.length ? (
             <div className="mt-5 grid grid-cols-2 gap-x-3 gap-y-7 sm:gap-x-5 lg:grid-cols-3 lg:gap-6 xl:grid-cols-4">
               {visible.map((project) => (
-                <AdCard key={project.id} project={project} />
+                <AdCard key={project.id} project={project} dirStatus={dir.statuses[project.id]} liveUntil={dir.liveUntil} onHide={() => void dir.hide(project.id)} />
               ))}
             </div>
           ) : (
