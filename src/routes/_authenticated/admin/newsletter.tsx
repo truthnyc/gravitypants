@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { getNewsletterPopupAdmin, saveNewsletterPopup } from "@/lib/site/newsletter.functions";
 import { DEFAULT_POPUP, type NewsletterPopupContent } from "@/lib/site/newsletter";
 import { photoSrc } from "@/lib/site/homepage";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/admin/newsletter")({
   head: () => ({ meta: [
@@ -112,6 +113,7 @@ function NewsletterAdmin() {
   return (
     <div className="space-y-6">
       <PageTitle title="Newsletter pop-up" sub="The sign-up pop-up visitors see on the site. Changes show as soon as you save." />
+      <PopupPreview c={c} />
       <Card className="space-y-4">
         <h2 className="text-[17px] font-semibold">Behaviour</h2>
         <Toggle label="Show the pop-up" hint="Turn off to stop showing it to visitors." checked={c.enabled} onChange={(enabled) => setC({ ...c, enabled })} />
