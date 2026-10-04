@@ -31,6 +31,9 @@ const Email = ({ clientEmail, clientName, plan, until, reason, adminEmail }: Pro
           <strong>Reason:</strong> {reason || '—'}<br />
           <strong>Invited by:</strong> {adminEmail || '—'}
         </Text>
+        <Button style={brandButton} href="https://gravitypants.com/admin/clients">
+          Open Admin → Clients
+        </Button>
         <Text style={brandFooter}>Gravity Pants admin · This is a copy of a client invite for your records.</Text>
       </Container>
     </Body>
