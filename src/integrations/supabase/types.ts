@@ -282,6 +282,32 @@ export type Database = {
           },
         ]
       }
+      directory_favorites: {
+        Row: {
+          brand_id: string
+          created_at: string
+          user_id: string
+        }
+        Insert: {
+          brand_id: string
+          created_at?: string
+          user_id: string
+        }
+        Update: {
+          brand_id?: string
+          created_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "directory_favorites_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "directory_brands"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       directory_make_events: {
         Row: {
           created_at: string
