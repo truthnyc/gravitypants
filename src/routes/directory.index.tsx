@@ -5,7 +5,7 @@ import { X } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { ReelCarousel } from "@/components/site/ReelCarousel";
 import { ReelVideo } from "@/components/site/ReelVideo";
-import { CardCarousel, DirectoryGrid, ReelDetail } from "@/components/directory/DirectoryGrid";
+import { DirectoryGrid, ReelDetail } from "@/components/directory/DirectoryGrid";
 import { searchDirectory } from "@/lib/directory/directory.functions";
 import type { DirectoryCard } from "@/lib/directory/directory";
 import { listSiteReels } from "@/lib/site/reels.functions";
@@ -66,8 +66,6 @@ function DirectoryPage() {
   const { day, mood } = useWeekdayMood();
   useEffect(() => setValue(q), [q]);
   const go = (v: string) => void navigate({ search: { q: v.trim() || undefined } });
-  const featured = cards.filter((c) => c.featured);
-  const rest = cards.filter((c) => !c.featured);
   const also = useMemo(() => {
     const words = new Set(q.toLowerCase().split(/\s+/));
     const counts = new Map<string, number>();
