@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { makeOneLikeThis, reportReel } from "@/lib/directory/directory.functions";
 import { ratio, type DirectoryCard } from "@/lib/directory/directory";
 import { ReelCarousel } from "@/components/site/ReelCarousel";
+import { LikeSave } from "./LikeSave";
 
 const shape = (f: string | undefined) => (f === "9x16" ? "aspect-[9/16] h-full" : f === "16x9" ? "aspect-[16/9] w-full" : "aspect-square h-full");
 
@@ -129,6 +130,7 @@ function DetailBody({ card, onClose }: { card: DirectoryCard; onClose: () => voi
         <p className="text-[14px] font-semibold text-ap-badge">{card.category}</p>
         <h2 className="text-[26px] leading-tight font-semibold tracking-[-0.02em]">{card.title ?? card.template_name ?? "Custom reel"}</h2>
         <p className="text-[15px]">by <Link to="/directory/$slug" params={{ slug: card.brand_slug }} onClick={onClose} className="font-semibold hover:text-ap-blue">{card.brand_name}</Link></p>
+        <div className="flex gap-2"><LikeSave kind="reel" id={card.reel_id} name={card.title ?? `${card.brand_name} reel`} /></div>
         {card.website_url && <a href={card.website_url} target="_blank" rel="noreferrer" className="inline-flex w-fit items-center gap-1 text-[14px] text-ap-blue">Visit {card.brand_name} <ArrowUpRight className="size-3.5" strokeWidth={1.7} /></a>}
         {card.description && <p className="text-[15px] leading-normal text-ap-body">{card.description}</p>}
         <div className="flex flex-wrap gap-1.5 text-[13px] nums">
