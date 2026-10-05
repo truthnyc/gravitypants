@@ -159,21 +159,24 @@ function DirectoryPage() {
               Search
             </button>
           </form>
-          <div className="mx-auto mt-[18px] flex max-w-[760px] flex-wrap justify-center gap-2">
-            {STARTERS.map((s) => (
-              <button
-                key={s.label}
-                type="button"
-                onClick={() => go(s.q)}
-                className={cn(
-                  "rounded-lg bg-ap-panel px-3.5 py-2 text-[14px] hover:bg-ap-media",
-                  s.mood && "font-medium text-ap-badge",
-                )}
-              >
-                {s.label}
-              </button>
-            ))}
-          </div>
+          {/* Starter mood/tag chips hidden for now — bring back by re-enabling this block. */}
+          {false && (
+            <div className="mx-auto mt-[18px] flex max-w-[760px] flex-wrap justify-center gap-2">
+              {STARTERS.map((s) => (
+                <button
+                  key={s.label}
+                  type="button"
+                  onClick={() => go(s.q)}
+                  className={cn(
+                    "rounded-lg bg-ap-panel px-3.5 py-2 text-[14px] hover:bg-ap-media",
+                    s.mood && "font-medium text-ap-badge",
+                  )}
+                >
+                  {s.label}
+                </button>
+              ))}
+            </div>
+          )}
         </section>
 
         {!q ? (
