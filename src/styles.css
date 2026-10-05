@@ -1107,3 +1107,5 @@ html:has(.acct), body:has(.acct), body:has(.acct) .bg-canvas { background: var(-
 @media (min-width: 768px) { .ap-steps-main.ap-large .ap-preview-box { height: 640px; } }
 .ap-steps-main.ap-large .ap-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .ap-steps-main.ap-large .ap-gif-grid { grid-template-columns: minmax(0, 1fr); }
+
+@keyframes dir-mood { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
