@@ -28,7 +28,7 @@ export function Avatar({ me, size = 32 }: { me: Me | null | undefined; size?: nu
   );
 }
 
-export function UserMenu() {
+export function UserMenu({ showName = false }: { showName?: boolean }) {
   const { data: me } = useMe();
   const signOut = useSignOut();
   const check = useServerFn(checkAdmin);
@@ -48,8 +48,9 @@ export function UserMenu() {
   });
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" aria-label="Your account">
+      <DropdownMenuTrigger className="flex items-center gap-2 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" aria-label="Your account">
         <Avatar me={me} />
+        {showName && <span className="hidden max-w-[160px] truncate text-[15px] font-medium md:inline">{me?.displayName || me?.email?.split("@")[0] || "Account"}</span>}
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-60">
         <DropdownMenuLabel className="font-normal">

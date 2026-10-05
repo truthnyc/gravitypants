@@ -5,6 +5,7 @@ import { GravityPantsLogo } from "@/components/GravityPantsLogo";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { FooterNewsletter, NewsletterPopup } from "@/components/site/Newsletter";
+import { UserMenu } from "@/components/stillframe/UserMenu";
 
 const nav = [
   { label: "How it works", to: "/how-it-works" },
@@ -42,6 +43,7 @@ function SiteHeader() {
         <div className="flex shrink-0 items-center gap-1.5 md:ml-auto md:gap-3">
           {!signedIn && <Link to="/signin" className="hidden px-3 text-[15px] font-medium text-site-ink md:inline-flex">Sign in</Link>}
           <Button asChild variant="site" size="siteHeader"><Link to={action.to} onClick={() => setMenuOpen(false)}>{action.label}</Link></Button>
+          {signedIn && <div className="text-site-ink"><UserMenu showName /></div>}
           <Button variant="ghost" size="icon" className="h-11 w-11 md:hidden" aria-label={menuOpen ? "Close menu" : "Open menu"} aria-expanded={menuOpen} onClick={() => setMenuOpen((v) => !v)}>{menuOpen ? <X size={22} strokeWidth={1.7} /> : <Menu size={22} strokeWidth={1.7} />}</Button>
         </div>
       </div>
