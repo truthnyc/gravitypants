@@ -11,6 +11,7 @@ import { AppButton } from "@/components/app-ui";
 import { Switch } from "@/components/ui/switch";
 import { ReelDetail } from "@/components/directory/DirectoryGrid";
 import { useSiteReelFavorites, SiteReelHeart } from "@/components/site/SiteReelHeart";
+import { SiteReelModal } from "@/components/site/SiteReelModal";
 import { listSiteReels } from "@/lib/site/reels.functions";
 import { type SiteReel } from "@/lib/site/reels";
 import { getMyFavorites, saveFavoritePage } from "@/lib/directory/favorites.functions";
@@ -35,6 +36,7 @@ function FavoritesPage() {
   const [pub, setPub] = useState(false);
   const [busy, setBusy] = useState(false);
   const [open, setOpen] = useState<DirectoryCard | null>(null);
+  const [openSite, setOpenSite] = useState<SiteReel | null>(null);
 
   useEffect(() => {
     if (!d) return;
@@ -154,6 +156,7 @@ function FavoritesPage() {
         ) : <p className="text-[14px] text-ap-body">No saved brands yet.</p>}
       </section>
       <ReelDetail card={open} onClose={() => setOpen(null)} />
+      <SiteReelModal reel={openSite} onClose={() => setOpenSite(null)} />
     </main>
   );
 }
