@@ -1097,3 +1097,13 @@ html:has(.acct), body:has(.acct), body:has(.acct) .bg-canvas { background: var(-
 .acct-card :is(input, select, textarea):not(.acct-bare):focus { border-color: var(--ap-blue); box-shadow: var(--ap-focus-ring); }
 .acct-card button:not([role="switch"]):not([role="checkbox"]) { border-radius: 8px; }
 .acct-danger h2 { color: #c62828; }
+
+/* Larger preview mode on the ad steps */
+.ap-steps-main { --ap-left: 380px; transition: grid-template-columns 0.35s ease; }
+.ap-steps-main.ap-large { --ap-left: 600px; }
+@media (max-width: 1099px) { .ap-steps-main.ap-large { --ap-left: 480px; } }
+@media (min-width: 1024px) { .ap-steps-main { grid-template-columns: var(--ap-left) minmax(0, 1fr); } }
+.ap-steps-main .ap-preview-box { transition: height 0.35s ease; }
+@media (min-width: 768px) { .ap-steps-main.ap-large .ap-preview-box { height: 640px; } }
+.ap-steps-main.ap-large .ap-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.ap-steps-main.ap-large .ap-gif-grid { grid-template-columns: minmax(0, 1fr); }
