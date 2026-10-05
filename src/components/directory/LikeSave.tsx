@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -70,6 +70,7 @@ export function LikeSave({ kind, id, name, showSave = true, brand = false }: { k
     if (error) { setSaved(!next); toast.error("Couldn't update your favorites. Try again."); return; }
     toast.success(next ? "Saved to your favorites" : "Removed from your favorites");
     void qc.invalidateQueries({ queryKey: ["my-favorites"] });
+    void qc.invalidateQueries({ queryKey: ["directory-reel-favs"] });
   };
 
   return (
@@ -104,7 +105,7 @@ export function DirectoryReelHeart({ reelId, name }: { reelId: string; name: str
     },
   });
   const saved = !!q.data?.includes(reelId);
-  const toggle = async (e: React.MouseEvent) => {
+  const toggle = async (e: MouseEvent) => {
     e.preventDefault(); e.stopPropagation();
     if (q.data === null) return gate();
     const { data: u } = await supabase.auth.getUser();
