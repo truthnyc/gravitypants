@@ -231,12 +231,20 @@ export const getDirectoryAccount = createServerFn({ method: "POST" })
     const sb = context.supabase as any;
     const { data: b } = await sb.from("directory_brands").select("*").eq("workspace_id", data.workspaceId).maybeSingle();
     if (!b) return null;
-    const { data: reels } = await sb.from("directory_reels").select("id, ad_id, status, updated_at, title, projects(name)").eq("brand_id", b.id).order("updated_at", { ascending: false });
+    const { data: reels } = await sb.from("directory_reels").select("id, ad_id, status, updated_at, title, formats, poster_url, projects(name)").eq("brand_id", b.id).order("updated_at", { ascending: false });
     const { data: log } = await sb.from("permission_log").select("id, created_at, ad_id, action, full_name, job_title, email, wording_version, wording_text").eq("brand_id", b.id).order("created_at", { ascending: false }).limit(500);
     const names = new Map<string, string>((reels ?? []).map((r: any) => [r.ad_id, r.title ?? r.projects?.name ?? "Untitled"]));
+    const { data: featured } = await sb.rpc("is_featured_brand", { _brand: b.id });
+    const posterPaths = ((reels ?? []) as any[]).map((r) => r.poster_url as string | null).filter((p): p is string => !!p?.startsWith("media:")).map((p) => p.slice(6));
+    const signedPosters = new Map<string, string>();
+    if (posterPaths.length) {
+      const bucket = sb.storage.from("media");
+      const { data: sp } = await bucket.createSignedUrls(posterPaths, 3600);
+      for (const x of sp ?? []) if (x.signedUrl && x.path) signedPosters.set(x.path, x.signedUrl);
+    }
     return {
-      brand: { id: b.id as string, name: b.name as string, slug: b.slug as string, description: (b.description ?? "") as string, logo: await signLogo(b.logo_url) },
-      reels: ((reels ?? []) as any[]).map((r: any) => ({ adId: r.ad_id as string, name: (r.title as string | null) ?? r.projects?.name ?? "Untitled", status: r.status as DirStatus, updated: r.updated_at as string })),
+      brand: { id: b.id as string, name: b.name as string, slug: b.slug as string, description: (b.description ?? "") as string, logo: await signLogo(b.logo_url), website: (b.website_url ?? "") as string, category: (b.category ?? "Other") as string, featured: !!featured, planEndedAt: (b.plan_ended_at ?? null) as string | null },
+      reels: ((reels ?? []) as any[]).map((r: any) => ({ adId: r.ad_id as string, name: (r.title as string | null) ?? r.projects?.name ?? "Untitled", status: r.status as DirStatus, updated: r.updated_at as string, size: ((r.formats ?? [])[0] ?? "").replace("x", ":") as string, thumb: r.poster_url?.startsWith("media:") ? signedPosters.get(r.poster_url.slice(6)) ?? null : null })),
       log: (log ?? []).map((l: any) => ({ ...l, reel: names.get(l.ad_id) ?? "Removed ad" })) as {
         id: string; created_at: string; reel: string; action: "granted" | "withdrawn"; full_name: string; job_title: string | null; email: string; wording_version: string; wording_text: string;
       }[],
@@ -246,10 +254,25 @@ export const getDirectoryAccount = createServerFn({ method: "POST" })
 /** Brands can edit the short description shown in their public page header. */
 export const saveBrandDescription = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ brandId: z.string().uuid(), description: z.string().trim().max(BRAND_DESCRIPTION_MAX) }).parse(d))
+  .inputValidator((d: unknown) => z.object({
+    brandId: z.string().uuid(),
+    description: z.string().trim().max(BRAND_DESCRIPTION_MAX),
+    name: z.string().trim().min(1).max(50).optional(),
+    website: z.string().trim().max(300).optional(),
+    category: z.enum(CATEGORIES).optional(),
+  }).parse(d))
   .handler(async ({ data, context }) => {
+    const patch: Record<string, unknown> = { description: data.description || null };
+    if (data.name) patch.name = data.name;
+    if (data.category) patch.category = data.category;
+    if (data.website !== undefined) {
+      let w = data.website;
+      if (w && !/^https?:\/\//i.test(w)) w = `https://${w}`;
+      if (w) { try { new URL(w); } catch { throw new Error("That website link doesn't look right."); } }
+      patch.website_url = w || null;
+    }
     const { error } = await (context.supabase as any).from("directory_brands")
-      .update({ description: data.description || null })
+      .update(patch)
       .eq("id", data.brandId);
     if (error) throw new Error("Couldn't save the brand description");
     return { ok: true };
