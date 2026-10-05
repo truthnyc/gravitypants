@@ -145,6 +145,7 @@ export function ReelCard({
   readOnly?: boolean;
 }) {
   const fmt = (s: number) => `${Math.floor(s / 60)}:${(s % 60).toFixed(1).padStart(4, "0")}`;
+  const lp = useContext(LargeCtx);
   let acc = 0;
   return (
     <AppCard>
