@@ -46,9 +46,11 @@ function FavoritesPublic() {
             <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {brands.map((b) => (
                 <li key={b.id}><Link to="/directory/$slug" params={{ slug: b.slug }} className="block rounded-[14px] bg-ap-panel p-4 hover:text-ap-blue">
+                  {b.logo
+                    ? <img src={b.logo} alt="" className="mb-3 size-12 object-contain" />
+                    : <span className="mb-3 flex size-12 items-center justify-center rounded-[14px] bg-ap-badge/10 text-[20px] font-semibold text-ap-badge">{b.name.charAt(0).toUpperCase()}</span>}
                   <p className="text-[13px] font-semibold text-ap-badge">{b.category}</p>
                   <p className="text-[18px] font-semibold">{b.name}</p>
-                  {b.description && <p className="mt-1 line-clamp-2 text-[14px] text-ap-body">{b.description}</p>}
                 </Link></li>
               ))}
             </ul>

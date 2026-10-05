@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { DirectoryCard } from "./directory";
 
-export type FavBrand = { id: string; name: string; slug: string; category: string; description: string | null };
+export type FavBrand = { id: string; name: string; slug: string; category: string; logo: string | null };
 
 /** A person's saved reels and brands, limited to what is public in the Directory right now. */
 export async function loadFavorites(userId: string): Promise<{ reels: DirectoryCard[]; brands: FavBrand[] }> {
@@ -18,7 +18,7 @@ export async function loadFavorites(userId: string): Promise<{ reels: DirectoryC
     ? await sb.from("directory_reels").select("id, tags, moods, formats, brand_id, templates(name), directory_brands(name, slug, category)").in("id", reelIds).eq("status", "live")
     : { data: [] };
   const { data: brands } = brandIds.length
-    ? await sb.from("directory_brands").select("id, name, slug, category, description").in("id", brandIds)
+    ? await sb.from("directory_brands").select("id, name, slug, category, logo_url").in("id", brandIds)
     : { data: [] };
   const all = new Set<string>([...(reels ?? []).map((r: any) => r.brand_id), ...(brands ?? []).map((b: any) => b.id)]);
   const visible = new Set<string>();
@@ -34,5 +34,16 @@ export async function loadFavorites(userId: string): Promise<{ reels: DirectoryC
   })));
   const bOrder = new Map<string, number>(brandIds.map((id: string, i: number) => [id, i]));
   const okBrands = ((brands ?? []) as any[]).filter((b) => visible.has(b.id)).sort((a, b) => (bOrder.get(a.id) ?? 0) - (bOrder.get(b.id) ?? 0));
-  return { reels: cards, brands: okBrands };
+  const signedLogos = new Map<string, string>();
+  const bucket = (sb as any).storage.from("brand-assets");
+  await Promise.all(okBrands.map(async (b) => {
+    const url: string | null = b.logo_url ?? null;
+    if (url?.startsWith("brand-assets:")) {
+      const { data } = await bucket.createSignedUrl(url.slice("brand-assets:".length), 60 * 60 * 24);
+      if (data?.signedUrl) signedLogos.set(b.id, data.signedUrl);
+    } else if (url?.startsWith("https://")) {
+      signedLogos.set(b.id, url);
+    }
+  }));
+  return { reels: cards, brands: okBrands.map((b) => ({ id: b.id, name: b.name, slug: b.slug, category: b.category, logo: signedLogos.get(b.id) ?? null })) };
 }
