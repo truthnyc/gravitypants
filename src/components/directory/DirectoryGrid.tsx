@@ -11,7 +11,7 @@ import { makeOneLikeThis, reportReel } from "@/lib/directory/directory.functions
 import { ratio, type DirectoryCard } from "@/lib/directory/directory";
 import { ReelVideo } from "@/components/site/ReelVideo";
 import { ReelCarousel } from "@/components/site/ReelCarousel";
-import { LikeSave } from "./LikeSave";
+import { DirectoryReelHeart, LikeSave } from "./LikeSave";
 
 const shape = (f: string | undefined) => (f === "9x16" ? "aspect-[9/16] h-full" : f === "16x9" ? "aspect-[16/9] w-full" : "aspect-square h-full");
 
@@ -52,9 +52,12 @@ export function DirectoryGrid({ cards, q = "", onOpen }: { cards: DirectoryCard[
     <div className="grid gap-5 font-ap [grid-template-columns:repeat(auto-fill,minmax(180px,1fr))]">
       {cards.map((c) => (
         <article key={c.reel_id} className="dir-card min-w-0">
-          <button type="button" onClick={() => onOpen(c)} className="dir-card-media block w-full focus-visible:outline-2 focus-visible:outline-ap-blue" aria-label={`Open ${c.brand_name} reel`}>
-            <ReelThumb card={c} />
-          </button>
+          <div className="relative">
+            <button type="button" onClick={() => onOpen(c)} className="dir-card-media block w-full focus-visible:outline-2 focus-visible:outline-ap-blue" aria-label={`Open ${c.brand_name} reel`}>
+              <ReelThumb card={c} />
+            </button>
+            <DirectoryReelHeart reelId={c.reel_id} name={`${c.brand_name} reel`} />
+          </div>
           <div className="mt-3 truncate font-semibold">
             <Link to="/directory/$slug" params={{ slug: c.brand_slug }} className="hover:text-ap-blue">{c.brand_name}</Link>
           </div>
@@ -75,9 +78,12 @@ export function CardCarousel({ cards, label, onOpen }: { cards: DirectoryCard[];
       items={cards.map((c) => ({
         key: c.reel_id,
         media: (hidden) => (
-          <button type="button" tabIndex={hidden ? -1 : undefined} onClick={() => onOpen(c)} className="dir-card-media block w-full" aria-label={`Open ${c.brand_name} reel`}>
-            <ReelThumb card={c} />
-          </button>
+          <div className="relative">
+            <button type="button" tabIndex={hidden ? -1 : undefined} onClick={() => onOpen(c)} className="dir-card-media block w-full" aria-label={`Open ${c.brand_name} reel`}>
+              <ReelThumb card={c} />
+            </button>
+            {!hidden && <DirectoryReelHeart reelId={c.reel_id} name={`${c.brand_name} reel`} />}
+          </div>
         ),
         title: c.brand_name,
         detail: `${c.title ?? c.template_name ?? "Custom reel"} · ${c.seconds} sec`,
