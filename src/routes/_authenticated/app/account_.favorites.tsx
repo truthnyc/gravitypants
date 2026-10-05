@@ -103,7 +103,7 @@ function FavoritesPage() {
               {d.reels.map((c) => (
                 <div key={c.reel_id} className="relative">
                   <button type="button" onClick={() => setOpen(c)} aria-label={`Open ${c.title ?? "reel"}`} className="relative block aspect-square w-full overflow-hidden rounded-[8px] bg-ap-panel">
-                    {c.poster && <img src={c.poster} alt="" loading="lazy" className="absolute top-1/2 left-1/2 max-h-[72%] max-w-[72%] -translate-x-1/2 -translate-y-1/2 rounded-[6px] shadow-[0_0_0_1px_var(--ap-inner),0_18px_34px_-16px_rgba(29,29,31,.28)]" />}
+                    {c.poster && <img src={c.poster} alt="" loading="lazy" className="absolute top-1/2 left-1/2 h-[72%] w-auto max-w-[72%] object-contain -translate-x-1/2 -translate-y-1/2 rounded-[6px] shadow-[0_0_0_1px_var(--ap-inner),0_18px_34px_-16px_rgba(29,29,31,.28)]" />}
                     {c.formats[0] && <span className="absolute top-2 left-2 rounded-[6px] bg-ap-card/95 px-[7px] py-[3px] text-[12px] font-semibold nums">{ratio(c.formats[0])}</span>}
                   </button>
                   <button type="button" aria-label="Remove from favorites" onClick={() => void removeReel(c.reel_id)} className="absolute top-1.5 right-1.5 grid size-[30px] place-items-center rounded-[8px] bg-ap-card/95 text-destructive">
@@ -124,7 +124,7 @@ function FavoritesPage() {
         {d?.brands.length ? (
           <ul className="grid gap-2 sm:grid-cols-2">
             {d.brands.map((b) => (
-              <li key={b.id} className="relative"><button type="button" aria-label={`Remove ${b.name}`} onClick={() => void removeBrand(b.id)} className="absolute top-2 right-2 grid size-7 place-items-center rounded-[8px] text-ap-muted hover:bg-ap-panel"><X className="size-4" strokeWidth={1.7} /></button><Link to="/directory/$slug" params={{ slug: b.slug }} className="block rounded-[4px] p-3 hover:text-ap-blue">
+              <li key={b.id} className="relative rounded-[14px] border border-ap-hairline"><button type="button" aria-label={`Remove ${b.name}`} onClick={() => void removeBrand(b.id)} className="absolute top-2 right-2 grid size-7 place-items-center rounded-[8px] text-ap-muted hover:bg-ap-panel"><X className="size-4" strokeWidth={1.7} /></button><Link to="/directory/$slug" params={{ slug: b.slug }} className="block rounded-[4px] p-3 hover:text-ap-blue">
                 <span className="flex size-12 items-center justify-center rounded-[4px] border border-ap-hairline bg-ap-card">
                   {b.logo
                     ? <img src={b.logo} alt="" className="max-h-full max-w-full object-contain" />
