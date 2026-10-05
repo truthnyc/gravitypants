@@ -8,6 +8,7 @@ import { siteHead } from "@/lib/site/seo";
 import { submitBrandRequest } from "@/lib/site/reels.functions";
 
 export const Route = createFileRoute("/contact")({
+  validateSearch: (s: Record<string, unknown>): { topic?: string } => (typeof s.topic === "string" ? { topic: s.topic } : {}),
   head: () => siteHead({ path: "/contact", title: "Contact — Get a reel for your brand | Gravity Pants", description: "Tell Gravity Pants about your brand and products, and we'll get back to you about a short video ad." }),
   component: Contact,
 });
