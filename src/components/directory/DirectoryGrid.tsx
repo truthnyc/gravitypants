@@ -59,7 +59,7 @@ export function DirectoryGrid({ cards, q = "", onOpen }: { cards: DirectoryCard[
             <Link to="/directory/$slug" params={{ slug: c.brand_slug }} className="hover:text-ap-blue">{c.brand_name}</Link>
           </div>
           <div className="truncate text-[13px] text-ap-muted nums">
-            {c.title ?? c.template_name ?? "Custom reel"} · {ratio(c.formats[0] ?? "1x1")} · {c.seconds} sec
+            {c.title ?? c.template_name ?? "Custom reel"}
           </div>
           <div className="mt-0.5 text-[12px] text-ap-badge">{matched(c, q).join(" · ")}</div>
         </article>
@@ -80,7 +80,7 @@ export function CardCarousel({ cards, label, onOpen }: { cards: DirectoryCard[];
           </button>
         ),
         title: c.brand_name,
-        detail: `${c.title ?? c.template_name ?? "Custom reel"} · ${ratio(c.formats[0] ?? "1x1")} · ${c.seconds} sec`,
+        detail: c.title ?? c.template_name ?? "Custom reel",
         visit: c.website_url ? { href: c.website_url, label: `Visit ${c.brand_name}` } : undefined,
       }))}
     />
