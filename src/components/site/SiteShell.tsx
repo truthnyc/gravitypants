@@ -1,59 +1,8 @@
 import { Link } from "@tanstack/react-router";
-import { Menu, X } from "lucide-react";
-import { useEffect, useState, type ReactNode } from "react";
+import { type ReactNode } from "react";
+import { SiteHeader } from "@/components/SiteHeader";
 import { GravityPantsLogo } from "@/components/GravityPantsLogo";
-import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
 import { FooterNewsletter, NewsletterPopup } from "@/components/site/Newsletter";
-import { UserMenu } from "@/components/stillframe/UserMenu";
-import { MobileNavLink, MobileNavPanel, useBodyScrollLock } from "@/components/MobileNavMenu";
-
-const nav = [
-  { label: "How it works", to: "/how-it-works" },
-  { label: "Examples", to: "/examples" },
-  { label: "Showcase", to: "/showcase" },
-  { label: "Features", to: "/features" },
-  { label: "Pricing", to: "/pricing" },
-] as const;
-
-function SiteHeader() {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [signedIn, setSignedIn] = useState(false);
-
-  useEffect(() => {
-    void supabase.auth.getSession().then(({ data }) => setSignedIn(Boolean(data.session)));
-    const { data } = supabase.auth.onAuthStateChange((_event, session) => setSignedIn(Boolean(session)));
-    return () => data.subscription.unsubscribe();
-  }, []);
-
-  useBodyScrollLock(menuOpen);
-
-  const action = signedIn ? { to: "/app/ads" as const, label: "Open app" } : { to: "/signup" as const, label: "Start free" };
-  return (
-    <header className="site-header relative z-50 border-b border-site-line bg-site-page/90 safe-top">
-      <div className="mx-auto flex h-14 max-w-[1440px] items-center justify-between gap-3 px-5 md:h-[72px] md:gap-5 md:px-8 lg:gap-8 lg:px-16 xl:px-24">
-        <Link to="/" onClick={() => setMenuOpen(false)} className="min-w-0 shrink-0 justify-self-start text-site-ink [&>span>span]:max-[420px]:hidden" aria-label="Gravity Pants home">
-          <GravityPantsLogo size={26} showWordmark wordmarkSize={24} />
-        </Link>
-        <nav aria-label="Main" className="hidden items-center gap-4 whitespace-nowrap text-[15px] font-medium text-site-nav lg:flex lg:gap-8">
-          {nav.map((item) => <Link key={item.label} to={item.to} className="hover:text-site-primary">{item.label}</Link>)}
-        </nav>
-        <div className="flex shrink-0 items-center gap-1.5 md:ml-auto md:gap-3">
-          {!signedIn && <Link to="/signin" className="hidden px-3 text-[15px] font-medium text-site-ink md:inline-flex">Sign in</Link>}
-          <Button asChild variant="site" size="siteHeader" className={signedIn ? "hidden lg:inline-flex" : undefined}><Link to={action.to} onClick={() => setMenuOpen(false)}>{action.label}</Link></Button>
-          {signedIn && <div className="hidden text-site-ink lg:block"><UserMenu showName websiteMenu /></div>}
-          {signedIn && <div className="text-site-ink lg:hidden"><UserMenu websiteMenu /></div>}
-          <Button variant="ghost" size="icon" className="h-11 w-11 lg:hidden" aria-label={menuOpen ? "Close menu" : "Open menu"} aria-expanded={menuOpen} onClick={() => setMenuOpen((v) => !v)}>{menuOpen ? <X size={22} strokeWidth={1.7} /> : <Menu size={22} strokeWidth={1.7} />}</Button>
-        </div>
-      </div>
-      <MobileNavPanel open={menuOpen} topClass="top-full" className="bg-site-page">
-        {signedIn && <MobileNavLink to="/app/ads" onNavigate={() => setMenuOpen(false)} className="border-site-line text-site-primary">Open app</MobileNavLink>}
-        {nav.map((item) => <MobileNavLink key={item.label} to={item.to} onNavigate={() => setMenuOpen(false)} className="border-site-line text-site-ink">{item.label}</MobileNavLink>)}
-        {!signedIn && <Link to="/signin" onClick={() => setMenuOpen(false)} className="flex min-h-14 items-center text-[18px] font-medium text-site-ink">Sign in</Link>}
-      </MobileNavPanel>
-    </header>
-  );
-}
 
 type FooterLink = { label: string; to: string; mailto?: boolean; external?: boolean };
 const columns: { label: string; links: FooterLink[] }[] = [
@@ -75,5 +24,5 @@ function SiteFooter() {
 }
 
 export function SiteShell({ children }: { children: ReactNode }) {
-  return <div className="flex min-h-dvh flex-col bg-site-page font-site text-site-ink"><SiteHeader /><main className="min-h-[48dvh] flex-1">{children}</main><SiteFooter /><NewsletterPopup /></div>;
+  return <div className="flex min-h-dvh flex-col bg-site-page font-site text-site-ink"><SiteHeader variant="site" /><main className="min-h-[48dvh] flex-1">{children}</main><SiteFooter /><NewsletterPopup /></div>;
 }
