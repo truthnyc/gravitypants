@@ -42,7 +42,7 @@ function Body({ reel, onClose }: { reel: SiteReel; onClose: () => void }) {
         <div className="flex flex-wrap gap-1.5 text-[13px] nums">
           {[`${reel.photos} photos`, `${reel.seconds} sec`, FORMAT_LABEL[reel.format]].map((c) => <span key={c} className="rounded-lg bg-ap-panel px-2.5 py-1">{c}</span>)}
         </div>
-        <Link to="/signup" onClick={onClose} className="mt-auto grid h-12 place-items-center rounded-lg bg-ap-blue text-[16px] font-semibold text-ap-card">Make one like this</Link>
+        <Link to="/app/ads" onClick={onClose} className="mt-auto grid h-12 place-items-center rounded-lg bg-ap-blue text-[16px] font-semibold text-ap-card">Make one like this</Link>
       </div>
     </div>
   );
