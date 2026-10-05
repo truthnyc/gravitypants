@@ -307,7 +307,7 @@ function PositionGrid({ value, color, onChange }: { value: string; color: string
           aria-label={pretty(a)}
           aria-pressed={value === a}
           onClick={() => onChange(a)}
-          className="flex size-7 items-center justify-center rounded-sm hover:bg-card"
+          className="flex size-7 min-h-0 min-w-0 items-center justify-center rounded-sm hover:bg-card"
           style={value === a ? { background: color } : undefined}
         >
           <span className={cn("size-2 rounded-full", value === a ? "bg-primary-foreground" : "bg-secondary-text/40")} />
