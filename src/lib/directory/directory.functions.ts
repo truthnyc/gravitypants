@@ -134,7 +134,10 @@ export const shareReel = createServerFn({ method: "POST" })
     if (!ad) throw new Error("This ad isn't available");
     const plan = await planState(sb, ad.workspace_id, null);
     if (plan.tag === "trial" || plan.tag === "ended") throw new Error("Sharing to the Directory is part of paid plans.");
-    if (data.show && (!data.agreed || !validFullName(data.fullName))) throw new Error("Type your first and last name to give permission.");
+    const { data: before } = await sb.from("directory_reels").select("status").eq("ad_id", data.adId).maybeSingle();
+    // Already-shared reels can update their listing without re-recording permission.
+    const keepShared = data.show && !data.agreed && (before?.status === "live" || before?.status === "in_review");
+    if (data.show && !keepShared && (!data.agreed || !validFullName(data.fullName))) throw new Error("Type your first and last name to give permission.");
     let website = data.brand.website_url;
     if (website && !/^https?:\/\//i.test(website)) website = `https://${website}`;
     if (website) { try { new URL(website); } catch { throw new Error("That website link doesn't look right."); } }
@@ -167,7 +170,7 @@ export const shareReel = createServerFn({ method: "POST" })
       : await sb.from("directory_reels").insert(row).select("id, status").single();
     if (error) throw new Error(error.message);
 
-    if (data.show) {
+    if (data.show && !keepShared) {
       const req = getRequest();
       const ip = req?.headers.get("cf-connecting-ip") ?? req?.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
       const { error: logErr } = await sb.from("permission_log").insert({
