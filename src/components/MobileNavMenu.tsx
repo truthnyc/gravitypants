@@ -62,7 +62,7 @@ function Row({ item, pathname, size, onNavigate }: { item: Item; pathname: strin
       className={cn(
         "flex min-h-12 items-center rounded-lg px-3 text-ap-ink transition-colors hover:bg-ap-panel",
         size === "lg" ? "text-[17px] font-semibold" : "text-[15px]",
-        on && "bg-ap-soft-blue text-ap-blue hover:bg-ap-soft-blue",
+        on && "bg-ap-soft-blue text-ap-blue-strong hover:bg-ap-soft-blue",
       )}
     >
       {item.label}

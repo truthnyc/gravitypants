@@ -40,7 +40,7 @@ const appNav: NavItem[] = [
 ];
 
 const navLink = "rounded-lg px-2.5 py-[7px] text-[14px] text-ap-ink transition-colors hover:bg-ap-panel";
-const navActive = "bg-ap-soft-blue font-semibold text-ap-blue hover:bg-ap-soft-blue";
+const navActive = "bg-ap-soft-blue font-semibold text-ap-blue-strong hover:bg-ap-soft-blue";
 const btn = "inline-flex h-9 min-h-0 min-w-0 shrink-0 items-center justify-center whitespace-nowrap rounded-lg px-4 text-[14px] font-medium transition-colors disabled:opacity-60";
 const primary = cn(btn, "bg-ap-blue text-ap-card hover:bg-ap-blue-hover");
 const secondary = cn(btn, "bg-ap-panel text-ap-ink hover:bg-ap-hairline");
