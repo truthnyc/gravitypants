@@ -1083,7 +1083,7 @@ textarea.contact-input { resize: vertical; }
 @media (max-width: 767px) { .dir-card-media { aspect-ratio: 3/4; border-radius: 8px; } .dir-reel-916 { width: 46%; } }
 
 /* Account area (account.html): one shared look for all five tabs */
-body:has(.acct) { background: var(--ap-panel); }
+html:has(.acct), body:has(.acct), body:has(.acct) .bg-canvas { background: var(--ap-panel) !important; }
 .acct { font-family: var(--ap-font); color: var(--ap-ink); }
 .acct-h1 { font-size: 34px; font-weight: 700; letter-spacing: -0.035em; margin: 0 0 2px; }
 .acct-card { background: var(--ap-card); border-radius: 24px; padding: 26px; }
