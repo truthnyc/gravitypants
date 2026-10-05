@@ -308,6 +308,27 @@ export type Database = {
           },
         ]
       }
+      directory_likes: {
+        Row: {
+          created_at: string
+          target_id: string
+          target_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          target_id: string
+          target_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          target_id?: string
+          target_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       directory_make_events: {
         Row: {
           created_at: string
@@ -337,6 +358,32 @@ export type Database = {
           {
             foreignKeyName: "directory_make_events_directory_reel_id_fkey"
             columns: ["directory_reel_id"]
+            isOneToOne: false
+            referencedRelation: "directory_reels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      directory_reel_favorites: {
+        Row: {
+          created_at: string
+          reel_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          reel_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          reel_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "directory_reel_favorites_reel_id_fkey"
+            columns: ["reel_id"]
             isOneToOne: false
             referencedRelation: "directory_reels"
             referencedColumns: ["id"]
@@ -579,6 +626,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      favorite_pages: {
+        Row: {
+          created_at: string
+          is_public: boolean
+          slug: string
+          title: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          is_public?: boolean
+          slug: string
+          title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          is_public?: boolean
+          slug?: string
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       frames: {
         Row: {
@@ -1358,6 +1432,13 @@ export type Database = {
       }
       delete_workspace: { Args: { _ws: string }; Returns: undefined }
       directory_effective_plan: { Args: { _ws: string }; Returns: string }
+      directory_like_counts: {
+        Args: { _ids: string[] }
+        Returns: {
+          likes: number
+          target_id: string
+        }[]
+      }
       directory_paid_plans: { Args: never; Returns: string[] }
       effective_billing: { Args: { _ws: string }; Returns: Json }
       ensure_workspace: { Args: never; Returns: string }
