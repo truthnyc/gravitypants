@@ -8,7 +8,7 @@ const clientToken = import.meta.env['VITE_PAYMENTS_CLIENT_TOKEN'] as string | un
 export function PaymentTestModeBanner() {
   if (clientToken?.startsWith("pk_live_")) return null;
   return (
-    <div className="w-full bg-warning-soft px-4 py-1.5 text-center text-[12px] text-foreground hairline-b">
+    <div role="region" aria-label="Payments notice" className="w-full bg-warning-soft px-4 py-1.5 text-center text-[12px] text-foreground hairline-b">
       {clientToken ? "Payments in the preview are in test mode." : "Real payments aren't set up yet."}{" "}
       <a href="https://docs.lovable.dev/features/payments#test-and-live-environments" target="_blank" rel="noopener noreferrer" className="text-link underline">
         Read about test and live payments
