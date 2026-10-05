@@ -50,12 +50,15 @@ export function MobileNavLink({
 export function MobileNavPanel({
   open,
   topClass = "top-14",
+  heightClass = "h-[calc(100dvh-56px)]",
   className,
   children,
 }: {
   open: boolean;
   /** Header height offset, e.g. "top-14" (56px) or "top-[60px]". */
   topClass?: string;
+  /** Panel height matching the offset, e.g. "h-[calc(100dvh-60px)]". */
+  heightClass?: string;
   className?: string;
   children: ReactNode;
 }) {
@@ -64,8 +67,9 @@ export function MobileNavPanel({
     <nav
       aria-label="Mobile"
       className={cn(
-        "absolute inset-x-0 flex h-[calc(100dvh-56px)] flex-col gap-1 overflow-y-auto bg-background px-5 py-8 safe-bottom lg:hidden",
+        "absolute inset-x-0 flex flex-col gap-1 overflow-y-auto bg-background px-5 py-8 safe-bottom lg:hidden",
         topClass,
+        heightClass,
         className,
       )}
     >
