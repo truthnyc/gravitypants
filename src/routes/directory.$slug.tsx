@@ -69,7 +69,7 @@ function BrandPage() {
         <div className="mx-auto max-w-[1280px] px-6 pt-12 pb-16">
           <Link to="/directory" className="text-[14px] text-ap-blue">← Directory</Link>
           <header className="mt-6 mb-12 flex flex-col gap-6 sm:flex-row sm:items-start">
-            <div className="flex items-center justify-end gap-2 sm:order-3 sm:flex-col">
+            <div className="flex flex-col items-end gap-2 sm:order-3">
               <BrandActions brandId={brand.id} name={brand.name} />
             </div>
             {brand.logo_url?.startsWith("https://")
