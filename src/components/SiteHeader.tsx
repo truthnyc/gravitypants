@@ -1,18 +1,17 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { ChevronDown, Menu, Search, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import { GravityPantsLogo } from "@/components/GravityPantsLogo";
-import { MobileNavLink, MobileNavPanel, useBodyScrollLock } from "@/components/MobileNavMenu";
+import { MobileMenu } from "@/components/MobileNavMenu";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
 import { SHOW_DIRECTORY } from "@/lib/features";
-import { useMe, useSignOut } from "@/lib/stillframe/account";
+import { useMe } from "@/lib/stillframe/account";
 import { cn } from "@/lib/utils";
 import { NewAdButton } from "@/components/stillframe/DropZone";
 import { HelpMenu } from "@/components/stillframe/HelpMenu";
 import { Avatar, UserMenu } from "@/components/stillframe/UserMenu";
-import { WorkspaceList, WorkspaceSwitcher } from "@/components/stillframe/WorkspaceSwitcher";
-import { TrialPill } from "@/components/billing/BillingNotices";
+import { WorkspaceSwitcher } from "@/components/stillframe/WorkspaceSwitcher";
 import { useSearch } from "@/components/stillframe/search-context";
 
 type NavItem = { label: string; to: string; exact?: boolean };
@@ -70,25 +69,15 @@ function NavLinks({ items, pathname }: { items: NavItem[]; pathname: string }) {
   );
 }
 
-function MenuButton({ open, onToggle, signedIn }: { open: boolean; onToggle: () => void; signedIn: boolean }) {
+const MenuButton = forwardRef<HTMLButtonElement, { open: boolean; onToggle: () => void; signedIn: boolean }>(function MenuButton({ open, onToggle, signedIn }, ref) {
   const { data: me } = useMe();
   return (
-    <button type="button" className="relative grid size-9 min-h-0 min-w-0 shrink-0 place-items-center rounded-lg text-ap-ink hover:bg-ap-panel lg:hidden" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} onClick={onToggle}>
+    <button ref={ref} type="button" className="relative grid size-9 min-h-0 min-w-0 shrink-0 place-items-center rounded-lg text-ap-ink hover:bg-ap-panel lg:hidden" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} aria-controls="mobile-menu" onClick={onToggle}>
       {open ? <X size={22} strokeWidth={1.7} /> : <Menu size={22} strokeWidth={1.7} />}
       {signedIn && !open && <span className="absolute -right-1 -bottom-1 rounded-full ring-2 ring-ap-card"><Avatar me={me} size={18} /></span>}
     </button>
   );
-}
-
-function AccountRows({ close }: { close: () => void }) {
-  const signOut = useSignOut();
-  return (
-    <>
-      <MobileNavLink to="/app/account" onNavigate={close}>Account</MobileNavLink>
-      <button type="button" onClick={() => { close(); void signOut(); }} className="flex min-h-14 w-full items-center text-[18px] font-medium text-ap-ink">Sign out</button>
-    </>
-  );
-}
+});
 
 /** One header for the marketing site and the app (the editor keeps its own). */
 export function SiteHeader({ variant }: { variant: "site" | "app" }) {
@@ -96,8 +85,14 @@ export function SiteHeader({ variant }: { variant: "site" | "app" }) {
   const signedIn = variant === "app" || siteSignedIn;
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [open, setOpen] = useState(false);
-  useBodyScrollLock(open);
-  const close = () => setOpen(false);
+  const menuButton = useRef<HTMLButtonElement>(null);
+  const close = useCallback(() => setOpen(false), []);
+  const wasOpen = useRef(false);
+  useEffect(() => close(), [pathname, close]);
+  useEffect(() => {
+    if (wasOpen.current && !open) menuButton.current?.focus();
+    wasOpen.current = open;
+  }, [open]);
 
   return (
     <header className="sticky top-0 z-50 border-b border-ap-hairline bg-ap-card/[.92] backdrop-blur-[14px] safe-top">
@@ -106,17 +101,9 @@ export function SiteHeader({ variant }: { variant: "site" | "app" }) {
           <GravityPantsLogo size={28} showWordmark wordmarkSize={17} />
         </Link>
         {variant === "app" ? <AppBar pathname={pathname} /> : <SiteBar pathname={pathname} signedIn={signedIn} close={close} />}
-        <MenuButton open={open} onToggle={() => setOpen((v) => !v)} signedIn={signedIn} />
+        <MenuButton ref={menuButton} open={open} onToggle={() => setOpen((v) => !v)} signedIn={signedIn} />
       </div>
-      <MobileNavPanel open={open} topClass="top-full" heightClass="h-[calc(100dvh-64px)]" className="bg-ap-card">
-        {variant === "app" ? <AppMenu pathname={pathname} close={close} /> : (
-          <>
-            {signedIn && <MobileNavLink to="/app/ads" onNavigate={close} className="text-ap-blue">Your Ads</MobileNavLink>}
-            {siteNav.map((item) => <MobileNavLink key={item.to} to={item.to as "/"} onNavigate={close} active={isActive(pathname, item)}>{item.label}</MobileNavLink>)}
-            {signedIn ? <AccountRows close={close} /> : <MobileNavLink to="/signin" onNavigate={close}>Sign in</MobileNavLink>}
-          </>
-        )}
-      </MobileNavPanel>
+      <MobileMenu open={open} signedIn={signedIn} pathname={pathname} close={close} />
     </header>
   );
 }
@@ -169,22 +156,3 @@ function AppBar({ pathname }: { pathname: string }) {
   );
 }
 
-function AppMenu({ pathname, close }: { pathname: string; close: () => void }) {
-  const { query, setQuery } = useSearch();
-  return (
-    <>
-      <label className="relative mb-4 block">
-        <Search className="pointer-events-none absolute left-3 top-1/2 size-5 -translate-y-1/2 text-ap-muted" strokeWidth={1.7} aria-hidden="true" />
-        <input type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search your ads" aria-label="Search your ads" className="h-12 w-full rounded-lg bg-ap-panel pl-11 pr-3 text-[16px] text-ap-ink placeholder:text-ap-muted focus-visible:outline-none" />
-      </label>
-      {appNav.map((item) => <MobileNavLink key={item.to} to={item.to as "/"} onNavigate={close} active={isActive(pathname, item)}>{item.label}</MobileNavLink>)}
-      {exploreNav.map((item) => <MobileNavLink key={item.to} to={item.to as "/"} onNavigate={close}>{item.label}</MobileNavLink>)}
-      <MobileNavLink to="/help" onNavigate={close}>Help center</MobileNavLink>
-      <div className="mt-8 flex flex-col gap-4 border-t border-ap-hairline pt-6">
-        <WorkspaceList onSwitch={close} />
-        <TrialPill />
-      </div>
-      <AccountRows close={close} />
-    </>
-  );
-}

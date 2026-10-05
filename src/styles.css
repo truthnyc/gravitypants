@@ -63,6 +63,7 @@
   --ap-body: #57575c;
   --ap-muted: #6e6e73;
   --ap-blue: #0071e3;
+  --ap-red: #c62828;
   --ap-blue-hover: #0077ed;
   --ap-badge: #0058b0;
   --ap-soft-blue: #eef4fb;
@@ -89,6 +90,7 @@
   --color-ap-body: var(--ap-body);
   --color-ap-muted: var(--ap-muted);
   --color-ap-blue: var(--ap-blue);
+  --color-ap-red: var(--ap-red);
   --color-ap-blue-hover: var(--ap-blue-hover);
   --color-ap-badge: var(--ap-badge);
   --color-ap-soft-blue: var(--ap-soft-blue);
