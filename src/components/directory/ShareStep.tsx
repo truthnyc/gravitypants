@@ -81,8 +81,9 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
   const brandName = name.trim() || "your brand";
   const nameOk = validFullName(fullName);
   const approved = !!ctx.brand.first_approved_at;
-  const canSubmit = !locked && !busy && name.trim().length > 0 && (!show || (agreed && nameOk));
-  const primaryLabel = !show ? "Done" : approved ? "Publish" : "Submit for review";
+  const alreadyShared = ctx.reel?.status === "live" || ctx.reel?.status === "in_review";
+  const canSubmit = !locked && !busy && name.trim().length > 0 && (!show || alreadyShared || (agreed && nameOk));
+  const primaryLabel = !show ? "Done" : alreadyShared && !agreed ? "Save changes" : approved ? "Publish" : "Submit for review";
 
   const addTag = (raw: string) => {
     const t = raw.trim().replace(/,$/, "").toLowerCase();
@@ -110,7 +111,8 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
         adId: doc.project.id, brand: { name: name.trim(), website_url: site.trim(), category }, description: desc.trim(),
         tags, moods: moods as (typeof MOODS)[number][], show, fullName, jobTitle: title, agreed, posterPath,
       } });
-      if (res.status === "live") toast.success("Published. It's live in the Directory. Permission saved to your log.");
+      if (alreadyShared && show && !agreed) toast.success("Changes saved.");
+      else if (res.status === "live") toast.success("Published. It's live in the Directory. Permission saved to your log.");
       else if (res.status === "in_review") toast.success("Submitted. Your first reel goes live after a quick review. Permission saved to your log.");
       else toast("Saved. This reel stays private.");
       setAgreed(false);
