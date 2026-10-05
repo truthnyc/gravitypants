@@ -78,19 +78,24 @@ function DirectoryPage() {
   return (
     <SiteShell>
       <main className="font-ap text-ap-ink">
-        <section className="mx-auto max-w-[900px] px-6 pt-20 pb-12 text-center">
+        <section className="mx-auto max-w-[900px] px-6 pt-20 pb-10 text-center">
           <p className="mb-3.5 text-[15px] font-semibold text-ap-badge">Directory</p>
-          <h1 className="mb-7 text-[clamp(30px,5vw,52px)] leading-[1.1] font-semibold tracking-[-0.035em]">
-            It's {day}.<br />Show me something: <span className="text-ap-blue" aria-live="polite">{mood}</span>
+          <h1 className="mb-8 text-[clamp(30px,5vw,56px)] leading-[1.08] font-semibold tracking-[-0.035em] text-[#a1a1a6]">
+            <b className="font-semibold text-ap-ink">It's {day}.</b><br />Show me something:{" "}
+            <span className="text-ap-blue" aria-live="polite">
+              <span className="font-light text-[#c7c7cc]">[ </span>
+              <span key={mood} className="inline-block animate-[dir-mood_.3s_ease]">{mood}</span>
+              <span className="font-light text-[#c7c7cc]"> ]</span>
+            </span>
           </h1>
-          <form role="search" onSubmit={(e) => { e.preventDefault(); go(value); }} className="mx-auto flex h-[60px] max-w-[640px] items-center gap-2 rounded-[12px] border border-ap-hairline bg-ap-card pr-2 pl-4 focus-within:border-ap-blue focus-within:shadow-ap-focus">
-            <input value={value} onChange={(e) => setValue(e.target.value)} placeholder="Try: cozy knitwear, square, TikTok" aria-label="Search the Directory" className="h-full min-w-0 flex-1 bg-transparent text-[17px] outline-hidden" />
+          <form role="search" onSubmit={(e) => { e.preventDefault(); go(value); }} className="mx-auto flex h-[60px] max-w-[680px] items-center gap-2.5 rounded-[12px] border border-transparent bg-ap-panel pr-2 pl-5 transition-[background,border-color,box-shadow] focus-within:border-ap-hairline focus-within:bg-ap-card focus-within:shadow-[0_10px_30px_rgba(20,30,50,.10)]">
+            <input value={value} onChange={(e) => setValue(e.target.value)} placeholder="Try: cozy knitwear, square, TikTok" aria-label="Search the Directory" className="h-full min-w-0 flex-1 bg-transparent text-[19px] outline-hidden placeholder:text-[#8e8e93]" />
             {value && <button type="button" aria-label="Clear search" onClick={() => { setValue(""); go(""); }} className="grid size-8 place-items-center text-ap-muted"><X className="size-4" strokeWidth={1.7} /></button>}
-            <button type="submit" className="h-11 rounded-lg bg-ap-blue px-5 text-[15px] font-semibold text-ap-card">Search</button>
+            <button type="submit" className="h-11 rounded-lg bg-ap-blue px-5 text-[16px] text-ap-card hover:bg-ap-blue-hover">Search</button>
           </form>
-          <div className="mt-4 flex flex-wrap justify-center gap-1.5">
+          <div className="mx-auto mt-[18px] flex max-w-[760px] flex-wrap justify-center gap-2">
             {STARTERS.map((s) => (
-              <button key={s.label} type="button" onClick={() => go(s.q)} className={cn("rounded-lg bg-ap-panel px-3 py-1.5 text-[14px]", s.mood && "text-ap-blue")}>{s.label}</button>
+              <button key={s.label} type="button" onClick={() => go(s.q)} className={cn("rounded-lg bg-ap-panel px-3.5 py-2 text-[14px] hover:bg-ap-media", s.mood && "font-medium text-ap-badge")}>{s.label}</button>
             ))}
           </div>
         </section>
