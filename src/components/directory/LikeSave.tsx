@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 
 type Kind = "reel" | "brand";
 const btn = "inline-flex h-11 min-w-11 items-center justify-center gap-1.5 rounded-lg bg-ap-panel px-3 text-ap-ink transition-colors hover:text-ap-blue";
-const brandBtn = "inline-flex h-11 min-w-11 items-center justify-center gap-1.5 rounded-lg px-3 text-[#da0519] transition-opacity hover:opacity-75";
+const brandBtn = "inline-flex h-11 min-w-11 items-center justify-center gap-1.5 rounded-lg px-3 text-ap-muted transition-colors hover:text-ap-ink";
 
 function useSignupGate() {
   const navigate = useNavigate();
