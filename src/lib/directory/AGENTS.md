@@ -1,1 +1,2 @@
 - Sharing writes the append-only `permission_log` row in the same request as the listing, so a reel is never public without a recorded permission.
+- Likes/favorites/shared favorites pages: `favorites.functions.ts` (like counts via service-only SQL `directory_like_counts`; public page only when `favorite_pages.is_public`, filtered by `brand_visible`).
