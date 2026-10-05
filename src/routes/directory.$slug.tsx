@@ -79,8 +79,7 @@ function BrandPage() {
               <div className="min-w-0 sm:col-start-2 sm:row-start-1">
                 <p className="text-[15px] font-semibold text-ap-badge">{brand.category}</p>
                 <div className="mt-2 flex flex-wrap items-center gap-3">
-                  <h1 className="text-[clamp(36px,4vw,52px)] leading-[1.05] font-semibold">{brand.name}</h1>
-                  {brand.featured && <span className="rounded border border-ap-hairline bg-ap-card px-3 py-1 text-[13px] font-semibold text-ap-blue">Featured</span>}
+                <h1 className="text-[clamp(36px,4vw,52px)] leading-[1.05] font-semibold tracking-[-0.035em]">{brand.name}</h1>
                 </div>
                 {brand.description && <p className="mt-5 max-w-[760px] text-[18px] leading-[1.5] text-ap-body">{brand.description}</p>}
                 <div className="mt-5 flex flex-wrap gap-2 text-[13px] nums">
