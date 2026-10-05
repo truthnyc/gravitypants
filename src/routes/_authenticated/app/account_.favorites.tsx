@@ -122,9 +122,15 @@ function FavoritesPage() {
               ))}
               {siteFavs.map((r) => (
                 <div key={r.id} className="relative">
-                  <Link to="/directory/$slug" params={{ slug: r.brandSlug ?? toSlug(r.brand) }} aria-label={`Open ${r.title}`} className="relative block aspect-square w-full overflow-hidden rounded-[8px] bg-ap-panel">
-                    {r.poster && <img src={r.poster} alt="" loading="lazy" className="absolute top-1/2 left-1/2 h-[72%] w-auto max-w-[72%] object-contain -translate-x-1/2 -translate-y-1/2 rounded-[6px] shadow-[0_0_0_1px_var(--ap-inner),0_18px_34px_-16px_rgba(29,29,31,.28)]" />}
-                  </Link>
+                  {r.brandSlug ? (
+                    <Link to="/directory/$slug" params={{ slug: r.brandSlug }} aria-label={`Open ${r.title}`} className="relative block aspect-square w-full overflow-hidden rounded-[8px] bg-ap-panel">
+                      {r.poster && <img src={r.poster} alt="" loading="lazy" className="absolute top-1/2 left-1/2 h-[72%] w-auto max-w-[72%] object-contain -translate-x-1/2 -translate-y-1/2 rounded-[6px] shadow-[0_0_0_1px_var(--ap-inner),0_18px_34px_-16px_rgba(29,29,31,.28)]" />}
+                    </Link>
+                  ) : (
+                    <a href={r.href ?? "/showcase"} target={r.href ? "_blank" : undefined} rel="noreferrer" aria-label={`Open ${r.title}`} className="relative block aspect-square w-full overflow-hidden rounded-[8px] bg-ap-panel">
+                      {r.poster && <img src={r.poster} alt="" loading="lazy" className="absolute top-1/2 left-1/2 h-[72%] w-auto max-w-[72%] object-contain -translate-x-1/2 -translate-y-1/2 rounded-[6px] shadow-[0_0_0_1px_var(--ap-inner),0_18px_34px_-16px_rgba(29,29,31,.28)]" />}
+                    </a>
+                  )}
                   <SiteReelHeart reelId={r.id} name={r.title} />
                   <p className="mt-2 truncate text-[14px] font-semibold">{r.title}</p>
                   <p className="text-[12px] text-ap-body nums">{r.seconds} sec · {r.brand}</p>
