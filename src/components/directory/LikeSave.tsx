@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 
 type Kind = "reel" | "brand";
 const btn = "inline-flex h-11 min-w-11 items-center justify-center gap-1.5 rounded-lg bg-ap-panel px-3 text-ap-ink transition-colors hover:text-ap-blue";
-const brandBtn = "inline-flex h-11 min-w-11 items-center justify-center gap-1.5 rounded-lg px-3 text-[#da0519] transition-opacity hover:opacity-75";
+const brandBtn = "inline-flex h-11 min-w-11 items-center justify-center gap-1.5 rounded-lg px-3 text-ap-muted transition-colors hover:text-ap-ink";
 
 function useSignupGate() {
   const navigate = useNavigate();
@@ -74,12 +74,12 @@ export function LikeSave({ kind, id, name, showSave = true, brand = false }: { k
 
   return (
     <>
-      <button type="button" onClick={() => void like()} aria-pressed={liked} aria-label={`${liked ? "Unlike" : "Like"} ${name}`} title={liked ? "Liked" : "Like"} className={cn(cls, !brand && liked && "text-ap-blue")}>
+      <button type="button" onClick={() => void like()} aria-pressed={liked} aria-label={`${liked ? "Unlike" : "Like"} ${name}`} title={liked ? "Liked" : "Like"} className={cn(cls, liked && brand && "text-[#da0519]", !brand && liked && "text-ap-blue")}>
         <ThumbsUp className={cn("size-5", liked && "fill-current")} strokeWidth={1.7} />
         <span className="text-[14px] font-semibold nums">{count}</span>
       </button>
       {showSave && (
-        <button type="button" onClick={() => void save()} aria-pressed={saved} aria-label={saved ? "Remove from my favorites" : "Save to my favorites"} title={saved ? "Saved to my favorites" : "Save to my favorites"} className={cn(cls, !brand && saved && "text-ap-blue")}>
+        <button type="button" onClick={() => void save()} aria-pressed={saved} aria-label={saved ? "Remove from my favorites" : "Save to my favorites"} title={saved ? "Saved to my favorites" : "Save to my favorites"} className={cn(cls, saved && brand && "text-[#da0519]", !brand && saved && "text-ap-blue")}>
           <Heart className={cn("size-5", saved && "fill-current")} strokeWidth={1.7} />
         </button>
       )}
