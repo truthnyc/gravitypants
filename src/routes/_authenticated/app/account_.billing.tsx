@@ -103,7 +103,7 @@ function BillingPage() {
             {/^(business|team)/i.test(billing.plan ?? "") && (
               <>
                 <dt className="text-secondary-text">Directory</dt>
-                <dd className="text-[13px] font-semibold text-ap-badge"><span className="text-[#d4a017]">★</span> Featured brand</dd>
+                <dd className="text-[13px] font-semibold text-ap-badge"><span className="text-ap-gold">★</span> Featured brand</dd>
               </>
             )}
             {paid && (
