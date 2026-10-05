@@ -11,6 +11,7 @@ import { AppButton } from "@/components/app-ui";
 import { Switch } from "@/components/ui/switch";
 import { ReelDetail } from "@/components/directory/DirectoryGrid";
 import { useSiteReelFavorites, SiteReelHeart } from "@/components/site/SiteReelHeart";
+import { SiteReelModal } from "@/components/site/SiteReelModal";
 import { listSiteReels } from "@/lib/site/reels.functions";
 import { type SiteReel } from "@/lib/site/reels";
 import { getMyFavorites, saveFavoritePage } from "@/lib/directory/favorites.functions";
@@ -35,6 +36,7 @@ function FavoritesPage() {
   const [pub, setPub] = useState(false);
   const [busy, setBusy] = useState(false);
   const [open, setOpen] = useState<DirectoryCard | null>(null);
+  const [openSite, setOpenSite] = useState<SiteReel | null>(null);
 
   useEffect(() => {
     if (!d) return;
@@ -122,15 +124,9 @@ function FavoritesPage() {
               ))}
               {siteFavs.map((r) => (
                 <div key={r.id} className="relative">
-                  {r.brandSlug ? (
-                    <Link to="/directory/$slug" params={{ slug: r.brandSlug }} aria-label={`Open ${r.title}`} className="relative block aspect-square w-full overflow-hidden rounded-[8px] bg-ap-panel">
+                  <button type="button" onClick={() => setOpenSite(r)} aria-label={`Open ${r.title}`} className="relative block aspect-square w-full overflow-hidden rounded-[8px] bg-ap-panel">
                       {r.poster && <img src={r.poster} alt="" loading="lazy" className="absolute top-1/2 left-1/2 h-[72%] w-auto max-w-[72%] object-contain -translate-x-1/2 -translate-y-1/2 rounded-[6px] shadow-[0_0_0_1px_var(--ap-inner),0_18px_34px_-16px_rgba(29,29,31,.28)]" />}
-                    </Link>
-                  ) : (
-                    <a href={r.href ?? "/showcase"} target={r.href ? "_blank" : undefined} rel="noreferrer" aria-label={`Open ${r.title}`} className="relative block aspect-square w-full overflow-hidden rounded-[8px] bg-ap-panel">
-                      {r.poster && <img src={r.poster} alt="" loading="lazy" className="absolute top-1/2 left-1/2 h-[72%] w-auto max-w-[72%] object-contain -translate-x-1/2 -translate-y-1/2 rounded-[6px] shadow-[0_0_0_1px_var(--ap-inner),0_18px_34px_-16px_rgba(29,29,31,.28)]" />}
-                    </a>
-                  )}
+                  </button>
                   <SiteReelHeart reelId={r.id} name={r.title} />
                   <p className="mt-2 truncate text-[14px] font-semibold">{r.title}</p>
                   <p className="text-[12px] text-ap-body nums">{r.seconds} sec · {r.brand}</p>
@@ -160,6 +156,7 @@ function FavoritesPage() {
         ) : <p className="text-[14px] text-ap-body">No saved brands yet.</p>}
       </section>
       <ReelDetail card={open} onClose={() => setOpen(null)} />
+      <SiteReelModal reel={openSite} onClose={() => setOpenSite(null)} />
     </main>
   );
 }

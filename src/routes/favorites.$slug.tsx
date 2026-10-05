@@ -9,6 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import { listSiteReels } from "@/lib/site/reels.functions";
 import type { SiteReel } from "@/lib/site/reels";
 import { SiteReelHeart } from "@/components/site/SiteReelHeart";
+import { SiteReelModal } from "@/components/site/SiteReelModal";
 
 const POSTER = "absolute top-1/2 left-1/2 h-[72%] w-auto max-w-[72%] object-contain -translate-x-1/2 -translate-y-1/2 rounded-[6px] shadow-[0_0_0_1px_var(--ap-inner),0_18px_34px_-16px_rgba(29,29,31,.28)]";
 
@@ -42,6 +43,7 @@ function FavoritesPublic() {
   const siteReels = siteReelIds.map((id) => all.find((r) => r.id === id)).filter((r): r is SiteReel => !!r);
   const reelCount = reels.length + siteReels.length;
   const [open, setOpen] = useState<DirectoryCard | null>(null);
+  const [openSite, setOpenSite] = useState<SiteReel | null>(null);
   return (
     <SiteShell>
       <main className="mx-auto max-w-[1280px] px-6 pt-12 pb-16 font-ap text-ap-ink">
@@ -57,9 +59,7 @@ function FavoritesPublic() {
               const cls = "relative block aspect-square w-full overflow-hidden rounded-[8px] bg-ap-panel";
               return (
                 <li key={r.id} className="relative">
-                  {r.brandSlug
-                    ? <Link to="/directory/$slug" params={{ slug: r.brandSlug }} aria-label={`Open ${r.title}`} className={cls}>{inner}</Link>
-                    : <a href={r.href ?? "/showcase"} target="_blank" rel="noreferrer" aria-label={`Open ${r.title}`} className={cls}>{inner}</a>}
+                  <button type="button" onClick={() => setOpenSite(r)} aria-label={`Open ${r.title}`} className={cls}>{inner}</button>
                   <SiteReelHeart reelId={r.id} name={r.title} />
                   <p className="mt-2.5 truncate text-[14px] font-semibold">{r.title}</p>
                   <p className="truncate text-[12px] text-ap-muted nums">{r.seconds} sec · {r.brand}</p>
@@ -89,6 +89,7 @@ function FavoritesPublic() {
         {!reelCount && !brands.length && <p className="mt-10 text-ap-body">Nothing saved here yet.</p>}
       </main>
       <ReelDetail card={open} onClose={() => setOpen(null)} />
+      <SiteReelModal reel={openSite} onClose={() => setOpenSite(null)} />
     </SiteShell>
   );
 }

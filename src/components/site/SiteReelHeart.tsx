@@ -23,7 +23,7 @@ export function useSiteReelFavorites() {
 }
 
 /** Heart button in the top-right corner of a reel tile. */
-export function SiteReelHeart({ reelId, name }: { reelId: string; name: string }) {
+export function SiteReelHeart({ reelId, name, inline = false }: { reelId: string; name: string; inline?: boolean | undefined }) {
   const { data: ids } = useSiteReelFavorites();
   const qc = useQueryClient();
   const navigate = useNavigate();
@@ -41,7 +41,7 @@ export function SiteReelHeart({ reelId, name }: { reelId: string; name: string }
   }
   return (
     <button type="button" onClick={toggle} aria-pressed={saved} aria-label={saved ? `Remove ${name} from favorites` : `Save ${name} to favorites`}
-      className={cn("absolute top-1.5 right-1.5 z-10 grid size-[30px] min-h-0 place-items-center rounded-[8px] bg-ap-card/95", saved ? "text-destructive" : "text-ap-body hover:text-ap-ink")}>
+      className={cn(inline ? "grid size-11 place-items-center rounded-lg bg-ap-panel transition-colors" : "absolute top-1.5 right-1.5 z-10 grid size-[30px] min-h-0 place-items-center rounded-[8px] bg-ap-card/95", saved ? "text-destructive" : "text-ap-body hover:text-ap-ink")}>
       <Heart className={cn("size-4", saved && "fill-current")} strokeWidth={1.7} />
     </button>
   );
