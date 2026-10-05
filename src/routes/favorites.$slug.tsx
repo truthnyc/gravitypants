@@ -51,7 +51,7 @@ function FavoritesPublic() {
         {reelCount > 0 && <h2 className="mt-10 mb-5 text-[24px] font-semibold">Reels</h2>}
         {reels.length > 0 && <DirectoryGrid cards={reels} onOpen={setOpen} />}
         {siteReels.length > 0 && (
-          <ul className={`grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 ${reels.length ? "mt-4" : ""}`}>
+          <ul className={`grid gap-5 [grid-template-columns:repeat(auto-fill,minmax(180px,1fr))] ${reels.length ? "mt-5" : ""}`}>
             {siteReels.map((r) => {
               const inner = <>{r.poster && <img src={r.poster} alt="" loading="lazy" className={POSTER} />}</>;
               const cls = "relative block aspect-square w-full overflow-hidden rounded-[8px] bg-ap-panel";
