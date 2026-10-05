@@ -1,8 +1,11 @@
 import { Link, useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { Search } from "lucide-react";
 import { useEffect, useRef, type ReactNode } from "react";
 import { SHOW_DIRECTORY } from "@/lib/features";
 import { useMe, useSignOut } from "@/lib/stillframe/account";
+import { checkAdmin } from "@/lib/stillframe/admin.functions";
 import { planName, useBilling } from "@/lib/stillframe/billing";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/stillframe/UserMenu";
@@ -125,6 +128,20 @@ export function MobileMenu({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const signOut = useSignOut();
+  const check = useServerFn(checkAdmin);
+  const { data: adminAccess } = useQuery({
+    queryKey: ["is-admin", "mobile-menu"],
+    enabled: signedIn,
+    retry: false,
+    staleTime: 300_000,
+    queryFn: async () => {
+      try {
+        return await check();
+      } catch {
+        return { admin: false };
+      }
+    },
+  });
   useBodyScrollLock(open);
 
   useEffect(() => {
@@ -173,6 +190,7 @@ export function MobileMenu({
               <AccountCard />
               <div className="mt-1 flex flex-col">
                 {account.map((i) => <Row key={i.to} item={i} pathname={pathname} size="md" onNavigate={close} />)}
+                 {adminAccess?.admin && <Row item={{ label: "Admin", to: "/admin" }} pathname={pathname} size="md" onNavigate={close} />}
                 <button type="button" onClick={() => { close(); void signOut(); }} className="flex min-h-12 items-center rounded-lg px-3 text-left text-[15px] text-ap-red hover:bg-ap-panel">
                   Sign out
                 </button>
