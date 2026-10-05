@@ -44,6 +44,7 @@ function SiteHeader() {
           {!signedIn && <Link to="/signin" className="hidden px-3 text-[15px] font-medium text-site-ink md:inline-flex">Sign in</Link>}
           <Button asChild variant="site" size="siteHeader" className={signedIn ? "hidden lg:inline-flex" : undefined}><Link to={action.to} onClick={() => setMenuOpen(false)}>{action.label}</Link></Button>
           {signedIn && <div className="hidden text-site-ink lg:block"><UserMenu showName websiteMenu /></div>}
+          {signedIn && <div className="text-site-ink lg:hidden"><UserMenu websiteMenu /></div>}
           <Button variant="ghost" size="icon" className="h-11 w-11 lg:hidden" aria-label={menuOpen ? "Close menu" : "Open menu"} aria-expanded={menuOpen} onClick={() => setMenuOpen((v) => !v)}>{menuOpen ? <X size={22} strokeWidth={1.7} /> : <Menu size={22} strokeWidth={1.7} />}</Button>
         </div>
       </div>
