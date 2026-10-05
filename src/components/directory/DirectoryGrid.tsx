@@ -100,7 +100,7 @@ export function ReelDetail({ card, onClose }: { card: DirectoryCard | null; onCl
   const body = <DetailBody card={card} onClose={onClose} />;
   return mobile ? (
     <Drawer open onOpenChange={(o) => !o && onClose()}>
-      <DrawerContent className="max-h-[92dvh] overflow-y-auto px-5 pb-8 font-ap"><DrawerTitle className="sr-only">{card.brand_name} reel</DrawerTitle>{body}</DrawerContent>
+      <DrawerContent className="max-h-[92dvh] overflow-x-hidden overflow-y-auto pb-6 font-ap"><DrawerTitle className="sr-only">{card.brand_name} reel</DrawerTitle>{body}</DrawerContent>
     </Drawer>
   ) : (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
@@ -140,17 +140,17 @@ function DetailBody({ card, onClose }: { card: DirectoryCard; onClose: () => voi
   };
 
   return (
-    <div className="grid text-ap-ink sm:grid-cols-[1fr_1fr]">
+    <div className="grid min-w-0 text-ap-ink sm:grid-cols-[1fr_1fr]">
       {card.video ? (
-        <div className="grid aspect-square place-items-center bg-ap-panel p-[10%] sm:aspect-auto sm:min-h-[460px]">
-          <video src={card.video} poster={card.poster ?? undefined} controls autoPlay loop muted playsInline className={`max-h-full max-w-full rounded-lg object-contain shadow-ap-soft ${shape(card.formats[0])}`} />
+        <div className="grid h-[min(52dvh,100vw)] place-items-center overflow-hidden bg-ap-panel p-5 sm:h-auto sm:min-h-[460px] sm:p-[10%]">
+          <video src={card.video} poster={card.poster ?? undefined} controls autoPlay loop muted playsInline className="h-full max-h-full w-auto max-w-full rounded-lg object-contain shadow-ap-soft sm:h-auto sm:max-h-[520px]" />
         </div>
       ) : (
-        <ReelPoster card={card} className="aspect-square sm:aspect-auto sm:min-h-[460px]" />
+        <ReelPoster card={card} className="h-[min(52dvh,100vw)] overflow-hidden sm:h-auto sm:min-h-[460px]" />
       )}
-      <div className="flex flex-col gap-3 p-6 sm:p-8">
+      <div className="flex min-w-0 flex-col gap-3 p-5 sm:p-8">
         <p className="text-[14px] font-semibold text-ap-badge">{card.category}</p>
-        <h2 className="text-[26px] leading-tight font-semibold tracking-[-0.02em]">{card.title ?? card.template_name ?? "Custom reel"}</h2>
+        <h2 className="text-[22px] break-words sm:text-[26px] leading-tight font-semibold tracking-[-0.02em]">{card.title ?? card.template_name ?? "Custom reel"}</h2>
         <p className="text-[15px]">by <Link to="/directory/$slug" params={{ slug: card.brand_slug }} onClick={onClose} className="font-semibold hover:text-ap-blue">{card.brand_name}</Link></p>
         <div className="flex gap-2"><LikeSave kind="reel" id={card.reel_id} name={card.title ?? `${card.brand_name} reel`} /></div>
         {card.website_url && <a href={card.website_url} target="_blank" rel="noreferrer" className="inline-flex w-fit items-center gap-1 text-[14px] text-ap-blue">Visit {card.brand_name} <ArrowUpRight className="size-3.5" strokeWidth={1.7} /></a>}
@@ -173,7 +173,7 @@ function DetailBody({ card, onClose }: { card: DirectoryCard; onClose: () => voi
             try { await report({ data: { reelId: card.reel_id, reason } }); toast("Thanks. We'll take a look."); setReporting(false); }
             catch (err) { toast.error(err instanceof Error ? err.message : "Couldn't send that."); }
           }}>
-            <input autoFocus value={reason} onChange={(e) => setReason(e.target.value)} maxLength={500} placeholder="What's wrong with this reel?" className="h-9 flex-1 rounded-lg border border-ap-hairline px-2.5 text-[14px]" />
+            <input autoFocus value={reason} onChange={(e) => setReason(e.target.value)} maxLength={500} placeholder="What's wrong with this reel?" className="h-9 min-w-0 flex-1 rounded-lg border border-ap-hairline px-2.5 text-[14px]" />
             <button type="submit" disabled={!reason.trim()} className="text-[14px] text-ap-blue disabled:opacity-40">Send</button>
           </form>
         ) : (
