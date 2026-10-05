@@ -42,8 +42,9 @@ export function customizedProject(t: Template, values: CustomSlide[]): ProjectWi
     return {
       ...f,
       photo: v.photo ? { ...f.photo, path: v.photo.path, url: v.photo.path } : f.photo,
-      headline: f.headline ? { ...f.headline, text: v.headline.trim() || f.headline.text } : f.headline,
-      subline: f.subline ? { ...f.subline, text: v.subline.trim() || f.subline.text } : f.subline,
+      // Never show the template's sample copy — empty fields render empty.
+      headline: f.headline ? { ...f.headline, text: v.headline.trim() } : f.headline,
+      subline: f.subline ? { ...f.subline, text: v.subline.trim() } : f.subline,
     } as Frame;
   });
   // Ready-made templates don't hand their logo to customers' ads.
