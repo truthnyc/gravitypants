@@ -97,7 +97,7 @@ export function SiteHeader({ variant }: { variant: "site" | "app" }) {
   return (
     <header className="sticky top-0 z-50 border-b border-ap-hairline bg-ap-card/[.92] backdrop-blur-[14px] safe-top">
       <div className="mx-auto flex h-[63px] max-w-[1280px] items-center gap-3 px-4 md:px-6 lg:gap-5">
-        <Link to={signedIn ? "/app/ads" : "/"} onClick={close} className="flex min-w-0 shrink-0 items-center text-ap-ink" aria-label="Gravity Pants home">
+        <Link to={variant === "app" ? "/" : signedIn ? "/app/ads" : "/"} onClick={close} className="flex min-w-0 shrink-0 items-center text-ap-ink" aria-label="Gravity Pants home">
           <GravityPantsLogo size={28} showWordmark wordmarkSize={17} />
         </Link>
         {variant === "app" ? <AppBar pathname={pathname} /> : <SiteBar pathname={pathname} signedIn={signedIn} close={close} />}
