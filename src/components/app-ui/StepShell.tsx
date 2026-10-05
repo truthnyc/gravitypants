@@ -100,7 +100,7 @@ function StepBar({ adId, current, className }: { adId: string; current: number; 
 }
 
 /** Ad-step header: same shell as the shared site header, with ad name and step bar. */
-function StepHeader({ adId, current, title, back }: { adId: string; current: number; title: StepTitleInfo; back?: { label: string; to: "/app/ads" | "/app/ad/$id/edit" } }) {
+function StepHeader({ adId, current, title, back }: { adId: string; current: number; title: StepTitleInfo; back?: { label: string; to: "/app/ads" | "/app/ad/$id/edit" } | undefined }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [open, setOpen] = useState(false);
   const close = useCallback(() => setOpen(false), []);
