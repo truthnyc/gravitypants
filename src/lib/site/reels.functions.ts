@@ -25,10 +25,18 @@ export const listSiteReels = createServerFn({ method: "GET" }).handler(async ():
     for (const x of s ?? []) if (x.path && x.signedUrl) signed.set(x.path, x.signedUrl);
   }
   const resolve = (u: string | null) => (u && u.startsWith(REEL_PREFIX) ? signed.get(u.slice(REEL_PREFIX.length)) ?? null : u);
+  const slugs = new Map<string, string>();
+  try {
+    const { data: brands } = await db.from("directory_brands").select("name, slug");
+    for (const b of brands ?? []) slugs.set((b.name ?? "").toLowerCase(), b.slug as string);
+  } catch {
+    // Directory is optional; fall back to the slugified brand name.
+  }
   return data
     .map((r) => ({
       id: r.id,
       brand: r.brand,
+      brandSlug: slugs.get(r.brand.toLowerCase()) ?? null,
       title: r.title,
       href: r.href,
       category: r.category as SiteReel["category"],
