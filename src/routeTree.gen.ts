@@ -35,6 +35,7 @@ import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as DirectoryIndexRouteImport } from './routes/directory.index'
 import { Route as DirectorySlugRouteImport } from './routes/directory.$slug'
+import { Route as FavoritesSlugRouteImport } from './routes/favorites.$slug'
 import { Route as GalleryPatternsSplatRouteImport } from './routes/gallery-patterns.$'
 import { Route as InviteTokenRouteImport } from './routes/invite.$token'
 import { Route as ProductCategorySplatRouteImport } from './routes/product-category.$'
@@ -65,6 +66,7 @@ import { Route as AuthenticatedAdminTemplatesIdRouteImport } from './routes/_aut
 import { Route as AuthenticatedAdminTemplatesNewRouteImport } from './routes/_authenticated/admin/templates.new'
 import { Route as AuthenticatedAppAccountBillingRouteImport } from './routes/_authenticated/app/account_.billing'
 import { Route as AuthenticatedAppAccountDirectoryRouteImport } from './routes/_authenticated/app/account_.directory'
+import { Route as AuthenticatedAppAccountFavoritesRouteImport } from './routes/_authenticated/app/account_.favorites'
 import { Route as AuthenticatedAppAccountMembersRouteImport } from './routes/_authenticated/app/account_.members'
 import { Route as AuthenticatedAppAdminSplatRouteImport } from './routes/_authenticated/app/admin.$'
 import { Route as AuthenticatedAppTemplatesIndexRouteImport } from './routes/_authenticated/app/templates.index'
@@ -206,6 +208,11 @@ const DirectoryIndexRoute = DirectoryIndexRouteImport.update({
 const DirectorySlugRoute = DirectorySlugRouteImport.update({
   id: '/directory/$slug',
   path: '/directory/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FavoritesSlugRoute = FavoritesSlugRouteImport.update({
+  id: '/favorites/$slug',
+  path: '/favorites/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GalleryPatternsSplatRoute = GalleryPatternsSplatRouteImport.update({
@@ -371,6 +378,12 @@ const AuthenticatedAppAccountDirectoryRoute =
     path: '/account/directory',
     getParentRoute: () => AuthenticatedAppRouteRoute,
   } as any)
+const AuthenticatedAppAccountFavoritesRoute =
+  AuthenticatedAppAccountFavoritesRouteImport.update({
+    id: '/account_/favorites',
+    path: '/account/favorites',
+    getParentRoute: () => AuthenticatedAppRouteRoute,
+  } as any)
 const AuthenticatedAppAccountMembersRoute =
   AuthenticatedAppAccountMembersRouteImport.update({
     id: '/account_/members',
@@ -472,6 +485,7 @@ export interface FileRoutesByFullPath {
   '/app': typeof AuthenticatedAppRouteRouteWithChildren
   '/blog/$slug': typeof BlogSlugRoute
   '/directory/$slug': typeof DirectorySlugRoute
+  '/favorites/$slug': typeof FavoritesSlugRoute
   '/gallery-patterns/$': typeof GalleryPatternsSplatRoute
   '/invite/$token': typeof InviteTokenRoute
   '/product-category/$': typeof ProductCategorySplatRoute
@@ -503,6 +517,7 @@ export interface FileRoutesByFullPath {
   '/admin/templates/new': typeof AuthenticatedAdminTemplatesNewRoute
   '/app/account/billing': typeof AuthenticatedAppAccountBillingRoute
   '/app/account/directory': typeof AuthenticatedAppAccountDirectoryRoute
+  '/app/account/favorites': typeof AuthenticatedAppAccountFavoritesRoute
   '/app/account/members': typeof AuthenticatedAppAccountMembersRoute
   '/app/admin/$': typeof AuthenticatedAppAdminSplatRoute
   '/app/templates/$slug': typeof AuthenticatedAppTemplatesSlugRoute
@@ -539,6 +554,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/directory/$slug': typeof DirectorySlugRoute
+  '/favorites/$slug': typeof FavoritesSlugRoute
   '/gallery-patterns/$': typeof GalleryPatternsSplatRoute
   '/invite/$token': typeof InviteTokenRoute
   '/product-category/$': typeof ProductCategorySplatRoute
@@ -570,6 +586,7 @@ export interface FileRoutesByTo {
   '/admin/templates/new': typeof AuthenticatedAdminTemplatesNewRoute
   '/app/account/billing': typeof AuthenticatedAppAccountBillingRoute
   '/app/account/directory': typeof AuthenticatedAppAccountDirectoryRoute
+  '/app/account/favorites': typeof AuthenticatedAppAccountFavoritesRoute
   '/app/account/members': typeof AuthenticatedAppAccountMembersRoute
   '/app/admin/$': typeof AuthenticatedAppAdminSplatRoute
   '/app/templates/$slug': typeof AuthenticatedAppTemplatesSlugRoute
@@ -611,6 +628,7 @@ export interface FileRoutesById {
   '/_authenticated/app': typeof AuthenticatedAppRouteRouteWithChildren
   '/blog/$slug': typeof BlogSlugRoute
   '/directory/$slug': typeof DirectorySlugRoute
+  '/favorites/$slug': typeof FavoritesSlugRoute
   '/gallery-patterns/$': typeof GalleryPatternsSplatRoute
   '/invite/$token': typeof InviteTokenRoute
   '/product-category/$': typeof ProductCategorySplatRoute
@@ -642,6 +660,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/templates/new': typeof AuthenticatedAdminTemplatesNewRoute
   '/_authenticated/app/account_/billing': typeof AuthenticatedAppAccountBillingRoute
   '/_authenticated/app/account_/directory': typeof AuthenticatedAppAccountDirectoryRoute
+  '/_authenticated/app/account_/favorites': typeof AuthenticatedAppAccountFavoritesRoute
   '/_authenticated/app/account_/members': typeof AuthenticatedAppAccountMembersRoute
   '/_authenticated/app/admin/$': typeof AuthenticatedAppAdminSplatRoute
   '/_authenticated/app/templates/$slug': typeof AuthenticatedAppTemplatesSlugRoute
@@ -683,6 +702,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/blog/$slug'
     | '/directory/$slug'
+    | '/favorites/$slug'
     | '/gallery-patterns/$'
     | '/invite/$token'
     | '/product-category/$'
@@ -714,6 +734,7 @@ export interface FileRouteTypes {
     | '/admin/templates/new'
     | '/app/account/billing'
     | '/app/account/directory'
+    | '/app/account/favorites'
     | '/app/account/members'
     | '/app/admin/$'
     | '/app/templates/$slug'
@@ -750,6 +771,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/blog/$slug'
     | '/directory/$slug'
+    | '/favorites/$slug'
     | '/gallery-patterns/$'
     | '/invite/$token'
     | '/product-category/$'
@@ -781,6 +803,7 @@ export interface FileRouteTypes {
     | '/admin/templates/new'
     | '/app/account/billing'
     | '/app/account/directory'
+    | '/app/account/favorites'
     | '/app/account/members'
     | '/app/admin/$'
     | '/app/templates/$slug'
@@ -821,6 +844,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app'
     | '/blog/$slug'
     | '/directory/$slug'
+    | '/favorites/$slug'
     | '/gallery-patterns/$'
     | '/invite/$token'
     | '/product-category/$'
@@ -852,6 +876,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/templates/new'
     | '/_authenticated/app/account_/billing'
     | '/_authenticated/app/account_/directory'
+    | '/_authenticated/app/account_/favorites'
     | '/_authenticated/app/account_/members'
     | '/_authenticated/app/admin/$'
     | '/_authenticated/app/templates/$slug'
@@ -890,6 +915,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   DirectorySlugRoute: typeof DirectorySlugRoute
+  FavoritesSlugRoute: typeof FavoritesSlugRoute
   InviteTokenRoute: typeof InviteTokenRoute
   DirectoryIndexRoute: typeof DirectoryIndexRoute
   ApiPublicCleanupExportsRoute: typeof ApiPublicCleanupExportsRoute
@@ -1084,6 +1110,13 @@ declare module '@tanstack/react-router' {
       path: '/directory/$slug'
       fullPath: '/directory/$slug'
       preLoaderRoute: typeof DirectorySlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/favorites/$slug': {
+      id: '/favorites/$slug'
+      path: '/favorites/$slug'
+      fullPath: '/favorites/$slug'
+      preLoaderRoute: typeof FavoritesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/gallery-patterns/$': {
@@ -1296,6 +1329,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppAccountDirectoryRouteImport
       parentRoute: typeof AuthenticatedAppRouteRoute
     }
+    '/_authenticated/app/account_/favorites': {
+      id: '/_authenticated/app/account_/favorites'
+      path: '/account/favorites'
+      fullPath: '/app/account/favorites'
+      preLoaderRoute: typeof AuthenticatedAppAccountFavoritesRouteImport
+      parentRoute: typeof AuthenticatedAppRouteRoute
+    }
     '/_authenticated/app/account_/members': {
       id: '/_authenticated/app/account_/members'
       path: '/account/members'
@@ -1456,6 +1496,7 @@ interface AuthenticatedAppRouteRouteChildren {
   AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
   AuthenticatedAppAccountBillingRoute: typeof AuthenticatedAppAccountBillingRoute
   AuthenticatedAppAccountDirectoryRoute: typeof AuthenticatedAppAccountDirectoryRoute
+  AuthenticatedAppAccountFavoritesRoute: typeof AuthenticatedAppAccountFavoritesRoute
   AuthenticatedAppAccountMembersRoute: typeof AuthenticatedAppAccountMembersRoute
   AuthenticatedAppAdminSplatRoute: typeof AuthenticatedAppAdminSplatRoute
   AuthenticatedAppTemplatesSlugRoute: typeof AuthenticatedAppTemplatesSlugRoute
@@ -1475,6 +1516,7 @@ const AuthenticatedAppRouteRouteChildren: AuthenticatedAppRouteRouteChildren = {
   AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
   AuthenticatedAppAccountBillingRoute: AuthenticatedAppAccountBillingRoute,
   AuthenticatedAppAccountDirectoryRoute: AuthenticatedAppAccountDirectoryRoute,
+  AuthenticatedAppAccountFavoritesRoute: AuthenticatedAppAccountFavoritesRoute,
   AuthenticatedAppAccountMembersRoute: AuthenticatedAppAccountMembersRoute,
   AuthenticatedAppAdminSplatRoute: AuthenticatedAppAdminSplatRoute,
   AuthenticatedAppTemplatesSlugRoute: AuthenticatedAppTemplatesSlugRoute,
@@ -1572,6 +1614,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   DirectorySlugRoute: DirectorySlugRoute,
+  FavoritesSlugRoute: FavoritesSlugRoute,
   InviteTokenRoute: InviteTokenRoute,
   DirectoryIndexRoute: DirectoryIndexRoute,
   ApiPublicCleanupExportsRoute: ApiPublicCleanupExportsRoute,
