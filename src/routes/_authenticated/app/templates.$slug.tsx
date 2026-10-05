@@ -333,7 +333,7 @@ function SlideRow({ index, slide, value, format, bg, active, busy, error, onFocu
         <input
           value={value.headline}
           onChange={(e) => onChange({ headline: e.target.value })}
-          placeholder={slide.headline_placeholder}
+          placeholder="Headline"
           aria-label={`Slide ${index + 1} headline`}
           className="mt-1.5 h-11 w-full rounded-sm bg-control-fill px-3 text-[16px] font-semibold placeholder:font-normal placeholder:text-secondary-text lg:h-9 lg:text-[14px]"
         />
@@ -343,7 +343,7 @@ function SlideRow({ index, slide, value, format, bg, active, busy, error, onFocu
         <input
           value={value.subline}
           onChange={(e) => onChange({ subline: e.target.value })}
-          placeholder={slide.subline_placeholder}
+          placeholder="Subline"
           aria-label={`Slide ${index + 1} subline`}
           className="mt-1.5 h-11 w-full rounded-sm bg-control-fill px-3 text-[16px] placeholder:text-secondary-text lg:h-9 lg:text-[14px]"
         />
