@@ -28,7 +28,7 @@ export function Avatar({ me, size = 32 }: { me: Me | null | undefined; size?: nu
   );
 }
 
-export function UserMenu({ showName = false }: { showName?: boolean }) {
+export function UserMenu({ showName = false, websiteMenu = false }: { showName?: boolean; websiteMenu?: boolean }) {
   const { data: me } = useMe();
   const signOut = useSignOut();
   const check = useServerFn(checkAdmin);
@@ -73,7 +73,7 @@ export function UserMenu({ showName = false }: { showName?: boolean }) {
         )}
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link to="/">Visit website ↗</Link>
+          {websiteMenu ? <Link to="/app/ads">Open app</Link> : <Link to="/">Visit website ↗</Link>}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={() => void signOut()}>Sign Out</DropdownMenuItem>
