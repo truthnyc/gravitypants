@@ -74,7 +74,7 @@ export function LikeSave({ kind, id, name, showSave = true, brand = false }: { k
 
   return (
     <>
-      <button type="button" onClick={() => void like()} aria-pressed={liked} aria-label={`${liked ? "Unlike" : "Like"} ${name}`} title={liked ? "Liked" : "Like"} className={cn(cls, !brand && liked && "text-ap-blue")}>
+      <button type="button" onClick={() => void like()} aria-pressed={liked} aria-label={`${liked ? "Unlike" : "Like"} ${name}`} title={liked ? "Liked" : "Like"} className={cn(cls, liked && brand && "text-[#da0519]", !brand && liked && "text-ap-blue")}>
         <ThumbsUp className={cn("size-5", liked && "fill-current")} strokeWidth={1.7} />
         <span className="text-[14px] font-semibold nums">{count}</span>
       </button>
