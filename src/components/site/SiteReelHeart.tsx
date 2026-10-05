@@ -12,7 +12,7 @@ export const SITE_FAVS_KEY = ["site-reel-favorites"] as const;
 export function useSiteReelFavorites() {
   return useQuery({
     queryKey: SITE_FAVS_KEY,
-    queryFn: async () => {
+    queryFn: async (): Promise<string[] | null> => {
       const { data: s } = await supabase.auth.getSession();
       if (!s.session) return null;
       const { data } = await (supabase as any).from("site_reel_favorites").select("reel_id, created_at").order("created_at", { ascending: false });

@@ -12,7 +12,7 @@ import { Switch } from "@/components/ui/switch";
 import { ReelDetail } from "@/components/directory/DirectoryGrid";
 import { useSiteReelFavorites, SiteReelHeart, ReelRatioChip } from "@/components/site/SiteReelHeart";
 import { listSiteReels } from "@/lib/site/reels.functions";
-import { FORMAT_LABEL } from "@/lib/site/reels";
+import { FORMAT_LABEL, type SiteReel } from "@/lib/site/reels";
 import { getMyFavorites, saveFavoritePage } from "@/lib/directory/favorites.functions";
 import { ratio, type DirectoryCard } from "@/lib/directory/directory";
 
@@ -28,7 +28,7 @@ function FavoritesPage() {
   const q = useQuery({ queryKey: ["my-favorites"], queryFn: () => load() });
   const d = q.data;
   const siteFavIds = useSiteReelFavorites().data ?? [];
-  const siteReels = useQuery({ queryKey: ["site-reels-all"], queryFn: () => listSiteReels() }).data ?? [];
+  const siteReels = useQuery({ queryKey: ["site-reels-all"], queryFn: () => listSiteReels() }).data ?? ([] as SiteReel[]);
   const siteFavs = siteFavIds.map((id) => siteReels.find((r) => r.id === id)).filter((r): r is NonNullable<typeof r> => !!r);
   const [slug, setSlug] = useState("");
   const [title, setTitle] = useState("");
@@ -106,7 +106,7 @@ function FavoritesPage() {
         {q.isLoading ? <div className="h-24" aria-busy="true" />
           : (d?.reels.length || siteFavs.length) ? (
             <div className="grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-x-3.5 gap-y-[18px]">
-              {d.reels.map((c) => (
+              {(d?.reels ?? []).map((c) => (
                 <div key={c.reel_id} className="relative">
                   <button type="button" onClick={() => setOpen(c)} aria-label={`Open ${c.title ?? "reel"}`} className="relative block aspect-square w-full overflow-hidden rounded-[8px] bg-ap-panel">
                     {c.poster && <img src={c.poster} alt="" loading="lazy" className="absolute top-1/2 left-1/2 h-[72%] w-auto max-w-[72%] object-contain -translate-x-1/2 -translate-y-1/2 rounded-[6px] shadow-[0_0_0_1px_var(--ap-inner),0_18px_34px_-16px_rgba(29,29,31,.28)]" />}
