@@ -134,7 +134,7 @@ function SiteBar({ pathname, signedIn, close }: { pathname: string; signedIn: bo
           </>
         ) : (
           <>
-            <Link to="/signin" className="hidden px-2 text-[14px] text-ap-ink hover:text-ap-blue md:inline">Sign in</Link>
+            <Link to="/signin" className="hidden h-9 min-h-0 items-center px-2 text-[14px] text-ap-ink hover:text-ap-blue md:inline-flex">Sign in</Link>
             <Link to="/signup" onClick={close} className={primary}>Start free</Link>
           </>
         )}
