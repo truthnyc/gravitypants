@@ -9,6 +9,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { supabase } from "@/integrations/supabase/client";
 import { makeOneLikeThis, reportReel } from "@/lib/directory/directory.functions";
 import { ratio, type DirectoryCard } from "@/lib/directory/directory";
+import { ReelVideo } from "@/components/site/ReelVideo";
 import { ReelCarousel } from "@/components/site/ReelCarousel";
 import { LikeSave } from "./LikeSave";
 
@@ -25,6 +26,20 @@ export function ReelPoster({ card, className = "" }: { card: DirectoryCard; clas
   );
 }
 
+/** The reel centred on its own shape, like the /showcase cards; plays the video once in view. */
+function ReelThumb({ card }: { card: DirectoryCard }) {
+  const shapeClass = card.formats[0] === "9x16" ? "dir-reel-916" : card.formats[0] === "16x9" ? "dir-reel-169" : "dir-reel-11";
+  return (
+    <div className={`dir-reel ${shapeClass}`}>
+      {card.video ? (
+        <ReelVideo noFullscreen video={card.video} poster={card.poster ?? undefined} label={`${card.brand_name} reel`} className="dir-reel-media" />
+      ) : card.poster ? (
+        <img src={card.poster} alt={`${card.brand_name} reel`} loading="lazy" />
+      ) : null}
+    </div>
+  );
+}
+
 function matched(card: DirectoryCard, q: string) {
   const words = q.toLowerCase().split(/\s+/).filter(Boolean);
   const all = [...card.moods, ...card.tags];
@@ -36,12 +51,11 @@ export function DirectoryGrid({ cards, q = "", onOpen }: { cards: DirectoryCard[
   return (
     <div className="grid gap-5 font-ap [grid-template-columns:repeat(auto-fill,minmax(180px,1fr))]">
       {cards.map((c) => (
-        <article key={c.reel_id} className="min-w-0">
-          <button type="button" onClick={() => onOpen(c)} className="relative block aspect-square w-full overflow-hidden rounded-[14px] focus-visible:outline-2 focus-visible:outline-ap-blue" aria-label={`Open ${c.brand_name} reel`}>
-            <ReelPoster card={c} className="size-full" />
-            <span className="absolute top-2 left-2 rounded-md bg-ap-card px-1.5 py-0.5 text-[11px] font-semibold nums">{c.formats.map(ratio).join(" · ")}</span>
+        <article key={c.reel_id} className="dir-card min-w-0">
+          <button type="button" onClick={() => onOpen(c)} className="dir-card-media block w-full focus-visible:outline-2 focus-visible:outline-ap-blue" aria-label={`Open ${c.brand_name} reel`}>
+            <ReelThumb card={c} />
           </button>
-          <div className="mt-2.5 truncate font-semibold">{c.title ?? c.template_name ?? "Custom reel"}</div>
+          <div className="mt-3 truncate font-semibold">{c.title ?? c.template_name ?? "Custom reel"}</div>
           <div className="text-[13px] text-ap-muted nums">
             {c.seconds} sec · <Link to="/directory/$slug" params={{ slug: c.brand_slug }} className="text-ap-ink hover:text-ap-blue">{c.brand_name}</Link>
           </div>
@@ -59,8 +73,8 @@ export function CardCarousel({ cards, label, onOpen }: { cards: DirectoryCard[];
       items={cards.map((c) => ({
         key: c.reel_id,
         media: (hidden) => (
-          <button type="button" tabIndex={hidden ? -1 : undefined} onClick={() => onOpen(c)} className="block aspect-[9/16] w-full overflow-hidden rounded-[14px]" aria-label={`Open ${c.brand_name} reel`}>
-            <ReelPoster card={c} className="size-full" />
+          <button type="button" tabIndex={hidden ? -1 : undefined} onClick={() => onOpen(c)} className="dir-card-media block w-full" aria-label={`Open ${c.brand_name} reel`}>
+            <ReelThumb card={c} />
           </button>
         ),
         title: c.title ?? c.template_name ?? c.brand_name,
