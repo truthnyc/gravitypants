@@ -9,8 +9,6 @@ import { getLikeCounts } from "@/lib/directory/favorites.functions";
 import { cn } from "@/lib/utils";
 
 type Kind = "reel" | "brand";
-const btn = "inline-flex h-11 min-w-11 items-center justify-center gap-1.5 rounded-lg bg-ap-panel px-3 text-ap-ink transition-colors hover:text-ap-blue";
-const brandBtn = "inline-flex h-11 min-w-11 items-center justify-center gap-1.5 rounded-lg bg-ap-panel px-3 text-ap-muted transition-colors hover:text-ap-ink";
 
 function useSignupGate() {
   const navigate = useNavigate();
@@ -22,7 +20,6 @@ function useSignupGate() {
 
 /** Like (public count) and Save to favorites (private list) for a reel or brand. Signed-out taps go to sign-up. */
 export function LikeSave({ kind, id, name, showSave = true, brand = false }: { kind: Kind; id: string; name: string; showSave?: boolean; brand?: boolean }) {
-  const cls = brand ? brandBtn : btn;
   const counts = useServerFn(getLikeCounts);
   const qc = useQueryClient();
   const gate = useSignupGate();
