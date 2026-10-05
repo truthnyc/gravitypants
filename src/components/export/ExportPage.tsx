@@ -391,7 +391,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
           {gif && (
             <div className="mt-6 border-t border-ap-hairline pt-5">
               <AppSectionLabel className="mb-3">GIF quality</AppSectionLabel>
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="ap-gif-grid grid gap-4 sm:grid-cols-2">
                 <Sub label="Size"><Seg value={gSize} onChange={setGSize} options={[{ v: "full", l: "Full", s: "same as video" }, { v: "half", l: "Half" }, { v: "small", l: "Small", s: "480 px" }]} /></Sub>
                 <Sub label="Colors"><Seg value={gColors} onChange={setGColors} options={[{ v: "best", l: "Best" }, { v: "balanced", l: "Balanced" }, { v: "smallest", l: "Smallest" }]} /></Sub>
                 <Sub label="Frame rate"><Seg value={gFps} onChange={setGFps} options={[{ v: 25, l: "Smooth", s: "25 fps" }, { v: 15, l: "Light", s: "15 fps" }, { v: 10, l: "Minimal", s: "10 fps" }]} /></Sub>

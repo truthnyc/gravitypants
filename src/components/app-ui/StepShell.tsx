@@ -1,6 +1,32 @@
-import type { ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import { Check, ChevronLeft, Pause, Play } from "lucide-react";
+import { Check, ChevronLeft, Maximize2, Minimize2, Pause, Play } from "lucide-react";
+
+const LARGE_KEY = "gp.largePreview";
+const LargeCtx = createContext<{ large: boolean; toggle: () => void } | null>(null);
+
+/** Larger/smaller preview choice, kept per browser so it stays the same across all four steps. */
+function useLargePreviewState() {
+  const [large, setLarge] = useState(false);
+  useEffect(() => { try { setLarge(localStorage.getItem(LARGE_KEY) === "1"); } catch { /* ignore */ } }, []);
+  const toggle = useCallback(() => setLarge((v) => {
+    const n = !v;
+    try { localStorage.setItem(LARGE_KEY, n ? "1" : "0"); } catch { /* ignore */ }
+    return n;
+  }), []);
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "\\" || e.metaKey || e.ctrlKey || e.altKey) return;
+      const t = e.target as HTMLElement | null;
+      if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+      e.preventDefault();
+      toggle();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [toggle]);
+  return { large, toggle };
+}
 import { GravityPantsLogo } from "@/components/GravityPantsLogo";
 import { cn } from "@/lib/utils";
 import { AppCard, AppSectionLabel, AppSwitch } from "./index";
@@ -23,6 +49,7 @@ export function StepShell({ adId, step, left, children, banner, back }: {
   back?: { label: string; to: "/app/ads" | "/app/ad/$id/edit" };
 }) {
   const current = STEPS.findIndex((s) => s.key === step);
+  const { large, toggle } = useLargePreviewState();
   return (
     <div className="ap-flow min-h-dvh">
       <header className="border-b border-ap-hairline bg-ap-card safe-top">
@@ -66,10 +93,12 @@ export function StepShell({ adId, step, left, children, banner, back }: {
         </div>
       </header>
       {banner}
-      <main className="mx-auto grid max-w-[1180px] items-start gap-7 px-4 pt-6 pb-20 sm:px-6 sm:pt-8 lg:grid-cols-[380px_minmax(0,1fr)]">
-        <div className="min-w-0 lg:sticky lg:top-6">{left}</div>
-        <AppCard className="min-w-0">{children}</AppCard>
-      </main>
+      <LargeCtx.Provider value={{ large, toggle }}>
+        <main className={cn("ap-steps-main mx-auto grid max-w-[1180px] items-start gap-7 px-4 pt-6 pb-20 sm:px-6 sm:pt-8", large && "ap-large")}>
+          <div className="min-w-0 lg:sticky lg:top-6">{left}</div>
+          <AppCard className="min-w-0">{children}</AppCard>
+        </main>
+      </LargeCtx.Provider>
     </div>
   );
 }
@@ -116,10 +145,25 @@ export function ReelCard({
   readOnly?: boolean;
 }) {
   const fmt = (s: number) => `${Math.floor(s / 60)}:${(s % 60).toFixed(1).padStart(4, "0")}`;
+  const lp = useContext(LargeCtx);
   let acc = 0;
   return (
     <AppCard>
-      <div className="grid h-[340px] place-items-center rounded-[18px] bg-ap-panel p-[22px] sm:h-[380px]">{preview}</div>
+      <div className="ap-preview-box relative grid h-[340px] place-items-center rounded-[18px] bg-ap-panel p-[22px] sm:h-[380px]">
+        {preview}
+        {lp && (
+          <button
+            type="button"
+            onClick={lp.toggle}
+            aria-pressed={lp.large}
+            title="Shortcut: \"
+            className="absolute top-2.5 right-2.5 hidden items-center gap-1.5 rounded-lg bg-ap-card px-2.5 py-1.5 text-[12px] font-medium text-ap-ink shadow-ap-soft hover:text-ap-blue md:inline-flex"
+          >
+            {lp.large ? <Minimize2 className="size-3.5" strokeWidth={1.7} /> : <Maximize2 className="size-3.5" strokeWidth={1.7} />}
+            {lp.large ? "Smaller preview" : "Larger preview"}
+          </button>
+        )}
+      </div>
       <div className="mt-3.5 flex items-center gap-3">
         <button type="button" onClick={onTogglePlay} aria-label={playing ? "Pause" : "Play"} className="grid size-9 shrink-0 place-items-center rounded-lg bg-ap-blue text-ap-card hover:bg-ap-blue-hover">
           {playing ? <Pause className="size-4" fill="currentColor" /> : <Play className="ml-0.5 size-4" fill="currentColor" />}
