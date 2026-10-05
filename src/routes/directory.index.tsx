@@ -182,7 +182,7 @@ function DirectoryPage() {
         {!q ? (
           <>
             {reels.length > 0 && (
-              <section className="home-examples !min-h-0 !gap-8 !py-14">
+              <section className="home-examples dir-carousel !min-h-0 !gap-8 !py-14">
                 <p className="mx-auto w-full max-w-[1280px] px-6 text-[15px] font-semibold text-ap-badge">
                   Made with Gravity Pants
                 </p>
