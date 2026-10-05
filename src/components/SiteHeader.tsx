@@ -3,14 +3,14 @@ import { ChevronDown, Menu, Search, X } from "lucide-react";
 import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import { GravityPantsLogo } from "@/components/GravityPantsLogo";
 import { MobileMenu } from "@/components/MobileNavMenu";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
 import { SHOW_DIRECTORY } from "@/lib/features";
 import { useMe } from "@/lib/stillframe/account";
 import { cn } from "@/lib/utils";
 import { NewAdButton } from "@/components/stillframe/DropZone";
 import { HelpMenu } from "@/components/stillframe/HelpMenu";
-import { Avatar, UserMenu } from "@/components/stillframe/UserMenu";
+import { Avatar, UserMenu, menuContent, menuItem, menuLabel } from "@/components/stillframe/UserMenu";
 import { WorkspaceSwitcher } from "@/components/stillframe/WorkspaceSwitcher";
 import { useSearch } from "@/components/stillframe/search-context";
 
@@ -139,8 +139,9 @@ function AppBar({ pathname }: { pathname: string }) {
         <NavLinks items={appNav} pathname={pathname} />
         <DropdownMenu>
           <DropdownMenuTrigger className={cn(navLink, "inline-flex items-center gap-1")}>Explore <ChevronDown size={14} strokeWidth={1.7} /></DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-48">
-            {exploreNav.map((item) => <DropdownMenuItem key={item.to} asChild><Link to={item.to as "/"}>{item.label}</Link></DropdownMenuItem>)}
+          <DropdownMenuContent align="start" sideOffset={8} className={cn(menuContent, "w-[240px]")}>
+            <DropdownMenuLabel className={menuLabel}>Explore Gravity Pants</DropdownMenuLabel>
+            {exploreNav.map((item) => <DropdownMenuItem key={item.to} asChild className={menuItem}><Link to={item.to as "/"}>{item.label}</Link></DropdownMenuItem>)}
           </DropdownMenuContent>
         </DropdownMenu>
       </nav>
