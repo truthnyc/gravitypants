@@ -47,7 +47,7 @@ function TopUpCheckout({ workspaceId, packId }: { workspaceId: string; packId: s
 export function TopUpCard({ extras }: { extras?: number | undefined }) {
   const [open, setOpen] = useState<{ ws: string; pack: Pack } | null>(null);
   return (
-    <section className="rounded-sm bg-card p-6 shadow-card">
+    <section className="acct-card">
       <h2 className="text-[17px] font-semibold">Need more exports?</h2>
       <p className="mt-1 text-[14px] text-secondary-text">
         Extra exports never expire and work on any plan.
