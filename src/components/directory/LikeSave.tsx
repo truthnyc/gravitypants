@@ -79,7 +79,7 @@ export function LikeSave({ kind, id, name, showSave = true, brand = false }: { k
         <span className="text-[14px] font-semibold nums">{count}</span>
       </button>
       {showSave && (
-        <button type="button" onClick={() => void save()} aria-pressed={saved} aria-label={saved ? "Remove from my favorites" : "Save to my favorites"} title={saved ? "Saved to my favorites" : "Save to my favorites"} className={cn(cls, !brand && saved && "text-ap-blue")}>
+        <button type="button" onClick={() => void save()} aria-pressed={saved} aria-label={saved ? "Remove from my favorites" : "Save to my favorites"} title={saved ? "Saved to my favorites" : "Save to my favorites"} className={cn(cls, saved && brand && "text-[#da0519]", !brand && saved && "text-ap-blue")}>
           <Heart className={cn("size-5", saved && "fill-current")} strokeWidth={1.7} />
         </button>
       )}
