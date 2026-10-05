@@ -110,8 +110,10 @@ function DirectoryPage() {
         <section className="mx-auto max-w-[900px] px-6 pt-20 pb-10 text-center">
           <p className="mb-3.5 text-[15px] font-semibold text-ap-badge">...</p>
           <h1 className="mb-8 text-[clamp(30px,5vw,56px)] leading-[1.08] font-semibold tracking-[-0.035em] text-[#a1a1a6]">
-            <b className="font-semibold text-ap-ink">It's {day}.</b>
-            Show me something:{" "}
+            <b className="font-semibold text-ap-ink">It's {day}.
+            Show me something:
+          </br>
+            {" "}</b>
             <span className="text-ap-blue" aria-live="polite">
               <span className="font-light text-[#c7c7cc]">[ </span>
               <span key={mood} className="inline-block animate-[dir-mood_.3s_ease]">
