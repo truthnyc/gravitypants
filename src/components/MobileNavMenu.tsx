@@ -37,8 +37,8 @@ export function MobileNavLink({
       to={to as "/"}
       onClick={onNavigate}
       className={cn(
-        "flex min-h-14 items-center border-b border-site-line text-[24px] font-semibold text-site-ink",
-        active && "text-site-primary",
+        "flex min-h-14 items-center border-b border-border text-[24px] font-semibold text-foreground",
+        active && "text-primary",
         className,
       )}
     >
@@ -64,7 +64,7 @@ export function MobileNavPanel({
     <nav
       aria-label="Mobile"
       className={cn(
-        "absolute inset-x-0 flex h-[calc(100dvh-56px)] flex-col gap-1 overflow-y-auto bg-site-page px-5 py-8 safe-bottom lg:hidden",
+        "absolute inset-x-0 flex h-[calc(100dvh-56px)] flex-col gap-1 overflow-y-auto bg-background px-5 py-8 safe-bottom lg:hidden",
         topClass,
         className,
       )}
