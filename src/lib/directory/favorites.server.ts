@@ -33,6 +33,7 @@ export async function loadFavorites(userId: string): Promise<{ reels: DirectoryC
     tags: r.tags, moods: r.moods, formats: r.formats, template_name: r.templates?.name ?? null,
   })));
   const bOrder = new Map<string, number>(brandIds.map((id: string, i: number) => [id, i]));
+  const okBrands = ((brands ?? []) as any[]).filter((b) => visible.has(b.id)).sort((a, b) => (bOrder.get(a.id) ?? 0) - (bOrder.get(b.id) ?? 0));
   const signedLogos = new Map<string, string>();
   const bucket = (sb as any).storage.from("brand-assets");
   await Promise.all(okBrands.map(async (b) => {
