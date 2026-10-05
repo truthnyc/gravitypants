@@ -50,20 +50,20 @@ function DirectoryAccount() {
   };
 
   return (
-    <main className="mx-auto flex max-w-[880px] flex-col gap-5 px-4 py-6 sm:px-8 sm:py-10">
-      <h1 className="text-[28px] font-bold tracking-[-0.02em]">Account</h1>
-      <div className="max-w-[640px]"><AccountTabs /></div>
+    <main className="acct mx-auto flex w-full max-w-[780px] flex-col gap-4 px-4 pb-20 pt-9 sm:px-6">
+      <h1 className="acct-h1">Account</h1>
+      <AccountTabs />
       {q.isLoading ? (
         <div className="h-40 rounded-[24px] bg-ap-card" aria-busy="true" />
       ) : !d ? (
-        <section className="rounded-[24px] bg-ap-card p-[26px] font-ap">
+        <section className="acct-card">
           <h2 className="text-[20px] font-semibold">No brand page yet</h2>
           <p className="mt-1 text-[14px] text-ap-body">Share a reel from its Share step to create your brand page in the Gravity Pants Directory.</p>
           <AppButton asChild className="mt-4"><Link to="/app/ads">Go to Your Ads</Link></AppButton>
         </section>
       ) : (
-        <section className="rounded-[24px] bg-ap-card p-[26px] font-ap text-ap-ink">
-          <h2 className="text-[20px] font-semibold">My reels</h2>
+        <section className="acct-card">
+          <h2 className="text-[20px] font-semibold">Brand page</h2>
           <LogoBox brandId={d.brand.id} name={d.brand.name} logo={d.brand.logo} onSaved={() => void qc.invalidateQueries({ queryKey: ["directory-account", ws] })} />
           <DescriptionBox brandId={d.brand.id} description={d.brand.description} onSaved={() => void qc.invalidateQueries({ queryKey: ["directory-account", ws] })} />
           <SlugBox brandId={d.brand.id} slug={d.brand.slug} onSaved={() => void qc.invalidateQueries({ queryKey: ["directory-account", ws] })} />
@@ -197,7 +197,7 @@ function SlugBox({ brandId, slug, onSaved }: { brandId: string; slug: string; on
       <span className="mr-1 font-semibold">Brand page</span>
       <span className="inline-flex items-center overflow-hidden rounded-lg border border-ap-hairline bg-ap-card">
         <span className="pr-0.5 pl-2.5 whitespace-nowrap text-ap-muted">gravitypants.com/directory/</span>
-        <input value={value} maxLength={SLUG_MAX} onChange={(e) => setValue(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))} aria-label="Brand page address" className="h-9 w-[150px] pr-2.5 outline-hidden" />
+        <input value={value} maxLength={SLUG_MAX} onChange={(e) => setValue(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))} aria-label="Brand page address" className="acct-bare h-9 w-[150px] pr-2.5 outline-hidden" />
       </span>
       <span className={cn("text-[13px]", msg[1])}>{msg[0]}</span>
       <span className={cn("text-[12px] nums", nearLimit(value.length, SLUG_MAX) ? "text-ap-amber" : "text-ap-muted")}>{value.length} / {SLUG_MAX}</span>

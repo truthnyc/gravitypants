@@ -26,11 +26,11 @@ export const Route = createFileRoute("/_authenticated/app/account")({
   component: AccountPage,
 });
 
-function Card({ title, hint, children }: { title: string; hint?: string; children: ReactNode }) {
+function Card({ title, hint, danger, children }: { title: string; hint?: string; danger?: boolean; children: ReactNode }) {
   return (
-    <section className="rounded-sm bg-card p-6 shadow-card">
-      <h2 className="text-[17px] font-semibold">{title}</h2>
-      {hint && <p className="mt-0.5 text-[13px] text-secondary-text">{hint}</p>}
+    <section className={danger ? "acct-card acct-danger" : "acct-card"}>
+      <h2 className="text-[20px] font-semibold">{title}</h2>
+      {hint && <p className="mt-1 text-[14px] leading-[1.5] text-ap-body">{hint}</p>}
       <div className="mt-5">{children}</div>
     </section>
   );
@@ -108,12 +108,12 @@ function AccountPage() {
   }
 
   return (
-    <main className="mx-auto flex max-w-[640px] flex-col gap-5 px-4 py-6 sm:px-8 sm:py-10">
-      <h1 className="text-[28px] font-bold tracking-[-0.02em]">Account</h1>
+    <main className="acct mx-auto flex w-full max-w-[780px] flex-col gap-4 px-4 pb-20 pt-9 sm:px-6">
+      <h1 className="acct-h1">Account</h1>
       <AccountTabs />
 
 
-      <Card title="Profile">
+      <Card title="Profile" hint="How you appear to teammates and in the permission log.">
         <div className="flex flex-wrap items-center gap-3 sm:gap-4">
           <Avatar me={me} size={56} />
           <Button variant="plain" size="sm" onClick={() => fileRef.current?.click()}>Change Photo</Button>
@@ -122,14 +122,14 @@ function AccountPage() {
           )}
           <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && void onAvatar(e.target.files[0])} />
         </div>
-        <label htmlFor="display-name" className="mt-5 block text-[13px] font-medium">Name</label>
+        <label htmlFor="display-name" className="mt-5 block text-[13px] font-medium">Full name</label>
         <div className="mt-1.5 flex flex-col gap-2 sm:flex-row">
           <input id="display-name" className={inputCls} value={name} placeholder="Optional" onChange={(e) => setName(e.target.value)} maxLength={80} />
           <Button onClick={() => void saveProfile({ display_name: name.trim() || null })}>Save</Button>
         </div>
       </Card>
 
-      <Card title="Email" hint="We'll send a link to confirm the change.">
+      <Card title="Email" hint="We'll send a link to the new address to confirm the change.">
         <div className="flex flex-col gap-2 sm:flex-row">
           <label htmlFor="acc-email" className="sr-only">Email</label>
           <input id="acc-email" type="email" autoComplete="email" className={inputCls} value={email} onChange={(e) => setEmail(e.target.value)} />
@@ -137,17 +137,17 @@ function AccountPage() {
         </div>
       </Card>
 
-      <Card title="Password">
-        <div className="flex flex-col gap-2">
+      <Card title="Password" hint="Enter your current password, then a new one.">
+        <div className="grid gap-3 sm:grid-cols-2">
           <label htmlFor="cur-pw" className="sr-only">Current password</label>
           <input id="cur-pw" type="password" autoComplete="current-password" placeholder="Current password" className={inputCls} value={current} onChange={(e) => setCurrent(e.target.value)} />
           <label htmlFor="new-pw" className="sr-only">New password</label>
           <input id="new-pw" type="password" autoComplete="new-password" placeholder="New password" className={inputCls} value={pw} onChange={(e) => setPw(e.target.value)} />
-          <Button className="self-start" disabled={!pw} onClick={() => void changePassword()}>Change Password</Button>
+          <Button className="justify-self-end sm:col-span-2" disabled={!pw} onClick={() => void changePassword()}>Change Password</Button>
         </div>
       </Card>
 
-      <Card title="Delete account" hint="Removes your ads, photos, Brand Kit and exported files for good.">
+      <Card danger title="Delete account" hint="Removes your ads, photos, Brand Kit and exported files for good. Your Directory reels are hidden and your brand page is taken down.">
         <Button variant="destructive-plain" onClick={() => { setTyped(""); setConfirmOpen(true); }}>Delete Account…</Button>
       </Card>
 

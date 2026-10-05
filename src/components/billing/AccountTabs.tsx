@@ -13,15 +13,15 @@ const tabs = [
 export function AccountTabs() {
   const { data: access } = usePlanAccess();
   return (
-    <nav className="flex gap-1 rounded-lg bg-control-fill p-1" aria-label="Account sections">
+    <nav className="mb-2 flex gap-[3px] rounded-[10px] bg-ap-inner p-[3px] font-ap" aria-label="Account sections">
       {tabs.filter((t) => t.label !== "Team" || access?.team).map((t) => (
         <Link
           key={t.to}
           to={t.to}
           className={cn(
-            "flex h-8 flex-1 items-center justify-center rounded-md px-3 text-[13px] font-medium text-secondary-text transition-colors",
+            "flex flex-1 items-center justify-center rounded-[7px] px-2.5 py-2 text-[14px] text-ap-body transition-colors",
           )}
-          activeProps={{ className: "bg-card text-foreground shadow-sm" }}
+          activeProps={{ className: "bg-ap-card font-semibold !text-ap-ink shadow-[var(--ap-shadow-soft)]" }}
           activeOptions={{ exact: true }}
         >
           {t.label}

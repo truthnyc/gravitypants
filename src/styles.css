@@ -1081,3 +1081,17 @@ textarea.contact-input { resize: vertical; }
 .dir-reel-169 { width: 84%; aspect-ratio: 16/9; max-width: 100%; }
 .dir-reel img, .dir-reel .dir-reel-media { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; background: #fff; }
 @media (max-width: 767px) { .dir-card-media { aspect-ratio: 3/4; border-radius: 8px; } .dir-reel-916 { width: 46%; } }
+
+/* Account area (account.html): one shared look for all five tabs */
+html:has(.acct), body:has(.acct), body:has(.acct) .bg-canvas { background: var(--ap-panel) !important; }
+.acct { font-family: var(--ap-font); color: var(--ap-ink); }
+.acct-h1 { font-size: 34px; font-weight: 700; letter-spacing: -0.035em; margin: 0 0 2px; }
+.acct-card { background: var(--ap-card); border-radius: 24px; padding: 26px; }
+.acct-card h2 { font-size: 20px !important; font-weight: 600; letter-spacing: -0.02em; }
+.acct-card :is(input[type="text"], input[type="email"], input[type="password"], input[type="url"], input:not([type]), select):not(.acct-bare) {
+  height: 44px; border-radius: 12px; border: 1px solid var(--ap-hairline); outline: none; padding-left: 14px; padding-right: 14px; background: var(--ap-card);
+}
+.acct-card textarea { border-radius: 12px; border: 1px solid var(--ap-hairline); outline: none; }
+.acct-card :is(input, select, textarea):not(.acct-bare):focus { border-color: var(--ap-blue); box-shadow: var(--ap-focus-ring); }
+.acct-card button:not([role="switch"]):not([role="checkbox"]) { border-radius: 8px; }
+.acct-danger h2 { color: #c62828; }

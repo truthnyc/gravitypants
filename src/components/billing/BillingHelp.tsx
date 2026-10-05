@@ -32,7 +32,7 @@ export function BillingHelp() {
   }
 
   return (
-    <section className="rounded-sm bg-card p-6 shadow-card">
+    <section className="acct-card">
       <h2 className="text-[17px] font-semibold">Something wrong with billing?</h2>
       <p className="mt-1 text-[14px] text-secondary-text">Tell us what happened. We'll look at your plan and suggest what to do next.</p>
       <Textarea

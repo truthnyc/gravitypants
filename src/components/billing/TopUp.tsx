@@ -47,25 +47,27 @@ function TopUpCheckout({ workspaceId, packId }: { workspaceId: string; packId: s
 export function TopUpCard({ extras }: { extras?: number | undefined }) {
   const [open, setOpen] = useState<{ ws: string; pack: Pack } | null>(null);
   return (
-    <section className="rounded-sm bg-card p-6 shadow-card">
+    <section className="acct-card">
       <h2 className="text-[17px] font-semibold">Need more exports?</h2>
       <p className="mt-1 text-[14px] text-secondary-text">
         Extra exports never expire and work on any plan.
         {extras != null && extras > 0 && <span className="nums"> You have {extras} left.</span>}
       </p>
-      <div className="mt-4 flex flex-wrap gap-3">
+      <div className="mt-4 grid grid-cols-1 gap-2.5 sm:grid-cols-3">
         {EXPORT_PACKS.map((pack) => (
-          <Button
+          <button
+            type="button"
             key={pack.id}
-            variant="plain"
-            className="nums"
+            className="nums rounded-[14px] border border-ap-hairline bg-ap-card p-3.5 text-left transition-colors hover:border-ap-blue"
             onClick={async () => {
               const ws = await currentWorkspaceId();
               if (ws) setOpen({ ws, pack });
             }}
           >
-            {pack.exports} Exports · ${pack.price}
-          </Button>
+            <b className="block text-[16px]">{pack.exports} exports</b>
+            <span className="text-[14px] text-ap-body">${pack.price}</span>
+            <small className="mt-1 block text-[12px] text-ap-muted">${(pack.price / pack.exports).toFixed(2)} each</small>
+          </button>
         ))}
       </div>
       <Dialog open={!!open} onOpenChange={(o) => !o && setOpen(null)}>
