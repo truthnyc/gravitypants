@@ -79,10 +79,49 @@ export function LikeSave({ kind, id, name, showSave = true, brand = false }: { k
         <span className="text-[14px] font-semibold nums">{count}</span>
       </button>
       {showSave && (
-        <button type="button" onClick={() => void save()} aria-pressed={saved} aria-label={saved ? "Remove from my favorites" : "Save to my favorites"} title={saved ? "Saved to my favorites" : "Save to my favorites"} className={cn(cls, saved && "bg-ap-blue/10 text-ap-blue")}>
-          <Heart className={cn("size-5", saved && "fill-current")} strokeWidth={1.7} />
+        <button type="button" onClick={() => void save()} aria-pressed={saved} aria-label={saved ? "Remove from my favorites" : "Save to my favorites"} title={saved ? "Saved to my favorites" : "Save to my favorites"} className={cn("grid size-11 place-items-center rounded-lg bg-ap-panel transition-colors", saved ? "text-destructive" : "text-ap-body hover:text-ap-ink")}>
+          <Heart className={cn("size-4", saved && "fill-current")} strokeWidth={1.7} />
         </button>
       )}
     </>
+  );
+}
+
+const DIR_FAVS_KEY = ["directory-reel-favs"];
+
+/** Same heart as website reel tiles, top-right of a Directory reel thumbnail. */
+export function DirectoryReelHeart({ reelId, name }: { reelId: string; name: string }) {
+  const qc = useQueryClient();
+  const gate = useSignupGate();
+  const q = useQuery({
+    queryKey: DIR_FAVS_KEY,
+    staleTime: 30_000,
+    queryFn: async () => {
+      const { data: u } = await supabase.auth.getUser();
+      if (!u.user) return null;
+      const { data } = await supabase.from("directory_reel_favorites").select("reel_id");
+      return (data ?? []).map((r: { reel_id: string }) => r.reel_id);
+    },
+  });
+  const saved = !!q.data?.includes(reelId);
+  const toggle = async (e: React.MouseEvent) => {
+    e.preventDefault(); e.stopPropagation();
+    if (q.data === null) return gate();
+    const { data: u } = await supabase.auth.getUser();
+    if (!u.user) return gate();
+    const next = !saved;
+    qc.setQueryData<string[]>(DIR_FAVS_KEY, (old) => next ? [...(old ?? []), reelId] : (old ?? []).filter((x) => x !== reelId));
+    const { error } = next
+      ? await supabase.from("directory_reel_favorites").insert({ user_id: u.user.id, reel_id: reelId })
+      : await supabase.from("directory_reel_favorites").delete().eq("reel_id", reelId);
+    if (error) toast.error("Couldn't update your favorites. Try again.");
+    void qc.invalidateQueries({ queryKey: DIR_FAVS_KEY });
+    void qc.invalidateQueries({ queryKey: ["my-favorites"] });
+  };
+  return (
+    <button type="button" onClick={(e) => void toggle(e)} aria-pressed={saved} aria-label={saved ? `Remove ${name} from favorites` : `Save ${name} to favorites`}
+      className={cn("absolute top-1.5 right-1.5 z-10 grid size-[30px] min-h-0 place-items-center rounded-[8px] bg-ap-card/95", saved ? "text-destructive" : "text-ap-body hover:text-ap-ink")}>
+      <Heart className={cn("size-4", saved && "fill-current")} strokeWidth={1.7} />
+    </button>
   );
 }
