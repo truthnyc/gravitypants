@@ -106,9 +106,9 @@ function SiteFooter() {
 
         <div className="mt-10 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-ap-hairline pt-5 text-[13px] text-ap-muted">
           <span>© {new Date().getFullYear()} Gravity Pants</span>
-          <Link to="/privacy" className="hover:text-ap-blue">Privacy</Link>
-          <Link to="/terms" className="hover:text-ap-blue">Terms</Link>
-          <a href={STATUS_URL} target="_blank" rel="noreferrer" className="ml-auto inline-flex items-center gap-1.5 hover:text-ap-blue">
+          <Link to="/privacy" className="min-h-0 min-w-0 hover:text-ap-blue">Privacy</Link>
+          <Link to="/terms" className="min-h-0 min-w-0 hover:text-ap-blue">Terms</Link>
+          <a href={STATUS_URL} target="_blank" rel="noreferrer" className="ml-auto inline-flex min-h-0 items-center gap-1.5 hover:text-ap-blue">
             <span className="size-2 rounded-full bg-ap-green" aria-hidden /> Status
           </a>
         </div>
