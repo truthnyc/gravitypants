@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { FooterNewsletter, NewsletterPopup } from "@/components/site/Newsletter";
 import { UserMenu } from "@/components/stillframe/UserMenu";
+import { MobileNavLink, MobileNavPanel, useBodyScrollLock } from "@/components/MobileNavMenu";
 
 const nav = [
   { label: "How it works", to: "/how-it-works" },
@@ -25,10 +26,7 @@ function SiteHeader() {
     return () => data.subscription.unsubscribe();
   }, []);
 
-  useEffect(() => {
-    document.body.style.overflow = menuOpen ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
-  }, [menuOpen]);
+  useBodyScrollLock(menuOpen);
 
   const action = signedIn ? { to: "/app/ads" as const, label: "Open app" } : { to: "/signup" as const, label: "Start free" };
   return (
@@ -48,11 +46,11 @@ function SiteHeader() {
           <Button variant="ghost" size="icon" className="h-11 w-11 lg:hidden" aria-label={menuOpen ? "Close menu" : "Open menu"} aria-expanded={menuOpen} onClick={() => setMenuOpen((v) => !v)}>{menuOpen ? <X size={22} strokeWidth={1.7} /> : <Menu size={22} strokeWidth={1.7} />}</Button>
         </div>
       </div>
-      {menuOpen && <nav aria-label="Mobile" className="absolute inset-x-0 top-full flex h-[calc(100dvh-56px)] flex-col gap-1 overflow-y-auto bg-site-page px-5 py-8 safe-bottom lg:hidden">
-        {signedIn && <Link to="/app/ads" onClick={() => setMenuOpen(false)} className="flex min-h-14 items-center border-b border-site-line text-[24px] font-semibold text-site-primary">Open app</Link>}
-        {nav.map((item) => <Link key={item.label} to={item.to} onClick={() => setMenuOpen(false)} className="flex min-h-14 items-center border-b border-site-line text-[24px] font-semibold text-site-ink">{item.label}</Link>)}
+      <MobileNavPanel open={menuOpen} topClass="top-full" className="bg-site-page">
+        {signedIn && <MobileNavLink to="/app/ads" onNavigate={() => setMenuOpen(false)} className="border-site-line text-site-primary">Open app</MobileNavLink>}
+        {nav.map((item) => <MobileNavLink key={item.label} to={item.to} onNavigate={() => setMenuOpen(false)} className="border-site-line text-site-ink">{item.label}</MobileNavLink>)}
         {!signedIn && <Link to="/signin" onClick={() => setMenuOpen(false)} className="flex min-h-14 items-center text-[18px] font-medium text-site-ink">Sign in</Link>}
-      </nav>}
+      </MobileNavPanel>
     </header>
   );
 }
