@@ -55,32 +55,47 @@ export function useEditorDoc(initial: EditorDoc) {
 
 export type SaveStatus = "saved" | "saving" | "error";
 
-/** Debounced (600ms) autosave through the data layer. */
+/** Debounced (600ms) autosave through the data layer. Pending edits flush on unmount and the
+ * cached ad is updated immediately so the next step (e.g. Photos -> Edit) opens with them. */
 export function useAutosave(doc: EditorDoc, enabled = true) {
   const queryClient = useQueryClient();
   const saved = useRef(doc);
+  const latest = useRef(doc);
   const chain = useRef<Promise<void>>(Promise.resolve());
   const [status, setStatus] = useState<SaveStatus>("saved");
+  latest.current = doc;
+
+  const flush = useCallback(() => {
+    const next = latest.current;
+    if (next === saved.current) return chain.current;
+    chain.current = chain.current.then(async () => {
+      if (next === saved.current) return;
+      try {
+        await saveEditorDoc(saved.current, next);
+        saved.current = next;
+        setStatus((s) => (s === "saving" && latest.current === next ? "saved" : s));
+        queryClient.invalidateQueries({ queryKey: projectKeys.all, exact: true });
+        queryClient.invalidateQueries({ queryKey: projectKeys.detail(next.project.id), exact: true });
+      } catch (error) {
+        console.error("Editor autosave failed", error);
+        setStatus("error");
+      }
+    });
+    return chain.current;
+  }, [queryClient]);
 
   useEffect(() => {
     if (!enabled || doc === saved.current) return;
     setStatus("saving");
-    const timer = setTimeout(() => {
-      chain.current = chain.current.then(async () => {
-        try {
-          await saveEditorDoc(saved.current, doc);
-          saved.current = doc;
-          setStatus((s) => (s === "saving" ? "saved" : s));
-          queryClient.invalidateQueries({ queryKey: projectKeys.all, exact: true });
-          queryClient.invalidateQueries({ queryKey: projectKeys.detail(doc.project.id), exact: true });
-        } catch (error) {
-          console.error("Editor autosave failed", error);
-          setStatus("error");
-        }
-      });
-    }, 600);
+    queryClient.setQueryData(projectKeys.detail(doc.project.id), (old: unknown) =>
+      old ? { ...(old as object), ...doc.project, frames: doc.frames } : old,
+    );
+    const timer = setTimeout(() => void flush(), 600);
     return () => clearTimeout(timer);
-  }, [doc, queryClient, enabled]);
+  }, [doc, queryClient, enabled, flush]);
+
+  // Never drop the last edit when leaving the page within the debounce window.
+  useEffect(() => () => { if (enabled) void flush(); }, [enabled, flush]);
 
   return status;
 }
