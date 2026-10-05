@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { ReelVideo } from "@/components/site/ReelVideo";
-import { SiteReelHeart, ReelRatioChip } from "@/components/site/SiteReelHeart";
+import { SiteReelHeart } from "@/components/site/SiteReelHeart";
 import { Button } from "@/components/ui/button";
 import { SHOWCASE_OG_IMAGE, siteHead } from "@/lib/site/seo";
 import { listSiteReels } from "@/lib/site/reels.functions";
@@ -36,7 +36,6 @@ function BrandCard({ reel }: { reel: SiteReel }) {
   return (
     <article className="examples-card showcase-card">
       <div className="examples-card-media">
-        <ReelRatioChip label={FORMAT_LABEL[reel.format]} />
         <SiteReelHeart reelId={reel.id} name={`${reel.brand} reel`} />
         {reel.href ? (
           <a

@@ -47,7 +47,3 @@ export function SiteReelHeart({ reelId, name }: { reelId: string; name: string }
   );
 }
 
-/** Format chip in the top-left corner of a reel tile. */
-export function ReelRatioChip({ label }: { label: string }) {
-  return <span className="absolute top-2 left-2 z-10 rounded-[6px] bg-ap-card/95 px-[7px] py-[3px] text-[12px] font-semibold text-ap-ink tabular-nums">{label}</span>;
-}
