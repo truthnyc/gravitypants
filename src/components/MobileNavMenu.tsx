@@ -130,7 +130,21 @@ export function MobileMenu({
   useEffect(() => {
     if (!open) return;
     ref.current?.querySelector<HTMLElement>("input, a, button")?.focus();
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && close();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") return close();
+      if (e.key !== "Tab" || !ref.current) return;
+      // Keep focus inside the menu and its toggle button while open.
+      const toggle = document.querySelector<HTMLElement>('[aria-controls="mobile-menu"]');
+      const items = [
+        ...(toggle ? [toggle] : []),
+        ...ref.current.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'),
+      ].filter((el) => el.offsetParent !== null);
+      if (!items.length) return;
+      const i = items.indexOf(document.activeElement as HTMLElement);
+      const next = e.shiftKey ? (i <= 0 ? items.length - 1 : i - 1) : (i === -1 || i === items.length - 1 ? 0 : i + 1);
+      e.preventDefault();
+      items[next]!.focus();
+    };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [open, close]);
