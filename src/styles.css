@@ -65,6 +65,7 @@
   --ap-blue: #0071e3;
   --ap-red: #c62828;
   --ap-blue-hover: #0077ed;
+  --ap-blue-strong: #0062c4;
   --ap-badge: #0058b0;
   --ap-soft-blue: #eef4fb;
   --ap-panel: #f5f5f7;
@@ -91,6 +92,7 @@
   --color-ap-body: var(--ap-body);
   --color-ap-muted: var(--ap-muted);
   --color-ap-blue: var(--ap-blue);
+  --color-ap-blue-strong: var(--ap-blue-strong);
   --color-ap-red: var(--ap-red);
   --color-ap-blue-hover: var(--ap-blue-hover);
   --color-ap-badge: var(--ap-badge);
@@ -205,6 +207,7 @@
   --site-soft-blue: #eef4fb;
   --site-eyebrow: #0058b0;
   --site-primary: #0071e3;
+  --site-link: #0062c4;
   --site-primary-hover: #0062c4;
   --site-on-primary: #ffffff;
   --site-line: #f0f0f2;
@@ -424,7 +427,7 @@
 
 /* Public home reference: page-specific palette and layout; app styles remain untouched. */
 :root {
-  --home-photo-sand: #c9b8a3; --home-photo-forest: #2f3a33; --home-photo-brick: #8c2f2b;
+  --home-photo-sand: #c9b8a3; --home-photo-sand-deep: #84705a; --home-photo-forest: #2f3a33; --home-photo-brick: #8c2f2b;
   --home-deep: #1d2a3a; --home-photo-warm: #e4b363; --home-photo-cream: #ebddc6;
   --home-logo-border: #c5c9c0; --home-illustration-purple: #7d3bd6;
   --home-illustration-green: #1a8f3c; --home-illustration-orange: #b25200;
@@ -481,7 +484,7 @@
 .home-photos span { display: block; width: 60px; height: 106px; border-radius: 8px; background: var(--home-photo-sand); transform: rotate(-8deg); }
 .home-photos span:nth-child(2) { background: var(--home-photo-forest); transform: none; }
 .home-photos span:nth-child(3) { background: var(--home-photo-brick); transform: rotate(8deg); }
-.home-step-edit { width: 150px; height: 260px; border-radius: 12px; background: var(--home-photo-sand); color: var(--site-on-primary); position: relative; }
+.home-step-edit { width: 150px; height: 260px; border-radius: 12px; background: var(--home-photo-sand-deep); color: var(--site-on-primary); position: relative; }
 .home-step-edit::before { content:""; position:absolute; top:12px; right:12px; width:44px; height:16px; border-radius:3px; background:var(--site-ink); outline:1.5px dashed var(--home-illustration-orange); outline-offset:3px; }
 .home-step-edit b { position:absolute; left:14px; bottom:52px; font-size:20px; outline:2px solid var(--home-illustration-purple); outline-offset:4px; }
 .home-step-edit small { position:absolute; left:14px; bottom:26px; font-size:11px; }
@@ -542,7 +545,7 @@
 .home-spotlight-copy h3 { font-size:36px; line-height:1.1; font-weight:600; }.home-spotlight-copy p { font-size:18px; line-height:1.55; color:var(--site-secondary); }
 .home-spotlight-media { min-width:0; display:flex; align-items:center; justify-content:center; background:var(--site-inner); margin:16px; border-radius:18px; overflow:hidden; }
 .home-edit-art,.home-motion-art { display:flex; align-items:center; justify-content:center; gap:40px; }
-.home-edit-reel { width:220px; height:392px; border-radius:8px; background:var(--home-photo-sand); position:relative; flex-shrink:0; }
+.home-edit-reel { width:220px; height:392px; border-radius:8px; background:var(--home-photo-sand-deep); position:relative; flex-shrink:0; }
 .home-edit-logo { position:absolute; top:18px; right:18px; width:58px; height:20px; background:var(--site-ink); outline:1.5px dashed var(--home-illustration-orange); outline-offset:4px; }
 .home-edit-reel strong { position:absolute; left:18px; bottom:80px; color:var(--site-on-primary); font-size:30px; line-height:1.05; outline:2px solid var(--home-illustration-purple); outline-offset:6px; animation:home-select 2.4s infinite; }
 .home-edit-reel small { position:absolute; left:18px; bottom:38px; color:var(--site-on-primary); outline:1.5px dashed var(--home-illustration-green); outline-offset:4px; }
@@ -1009,13 +1012,13 @@ html:has(.features-page) { scroll-behavior: smooth; }
 
 /* Readable contrast: links and illustration labels meet WCAG AA. */
 .home-text-link, .site-reel-link .home-text-link { color: #0060c0; }
-.home-edit-reel strong, .home-timing-track span:first-child { color: var(--site-ink); }
+.home-timing-track span:first-child { color: var(--site-ink); }
 .home-person > span { color: #52525a; }
 
 /* Showcase, contact page and gallery calls to action */
-.showcase-visit { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; color: var(--site-primary); font-size: 12px; font-weight: 500; }
+.showcase-visit { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; color: var(--site-link); font-size: 12px; font-weight: 500; }
 .site-gallery-cta { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; padding-top: 28px; font-size: 17px; color: var(--site-secondary); }
-.site-gallery-cta a { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; color: var(--site-primary); font-weight: 500; }
+.site-gallery-cta a { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; color: var(--site-link); font-weight: 500; }
 .contact-section { padding-bottom: 96px; }
 .contact-card { max-width: 760px; padding: 32px; }
 .contact-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }

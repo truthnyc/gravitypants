@@ -31,7 +31,7 @@ function FooterLinkItem({ link }: { link: FooterLink }) {
   const inner = (
     <>
       {link.label}
-      {link.badge && <span className="rounded-md bg-ap-soft-blue px-1.5 py-px text-[11px] font-semibold text-ap-blue">{link.badge}</span>}
+      {link.badge && <span className="rounded-md bg-ap-soft-blue px-1.5 py-px text-[11px] font-semibold text-ap-blue-strong">{link.badge}</span>}
     </>
   );
   return link.external ? (

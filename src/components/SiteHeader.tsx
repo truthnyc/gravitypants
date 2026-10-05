@@ -40,7 +40,7 @@ const appNav: NavItem[] = [
 ];
 
 const navLink = "rounded-lg px-2.5 py-[7px] text-[14px] text-ap-ink transition-colors hover:bg-ap-panel";
-const navActive = "bg-ap-soft-blue font-semibold text-ap-blue hover:bg-ap-soft-blue";
+const navActive = "bg-ap-soft-blue font-semibold text-ap-blue-strong hover:bg-ap-soft-blue";
 const btn = "inline-flex h-9 min-h-0 min-w-0 shrink-0 items-center justify-center whitespace-nowrap rounded-lg px-4 text-[14px] font-medium transition-colors disabled:opacity-60";
 const primary = cn(btn, "bg-ap-blue text-ap-card hover:bg-ap-blue-hover");
 const secondary = cn(btn, "bg-ap-panel text-ap-ink hover:bg-ap-hairline");
@@ -96,7 +96,7 @@ export function SiteHeader({ variant }: { variant: "site" | "app" }) {
 
   return (
     <header className="sticky top-0 z-50 border-b border-ap-hairline bg-ap-card/[.92] backdrop-blur-[14px] safe-top">
-      <div className="mx-auto flex h-16 max-w-[1280px] items-center gap-3 px-4 md:px-6 lg:gap-5">
+      <div className="mx-auto flex h-[63px] max-w-[1280px] items-center gap-3 px-4 md:px-6 lg:gap-5">
         <Link to={signedIn ? "/app/ads" : "/"} onClick={close} className="flex min-w-0 shrink-0 items-center text-ap-ink" aria-label="Gravity Pants home">
           <GravityPantsLogo size={28} showWordmark wordmarkSize={17} />
         </Link>

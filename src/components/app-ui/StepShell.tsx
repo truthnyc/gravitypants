@@ -111,7 +111,7 @@ function StepHeader({ adId, current, title, back }: { adId: string; current: num
   return (
     <>
       <header className="sticky top-0 z-50 border-b border-ap-hairline bg-ap-card/[.92] backdrop-blur-[14px] safe-top">
-        <div className="relative mx-auto flex h-16 max-w-[1280px] items-center gap-3 px-4 md:px-6 lg:gap-4">
+        <div className="relative mx-auto flex h-[63px] max-w-[1280px] items-center gap-3 px-4 md:px-6 lg:gap-4">
           <Link to="/app/ads" aria-label="Gravity Pants home" className="hidden shrink-0 lg:flex"><GravityPantsLogo size={28} showWordmark wordmarkSize={17} /></Link>
           <Link to={back?.to ?? "/app/ads"} params={{ id: adId }} className="flex min-h-0 shrink-0 items-center text-[14px] text-ap-blue hover:text-ap-blue-hover">
             <ChevronLeft className="size-4" strokeWidth={1.7} /> {back?.label ?? "Your Ads"}
