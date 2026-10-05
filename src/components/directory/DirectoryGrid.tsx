@@ -55,9 +55,11 @@ export function DirectoryGrid({ cards, q = "", onOpen }: { cards: DirectoryCard[
           <button type="button" onClick={() => onOpen(c)} className="dir-card-media block w-full focus-visible:outline-2 focus-visible:outline-ap-blue" aria-label={`Open ${c.brand_name} reel`}>
             <ReelThumb card={c} />
           </button>
-          <div className="mt-3 truncate font-semibold">{c.title ?? c.template_name ?? "Custom reel"}</div>
-          <div className="text-[13px] text-ap-muted nums">
-            {c.seconds} sec · <Link to="/directory/$slug" params={{ slug: c.brand_slug }} className="text-ap-ink hover:text-ap-blue">{c.brand_name}</Link>
+          <div className="mt-3 truncate font-semibold">
+            <Link to="/directory/$slug" params={{ slug: c.brand_slug }} className="hover:text-ap-blue">{c.brand_name}</Link>
+          </div>
+          <div className="truncate text-[13px] text-ap-muted nums">
+            {c.title ?? c.template_name ?? "Custom reel"} · {ratio(c.formats[0] ?? "1x1")} · {c.seconds} sec
           </div>
           <div className="mt-0.5 text-[12px] text-ap-badge">{matched(c, q).join(" · ")}</div>
         </article>
@@ -77,8 +79,8 @@ export function CardCarousel({ cards, label, onOpen }: { cards: DirectoryCard[];
             <ReelThumb card={c} />
           </button>
         ),
-        title: c.title ?? c.template_name ?? c.brand_name,
-        detail: `${c.photos} photos · ${c.seconds} sec · ${c.formats.map(ratio).join(" · ")} · ${c.brand_name}`,
+        title: c.brand_name,
+        detail: `${c.title ?? c.template_name ?? "Custom reel"} · ${ratio(c.formats[0] ?? "1x1")} · ${c.seconds} sec`,
         visit: c.website_url ? { href: c.website_url, label: `Visit ${c.brand_name}` } : undefined,
       }))}
     />
