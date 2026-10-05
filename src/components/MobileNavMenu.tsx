@@ -159,7 +159,7 @@ export function MobileMenu({
               <AccountCard />
               <div className="mt-1 flex flex-col">
                 {account.map((i) => <Row key={i.to} item={i} pathname={pathname} size="md" onNavigate={close} />)}
-                <button type="button" onClick={() => { close(); void signOut(); }} className="flex min-h-12 items-center rounded-lg px-3 text-left text-[15px] text-destructive hover:bg-ap-panel">
+                <button type="button" onClick={() => { close(); void signOut(); }} className="flex min-h-12 items-center rounded-lg px-3 text-left text-[15px] text-ap-red hover:bg-ap-panel">
                   Sign out
                 </button>
               </div>
