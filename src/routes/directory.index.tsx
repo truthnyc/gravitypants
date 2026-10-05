@@ -81,7 +81,7 @@ function DirectoryPage() {
         <section className="mx-auto max-w-[900px] px-6 pt-20 pb-12 text-center">
           <p className="mb-3.5 text-[15px] font-semibold text-ap-badge">Directory</p>
           <h1 className="mb-7 text-[clamp(30px,5vw,52px)] leading-[1.1] font-semibold tracking-[-0.035em]">
-            It's {day}. Show me something: <span className="text-ap-blue" aria-live="polite">{mood}</span>
+            It's {day}. </br>>Show me something: <span className="text-ap-blue" aria-live="polite">{mood}</span>
           </h1>
           <form role="search" onSubmit={(e) => { e.preventDefault(); go(value); }} className="mx-auto flex h-[60px] max-w-[640px] items-center gap-2 rounded-[12px] border border-ap-hairline bg-ap-card pr-2 pl-4 focus-within:border-ap-blue focus-within:shadow-ap-focus">
             <input value={value} onChange={(e) => setValue(e.target.value)} placeholder="Try: cozy knitwear, square, TikTok" aria-label="Search the Directory" className="h-full min-w-0 flex-1 bg-transparent text-[17px] outline-hidden" />
