@@ -45,12 +45,14 @@ function FavoritesPublic() {
             <h2 className="mt-12 mb-5 text-[24px] font-semibold">Brands</h2>
             <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {brands.map((b) => (
-                <li key={b.id}><Link to="/directory/$slug" params={{ slug: b.slug }} className="block rounded-[14px] bg-ap-panel p-4 hover:text-ap-blue">
-                  {b.logo
-                    ? <img src={b.logo} alt="" className="mb-3 size-12 object-contain" />
-                    : <span className="mb-3 flex size-12 items-center justify-center rounded-[14px] bg-ap-badge/10 text-[20px] font-semibold text-ap-badge">{b.name.charAt(0).toUpperCase()}</span>}
-                  <p className="text-[13px] font-semibold text-ap-badge">{b.category}</p>
-                  <p className="text-[18px] font-semibold">{b.name}</p>
+                <li key={b.id}><Link to="/directory/$slug" params={{ slug: b.slug }} className="block rounded-[4px] bg-ap-panel p-3 hover:text-ap-blue">
+                  <span className="flex size-9 items-center justify-center rounded-[4px] bg-ap-hairline">
+                    {b.logo
+                      ? <img src={b.logo} alt="" className="max-h-full max-w-full object-contain" />
+                      : <span className="text-[16px] font-semibold text-ap-muted">{b.name.charAt(0).toUpperCase()}</span>}
+                  </span>
+                  <p className="mt-2.5 text-[12px] text-ap-muted">{b.category}</p>
+                  <p className="mt-0.5 truncate text-[14px] font-semibold">{b.name}</p>
                 </Link></li>
               ))}
             </ul>
