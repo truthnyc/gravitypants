@@ -9,6 +9,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { supabase } from "@/integrations/supabase/client";
 import { makeOneLikeThis, reportReel } from "@/lib/directory/directory.functions";
 import { ratio, type DirectoryCard } from "@/lib/directory/directory";
+import { ReelVideo } from "@/components/site/ReelVideo";
 import { ReelCarousel } from "@/components/site/ReelCarousel";
 import { LikeSave } from "./LikeSave";
 
@@ -25,7 +26,19 @@ export function ReelPoster({ card, className = "" }: { card: DirectoryCard; clas
   );
 }
 
-function matched(card: DirectoryCard, q: string) {
+/** The reel centred on its own shape, like the /showcase cards; plays the video once in view. */
+function ReelThumb({ card }: { card: DirectoryCard }) {
+  const shapeClass = card.formats[0] === "9x16" ? "dir-reel-916" : card.formats[0] === "16x9" ? "dir-reel-169" : "dir-reel-11";
+  return (
+    <div className={`dir-reel ${shapeClass}`}>
+      {card.video ? (
+        <ReelVideo noFullscreen video={card.video} poster={card.poster ?? undefined} label={`${card.brand_name} reel`} className="dir-reel-media" />
+      ) : card.poster ? (
+        <img src={card.poster} alt={`${card.brand_name} reel`} loading="lazy" />
+      ) : null}
+    </div>
+  );
+}
   const words = q.toLowerCase().split(/\s+/).filter(Boolean);
   const all = [...card.moods, ...card.tags];
   const hits = words.length ? all.filter((t) => words.some((w) => t.includes(w) || w.includes(t))) : [];
