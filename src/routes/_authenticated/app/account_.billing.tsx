@@ -62,7 +62,7 @@ function BillingPage() {
 
       {thanks && (
         <section role="status" className="acct-card">
-          <h2 className="text-[17px] font-semibold">{thanks === "pack" ? "Extra exports added" : "Thank you for choosing Gravity Pants"}</h2>
+          <h2 className="text-[20px] font-semibold">{thanks === "pack" ? "Extra exports added" : "Thank you for choosing Gravity Pants"}</h2>
           <p className="mt-1 text-[14px] text-secondary-text nums">
             {thanks === "pack"
               ? `Payment received. You now have ${status?.extras ?? 0} extra exports, shown below. They never expire.`
@@ -77,7 +77,7 @@ function BillingPage() {
 
       <section className="acct-card">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h2 className="text-[17px] font-semibold">{billing ? planName(billing.plan) : " "}</h2>
+          <h2 className="text-[20px] font-semibold">{billing ? planName(billing.plan) : " "}</h2>
           {paid && plan && (
             <span className="text-[15px] font-semibold nums">
               {money(plan.amount_cents)} <span className="font-normal text-secondary-text">/ {plan.interval}</span>
@@ -100,6 +100,12 @@ function BillingPage() {
           <dl className="mt-5 grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-[14px]">
             <dt className="text-secondary-text">Plan</dt>
             <dd className="font-medium">{planName(billing.plan)}</dd>
+            {/^(business|team)/i.test(billing.plan ?? "") && (
+              <>
+                <dt className="text-secondary-text">Directory</dt>
+                <dd className="text-[13px] font-semibold text-ap-badge"><span className="text-[#d4a017]">★</span> Featured brand</dd>
+              </>
+            )}
             {paid && (
               <>
                 <dt className="text-secondary-text">{billing.cancel_at_period_end || billing.status === "canceled" ? "Ends on" : "Renews on"}</dt>
