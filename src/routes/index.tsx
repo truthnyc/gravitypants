@@ -381,7 +381,7 @@ function SpotlightArt({ active }: { active: Tab }) {
     );
   if (active === "Export") return <FormatShapes labelled />;
   return (
-    <div className="home-edit-art">
+    <div className="home-edit-art" aria-hidden="true">
       <div className="home-edit-reel">
         <span className="home-edit-logo" />
         <strong>
