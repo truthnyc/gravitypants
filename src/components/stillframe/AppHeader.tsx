@@ -47,6 +47,7 @@ export function AppHeader() {
               {item.label}
             </Link>
           ))}
+          <Link to="/" className="rounded-lg px-3 py-1.5 text-[14px] font-medium text-secondary-text transition-colors hover:bg-control-fill/60">Website</Link>
         </nav>
 
         <div className="relative ml-auto hidden lg:block">
@@ -82,7 +83,7 @@ export function AppHeader() {
       <Drawer open={menuOpen} onOpenChange={setMenuOpen} shouldScaleBackground={false}>
         <DrawerContent className="lg:hidden">
           <DrawerHeader><DrawerTitle>Menu</DrawerTitle></DrawerHeader>
-          <nav className="grid px-4 pb-3">{navItems.map((item) => <Link key={item.to} to={item.to} onClick={() => setMenuOpen(false)} className="flex h-12 items-center hairline-b">{item.label}</Link>)}</nav>
+          <nav className="grid px-4 pb-3">{navItems.map((item) => <Link key={item.to} to={item.to} onClick={() => setMenuOpen(false)} className="flex h-12 items-center hairline-b">{item.label}</Link>)}<Link to="/" onClick={() => setMenuOpen(false)} className="flex h-12 items-center hairline-b">Website</Link></nav>
           <WorkspaceList onSwitch={() => setMenuOpen(false)} />
           <div className="flex items-center justify-between px-4 pb-6"><TrialPill /><UserMenu /></div>
 
