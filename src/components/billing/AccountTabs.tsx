@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import { usePlanAccess } from "@/lib/stillframe/plan";
+import { SHOW_DIRECTORY } from "@/lib/features";
 
 const tabs = [
   { to: "/app/account", label: "Profile" },
@@ -14,7 +15,7 @@ export function AccountTabs() {
   const { data: access } = usePlanAccess();
   return (
     <nav className="mb-2 flex gap-[3px] rounded-[10px] bg-ap-inner p-[3px] font-ap" aria-label="Account sections">
-      {tabs.filter((t) => t.label !== "Team" || access?.team).map((t) => (
+      {tabs.filter((t) => (t.label !== "Team" || access?.team) && (t.label !== "Directory" || SHOW_DIRECTORY)).map((t) => (
         <Link
           key={t.to}
           to={t.to}

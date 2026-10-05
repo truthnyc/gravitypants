@@ -33,6 +33,7 @@ import { isAcceptedImage } from "@/lib/stillframe/media";
 import { FramePreview } from "./FramePreview";
 import { cn } from "@/lib/utils";
 import { SaveTemplateDialog } from "@/components/templates/TemplateDialogs";
+import { SHOW_DIRECTORY } from "@/lib/features";
 import { STATUS_LABEL, type DirStatus } from "@/lib/directory/directory";
 
 export function AdCard({ project, dirStatus, liveUntil, onHide }: { project: ProjectWithFrames; dirStatus?: DirStatus | undefined; liveUntil?: string | null | undefined; onHide?: (() => void) | undefined }) {
@@ -126,8 +127,8 @@ export function AdCard({ project, dirStatus, liveUntil, onHide }: { project: Pro
             <DropdownMenuItem onSelect={() => navigate({ to: "/app/ad/$id/edit", params: { id: project.id } })}>
               Open
             </DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => navigate({ to: "/app/ad/$id/share", params: { id: project.id } })}>Share to the Directory</DropdownMenuItem>
-            {(dirStatus === "live" || dirStatus === "in_review") && onHide && <DropdownMenuItem onSelect={onHide}>Hide from the Directory</DropdownMenuItem>}
+            {SHOW_DIRECTORY && <DropdownMenuItem onSelect={() => navigate({ to: "/app/ad/$id/share", params: { id: project.id } })}>Share to the Directory</DropdownMenuItem>}
+            {SHOW_DIRECTORY && (dirStatus === "live" || dirStatus === "in_review") && onHide && <DropdownMenuItem onSelect={onHide}>Hide from the Directory</DropdownMenuItem>}
             <DropdownMenuItem onSelect={() => void handleDuplicate()}>Duplicate</DropdownMenuItem>
             <DropdownMenuItem onSelect={() => fileInput.current?.click()}>
               Duplicate with New Photos…
