@@ -96,7 +96,7 @@ function FavoritesPage() {
 
       <section className="acct-card">
         <h2 className="text-[20px] font-semibold">Saved reels</h2>
-        <p className="mt-1 mb-4 text-[14px] text-ap-body">Tap the heart in the Directory to save a reel. Tap it again here to remove it.</p>
+        <p className="mt-1 mb-4 text-[14px] text-ap-body">Tap the heart on any reel across the site to save it. Tap it again here to remove it.</p>
         {q.isLoading ? <div className="h-24" aria-busy="true" />
           : d?.reels.length ? (
             <div className="grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-x-3.5 gap-y-[18px]">
@@ -116,7 +116,7 @@ function FavoritesPage() {
               ))}
             </div>
           )
-          : <p className="text-[14px] text-ap-body">Tap the heart on any reel in the <Link to="/directory" className="text-ap-blue">Directory</Link> to save it here.</p>}
+          : <p className="text-[14px] text-ap-body">Tap the heart on any reel, for example on <Link to="/examples" className="text-ap-blue">Examples</Link> or <Link to="/showcase" className="text-ap-blue">Showcase</Link>, to save it here.</p>}
       </section>
       <section className="acct-card">
         <h2 className="text-[20px] font-semibold">Saved brands</h2>
