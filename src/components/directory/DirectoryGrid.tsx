@@ -153,12 +153,12 @@ function DetailBody({ card, onClose }: { card: DirectoryCard; onClose: () => voi
           {[`${card.photos} photos`, `${card.seconds} sec`, ...card.formats.map(ratio)].map((c) => <span key={c} className="rounded-lg bg-ap-panel px-2.5 py-1">{c}</span>)}
         </div>
         {card.template_id && (
-          <div className="mt-2 rounded-[14px] bg-ap-panel p-4 text-[14px] leading-normal">
+          <div className="mt-auto rounded-[14px] bg-ap-panel p-4 text-[14px] leading-normal">
             <p>Make one like this starts with: <b>{tname} template</b></p>
             <p className="mt-1 text-ap-body">You add your own photos, words, colors and fonts, or use your brand kit.</p>
           </div>
         )}
-        <button type="button" disabled={!card.template_id || busy} onClick={() => void start()} className="mt-auto h-12 rounded-lg bg-ap-blue text-[16px] font-semibold text-ap-card disabled:opacity-40">
+        <button type="button" disabled={!card.template_id || busy} onClick={() => void start()} className="mt-1 h-12 rounded-lg bg-ap-blue text-[16px] font-semibold text-ap-card disabled:opacity-40">
           {busy ? "Starting…" : "Make one like this"}
         </button>
         {reporting ? (
