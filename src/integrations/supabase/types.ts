@@ -938,6 +938,32 @@ export type Database = {
           },
         ]
       }
+      site_reel_favorites: {
+        Row: {
+          created_at: string
+          reel_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          reel_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          reel_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_reel_favorites_reel_id_fkey"
+            columns: ["reel_id"]
+            isOneToOne: false
+            referencedRelation: "site_reels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       site_reels: {
         Row: {
           brand: string
