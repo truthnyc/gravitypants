@@ -18,20 +18,20 @@ interface Props {
 const Email = ({ name }: Props) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>Welcome to Gravity Pants — your 7-day free trial has started</Preview>
+    <Preview>Welcome to Gravity Pants — your free trial is ready</Preview>
     <Body style={brandMain}>
       <Container style={brandContainer}>
         <EmailHeader />
         <Heading style={brandH1}>Welcome to Gravity Pants</Heading>
         <Text style={brandText}>{name ? `Hi ${name}` : 'Hi there'}</Text>
         <Text style={brandText}>
-          Your 7-day free trial has started. Upload a few photos, turn them into a video ad, and
+          Your free trial includes 3 exports, with no time limit and no card needed. Upload a few photos, turn them into a video ad, and
           preview it for every social channel — no editing experience needed.
         </Text>
         <Text style={brandText}>
           When you're ready to export your videos and GIFs, pick a Simple or Business plan.
         </Text>
-        <Button style={brandButton} href="https://gravitypants.com">
+        <Button style={brandButton} href="https://gravitypants.com/app/ads">
           Make Your First Ad
         </Button>
         <Text style={brandFooter}>
