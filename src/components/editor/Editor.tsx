@@ -503,6 +503,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
     <StepShell
       adId={doc.project.id}
       step="edit"
+      title={{ name: doc.project.name, onRename: (name) => apply((d) => ({ ...d, project: { ...d.project, name } })), status: readOnly ? undefined : status, readOnly }}
       banner={banner}
       left={
         <ReelCard

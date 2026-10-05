@@ -1,6 +1,10 @@
-import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
-import { Link } from "@tanstack/react-router";
-import { Check, ChevronLeft, Maximize2, Minimize2, Pause, Play } from "lucide-react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import { Link, useRouterState } from "@tanstack/react-router";
+import { Check, ChevronLeft, Maximize2, Menu, Minimize2, Pause, Play, X } from "lucide-react";
+import { SHOW_DIRECTORY } from "@/lib/features";
+import { MobileMenu } from "@/components/MobileNavMenu";
+import { HelpMenu } from "@/components/stillframe/HelpMenu";
+import { UserMenu } from "@/components/stillframe/UserMenu";
 
 const LARGE_KEY = "gp.largePreview";
 const LargeCtx = createContext<{ large: boolean; toggle: () => void } | null>(null);
@@ -32,66 +36,118 @@ import { cn } from "@/lib/utils";
 import { AppCard, AppSectionLabel, AppSwitch } from "./index";
 
 export type StepKey = "photos" | "edit" | "export" | "share";
-const STEPS: { key: StepKey; label: string; to: "/app/ad/$id/photos" | "/app/ad/$id/edit" | "/app/ad/$id/export" | "/app/ad/$id/share" }[] = [
+const STEPS_ALL: { key: StepKey; label: string; to: "/app/ad/$id/photos" | "/app/ad/$id/edit" | "/app/ad/$id/export" | "/app/ad/$id/share" }[] = [
   { key: "photos", label: "Photos", to: "/app/ad/$id/photos" },
   { key: "edit", label: "Edit", to: "/app/ad/$id/edit" },
   { key: "export", label: "Export", to: "/app/ad/$id/export" },
   { key: "share", label: "Share", to: "/app/ad/$id/share" },
 ];
+const STEPS = STEPS_ALL.filter((s) => SHOW_DIRECTORY || s.key !== "share");
 
-/** Shared frame for the four ad steps: top bar with steps, sticky reel card on the left, step card on the right. */
-export function StepShell({ adId, step, left, children, banner, back }: {
+export type StepTitleInfo = { name: string; onRename?: (name: string) => void; status?: "saving" | "saved" | "error"; readOnly?: boolean };
+
+function AdName({ title }: { title: StepTitleInfo }) {
+  const { name, onRename, status, readOnly } = title;
+  return (
+    <div className="flex min-w-0 items-center gap-2">
+      {onRename && !readOnly ? (
+        <input
+          key={name}
+          defaultValue={name}
+          aria-label="Ad name"
+          className="min-w-0 max-w-[260px] truncate rounded-md bg-transparent px-1 text-[15px] font-semibold text-ap-ink outline-hidden focus:shadow-ap-focus"
+          onBlur={(e) => { const v = e.currentTarget.value.trim(); if (v && v !== name) onRename(v); else e.currentTarget.value = name; }}
+          onKeyDown={(e) => { if (e.key === "Enter") e.currentTarget.blur(); if (e.key === "Escape") { e.currentTarget.value = name; e.currentTarget.blur(); } }}
+        />
+      ) : (
+        <span className="min-w-0 truncate px-1 text-[15px] font-semibold text-ap-ink">{name}</span>
+      )}
+      {status && (
+        <span className="hidden shrink-0 text-[13px] lg:inline">
+          {status === "saving" ? <span className="text-ap-muted">Saving…</span> : status === "error" ? <span className="text-destructive">Not saved</span> : <span className="text-ap-green">✓ Saved</span>}
+        </span>
+      )}
+    </div>
+  );
+}
+
+function StepBar({ adId, current, className }: { adId: string; current: number; className?: string }) {
+  return (
+    <nav aria-label="Steps" className={cn("inline-flex shrink-0 gap-[3px] rounded-[10px] bg-ap-panel p-[3px]", className)}>
+      {STEPS.map((s, i) => {
+        const done = i < current;
+        const on = i === current;
+        return (
+          <Link
+            key={s.key}
+            to={s.to}
+            params={{ id: adId }}
+            aria-current={on ? "step" : undefined}
+            className={cn(
+              "inline-flex min-h-0 min-w-0 items-center gap-1.5 whitespace-nowrap rounded-[7px] px-3 py-1.5 text-[13px]",
+              on ? "bg-ap-card font-semibold text-ap-ink shadow-ap-soft" : "text-ap-muted hover:text-ap-ink",
+            )}
+          >
+            <span className={cn("grid size-[18px] place-items-center rounded-full text-[11px] font-semibold nums", done ? "bg-ap-green text-ap-card" : on ? "bg-ap-blue text-ap-card" : "bg-ap-media text-ap-muted")}>
+              {done ? <Check className="size-[11px]" strokeWidth={2.5} /> : i + 1}
+            </span>
+            {s.label}
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}
+
+/** Ad-step header: same shell as the shared site header, with ad name and step bar. */
+function StepHeader({ adId, current, title, back }: { adId: string; current: number; title: StepTitleInfo; back?: { label: string; to: "/app/ads" | "/app/ad/$id/edit" } }) {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const [open, setOpen] = useState(false);
+  const close = useCallback(() => setOpen(false), []);
+  const btn = useRef<HTMLButtonElement>(null);
+  const was = useRef(false);
+  useEffect(() => close(), [pathname, close]);
+  useEffect(() => { if (was.current && !open) btn.current?.focus(); was.current = open; }, [open]);
+  return (
+    <>
+      <header className="sticky top-0 z-50 border-b border-ap-hairline bg-ap-card/[.92] backdrop-blur-[14px] safe-top">
+        <div className="relative mx-auto flex h-16 max-w-[1280px] items-center gap-3 px-4 md:px-6 lg:gap-4">
+          <Link to="/app/ads" aria-label="Gravity Pants home" className="hidden shrink-0 lg:flex"><GravityPantsLogo size={28} showWordmark wordmarkSize={17} /></Link>
+          <Link to={back?.to ?? "/app/ads"} params={{ id: adId }} className="flex min-h-0 shrink-0 items-center text-[14px] text-ap-blue hover:text-ap-blue-hover">
+            <ChevronLeft className="size-4" strokeWidth={1.7} /> {back?.label ?? "Your Ads"}
+          </Link>
+          <AdName title={title} />
+          <div className="flex-1" />
+          <StepBar adId={adId} current={current} className="absolute left-1/2 hidden -translate-x-1/2 lg:inline-flex" />
+          <div className="hidden items-center gap-3 lg:flex"><HelpMenu /><UserMenu /></div>
+          <button ref={btn} type="button" className="grid size-9 min-h-0 min-w-0 shrink-0 place-items-center rounded-lg text-ap-ink hover:bg-ap-panel lg:hidden" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} aria-controls="mobile-menu" onClick={() => setOpen((v) => !v)}>
+            {open ? <X size={22} strokeWidth={1.7} /> : <Menu size={22} strokeWidth={1.7} />}
+          </button>
+        </div>
+        <MobileMenu open={open} signedIn pathname={pathname} close={close} />
+      </header>
+      <div className="overflow-x-auto border-b border-ap-hairline bg-ap-card px-4 py-2 md:px-6 lg:hidden">
+        <StepBar adId={adId} current={current} className="flex w-max min-w-full" />
+      </div>
+    </>
+  );
+}
+
+/** Shared frame for the four ad steps: header with steps, sticky reel card on the left, step card on the right. */
+export function StepShell({ adId, step, left, children, banner, back, title }: {
   adId: string;
   step: StepKey;
   left: ReactNode;
   children: ReactNode;
   banner?: ReactNode;
   back?: { label: string; to: "/app/ads" | "/app/ad/$id/edit" };
+  title: StepTitleInfo;
 }) {
   const current = STEPS.findIndex((s) => s.key === step);
   const { large, toggle } = useLargePreviewState();
   return (
     <div className="ap-flow min-h-dvh">
-      <header className="border-b border-ap-hairline bg-ap-card safe-top">
-        <div className="mx-auto flex h-[60px] max-w-[1180px] items-center gap-4 px-6">
-          <Link to="/app/ads" aria-label="Gravity Pants home" className="shrink-0"><GravityPantsLogo /></Link>
-          <Link
-            to={back?.to ?? "/app/ads"}
-            params={{ id: adId }}
-            className="flex items-center text-[14px] text-ap-muted hover:text-ap-ink"
-          >
-            <ChevronLeft className="size-4" strokeWidth={1.7} /> {back?.label ?? "Your Ads"}
-          </Link>
-          <nav aria-label="Steps" className="ml-auto hidden gap-[3px] rounded-[10px] bg-ap-panel p-[3px] md:inline-flex">
-            {STEPS.map((s, i) => {
-              const done = i < current;
-              const on = i === current;
-              return (
-                <Link
-                  key={s.key}
-                  to={s.to}
-                  params={{ id: adId }}
-                  aria-current={on ? "step" : undefined}
-                  className={cn(
-                    "inline-flex items-center gap-1.5 rounded-[7px] px-3 py-1.5 text-[13px]",
-                    on ? "bg-ap-card font-semibold text-ap-ink shadow-ap-soft" : "text-ap-muted hover:text-ap-ink",
-                  )}
-                >
-                  <span
-                    className={cn(
-                      "grid size-[18px] place-items-center rounded-full text-[11px] font-semibold nums",
-                      done ? "bg-ap-green text-ap-card" : on ? "bg-ap-blue text-ap-card" : "bg-ap-media text-ap-muted",
-                    )}
-                  >
-                    {done ? <Check className="size-[11px]" strokeWidth={2.5} /> : i + 1}
-                  </span>
-                  {s.label}
-                </Link>
-              );
-            })}
-          </nav>
-        </div>
-      </header>
+      <StepHeader adId={adId} current={current} title={title} back={back} />
       {banner}
       <LargeCtx.Provider value={{ large, toggle }}>
         <main className={cn("ap-steps-main mx-auto grid max-w-[1180px] items-start gap-7 px-4 pt-6 pb-20 sm:px-6 sm:pt-8", large && "ap-large")}>

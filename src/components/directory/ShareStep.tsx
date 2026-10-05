@@ -136,6 +136,7 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
     <StepShell
       adId={doc.project.id}
       step="share"
+      title={{ name: doc.project.name }}
       back={{ label: "Back to Edit", to: "/app/ad/$id/edit" }}
       left={
         <ReelCard
