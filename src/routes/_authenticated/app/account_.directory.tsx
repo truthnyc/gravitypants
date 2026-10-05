@@ -10,7 +10,7 @@ import { checkSlug, getDirectoryAccount, hideReel, renameDirectoryReel, saveBran
 import { STATUS_LABEL } from "@/lib/directory/directory";
 import { getWorkspaceId } from "@/lib/stillframe/workspace";
 import { cn } from "@/lib/utils";
-import { BRAND_DESCRIPTION_MAX, SLUG_MAX, nearLimit } from "@/lib/directory/directory";
+import { BRAND_DESCRIPTION_MAX, BRAND_NAME_MAX, CATEGORIES, GRACE_DAYS, SLUG_MAX, nearLimit } from "@/lib/directory/directory";
 
 export const Route = createFileRoute("/_authenticated/app/account_/directory")({
   head: () => ({
@@ -62,33 +62,60 @@ function DirectoryAccount() {
           <AppButton asChild className="mt-4"><Link to="/app/ads">Go to Your Ads</Link></AppButton>
         </section>
       ) : (
+        <>
         <section className="acct-card">
           <h2 className="text-[20px] font-semibold">Brand page</h2>
+          <p className="mt-1 mb-[18px] text-[14px] leading-[1.5] text-ap-body">How your brand appears in the Gravity Pants Directory.</p>
+          <div className="mb-[18px] flex items-start gap-3 rounded-[14px] border border-ap-hairline px-4 py-3.5 text-[14px] leading-[1.5] text-ap-body">
+            <span className="grid size-[26px] flex-none place-items-center rounded-[8px] bg-ap-blue text-[13px] text-ap-card">★</span>
+            {d.brand.featured ? (
+              <span><b className="text-ap-ink">Featured brand.</b> Your matching reels appear in the Featured carousel at the top of search results.</span>
+            ) : (
+              <span><b className="text-ap-ink">Want to be featured?</b> On Business and Team plans, your matching reels appear in the Featured carousel at the top of search results. <Link to="/pricing" className="text-ap-blue">See plans</Link></span>
+            )}
+          </div>
           <LogoBox brandId={d.brand.id} name={d.brand.name} logo={d.brand.logo} onSaved={() => void qc.invalidateQueries({ queryKey: ["directory-account", ws] })} />
-          <DescriptionBox brandId={d.brand.id} description={d.brand.description} onSaved={() => void qc.invalidateQueries({ queryKey: ["directory-account", ws] })} />
+          <DescriptionBox brand={d.brand} onSaved={() => void qc.invalidateQueries({ queryKey: ["directory-account", ws] })} />
           <SlugBox brandId={d.brand.id} slug={d.brand.slug} onSaved={() => void qc.invalidateQueries({ queryKey: ["directory-account", ws] })} />
+        </section>
 
-          <table className="mt-2 w-full text-left text-[14px]">
-            <thead><tr className="border-b border-ap-hairline text-[12px] text-ap-muted"><th className="py-2 font-medium">Reel</th><th className="py-2 font-medium">Status</th><th /></tr></thead>
+        <section className="acct-card">
+          <h2 className="text-[20px] font-semibold">Reels in the Directory</h2>
+          <p className="mt-1 mb-4 text-[14px] leading-[1.5] text-ap-body">Share new reels from the last step of the editor. Hide any reel here at any time.</p>
+          <div className="overflow-x-auto">
+          <table className="w-full min-w-[520px] text-left text-[14px]">
+            <thead><tr className="border-b border-ap-hairline text-[13px] text-ap-muted"><th className="w-[64px] py-2" /><th className="py-2 font-medium">Reel</th><th className="py-2 font-medium">Size</th><th className="py-2 font-medium">Status</th><th /></tr></thead>
             <tbody>
-              {d.reels.map((r) => (
+              {d.reels.map((r) => {
+                const until = r.status === "live" && d.brand.planEndedAt ? new Date(new Date(d.brand.planEndedAt).getTime() + GRACE_DAYS * 86400000) : null;
+                const label = until ? `Live until ${until.toLocaleDateString(undefined, { month: "short", day: "numeric" })}` : r.status === "live" ? "Live" : STATUS_LABEL[r.status];
+                const tone = r.status === "live" ? (until ? "text-ap-amber" : "text-ap-green") : r.status === "in_review" ? "text-ap-amber" : "text-ap-muted";
+                return (
                 <tr key={r.adId} className="border-b border-ap-hairline last:border-0">
-                  <td className="py-2.5"><ReelName adId={r.adId} name={r.name} onSaved={() => void qc.invalidateQueries({ queryKey: ["directory-account", ws] })} /></td>
-                  <td className="py-2.5 text-ap-body">{STATUS_LABEL[r.status]}</td>
-                  <td className="py-2.5 text-right">
-                    {(r.status === "live" || r.status === "in_review") && (
+                  <td className="py-3 pr-3">{r.thumb ? <img src={r.thumb} alt="" className="size-11 rounded-[8px] object-cover" /> : <span className="block size-11 rounded-[8px] bg-ap-panel" />}</td>
+                  <td className="py-3"><ReelName adId={r.adId} name={r.name} onSaved={() => void qc.invalidateQueries({ queryKey: ["directory-account", ws] })} /></td>
+                  <td className="py-3 nums text-ap-body">{r.size || "—"}</td>
+                  <td className="py-3"><span className={cn("inline-flex items-center gap-1.5 font-medium", tone)}><span className="size-2 rounded-full bg-current" />{label}</span></td>
+                  <td className="py-3 text-right">
+                    {(r.status === "live" || r.status === "in_review") ? (
                       <AppButton variant="ghost" size="sm" onClick={async () => {
                         try { await hide({ data: { adId: r.adId } }); toast("Hidden from the Directory. Withdrawal saved to your log."); void qc.invalidateQueries({ queryKey: ["directory-account", ws] }); }
                         catch (e) { toast.error(e instanceof Error ? e.message : "Couldn't hide it. Try again."); }
                       }}>Hide</AppButton>
+                    ) : (
+                      <AppButton asChild variant="ghost" size="sm"><Link to="/app/ad/$id/share" params={{ id: r.adId }}>Share again</Link></AppButton>
                     )}
                   </td>
                 </tr>
-              ))}
+              );})}
+              {!d.reels.length && <tr><td colSpan={5} className="py-4 text-ap-muted">No reels shared yet.</td></tr>}
             </tbody>
           </table>
+          </div>
+        </section>
 
-          <div className="mt-[34px] mb-1.5 flex flex-wrap items-center justify-between gap-3">
+        <section className="acct-card">
+          <div className="mb-1.5 flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 className="text-[20px] font-semibold">Permission log</h2>
               <p className="mt-1 text-[13px] text-ap-muted">Every permission given or withdrawn for this brand. Records can't be edited or deleted.</p>
@@ -118,33 +145,52 @@ function DirectoryAccount() {
             </table>
           </div>
         </section>
+        </>
       )}
     </main>
   );
 }
 
-function DescriptionBox({ brandId, description, onSaved }: { brandId: string; description: string; onSaved: () => void }) {
+type BrandInfo = { id: string; name: string; description: string; website: string; category: string };
+const fieldCls = "w-full text-[14px]";
+function Counter({ n, max }: { n: number; max: number }) {
+  return <em className={cn("not-italic font-normal text-[12px] nums", nearLimit(n, max) ? "text-ap-amber" : "text-ap-muted")}>{n} / {max}</em>;
+}
+function DescriptionBox({ brand, onSaved }: { brand: BrandInfo; onSaved: () => void }) {
   const save = useServerFn(saveBrandDescription);
-  const [value, setValue] = useState(description);
+  const [name, setName] = useState(brand.name);
+  const [website, setWebsite] = useState(brand.website);
+  const [category, setCategory] = useState(brand.category);
+  const [value, setValue] = useState(brand.description);
   const [busy, setBusy] = useState(false);
-  const changed = value.trim() !== description;
+  const changed = value.trim() !== brand.description || name.trim() !== brand.name || website.trim() !== brand.website || category !== brand.category;
   const commit = async () => {
     setBusy(true);
     try {
-      await save({ data: { brandId, description: value } });
-      toast.success("Brand description saved.");
+      await save({ data: { brandId: brand.id, description: value, name: name.trim(), website: website.trim(), category: category as (typeof CATEGORIES)[number] } });
+      toast.success("Brand page saved.");
       onSaved();
-    } catch (e) { toast.error(e instanceof Error ? e.message : "Couldn't save the description"); }
+    } catch (e) { toast.error(e instanceof Error ? e.message : "Couldn't save your brand page"); }
     finally { setBusy(false); }
   };
+  const lbl = "mb-[7px] flex justify-between text-[13px] font-semibold";
   return (
     <div className="mt-[18px]">
-      <label htmlFor="brand-description" className="text-[14px] font-semibold">Brand description</label>
-      <p className="mt-0.5 text-[12px] text-ap-muted">Shown below your brand name in the page header.</p>
-      <textarea id="brand-description" value={value} maxLength={BRAND_DESCRIPTION_MAX} rows={4} onChange={(e) => setValue(e.target.value)} className="mt-2 w-full resize-none rounded-lg border border-ap-hairline bg-ap-card px-3 py-2 text-[14px] outline-hidden focus:border-ap-blue" />
-      <div className="mt-1.5 flex items-center justify-between gap-3">
-        <span className={cn("text-[12px] nums", nearLimit(value.length, BRAND_DESCRIPTION_MAX) ? "text-ap-amber" : "text-ap-muted")}>{value.length} / {BRAND_DESCRIPTION_MAX}</span>
-        <AppButton size="sm" disabled={busy || !changed} onClick={() => void commit()}>{busy ? "Saving..." : "Save description"}</AppButton>
+      <div className="grid gap-3.5 sm:grid-cols-2">
+        <label className="block"><span className={lbl}>Brand name <Counter n={name.length} max={BRAND_NAME_MAX} /></span>
+          <input value={name} maxLength={BRAND_NAME_MAX} onChange={(e) => setName(e.target.value)} className={fieldCls} /></label>
+        <label className="block"><span className={lbl}>Website</span>
+          <input type="url" value={website} placeholder="https://yourbrand.com" onChange={(e) => setWebsite(e.target.value)} className={fieldCls} /></label>
+      </div>
+      <label className="mt-4 block sm:w-1/2 sm:pr-[7px]"><span className={lbl}>Category</span>
+        <select value={category} onChange={(e) => setCategory(e.target.value)} className={fieldCls}>
+          {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
+        </select></label>
+      <label htmlFor="brand-description" className={cn(lbl, "mt-4")}>Brand description <Counter n={value.length} max={BRAND_DESCRIPTION_MAX} /></label>
+      <textarea id="brand-description" value={value} maxLength={BRAND_DESCRIPTION_MAX} rows={3} onChange={(e) => setValue(e.target.value)} className="w-full resize-y bg-ap-card px-3.5 py-2.5 text-[14px] leading-[1.5]" />
+      <small className="mt-1.5 block text-[12px] text-ap-muted">Shown under your brand name, and used as your page's description in search engines.</small>
+      <div className="mt-3 flex justify-end">
+        <AppButton disabled={busy || !changed || !name.trim()} onClick={() => void commit()}>{busy ? "Saving..." : "Save"}</AppButton>
       </div>
     </div>
   );

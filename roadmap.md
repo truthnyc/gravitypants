@@ -1,11 +1,6 @@
-# Roadmap: ad flow redesign + Directory
-- [x] Database: Directory tables, permission log, search
-- [ ] Shared step layout (top bar steps, left reel card, right card)
-- [ ] Photos step page
-- [ ] Edit step restyle
-- [ ] Export step restyle + share hand-off
-- [ ] Share step
-- [ ] Your Ads: Directory status + menu items
-- [ ] Account → Directory tab (slug, reels, permission log + CSV)
-- [ ] Public /directory search + /directory/$slug brand page
-- [ ] Admin → Directory review list
+# Roadmap
+- [x] Account Directory tab: name/website/category fields, featured note, split cards, reel thumbnails
+- [x] Favorites: square tiles, live Shared/Private text
+- [x] Team: seats bar, role picker, Resend invite
+- [x] Billing: Featured brand row
+- [x] Your Ads: verify Directory status + menu

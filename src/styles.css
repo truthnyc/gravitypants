@@ -72,6 +72,7 @@
   --ap-inner: #e8e8ed;
   --ap-green: #248a3d;
   --ap-amber: #b25000;
+  --ap-gold: #d4a017;
   --ap-switch-off: #d1d1d6;
   --ap-card: #ffffff;
   --ap-focus-ring: 0 0 0 3px rgba(0, 113, 227, 0.15);
@@ -84,6 +85,7 @@
 
 @theme inline {
   --color-ap-ink: var(--ap-ink);
+  --color-ap-gold: var(--ap-gold);
   --color-ap-body: var(--ap-body);
   --color-ap-muted: var(--ap-muted);
   --color-ap-blue: var(--ap-blue);
