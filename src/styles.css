@@ -706,7 +706,7 @@ html:has(.features-page) { scroll-behavior: smooth; }
 .examples-format-short { display: none; }
 .examples-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 40px 24px; }
 .examples-card { min-width: 0; position: relative; display: flex; flex-direction: column; gap: 16px; }
-.examples-card-media { height: 420px; border-radius: 22px; background: var(--site-panel); display: flex; align-items: center; justify-content: center; }
+.examples-card-media { position: relative; height: 420px; border-radius: 22px; background: var(--site-panel); display: flex; align-items: center; justify-content: center; }
 .examples-card:hover .examples-card-media { background: var(--site-inner); }
 .examples-reel { position: relative; overflow: hidden; border-radius: 8px; box-shadow: 0 30px 60px -28px color-mix(in oklab, var(--site-ink) 35%, transparent), 0 0 0 1px color-mix(in oklab, var(--site-ink) 4%, transparent); }
 .examples-reel-916 { width: 210px; aspect-ratio: 9/16; }.examples-reel-11 { width: 270px; aspect-ratio: 1; }.examples-reel-169 { width: 300px; aspect-ratio: 16/9; max-width: 100%; }

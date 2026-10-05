@@ -10,6 +10,9 @@ import { AccountTabs } from "@/components/billing/AccountTabs";
 import { AppButton } from "@/components/app-ui";
 import { Switch } from "@/components/ui/switch";
 import { ReelDetail } from "@/components/directory/DirectoryGrid";
+import { useSiteReelFavorites, SiteReelHeart, ReelRatioChip } from "@/components/site/SiteReelHeart";
+import { listSiteReels } from "@/lib/site/reels.functions";
+import { FORMAT_LABEL, type SiteReel } from "@/lib/site/reels";
 import { getMyFavorites, saveFavoritePage } from "@/lib/directory/favorites.functions";
 import { ratio, type DirectoryCard } from "@/lib/directory/directory";
 
@@ -24,6 +27,9 @@ function FavoritesPage() {
   const qc = useQueryClient();
   const q = useQuery({ queryKey: ["my-favorites"], queryFn: () => load() });
   const d = q.data;
+  const siteFavIds = useSiteReelFavorites().data ?? [];
+  const siteReels = useQuery({ queryKey: ["site-reels-all"], queryFn: () => listSiteReels() }).data ?? ([] as SiteReel[]);
+  const siteFavs = siteFavIds.map((id) => siteReels.find((r) => r.id === id)).filter((r): r is NonNullable<typeof r> => !!r);
   const [slug, setSlug] = useState("");
   const [title, setTitle] = useState("");
   const [pub, setPub] = useState(false);
@@ -96,11 +102,11 @@ function FavoritesPage() {
 
       <section className="acct-card">
         <h2 className="text-[20px] font-semibold">Saved reels</h2>
-        <p className="mt-1 mb-4 text-[14px] text-ap-body">Tap the heart in the Directory to save a reel. Tap it again here to remove it.</p>
+        <p className="mt-1 mb-4 text-[14px] text-ap-body">Tap the heart on any reel across the site to save it. Tap it again here to remove it.</p>
         {q.isLoading ? <div className="h-24" aria-busy="true" />
-          : d?.reels.length ? (
+          : (d?.reels.length || siteFavs.length) ? (
             <div className="grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-x-3.5 gap-y-[18px]">
-              {d.reels.map((c) => (
+              {(d?.reels ?? []).map((c) => (
                 <div key={c.reel_id} className="relative">
                   <button type="button" onClick={() => setOpen(c)} aria-label={`Open ${c.title ?? "reel"}`} className="relative block aspect-square w-full overflow-hidden rounded-[8px] bg-ap-panel">
                     {c.poster && <img src={c.poster} alt="" loading="lazy" className="absolute top-1/2 left-1/2 h-[72%] w-auto max-w-[72%] object-contain -translate-x-1/2 -translate-y-1/2 rounded-[6px] shadow-[0_0_0_1px_var(--ap-inner),0_18px_34px_-16px_rgba(29,29,31,.28)]" />}
@@ -114,9 +120,20 @@ function FavoritesPage() {
                   {c.tags.length > 0 && <p className="truncate text-[12px] text-ap-badge">{c.tags.slice(0, 3).join(" · ")}</p>}
                 </div>
               ))}
+              {siteFavs.map((r) => (
+                <div key={r.id} className="relative">
+                  <a href={r.href ?? "/showcase"} target={r.href ? "_blank" : undefined} rel="noreferrer" aria-label={`Open ${r.title}`} className="relative block aspect-square w-full overflow-hidden rounded-[8px] bg-ap-panel">
+                    {r.poster && <img src={r.poster} alt="" loading="lazy" className="absolute top-1/2 left-1/2 h-[72%] w-auto max-w-[72%] object-contain -translate-x-1/2 -translate-y-1/2 rounded-[6px] shadow-[0_0_0_1px_var(--ap-inner),0_18px_34px_-16px_rgba(29,29,31,.28)]" />}
+                  </a>
+                  <ReelRatioChip label={FORMAT_LABEL[r.format]} />
+                  <SiteReelHeart reelId={r.id} name={r.title} />
+                  <p className="mt-2 truncate text-[14px] font-semibold">{r.title}</p>
+                  <p className="text-[12px] text-ap-body nums">{r.seconds} sec · {r.brand}</p>
+                </div>
+              ))}
             </div>
           )
-          : <p className="text-[14px] text-ap-body">Tap the heart on any reel in the <Link to="/directory" className="text-ap-blue">Directory</Link> to save it here.</p>}
+          : <p className="text-[14px] text-ap-body">Tap the heart on any reel, for example on <Link to="/examples" className="text-ap-blue">Examples</Link> or <Link to="/showcase" className="text-ap-blue">Showcase</Link>, to save it here.</p>}
       </section>
       <section className="acct-card">
         <h2 className="text-[20px] font-semibold">Saved brands</h2>
