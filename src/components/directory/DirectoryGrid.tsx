@@ -73,8 +73,8 @@ export function CardCarousel({ cards, label, onOpen }: { cards: DirectoryCard[];
       items={cards.map((c) => ({
         key: c.reel_id,
         media: (hidden) => (
-          <button type="button" tabIndex={hidden ? -1 : undefined} onClick={() => onOpen(c)} className="block aspect-[9/16] w-full overflow-hidden rounded-[14px]" aria-label={`Open ${c.brand_name} reel`}>
-            <ReelPoster card={c} className="size-full" />
+          <button type="button" tabIndex={hidden ? -1 : undefined} onClick={() => onOpen(c)} className="dir-card-media block w-full" aria-label={`Open ${c.brand_name} reel`}>
+            <ReelThumb card={c} />
           </button>
         ),
         title: c.title ?? c.template_name ?? c.brand_name,
