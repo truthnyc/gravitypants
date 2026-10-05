@@ -12,7 +12,7 @@ import { Switch } from "@/components/ui/switch";
 import { ReelDetail } from "@/components/directory/DirectoryGrid";
 import { useSiteReelFavorites, SiteReelHeart } from "@/components/site/SiteReelHeart";
 import { listSiteReels } from "@/lib/site/reels.functions";
-import { FORMAT_LABEL, type SiteReel } from "@/lib/site/reels";
+import { type SiteReel } from "@/lib/site/reels";
 import { getMyFavorites, saveFavoritePage } from "@/lib/directory/favorites.functions";
 import { ratio, type DirectoryCard } from "@/lib/directory/directory";
 
