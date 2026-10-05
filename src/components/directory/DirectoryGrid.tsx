@@ -79,8 +79,8 @@ export function CardCarousel({ cards, label, onOpen }: { cards: DirectoryCard[];
             <ReelThumb card={c} />
           </button>
         ),
-        title: c.title ?? c.template_name ?? c.brand_name,
-        detail: `${c.photos} photos · ${c.seconds} sec · ${c.formats.map(ratio).join(" · ")} · ${c.brand_name}`,
+        title: c.brand_name,
+        detail: `${c.title ?? c.template_name ?? "Custom reel"} · ${ratio(c.formats[0])} · ${c.seconds} sec`,
         visit: c.website_url ? { href: c.website_url, label: `Visit ${c.brand_name}` } : undefined,
       }))}
     />
