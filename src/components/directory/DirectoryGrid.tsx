@@ -152,16 +152,6 @@ function DetailBody({ card, onClose }: { card: DirectoryCard; onClose: () => voi
         <div className="flex flex-wrap gap-1.5 text-[13px] nums">
           {[`${card.photos} photos`, `${card.seconds} sec`, ...card.formats.map(ratio)].map((c) => <span key={c} className="rounded-lg bg-ap-panel px-2.5 py-1">{c}</span>)}
         </div>
-        {(card.tags.length > 0 || card.moods.length > 0) && (
-          <div>
-            <p className="mb-1.5 text-[12px] font-semibold tracking-[0.06em] text-ap-body uppercase">Tags</p>
-            <div className="flex flex-wrap gap-1.5">
-              {[...card.moods, ...card.tags].map((t) => (
-                <Link key={t} to="/directory" search={{ q: t }} onClick={onClose} className="rounded-lg border border-ap-hairline bg-ap-card px-2.5 py-1 text-[13px] hover:border-ap-blue">{t}</Link>
-              ))}
-            </div>
-          </div>
-        )}
         {card.template_id && (
           <div className="mt-2 rounded-[14px] bg-ap-panel p-4 text-[14px] leading-normal">
             <p>Make one like this starts with: <b>{tname} template</b></p>
