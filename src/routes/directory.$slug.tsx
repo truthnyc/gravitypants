@@ -70,8 +70,15 @@ function BrandPage() {
           <Link to="/directory" className="inline-flex text-[15px] text-ap-blue">← Directory</Link>
           <header className="mt-10 mb-12 border-b border-ap-hairline pb-10 sm:mt-12 sm:pb-11">
             <div className="grid gap-x-5 gap-y-5 sm:grid-cols-[96px_minmax(0,1fr)] lg:grid-cols-[96px_minmax(0,1fr)_auto] lg:gap-x-6">
-              <div className="flex items-center justify-end gap-1 self-start sm:col-start-2 sm:row-start-1 lg:col-start-3">
-                <BrandActions brandId={brand.id} name={brand.name} />
+              <div className="flex flex-col items-end gap-4 self-start sm:col-start-2 sm:row-start-1 lg:col-start-3">
+                <div className="flex items-center gap-1">
+                  <BrandActions brandId={brand.id} name={brand.name} />
+                </div>
+                {brand.website_url && (
+                  <a href={brand.website_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-[15px] text-ap-blue">
+                    Visit {brand.name} <ArrowUpRight className="size-4" strokeWidth={1.7} />
+                  </a>
+                )}
               </div>
               {brand.logo_url?.startsWith("https://")
                 ? <img src={brand.logo_url} alt={`${brand.name} logo`} className="size-24 rounded-lg border border-ap-hairline bg-ap-card object-contain sm:row-start-1 sm:mt-10" />
@@ -86,11 +93,6 @@ function BrandPage() {
                   {[`${reels.length} public ${reels.length === 1 ? "reel" : "reels"}`, `${sizes.size} ${sizes.size === 1 ? "size" : "sizes"}`].map((c) => <span key={c} className="rounded-lg bg-ap-panel px-3 py-1.5">{c}</span>)}
                 </div>
               </div>
-              {brand.website_url && (
-                <a href={brand.website_url} target="_blank" rel="noreferrer" className="inline-flex h-[42px] items-center justify-center gap-2 rounded-lg bg-ap-blue px-6 text-[16px] font-light text-ap-card sm:col-start-2 sm:w-fit lg:col-start-3 lg:row-start-1 lg:mt-12 lg:min-w-[188px] lg:self-start">
-                  Visit {brand.name} <ArrowUpRight className="size-4" strokeWidth={1.7} />
-                </a>
-              )}
             </div>
           </header>
           <h2 className="mb-5 text-[24px] font-semibold tracking-[-0.02em]">Reels</h2>
