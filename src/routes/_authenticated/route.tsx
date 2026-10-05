@@ -1,6 +1,7 @@
 import { createFileRoute, notFound, Outlet, redirect, useRouterState } from "@tanstack/react-router";
 import { UpgradeDialog } from "@/components/billing/UpgradeDialog";
 import { SiteHeader } from "@/components/SiteHeader";
+import { AppFooter } from "@/components/AppFooter";
 import { PaymentProblemBanner } from "@/components/billing/BillingNotices";
 import { supabase } from "@/integrations/supabase/client";
 import { preferredWorkspaceId, rememberWorkspaceId, setWorkspaceId } from "@/lib/stillframe/workspace";
@@ -51,6 +52,7 @@ function Layout() {
       <PaymentProblemBanner />
       {!pathname.startsWith("/app/ad/") && !pathname.startsWith("/admin") && <SiteHeader variant="app" />}
       <Outlet />
+      {pathname.startsWith("/app/") && !pathname.startsWith("/app/ad/") && <AppFooter />}
       <UpgradeDialog />
     </>
   );
