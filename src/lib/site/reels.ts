@@ -8,6 +8,8 @@ export const categoryLabel = (c: string) => CATEGORY_LABEL[c] ?? c.replace(/[-_]
 export type SiteReel = {
   id: string;
   brand: string;
+  /** Slug of the matching Directory brand page (/directory/<slug>), when one exists. */
+  brandSlug: string | null;
   title: string;
   href: string | null;
   category: ReelCategory;
