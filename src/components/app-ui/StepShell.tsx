@@ -149,7 +149,7 @@ export function ReelCard({
   let acc = 0;
   return (
     <AppCard>
-      <div className="ap-preview-box relative grid h-[340px] place-items-center rounded-[18px] bg-ap-panel p-[22px] sm:h-[380px]">
+      <div className="ap-preview-box relative grid h-[340px] grid-cols-[minmax(0,1fr)] grid-rows-[minmax(0,1fr)] place-items-center overflow-hidden rounded-[18px] bg-ap-panel p-[22px] sm:h-[380px]">
         {preview}
         {lp && (
           <button
@@ -217,10 +217,10 @@ export function ReelCard({
               const on = formats.includes(f);
               const active = f === format;
               return (
-                <div key={f} className={cn("flex items-center justify-between gap-1 rounded-[10px] border bg-ap-card px-2.5 py-2", active ? "border-ap-blue shadow-[0_0_0_1px_var(--ap-blue)]" : "border-ap-hairline")}>
-                  <button type="button" onClick={() => onFormat(f)} aria-pressed={active} className="text-[13px] font-medium nums">{f}</button>
+                <div key={f} onClick={() => onFormat(f)} className={cn("flex cursor-pointer items-center justify-between gap-1 rounded-[10px] border bg-ap-card px-2.5 py-2", active ? "border-ap-blue shadow-[0_0_0_1px_var(--ap-blue)]" : "border-ap-hairline")}>
+                  <button type="button" onClick={(e) => { e.stopPropagation(); onFormat(f); }} aria-pressed={active} className="flex-1 text-left text-[13px] font-medium nums">{f}</button>
                   {onToggleFormat && (
-                    <AppSwitch checked={on} disabled={readOnly} onCheckedChange={(v) => onToggleFormat(f, v)} aria-label={`Include ${f}`} small />
+                    <span className="flex" onClick={(e) => e.stopPropagation()}><AppSwitch checked={on} disabled={readOnly} onCheckedChange={(v) => { onToggleFormat(f, v); if (!v && active) { const next = FORMATS.find((x) => x !== f && formats.includes(x)); if (next) onFormat(next); } }} aria-label={`Include ${f}`} small /></span>
                   )}
                 </div>
               );

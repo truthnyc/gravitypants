@@ -209,7 +209,7 @@ export function Stage({
   };
 
   return (
-    <div ref={wrapRef} className="flex h-full w-full items-center justify-center">
+    <div ref={wrapRef} className="flex h-full min-h-0 w-full min-w-0 items-center justify-center">
       <div
         className="relative rounded-lg shadow-ap-thumb"
         style={{ width: box.w, height: box.h, outline: selected === "photo" && showTags ? `2px solid var(--accent-blue)` : undefined, outlineOffset: 3 }}
