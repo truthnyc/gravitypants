@@ -16,6 +16,8 @@ export const Route = createFileRoute("/_authenticated")({
       await supabase.auth.signOut();
       localStorage.removeItem("gravity-pants:session-only");
     }
+    // Let a confirmation link finish signing the user in before checking.
+    await supabase.auth.getSession();
     const { data, error } = await supabase.auth.getUser();
     if (error || !data.user) {
       // Staff area stays hidden: signed-out visitors see "not found", not a sign-in prompt.
