@@ -112,7 +112,8 @@ function DirectoryPage() {
           <h1 className="mb-8 text-[clamp(30px,5vw,56px)] leading-[1.08] font-semibold tracking-[-0.035em] text-[#a1a1a6]">
             <b className="font-semibold text-ap-ink">
               <span className="text-[#a1a1a6]">It's </span>
-              {day}. Show me something:
+              <span className="text-ap-ink">{day}.</span>
+              <span className="text-[#a1a1a6]"> Show me something:</span>
               <br />
               {" "}
             </b>
