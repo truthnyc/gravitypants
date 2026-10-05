@@ -142,11 +142,11 @@ function DetailBody({ card, onClose }: { card: DirectoryCard; onClose: () => voi
   return (
     <div className="grid min-w-0 text-ap-ink sm:grid-cols-[1fr_1fr]">
       {card.video ? (
-        <div className="grid h-[min(52dvh,100vw)] place-items-center overflow-hidden bg-ap-panel p-5 sm:h-auto sm:min-h-[460px] sm:p-[10%]">
+        <div className="grid h-[min(52dvh,100vw)] grid-rows-[minmax(0,1fr)] place-items-center overflow-hidden bg-ap-panel p-5 sm:h-auto sm:min-h-[460px] sm:p-[10%]">
           <video src={card.video} poster={card.poster ?? undefined} controls autoPlay loop muted playsInline className="h-full max-h-full w-auto max-w-full rounded-lg object-contain shadow-ap-soft sm:h-auto sm:max-h-[520px]" />
         </div>
       ) : (
-        <ReelPoster card={card} className="h-[min(52dvh,100vw)] overflow-hidden sm:h-auto sm:min-h-[460px]" />
+        <ReelPoster card={card} className="h-[min(52dvh,100vw)] grid-rows-[minmax(0,1fr)] overflow-hidden sm:h-auto sm:min-h-[460px]" />
       )}
       <div className="flex min-w-0 flex-col gap-3 p-5 sm:p-8">
         <p className="text-[14px] font-semibold text-ap-badge">{card.category}</p>

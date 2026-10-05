@@ -25,7 +25,7 @@ export function SiteReelModal({ reel, onClose }: { reel: SiteReel | null; onClos
 function Body({ reel, onClose }: { reel: SiteReel; onClose: () => void }) {
   return (
     <div className="grid min-w-0 text-ap-ink sm:grid-cols-[1fr_1fr]">
-      <div className="grid h-[min(52dvh,100vw)] place-items-center overflow-hidden bg-ap-panel p-5 sm:h-auto sm:min-h-[460px] sm:p-[10%]">
+      <div className="grid h-[min(52dvh,100vw)] grid-rows-[minmax(0,1fr)] place-items-center overflow-hidden bg-ap-panel p-5 sm:h-auto sm:min-h-[460px] sm:p-[10%]">
         <video controls autoPlay loop muted playsInline poster={reel.poster ?? undefined} className="h-full max-h-full w-auto max-w-full rounded-lg object-contain shadow-ap-soft sm:h-auto sm:max-h-[520px]">
           {reel.videoWebm && <source src={reel.videoWebm} type="video/webm" />}
           <source src={reel.video} type="video/mp4" />
