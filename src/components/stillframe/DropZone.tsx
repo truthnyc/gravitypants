@@ -8,13 +8,12 @@ import { useCreateAdFromPhotos, useCreateAdFromTemplate, type Template, type Upl
 import { StartFromDialog } from "@/components/templates/TemplateDialogs";
 import { templateForExample } from "@/lib/site/example-template";
 
-export function DropZone({ spacious = false }: { spacious?: boolean }) {
+/** Shared "new ad from photos" flow: optional template pick, upload, then open the editor. */
+export function useNewAdFromPhotos() {
   const navigate = useNavigate();
   const createAd = useCreateAdFromPhotos();
   const fromTemplate = useCreateAdFromTemplate();
   const [pending, setPending] = useState<File[] | null>(null);
-  const fileInput = useRef<HTMLInputElement>(null);
-  const [dragging, setDragging] = useState(false);
   const [uploads, setUploads] = useState<UploadProgress[]>([]);
 
   async function startFromFiles(files: File[]) {
@@ -44,6 +43,38 @@ export function DropZone({ spacious = false }: { spacious?: boolean }) {
       toast.error("Those photos could not be uploaded. Please try again.");
     }
   }
+
+  const busy = createAd.isPending || fromTemplate.isPending;
+  const dialog = (
+    <StartFromDialog
+      open={Boolean(pending)}
+      count={pending?.length ?? 0}
+      onCancel={() => setPending(null)}
+      onPick={(t) => pending && void create(pending, t)}
+    />
+  );
+  return { startFromFiles, busy, uploads, dialog };
+}
+
+/** Header "+ New ad": same flow as the drop zone's Choose Photos. */
+export function NewAdButton({ className }: { className?: string }) {
+  const { startFromFiles, busy, dialog } = useNewAdFromPhotos();
+  const fileInput = useRef<HTMLInputElement>(null);
+  return (
+    <>
+      <button type="button" disabled={busy} onClick={() => fileInput.current?.click()} className={className}>
+        {busy ? "Uploading…" : "+ New ad"}
+      </button>
+      {dialog}
+      <input ref={fileInput} type="file" accept="image/*" multiple className="hidden" onChange={(event) => { const files = Array.from(event.target.files ?? []); event.target.value = ""; void startFromFiles(files); }} />
+    </>
+  );
+}
+
+export function DropZone({ spacious = false }: { spacious?: boolean }) {
+  const { startFromFiles, busy, uploads, dialog } = useNewAdFromPhotos();
+  const fileInput = useRef<HTMLInputElement>(null);
+  const [dragging, setDragging] = useState(false);
 
   return (
     <div
@@ -79,10 +110,10 @@ export function DropZone({ spacious = false }: { spacious?: boolean }) {
         <Button
           className="mt-3 min-h-12 w-full text-[16px] sm:w-auto lg:mt-4 lg:min-h-10 lg:text-[14px]"
           size="main"
-          disabled={(createAd.isPending || fromTemplate.isPending)}
+          disabled={busy}
           onClick={() => fileInput.current?.click()}
         >
-          {(createAd.isPending || fromTemplate.isPending) ? "Uploading…" : "Choose Photos"}
+          {busy ? "Uploading…" : "Choose Photos"}
         </Button>
         <Button
           asChild
@@ -115,12 +146,7 @@ export function DropZone({ spacious = false }: { spacious?: boolean }) {
         )}
       </div>
 
-      <StartFromDialog
-        open={Boolean(pending)}
-        count={pending?.length ?? 0}
-        onCancel={() => setPending(null)}
-        onPick={(t) => pending && void create(pending, t)}
-      />
+      {dialog}
 
       <input
         ref={fileInput}

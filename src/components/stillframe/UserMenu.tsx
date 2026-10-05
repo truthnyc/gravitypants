@@ -12,6 +12,7 @@ import { MediaImage } from "./MediaImage";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { checkAdmin } from "@/lib/stillframe/admin.functions";
+import { SHOW_DIRECTORY } from "@/lib/features";
 
 export function Avatar({ me, size = 32 }: { me: Me | null | undefined; size?: number }) {
   return (
@@ -63,9 +64,11 @@ export function UserMenu({ showName = false, websiteMenu = false }: { showName?:
         <DropdownMenuItem asChild>
           <Link to="/app/brand">Brand Kit</Link>
         </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link to="/app/account/directory">Directory</Link>
-        </DropdownMenuItem>
+        {SHOW_DIRECTORY && (
+          <DropdownMenuItem asChild>
+            <Link to="/app/account/directory">Directory</Link>
+          </DropdownMenuItem>
+        )}
         {adm?.admin && (
           <DropdownMenuItem asChild>
             <Link to="/admin">Admin</Link>
