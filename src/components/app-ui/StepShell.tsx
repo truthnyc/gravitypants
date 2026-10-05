@@ -44,7 +44,7 @@ const STEPS_ALL: { key: StepKey; label: string; to: "/app/ad/$id/photos" | "/app
 ];
 const STEPS = STEPS_ALL.filter((s) => SHOW_DIRECTORY || s.key !== "share");
 
-export type StepTitleInfo = { name: string; onRename?: (name: string) => void; status?: "saving" | "saved" | "error"; readOnly?: boolean };
+export type StepTitleInfo = { name: string; onRename?: ((name: string) => void) | undefined; status?: "saving" | "saved" | "error" | undefined; readOnly?: boolean | undefined };
 
 function AdName({ title }: { title: StepTitleInfo }) {
   const { name, onRename, status, readOnly } = title;
