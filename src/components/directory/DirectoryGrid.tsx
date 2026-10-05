@@ -158,7 +158,7 @@ function DetailBody({ card, onClose }: { card: DirectoryCard; onClose: () => voi
             <p className="mt-1 text-ap-body">You add your own photos, words, colors and fonts, or use your brand kit.</p>
           </div>
         )}
-        <button type="button" disabled={!card.template_id || busy} onClick={() => void start()} className="mt-1 h-12 rounded-lg bg-ap-blue text-[16px] font-semibold text-ap-card disabled:opacity-40">
+        <button type="button" disabled={!card.template_id || busy} onClick={() => void start()} className="mt-auto h-12 rounded-lg bg-ap-blue text-[16px] font-semibold text-ap-card disabled:opacity-40">
           {busy ? "Starting…" : "Make one like this"}
         </button>
         {reporting ? (
