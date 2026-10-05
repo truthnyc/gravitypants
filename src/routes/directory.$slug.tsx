@@ -66,32 +66,32 @@ function BrandPage() {
   return (
     <SiteShell>
       <main className="font-ap text-ap-ink">
-        <div className="mx-auto max-w-[1280px] px-6 pt-12 pb-16">
-          <Link to="/directory" className="text-[14px] text-ap-blue">← Directory</Link>
-          <header className="mt-6 mb-12 flex flex-col gap-6 sm:flex-row sm:items-start">
-            <div className="flex items-center justify-end gap-2 sm:order-3">
-              <BrandActions brandId={brand.id} name={brand.name} />
-            </div>
-            {brand.logo_url?.startsWith("https://")
-              ? <img src={brand.logo_url} alt={`${brand.name} logo`} className="size-24 rounded-[16px] border border-ap-hairline bg-ap-card object-contain" />
-              : <div className="grid size-24 shrink-0 place-items-center rounded-[16px] bg-ap-blue text-[30px] font-semibold text-ap-card">{initials}</div>}
-            <div className="min-w-0 flex-1">
-              <p className="text-[15px] font-semibold text-ap-badge">{brand.category}</p>
-              <div className="mt-1 flex flex-wrap items-center gap-3">
-                <h1 className="text-[clamp(30px,4vw,48px)] leading-tight font-semibold tracking-[-0.03em]">{brand.name}</h1>
-                {brand.featured && <span className="rounded-lg bg-ap-soft-blue px-2.5 py-1 text-[13px] font-semibold tracking-normal text-ap-blue"><span className="text-[#d4a017]">★</span> Featured brand</span>}
+        <div className="mx-auto max-w-[1440px] px-6 pt-10 pb-16 sm:px-8 lg:px-10">
+          <Link to="/directory" className="inline-flex text-[15px] text-ap-blue">← Directory</Link>
+          <header className="mt-10 mb-12 border-b border-ap-hairline pb-10 sm:mt-12 sm:pb-11">
+            <div className="grid gap-x-5 gap-y-5 sm:grid-cols-[96px_minmax(0,1fr)] lg:grid-cols-[96px_minmax(0,1fr)_auto] lg:gap-x-6">
+              <div className="flex items-center justify-end gap-1 self-start sm:col-start-2 sm:row-start-1 lg:col-start-3">
+                <BrandActions brandId={brand.id} name={brand.name} />
               </div>
-              {brand.description && <p className="mt-2 max-w-[640px] text-[17px] leading-normal text-ap-body">{brand.description}</p>}
-              <div className="mt-4 flex flex-wrap gap-1.5 text-[13px] nums">
-                {[`${reels.length} public ${reels.length === 1 ? "reel" : "reels"}`, `${sizes.size} ${sizes.size === 1 ? "size" : "sizes"}`].map((c) => <span key={c} className="rounded-lg bg-ap-panel px-2.5 py-1">{c}</span>)}
+              {brand.logo_url?.startsWith("https://")
+                ? <img src={brand.logo_url} alt={`${brand.name} logo`} className="size-24 rounded-lg border border-ap-hairline bg-ap-card object-contain sm:row-start-1 sm:mt-10" />
+                : <div className="grid size-24 shrink-0 place-items-center rounded-lg border border-ap-hairline bg-ap-card text-[30px] font-semibold text-ap-ink sm:row-start-1 sm:mt-10">{initials}</div>}
+              <div className="min-w-0 sm:col-start-2 sm:row-start-1">
+                <p className="text-[15px] font-semibold text-ap-badge">{brand.category}</p>
+                <div className="mt-2 flex flex-wrap items-center gap-3">
+                  <h1 className="text-[clamp(36px,4vw,52px)] leading-[1.05] font-semibold">{brand.name}</h1>
+                  {brand.featured && <span className="rounded border border-ap-hairline bg-ap-card px-3 py-1 text-[13px] font-semibold text-ap-blue">Featured</span>}
+                </div>
+                {brand.description && <p className="mt-5 max-w-[760px] text-[18px] leading-[1.5] text-ap-body">{brand.description}</p>}
+                <div className="mt-5 flex flex-wrap gap-2 text-[13px] nums">
+                  {[`${reels.length} public ${reels.length === 1 ? "reel" : "reels"}`, `${sizes.size} ${sizes.size === 1 ? "size" : "sizes"}`].map((c) => <span key={c} className="rounded-lg bg-ap-panel px-3 py-1.5">{c}</span>)}
+                </div>
               </div>
-              <div className="mt-5 flex flex-wrap gap-2">
               {brand.website_url && (
-                <a href={brand.website_url} target="_blank" rel="noreferrer" className="inline-flex h-11 items-center gap-1.5 rounded-lg bg-ap-blue px-5 text-[15px] font-semibold text-ap-card">
+                <a href={brand.website_url} target="_blank" rel="noreferrer" className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-ap-blue px-6 text-[16px] font-semibold text-ap-card sm:col-start-2 sm:w-fit lg:col-start-3 lg:row-start-1 lg:mt-12 lg:min-w-[188px] lg:self-start">
                   Visit {brand.name} <ArrowUpRight className="size-4" strokeWidth={1.7} />
                 </a>
               )}
-              </div>
             </div>
           </header>
           <h2 className="mb-5 text-[24px] font-semibold tracking-[-0.02em]">Reels</h2>
