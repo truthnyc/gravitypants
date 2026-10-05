@@ -4,13 +4,14 @@ import type { DirectoryCard } from "./directory";
 export type FavBrand = { id: string; name: string; slug: string; category: string; logo: string | null };
 
 /** A person's saved reels and brands, limited to what is public in the Directory right now. */
-export async function loadFavorites(userId: string): Promise<{ reels: DirectoryCard[]; brands: FavBrand[] }> {
+export async function loadFavorites(userId: string): Promise<{ reels: DirectoryCard[]; brands: FavBrand[]; siteReelIds: string[] }> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { toCards } = await import("./directory.server");
   const sb = supabaseAdmin as any;
-  const [{ data: rf }, { data: bf }] = await Promise.all([
+  const [{ data: rf }, { data: bf }, { data: sf }] = await Promise.all([
     sb.from("directory_reel_favorites").select("reel_id, created_at").eq("user_id", userId).order("created_at", { ascending: false }),
     sb.from("directory_favorites").select("brand_id, created_at").eq("user_id", userId).order("created_at", { ascending: false }),
+    sb.from("site_reel_favorites").select("reel_id, created_at").eq("user_id", userId).order("created_at", { ascending: false }),
   ]);
   const reelIds = (rf ?? []).map((r: any) => r.reel_id);
   const brandIds = (bf ?? []).map((r: any) => r.brand_id);
@@ -45,5 +46,5 @@ export async function loadFavorites(userId: string): Promise<{ reels: DirectoryC
       signedLogos.set(b.id, url);
     }
   }));
-  return { reels: cards, brands: okBrands.map((b) => ({ id: b.id, name: b.name, slug: b.slug, category: b.category, logo: signedLogos.get(b.id) ?? null })) };
+  return { siteReelIds: (sf ?? []).map((r: any) => r.reel_id as string), reels: cards, brands: okBrands.map((b) => ({ id: b.id, name: b.name, slug: b.slug, category: b.category, logo: signedLogos.get(b.id) ?? null })) };
 }
