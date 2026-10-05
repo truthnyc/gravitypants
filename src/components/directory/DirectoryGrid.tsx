@@ -39,6 +39,8 @@ function ReelThumb({ card }: { card: DirectoryCard }) {
     </div>
   );
 }
+
+function matched(card: DirectoryCard, q: string) {
   const words = q.toLowerCase().split(/\s+/).filter(Boolean);
   const all = [...card.moods, ...card.tags];
   const hits = words.length ? all.filter((t) => words.some((w) => t.includes(w) || w.includes(t))) : [];
@@ -49,12 +51,11 @@ export function DirectoryGrid({ cards, q = "", onOpen }: { cards: DirectoryCard[
   return (
     <div className="grid gap-5 font-ap [grid-template-columns:repeat(auto-fill,minmax(180px,1fr))]">
       {cards.map((c) => (
-        <article key={c.reel_id} className="min-w-0">
-          <button type="button" onClick={() => onOpen(c)} className="relative block aspect-square w-full overflow-hidden rounded-[14px] focus-visible:outline-2 focus-visible:outline-ap-blue" aria-label={`Open ${c.brand_name} reel`}>
-            <ReelPoster card={c} className="size-full" />
-            <span className="absolute top-2 left-2 rounded-md bg-ap-card px-1.5 py-0.5 text-[11px] font-semibold nums">{c.formats.map(ratio).join(" · ")}</span>
+        <article key={c.reel_id} className="dir-card min-w-0">
+          <button type="button" onClick={() => onOpen(c)} className="dir-card-media block w-full focus-visible:outline-2 focus-visible:outline-ap-blue" aria-label={`Open ${c.brand_name} reel`}>
+            <ReelThumb card={c} />
           </button>
-          <div className="mt-2.5 truncate font-semibold">{c.title ?? c.template_name ?? "Custom reel"}</div>
+          <div className="mt-3 truncate font-semibold">{c.title ?? c.template_name ?? "Custom reel"}</div>
           <div className="text-[13px] text-ap-muted nums">
             {c.seconds} sec · <Link to="/directory/$slug" params={{ slug: c.brand_slug }} className="text-ap-ink hover:text-ap-blue">{c.brand_name}</Link>
           </div>
