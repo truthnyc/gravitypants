@@ -40,3 +40,4 @@
 - Admin analytics: public visits go to `page_views` (anon insert) via `src/lib/site/track.ts`; sign-up UTM in user metadata; `analytics.server.ts` feeds the Analytics page and deduped Monday `/api/public/weekly-report`.
 - Directory: all access via `src/lib/directory/directory.functions.ts` (see its AGENTS.md).
 - One shared `SiteHeader` (`src/components/SiteHeader.tsx`, variant site|app) is the header everywhere except the editor; feature flags live in `src/lib/features.ts` (`SHOW_DIRECTORY` gates every Directory link) — headers can't drift and Directory ships when ready.
+- Website reel favorites: `site_reel_favorites` (own rows only) via `SiteReelHeart`/`useSiteReelFavorites` in src/components/site/SiteReelHeart.tsx; the Favorites page shows them alongside Directory reels — one heart for every reel tile.
