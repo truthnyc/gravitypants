@@ -52,6 +52,7 @@ function Layout() {
       <PaymentProblemBanner />
       {!pathname.startsWith("/app/ad/") && !pathname.startsWith("/admin") && <SiteHeader variant="app" />}
       <Outlet />
+      {pathname.startsWith("/app/") && !pathname.startsWith("/app/ad/") && <AppFooter />}
       <UpgradeDialog />
     </>
   );
