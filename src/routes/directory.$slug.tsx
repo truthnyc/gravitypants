@@ -87,7 +87,7 @@ function BrandPage() {
                 </div>
               </div>
               {brand.website_url && (
-                <a href={brand.website_url} target="_blank" rel="noreferrer" className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-ap-blue px-6 text-[16px] font-semibold text-ap-card sm:col-start-2 sm:w-fit lg:col-start-3 lg:row-start-1 lg:mt-12 lg:min-w-[188px] lg:self-start">
+                <a href={brand.website_url} target="_blank" rel="noreferrer" className="inline-flex h-[42px] items-center justify-center gap-2 rounded-lg bg-ap-blue px-6 text-[16px] font-light text-ap-card sm:col-start-2 sm:w-fit lg:col-start-3 lg:row-start-1 lg:mt-12 lg:min-w-[188px] lg:self-start">
                   Visit {brand.name} <ArrowUpRight className="size-4" strokeWidth={1.7} />
                 </a>
               )}
