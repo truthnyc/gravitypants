@@ -113,12 +113,12 @@ function BillingPage() {
 
         {canManage ? (
           <div className="mt-6 flex flex-wrap gap-2">
-            <Button asChild variant={paid ? "plain" : "default"}>
-              <Link to="/pricing">{paid ? "Change Plan" : "Pick a Plan"}</Link>
+            <Button asChild>
+              <Link to="/pricing">{paid ? "Change plan" : "Pick a plan"}</Link>
             </Button>
             {billing?.stripe_customer_id && (
               <Button variant="plain" onClick={() => void manage().then(() => refetch())}>
-                Manage Billing
+                Manage billing ↗
               </Button>
             )}
           </div>
