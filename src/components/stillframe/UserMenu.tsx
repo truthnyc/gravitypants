@@ -72,6 +72,10 @@ export function UserMenu({ showName = false }: { showName?: boolean }) {
           </DropdownMenuItem>
         )}
         <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link to="/">Visit website ↗</Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={() => void signOut()}>Sign Out</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
