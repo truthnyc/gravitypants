@@ -95,7 +95,7 @@ function FavoritesPage() {
           <ul className="grid gap-2 sm:grid-cols-2">
             {d.brands.map((b) => (
               <li key={b.id}><Link to="/directory/$slug" params={{ slug: b.slug }} className="block rounded-[4px] p-3 hover:text-ap-blue">
-                <span className="flex size-9 items-center justify-center rounded-[4px] border border-ap-hairline bg-ap-card">
+                <span className="flex size-12 items-center justify-center rounded-[4px] border border-ap-hairline bg-ap-card">
                   {b.logo
                     ? <img src={b.logo} alt="" className="max-h-full max-w-full object-contain" />
                     : <span className="text-[16px] font-semibold text-ap-muted">{b.name.charAt(0).toUpperCase()}</span>}

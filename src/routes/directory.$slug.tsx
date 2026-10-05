@@ -73,7 +73,7 @@ function BrandPage() {
               <BrandActions brandId={brand.id} name={brand.name} />
             </div>
             {brand.logo_url?.startsWith("https://")
-              ? <img src={brand.logo_url} alt={`${brand.name} logo`} className="size-24 rounded-[16px] object-contain" />
+              ? <img src={brand.logo_url} alt={`${brand.name} logo`} className="size-24 rounded-[16px] border border-ap-hairline bg-ap-card object-contain" />
               : <div className="grid size-24 shrink-0 place-items-center rounded-[16px] bg-ap-blue text-[30px] font-semibold text-ap-card">{initials}</div>}
             <div className="min-w-0 flex-1">
               <p className="text-[15px] font-semibold text-ap-badge">{brand.category}</p>
