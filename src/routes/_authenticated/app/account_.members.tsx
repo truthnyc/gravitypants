@@ -203,7 +203,7 @@ function MembersPage() {
       <AccountTabs />
 
       <section className="acct-card">
-        <h2 className="text-[17px] font-semibold">Workspaces</h2>
+        <h2 className="text-[20px] font-semibold">Workspaces</h2>
         <p className="mt-0.5 text-[13px] text-secondary-text">
           {isTeamPlan ? `Your Team plan lets you invite ${seats - 1} teammates with shared ads, brand kits and templates.` : "Team workspaces with shared ads and brand kits are part of the Team plan."}
         </p>
@@ -218,7 +218,7 @@ function MembersPage() {
               )}
             >
               <span>{w.name}</span>
-              <span className="text-[12px] text-secondary-text">{w.id === ws ? "Current" : w.role}</span>
+              <span className="text-[12px] capitalize text-secondary-text">{w.id === ws ? <span className="font-medium text-ap-blue">Current · {w.role}</span> : <>{w.role} · <span className="text-ap-blue">Switch</span></>}</span>
             </button>
           ))}
         </div>
@@ -226,14 +226,14 @@ function MembersPage() {
           <div className="mt-3 flex flex-wrap gap-2">
             <Button variant="plain" onClick={() => void renameWorkspace()}>Rename “{current.name}”</Button>
             {current.role === "owner" && (workspaces?.length ?? 0) > 1 && (
-              <Button variant="plain" className="text-destructive" onClick={() => void deleteWorkspace()}>Delete workspace</Button>
+              <Button variant="destructive-plain" onClick={() => void deleteWorkspace()}>Delete workspace…</Button>
             )}
           </div>
         )}
         <div className="mt-4">
           {current && current.role !== "owner" ? null : isTeamPlan ? (
             <Button variant="plain" onClick={() => void createTeamWorkspace()} disabled={creating}>
-              {creating ? "Creating…" : "Create Team Workspace"}
+              {creating ? "Creating…" : "+ Create workspace"}
             </Button>
           ) : (
             <p className="text-[13px] text-secondary-text">
@@ -244,13 +244,17 @@ function MembersPage() {
       </section>
 
       <section className="acct-card">
-        <h2 className="text-[17px] font-semibold">Members</h2>
-        <p className="mt-0.5 text-[13px] text-secondary-text">
-          {members?.length ?? 0} of {seats} {seats === 1 ? "seat" : "seats"} used
-        </p>
+        <h2 className="text-[20px] font-semibold">Members</h2>
+        <div className="mt-3 flex items-center gap-3">
+          <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-ap-inner">
+            <div className="h-full rounded-full bg-ap-blue" style={{ width: `${Math.min(100, ((members?.length ?? 0) / Math.max(1, seats)) * 100)}%` }} />
+          </div>
+          <span className="text-[12px] text-ap-muted nums">{members?.length ?? 0} of {seats} {seats === 1 ? "seat" : "seats"} used</span>
+        </div>
         <div className="mt-4 flex flex-col divide-y divide-border/60">
           {(members ?? []).map((m) => (
-            <div key={m.user_id} className="flex flex-wrap items-center gap-2 py-3">
+            <div key={m.user_id} className="flex flex-wrap items-center gap-3 py-3">
+              <span className="grid size-8 flex-none place-items-center rounded-full bg-ap-ink text-[13px] font-semibold text-ap-card">{(m.display_name || m.email).charAt(0).toUpperCase()}</span>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-[14px] font-medium">{m.display_name || m.email}</p>
                 {m.display_name && <p className="truncate text-[12px] text-secondary-text">{m.email}</p>}
@@ -278,7 +282,7 @@ function MembersPage() {
 
       {isAdmin && (
         <section className="acct-card">
-          <h2 className="text-[17px] font-semibold">Invite by email</h2>
+          <h2 className="text-[20px] font-semibold">Invite by email</h2>
           <p className="mt-0.5 text-[13px] text-secondary-text">They'll get an email with a link to join after they sign in. Editors make and export ads. Admins can also manage billing, members and the Directory.</p>
           <div className="mt-4 flex flex-col gap-2 sm:flex-row">
             <label htmlFor="invite-email" className="sr-only">Email</label>
@@ -300,7 +304,7 @@ function MembersPage() {
               <option value="admin">Admin</option>
             </select>
             <Button disabled={!email.trim() || busy} onClick={() => void sendInvite()}>
-              {busy ? "Sending…" : "Send Invite"}
+              {busy ? "Sending…" : "Send invite"}
             </Button>
           </div>
 
