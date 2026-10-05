@@ -85,6 +85,7 @@ export function PhotosStep({ initial, readOnly = false }: { initial: EditorDoc; 
     <StepShell
       adId={doc.project.id}
       step="photos"
+      title={{ name: doc.project.name, onRename: (name) => apply((d) => ({ ...d, project: { ...d.project, name } })), status: readOnly ? undefined : status, readOnly }}
       left={
         <ReelCard
           preview={player.preview}
