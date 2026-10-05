@@ -28,6 +28,7 @@ export function SiteReelHeart({ reelId, name }: { reelId: string; name: string }
   const qc = useQueryClient();
   const navigate = useNavigate();
   const saved = !!ids?.includes(reelId);
+  if (!/^[0-9a-f-]{36}$/i.test(reelId)) return null;
   async function toggle(e: React.MouseEvent) {
     e.preventDefault(); e.stopPropagation();
     if (ids === null || ids === undefined) { void navigate({ to: "/signin" }); return; }
