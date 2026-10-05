@@ -14,7 +14,7 @@ import { useSiteReelFavorites, SiteReelHeart } from "@/components/site/SiteReelH
 import { listSiteReels } from "@/lib/site/reels.functions";
 import { type SiteReel } from "@/lib/site/reels";
 import { getMyFavorites, saveFavoritePage } from "@/lib/directory/favorites.functions";
-import { ratio, type DirectoryCard } from "@/lib/directory/directory";
+import { ratio, toSlug, type DirectoryCard } from "@/lib/directory/directory";
 
 export const Route = createFileRoute("/_authenticated/app/account_/favorites")({
   head: () => ({ meta: [{ title: "My favorites — Gravity Pants" }, { name: "robots", content: "noindex" }] }),
