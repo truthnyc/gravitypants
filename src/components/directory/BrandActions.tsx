@@ -2,7 +2,7 @@ import { Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { LikeSave } from "./LikeSave";
 
-const btn = "inline-flex size-9 items-center justify-center rounded-lg text-ap-muted transition-colors hover:text-ap-ink";
+const btn = "inline-flex h-11 min-w-11 items-center justify-center rounded-lg bg-ap-panel text-ap-muted transition-colors hover:text-ap-ink";
 
 /** Share, plus Like and Save to favorites (sign-up prompt when signed out). */
 export function BrandActions({ brandId, name }: { brandId: string; name: string }) {
