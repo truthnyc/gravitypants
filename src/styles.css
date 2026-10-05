@@ -78,6 +78,7 @@
   --ap-card: #ffffff;
   --ap-focus-ring: 0 0 0 3px rgba(0, 113, 227, 0.15);
   --ap-shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 1px rgba(0, 0, 0, 0.04);
+  --ap-shadow-menu: 0 0 0 1px #e5e5ea, 0 20px 40px -12px rgba(0, 0, 0, 0.2);
   --ap-shadow-thumb: 0 14px 40px rgba(20, 30, 50, 0.18);
   --ap-shadow-knob: 0 2px 4px rgba(0, 0, 0, 0.2);
   --ap-font:

@@ -131,3 +131,12 @@ export function WorkspaceList({ onSwitch }: { onSwitch?: () => void }) {
     </div>
   );
 }
+
+/** Switch to another workspace the signed-in person belongs to. */
+export async function switchWorkspace(id: string, ids: string[]) {
+  if (id === peekWorkspaceId()) return;
+  const { data: auth } = await supabase.auth.getUser();
+  if (!auth.user || !ids.includes(id)) return;
+  rememberWorkspaceId(auth.user.id, id);
+  window.location.href = "/app/ads";
+}
