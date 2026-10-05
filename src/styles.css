@@ -205,6 +205,7 @@
   --site-soft-blue: #eef4fb;
   --site-eyebrow: #0058b0;
   --site-primary: #0071e3;
+  --site-link: #0062c4;
   --site-primary-hover: #0062c4;
   --site-on-primary: #ffffff;
   --site-line: #f0f0f2;
@@ -1013,9 +1014,9 @@ html:has(.features-page) { scroll-behavior: smooth; }
 .home-person > span { color: #52525a; }
 
 /* Showcase, contact page and gallery calls to action */
-.showcase-visit { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; color: var(--site-primary); font-size: 12px; font-weight: 500; }
+.showcase-visit { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; color: var(--site-link); font-size: 12px; font-weight: 500; }
 .site-gallery-cta { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; padding-top: 28px; font-size: 17px; color: var(--site-secondary); }
-.site-gallery-cta a { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; color: var(--site-primary); font-weight: 500; }
+.site-gallery-cta a { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; color: var(--site-link); font-weight: 500; }
 .contact-section { padding-bottom: 96px; }
 .contact-card { max-width: 760px; padding: 32px; }
 .contact-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }

@@ -650,7 +650,7 @@ function Home() {
               </div>
             </article>
             <article className="site-card home-step">
-              <div className="home-step-art">
+              <div className="home-step-art" aria-hidden="true">
                 <div className="home-step-edit">
                   <b>New season.</b>
                   <small>[Your product line]</small>
@@ -664,7 +664,7 @@ function Home() {
               </div>
             </article>
             <article className="site-card home-step">
-              <div className="home-step-art">
+              <div className="home-step-art" aria-hidden="true">
                 <FormatShapes />
               </div>
               <div className="home-step-copy">
