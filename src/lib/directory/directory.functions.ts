@@ -263,13 +263,13 @@ export const saveBrandDescription = createServerFn({ method: "POST" })
   }).parse(d))
   .handler(async ({ data, context }) => {
     const patch: Record<string, unknown> = { description: data.description || null };
-    if (data.name) patch.name = data.name;
-    if (data.category) patch.category = data.category;
+    if (data.name) patch["name"] = data.name;
+    if (data.category) patch["category"] = data.category;
     if (data.website !== undefined) {
       let w = data.website;
       if (w && !/^https?:\/\//i.test(w)) w = `https://${w}`;
       if (w) { try { new URL(w); } catch { throw new Error("That website link doesn't look right."); } }
-      patch.website_url = w || null;
+      patch["website_url"] = w || null;
     }
     const { error } = await (context.supabase as any).from("directory_brands")
       .update(patch)
