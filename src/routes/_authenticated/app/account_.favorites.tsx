@@ -52,10 +52,10 @@ function FavoritesPage() {
   };
 
   return (
-    <main className="mx-auto flex max-w-[880px] flex-col gap-5 px-4 py-6 sm:px-8 sm:py-10">
-      <h1 className="text-[28px] font-bold tracking-[-0.02em]">Account</h1>
-      <div className="max-w-[640px]"><AccountTabs /></div>
-      <section className="rounded-[24px] bg-ap-card p-[26px] font-ap text-ap-ink">
+    <main className="acct mx-auto flex w-full max-w-[780px] flex-col gap-4 px-4 pb-20 pt-9 sm:px-6">
+      <h1 className="acct-h1">Account</h1>
+      <AccountTabs />
+      <section className="acct-card">
         <h2 className="text-[20px] font-semibold">Share my favorites</h2>
         <p className="mt-1 text-[14px] text-ap-body">Your favorites are private until you turn on sharing. Anyone with the link can then see the reels and brands you saved.</p>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -83,13 +83,13 @@ function FavoritesPage() {
         </div>
       </section>
 
-      <section className="rounded-[24px] bg-ap-card p-[26px] font-ap text-ap-ink">
+      <section className="acct-card">
         <h2 className="mb-4 text-[20px] font-semibold">Saved reels</h2>
         {q.isLoading ? <div className="h-24" aria-busy="true" />
           : d?.reels.length ? <DirectoryGrid cards={d.reels} onOpen={setOpen} />
           : <p className="text-[14px] text-ap-body">Tap the heart on any reel in the <Link to="/directory" className="text-ap-blue">Directory</Link> to save it here.</p>}
       </section>
-      <section className="rounded-[24px] bg-ap-card p-[26px] font-ap text-ap-ink">
+      <section className="acct-card">
         <h2 className="mb-4 text-[20px] font-semibold">Saved brands</h2>
         {d?.brands.length ? (
           <ul className="grid gap-2 sm:grid-cols-2">

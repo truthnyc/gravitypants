@@ -56,12 +56,12 @@ function BillingPage() {
   const canManage = myRole === "owner" || myRole === "admin";
 
   return (
-    <main className="mx-auto flex max-w-[640px] flex-col gap-5 px-4 py-6 sm:px-8 sm:py-10">
-      <h1 className="text-[28px] font-bold tracking-[-0.02em]">Account</h1>
+    <main className="acct mx-auto flex w-full max-w-[780px] flex-col gap-4 px-4 pb-20 pt-9 sm:px-6">
+      <h1 className="acct-h1">Account</h1>
       <AccountTabs />
 
       {thanks && (
-        <section role="status" className="rounded-sm bg-card p-6 shadow-card">
+        <section role="status" className="acct-card">
           <h2 className="text-[17px] font-semibold">{thanks === "pack" ? "Extra exports added" : "Thank you for choosing Gravity Pants"}</h2>
           <p className="mt-1 text-[14px] text-secondary-text nums">
             {thanks === "pack"
@@ -75,7 +75,7 @@ function BillingPage() {
         </section>
       )}
 
-      <section className="rounded-sm bg-card p-6 shadow-card">
+      <section className="acct-card">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <h2 className="text-[17px] font-semibold">{billing ? planName(billing.plan) : " "}</h2>
           {paid && plan && (

@@ -50,19 +50,19 @@ function DirectoryAccount() {
   };
 
   return (
-    <main className="mx-auto flex max-w-[880px] flex-col gap-5 px-4 py-6 sm:px-8 sm:py-10">
-      <h1 className="text-[28px] font-bold tracking-[-0.02em]">Account</h1>
-      <div className="max-w-[640px]"><AccountTabs /></div>
+    <main className="acct mx-auto flex w-full max-w-[780px] flex-col gap-4 px-4 pb-20 pt-9 sm:px-6">
+      <h1 className="acct-h1">Account</h1>
+      <AccountTabs />
       {q.isLoading ? (
         <div className="h-40 rounded-[24px] bg-ap-card" aria-busy="true" />
       ) : !d ? (
-        <section className="rounded-[24px] bg-ap-card p-[26px] font-ap">
+        <section className="acct-card">
           <h2 className="text-[20px] font-semibold">No brand page yet</h2>
           <p className="mt-1 text-[14px] text-ap-body">Share a reel from its Share step to create your brand page in the Gravity Pants Directory.</p>
           <AppButton asChild className="mt-4"><Link to="/app/ads">Go to Your Ads</Link></AppButton>
         </section>
       ) : (
-        <section className="rounded-[24px] bg-ap-card p-[26px] font-ap text-ap-ink">
+        <section className="acct-card">
           <h2 className="text-[20px] font-semibold">My reels</h2>
           <LogoBox brandId={d.brand.id} name={d.brand.name} logo={d.brand.logo} onSaved={() => void qc.invalidateQueries({ queryKey: ["directory-account", ws] })} />
           <DescriptionBox brandId={d.brand.id} description={d.brand.description} onSaved={() => void qc.invalidateQueries({ queryKey: ["directory-account", ws] })} />

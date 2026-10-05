@@ -28,7 +28,7 @@ export const Route = createFileRoute("/_authenticated/app/account")({
 
 function Card({ title, hint, children }: { title: string; hint?: string; children: ReactNode }) {
   return (
-    <section className="rounded-sm bg-card p-6 shadow-card">
+    <section className="acct-card">
       <h2 className="text-[17px] font-semibold">{title}</h2>
       {hint && <p className="mt-0.5 text-[13px] text-secondary-text">{hint}</p>}
       <div className="mt-5">{children}</div>
@@ -108,8 +108,8 @@ function AccountPage() {
   }
 
   return (
-    <main className="mx-auto flex max-w-[640px] flex-col gap-5 px-4 py-6 sm:px-8 sm:py-10">
-      <h1 className="text-[28px] font-bold tracking-[-0.02em]">Account</h1>
+    <main className="acct mx-auto flex w-full max-w-[780px] flex-col gap-4 px-4 pb-20 pt-9 sm:px-6">
+      <h1 className="acct-h1">Account</h1>
       <AccountTabs />
 
 

@@ -198,11 +198,11 @@ function MembersPage() {
   const seats = billing?.plan === "team" || billing?.plan === "team_yearly" ? 4 : 1;
 
   return (
-    <main className="mx-auto flex max-w-[640px] flex-col gap-5 px-4 py-6 sm:px-8 sm:py-10">
-      <h1 className="text-[28px] font-bold tracking-[-0.02em]">Account</h1>
+    <main className="acct mx-auto flex w-full max-w-[780px] flex-col gap-4 px-4 pb-20 pt-9 sm:px-6">
+      <h1 className="acct-h1">Account</h1>
       <AccountTabs />
 
-      <section className="rounded-sm bg-card p-6 shadow-card">
+      <section className="acct-card">
         <h2 className="text-[17px] font-semibold">Workspace</h2>
         <p className="mt-0.5 text-[13px] text-secondary-text">
           {isTeamPlan ? `Your Team plan lets you invite ${seats - 1} teammates with shared ads, brand kits and templates.` : "Team workspaces with shared ads and brand kits are part of the Team plan."}
@@ -243,7 +243,7 @@ function MembersPage() {
         </div>
       </section>
 
-      <section className="rounded-sm bg-card p-6 shadow-card">
+      <section className="acct-card">
         <h2 className="text-[17px] font-semibold">Members</h2>
         <p className="mt-0.5 text-[13px] text-secondary-text">
           {members?.length ?? 0} of {seats} {seats === 1 ? "seat" : "seats"} used
@@ -277,7 +277,7 @@ function MembersPage() {
       </section>
 
       {isAdmin && (
-        <section className="rounded-sm bg-card p-6 shadow-card">
+        <section className="acct-card">
           <h2 className="text-[17px] font-semibold">Invite by email</h2>
           <p className="mt-0.5 text-[13px] text-secondary-text">They'll get an email with a link to join after they sign in.</p>
           <div className="mt-4 flex flex-col gap-2 sm:flex-row">
