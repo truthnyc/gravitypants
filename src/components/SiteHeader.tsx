@@ -97,7 +97,7 @@ export function SiteHeader({ variant }: { variant: "site" | "app" }) {
   return (
     <header className="sticky top-0 z-50 border-b border-ap-hairline bg-ap-card/[.92] backdrop-blur-[14px] safe-top">
       <div className="mx-auto flex h-[63px] max-w-[1280px] items-center gap-3 px-4 md:px-6 lg:gap-5">
-        <Link to={variant === "app" ? "/" : signedIn ? "/app/ads" : "/"} onClick={close} className="flex min-w-0 shrink-0 items-center text-ap-ink" aria-label="Gravity Pants home">
+        <Link to="/" onClick={close} className="flex min-w-0 shrink-0 items-center text-ap-ink" aria-label="Gravity Pants home">
           <GravityPantsLogo size={28} showWordmark wordmarkSize={17} />
         </Link>
         {variant === "app" ? <AppBar pathname={pathname} /> : <SiteBar pathname={pathname} signedIn={signedIn} close={close} />}
@@ -137,13 +137,6 @@ function AppBar({ pathname }: { pathname: string }) {
       <div className="hidden min-w-0 md:block"><WorkspaceSwitcher /></div>
       <nav aria-label="App" className="hidden items-center gap-1 lg:flex">
         <NavLinks items={appNav} pathname={pathname} />
-        <DropdownMenu>
-          <DropdownMenuTrigger className={cn(navLink, "inline-flex items-center gap-1")}>Explore <ChevronDown size={14} strokeWidth={1.7} /></DropdownMenuTrigger>
-          <DropdownMenuContent align="start" sideOffset={8} className={cn(menuContent, "w-[240px]")}>
-            <DropdownMenuLabel className={menuLabel}>Explore Gravity Pants</DropdownMenuLabel>
-            {exploreNav.map((item) => <DropdownMenuItem key={item.to} asChild className={menuItem}><Link to={item.to as "/"}>{item.label}</Link></DropdownMenuItem>)}
-          </DropdownMenuContent>
-        </DropdownMenu>
       </nav>
       <div className="ml-auto flex shrink-0 items-center gap-2 lg:gap-3">
         <label className="relative hidden lg:block">

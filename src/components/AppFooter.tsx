@@ -10,6 +10,8 @@ export function AppFooter() {
       <div className="mx-auto flex max-w-[1280px] flex-wrap items-center gap-x-5 gap-y-1 px-6 py-4 text-[13px] text-ap-muted">
         <span>© {new Date().getFullYear()} Gravity Pants</span>
         <nav aria-label="Footer" className="flex flex-wrap items-center gap-x-5 gap-y-1 sm:ml-auto">
+          <Link to="/examples" className={linkCls}>Examples</Link>
+          <Link to="/showcase" className={linkCls}>Showcase</Link>
           <Link to="/app/help" className={linkCls}>Help center</Link>
           <a href={STATUS_URL} target="_blank" rel="noreferrer" className={linkCls}>Status</a>
           <Link to="/privacy" className={linkCls}>Privacy</Link>
