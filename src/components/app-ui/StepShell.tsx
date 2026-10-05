@@ -149,7 +149,7 @@ export function ReelCard({
   let acc = 0;
   return (
     <AppCard>
-      <div className="ap-preview-box relative grid h-[340px] place-items-center rounded-[18px] bg-ap-panel p-[22px] sm:h-[380px]">
+      <div className="ap-preview-box relative grid h-[340px] grid-cols-[minmax(0,1fr)] grid-rows-[minmax(0,1fr)] place-items-center overflow-hidden rounded-[18px] bg-ap-panel p-[22px] sm:h-[380px]">
         {preview}
         {lp && (
           <button
