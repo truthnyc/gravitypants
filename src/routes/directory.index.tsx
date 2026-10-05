@@ -134,8 +134,8 @@ function DirectoryPage() {
             </div>
             {fallback.length > 0 && (
               <div className="mt-12 text-left">
-                <h3 className="mb-5 px-6 text-[20px] font-semibold">You might like these</h3>
-                <CardCarousel cards={fallback.slice(0, 12)} label="Reels you might like" onOpen={setOpen} />
+                <h3 className="mb-5 text-[20px] font-semibold">You might like these</h3>
+                <DirectoryGrid cards={fallback.slice(0, 12)} onOpen={setOpen} />
               </div>
             )}
           </section>
@@ -152,22 +152,9 @@ function DirectoryPage() {
                 <p className="text-[14px] text-ap-muted">Also try: {also.map((t, i) => <span key={t}>{i > 0 && " · "}<Link to="/directory" search={{ q: t }} className="text-ap-blue">{t}</Link></span>)}</p>
               )}
             </section>
-            {featured.length > 0 && (
-              <section className="home-examples !min-h-0 !gap-6 py-12">
-                <div className="mx-auto w-full max-w-[1280px] px-6">
-                  <p className="text-[15px] font-semibold text-ap-badge">Featured</p>
-                  <h2 className="mt-1 text-[28px] font-semibold tracking-[-0.02em]">Top matches from Gravity Pants brands</h2>
-                  <p className="mt-1 text-[14px] text-ap-muted">Brands on the Business plan whose reels match “{q}”.</p>
-                </div>
-                <CardCarousel cards={featured} label="Featured matches" onOpen={setOpen} />
-              </section>
-            )}
-            {rest.length > 0 && (
-              <section className="mx-auto max-w-[1280px] px-6 py-12">
-                <h2 className="mb-5 text-[24px] font-semibold tracking-[-0.02em]">More reels</h2>
-                <DirectoryGrid cards={rest} q={q} onOpen={setOpen} />
-              </section>
-            )}
+            <section className="mx-auto max-w-[1280px] px-6 py-12">
+              <DirectoryGrid cards={cards} q={q} onOpen={setOpen} />
+            </section>
           </>
         )}
       </main>
