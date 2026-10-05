@@ -203,7 +203,7 @@ function MembersPage() {
       <AccountTabs />
 
       <section className="acct-card">
-        <h2 className="text-[17px] font-semibold">Workspace</h2>
+        <h2 className="text-[17px] font-semibold">Workspaces</h2>
         <p className="mt-0.5 text-[13px] text-secondary-text">
           {isTeamPlan ? `Your Team plan lets you invite ${seats - 1} teammates with shared ads, brand kits and templates.` : "Team workspaces with shared ads and brand kits are part of the Team plan."}
         </p>
@@ -279,7 +279,7 @@ function MembersPage() {
       {isAdmin && (
         <section className="acct-card">
           <h2 className="text-[17px] font-semibold">Invite by email</h2>
-          <p className="mt-0.5 text-[13px] text-secondary-text">They'll get an email with a link to join after they sign in.</p>
+          <p className="mt-0.5 text-[13px] text-secondary-text">They'll get an email with a link to join after they sign in. Editors make and export ads. Admins can also manage billing, members and the Directory.</p>
           <div className="mt-4 flex flex-col gap-2 sm:flex-row">
             <label htmlFor="invite-email" className="sr-only">Email</label>
             <input

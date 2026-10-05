@@ -63,7 +63,7 @@ function DirectoryAccount() {
         </section>
       ) : (
         <section className="acct-card">
-          <h2 className="text-[20px] font-semibold">My reels</h2>
+          <h2 className="text-[20px] font-semibold">Brand page</h2>
           <LogoBox brandId={d.brand.id} name={d.brand.name} logo={d.brand.logo} onSaved={() => void qc.invalidateQueries({ queryKey: ["directory-account", ws] })} />
           <DescriptionBox brandId={d.brand.id} description={d.brand.description} onSaved={() => void qc.invalidateQueries({ queryKey: ["directory-account", ws] })} />
           <SlugBox brandId={d.brand.id} slug={d.brand.slug} onSaved={() => void qc.invalidateQueries({ queryKey: ["directory-account", ws] })} />
@@ -197,7 +197,7 @@ function SlugBox({ brandId, slug, onSaved }: { brandId: string; slug: string; on
       <span className="mr-1 font-semibold">Brand page</span>
       <span className="inline-flex items-center overflow-hidden rounded-lg border border-ap-hairline bg-ap-card">
         <span className="pr-0.5 pl-2.5 whitespace-nowrap text-ap-muted">gravitypants.com/directory/</span>
-        <input value={value} maxLength={SLUG_MAX} onChange={(e) => setValue(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))} aria-label="Brand page address" className="h-9 w-[150px] pr-2.5 outline-hidden" />
+        <input value={value} maxLength={SLUG_MAX} onChange={(e) => setValue(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))} aria-label="Brand page address" className="acct-bare h-9 w-[150px] pr-2.5 outline-hidden" />
       </span>
       <span className={cn("text-[13px]", msg[1])}>{msg[0]}</span>
       <span className={cn("text-[12px] nums", nearLimit(value.length, SLUG_MAX) ? "text-ap-amber" : "text-ap-muted")}>{value.length} / {SLUG_MAX}</span>
