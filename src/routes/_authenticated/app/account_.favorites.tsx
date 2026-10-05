@@ -94,11 +94,14 @@ function FavoritesPage() {
         {d?.brands.length ? (
           <ul className="grid gap-2 sm:grid-cols-2">
             {d.brands.map((b) => (
-              <li key={b.id}><Link to="/directory/$slug" params={{ slug: b.slug }} className="flex items-center gap-3 rounded-[4px] bg-ap-panel p-3 hover:text-ap-blue">
-                {b.logo
-                  ? <img src={b.logo} alt="" className="size-10 shrink-0 rounded-[4px] object-contain" />
-                  : <span className="flex size-10 shrink-0 items-center justify-center rounded-[4px] bg-ap-hairline text-[16px] font-semibold text-ap-muted">{b.name.charAt(0).toUpperCase()}</span>}
-                <span className="min-w-0"><b className="block truncate">{b.name}</b> <span className="text-[13px] text-ap-muted">{b.category}</span></span>
+              <li key={b.id}><Link to="/directory/$slug" params={{ slug: b.slug }} className="block rounded-[4px] bg-ap-panel p-3 hover:text-ap-blue">
+                <span className="flex size-9 items-center justify-center rounded-[4px] bg-ap-hairline">
+                  {b.logo
+                    ? <img src={b.logo} alt="" className="max-h-full max-w-full object-contain" />
+                    : <span className="text-[16px] font-semibold text-ap-muted">{b.name.charAt(0).toUpperCase()}</span>}
+                </span>
+                <p className="mt-2.5 text-[12px] text-ap-muted">{b.category}</p>
+                <p className="mt-0.5 truncate text-[14px] font-semibold">{b.name}</p>
               </Link></li>
             ))}
           </ul>
