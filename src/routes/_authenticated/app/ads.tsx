@@ -106,7 +106,7 @@ function YourAds() {
 
       {!isEmpty && (
         <section className="mt-12">
-          <h2 className="hidden text-[22px] font-bold tracking-[-0.02em] lg:block">Your ads</h2>
+          <h1 className="hidden text-[22px] font-bold tracking-[-0.02em] lg:block">Your ads</h1>
 
           {isLoading ? (
             <div className="mt-5 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3 lg:gap-6 xl:grid-cols-4">

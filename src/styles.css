@@ -1012,7 +1012,7 @@ html:has(.features-page) { scroll-behavior: smooth; }
 
 /* Readable contrast: links and illustration labels meet WCAG AA. */
 .home-text-link, .site-reel-link .home-text-link { color: #0060c0; }
-.home-edit-reel strong, .home-timing-track span:first-child { color: var(--site-ink); }
+.home-timing-track span:first-child { color: var(--site-ink); }
 .home-person > span { color: #52525a; }
 
 /* Showcase, contact page and gallery calls to action */
