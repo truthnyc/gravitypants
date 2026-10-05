@@ -35,7 +35,7 @@ function TrialUnlocked({ onClose }: { onClose: () => void }) {
 }
 
 export const Route = createFileRoute("/_authenticated/app/ads")({
-  validateSearch: z.object({ welcome: z.string().optional(), template: z.string().optional(), plan: z.string().optional(), billing: z.string().optional() }),
+  validateSearch: z.object({ welcome: z.coerce.string().optional(), template: z.coerce.string().optional(), plan: z.coerce.string().optional(), billing: z.coerce.string().optional() }),
   head: () => ({
     meta: [
       { title: "Your Ads — Gravity Pants" },
