@@ -83,11 +83,9 @@ function Form({ source, stacked = false }: { source: "popup" | "footer"; stacked
 
 export function FooterNewsletter() {
   return (
-    <div className="max-w-[360px]">
-      <p className="text-[14px] font-semibold">Get reel tips by email</p>
-      <p className="mb-3 mt-1 text-[13px] text-site-muted">
-        New templates, examples and ideas. <br></br>No spam. Unsubscribe any time.
-      </p>
+    <div className="rounded-[18px] bg-ap-card p-5">
+      <p className="text-[15px] font-semibold text-ap-ink">Get reel tips by email</p>
+      <p className="mb-3 mt-1 text-[13px] text-ap-body">New templates, examples and ideas. No spam. Unsubscribe any time.</p>
       <Form source="footer" />
     </div>
   );
