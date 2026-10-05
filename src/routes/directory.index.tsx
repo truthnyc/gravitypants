@@ -15,11 +15,23 @@ import { cn } from "@/lib/utils";
 
 const ROTATING = ["soothing", "energizing", "hopeful", "inspiring", "cozy", "luxurious", "playful"];
 const STARTERS: { label: string; q: string; mood?: boolean }[] = [
-  { label: "soothing", q: "soothing", mood: true }, { label: "energizing", q: "energizing", mood: true }, { label: "cozy", q: "cozy", mood: true }, { label: "luxurious", q: "luxurious", mood: true },
-  { label: "coffee", q: "coffee" }, { label: "wine", q: "wine" }, { label: "jewelry", q: "jewelry" }, { label: "holiday gifts", q: "holiday gifts" },
-  { label: "square reels", q: "square" }, { label: "vertical for TikTok", q: "tiktok" },
+  { label: "soothing", q: "soothing", mood: true },
+  { label: "energizing", q: "energizing", mood: true },
+  { label: "cozy", q: "cozy", mood: true },
+  { label: "luxurious", q: "luxurious", mood: true },
+  { label: "coffee", q: "coffee" },
+  { label: "wine", q: "wine" },
+  { label: "jewelry", q: "jewelry" },
+  { label: "holiday gifts", q: "holiday gifts" },
+  { label: "square reels", q: "square" },
+  { label: "vertical for TikTok", q: "tiktok" },
 ];
-const SIZES = [{ v: undefined, l: "All" }, { v: "9x16", l: "9:16" }, { v: "1x1", l: "1:1" }, { v: "16x9", l: "16:9" }] as const;
+const SIZES = [
+  { v: undefined, l: "All" },
+  { v: "9x16", l: "9:16" },
+  { v: "1x1", l: "1:1" },
+  { v: "16x9", l: "16:9" },
+] as const;
 
 export const Route = createFileRoute("/directory/")({
   validateSearch: z.object({ q: z.string().optional(), size: z.string().optional() }),
@@ -29,20 +41,35 @@ export const Route = createFileRoute("/directory/")({
     const [cards, reels, fallback] = await Promise.all([
       searchDirectory({ data: { q: deps.q, size } }).catch(() => [] as DirectoryCard[]),
       deps.q ? Promise.resolve([] as SiteReel[]) : listSiteReels().catch(() => [] as SiteReel[]),
-      deps.q ? searchDirectory({ data: { q: "", size: null } }).catch(() => [] as DirectoryCard[]) : Promise.resolve([] as DirectoryCard[]),
+      deps.q
+        ? searchDirectory({ data: { q: "", size: null } }).catch(() => [] as DirectoryCard[])
+        : Promise.resolve([] as DirectoryCard[]),
     ]);
     return { q: deps.q, cards, reels, fallback };
   },
   head: ({ loaderData }) => {
     const base = siteHead({
       path: "/directory",
-      title: loaderData?.q ? `“${loaderData.q}” video ads — Gravity Pants Directory` : "Gravity Pants Directory — Video ad ideas by mood and brand",
-      description: "Search real video ads and Reels made with Gravity Pants by mood, product or brand, and start your own from the same template.",
+      title: loaderData?.q
+        ? `“${loaderData.q}” video ads — Gravity Pants Directory`
+        : "Gravity Pants Directory — Video ad ideas by mood and brand",
+      description:
+        "Search real video ads and Reels made with Gravity Pants by mood, product or brand, and start your own from the same template.",
     });
     // The Directory isn't part of the marketing site yet — keep all pages out of search results.
-    return { ...base, meta: [...(base.meta ?? []).filter((m: any) => m?.name !== "robots"), { name: "robots", content: "noindex, follow" }] }; // eslint-disable-line @typescript-eslint/no-explicit-any
+    return {
+      ...base,
+      meta: [
+        ...(base.meta ?? []).filter((m: any) => m?.name !== "robots"),
+        { name: "robots", content: "noindex, follow" },
+      ],
+    }; // eslint-disable-line @typescript-eslint/no-explicit-any
   },
-  errorComponent: () => <SiteShell><p className="py-20 text-center">The Directory couldn't load. Try again.</p></SiteShell>,
+  errorComponent: () => (
+    <SiteShell>
+      <p className="py-20 text-center">The Directory couldn't load. Try again.</p>
+    </SiteShell>
+  ),
   component: DirectoryPage,
 });
 
@@ -69,31 +96,79 @@ function DirectoryPage() {
   const also = useMemo(() => {
     const words = new Set(q.toLowerCase().split(/\s+/));
     const counts = new Map<string, number>();
-    for (const c of cards.slice(0, 10)) for (const t of [...c.moods, ...c.tags]) if (!words.has(t)) counts.set(t, (counts.get(t) ?? 0) + 1);
-    return [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6).map(([t]) => t);
+    for (const c of cards.slice(0, 10))
+      for (const t of [...c.moods, ...c.tags]) if (!words.has(t)) counts.set(t, (counts.get(t) ?? 0) + 1);
+    return [...counts.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 6)
+      .map(([t]) => t);
   }, [cards, q]);
 
   return (
     <SiteShell>
       <main className="font-ap text-ap-ink">
         <section className="mx-auto max-w-[900px] px-6 pt-20 pb-10 text-center">
-          <p className="mb-3.5 text-[15px] font-semibold text-ap-badge">Directory</p>
+          <p className="mb-3.5 text-[15px] font-semibold text-ap-badge">...</p>
           <h1 className="mb-8 text-[clamp(30px,5vw,56px)] leading-[1.08] font-semibold tracking-[-0.035em] text-[#a1a1a6]">
-            <b className="font-semibold text-ap-ink">It's {day}.</b><br />Show me something:{" "}
+            <b className="font-semibold text-ap-ink">It's {day}.</b>
+            <br />
+            Show me something:{" "}
             <span className="text-ap-blue" aria-live="polite">
               <span className="font-light text-[#c7c7cc]">[ </span>
-              <span key={mood} className="inline-block animate-[dir-mood_.3s_ease]">{mood}</span>
+              <span key={mood} className="inline-block animate-[dir-mood_.3s_ease]">
+                {mood}
+              </span>
               <span className="font-light text-[#c7c7cc]"> ]</span>
             </span>
           </h1>
-          <form role="search" onSubmit={(e) => { e.preventDefault(); go(value); }} className="mx-auto flex h-[60px] max-w-[680px] items-center gap-2.5 rounded-[12px] border border-transparent bg-ap-panel pr-2 pl-5 transition-[background,border-color,box-shadow] focus-within:border-ap-hairline focus-within:bg-ap-card focus-within:shadow-[0_10px_30px_rgba(20,30,50,.10)]">
-            <input value={value} onChange={(e) => setValue(e.target.value)} placeholder="Try: cozy knitwear, square, TikTok" aria-label="Search the Directory" className="h-full min-w-0 flex-1 bg-transparent text-[19px] outline-hidden placeholder:text-[#8e8e93]" />
-            {value && <button type="button" aria-label="Clear search" onClick={() => { setValue(""); go(""); }} className="grid size-8 place-items-center text-ap-muted"><X className="size-4" strokeWidth={1.7} /></button>}
-            <button type="submit" className="h-11 rounded-lg bg-ap-blue px-5 text-[16px] text-ap-card hover:bg-ap-blue-hover">Search</button>
+          <form
+            role="search"
+            onSubmit={(e) => {
+              e.preventDefault();
+              go(value);
+            }}
+            className="mx-auto flex h-[60px] max-w-[680px] items-center gap-2.5 rounded-[12px] border border-transparent bg-ap-panel pr-2 pl-5 transition-[background,border-color,box-shadow] focus-within:border-ap-hairline focus-within:bg-ap-card focus-within:shadow-[0_10px_30px_rgba(20,30,50,.10)]"
+          >
+            <input
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              placeholder="Try: cozy knitwear, square, TikTok"
+              aria-label="Search the Directory"
+              className="h-full min-w-0 flex-1 bg-transparent text-[19px] outline-hidden placeholder:text-[#8e8e93]"
+            />
+            {value && (
+              <button
+                type="button"
+                aria-label="Clear search"
+                onClick={() => {
+                  setValue("");
+                  go("");
+                }}
+                className="grid size-8 place-items-center text-ap-muted"
+              >
+                <X className="size-4" strokeWidth={1.7} />
+              </button>
+            )}
+            <button
+              type="submit"
+              className="h-11 rounded-lg bg-ap-blue px-5 text-[16px] text-ap-card hover:bg-ap-blue-hover"
+            >
+              Search
+            </button>
           </form>
           <div className="mx-auto mt-[18px] flex max-w-[760px] flex-wrap justify-center gap-2">
             {STARTERS.map((s) => (
-              <button key={s.label} type="button" onClick={() => go(s.q)} className={cn("rounded-lg bg-ap-panel px-3.5 py-2 text-[14px] hover:bg-ap-media", s.mood && "font-medium text-ap-badge")}>{s.label}</button>
+              <button
+                key={s.label}
+                type="button"
+                onClick={() => go(s.q)}
+                className={cn(
+                  "rounded-lg bg-ap-panel px-3.5 py-2 text-[14px] hover:bg-ap-media",
+                  s.mood && "font-medium text-ap-badge",
+                )}
+              >
+                {s.label}
+              </button>
             ))}
           </div>
         </section>
@@ -102,14 +177,21 @@ function DirectoryPage() {
           <>
             {reels.length > 0 && (
               <section className="home-examples !min-h-0 !gap-8 py-14">
-                <p className="mx-auto w-full max-w-[1280px] px-6 text-[15px] font-semibold text-ap-badge">Made with Gravity Pants</p>
+                <p className="mx-auto w-full max-w-[1280px] px-6 text-[15px] font-semibold text-ap-badge">
+                  Made with Gravity Pants
+                </p>
                 <ReelCarousel
                   label="Reels made with Gravity Pants"
                   items={reels.map((r) => ({
                     key: r.id,
                     media: () => (
                       <div className={`home-example-video home-example-video-${r.format}`}>
-                        <ReelVideo video={r.video} videoWebm={r.videoWebm ?? undefined} poster={r.poster ?? undefined} label={`${r.title} video ad`} />
+                        <ReelVideo
+                          video={r.video}
+                          videoWebm={r.videoWebm ?? undefined}
+                          poster={r.poster ?? undefined}
+                          label={`${r.title} video ad`}
+                        />
                       </div>
                     ),
                     title: r.title,
@@ -121,14 +203,27 @@ function DirectoryPage() {
             )}
             <section className="mx-auto max-w-[1280px] px-6 py-14">
               <h2 className="mb-5 text-[24px] font-semibold tracking-[-0.02em]">Browse the directory</h2>
-              {cards.length ? <DirectoryGrid cards={cards} onOpen={setOpen} /> : <p className="text-ap-muted">The first reels are on their way.</p>}
+              {cards.length ? (
+                <DirectoryGrid cards={cards} onOpen={setOpen} />
+              ) : (
+                <p className="text-ap-muted">The first reels are on their way.</p>
+              )}
             </section>
           </>
         ) : cards.length === 0 ? (
           <section className="mx-auto max-w-[1280px] px-6 pb-16 text-center">
             <h2 className="text-[24px] font-semibold">Nothing for “{q}” yet.</h2>
             <div className="mt-4 flex flex-wrap justify-center gap-1.5">
-              {STARTERS.slice(0, 6).map((s) => <button key={s.label} type="button" onClick={() => go(s.q)} className="rounded-lg bg-ap-panel px-3 py-1.5 text-[14px]">{s.label}</button>)}
+              {STARTERS.slice(0, 6).map((s) => (
+                <button
+                  key={s.label}
+                  type="button"
+                  onClick={() => go(s.q)}
+                  className="rounded-lg bg-ap-panel px-3 py-1.5 text-[14px]"
+                >
+                  {s.label}
+                </button>
+              ))}
             </div>
             {fallback.length > 0 && (
               <div className="mt-12 text-left">
@@ -140,14 +235,37 @@ function DirectoryPage() {
         ) : (
           <>
             <section className="mx-auto flex max-w-[1280px] flex-wrap items-center gap-4 px-6 pb-8">
-              <p className="text-[17px] font-semibold nums">{cards.length} {cards.length === 1 ? "reel" : "reels"} for “{q}”</p>
+              <p className="text-[17px] font-semibold nums">
+                {cards.length} {cards.length === 1 ? "reel" : "reels"} for “{q}”
+              </p>
               <div className="flex rounded-lg bg-ap-panel p-1" role="group" aria-label="Size">
                 {SIZES.map((s) => (
-                  <button key={s.l} type="button" aria-pressed={size === s.v} onClick={() => void navigate({ search: (p) => ({ ...p, size: s.v }) })} className={cn("h-8 rounded-md px-3 text-[13px] font-medium nums", size === s.v ? "bg-ap-card font-semibold shadow-ap-soft" : "text-ap-body")}>{s.l}</button>
+                  <button
+                    key={s.l}
+                    type="button"
+                    aria-pressed={size === s.v}
+                    onClick={() => void navigate({ search: (p) => ({ ...p, size: s.v }) })}
+                    className={cn(
+                      "h-8 rounded-md px-3 text-[13px] font-medium nums",
+                      size === s.v ? "bg-ap-card font-semibold shadow-ap-soft" : "text-ap-body",
+                    )}
+                  >
+                    {s.l}
+                  </button>
                 ))}
               </div>
               {also.length > 0 && (
-                <p className="text-[14px] text-ap-muted">Also try: {also.map((t, i) => <span key={t}>{i > 0 && " · "}<Link to="/directory" search={{ q: t }} className="text-ap-blue">{t}</Link></span>)}</p>
+                <p className="text-[14px] text-ap-muted">
+                  Also try:{" "}
+                  {also.map((t, i) => (
+                    <span key={t}>
+                      {i > 0 && " · "}
+                      <Link to="/directory" search={{ q: t }} className="text-ap-blue">
+                        {t}
+                      </Link>
+                    </span>
+                  ))}
+                </p>
               )}
             </section>
             <section className="mx-auto max-w-[1280px] px-6 py-12">
