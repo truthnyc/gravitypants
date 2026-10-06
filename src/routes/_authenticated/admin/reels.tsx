@@ -99,7 +99,7 @@ function ReelForm({ initial, onDone, onCancel, videoSrc }: { videoSrc?: string |
   const save = useServerFn(saveSiteReel);
   const brandsFn = useServerFn(listDirectoryBrands);
   const { data: brands } = useQuery({ queryKey: ["admin", "directory-brands"], queryFn: () => brandsFn() });
-  const [d, setD] = useState(() => ({ ...initial, category: normalizeCategory(initial.category) ?? "Other" }));
+  const [d, setD] = useState<Draft>(() => ({ ...initial, category: normalizeCategory(initial.category) ?? "Other" }));
   const [file, setFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
   const [cover, setCover] = useState<Blob | null>(null);
@@ -163,7 +163,7 @@ function ReelForm({ initial, onDone, onCancel, videoSrc }: { videoSrc?: string |
         <span>How many photos the reel was made from — shown on Examples.</span>
       </label>
       <label className="grid gap-1 text-[13px] text-secondary-text">Category
-        <select required value={d.category} onChange={(e) => setD({ ...d, category: e.target.value })} className="h-11 rounded-sm border border-input bg-card px-3 text-[15px] text-foreground">
+        <select aria-label="Category" required value={d.category} onChange={(e) => setD({ ...d, category: e.target.value })} className="h-11 rounded-sm border border-input bg-card px-3 text-[15px] text-foreground">
           {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
         </select>
       </label>
