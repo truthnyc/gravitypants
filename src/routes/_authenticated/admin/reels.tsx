@@ -27,6 +27,33 @@ export const Route = createFileRoute("/_authenticated/admin/reels")({
 });
 
 import { CATEGORIES, normalizeCategory } from "@/lib/directory/directory";
+import { useMoodCatalog } from "@/lib/directory/moods";
+import { MOOD_FAMILY_COLORS, type MoodFamily } from "@/lib/directory/mood-admin";
+
+/** Up to 3 moods from the master list, grouped by family. Empty = the reel uses its brand's moods. */
+function MoodPicker({ value, onChange }: { value: string[]; onChange: (v: string[]) => void }) {
+  const { families } = useMoodCatalog();
+  const toggle = (m: string) => onChange(value.includes(m) ? value.filter((x) => x !== m) : value.length >= 3 ? value : [...value, m]);
+  return (
+    <fieldset className="grid gap-2 text-[13px] text-secondary-text sm:col-span-2">
+      <legend className="mb-1">Moods <span className="nums">({value.length}/3)</span> — leave empty to use the brand's moods</legend>
+      {families.map((f) => (
+        <div key={f.family} role="group" aria-label={`${f.family} moods`} className="flex flex-wrap items-center gap-1.5">
+          <span className="flex w-24 items-center gap-1.5 text-foreground"><span aria-hidden className="size-2.5 rounded-full" style={{ background: MOOD_FAMILY_COLORS[f.family as MoodFamily]?.bg }} />{f.family}</span>
+          {f.moods.map((m) => {
+            const on = value.includes(m);
+            return (
+              <button key={m} type="button" aria-pressed={on} disabled={!on && value.length >= 3} onClick={() => toggle(m)}
+                className={`h-8 rounded-lg border px-2.5 text-[13px] capitalize disabled:opacity-40 ${on ? "border-primary bg-primary text-primary-foreground" : "border-input bg-card text-foreground"}`}>
+                {m}
+              </button>
+            );
+          })}
+        </div>
+      ))}
+    </fieldset>
+  );
+}
 
 type Probe = { format: ReelFormat; seconds: number; poster: Blob | null };
 
@@ -92,8 +119,8 @@ function CoverPicker({ src, onPick }: { src: string; onPick: (b: Blob, preview: 
   );
 }
 
-type Draft = { id?: string; brand: string; title: string; href: string; category: string; published: boolean; photos: number; brand_id?: string | null };
-const empty: Draft = { brand: "", title: "", href: "", category: "Fashion & Apparel", published: true, photos: 3 };
+type Draft = { id?: string; brand: string; title: string; href: string; category: string; published: boolean; photos: number; brand_id?: string | null; moods?: string[] };
+const empty: Draft = { brand: "", title: "", href: "", category: "Fashion & Apparel", published: true, photos: 3, moods: [] };
 
 function ReelForm({ initial, onDone, onCancel, videoSrc }: { videoSrc?: string | null; initial: Draft; onDone: () => void; onCancel?: () => void }) {
   const save = useServerFn(saveSiteReel);
@@ -133,7 +160,7 @@ function ReelForm({ initial, onDone, onCancel, videoSrc }: { videoSrc?: string |
       await save({ data: {
         ...(d.id ? { id: d.id } : {}),
         brand: d.brand, title: d.title, href: href || null,
-        category: d.category, photos: d.photos, published: d.published, brand_id: d.brand_id ?? null,
+        category: d.category, photos: d.photos, published: d.published, brand_id: d.brand_id ?? null, moods: d.moods ?? [],
         format: files.format ?? current.format ?? "916",
         seconds: files.seconds ?? current.seconds ?? 8,
         ...(files.video_url ? { video_url: files.video_url } : {}),
@@ -190,6 +217,7 @@ function ReelForm({ initial, onDone, onCancel, videoSrc }: { videoSrc?: string |
         </select>
         <span>The reel also shows on this brand page.</span>
       </label>
+      <MoodPicker value={d.moods ?? []} onChange={(moods) => setD({ ...d, moods })} />
       <label className="flex items-center gap-2 text-[14px]">
         <Switch checked={d.published} onCheckedChange={(v) => setD({ ...d, published: v })} /> Show on the website
       </label>
@@ -254,7 +282,7 @@ function Reels() {
                   <ReelForm
                    
                     videoSrc={r.videoView}
-                    initial={{ id: r.id, brand: r.brand, title: r.title, href: r.href ?? "", category: r.category, published: r.published, photos: r.photos, brand_id: r.brand_id, ...({ format: r.format, seconds: r.seconds } as object) }}
+                    initial={{ id: r.id, brand: r.brand, title: r.title, href: r.href ?? "", category: r.category, published: r.published, photos: r.photos, brand_id: r.brand_id, moods: r.moods ?? [], ...({ format: r.format, seconds: r.seconds } as object) }}
                     onDone={() => { setEditing(null); void refetch(); }}
                     onCancel={() => setEditing(null)}
                   />
