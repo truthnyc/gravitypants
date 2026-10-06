@@ -721,7 +721,7 @@ export const adminBrandLinks = createServerFn({ method: "POST" })
 
 /* ---------------- faceted search (server-side filter, count, page) */
 
-export const DIRECTORY_PAGE_SIZE = 12;
+export const DIRECTORY_PAGE_SIZE = 12; // reels per page
 /** Pages loaded automatically while scrolling after the first "Show more" click. */
 export const DIRECTORY_AUTO_LOAD_PAGES = 3;
 export type FacetedReel = {
