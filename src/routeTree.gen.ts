@@ -60,6 +60,7 @@ import { Route as ApiPublicCleanupExportsRouteImport } from './routes/api/public
 import { Route as ApiPublicDirectoryDailyRouteImport } from './routes/api/public/directory-daily'
 import { Route as ApiPublicTrialRemindersRouteImport } from './routes/api/public/trial-reminders'
 import { Route as ApiPublicWeeklyReportRouteImport } from './routes/api/public/weekly-report'
+import { Route as DirectoryCategorySlugRouteImport } from './routes/directory.category.$slug'
 import { Route as AuthenticatedAdminClientsIdRouteImport } from './routes/_authenticated/admin/clients_.$id'
 import { Route as AuthenticatedAdminTemplatesIndexRouteImport } from './routes/_authenticated/admin/templates.index'
 import { Route as AuthenticatedAdminTemplatesIdRouteImport } from './routes/_authenticated/admin/templates.$id'
@@ -342,6 +343,11 @@ const ApiPublicWeeklyReportRoute = ApiPublicWeeklyReportRouteImport.update({
   path: '/api/public/weekly-report',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DirectoryCategorySlugRoute = DirectoryCategorySlugRouteImport.update({
+  id: '/directory/category/$slug',
+  path: '/directory/category/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAdminClientsIdRoute =
   AuthenticatedAdminClientsIdRouteImport.update({
     id: '/clients_/$id',
@@ -510,6 +516,7 @@ export interface FileRoutesByFullPath {
   '/api/public/directory-daily': typeof ApiPublicDirectoryDailyRoute
   '/api/public/trial-reminders': typeof ApiPublicTrialRemindersRoute
   '/api/public/weekly-report': typeof ApiPublicWeeklyReportRoute
+  '/directory/category/$slug': typeof DirectoryCategorySlugRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/app/': typeof AuthenticatedAppIndexRoute
   '/admin/clients/$id': typeof AuthenticatedAdminClientsIdRoute
@@ -579,6 +586,7 @@ export interface FileRoutesByTo {
   '/api/public/directory-daily': typeof ApiPublicDirectoryDailyRoute
   '/api/public/trial-reminders': typeof ApiPublicTrialRemindersRoute
   '/api/public/weekly-report': typeof ApiPublicWeeklyReportRoute
+  '/directory/category/$slug': typeof DirectoryCategorySlugRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/app': typeof AuthenticatedAppIndexRoute
   '/admin/clients/$id': typeof AuthenticatedAdminClientsIdRoute
@@ -653,6 +661,7 @@ export interface FileRoutesById {
   '/api/public/directory-daily': typeof ApiPublicDirectoryDailyRoute
   '/api/public/trial-reminders': typeof ApiPublicTrialRemindersRoute
   '/api/public/weekly-report': typeof ApiPublicWeeklyReportRoute
+  '/directory/category/$slug': typeof DirectoryCategorySlugRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
   '/_authenticated/admin/clients_/$id': typeof AuthenticatedAdminClientsIdRoute
@@ -727,6 +736,7 @@ export interface FileRouteTypes {
     | '/api/public/directory-daily'
     | '/api/public/trial-reminders'
     | '/api/public/weekly-report'
+    | '/directory/category/$slug'
     | '/admin/'
     | '/app/'
     | '/admin/clients/$id'
@@ -796,6 +806,7 @@ export interface FileRouteTypes {
     | '/api/public/directory-daily'
     | '/api/public/trial-reminders'
     | '/api/public/weekly-report'
+    | '/directory/category/$slug'
     | '/admin'
     | '/app'
     | '/admin/clients/$id'
@@ -869,6 +880,7 @@ export interface FileRouteTypes {
     | '/api/public/directory-daily'
     | '/api/public/trial-reminders'
     | '/api/public/weekly-report'
+    | '/directory/category/$slug'
     | '/_authenticated/admin/'
     | '/_authenticated/app/'
     | '/_authenticated/admin/clients_/$id'
@@ -922,6 +934,7 @@ export interface RootRouteChildren {
   ApiPublicDirectoryDailyRoute: typeof ApiPublicDirectoryDailyRoute
   ApiPublicTrialRemindersRoute: typeof ApiPublicTrialRemindersRoute
   ApiPublicWeeklyReportRoute: typeof ApiPublicWeeklyReportRoute
+  DirectoryCategorySlugRoute: typeof DirectoryCategorySlugRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
@@ -1287,6 +1300,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicWeeklyReportRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/directory/category/$slug': {
+      id: '/directory/category/$slug'
+      path: '/directory/category/$slug'
+      fullPath: '/directory/category/$slug'
+      preLoaderRoute: typeof DirectoryCategorySlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/admin/clients_/$id': {
       id: '/_authenticated/admin/clients_/$id'
       path: '/clients/$id'
@@ -1621,6 +1641,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicDirectoryDailyRoute: ApiPublicDirectoryDailyRoute,
   ApiPublicTrialRemindersRoute: ApiPublicTrialRemindersRoute,
   ApiPublicWeeklyReportRoute: ApiPublicWeeklyReportRoute,
+  DirectoryCategorySlugRoute: DirectoryCategorySlugRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
