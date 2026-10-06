@@ -38,6 +38,6 @@
 
 - Folder rules: see `AGENTS.md` in src/components/editor, src/render, src/lib/stillframe (billing details), src/lib/directory and src/routes/_authenticated/admin.
 - Admin analytics: public visits go to `page_views` (anon insert) via `src/lib/site/track.ts`; sign-up UTM in user metadata; `analytics.server.ts` feeds the Analytics page and deduped Monday `/api/public/weekly-report`.
-- Directory: listings via `directory.functions.ts`, staff mood CRUD via `moods.functions.ts` with atomic sync triggers; shared categories in `directory.ts` prevent drift.
+- Directory: `directory.functions.ts` lists; `moods.functions.ts` manages moods with sync triggers; categories are shared. Mood filters match exact reel/brand moods.
 - One shared `SiteHeader` (`src/components/SiteHeader.tsx`, variant site|app) is the header everywhere except the editor; feature flags live in `src/lib/features.ts` (`SHOW_DIRECTORY` gates every Directory link) — headers can't drift and Directory ships when ready.
 - Website reel favorites: `site_reel_favorites` (own rows only) via `SiteReelHeart`/`useSiteReelFavorites` in src/components/site/SiteReelHeart.tsx; the Favorites page shows them alongside Directory reels — one heart for every reel tile.

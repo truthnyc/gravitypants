@@ -1,4 +1,5 @@
 # Roadmap
+- [x] Add shared-list Moods filter to Directory and verify filtering/reset.
 - [x] Add staff-only Moods page and family-grouped add/rename/delete controls.
 - [x] Preserve category and brand/reel mood references on rename; remove deleted moods safely.
 - [x] Verify mood management end to end.
