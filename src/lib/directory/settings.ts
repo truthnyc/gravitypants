@@ -37,7 +37,9 @@ export type FeaturedPick = z.infer<typeof pickSchema>;
 /** Saved settings merged over the defaults, so new fields always have a value. */
 export function mergeSettings(saved: unknown): DirectorySettings {
   const r = directorySettingsSchema.partial().safeParse(saved ?? {});
-  return { ...DEFAULT_DIRECTORY_SETTINGS, ...(r.success ? r.data : {}) };
+  const out: DirectorySettings = { ...DEFAULT_DIRECTORY_SETTINGS };
+  if (r.success) for (const [k, v] of Object.entries(r.data)) if (v !== undefined) (out as Record<string, unknown>)[k] = v;
+  return out;
 }
 
 /** Monday (UTC) of the week containing `d`, as YYYY-MM-DD. */
