@@ -134,7 +134,7 @@ function DirectoryPage() {
             <input
               value={value}
               onChange={(e) => setValue(e.target.value)}
-              placeholder="Try: cozy knitwear, square, TikTok"
+              placeholder="Try: cozy knitwear, square, Purl Soho"
               aria-label="Search the Directory"
               className="h-full min-w-0 flex-1 bg-transparent text-[19px] outline-hidden placeholder:text-[#8e8e93]"
             />
