@@ -336,7 +336,7 @@ export const getBrandPage = createServerFn({ method: "GET" })
     const { publicClient } = await import("@/lib/site/reels.server");
     const { toCards } = await import("./directory.server");
     const pc = publicClient() as any;
-    const empty = { redirect: null as string | null, brand: null, reels: [] as DirectoryCard[], more: [] as { name: string; slug: string; poster: string | null }[] };
+    const empty = { redirect: null as string | null, brand: null, reels: [] as DirectoryCard[], siteReels: [] as import("@/lib/site/reels").SiteReel[], more: [] as { name: string; slug: string; poster: string | null }[] };
     const { data: b } = await pc.from("directory_brands").select("id, name, website_url, category, description, slug, logo_url").eq("slug", data.slug).maybeSingle();
     if (!b) {
       const { data: h } = await pc.from("directory_slug_history").select("brand_id").eq("old_slug", data.slug).order("changed_at", { ascending: false }).limit(1).maybeSingle();
@@ -347,9 +347,10 @@ export const getBrandPage = createServerFn({ method: "GET" })
       return empty;
     }
     const { data: reels } = await pc.from("directory_reels").select("id, tags, moods, formats, published_at, templates(name)").eq("brand_id", b.id).eq("status", "live").order("published_at", { ascending: false });
-    if (!reels?.length) return empty;
+    const { listSiteReels } = await import("@/lib/site/reels.functions");
+    const siteReels = (await listSiteReels()).filter((r) => r.brandSlug === b.slug);
     const { data: featured } = await pc.rpc("is_featured_brand", { _brand: b.id });
-    const cards = await toCards(reels.map((r: any) => ({ id: r.id, brand_name: b.name, brand_slug: b.slug, category: b.category, tags: r.tags, moods: r.moods, formats: r.formats, template_name: r.templates?.name ?? null, featured })));
+    const cards = await toCards((reels ?? []).map((r: any) => ({ id: r.id, brand_name: b.name, brand_slug: b.slug, category: b.category, tags: r.tags, moods: r.moods, formats: r.formats, template_name: r.templates?.name ?? null, featured })));
     const { data: similar } = await pc.rpc("search_directory", { q: "", size: null });
     const seen = new Set<string>([b.slug]);
     const moreRows = ((similar ?? []) as any[]).filter((r) => r.category === b.category && !seen.has(r.brand_slug) && seen.add(r.brand_slug)).slice(0, 12);
@@ -358,6 +359,7 @@ export const getBrandPage = createServerFn({ method: "GET" })
       redirect: null,
       brand: { id: b.id as string, name: b.name as string, website_url: b.website_url as string | null, category: b.category as string, description: b.description as string | null, slug: b.slug as string, logo_url: await signLogo(b.logo_url), featured: !!featured },
       reels: cards,
+      siteReels,
       more: moreCards.map((c) => ({ name: c.brand_name, slug: c.brand_slug, poster: c.poster })),
     };
   });
