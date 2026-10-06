@@ -1,4 +1,4 @@
-import { createFileRoute, notFound, Link } from "@tanstack/react-router";
+import { createFileRoute, notFound, redirect, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { DirectoryGrid, ReelDetail } from "@/components/directory/DirectoryGrid";
@@ -14,6 +14,10 @@ const POSTER =
   "absolute top-1/2 left-1/2 h-[72%] w-auto max-w-[72%] object-contain -translate-x-1/2 -translate-y-1/2 rounded-[6px] shadow-[0_0_0_1px_var(--ap-inner),0_18px_34px_-16px_rgba(29,29,31,.28)]";
 
 export const Route = createFileRoute("/directory/category/$slug")({
+  // Category pages now open the Directory with that category already filtered.
+  beforeLoad: ({ params }) => {
+    if (categoryFromSlug(params.slug)) throw redirect({ to: "/directory", search: { categories: params.slug }, statusCode: 301 });
+  },
   loader: async ({ params }) => {
     const category = categoryFromSlug(params.slug);
     if (!category) throw notFound();
