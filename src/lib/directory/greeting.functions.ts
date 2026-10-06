@@ -85,12 +85,12 @@ export const getGreetingAdmin = createServerFn({ method: "GET" })
       const m = r.action === "shown" ? shownSessions : r.action === "mood_click" ? clickSessions : filterSessions;
       if (!m.has(r.rule)) m.set(r.rule, new Set());
       m.get(r.rule)!.add(r.session_id);
-      stats[r.rule] ??= { shown: 0, clicks: 0, filters: 0 };
-      if (r.action === "shown") stats[r.rule].shown++;
+      const st = (stats[r.rule] ??= { shown: 0, clicks: 0, filters: 0 });
+      if (r.action === "shown") st.shown++;
     }
-    for (const rule of Object.keys(stats)) {
-      stats[rule].clicks = clickSessions.get(rule)?.size ?? 0;
-      stats[rule].filters = filterSessions.get(rule)?.size ?? 0;
+    for (const [rule, st] of Object.entries(stats)) {
+      st.clicks = clickSessions.get(rule)?.size ?? 0;
+      st.filters = filterSessions.get(rule)?.size ?? 0;
     }
-    return { config: mergeGreeting(row?.value), saved: !!row, stats: RULE_TYPES.filter((r) => stats[r]).map((rule) => ({ rule, shown: stats[rule].shown, sessions: shownSessions.get(rule)?.size ?? 0, clicks: stats[rule].clicks, filters: stats[rule].filters })) };
+    return { config: mergeGreeting(row?.value), saved: !!row, stats: RULE_TYPES.filter((r) => stats[r]).map((rule) => ({ rule, shown: stats[rule]!.shown, sessions: shownSessions.get(rule)?.size ?? 0, clicks: stats[rule]!.clicks, filters: stats[rule]!.filters })) };
   });

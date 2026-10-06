@@ -250,7 +250,7 @@ function timeKey(now: Date, sunset: string | null): string | null {
 }
 
 export function chooseGreeting(cfg: GreetingConfig, ctx: GreetingCtx): Chosen {
-  const day = WEEKDAYS[ctx.now.getDay()];
+  const day = WEEKDAYS[ctx.now.getDay()]!;
   const base: Tokens = { day, city: ctx.city, count: ctx.count };
   const make = (rule: RuleType, source: string, tpl: string, mood: string, tokens: Partial<Tokens> = {}, category: string | null = null, brand: string | null = null): Chosen => {
     const filled = fillTemplate(tpl, { ...base, brand, ...tokens });
