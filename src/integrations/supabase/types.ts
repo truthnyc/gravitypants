@@ -226,6 +226,32 @@ export type Database = {
         }
         Relationships: []
       }
+      category_moods: {
+        Row: {
+          category: string
+          mood_id: string
+          sort_order: number
+        }
+        Insert: {
+          category: string
+          mood_id: string
+          sort_order?: number
+        }
+        Update: {
+          category?: string
+          mood_id?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "category_moods_mood_id_fkey"
+            columns: ["mood_id"]
+            isOneToOne: false
+            referencedRelation: "moods"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       directory_brands: {
         Row: {
           category: string
@@ -712,6 +738,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      moods: {
+        Row: {
+          created_at: string
+          family: string
+          id: string
+          name: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          family: string
+          id?: string
+          name: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          family?: string
+          id?: string
+          name?: string
+          sort_order?: number
+        }
+        Relationships: []
       }
       page_views: {
         Row: {
