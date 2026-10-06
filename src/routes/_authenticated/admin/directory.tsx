@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Fragment, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { adminBrandDetail, adminRenameReel, adminSaveBrand, adminSaveBrandSlug, setBrandLogo, listDirectoryBrands, listDirectoryReview, resolveReport, reviewDirectoryReel } from "@/lib/directory/directory.functions";
+import { adminDeleteReel, adminMoveReel, adminBrandDetail, adminRenameReel, adminSaveBrand, adminSaveBrandSlug, setBrandLogo, listDirectoryBrands, listDirectoryReview, resolveReport, reviewDirectoryReel } from "@/lib/directory/directory.functions";
 import { BRAND_DESCRIPTION_MAX, BRAND_NAME_MAX, CATEGORIES, MOODS, SLUG_MAX, STATUS_LABEL, nearLimit, type Category } from "@/lib/directory/directory";
 import { cn } from "@/lib/utils";
 import { BrandOwnership, NewBrandPage } from "@/components/admin/BrandPageAdmin";
@@ -84,6 +84,7 @@ function AdminDirectory() {
                   {r.status === "live" && <Button size="sm" variant="plain" onClick={() => void act({ id: r.id, action: "review" }, "Pulled back into review")}>Pull back into review</Button>}
                   {r.status === "live" && <Button size="sm" variant="plain" onClick={() => void act({ id: r.id, action: "hide" }, "Hidden")}>Hide</Button>}
                   {r.status === "hidden" && <Button size="sm" variant="plain" onClick={() => void act({ id: r.id, action: "approve" }, "Visible again")}>Unhide</Button>}
+                  <ReelMoveDelete reelId={r.id} brandId={r.brand_id} onChanged={refresh} />
                 </td>
               </tr>
             ))}
@@ -219,7 +220,7 @@ function BrandPanel({ brandId, onChanged }: { brandId: string; onChanged: () => 
       <div>
         <div className="mb-2 font-semibold nums">Reels · {d.reels.length}</div>
         <div className="space-y-2">
-          {d.reels.map((r) => <AdminReel key={r.id} r={r} onChanged={refresh} />)}
+          {d.reels.map((r) => <AdminReel key={r.id} r={r} brandId={brandId} onChanged={refresh} />)}
           {!d.reels.length && <p className="text-secondary-text">No reels shared yet.</p>}
         </div>
       </div>
@@ -276,7 +277,7 @@ function BrandForm({ b, onSaved }: { b: Detail["brand"]; onSaved: () => void }) 
   );
 }
 
-function AdminReel({ r, onChanged }: { r: Detail["reels"][number]; onChanged: () => void }) {
+function AdminReel({ r, brandId, onChanged }: { r: Detail["reels"][number]; brandId: string; onChanged: () => void }) {
   const rename = useServerFn(adminRenameReel);
   const review = useServerFn(reviewDirectoryReel);
   const [title, setTitle] = useState(r.title);
@@ -313,8 +314,39 @@ function AdminReel({ r, onChanged }: { r: Detail["reels"][number]; onChanged: ()
           {r.status === "live" && <Button size="sm" variant="plain" disabled={busy} onClick={() => void run(() => review({ data: { id: r.id, action: "review" } }), "Pulled back into review")}>Pull back into review</Button>}
           {r.status === "live" && <Button size="sm" variant="plain" disabled={busy} onClick={() => void run(() => review({ data: { id: r.id, action: "hide" } }), "Hidden")}>Hide</Button>}
           {r.status === "hidden" && <Button size="sm" variant="plain" disabled={busy} onClick={() => void run(() => review({ data: { id: r.id, action: "approve" } }), "Visible again")}>Unhide</Button>}
+          <ReelMoveDelete reelId={r.id} brandId={brandId} onChanged={onChanged} />
         </div>
       </div>
     </div>
+  );
+}
+
+function ReelMoveDelete({ reelId, brandId, onChanged }: { reelId: string; brandId: string; onChanged: () => void }) {
+  const brands = useServerFn(listDirectoryBrands);
+  const move = useServerFn(adminMoveReel);
+  const del = useServerFn(adminDeleteReel);
+  const qc = useQueryClient();
+  const [moving, setMoving] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const q = useQuery({ queryKey: ["admin", "directory-brands"], queryFn: () => brands(), enabled: moving });
+  const done = (msg: string) => { toast.success(msg); setMoving(false); void qc.invalidateQueries({ queryKey: ["admin"] }); onChanged(); };
+  const run = async (fn: () => Promise<unknown>, msg: string) => {
+    setBusy(true);
+    try { await fn(); done(msg); } catch (e) { toast.error(e instanceof Error ? e.message : "That didn't work"); } finally { setBusy(false); }
+  };
+  if (moving) return (
+    <span className="inline-flex items-center gap-2">
+      <select aria-label="Move to brand page" disabled={busy || !q.data} defaultValue="" onChange={(e) => e.target.value && void run(() => move({ data: { reelId, brandId: e.target.value } }), "Reel moved")} className="rounded-sm bg-control-fill px-2 py-1 text-[13px]">
+        <option value="">{q.data ? "Move to…" : "Loading…"}</option>
+        {(q.data ?? []).filter((b) => b.id !== brandId).map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
+      </select>
+      <Button size="sm" variant="plain" onClick={() => setMoving(false)}>Cancel</Button>
+    </span>
+  );
+  return (
+    <>
+      <Button size="sm" variant="plain" disabled={busy} onClick={() => setMoving(true)}>Move</Button>
+      <Button size="sm" variant="plain" disabled={busy} className="text-destructive" onClick={() => { if (confirm("Delete this reel from the Directory? The client's ad isn't affected. This can't be undone.")) void run(() => del({ data: { reelId } }), "Reel deleted"); }}>Delete</Button>
+    </>
   );
 }

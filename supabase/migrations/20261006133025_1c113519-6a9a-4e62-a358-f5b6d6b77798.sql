@@ -1,0 +1,1 @@
+ALTER TABLE public.permission_log DROP CONSTRAINT IF EXISTS permission_log_directory_reel_id_fkey;
