@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Check, ChevronLeft, Maximize2, Menu, Minimize2, Pause, Play, X } from "lucide-react";
-import { SHOW_DIRECTORY } from "@/lib/features";
+import { SHOW_SHARE } from "@/lib/features";
 import { MobileMenu } from "@/components/MobileNavMenu";
 import { HelpMenu } from "@/components/stillframe/HelpMenu";
 import { UserMenu } from "@/components/stillframe/UserMenu";
@@ -42,7 +42,7 @@ const STEPS_ALL: { key: StepKey; label: string; to: "/app/ad/$id/photos" | "/app
   { key: "export", label: "Export", to: "/app/ad/$id/export" },
   { key: "share", label: "Share", to: "/app/ad/$id/share" },
 ];
-const STEPS = STEPS_ALL.filter((s) => SHOW_DIRECTORY || s.key !== "share");
+const STEPS = STEPS_ALL.filter((s) => SHOW_SHARE || s.key !== "share");
 
 export type StepTitleInfo = { name: string; onRename?: ((name: string) => void) | undefined; status?: "saving" | "saved" | "error" | undefined; readOnly?: boolean | undefined };
 
