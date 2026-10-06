@@ -367,6 +367,33 @@ export type Database = {
         }
         Relationships: []
       }
+      directory_greeting_log: {
+        Row: {
+          action: string
+          created_at: string
+          greeting: string
+          id: string
+          rule: string
+          session_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          greeting: string
+          id?: string
+          rule: string
+          session_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          greeting?: string
+          id?: string
+          rule?: string
+          session_id?: string
+        }
+        Relationships: []
+      }
       directory_likes: {
         Row: {
           created_at: string
