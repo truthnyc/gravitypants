@@ -37,7 +37,7 @@
 - Free trial is usage-based (no time limit): SQL `export_status` returns `trial`, `watermark` (false only for the first export) and `clean_left`; the UI reads these flags, never `trial_ends_at`.
 
 - Folder rules: see `AGENTS.md` in src/components/editor, src/render, src/lib/stillframe (billing details), src/lib/directory and src/routes/_authenticated/admin.
-- Directory headline rotation is independent of motion preferences; reduced-motion CSS removes the transitions so words still change on phones without animated movement.
+- Directory greetings use hosting geo or browser GeoJS, then server weather; no stored location or shared cache. Reduced motion removes transitions, not word rotation.
 - Admin analytics: public visits go to `page_views` (anon insert) via `src/lib/site/track.ts`; sign-up UTM in user metadata; `analytics.server.ts` feeds the Analytics page and deduped Monday `/api/public/weekly-report`.
 - One shared `SiteHeader` (`src/components/SiteHeader.tsx`, variant site|app) is the header everywhere except the editor; feature flags live in `src/lib/features.ts` (`SHOW_DIRECTORY` gates every Directory link) — headers can't drift and Directory ships when ready.
 - Website reel favorites: `site_reel_favorites` (own rows only) via `SiteReelHeart`/`useSiteReelFavorites` in src/components/site/SiteReelHeart.tsx; the Favorites page shows them alongside Directory reels — one heart for every reel tile.
