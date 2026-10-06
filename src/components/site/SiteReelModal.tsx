@@ -13,7 +13,7 @@ export function SiteReelModal({ reel, onClose }: { reel: SiteReel | null; onClos
   const body = <Body reel={reel} onClose={onClose} />;
   return mobile ? (
     <Drawer open onOpenChange={(o) => !o && onClose()}>
-      <DrawerContent className="max-h-[92dvh] overflow-x-hidden overflow-y-auto pb-6 font-ap"><DrawerTitle className="sr-only">{reel.title}</DrawerTitle>{body}</DrawerContent>
+      <DrawerContent className="max-h-[92dvh] font-ap"><DrawerTitle className="sr-only">{reel.title}</DrawerTitle><div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto pb-6">{body}</div></DrawerContent>
     </Drawer>
   ) : (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
