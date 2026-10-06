@@ -3,7 +3,7 @@ import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
-  BRAND_DESCRIPTION_MAX, BRAND_NAME_MAX, CATEGORIES, GRACE_DAYS, MOODS, REEL_DESCRIPTION_MAX, SLUG_MAX,
+  BRAND_DESCRIPTION_MAX, BRAND_NAME_MAX, CATEGORIES, GRACE_DAYS, MOODS, BRAND_MOODS_MAX, REEL_DESCRIPTION_MAX, SLUG_MAX,
   WORDING_VERSION, permissionWording, toSlug, validFullName,
   type DirStatus, type DirectoryCard, type PlanTag, type ShareBrand,
 } from "./directory";
@@ -263,7 +263,7 @@ export const saveBrandDescription = createServerFn({ method: "POST" })
     name: z.string().trim().min(1).max(50).optional(),
     website: z.string().trim().max(300).optional(),
     category: z.enum(CATEGORIES).optional(),
-    moods: z.array(z.enum(MOODS)).max(MOODS.length).optional(),
+    moods: z.array(z.enum(MOODS)).max(BRAND_MOODS_MAX).optional(),
   }).parse(d))
   .handler(async ({ data, context }) => {
     const patch: Record<string, unknown> = { description: data.description || null };
@@ -535,7 +535,7 @@ export const adminSaveBrand = createServerFn({ method: "POST" })
     brandId: z.string().uuid(), name: z.string().trim().min(1).max(BRAND_NAME_MAX),
     website: z.string().trim().max(200).refine((v) => !v || /^https?:\/\//.test(v), "Website must start with http:// or https://"),
     category: z.enum(CATEGORIES), description: z.string().trim().max(BRAND_DESCRIPTION_MAX),
-    moods: z.array(z.enum(MOODS)).max(MOODS.length).default([]),
+    moods: z.array(z.enum(MOODS)).max(BRAND_MOODS_MAX).default([]),
   }).parse(d))
   .handler(async ({ data, context }) => {
     const sb = context.supabase as any;

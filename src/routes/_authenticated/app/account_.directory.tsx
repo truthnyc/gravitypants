@@ -10,7 +10,7 @@ import { checkSlug, getDirectoryAccount, hideReel, renameDirectoryReel, saveBran
 import { STATUS_LABEL } from "@/lib/directory/directory";
 import { getWorkspaceId } from "@/lib/stillframe/workspace";
 import { cn } from "@/lib/utils";
-import { BRAND_DESCRIPTION_MAX, BRAND_NAME_MAX, CATEGORIES, GRACE_DAYS, MOODS, SLUG_MAX, nearLimit } from "@/lib/directory/directory";
+import { BRAND_DESCRIPTION_MAX, BRAND_NAME_MAX, CATEGORIES, GRACE_DAYS, MOODS, SLUG_MAX, BRAND_MOODS_MAX, moodLabel, moodsFor, nearLimit } from "@/lib/directory/directory";
 
 export const Route = createFileRoute("/_authenticated/app/account_/directory")({
   head: () => ({
@@ -184,17 +184,17 @@ function DescriptionBox({ brand, onSaved }: { brand: BrandInfo; onSaved: () => v
           <input type="url" value={website} placeholder="https://yourbrand.com" onChange={(e) => setWebsite(e.target.value)} className={fieldCls} /></label>
       </div>
       <label className="mt-4 block sm:w-1/2 sm:pr-[7px]"><span className={lbl}>Category</span>
-        <select value={category} onChange={(e) => setCategory(e.target.value)} className={fieldCls}>
+        <select value={category} onChange={(e) => { const c = e.target.value; setCategory(c); setMoods(moods.filter((m) => (moodsFor(c) as string[]).includes(m))); }} className={fieldCls}>
           {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
         </select></label>
       <div className="mt-4"><span className={lbl}>Moods</span>
         <div className="flex flex-wrap gap-1.5">
-          {MOODS.map((m) => { const on = moods.includes(m); return (
-            <button key={m} type="button" aria-pressed={on} onClick={() => setMoods(on ? moods.filter((x) => x !== m) : [...moods, m])}
-              className={cn("h-9 rounded-lg px-3 text-[14px]", on ? "bg-ap-blue text-ap-card" : "bg-ap-panel text-ap-body hover:bg-ap-media")}>{m}</button>
+          {[...new Set([...moodsFor(category), ...moods])].map((m) => { const on = moods.includes(m); return (
+            <button key={m} type="button" aria-pressed={on} disabled={!on && moods.length >= BRAND_MOODS_MAX} onClick={() => setMoods(on ? moods.filter((x) => x !== m) : [...moods, m])}
+              className={cn("h-9 rounded-lg px-3 text-[14px]", on ? "bg-ap-blue text-ap-card" : "bg-ap-panel text-ap-body hover:bg-ap-media", "disabled:opacity-40")}>{moodLabel(m)}</button>
           ); })}
         </div>
-        <small className="mt-1.5 block text-[12px] text-ap-muted">Pick the moods that fit your brand. They show on your brand page.</small>
+        <small className="mt-1.5 block text-[12px] text-ap-muted">Pick 1 to 3 moods that fit your brand. The list matches your category.</small>
       </div>
       <label htmlFor="brand-description" className={cn(lbl, "mt-4")}>Brand description <Counter n={value.length} max={BRAND_DESCRIPTION_MAX} /></label>
       <textarea id="brand-description" value={value} maxLength={BRAND_DESCRIPTION_MAX} rows={3} onChange={(e) => setValue(e.target.value)} className="w-full resize-y bg-ap-card px-3.5 py-2.5 text-[14px] leading-[1.5]" />
