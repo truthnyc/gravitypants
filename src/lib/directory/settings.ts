@@ -4,6 +4,9 @@ import { z } from "zod";
 export const directorySettingsSchema = z.object({
   showCarousel: z.boolean(),
   title: z.string().trim().min(1).max(60),
+  filterCarouselGap: z.number().int().min(0).max(96).default(24),
+  carouselLabelSize: z.number().int().min(12).max(32).default(13),
+  carouselLabelGap: z.number().int().min(0).max(96).default(16),
   source: z.enum(["manual", "auto"]),
   rule: z.enum(["newest", "viewed", "saved", "random"]),
   ruleMoods: z.array(z.string().max(30)).max(20),
@@ -24,6 +27,7 @@ export type DirectorySettings = z.infer<typeof directorySettingsSchema>;
 
 export const DEFAULT_DIRECTORY_SETTINGS: DirectorySettings = {
   showCarousel: true, title: "Featured this week", source: "auto", rule: "newest",
+  filterCarouselGap: 24, carouselLabelSize: 13, carouselLabelGap: 16,
   ruleMoods: [], ruleCategories: [], ruleBrands: [], count: 12, speed: "normal", whenFiltering: "follow",
   rotateWeekly: false, showFrom: null, showUntil: null,
   comingSoon: true, pageSize: 12, autoLoadPages: 3, headlineMoods: [],
