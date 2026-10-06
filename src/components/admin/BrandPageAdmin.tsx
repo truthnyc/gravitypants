@@ -145,7 +145,8 @@ export function BrandOwnership({ brandId, onChanged }: { brandId: string; onChan
   const [picking, setPicking] = useState(false);
   const [reels, setReelsSel] = useState<string[] | null>(null);
   const [busy, setBusy] = useState(false);
-  if (!q.data) return null;
+  if (q.isLoading) return <div className="h-24 rounded-sm bg-control-fill" aria-busy="true" />;
+  if (!q.data) return <p className="border-t pt-4 text-[13px] text-secondary-text">Couldn't load ownership and website reels. <button type="button" className="text-primary" onClick={() => void q.refetch()}>Try again</button></p>;
   const d = q.data;
   const selected = reels ?? d.siteReelIds;
   const refresh = () => { void qc.invalidateQueries({ queryKey: key }); void qc.invalidateQueries({ queryKey: ["admin", "brand-workspaces"] }); void qc.invalidateQueries({ queryKey: ["site-reels-all"] }); onChanged(); };
