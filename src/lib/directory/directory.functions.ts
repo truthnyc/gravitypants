@@ -3,7 +3,7 @@ import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
-  BRAND_DESCRIPTION_MAX, BRAND_NAME_MAX, CATEGORIES, GRACE_DAYS, BRAND_MOODS_MAX, REEL_DESCRIPTION_MAX, SLUG_MAX,
+  BRAND_DESCRIPTION_MAX, BRAND_NAME_MAX, CATEGORIES, categorySlug, GRACE_DAYS, BRAND_MOODS_MAX, REEL_DESCRIPTION_MAX, SLUG_MAX,
   WORDING_VERSION, permissionWording, toSlug, validFullName,
   type DirStatus, type DirectoryCard, type PlanTag, type ShareBrand,
 } from "./directory";
@@ -331,7 +331,7 @@ export const saveSlug = createServerFn({ method: "POST" })
 
 /* ---------------- public */
 
-export const searchDirectory = createServerFn({ method: "GET" })
+export const searchDirectoryLegacy = createServerFn({ method: "GET" })
   .inputValidator((d: unknown) => z.object({ q: z.string().max(200).default(""), size: z.enum(["9x16", "1x1", "16x9"]).nullable().default(null) }).parse(d))
   .handler(async ({ data }): Promise<DirectoryCard[]> => {
     const { publicClient } = await import("@/lib/site/reels.server");
@@ -716,5 +716,61 @@ export const adminBrandLinks = createServerFn({ method: "POST" })
       editorial: !!b?.is_editorial,
       placeholder: !b?.workspaces?.owner_id,
       siteReelIds: ((reels ?? []) as any[]).map((r) => r.id as string),
+    };
+  });
+
+/* ---------------- faceted search (server-side filter, count, page) */
+
+export const DIRECTORY_PAGE_SIZE = 12;
+export type FacetedReel = {
+  kind: "directory" | "site"; id: string; title: string; brand_id: string; brand_name: string; brand_slug: string;
+  category: string; cat_slug: string; formats: string[]; moods: string[]; featured: boolean;
+  poster: string | null; preview_url: string | null; video_url: string | null;
+};
+export type FacetedResult = {
+  reels: FacetedReel[]; total: number; page: number; pageSize: number; hasMore: boolean;
+  facets: { moods: Record<string, number>; categories: Record<string, number>; brands: Record<string, number> };
+};
+const slugList = z.array(z.string().trim().toLowerCase().max(60)).max(60).default([]);
+export const facetedInput = z.object({
+  q: z.string().max(200).default(""), moods: slugList, categories: slugList, brands: slugList,
+  page: z.number().int().min(1).max(1000).default(1), pageSize: z.number().int().min(1).max(60).default(DIRECTORY_PAGE_SIZE),
+});
+
+/** One query for /directory: OR within a filter, AND across filters, disjunctive facet counts. */
+export const searchDirectory = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => facetedInput.parse(d ?? {}))
+  .handler(async ({ data }): Promise<FacetedResult> => {
+    const { publicClient } = await import("@/lib/site/reels.server");
+    const { data: r, error } = await (publicClient() as any).rpc("directory_faceted_search", {
+      q: data.q, f_moods: data.moods, f_categories: data.categories, f_brands: data.brands, page: data.page, page_size: data.pageSize,
+    });
+    if (error) throw new Error(error.message);
+    const res = r as any;
+    const rows = (res.reels ?? []) as any[];
+    const signed = await signPosters(rows.filter((x) => x.kind === "directory"));
+    const site = rows.filter((x) => x.kind === "site");
+    const sitePaths = site.flatMap((x) => [x.poster_url, x.video_url]).filter((u: string | null) => u?.startsWith("site-reels:")).map((u: string) => u.slice(11));
+    const sm = new Map<string, string>();
+    if (sitePaths.length) {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: s } = await supabaseAdmin.storage.from("site-reels").createSignedUrls(sitePaths, 60 * 60 * 24);
+      for (const x of s ?? []) if (x.path && x.signedUrl) sm.set(x.path, x.signedUrl);
+    }
+    const sign = (u: string | null) => (u?.startsWith("site-reels:") ? sm.get(u.slice(11)) ?? null : u);
+    const byId = new Map(signed.map((x) => [x.id as string, x.poster]));
+    const reels: FacetedReel[] = rows.map((x) => ({
+      kind: x.kind, id: x.id, title: x.title, brand_id: x.brand_id, brand_name: x.brand_name, brand_slug: x.brand_slug,
+      category: x.category, cat_slug: x.cat_slug, formats: x.formats ?? [], moods: x.moods ?? [], featured: !!x.featured,
+      poster: x.kind === "site" ? sign(x.poster_url) : byId.get(x.id) ?? null,
+      preview_url: x.preview_url ?? null, video_url: x.kind === "site" ? sign(x.video_url) : x.video_url ?? null,
+    }));
+    // Every category is listed, even with 0 reels, so the UI can say "Coming soon".
+    const categories: Record<string, number> = {};
+    for (const c of CATEGORIES) { const s = categorySlug(c); categories[s] = Number(res.categories?.[s] ?? 0); }
+    const total = Number(res.total ?? 0);
+    return {
+      reels, total, page: res.page, pageSize: res.pageSize, hasMore: res.page * res.pageSize < total,
+      facets: { moods: res.moods ?? {}, categories, brands: res.brands ?? {} },
     };
   });
