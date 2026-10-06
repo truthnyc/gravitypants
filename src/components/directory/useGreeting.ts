@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { chooseGreeting, readReturning, rememberVisit, type Chosen } from "@/lib/directory/greeting";
 import { getGreetingConfig, getVisitorContext } from "@/lib/directory/greeting.functions";
 
+import { lookupBrowserLocation } from "@/lib/directory/visitor-context";
+
 const sid = () => {
   try {
     let v = sessionStorage.getItem("gp_sid");
@@ -26,7 +28,12 @@ export function logGreeting(c: Chosen | null, action: "shown" | "mood_click" | "
  */
 export function useGreeting(hasReels: (c: string | null, b: string | null) => boolean, fallbackMood: string, ready: boolean) {
   const cfg = useQuery({ queryKey: ["directory-greeting"], staleTime: 300_000, queryFn: () => getGreetingConfig() });
-  const vis = useQuery({ queryKey: ["directory-visitor"], staleTime: 1_800_000, retry: false, queryFn: () => getVisitorContext() });
+  const vis = useQuery({ queryKey: ["directory-visitor"], staleTime: 1_800_000, retry: false, queryFn: async () => {
+    const context = await getVisitorContext();
+    if (!context.needsLocation) return context;
+    const location = await lookupBrowserLocation();
+    return location ? getVisitorContext({ data: { location } }) : context;
+  } });
   const [chosen, setChosen] = useState<Chosen | null>(null);
   const done = useRef(false);
   useEffect(() => {

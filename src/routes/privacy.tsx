@@ -15,6 +15,7 @@ const sections: { h: string; body: string[] }[] = [
       "Your content: the photos you upload and the ads, brand kits and templates you create. These belong to you.",
       "Billing details: payments are handled by our payment provider; we never see or store your full card number.",
       "Usage basics: which features you use and technical logs that keep the service running and secure.",
+      "Directory greetings: when hosting location information is unavailable, GeoJS estimates your country and city from your internet connection. Open-Meteo supplies weather for that approximate area. We do not request device location access or save your location to your account; these services receive the connection or approximate area needed for their lookup.",
     ],
   },
   {
@@ -61,7 +62,7 @@ function PrivacyPage() {
       <article className="mx-auto max-w-[760px] px-5 pb-24 pt-16 md:pt-24">
         <p className="text-[15px] font-semibold text-site-eyebrow">Legal</p>
         <h1 className="mt-3 text-[40px] font-semibold leading-[1.05] tracking-[-0.03em] text-site-ink md:text-[56px]">Privacy policy</h1>
-        <p className="mt-4 text-[15px] text-site-muted">Last updated: September 2026</p>
+        <p className="mt-4 text-[15px] text-site-muted">Last updated: October 2026</p>
         <p className="mt-6 text-[17px] leading-[1.5] text-site-secondary">Gravity Pants turns your photos into video ads. This policy explains what we collect, why, and the choices you have. The short version: your content is yours, we don't sell data, and we keep things private by default.</p>
         {sections.map((s) => (
           <section key={s.h} className="mt-10">

@@ -1,8 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getRequest } from "@tanstack/react-start/server";
+import { getRequest, setResponseHeader } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { greetingConfigSchema, mergeGreeting, RULE_TYPES, type GreetingConfig, type WeatherKind } from "./greeting";
+import { greetingConfigSchema, mergeGreeting, RULE_TYPES, type GreetingConfig } from "./greeting";
+
+import { countryCode, parseLocation, fetchLocalWeather, type VisitorContext } from "./visitor-context";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const KEY = "directory_greeting";
@@ -13,43 +15,19 @@ export const getGreetingConfig = createServerFn({ method: "GET" }).handler(async
   return mergeGreeting(data?.value);
 });
 
-type Wx = { kind: WeatherKind; tempC: number; isDay: boolean; sunset: string | null };
-const wxCache = new Map<string, { at: number; wx: Wx | null }>();
-
-function wxKind(code: number): WeatherKind {
-  if (code >= 95) return "storm";
-  if ((code >= 71 && code <= 77) || code === 85 || code === 86) return "snow";
-  if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) return "rain";
-  if (code === 45 || code === 48) return "fog";
-  if (code <= 1) return "clear";
-  return "cloudy";
-}
-
-/** Approximate visitor context from hosting geo headers. Nothing is stored; weather failures are silent. */
-export const getVisitorContext = createServerFn({ method: "GET" }).handler(async () => {
-  const req = getRequest() as any;
-  const cf = req?.cf ?? {};
-  const country: string | null = (cf.country ?? req?.headers?.get?.("cf-ipcountry") ?? null) || null;
-  const city: string | null = cf.city ?? null;
-  const lat = Number(cf.latitude), lon = Number(cf.longitude);
-  let weather: Wx | null = null;
-  if (Number.isFinite(lat) && Number.isFinite(lon) && (lat || lon)) {
-    const key = city ?? `${lat.toFixed(1)},${lon.toFixed(1)}`;
-    const hit = wxCache.get(key);
-    if (hit && Date.now() - hit.at < 30 * 60000) weather = hit.wx;
-    else {
-      try {
-        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat.toFixed(2)}&longitude=${lon.toFixed(2)}&current=temperature_2m,weather_code,is_day&daily=sunset&timezone=GMT&forecast_days=1`, { signal: AbortSignal.timeout(2500) });
-        if (res.ok) {
-          const j: any = await res.json();
-          weather = { kind: wxKind(Number(j.current?.weather_code ?? 3)), tempC: Number(j.current?.temperature_2m ?? 15), isDay: j.current?.is_day === 1, sunset: j.daily?.sunset?.[0] ? `${j.daily.sunset[0]}Z` : null };
-        }
-      } catch { weather = null; }
-      wxCache.set(key, { at: Date.now(), wx: weather });
-    }
-  }
-  return { country: country && country !== "XX" ? country.toUpperCase() : null, city, weather };
-});
+/** Location personalizes greetings only; it never controls access or billing. */
+export const getVisitorContext = createServerFn({ method: "GET" })
+  .inputValidator((value: unknown) => z.object({ location: z.object({ country: z.string().length(2).nullable(), city: z.string().max(120).nullable(), latitude: z.number().min(-90).max(90), longitude: z.number().min(-180).max(180) }).optional() }).optional().parse(value))
+  .handler(async ({ data }): Promise<VisitorContext> => {
+    setResponseHeader("Cache-Control", "private, no-store");
+    const req = getRequest() as Request & { cf?: { country?: unknown; city?: unknown; latitude?: unknown; longitude?: unknown } };
+    const cf = req.cf ?? {};
+    const country = countryCode(cf.country ?? req.headers.get("cf-ipcountry"));
+    const city = typeof cf.city === "string" ? cf.city : req.headers.get("cf-ipcity");
+    const location = parseLocation({ country, city, latitude: cf.latitude ?? req.headers.get("cf-iplatitude"), longitude: cf.longitude ?? req.headers.get("cf-iplongitude") }) ?? parseLocation(data?.location);
+    if (!location) return { country, city, weather: null, needsLocation: true };
+    return { country: location.country ?? country, city: location.city ?? city, weather: await fetchLocalWeather(location), needsLocation: false };
+  });
 
 async function adminDb(ctx: { supabase: any }) {
   const { data, error } = await ctx.supabase.rpc("is_platform_admin");
