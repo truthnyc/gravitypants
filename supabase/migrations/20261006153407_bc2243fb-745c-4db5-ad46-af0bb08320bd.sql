@@ -1,0 +1,3 @@
+ALTER TABLE public.directory_brands DROP CONSTRAINT directory_brands_category_check;
+UPDATE public.directory_brands SET category = 'Crafts & Hobbies' WHERE category = 'Arts, Crafts & Hobbies';
+ALTER TABLE public.directory_brands ADD CONSTRAINT directory_brands_category_check CHECK (category IN ('Beauty & Fragrance','Crafts & Hobbies','Events & Entertainment','Fashion & Apparel','Food & Drink','Health & Wellness','Home & Living','Jewelry & Watches','Kids & Family','Nonprofit & Causes','Pets','Photography & Visual Arts','Real Estate','Restaurants & Cafés','Services & Local Business','Travel & Hospitality','Wine & Spirits','Other'));

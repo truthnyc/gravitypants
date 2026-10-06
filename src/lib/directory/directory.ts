@@ -1,13 +1,13 @@
 /** Shared Directory constants (client- and server-safe). */
 /** A–Z, with Other last. Must match the directory_brands_category_check constraint. */
 export const CATEGORIES = [
-  "Arts, Crafts & Hobbies", "Beauty & Fragrance", "Events & Entertainment", "Fashion & Apparel", "Food & Drink",
+  "Beauty & Fragrance", "Crafts & Hobbies", "Events & Entertainment", "Fashion & Apparel", "Food & Drink",
   "Health & Wellness", "Home & Living", "Jewelry & Watches", "Kids & Family", "Nonprofit & Causes", "Pets",
-  "Real Estate", "Restaurants & Cafés", "Services & Local Business", "Travel & Hospitality", "Wine & Spirits", "Other",
+  "Photography & Visual Arts", "Real Estate", "Restaurants & Cafés", "Services & Local Business", "Travel & Hospitality", "Wine & Spirits", "Other",
 ] as const;
 export type Category = (typeof CATEGORIES)[number];
 export const CATEGORY_COVERS: Record<Category, string> = {
-  "Arts, Crafts & Hobbies": "Yarn, craft supplies, galleries, artists",
+  "Crafts & Hobbies": "Yarn, craft supplies, handmade goods, hobbies",
   "Beauty & Fragrance": "Skincare, makeup, perfume, hair",
   "Events & Entertainment": "Venues, concerts, festivals, weddings",
   "Fashion & Apparel": "Clothing, shoes, bags, knitwear",
@@ -18,6 +18,7 @@ export const CATEGORY_COVERS: Record<Category, string> = {
   "Kids & Family": "Toys, baby goods, children's fashion",
   "Nonprofit & Causes": "Charities, NGOs, fundraisers",
   Pets: "Pet food, accessories, grooming",
+  "Photography & Visual Arts": "Photography, galleries, artists, visual art",
   "Real Estate": "Listings, developments, agents",
   "Restaurants & Cafés": "Menus, specials, openings",
   "Services & Local Business": "Salons, studios, agencies, shops",
@@ -87,3 +88,14 @@ export type DirectoryCard = {
   website_url: string | null;
 };
 export const ratio = (f: string) => f.replace("x", ":");
+
+/** Resolve old website-reel values to the shared taxonomy. */
+export function normalizeCategory(value: string): Category | null {
+  const slug = categorySlug(value);
+  const aliases: Record<string, Category> = {
+    fashion: "Fashion & Apparel", beauty: "Beauty & Fragrance", food: "Food & Drink",
+    home: "Home & Living", travel: "Travel & Hospitality", "travel-photography": "Travel & Hospitality",
+    nonprofits: "Nonprofit & Causes", "arts-crafts-hobbies": "Crafts & Hobbies",
+  };
+  return categoryFromSlug(slug) ?? aliases[slug] ?? null;
+}

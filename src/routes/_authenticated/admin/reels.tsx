@@ -11,7 +11,7 @@ import { Card, PageTitle, Pill } from "@/components/admin/AdminShell";
 import { supabase } from "@/integrations/supabase/client";
 import { deleteSiteReel, listAdminReels, moveSiteReel, saveSiteReel, type AdminReel } from "@/lib/stillframe/admin-reels.functions";
 import { listDirectoryBrands } from "@/lib/directory/directory.functions";
-import { CATEGORY_LABEL, FORMAT_LABEL, categoryLabel, type ReelFormat } from "@/lib/site/reels";
+import { FORMAT_LABEL, type ReelFormat } from "@/lib/site/reels";
 
 export const Route = createFileRoute("/_authenticated/admin/reels")({
   head: () => ({ meta: [
@@ -26,7 +26,7 @@ export const Route = createFileRoute("/_authenticated/admin/reels")({
   component: Reels,
 });
 
-const DEFAULT_CATEGORIES = Object.keys(CATEGORY_LABEL);
+import { CATEGORIES, normalizeCategory } from "@/lib/directory/directory";
 
 type Probe = { format: ReelFormat; seconds: number; poster: Blob | null };
 
@@ -93,13 +93,13 @@ function CoverPicker({ src, onPick }: { src: string; onPick: (b: Blob, preview: 
 }
 
 type Draft = { id?: string; brand: string; title: string; href: string; category: string; published: boolean; photos: number; brand_id?: string | null };
-const empty: Draft = { brand: "", title: "", href: "", category: "fashion", published: true, photos: 3 };
+const empty: Draft = { brand: "", title: "", href: "", category: "Fashion & Apparel", published: true, photos: 3 };
 
-function ReelForm({ initial, categories, onDone, onCancel, videoSrc }: { videoSrc?: string | null; initial: Draft; categories: string[]; onDone: () => void; onCancel?: () => void }) {
+function ReelForm({ initial, onDone, onCancel, videoSrc }: { videoSrc?: string | null; initial: Draft; onDone: () => void; onCancel?: () => void }) {
   const save = useServerFn(saveSiteReel);
   const brandsFn = useServerFn(listDirectoryBrands);
   const { data: brands } = useQuery({ queryKey: ["admin", "directory-brands"], queryFn: () => brandsFn() });
-  const [d, setD] = useState(initial);
+  const [d, setD] = useState<Draft>(() => ({ ...initial, category: normalizeCategory(initial.category) ?? "Other" }));
   const [file, setFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
   const [cover, setCover] = useState<Blob | null>(null);
@@ -112,6 +112,7 @@ function ReelForm({ initial, categories, onDone, onCancel, videoSrc }: { videoSr
   }, [file]);
   const input = useRef<HTMLInputElement>(null);
   const isNew = !initial.id;
+  const coverSrc = fileUrl ?? videoSrc;
 
   const submit = async () => {
     if (isNew && !file) { toast.error("Pick a reel file."); return; }
@@ -162,11 +163,9 @@ function ReelForm({ initial, categories, onDone, onCancel, videoSrc }: { videoSr
         <span>How many photos the reel was made from — shown on Examples.</span>
       </label>
       <label className="grid gap-1 text-[13px] text-secondary-text">Category
-        <Input required list="reel-categories" value={d.category} onChange={(e) => setD({ ...d, category: e.target.value })} placeholder="fashion" className="h-11 bg-card text-[15px] text-foreground" />
-        <datalist id="reel-categories">
-          {categories.map((c) => <option key={c} value={c}>{categoryLabel(c)}</option>)}
-        </datalist>
-        <span>Pick an existing one or type a new category.</span>
+        <select aria-label="Category" required value={d.category} onChange={(e) => setD({ ...d, category: e.target.value })} className="h-11 rounded-sm border border-input bg-card px-3 text-[15px] text-foreground">
+          {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+        </select>
       </label>
       <div className="grid gap-1 text-[13px] text-secondary-text sm:col-span-2">Reel file (MP4 or WebM)
         <div className="flex flex-wrap items-center gap-3">
@@ -178,9 +177,9 @@ function ReelForm({ initial, categories, onDone, onCancel, videoSrc }: { videoSr
         </div>
         <span>Size and length are read from the file, and a still frame is made for you.</span>
       </div>
-      {(fileUrl ?? videoSrc) && (
+      {coverSrc && (
         <>
-          <CoverPicker key={fileUrl ?? videoSrc!} src={(fileUrl ?? videoSrc)!} onPick={(b, p) => { setCover(b); setCoverPreview(p); }} />
+          <CoverPicker key={coverSrc} src={coverSrc} onPick={(b, p) => { setCover(b); setCoverPreview(p); }} />
           {coverPreview && <div className="sm:col-span-2 flex items-center gap-3 text-[13px] text-secondary-text"><img src={coverPreview} alt="Picked thumbnail" className="h-16 w-auto rounded-sm" /> New thumbnail — saves with the reel.</div>}
         </>
       )}
@@ -209,13 +208,14 @@ function Reels() {
   const { data, refetch } = useQuery({ queryKey: ["admin", "reels"], queryFn: () => list() });
   const [editing, setEditing] = useState<string | null>(null);
   const reels = data ?? [];
-  const categories = [...new Set([...DEFAULT_CATEGORIES, ...reels.map((r) => r.category)])];
 
   const reorder = async (i: number, dir: -1 | 1) => {
     const ids = reels.map((r) => r.id);
     const j = i + dir;
     if (j < 0 || j >= ids.length) return;
-    [ids[i], ids[j]] = [ids[j]!, ids[i]!];
+    const current = ids[i]; const next = ids[j];
+    if (!current || !next) return;
+    [ids[i], ids[j]] = [next, current];
     await move({ data: { ids } });
     void refetch();
   };
@@ -229,7 +229,7 @@ function Reels() {
   return (
     <>
       <PageTitle title="Website Reels" sub="These reels show on the home page, Examples and Showcase, in this order." />
-      <Card className="mb-6"><h2 className="mb-3 text-[17px] font-semibold">Add a reel</h2><ReelForm initial={empty} categories={categories} onDone={() => void refetch()} /></Card>
+      <Card className="mb-6"><h2 className="mb-3 text-[17px] font-semibold">Add a reel</h2><ReelForm initial={empty} onDone={() => void refetch()} /></Card>
       <Card className="p-0">
         <ul className="divide-y divide-border">
           {reels.map((r, i) => (
@@ -252,7 +252,7 @@ function Reels() {
               {editing === r.id && (
                 <div className="mt-4">
                   <ReelForm
-                    categories={categories}
+                   
                     videoSrc={r.videoView}
                     initial={{ id: r.id, brand: r.brand, title: r.title, href: r.href ?? "", category: r.category, published: r.published, photos: r.photos, brand_id: r.brand_id, ...({ format: r.format, seconds: r.seconds } as object) }}
                     onDone={() => { setEditing(null); void refetch(); }}
