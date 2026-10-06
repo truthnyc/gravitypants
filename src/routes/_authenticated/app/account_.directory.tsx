@@ -10,7 +10,7 @@ import { checkSlug, getDirectoryAccount, hideReel, renameDirectoryReel, saveBran
 import { STATUS_LABEL } from "@/lib/directory/directory";
 import { getWorkspaceId } from "@/lib/stillframe/workspace";
 import { cn } from "@/lib/utils";
-import { BRAND_DESCRIPTION_MAX, BRAND_NAME_MAX, CATEGORIES, GRACE_DAYS, SLUG_MAX, nearLimit } from "@/lib/directory/directory";
+import { BRAND_DESCRIPTION_MAX, BRAND_NAME_MAX, CATEGORIES, GRACE_DAYS, MOODS, SLUG_MAX, nearLimit } from "@/lib/directory/directory";
 
 export const Route = createFileRoute("/_authenticated/app/account_/directory")({
   head: () => ({
@@ -151,7 +151,7 @@ function DirectoryAccount() {
   );
 }
 
-type BrandInfo = { id: string; name: string; description: string; website: string; category: string };
+type BrandInfo = { id: string; name: string; description: string; website: string; category: string; moods: string[] };
 const fieldCls = "w-full text-[14px]";
 function Counter({ n, max }: { n: number; max: number }) {
   return <em className={cn("not-italic font-normal text-[12px] nums", nearLimit(n, max) ? "text-ap-amber" : "text-ap-muted")}>{n} / {max}</em>;
@@ -162,12 +162,13 @@ function DescriptionBox({ brand, onSaved }: { brand: BrandInfo; onSaved: () => v
   const [website, setWebsite] = useState(brand.website);
   const [category, setCategory] = useState(brand.category);
   const [value, setValue] = useState(brand.description);
+  const [moods, setMoods] = useState<string[]>(brand.moods);
   const [busy, setBusy] = useState(false);
-  const changed = value.trim() !== brand.description || name.trim() !== brand.name || website.trim() !== brand.website || category !== brand.category;
+  const changed = value.trim() !== brand.description || name.trim() !== brand.name || website.trim() !== brand.website || category !== brand.category || moods.join() !== brand.moods.join();
   const commit = async () => {
     setBusy(true);
     try {
-      await save({ data: { brandId: brand.id, description: value, name: name.trim(), website: website.trim(), category: category as (typeof CATEGORIES)[number] } });
+      await save({ data: { brandId: brand.id, description: value, name: name.trim(), website: website.trim(), category: category as (typeof CATEGORIES)[number], moods: moods as (typeof MOODS)[number][] } });
       toast.success("Brand page saved.");
       onSaved();
     } catch (e) { toast.error(e instanceof Error ? e.message : "Couldn't save your brand page"); }
@@ -186,6 +187,15 @@ function DescriptionBox({ brand, onSaved }: { brand: BrandInfo; onSaved: () => v
         <select value={category} onChange={(e) => setCategory(e.target.value)} className={fieldCls}>
           {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
         </select></label>
+      <div className="mt-4"><span className={lbl}>Moods</span>
+        <div className="flex flex-wrap gap-1.5">
+          {MOODS.map((m) => { const on = moods.includes(m); return (
+            <button key={m} type="button" aria-pressed={on} onClick={() => setMoods(on ? moods.filter((x) => x !== m) : [...moods, m])}
+              className={cn("h-9 rounded-lg px-3 text-[14px]", on ? "bg-ap-blue text-ap-card" : "bg-ap-panel text-ap-body hover:bg-ap-media")}>{m}</button>
+          ); })}
+        </div>
+        <small className="mt-1.5 block text-[12px] text-ap-muted">Pick the moods that fit your brand. They show on your brand page.</small>
+      </div>
       <label htmlFor="brand-description" className={cn(lbl, "mt-4")}>Brand description <Counter n={value.length} max={BRAND_DESCRIPTION_MAX} /></label>
       <textarea id="brand-description" value={value} maxLength={BRAND_DESCRIPTION_MAX} rows={3} onChange={(e) => setValue(e.target.value)} className="w-full resize-y bg-ap-card px-3.5 py-2.5 text-[14px] leading-[1.5]" />
       <small className="mt-1.5 block text-[12px] text-ap-muted">Shown under your brand name, and used as your page's description in search engines.</small>
