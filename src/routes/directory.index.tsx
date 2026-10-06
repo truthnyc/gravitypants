@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
-import { keepPreviousData, useQueries, useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useInfiniteQuery, useQueries, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { FilterBar, type FilterValue } from "@/components/directory/FilterBar";
 import { DirectoryReelHeart } from "@/components/directory/LikeSave";
@@ -10,7 +10,7 @@ import { SiteShell } from "@/components/site/SiteShell";
 import { ReelCarousel } from "@/components/site/ReelCarousel";
 import { ReelVideo } from "@/components/site/ReelVideo";
 import { ReelDetail } from "@/components/directory/DirectoryGrid";
-import { listPublicBrands, searchDirectory, searchDirectoryLegacy, type FacetedReel } from "@/lib/directory/directory.functions";
+import { DIRECTORY_AUTO_LOAD_PAGES, DIRECTORY_PAGE_SIZE, listPublicBrands, searchDirectory, searchDirectoryLegacy, type FacetedReel } from "@/lib/directory/directory.functions";
 import { CATEGORIES, categorySlug, type DirectoryCard } from "@/lib/directory/directory";
 import { MOOD_FAMILY_COLORS, type MoodFamily } from "@/lib/directory/mood-admin";
 import { cn } from "@/lib/utils";
@@ -143,19 +143,56 @@ function DirectoryPage() {
     search: (prev) => ({ ...prev, mood: f.moods.join(",") || undefined, category: f.categories.join(",") || undefined, brand: f.brands.join(",") || undefined, page: undefined }),
   });
   const searchFn = useServerFn(searchDirectory);
-  const results = useQuery({
-    queryKey: ["directory-search", q, fKey, page],
+  // A shared ?page=3 loads pages 1–3 in one request; later pages are appended one at a time.
+  const startPage = useRef(page);
+  const keyRef = useRef(`${q}|${fKey}`);
+  if (keyRef.current !== `${q}|${fKey}`) { keyRef.current = `${q}|${fKey}`; startPage.current = page; }
+  const results = useInfiniteQuery({
+    queryKey: ["directory-search", q, fKey],
     placeholderData: keepPreviousData,
-    queryFn: async () => {
-      const pages = await Promise.all(Array.from({ length: page }, (_, i) => searchFn({ data: { q, ...filters, page: i + 1 } })));
-      return { ...pages[0]!, reels: pages.flatMap((p) => p.reels), hasMore: pages.at(-1)!.hasMore };
+    initialPageParam: startPage.current,
+    queryFn: ({ pageParam }) => pageParam === startPage.current
+      ? searchFn({ data: { q, ...filters, page: 1, pageSize: DIRECTORY_PAGE_SIZE * pageParam } })
+      : searchFn({ data: { q, ...filters, page: pageParam } }),
+    getNextPageParam: (last, all) => {
+      const loaded = all.reduce((n, p) => n + p.reels.length, 0);
+      return loaded < last.total ? startPage.current + all.length : undefined;
     },
   });
+  const loadedPages = startPage.current + Math.max(0, (results.data?.pages.length ?? 1) - 1);
+  const [autoLeft, setAutoLeft] = useState(-1); // -1 until the first click
+  const focusIdx = useRef<number | null>(null);
+  const moreRef = useRef<HTMLAnchorElement>(null);
+  const loadMore = (keyboard: boolean) => {
+    if (!results.hasNextPage || results.isFetchingNextPage) return;
+    if (keyboard) focusIdx.current = found.length;
+    const next = loadedPages + 1;
+    void results.fetchNextPage().then(() => navigate({ replace: true, resetScroll: false, search: (prev) => ({ ...prev, page: next }) }));
+  };
   const everything = useQuery({ queryKey: ["directory-search-all"], staleTime: 60_000, queryFn: () => searchFn({ data: { pageSize: 1 } }) });
-  const found = results.data?.reels ?? [];
-  const total = results.data?.total ?? 0;
+  const found = results.data?.pages.flatMap((p) => p.reels) ?? [];
+  const total = results.data?.pages[0]?.total ?? 0;
   const allTotal = everything.data?.total ?? total;
-  const facets = results.data?.facets ?? { moods: {}, categories: {}, brands: {} };
+  const facets = results.data?.pages[0]?.facets ?? { moods: {}, categories: {}, brands: {} };
+  const hasMore = !!results.hasNextPage;
+  const remaining = Math.max(0, total - found.length);
+  // Focus the first new card after a keyboard "Show more".
+  useEffect(() => {
+    if (focusIdx.current === null || found.length <= focusIdx.current) return;
+    document.querySelector<HTMLElement>(`[data-reel-idx="${focusIdx.current}"] button`)?.focus();
+    focusIdx.current = null;
+  }, [found.length]);
+  // After the first click, keep loading as the button nears the screen, a few pages at most.
+  useEffect(() => {
+    const el = moreRef.current;
+    if (!el || autoLeft <= 0 || !hasMore) return;
+    const io = new IntersectionObserver(([e]) => {
+      if (e!.isIntersecting && !results.isFetchingNextPage) { setAutoLeft((n) => n - 1); loadMore(false); }
+    }, { rootMargin: "300px 0px" });
+    io.observe(el);
+    return () => io.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoLeft, hasMore, results.isFetchingNextPage, found.length]);
   const filtered = !!q || filters.moods.length + filters.categories.length + filters.brands.length > 0;
 
   const famOf = new Map(families.flatMap((f) => f.moods.map((m) => [m, f.family] as const)));
@@ -258,10 +295,11 @@ function DirectoryPage() {
               {results.data ? (filtered ? `${total} of ${allTotal} reels` : `${total} ${total === 1 ? "reel" : "reels"}`) : ""}
             </p>
           </div>
+          {results.isPending && <SkeletonGrid n={DIRECTORY_PAGE_SIZE} />}
           {found.length > 0 && (
-            <ul className="grid gap-5 [grid-template-columns:repeat(auto-fill,minmax(180px,1fr))]">
-              {found.map((r) => (
-                <li key={`${r.kind}-${r.id}`} className="relative">
+            <ul className={cn("grid gap-5 transition-opacity [grid-template-columns:repeat(auto-fill,minmax(180px,1fr))] motion-reduce:transition-none", results.isPlaceholderData && "opacity-50")}>
+              {found.map((r, i) => (
+                <li key={`${r.kind}-${r.id}`} data-reel-idx={i} className="dir-card-in relative" style={{ animationDelay: `${(i % DIRECTORY_PAGE_SIZE) * 40}ms` }}>
                   <button type="button" onClick={() => openReel(r)} aria-label={`Open ${r.title}`}
                     className="relative block aspect-square w-full overflow-hidden rounded-[8px] bg-ap-panel">
                     {r.poster && <img src={r.poster} alt="" loading="lazy" className={POSTER} />}
@@ -281,6 +319,7 @@ function DirectoryPage() {
               ))}
             </ul>
           )}
+          {results.isFetchingNextPage && <SkeletonGrid n={Math.min(DIRECTORY_PAGE_SIZE, remaining)} className="mt-5" />}
           {results.data && total === 0 && (
             filtered ? (
               <div role="status" className="rounded-[4px] bg-ap-panel px-6 py-10 text-center">
@@ -297,13 +336,28 @@ function DirectoryPage() {
               </div>
             ) : <p className="text-ap-muted" role="status">The first reels are on their way.</p>
           )}
-          {results.data?.hasMore && (
-            <div className="mt-8 text-center">
-              <button type="button" disabled={results.isFetching}
-                onClick={() => void navigate({ replace: true, resetScroll: false, search: (prev) => ({ ...prev, page: page + 1 }) })}
-                className="h-11 rounded-lg bg-ap-panel px-5 text-[15px] font-medium hover:bg-ap-media disabled:opacity-60">
-                {results.isFetching ? "Loading…" : "Show more reels"}
-              </button>
+          {found.length > 0 && !results.isPlaceholderData && (
+            <div className="mt-10 flex flex-col items-center gap-3 text-center">
+              <p className="text-[14px] text-ap-muted nums">Showing {found.length} of {total} reels</p>
+              <div className="h-1 w-[180px] overflow-hidden rounded-full bg-ap-inner" role="progressbar" aria-label="Reels loaded" aria-valuemin={0} aria-valuemax={total} aria-valuenow={found.length}>
+                <div className="h-full rounded-full bg-ap-ink transition-[width] duration-500 motion-reduce:transition-none" style={{ width: `${total ? (found.length / total) * 100 : 0}%` }} />
+              </div>
+              {hasMore ? (
+                <>
+                  <link rel="next" href={`/directory?${nextQuery(search, loadedPages + 1)}`} />
+                  <a ref={moreRef} href={`/directory?${nextQuery(search, loadedPages + 1)}`}
+                    onClick={(e) => { e.preventDefault(); if (autoLeft < 0) setAutoLeft(DIRECTORY_AUTO_LOAD_PAGES); loadMore(e.detail === 0); }}
+                    aria-disabled={results.isFetchingNextPage}
+                    className="mt-1 inline-flex h-11 items-center rounded-lg bg-ap-panel px-5 text-[15px] font-medium text-ap-ink hover:bg-ap-media nums">
+                    {results.isFetchingNextPage ? "Loading…" : `Show ${Math.min(DIRECTORY_PAGE_SIZE, remaining)} more`}
+                  </a>
+                </>
+              ) : (
+                <p className="text-[14px] text-ap-muted">
+                  You've seen them all ·{" "}
+                  <button type="button" onClick={() => { window.scrollTo({ top: 0, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }); input.current?.focus({ preventScroll: true }); }} className="font-medium text-ap-blue">Back to top ↑</button>
+                </p>
+              )}
             </div>
           )}
         </section>
@@ -311,5 +365,26 @@ function DirectoryPage() {
       <ReelDetail card={open} onClose={() => setOpen(null)} />
       <SiteReelModal reel={openSite} onClose={() => setOpenSite(null)} />
     </SiteShell>
+  );
+}
+
+function nextQuery(search: Record<string, unknown>, page: number) {
+  const p = new URLSearchParams();
+  for (const k of ["q", "mood", "category", "brand"]) { const v = search[k]; if (typeof v === "string" && v) p.set(k, v); }
+  p.set("page", String(page));
+  return p.toString();
+}
+
+function SkeletonGrid({ n, className }: { n: number; className?: string }) {
+  return (
+    <ul aria-hidden className={cn("grid gap-5 [grid-template-columns:repeat(auto-fill,minmax(180px,1fr))]", className)}>
+      {Array.from({ length: n }, (_, i) => (
+        <li key={i}>
+          <div className="aspect-square w-full animate-pulse rounded-[8px] bg-ap-panel motion-reduce:animate-none" />
+          <div className="mt-2.5 h-3.5 w-3/4 rounded-[4px] bg-ap-panel" />
+          <div className="mt-1.5 h-3 w-1/2 rounded-[4px] bg-ap-panel" />
+        </li>
+      ))}
+    </ul>
   );
 }
