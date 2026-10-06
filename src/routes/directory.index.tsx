@@ -15,7 +15,8 @@ import { cn } from "@/lib/utils";
 import { SiteReelHeart } from "@/components/site/SiteReelHeart";
 import { SiteReelModal } from "@/components/site/SiteReelModal";
 
-const POSTER = "absolute top-1/2 left-1/2 h-[72%] w-auto max-w-[72%] object-contain -translate-x-1/2 -translate-y-1/2 rounded-[6px] shadow-[0_0_0_1px_var(--ap-inner),0_18px_34px_-16px_rgba(29,29,31,.28)]";
+const POSTER =
+  "absolute top-1/2 left-1/2 h-[72%] w-auto max-w-[72%] object-contain -translate-x-1/2 -translate-y-1/2 rounded-[6px] shadow-[0_0_0_1px_var(--ap-inner),0_18px_34px_-16px_rgba(29,29,31,.28)]";
 
 const ROTATING = ["soothing", "energizing", "hopeful", "inspiring", "cozy", "luxurious", "playful"];
 const STARTERS: { label: string; q: string; mood?: boolean }[] = [
@@ -117,7 +118,7 @@ function DirectoryPage() {
         <section className="mx-auto max-w-[900px] px-6 pt-20 pb-10 text-center">
           <h1 className="mb-8 text-[clamp(30px,5vw,56px)] leading-[1.08] font-semibold tracking-[-0.035em] text-[#a1a1a6]">
             <b className="font-semibold text-ap-ink">
-              <span className="text-[#a1a1a6]">It's </span>
+              <span className="text-[#a1a1a6]">Happy </span>
               <span className="text-ap-ink">{day}.</span>
               <span className="text-[#a1a1a6]"> Show me something:</span>
               <br />{" "}
@@ -216,10 +217,27 @@ function DirectoryPage() {
                 <ul className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(220px,1fr))]">
                   {brands.map((b) => (
                     <li key={b.id}>
-                      <Link to="/directory/$slug" params={{ slug: b.slug }} className="flex items-center gap-3 rounded-lg bg-ap-panel p-3 hover:bg-ap-media">
-                        {b.logo_url?.startsWith("https://")
-                          ? <img src={b.logo_url} alt="" className="size-12 shrink-0 rounded-sm border border-ap-hairline bg-ap-card object-contain" />
-                          : <span className="grid size-12 shrink-0 place-items-center rounded-sm border border-ap-hairline bg-ap-card text-[16px] font-semibold">{b.name.split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase()}</span>}
+                      <Link
+                        to="/directory/$slug"
+                        params={{ slug: b.slug }}
+                        className="flex items-center gap-3 rounded-lg bg-ap-panel p-3 hover:bg-ap-media"
+                      >
+                        {b.logo_url?.startsWith("https://") ? (
+                          <img
+                            src={b.logo_url}
+                            alt=""
+                            className="size-12 shrink-0 rounded-sm border border-ap-hairline bg-ap-card object-contain"
+                          />
+                        ) : (
+                          <span className="grid size-12 shrink-0 place-items-center rounded-sm border border-ap-hairline bg-ap-card text-[16px] font-semibold">
+                            {b.name
+                              .split(/\s+/)
+                              .map((w) => w[0])
+                              .join("")
+                              .slice(0, 2)
+                              .toUpperCase()}
+                          </span>
+                        )}
                         <span className="min-w-0">
                           <span className="block truncate text-[15px] font-semibold">{b.name}</span>
                           <span className="block truncate text-[13px] text-ap-muted">{b.category}</span>
@@ -234,15 +252,24 @@ function DirectoryPage() {
               <h2 className="mb-5 text-[24px] font-semibold tracking-[-0.02em]">Browse the directory</h2>
               {cards.length > 0 && <DirectoryGrid cards={cards} onOpen={setOpen} />}
               {brandReels.length > 0 && (
-                <ul className={`grid gap-5 [grid-template-columns:repeat(auto-fill,minmax(180px,1fr))] ${cards.length ? "mt-5" : ""}`}>
+                <ul
+                  className={`grid gap-5 [grid-template-columns:repeat(auto-fill,minmax(180px,1fr))] ${cards.length ? "mt-5" : ""}`}
+                >
                   {brandReels.map((r) => (
                     <li key={r.id} className="relative">
-                      <button type="button" onClick={() => setOpenSite(r)} aria-label={`Open ${r.title}`} className="relative block aspect-square w-full overflow-hidden rounded-[8px] bg-ap-panel">
+                      <button
+                        type="button"
+                        onClick={() => setOpenSite(r)}
+                        aria-label={`Open ${r.title}`}
+                        className="relative block aspect-square w-full overflow-hidden rounded-[8px] bg-ap-panel"
+                      >
                         {r.poster && <img src={r.poster} alt="" loading="lazy" className={POSTER} />}
                       </button>
                       <SiteReelHeart reelId={r.id} name={r.title} />
                       <p className="mt-2.5 truncate text-[14px] font-semibold">{r.title}</p>
-                      <p className="truncate text-[12px] text-ap-muted nums">{r.brand} · {r.seconds} sec</p>
+                      <p className="truncate text-[12px] text-ap-muted nums">
+                        {r.brand} · {r.seconds} sec
+                      </p>
                     </li>
                   ))}
                 </ul>
