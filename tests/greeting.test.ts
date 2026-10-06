@@ -8,11 +8,6 @@ describe("headline greeting", () => {
   it("Black Friday 2026 is the day after Thanksgiving (Nov 27)", () => {
     expect(nextOccurrence(ev("black-friday"), new Date(2026, 9, 6), DEFAULT_GREETING.events)?.getDate()).toBe(27);
   });
-  it("countdown shows within 14 days", () => {
-    const c = chooseGreeting(DEFAULT_GREETING, ctx(new Date(2026, 10, 15, 16)));
-    expect(plainText(c.filled)).toBe("Singles' Day is in 12 days.".replace("Singles' Day is in 12 days.", plainText(c.filled)));
-    expect(c.rule).toBe("countdown");
-  });
   it("Black Friday countdown reads 12 days out", () => {
     const c = chooseGreeting(DEFAULT_GREETING, ctx(new Date(2026, 10, 15, 16)));
     expect(plainText(c.filled)).toBe("Black Friday is in 12 days.");
