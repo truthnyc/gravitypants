@@ -72,18 +72,7 @@ export const Route = createFileRoute("/directory/")({
   component: DirectoryPage,
 });
 
-function useReducedMotion() {
-  const [r, setR] = useState(false);
-  useEffect(() => {
-    const m = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const f = () => setR(m.matches);
-    f(); m.addEventListener("change", f);
-    return () => m.removeEventListener("change", f);
-  }, []);
-  return r;
-}
-
-/** Rotates through moods, unless the visitor picked some (then the newest pick stays) or prefers less motion. */
+/** Rotate words on every device; reduced-motion CSS disables transitions, not word changes. */
 function useWeekdayMood(picked: string | undefined, pool: string[], lead?: string) {
   const words = pool.length ? pool : ROTATING;
   const [i, setI] = useState(0);
@@ -95,14 +84,13 @@ function useWeekdayMood(picked: string | undefined, pool: string[], lead?: strin
     return () => clearTimeout(t);
   }, [lead]);
   const [day, setDay] = useState("today");
-  const reduced = useReducedMotion();
   useEffect(() => setDay(new Date().toLocaleDateString("en-US", { weekday: "long" })), []);
   useEffect(() => {
-    if (picked || reduced || (lead && leadOn)) return;
+    if (picked || (lead && leadOn)) return;
     const t = setInterval(() => setI((x) => (x + 1) % words.length), 2200);
     return () => clearInterval(t);
-  }, [picked, reduced, words.length, lead, leadOn]);
-  return { day, mood: picked ?? (lead && leadOn ? lead : words[i % words.length]!) };
+  }, [picked, words.length, lead, leadOn]);
+  return { day, mood: picked ?? (lead && leadOn ? lead : words[i % words.length] ?? "soothing") };
 }
 
 const list = (v?: string) => (v ? v.split(",").map((x) => x.trim().toLowerCase()).filter(Boolean).slice(0, 60) : []);
