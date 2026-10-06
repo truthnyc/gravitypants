@@ -1,6 +1,33 @@
 /** Shared Directory constants (client- and server-safe). */
-export const CATEGORIES = ["Fashion", "Beauty", "Food & Drink", "Home", "Travel & Photography", "Nonprofits", "Other"] as const;
+/** A–Z, with Other last. Must match the directory_brands_category_check constraint. */
+export const CATEGORIES = [
+  "Arts, Crafts & Hobbies", "Beauty & Fragrance", "Events & Entertainment", "Fashion & Apparel", "Food & Drink",
+  "Health & Wellness", "Home & Living", "Jewelry & Watches", "Kids & Family", "Nonprofit & Causes", "Pets",
+  "Real Estate", "Restaurants & Cafés", "Services & Local Business", "Travel & Hospitality", "Wine & Spirits", "Other",
+] as const;
 export type Category = (typeof CATEGORIES)[number];
+export const CATEGORY_COVERS: Record<Category, string> = {
+  "Arts, Crafts & Hobbies": "Yarn, craft supplies, galleries, artists",
+  "Beauty & Fragrance": "Skincare, makeup, perfume, hair",
+  "Events & Entertainment": "Venues, concerts, festivals, weddings",
+  "Fashion & Apparel": "Clothing, shoes, bags, knitwear",
+  "Food & Drink": "Chocolate, coffee, bakeries, packaged food",
+  "Health & Wellness": "Supplements, fitness, spas, yoga",
+  "Home & Living": "Furniture, decor, textiles, candles",
+  "Jewelry & Watches": "Fine jewelry, watches, accessories",
+  "Kids & Family": "Toys, baby goods, children's fashion",
+  "Nonprofit & Causes": "Charities, NGOs, fundraisers",
+  Pets: "Pet food, accessories, grooming",
+  "Real Estate": "Listings, developments, agents",
+  "Restaurants & Cafés": "Menus, specials, openings",
+  "Services & Local Business": "Salons, studios, agencies, shops",
+  "Travel & Hospitality": "Hotels, villas, tours, destinations",
+  "Wine & Spirits": "Wineries, breweries, distilleries",
+  Other: "Everything else",
+};
+export const categorySlug = (c: string) =>
+  c.toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+export const categoryFromSlug = (s: string): Category | null => CATEGORIES.find((c) => categorySlug(c) === s) ?? null;
 export const MOODS = ["soothing", "cozy", "calm", "playful", "energizing", "luxurious", "elegant", "hopeful", "warm", "bold"] as const;
 export const RESERVED_SLUGS = ["directory", "admin", "search", "new", "edit", "api", "app"];
 export const WORDING_VERSION = "v1.0";
