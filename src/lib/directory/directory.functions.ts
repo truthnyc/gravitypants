@@ -721,7 +721,9 @@ export const adminBrandLinks = createServerFn({ method: "POST" })
 
 /* ---------------- faceted search (server-side filter, count, page) */
 
-export const DIRECTORY_PAGE_SIZE = 12;
+export const DIRECTORY_PAGE_SIZE = 12; // reels per page
+/** Pages loaded automatically while scrolling after the first "Show more" click. */
+export const DIRECTORY_AUTO_LOAD_PAGES = 3;
 export type FacetedReel = {
   kind: "directory" | "site"; id: string; title: string; brand_id: string; brand_name: string; brand_slug: string;
   category: string; cat_slug: string; formats: string[]; moods: string[]; featured: boolean;
@@ -734,7 +736,7 @@ export type FacetedResult = {
 const slugList = z.array(z.string().trim().toLowerCase().max(60)).max(60).default([]);
 export const facetedInput = z.object({
   q: z.string().max(200).default(""), moods: slugList, categories: slugList, brands: slugList,
-  page: z.number().int().min(1).max(1000).default(1), pageSize: z.number().int().min(1).max(60).default(DIRECTORY_PAGE_SIZE),
+  page: z.number().int().min(1).max(1000).default(1), pageSize: z.number().int().min(1).max(240).default(DIRECTORY_PAGE_SIZE),
 });
 
 /** One query for /directory: OR within a filter, AND across filters, disjunctive facet counts. */
