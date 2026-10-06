@@ -33,8 +33,8 @@ function Mark({ text, q }: { text: string; q: string }) {
   return <>{text.slice(0, i)}<mark className="rounded-[2px] bg-ap-soft-blue text-inherit">{text.slice(i, i + q.length)}</mark>{text.slice(i + q.length)}</>;
 }
 
-export function FilterBar({ value, onChange, facets, total, families, brands }: {
-  value: FilterValue; onChange: (v: FilterValue) => void; facets: Facets; total: number; families: Family[]; brands: Brand[];
+export function FilterBar({ value, onChange, facets, total, families, brands, compact = false }: {
+  compact?: boolean; value: FilterValue; onChange: (v: FilterValue) => void; facets: Facets; total: number; families: Family[]; brands: Brand[];
 }) {
   const [open, setOpen] = useState<Seg | null>(null);
   const [hover, setHover] = useState<Seg | null>(null);
@@ -102,8 +102,9 @@ export function FilterBar({ value, onChange, facets, total, families, brands }: 
   };
 
   return (
-    <div ref={wrap} className="relative mx-auto mt-4 max-w-[680px]">
-      <div className="grid h-[60px] grid-cols-[1.15fr_1fr_1fr] rounded-[14px] bg-ap-panel p-1" role="group" aria-label="Filter reels">
+    <div ref={wrap} className="relative mx-auto max-w-[680px]">
+      <div className={cn("grid transition-[height] motion-reduce:transition-none", compact ? "h-[52px]" : "h-[60px]")}>
+      <div className="grid h-full grid-cols-[1.15fr_1fr_1fr] rounded-[14px] bg-ap-panel p-1" role="group" aria-label="Filter reels">
         {segs.map((s, i) => {
           const active = s.names.length > 0;
           const isOpen = open === s.id;
@@ -116,7 +117,7 @@ export function FilterBar({ value, onChange, facets, total, families, brands }: 
                 aria-label={`${s.label}: ${active ? s.names.join(", ") : s.empty}`}
                 onClick={() => setOpen(isOpen ? null : s.id)}
                 onMouseEnter={() => setHover(s.id)} onMouseLeave={() => setHover(null)}
-                className={cn("flex h-full w-full items-center gap-2 rounded-[10px] px-2.5 text-left transition-[background,box-shadow] sm:px-4 focus-visible:outline-2 focus-visible:outline-ap-blue",
+                className={cn("flex h-full w-full items-center gap-2 rounded-[10px] px-2.5 text-left transition-[background,box-shadow] motion-reduce:transition-none sm:px-4 focus-visible:outline-2 focus-visible:outline-ap-blue",
                   isOpen ? "bg-ap-card shadow-ap-soft" : "hover:bg-ap-segment-hover", active && "pr-9 sm:pr-10")}>
                 <span className="min-w-0 flex-1">
                   <span className={cn("block text-[10.5px] font-semibold tracking-[.06em] uppercase", active ? "text-ap-blue-strong" : "text-ap-muted")}>{s.label}</span>
@@ -129,7 +130,7 @@ export function FilterBar({ value, onChange, facets, total, families, brands }: 
                     <span className="truncate">{active ? summary(s.names) : s.empty}</span>
                   </span>
                 </span>
-                {!active && <ChevronDown aria-hidden className={cn("hidden size-4 shrink-0 text-ap-muted transition-transform sm:block", isOpen && "rotate-180")} strokeWidth={1.7} />}
+                {!active && <ChevronDown aria-hidden className={cn("hidden size-4 shrink-0 text-ap-muted transition-transform motion-reduce:transition-none sm:block", isOpen && "rotate-180")} strokeWidth={1.7} />}
               </button>
               {active && (
                 <button type="button" aria-label={`Clear ${s.label.toLowerCase()} filter`} onClick={() => set(s.key, [])}
@@ -140,6 +141,7 @@ export function FilterBar({ value, onChange, facets, total, families, brands }: 
             </div>
           );
         })}
+      </div>
       </div>
       {open === "mood" && panel("mood", "Mood", "Pick the feelings you're after. Tap a family to pick all of it.",
         <MoodBody families={families} selected={value.moods} counts={facets.moods} onChange={(m) => set("moods", m)} />, "moods")}

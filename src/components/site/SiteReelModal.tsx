@@ -35,7 +35,7 @@ function Body({ reel, onClose }: { reel: SiteReel; onClose: () => void }) {
         <p className="text-[14px] font-semibold text-ap-badge">{categoryLabel(reel.category)}</p>
         <h2 className="text-[22px] leading-tight font-semibold tracking-[-0.02em] break-words sm:text-[26px]">{reel.title}</h2>
         <p className="text-[15px]">by {reel.brandSlug
-          ? <Link to="/directory/$slug" params={{ slug: reel.brandSlug }} onClick={onClose} className="font-semibold hover:text-ap-blue">{reel.brand}</Link>
+          ? <Link to="/directory" search={{ brand: reel.brandSlug }} onClick={onClose} className="font-semibold hover:text-ap-blue">{reel.brand}</Link>
           : <span className="font-semibold">{reel.brand}</span>}</p>
         <div className="flex gap-2"><SiteReelHeart inline reelId={reel.id} name={reel.title} /></div>
         {reel.href && <a href={reel.href} target="_blank" rel="noreferrer" className="inline-flex w-fit items-center gap-1 text-[14px] text-ap-blue">Visit {reel.brand} <ArrowUpRight className="size-3.5" strokeWidth={1.7} /></a>}
