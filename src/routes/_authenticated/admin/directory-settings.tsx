@@ -84,10 +84,11 @@ function DirectorySettingsAdmin() {
   const siteFn = useServerFn(listSiteReels);
   const saved = useQuery({ queryKey: ["admin", "directory-settings"], queryFn: () => load() });
   const library = useQuery({ queryKey: ["admin", "directory-library"], queryFn: async () => (await searchFn({ data: { pageSize: 240 } })).reels });
+  const [s, setS] = useState<DirectorySettings>(DEFAULT_DIRECTORY_SETTINGS);
   const loadViews = useServerFn(getDirectoryWeeklyViews);
   const weeklyViews = useQuery({
     queryKey: ["admin", "directory-weekly-views", library.data?.map((r) => r.id)],
-    enabled: !!library.data && sRuleNeedsViews(),
+    enabled: !!library.data && s.rule === "viewed",
     queryFn: () => loadViews({ data: { ids: (library.data ?? []).map((r) => r.id) } }),
   });
   const brands = useQuery({ queryKey: ["admin", "directory-public-brands"], queryFn: () => brandsFn() });
@@ -100,8 +101,6 @@ function DirectorySettingsAdmin() {
   useEffect(() => { if (savedG.data) setG(savedG.data.config); }, [savedG.data]);
   const facets = useQuery({ queryKey: ["admin", "directory-facets"], queryFn: async () => (await searchFn({ data: { pageSize: 1 } })).facets });
 
-  const [s, setS] = useState<DirectorySettings>(DEFAULT_DIRECTORY_SETTINGS);
-  function sRuleNeedsViews() { return s.rule === "viewed"; }
   const [picks, setPicks] = useState<FeaturedPick[]>([]);
   const [busy, setBusy] = useState(false);
   const [pickerFor, setPickerFor] = useState<string | null | undefined>(undefined); // undefined = closed; null = main list; date = week
