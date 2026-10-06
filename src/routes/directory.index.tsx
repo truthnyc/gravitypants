@@ -7,7 +7,7 @@ import { ReelCarousel } from "@/components/site/ReelCarousel";
 import { ReelVideo } from "@/components/site/ReelVideo";
 import { DirectoryGrid, ReelDetail } from "@/components/directory/DirectoryGrid";
 import { listPublicBrands, searchDirectory } from "@/lib/directory/directory.functions";
-import type { DirectoryCard } from "@/lib/directory/directory";
+import { CATEGORIES, categorySlug, type DirectoryCard } from "@/lib/directory/directory";
 import { listSiteReels } from "@/lib/site/reels.functions";
 import { FORMAT_LABEL, type SiteReel } from "@/lib/site/reels";
 import { siteHead } from "@/lib/site/seo";
@@ -211,6 +211,18 @@ function DirectoryPage() {
                 />
               </section>
             )}
+            <section className="mx-auto max-w-[1280px] px-6 pt-14">
+              <h2 className="mb-5 text-[24px] font-semibold tracking-[-0.02em]">Categories</h2>
+              <ul className="flex flex-wrap gap-2">
+                {CATEGORIES.map((c) => (
+                  <li key={c}>
+                    <Link to="/directory/category/$slug" params={{ slug: categorySlug(c) }} className="inline-block rounded-lg bg-ap-panel px-3.5 py-2 text-[14px] hover:bg-ap-media">
+                      {c}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
             {brands.length > 0 && (
               <section className="mx-auto max-w-[1280px] px-6 pt-14">
                 <h2 className="mb-5 text-[24px] font-semibold tracking-[-0.02em]">Brands</h2>

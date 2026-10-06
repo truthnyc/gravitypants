@@ -115,7 +115,7 @@ function CategoryPage() {
   );
 }
 
-export function CategoryChips({ current }: { current?: string }) {
+function CategoryChips({ current }: { current?: string }) {
   return (
     <ul className="flex flex-wrap gap-2">
       {CATEGORIES.filter((c) => c !== current).map((c) => (

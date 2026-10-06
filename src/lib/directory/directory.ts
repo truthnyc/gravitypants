@@ -29,7 +29,7 @@ export const categorySlug = (c: string) =>
   c.toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 export const categoryFromSlug = (s: string): Category | null => CATEGORIES.find((c) => categorySlug(c) === s) ?? null;
 export const MOODS = ["soothing", "cozy", "calm", "playful", "energizing", "luxurious", "elegant", "hopeful", "warm", "bold"] as const;
-export const RESERVED_SLUGS = ["directory", "admin", "search", "new", "edit", "api", "app"];
+export const RESERVED_SLUGS = ["directory", "admin", "category", "search", "new", "edit", "api", "app"];
 export const WORDING_VERSION = "v1.0";
 export const GRACE_DAYS = 30;
 export const BRAND_NAME_MAX = 50;
