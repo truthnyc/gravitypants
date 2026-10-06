@@ -415,7 +415,7 @@ export const listDirectoryReview = createServerFn({ method: "POST" })
     const { data: reports } = await sb.from("directory_reports").select("id, directory_reel_id, reason, reporter_email, created_at").is("resolved_at", null).order("created_at", { ascending: false });
     return {
       reels: rows.map((r: any) => ({
-        id: r.id as string, adId: r.ad_id as string, status: r.status as DirStatus, tags: r.tags as string[], moods: r.moods as string[], poster: r.poster as string | null,
+        id: r.id as string, adId: r.ad_id as string, brand_id: r.brand_id as string, status: r.status as DirStatus, tags: r.tags as string[], moods: r.moods as string[], poster: r.poster as string | null,
         updated: r.updated_at as string, note: r.review_note as string | null, brand: r.directory_brands?.name as string, slug: r.directory_brands?.slug as string,
         website: r.directory_brands?.website_url as string | null, category: r.directory_brands?.category as string, description: r.directory_brands?.description as string | null,
         approved: !!r.directory_brands?.first_approved_at, ad: (r.title as string | null) ?? (r.projects?.name as string) ?? "Untitled",

@@ -220,7 +220,7 @@ function BrandPanel({ brandId, onChanged }: { brandId: string; onChanged: () => 
       <div>
         <div className="mb-2 font-semibold nums">Reels · {d.reels.length}</div>
         <div className="space-y-2">
-          {d.reels.map((r) => <AdminReel key={r.id} r={r} onChanged={refresh} />)}
+          {d.reels.map((r) => <AdminReel key={r.id} r={r} brandId={brandId} onChanged={refresh} />)}
           {!d.reels.length && <p className="text-secondary-text">No reels shared yet.</p>}
         </div>
       </div>
