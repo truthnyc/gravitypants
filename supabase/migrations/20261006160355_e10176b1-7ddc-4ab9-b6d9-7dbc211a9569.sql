@@ -1,0 +1,1 @@
+ALTER FUNCTION public.directory_faceted_search(text, text[], text[], text[], int, int) SECURITY INVOKER;
