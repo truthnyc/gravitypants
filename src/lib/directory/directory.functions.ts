@@ -246,7 +246,7 @@ export const getDirectoryAccount = createServerFn({ method: "POST" })
       for (const x of sp ?? []) if (x.signedUrl && x.path) signedPosters.set(x.path, x.signedUrl);
     }
     return {
-      brand: { id: b.id as string, name: b.name as string, slug: b.slug as string, description: (b.description ?? "") as string, logo: await signLogo(b.logo_url), website: (b.website_url ?? "") as string, category: (b.category ?? "Other") as string, featured: !!featured, planEndedAt: (b.plan_ended_at ?? null) as string | null },
+      brand: { id: b.id as string, name: b.name as string, slug: b.slug as string, description: (b.description ?? "") as string, logo: await signLogo(b.logo_url), website: (b.website_url ?? "") as string, category: (b.category ?? "Other") as string, moods: (b.moods ?? []) as string[], featured: !!featured, planEndedAt: (b.plan_ended_at ?? null) as string | null },
       reels: ((reels ?? []) as any[]).map((r: any) => ({ adId: r.ad_id as string, name: (r.title as string | null) ?? r.projects?.name ?? "Untitled", status: r.status as DirStatus, updated: r.updated_at as string, size: ((r.formats ?? [])[0] ?? "").replace("x", ":") as string, thumb: r.poster_url?.startsWith("media:") ? signedPosters.get(r.poster_url.slice(6)) ?? null : null })),
       log: (log ?? []).map((l: any) => ({ ...l, reel: names.get(l.ad_id) ?? "Removed ad" })) as {
         id: string; created_at: string; reel: string; action: "granted" | "withdrawn"; full_name: string; job_title: string | null; email: string; wording_version: string; wording_text: string;
@@ -263,9 +263,11 @@ export const saveBrandDescription = createServerFn({ method: "POST" })
     name: z.string().trim().min(1).max(50).optional(),
     website: z.string().trim().max(300).optional(),
     category: z.enum(CATEGORIES).optional(),
+    moods: z.array(z.enum(MOODS)).max(MOODS.length).optional(),
   }).parse(d))
   .handler(async ({ data, context }) => {
     const patch: Record<string, unknown> = { description: data.description || null };
+    if (data.moods) patch["moods"] = data.moods;
     if (data.name) patch["name"] = data.name;
     if (data.category) patch["category"] = data.category;
     if (data.website !== undefined) {
@@ -345,7 +347,7 @@ export const getBrandPage = createServerFn({ method: "GET" })
     const { toCards } = await import("./directory.server");
     const pc = publicClient() as any;
     const empty = { redirect: null as string | null, brand: null, reels: [] as DirectoryCard[], siteReels: [] as import("@/lib/site/reels").SiteReel[], more: [] as { name: string; slug: string; poster: string | null }[] };
-    const { data: b } = await pc.from("directory_brands").select("id, name, website_url, category, description, slug, logo_url").eq("slug", data.slug).maybeSingle();
+    const { data: b } = await pc.from("directory_brands").select("id, name, website_url, category, description, slug, logo_url, moods").eq("slug", data.slug).maybeSingle();
     if (!b) {
       const { data: h } = await pc.from("directory_slug_history").select("brand_id").eq("old_slug", data.slug).order("changed_at", { ascending: false }).limit(1).maybeSingle();
       if (h) {
@@ -365,7 +367,7 @@ export const getBrandPage = createServerFn({ method: "GET" })
     const moreCards = await toCards(moreRows);
     return {
       redirect: null,
-      brand: { id: b.id as string, name: b.name as string, website_url: b.website_url as string | null, category: b.category as string, description: b.description as string | null, slug: b.slug as string, logo_url: await signLogo(b.logo_url), featured: !!featured },
+      brand: { id: b.id as string, name: b.name as string, website_url: b.website_url as string | null, category: b.category as string, description: b.description as string | null, slug: b.slug as string, logo_url: await signLogo(b.logo_url), moods: (b.moods ?? []) as string[], featured: !!featured },
       reels: cards,
       siteReels,
       more: moreCards.map((c) => ({ name: c.brand_name, slug: c.brand_slug, poster: c.poster })),
@@ -516,12 +518,12 @@ export const adminBrandDetail = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const sb = context.supabase as any;
     await assertAdmin(sb);
-    const { data: b, error } = await sb.from("directory_brands").select("id, name, slug, website_url, category, description, logo_url, first_approved_at, plan_ended_at, created_at").eq("id", data.brandId).single();
+    const { data: b, error } = await sb.from("directory_brands").select("id, name, slug, website_url, category, description, logo_url, moods, first_approved_at, plan_ended_at, created_at").eq("id", data.brandId).single();
     if (error) throw new Error(error.message);
     const { data: reels } = await sb.from("directory_reels").select("id, ad_id, title, description, status, tags, moods, formats, poster_url, published_at, review_note, hidden_reason, projects(name)").eq("brand_id", b.id).order("created_at", { ascending: false });
     const signed = await signPosters((reels ?? []) as any[]);
     return {
-      brand: { id: b.id as string, name: b.name as string, slug: b.slug as string, website: (b.website_url ?? "") as string, category: b.category as string, description: (b.description ?? "") as string, logo: await signLogo(b.logo_url), approved: b.first_approved_at as string | null, planEnded: b.plan_ended_at as string | null },
+      brand: { id: b.id as string, name: b.name as string, slug: b.slug as string, website: (b.website_url ?? "") as string, category: b.category as string, description: (b.description ?? "") as string, moods: (b.moods ?? []) as string[], logo: await signLogo(b.logo_url), approved: b.first_approved_at as string | null, planEnded: b.plan_ended_at as string | null },
       reels: signed.map((r: any) => ({ id: r.id as string, title: (r.title ?? r.projects?.name ?? "Untitled") as string, description: (r.description ?? "") as string, ad: (r.projects?.name ?? "Removed ad") as string, status: r.status as DirStatus, tags: (r.tags ?? []) as string[], moods: (r.moods ?? []) as string[], formats: (r.formats ?? []) as string[], poster: r.poster as string | null, published: r.published_at as string | null, note: (r.review_note ?? r.hidden_reason ?? null) as string | null })),
     };
   });
@@ -533,11 +535,12 @@ export const adminSaveBrand = createServerFn({ method: "POST" })
     brandId: z.string().uuid(), name: z.string().trim().min(1).max(BRAND_NAME_MAX),
     website: z.string().trim().max(200).refine((v) => !v || /^https?:\/\//.test(v), "Website must start with http:// or https://"),
     category: z.enum(CATEGORIES), description: z.string().trim().max(BRAND_DESCRIPTION_MAX),
+    moods: z.array(z.enum(MOODS)).max(MOODS.length).default([]),
   }).parse(d))
   .handler(async ({ data, context }) => {
     const sb = context.supabase as any;
     await assertAdmin(sb);
-    const { error } = await sb.from("directory_brands").update({ name: data.name, website_url: data.website || null, category: data.category, description: data.description || null }).eq("id", data.brandId);
+    const { error } = await sb.from("directory_brands").update({ name: data.name, website_url: data.website || null, category: data.category, description: data.description || null, moods: data.moods }).eq("id", data.brandId);
     if (error) throw new Error(error.message);
     return { ok: true };
   });

@@ -233,7 +233,7 @@ type Detail = Awaited<ReturnType<typeof adminBrandDetail>>;
 function BrandForm({ b, onSaved }: { b: Detail["brand"]; onSaved: () => void }) {
   const save = useServerFn(adminSaveBrand);
   const logo = useServerFn(setBrandLogo);
-  const [f, setF] = useState({ name: b.name, website: b.website, category: b.category as Category, description: b.description });
+  const [f, setF] = useState({ name: b.name, website: b.website, category: b.category as Category, description: b.description, moods: b.moods as (typeof MOODS)[number][] });
   const [busy, setBusy] = useState(false);
   const run = async (fn: () => Promise<unknown>, msg: string) => {
     setBusy(true);
@@ -266,6 +266,15 @@ function BrandForm({ b, onSaved }: { b: Detail["brand"]; onSaved: () => void }) 
           <div>Status: {b.approved ? `Approved ${new Date(b.approved).toLocaleDateString()}` : "Not approved yet"}</div>
           {b.planEnded && <div>Plan ended {new Date(b.planEnded).toLocaleDateString()}</div>}
           <a href={`/directory/${b.slug}`} target="_blank" rel="noreferrer" className="text-link">View brand page</a>
+        </div>
+        <div className="space-y-1 sm:col-span-2">
+          <span className="text-[12px] text-secondary-text">Moods</span>
+          <div className="flex flex-wrap gap-1.5">
+            {MOODS.map((m) => { const on = f.moods.includes(m); return (
+              <button key={m} type="button" aria-pressed={on} onClick={() => setF({ ...f, moods: on ? f.moods.filter((x) => x !== m) : [...f.moods, m] })}
+                className={cn("h-7 rounded-lg px-2.5 text-[12px]", on ? "bg-primary text-primary-foreground" : "bg-control-fill")}>{m}</button>
+            ); })}
+          </div>
         </div>
         <label className="space-y-1 sm:col-span-2">
           <span className="flex justify-between text-[12px] text-secondary-text"><span>Brand description</span><span className={cn("nums", nearLimit(f.description.length, BRAND_DESCRIPTION_MAX) && "text-warning-text")}>{f.description.length} / {BRAND_DESCRIPTION_MAX}</span></span>

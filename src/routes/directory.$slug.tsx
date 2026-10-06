@@ -96,6 +96,11 @@ function BrandPage() {
                 <h1 className="text-[clamp(36px,4vw,52px)] leading-[1.05] font-semibold tracking-[-0.035em]">{brand.name}</h1>
                 </div>
                 {brand.description && <p className="mt-5 max-w-[760px] text-[18px] leading-[1.5] text-ap-body">{brand.description}</p>}
+                {brand.moods.length > 0 && (
+                  <p className="mt-3 flex flex-wrap text-[14px] font-medium text-ap-badge" aria-label="Moods">
+                    {brand.moods.map((m, i) => <span key={m}>{i > 0 && <span className="mx-1.5 text-ap-muted">·</span>}<Link to="/directory" search={{ q: m }} className="hover:underline">{m}</Link></span>)}
+                  </p>
+                )}
                 <div className="mt-5 flex flex-wrap gap-2 text-[13px] nums">
                   {[`${total} public ${total === 1 ? "reel" : "reels"}`, `${sizes.size} ${sizes.size === 1 ? "size" : "sizes"}`].map((c) => <span key={c} className="rounded-lg bg-ap-panel px-3 py-1.5">{c}</span>)}
                 </div>
