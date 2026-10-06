@@ -296,7 +296,7 @@ export const renameDirectoryReel = createServerFn({ method: "POST" })
 
 export const checkSlug = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ slug: z.string().max(SLUG_MAX), brandId: z.string().uuid() }).parse(d))
+  .inputValidator((d: unknown) => z.object({ slug: z.string().max(SLUG_MAX), brandId: z.string().uuid().nullable() }).parse(d))
   .handler(async ({ data, context }) => {
     const { data: st } = await (context.supabase as any).rpc("slug_status", { _slug: data.slug, _brand: data.brandId });
     return st as "invalid" | "reserved" | "yours" | "taken" | "available";

@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import {
-  adminAssignBrandWorkspace, adminBrandLinks, adminBrandWorkspaces, adminCreateBrand, adminSetBrandSiteReels, slugStatus,
+  adminAssignBrandWorkspace, adminBrandLinks, adminBrandWorkspaces, adminCreateBrand, adminSetBrandSiteReels, checkSlug,
 } from "@/lib/directory/directory.functions";
 import { BRAND_DESCRIPTION_MAX, BRAND_NAME_MAX, CATEGORIES, SLUG_MAX, toSlug, type Category } from "@/lib/directory/directory";
 import { listSiteReels } from "@/lib/site/reels.functions";
@@ -59,7 +59,7 @@ function ReelPicker({ selected, onChange }: { selected: string[]; onChange: (ids
 /** "+ New brand page" button and dialog. */
 export function NewBrandPage({ onCreated }: { onCreated: () => void }) {
   const create = useServerFn(adminCreateBrand);
-  const check = useServerFn(slugStatus);
+  const check = useServerFn(checkSlug);
   const [open, setOpen] = useState(false);
   const [f, setF] = useState({ name: "", slug: "", slugTouched: false, category: "Other" as Category, website: "", description: "", owner: "editorial" as "editorial" | "client", workspaceId: "", reels: [] as string[] });
   const [status, setStatus] = useState<string | null>(null);

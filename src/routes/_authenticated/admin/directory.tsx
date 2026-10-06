@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { adminBrandDetail, adminRenameReel, adminSaveBrand, adminSaveBrandSlug, setBrandLogo, listDirectoryBrands, listDirectoryReview, resolveReport, reviewDirectoryReel } from "@/lib/directory/directory.functions";
 import { BRAND_DESCRIPTION_MAX, BRAND_NAME_MAX, CATEGORIES, MOODS, SLUG_MAX, STATUS_LABEL, nearLimit, type Category } from "@/lib/directory/directory";
 import { cn } from "@/lib/utils";
+import { BrandOwnership, NewBrandPage } from "@/components/admin/BrandPageAdmin";
 
 export const Route = createFileRoute("/_authenticated/admin/directory")({
   head: () => ({ meta: [{ title: "Directory review — Admin" }, { name: "robots", content: "noindex" }] }),
@@ -118,7 +119,10 @@ function BrandAddresses() {
   };
   return (
     <section>
-      <h2 className="mb-1 text-[15px] font-semibold nums">Brand pages · {brands.length}</h2>
+      <div className="mb-1 flex items-center justify-between gap-3">
+        <h2 className="text-[15px] font-semibold nums">Brand pages · {brands.length}</h2>
+        <NewBrandPage onCreated={() => { void qc.invalidateQueries({ queryKey: ["admin", "directory-brands"] }); void qc.invalidateQueries({ queryKey: ["admin", "brand-workspaces"] }); }} />
+      </div>
       <p className="mb-3 text-[13px] text-secondary-text">Every brand page, approved or not. Open Manage to edit its details, logo and reels. Changing an address keeps the old one redirecting for 12 months.</p>
       <table className="w-full text-left text-[13px]">
         <thead><tr className="text-secondary-text"><th className="py-1.5">Brand</th><th>Workspace</th><th>Address</th><th /></tr></thead>
@@ -209,6 +213,7 @@ function BrandPanel({ brandId, onChanged }: { brandId: string; onChanged: () => 
   return (
     <div className="space-y-4 rounded-sm bg-card p-4 shadow-card">
       <BrandForm key={JSON.stringify(d.brand)} b={d.brand} onSaved={refresh} />
+      <BrandOwnership brandId={brandId} onChanged={onChanged} />
       <div>
         <div className="mb-2 font-semibold nums">Reels · {d.reels.length}</div>
         <div className="space-y-2">
