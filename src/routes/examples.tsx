@@ -22,7 +22,7 @@ const formats = [{ id: "all", label: "All formats", short: "All" }, { id: "916",
 const formatLabel: Record<string, string> = { "916": "9:16", "11": "1:1", "169": "16:9" };
 
 function ExampleFilter({ label, value, options, onChange, total }: {
-  label: string; value?: string; options: { id: string; label: string; count: number }[];
+  label: string; value: string | undefined; options: { id: string; label: string; count: number }[];
   onChange: (value?: string) => void; total: number;
 }) {
   const [open, setOpen] = useState(false);
