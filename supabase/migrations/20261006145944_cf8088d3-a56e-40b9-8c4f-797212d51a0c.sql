@@ -1,0 +1,1 @@
+ALTER TABLE public.directory_brands ADD COLUMN IF NOT EXISTS moods text[] NOT NULL DEFAULT '{}';

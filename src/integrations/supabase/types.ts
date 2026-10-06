@@ -236,6 +236,7 @@ export type Database = {
           id: string
           is_editorial: boolean
           logo_url: string | null
+          moods: string[]
           name: string
           plan_ended_at: string | null
           slug: string
@@ -252,6 +253,7 @@ export type Database = {
           id?: string
           is_editorial?: boolean
           logo_url?: string | null
+          moods?: string[]
           name: string
           plan_ended_at?: string | null
           slug: string
@@ -268,6 +270,7 @@ export type Database = {
           id?: string
           is_editorial?: boolean
           logo_url?: string | null
+          moods?: string[]
           name?: string
           plan_ended_at?: string | null
           slug?: string
