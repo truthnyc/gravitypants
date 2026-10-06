@@ -262,16 +262,16 @@ function DirectoryPage() {
 
   return (
     <SiteShell>
-      <main className="font-ap text-ap-ink">
+      <div className="font-ap text-ap-ink">
         <section className="mx-auto max-w-[900px] px-6 pt-20 pb-6 text-center">
-          <h1 className="mb-8 text-[clamp(30px,5vw,56px)] leading-[1.08] font-semibold tracking-[-0.035em] text-[#a1a1a6]">
+          <h1 className="mb-8 text-[clamp(21px,5vw,56px)] leading-[1.08] font-semibold tracking-[-0.035em] text-[#a1a1a6]">
             <b className="font-semibold text-ap-ink">
               <span key={greeting?.filled ?? "ssr"} className={greeting ? "animate-[dir-fade_.4s_ease] motion-reduce:animate-none" : undefined}>
                 {greeting ? greeting.segments.map((g, k) => <span key={k} className={g.bold ? "text-ap-ink" : "text-[#a1a1a6]"}>{g.text}</span>)
                   : <><span className="text-[#a1a1a6]">Happy </span><span className="text-ap-ink">{day}.</span></>}
               </span>
               <span className="text-[#a1a1a6]"> Show me something:</span>
-              <br />{" "}
+              <br className="max-sm:hidden" />{" "}
             </b>
             <span className="text-ap-blue" aria-live="polite">
               <span className="font-light text-[#c7c7cc]">[ </span>
@@ -392,7 +392,7 @@ function DirectoryPage() {
             </div>
           )}
         </section>
-      </main>
+      </div>
       <ReelDetail card={open} onClose={() => setOpen(null)} />
       <SiteReelModal reel={openSite} onClose={() => setOpenSite(null)} />
     </SiteShell>
