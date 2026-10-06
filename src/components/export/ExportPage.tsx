@@ -7,7 +7,7 @@ import { TRIAL, planById } from "@/lib/stillframe/plans-config";
 import { getSignupChoice } from "@/lib/stillframe/signup-choice";
 import { AlertCircle, Check, ChevronDown, ChevronLeft, ChevronRight, Download, Film, Image as ImageIcon } from "lucide-react";
 import { AppButton, AppSectionLabel } from "@/components/app-ui";
-import { SHOW_DIRECTORY } from "@/lib/features";
+import { SHOW_SHARE } from "@/lib/features";
 import { ReelCard, StepActions, StepShell, StepTitle } from "@/components/app-ui/StepShell";
 import { useReelPlayer } from "@/components/editor/ReelPreview";
 import { zipSync } from "fflate";
@@ -345,7 +345,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
             {doneCount > 1 && <AppButton onClick={() => void zipAll(files, state, `${base}.zip`)}><Download className="size-4" strokeWidth={1.7} /> Download all</AppButton>}
             <AppButton variant="ghost" onClick={() => setOpen(false)}>Export more sizes</AppButton>
           </div>
-          {SHOW_DIRECTORY && <div className="mt-6 flex flex-col gap-4 rounded-[18px] bg-ap-soft-blue p-5 sm:flex-row sm:items-center">
+          {SHOW_SHARE && <div className="mt-6 flex flex-col gap-4 rounded-[18px] bg-ap-soft-blue p-5 sm:flex-row sm:items-center">
             <div className="flex-1">
               <b className="mb-1 block text-[17px]">Share it to the Directory</b>
               <p className="text-[14px] leading-normal text-ap-body">Let people find this reel in Gravity Pants search and on your brand page. It's optional and takes a minute.</p>
