@@ -15,7 +15,7 @@ const log = (db: any, admin: string, action: string, target: string) =>
 export type AdminReel = {
   id: string; brand: string; title: string; href: string | null; category: string; format: string;
   seconds: number; photos: number; video_url: string; video_webm_url: string | null; poster_url: string | null;
-  sort_order: number; published: boolean; brand_id: string | null; posterView: string | null;
+  sort_order: number; published: boolean; brand_id: string | null; posterView: string | null; videoView: string | null;
 };
 
 export const listAdminReels = createServerFn({ method: "GET" })
@@ -24,7 +24,7 @@ export const listAdminReels = createServerFn({ method: "GET" })
     const db = await adminDb(context);
     const { data } = await db.from("site_reels").select("*").order("sort_order").order("created_at");
     const rows = (data ?? []) as any[];
-    const paths = rows.map((r) => r.poster_url).filter((u: string | null) => u?.startsWith("site-reels:")).map((u: string) => u.slice(11));
+    const paths = rows.flatMap((r) => [r.poster_url, r.video_url]).filter((u: string | null) => u?.startsWith("site-reels:")).map((u: string) => u.slice(11));
     const signed = new Map<string, string>();
     if (paths.length) {
       const { data: s } = await db.storage.from("site-reels").createSignedUrls(paths, 3600);
@@ -33,6 +33,7 @@ export const listAdminReels = createServerFn({ method: "GET" })
     return rows.map((r) => ({
       ...r,
       seconds: Number(r.seconds),
+      videoView: r.video_url?.startsWith("site-reels:") ? signed.get(r.video_url.slice(11)) ?? null : r.video_url,
       posterView: r.poster_url?.startsWith("site-reels:") ? signed.get(r.poster_url.slice(11)) ?? null : r.poster_url,
     }));
   });
