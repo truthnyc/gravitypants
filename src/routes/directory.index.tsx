@@ -21,6 +21,8 @@ import { useMoodCatalog } from "@/lib/directory/moods";
 import { FeaturedBand } from "@/components/directory/FeaturedBand";
 import { DEFAULT_DIRECTORY_SETTINGS, SPEED_SECONDS } from "@/lib/directory/settings";
 import { getDirectoryPublic } from "@/lib/directory/settings.functions";
+import { useGreeting, logGreeting } from "@/components/directory/useGreeting";
+import { rememberVisit } from "@/lib/directory/greeting";
 
 const POSTER =
   "absolute top-1/2 left-1/2 h-[72%] w-auto max-w-[72%] object-contain -translate-x-1/2 -translate-y-1/2 rounded-[6px] shadow-[0_0_0_1px_var(--ap-inner),0_18px_34px_-16px_rgba(29,29,31,.28)]";
@@ -81,18 +83,25 @@ function useReducedMotion() {
 }
 
 /** Rotates through moods, unless the visitor picked some (then the newest pick stays) or prefers less motion. */
-function useWeekdayMood(picked: string | undefined, pool: string[]) {
+function useWeekdayMood(picked: string | undefined, pool: string[], lead?: string) {
   const words = pool.length ? pool : ROTATING;
   const [i, setI] = useState(0);
+  const [leadOn, setLeadOn] = useState(true);
+  useEffect(() => {
+    if (!lead) return;
+    setLeadOn(true);
+    const t = setTimeout(() => setLeadOn(false), 6000);
+    return () => clearTimeout(t);
+  }, [lead]);
   const [day, setDay] = useState("today");
   const reduced = useReducedMotion();
   useEffect(() => setDay(new Date().toLocaleDateString("en-US", { weekday: "long" })), []);
   useEffect(() => {
-    if (picked || reduced) return;
+    if (picked || reduced || (lead && leadOn)) return;
     const t = setInterval(() => setI((x) => (x + 1) % words.length), 2200);
     return () => clearInterval(t);
-  }, [picked, reduced, words.length]);
-  return { day, mood: picked ?? words[i % words.length]! };
+  }, [picked, reduced, words.length, lead, leadOn]);
+  return { day, mood: picked ?? (lead && leadOn ? lead : words[i % words.length]!) };
 }
 
 const list = (v?: string) => (v ? v.split(",").map((x) => x.trim().toLowerCase()).filter(Boolean).slice(0, 60) : []);
@@ -112,7 +121,6 @@ function DirectoryPage() {
   const [value, setValue] = useState(q);
   const [open, setOpen] = useState<DirectoryCard | null>(null);
   const [openSite, setOpenSite] = useState<SiteReel | null>(null);
-  const { day, mood } = useWeekdayMood(filters.moods.at(-1), settings.headlineMoods);
   const input = useRef<HTMLInputElement>(null);
   const sentinel = useRef<HTMLDivElement>(null);
   const [stuck, setStuck] = useState(false);
@@ -178,6 +186,28 @@ function DirectoryPage() {
   const found = results.data?.pages.flatMap((p) => p.reels) ?? [];
   const total = results.data?.pages[0]?.total ?? 0;
   const allTotal = everything.data?.total ?? total;
+  const allFacets = everything.data?.facets;
+  const hasReels = (c: string | null, b: string | null) => {
+    const bs = b ? brands.find((x) => x.name.toLowerCase() === b.toLowerCase())?.slug : null;
+    return (!c || (allFacets?.categories[categorySlug(c)] ?? 0) > 0) && (!b || (!!bs && (allFacets?.brands[bs] ?? 0) > 0));
+  };
+  const greeting = useGreeting(hasReels, (settings.headlineMoods[0] ?? ROTATING[0])!, !!everything.data || everything.isError);
+  const { day, mood } = useWeekdayMood(filters.moods.at(-1), settings.headlineMoods, greeting?.rule === "fallback" ? undefined : greeting?.mood);
+  const moodClicked = useRef(false);
+  const filterLogged = useRef(false);
+  const anyFilter = !!q || filters.moods.length + filters.categories.length + filters.brands.length > 0;
+  useEffect(() => {
+    if (filters.moods.length) rememberVisit(filters.moods.at(-1));
+    if (anyFilter && greeting && !moodClicked.current && !filterLogged.current) { filterLogged.current = true; logGreeting(greeting, "filter"); }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fKey, q, greeting]);
+  const applyMood = () => {
+    moodClicked.current = true;
+    logGreeting(greeting, "mood_click");
+    const bs = greeting?.brand ? brands.find((x) => x.name.toLowerCase() === greeting.brand!.toLowerCase())?.slug : undefined;
+    setFilters({ moods: [mood.toLowerCase()], categories: greeting?.category && greeting.mood === mood ? [categorySlug(greeting.category)] : [], brands: bs && greeting?.mood === mood ? [bs] : [] });
+    requestAnimationFrame(() => document.getElementById("directory-results")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+  };
   const facets = results.data?.pages[0]?.facets ?? { moods: {}, categories: {}, brands: {} };
   const hasMore = !!results.hasNextPage;
   const remaining = Math.max(0, total - found.length);
@@ -236,14 +266,18 @@ function DirectoryPage() {
         <section className="mx-auto max-w-[900px] px-6 pt-20 pb-6 text-center">
           <h1 className="mb-8 text-[clamp(30px,5vw,56px)] leading-[1.08] font-semibold tracking-[-0.035em] text-[#a1a1a6]">
             <b className="font-semibold text-ap-ink">
-              <span className="text-[#a1a1a6]">Happy </span>
-              <span className="text-ap-ink">{day}.</span>
+              <span key={greeting?.filled ?? "ssr"} className={greeting ? "animate-[dir-fade_.4s_ease] motion-reduce:animate-none" : undefined}>
+                {greeting ? greeting.segments.map((g, k) => <span key={k} className={g.bold ? "text-ap-ink" : "text-[#a1a1a6]"}>{g.text}</span>)
+                  : <><span className="text-[#a1a1a6]">Happy </span><span className="text-ap-ink">{day}.</span></>}
+              </span>
               <span className="text-[#a1a1a6]"> Show me something:</span>
               <br />{" "}
             </b>
             <span className="text-ap-blue" aria-live="polite">
               <span className="font-light text-[#c7c7cc]">[ </span>
-              <span key={mood} className="inline-block animate-[dir-mood_.3s_ease] motion-reduce:animate-none">{mood}</span>
+              <button type="button" onClick={applyMood} aria-label={`Show ${mood} reels`} className="rounded-lg underline-offset-8 hover:underline focus-visible:outline-2 focus-visible:outline-ap-blue">
+                <span key={mood} className="inline-block animate-[dir-mood_.3s_ease] motion-reduce:animate-none">{mood}</span>
+              </button>
               <span className="font-light text-[#c7c7cc]"> ]</span>
             </span>
           </h1>
@@ -285,7 +319,7 @@ function DirectoryPage() {
           <FeaturedBand label={featuredLabel} reels={featuredReels} secondsPerReel={SPEED_SECONDS[featured.speed]}
             seconds={(r) => (r.kind === "site" ? reels.find((x) => x.id === r.id)?.seconds ?? null : null)} onOpen={openReel} />
         )}
-        <section className="mx-auto max-w-[1280px] px-6 py-14" aria-busy={results.isFetching}>
+        <section id="directory-results" className="mx-auto max-w-[1280px] scroll-mt-32 px-6 py-14" aria-busy={results.isFetching}>
           <div className="mb-5 flex items-baseline justify-between gap-4">
             <h2 className="text-[24px] font-semibold tracking-[-0.02em]">Browse the directory</h2>
             <p className="text-[15px] text-ap-muted nums" aria-live="polite">
