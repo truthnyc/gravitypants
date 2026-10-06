@@ -142,7 +142,7 @@ function FavoritesPage() {
         {d?.brands.length ? (
           <ul className="grid gap-2 sm:grid-cols-2">
             {d.brands.map((b) => (
-              <li key={b.id} className="relative rounded-[14px] border border-ap-hairline"><button type="button" aria-label={`Remove ${b.name}`} onClick={() => void removeBrand(b.id)} className="absolute top-2 right-2 grid size-7 place-items-center rounded-[8px] text-ap-muted hover:bg-ap-panel"><X className="size-4" strokeWidth={1.7} /></button><Link to="/directory/" search={{ brand: b.slug }} className="block rounded-[4px] p-3 hover:text-ap-blue">
+              <li key={b.id} className="relative rounded-[14px] border border-ap-hairline"><button type="button" aria-label={`Remove ${b.name}`} onClick={() => void removeBrand(b.id)} className="absolute top-2 right-2 grid size-7 place-items-center rounded-[8px] text-ap-muted hover:bg-ap-panel"><X className="size-4" strokeWidth={1.7} /></button><Link to="/directory" search={{ brand: b.slug }} className="block rounded-[4px] p-3 hover:text-ap-blue">
                 <span className="flex size-12 items-center justify-center rounded-[4px] border border-ap-hairline bg-ap-card">
                   {b.logo
                     ? <img src={b.logo} alt="" className="max-h-full max-w-full object-contain" />

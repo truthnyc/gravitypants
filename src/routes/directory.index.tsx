@@ -28,7 +28,7 @@ const ROTATING = ["soothing", "energizing", "hopeful", "inspiring", "cozy", "lux
 export const Route = createFileRoute("/directory/")({
   validateSearch: z.object({
     q: z.string().optional(), mood: z.string().optional(), category: z.string().optional(), brand: z.string().optional(),
-    page: z.coerce.number().optional(),
+    page: z.union([z.number(), z.string()]).optional(),
   }),
   loaderDeps: ({ search }) => ({ q: (search.q ?? "").slice(0, 200) }),
   loader: async ({ deps }) => {

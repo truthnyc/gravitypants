@@ -16,7 +16,7 @@ const POSTER =
 export const Route = createFileRoute("/directory/category/$slug")({
   // Category pages now open the Directory with that category already filtered.
   beforeLoad: ({ params }) => {
-    if (categoryFromSlug(params.slug)) throw redirect({ to: "/directory/", search: { category: params.slug }, statusCode: 301 });
+    if (categoryFromSlug(params.slug)) throw redirect({ to: "/directory", search: { category: params.slug }, statusCode: 301 });
   },
   loader: async ({ params }) => {
     const category = categoryFromSlug(params.slug);
@@ -81,7 +81,7 @@ function CategoryPage() {
           <ul className="mt-8 flex flex-wrap gap-2">
             {brands.map((b) => (
               <li key={b.id}>
-                <Link to="/directory/" search={{ brand: b.slug }} className="inline-block rounded-lg bg-ap-panel px-3.5 py-2 text-[14px] font-medium hover:bg-ap-media">
+                <Link to="/directory" search={{ brand: b.slug }} className="inline-block rounded-lg bg-ap-panel px-3.5 py-2 text-[14px] font-medium hover:bg-ap-media">
                   {b.name}
                 </Link>
               </li>

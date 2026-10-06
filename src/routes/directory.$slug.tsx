@@ -98,7 +98,7 @@ function BrandPage() {
                 {brand.description && <p className="mt-5 max-w-[760px] text-[18px] leading-[1.5] text-ap-body">{brand.description}</p>}
                 {brand.moods.length > 0 && (
                   <p className="mt-3 flex flex-wrap text-[14px] font-medium text-ap-badge" aria-label="Moods">
-                    {brand.moods.map((m, i) => <span key={m}>{i > 0 && <span className="mx-1.5 text-ap-muted">·</span>}<Link to="/directory/" search={{ mood: m }} className="hover:underline">{m.charAt(0).toUpperCase() + m.slice(1)}</Link></span>)}
+                    {brand.moods.map((m, i) => <span key={m}>{i > 0 && <span className="mx-1.5 text-ap-muted">·</span>}<Link to="/directory" search={{ mood: m }} className="hover:underline">{m.charAt(0).toUpperCase() + m.slice(1)}</Link></span>)}
                   </p>
                 )}
                 <div className="mt-5 flex flex-wrap gap-2 text-[13px] nums">
@@ -133,7 +133,7 @@ function BrandPage() {
               items={more.map((m) => ({
                 key: m.slug,
                 media: (hidden) => (
-                  <Link to="/directory/" search={{ brand: m.slug }} tabIndex={hidden ? -1 : undefined} className="grid aspect-[9/16] place-items-center overflow-hidden rounded-[14px] bg-ap-panel">
+                  <Link to="/directory" search={{ brand: m.slug }} tabIndex={hidden ? -1 : undefined} className="grid aspect-[9/16] place-items-center overflow-hidden rounded-[14px] bg-ap-panel">
                     {m.poster ? <img src={m.poster} alt={`${m.name} reel`} className="max-h-full max-w-full object-contain" /> : null}
                   </Link>
                 ),
