@@ -187,7 +187,7 @@ function seasonToday(d: Date, country: string | null): string | null {
 /* ---------- templates ---------- */
 export type Segment = { text: string; bold: boolean };
 export const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-export type Tokens = { day: string; days?: number; event?: string; city?: string | null; brand?: string | null; count?: number };
+export type Tokens = { day: string; days?: number | undefined; event?: string | undefined; city?: string | null | undefined; brand?: string | null | undefined; count?: number | undefined };
 
 export function whenText(days: number) { return days <= 0 ? "today" : days === 1 ? "tomorrow" : `in ${days} days`; }
 
