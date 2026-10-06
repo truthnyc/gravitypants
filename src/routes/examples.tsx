@@ -2,7 +2,9 @@ import { ReelVideo } from "@/components/site/ReelVideo";
 import { SiteReelHeart } from "@/components/site/SiteReelHeart";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
-import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Check, ChevronDown, X } from "lucide-react";
+import { useState } from "react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { SiteShell } from "@/components/site/SiteShell";
 import { FeaturedAdVideo } from "@/components/site/FeaturedAdVideo";
 import { GravityPantsLogo } from "@/components/GravityPantsLogo";
@@ -18,6 +20,36 @@ const reelToExample = (r: SiteReel): GalleryExample => ({ id: r.id, name: r.titl
 
 const formats = [{ id: "all", label: "All formats", short: "All" }, { id: "916", label: "9:16", short: "9:16" }, { id: "11", label: "1:1", short: "1:1" }, { id: "169", label: "16:9", short: "16:9" }] as const;
 const formatLabel: Record<string, string> = { "916": "9:16", "11": "1:1", "169": "16:9" };
+
+function ExampleFilter({ label, value, options, onChange, total }: {
+  label: string; value: string | undefined; options: { id: string; label: string; count: number }[];
+  onChange: (value?: string) => void; total: number;
+}) {
+  const [open, setOpen] = useState(false);
+  const selected = options.find(option => option.id === value);
+  return <Popover open={open} onOpenChange={setOpen}>
+    <div className="relative min-w-0">
+      <PopoverTrigger asChild><Button variant="ghost" aria-label={`${label}: ${selected?.label ?? `Any ${label.toLowerCase()}`}`} className={`h-[52px] w-full justify-start rounded-lg px-3 text-left hover:bg-ap-segment-hover sm:px-4 ${open ? "bg-ap-card shadow-ap-soft" : ""} ${selected ? "pr-11" : ""}`}>
+        <span className="min-w-0 flex-1"><span className={`block text-[10.5px] font-semibold uppercase ${selected ? "text-ap-blue-strong" : "text-ap-muted"}`}>{label}</span><span className={`block truncate text-[15px] ${selected ? "font-medium text-ap-ink" : "font-normal text-ap-muted"}`}>{selected?.label ?? `Any ${label.toLowerCase()}`}</span></span>
+        {!selected && <ChevronDown size={16} strokeWidth={1.7} className={`text-ap-muted motion-reduce:transition-none ${open ? "rotate-180" : ""}`} />}
+      </Button></PopoverTrigger>
+      {selected && <Button variant="ghost" size="icon" aria-label={`Clear ${label.toLowerCase()} filter`} onClick={() => onChange(undefined)} className="absolute top-1/2 right-2 size-6 -translate-y-1/2 rounded-full bg-ap-media p-0 text-ap-ink hover:bg-ap-switch-off"><X size={14} strokeWidth={1.7} /></Button>}
+    </div>
+    <PopoverContent align={label === "Category" ? "start" : "end"} sideOffset={8} className="w-[400px] max-w-[calc(100vw-32px)] rounded-[4px] border-0 bg-ap-card p-0 text-ap-ink shadow-[var(--ap-shadow-menu)] motion-reduce:animate-none">
+      <h2 className="px-5 pt-4 pb-3 text-[17px] font-semibold">{label}</h2>
+      <div className="max-h-[320px] overflow-y-auto overscroll-contain px-3 pb-3" role="group" aria-label={`Filter by ${label.toLowerCase()}`}>
+        {options.map(option => <Button key={option.id} variant="ghost" aria-pressed={(value ?? "all") === option.id} onClick={() => onChange(option.id === "all" ? undefined : option.id)} className="h-auto min-h-10 w-full justify-start gap-3 px-3 py-2 text-left text-ap-ink hover:bg-ap-panel">
+          <span className={`grid size-4 shrink-0 place-items-center rounded-[4px] border ${(value ?? "all") === option.id ? "border-ap-blue bg-ap-blue text-ap-card" : "border-ap-hairline"}`}>{(value ?? "all") === option.id && <Check size={12} strokeWidth={1.7} />}</span>
+          <span className="min-w-0 flex-1 whitespace-normal">{option.label}</span><span className="text-ap-muted tabular-nums">{option.count}</span>
+        </Button>)}
+      </div>
+      <div className="flex items-center justify-between gap-3 border-t border-ap-hairline px-5 py-3">
+        <Button variant="link" disabled={!value} onClick={() => onChange(undefined)} className="px-0 text-ap-blue">Clear ({value ? 1 : 0})</Button>
+        <Button variant="plain" onClick={() => setOpen(false)} className="bg-ap-ink text-ap-card hover:bg-ap-ink/90 tabular-nums">Show {total} {total === 1 ? "example" : "examples"}</Button>
+      </div>
+    </PopoverContent>
+  </Popover>;
+}
 
 function GalleryReel({ example }: { example: GalleryExample }) {
   if (example.video) {
@@ -68,7 +100,13 @@ function ExamplesPage() {
   return <SiteShell><div className="examples-page">
     <section className="examples-hero examples-container"><span className="site-eyebrow">Examples</span><div><h1>See what your<br />photos can become.</h1><p className="site-lede">Each example started with a few still photos. Choose a style you like and use it with your own products.</p></div></section>
     <section className="examples-featured examples-container" aria-label="Example of the week"><article className="site-card examples-featured-panel"><div className="examples-featured-copy"><div><span className="examples-badge">Example of the week</span><h2>{week.title}</h2><p>{week.description}</p></div><div className="examples-featured-bottom"><div className="examples-chips">{weekVideo.chips.map((c) => <span key={c}>{c}</span>)}</div><div className="examples-featured-actions"><Button asChild variant="siteSecondary" size="site"><a href="#gallery">Browse more examples</a></Button></div></div></div><div className="examples-featured-media"><div className="examples-featured-stills"><small>Original photos</small>{week.photos.map((photo, index) => <img key={index} src={photoSrc(photo)} alt={photo.alt || `Original photo ${index + 1}`} />)}</div><ArrowRight className="examples-featured-arrow" size={30} strokeWidth={1.7} /><div className="examples-featured-phone"><small>Video ad</small><FeaturedAdVideo tapToggle video={weekVideo.video} videoWebm={weekVideo.videoWebm} poster={weekVideo.poster} label={weekVideo.label} format={weekVideo.format} /></div></div></article></section>
-    <section id="gallery" className="examples-gallery examples-container" aria-label="Examples gallery"><div className="examples-filters"><div className="examples-categories" role="group" aria-label="Filter by category">{categories.map(option => <Button key={option.id} type="button" variant="ghost" className="examples-filter-button" aria-pressed={(cat || "all") === option.id} onClick={() => navigate({ search: prev => ({ ...prev, cat: option.id === "all" ? undefined : option.id }), hash: "gallery", replace: true })}>{option.label}</Button>)}</div><div className="examples-filter-right"><span className="examples-count" aria-live="polite">{visible.length} {visible.length === 1 ? "example" : "examples"}</span><div className="examples-formats" role="group" aria-label="Filter by format">{formats.map(option => <Button key={option.id} type="button" variant="ghost" className="examples-filter-button" aria-pressed={(format || "all") === option.id} onClick={() => navigate({ search: prev => ({ ...prev, format: option.id === "all" ? undefined : Number(option.id) }), hash: "gallery", replace: true })}><span className="examples-format-long">{option.label}</span><span className="examples-format-short">{option.short}</span></Button>)}</div></div></div>
+    <section id="gallery" className="examples-gallery examples-container" aria-label="Examples gallery"><div className="flex flex-col items-center gap-4">
+      <div className="grid h-[60px] w-full max-w-[680px] grid-cols-[1.15fr_1fr] rounded-lg bg-ap-panel p-1" role="group" aria-label="Filter examples">
+        <ExampleFilter label="Category" value={cat} total={visible.length} options={categories.map(option => ({ ...option, label: option.id === "all" ? "Any category" : option.label, count: all.filter(e => (option.id === "all" || e.category === option.id) && (!format || e.format === format)).length }))} onChange={value => navigate({ search: prev => ({ ...prev, cat: value }), hash: "gallery", replace: true })} />
+        <div className="min-w-0 border-l border-ap-hairline has-[[data-state=open]]:border-transparent hover:border-transparent"><ExampleFilter label="Format" value={format} total={visible.length} options={formats.map(option => ({ ...option, label: option.id === "all" ? "Any format" : option.label, count: all.filter(e => (option.id === "all" || e.format === option.id) && (!cat || e.category === cat)).length }))} onChange={value => navigate({ search: prev => ({ ...prev, format: value ? Number(value) : undefined }), hash: "gallery", replace: true })} /></div>
+      </div>
+      <span className="examples-count self-end tabular-nums" aria-live="polite">{visible.length} {visible.length === 1 ? "example" : "examples"}</span>
+    </div>
       {visible.length > 0 ? <div className="examples-grid">{visible.map(example => <GalleryCard key={example.id} example={example} />)}</div> : <div className="site-card examples-empty"><h2>No examples in this combination yet.</h2><Button variant="siteSecondary" size="site" onClick={() => navigate({ search: { cat: undefined, format: undefined }, hash: "gallery", replace: true })}>Show all examples</Button></div>}
     </section>
     <section className="examples-submit examples-container"><span>Want a reel like these for your brand?</span><Link to="/contact">Tell us about it <ArrowRight size={16} strokeWidth={1.7} /></Link></section>
