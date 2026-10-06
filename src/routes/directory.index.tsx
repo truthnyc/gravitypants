@@ -336,7 +336,6 @@ function DirectoryPage() {
                     className="relative block aspect-square w-full overflow-hidden rounded-[8px] bg-ap-panel">
                     {r.poster && <img src={r.poster} alt="" loading="lazy" className={POSTER} />}
                   </button>
-                  <BrandLink tile name={r.brand_name} slug={r.brand_slug} logo={brands.find((b) => b.id === r.brand_id)?.logo_url ?? null} />
                   {r.kind === "site" ? <SiteReelHeart reelId={r.id} name={r.title} /> : <DirectoryReelHeart reelId={r.id} name={`${r.brand_name} reel`} />}
                   <p className="mt-2.5 truncate text-[14px] font-semibold">{r.title}</p>
                   <p className="truncate text-[12px] text-ap-muted"><BrandLink name={r.brand_name} slug={r.brand_slug} /> · {r.category}</p>
