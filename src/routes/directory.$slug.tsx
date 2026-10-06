@@ -8,6 +8,11 @@ import { getBrandPage } from "@/lib/directory/directory.functions";
 import type { DirectoryCard } from "@/lib/directory/directory";
 import { BrandActions } from "@/components/directory/BrandActions";
 import { siteHead } from "@/lib/site/seo";
+import { SiteReelHeart } from "@/components/site/SiteReelHeart";
+import { SiteReelModal } from "@/components/site/SiteReelModal";
+import type { SiteReel } from "@/lib/site/reels";
+
+const POSTER = "absolute top-1/2 left-1/2 h-[72%] w-auto max-w-[72%] object-contain -translate-x-1/2 -translate-y-1/2 rounded-[6px] shadow-[0_0_0_1px_var(--ap-inner),0_18px_34px_-16px_rgba(29,29,31,.28)]";
 
 const ORIGIN = "https://gravitypants.com";
 
@@ -58,10 +63,12 @@ export const Route = createFileRoute("/directory/$slug")({
 });
 
 function BrandPage() {
-  const { brand, reels, more } = Route.useLoaderData();
+  const { brand, reels, siteReels, more } = Route.useLoaderData();
   const [open, setOpen] = useState<DirectoryCard | null>(null);
+  const [openSite, setOpenSite] = useState<SiteReel | null>(null);
+  const total = reels.length + siteReels.length;
   if (!brand) return null;
-  const sizes = new Set(reels.flatMap((r) => r.formats));
+  const sizes = new Set([...reels.flatMap((r) => r.formats), ...siteReels.map((r) => r.format)]);
   const initials = brand.name.split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase();
   return (
     <SiteShell>
@@ -90,13 +97,28 @@ function BrandPage() {
                 </div>
                 {brand.description && <p className="mt-5 max-w-[760px] text-[18px] leading-[1.5] text-ap-body">{brand.description}</p>}
                 <div className="mt-5 flex flex-wrap gap-2 text-[13px] nums">
-                  {[`${reels.length} public ${reels.length === 1 ? "reel" : "reels"}`, `${sizes.size} ${sizes.size === 1 ? "size" : "sizes"}`].map((c) => <span key={c} className="rounded-lg bg-ap-panel px-3 py-1.5">{c}</span>)}
+                  {[`${total} public ${total === 1 ? "reel" : "reels"}`, `${sizes.size} ${sizes.size === 1 ? "size" : "sizes"}`].map((c) => <span key={c} className="rounded-lg bg-ap-panel px-3 py-1.5">{c}</span>)}
                 </div>
               </div>
             </div>
           </header>
           <h2 className="mb-5 text-[24px] font-semibold tracking-[-0.02em]">Reels</h2>
-          <DirectoryGrid cards={reels} onOpen={setOpen} />
+          {reels.length > 0 && <DirectoryGrid cards={reels} onOpen={setOpen} />}
+          {siteReels.length > 0 && (
+            <ul className={`grid gap-5 [grid-template-columns:repeat(auto-fill,minmax(180px,1fr))] ${reels.length ? "mt-5" : ""}`}>
+              {siteReels.map((r) => (
+                <li key={r.id} className="relative">
+                  <button type="button" onClick={() => setOpenSite(r)} aria-label={`Open ${r.title}`} className="relative block aspect-square w-full overflow-hidden rounded-[8px] bg-ap-panel">
+                    {r.poster && <img src={r.poster} alt="" loading="lazy" className={POSTER} />}
+                  </button>
+                  <SiteReelHeart reelId={r.id} name={r.title} />
+                  <p className="mt-2.5 truncate text-[14px] font-semibold">{r.title}</p>
+                  <p className="truncate text-[12px] text-ap-muted nums">{r.seconds} sec</p>
+                </li>
+              ))}
+            </ul>
+          )}
+          {total === 0 && <p className="rounded-sm bg-ap-panel px-5 py-10 text-center text-[15px] text-ap-body">No reels yet. Check back soon.</p>}
         </div>
         {more.length > 0 && (
           <section className="home-examples !min-h-0 !gap-6 py-12">
@@ -118,6 +140,7 @@ function BrandPage() {
         )}
       </main>
       <ReelDetail card={open} onClose={() => setOpen(null)} />
+      <SiteReelModal reel={openSite} onClose={() => setOpenSite(null)} />
     </SiteShell>
   );
 }

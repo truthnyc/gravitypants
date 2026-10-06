@@ -296,7 +296,7 @@ export const renameDirectoryReel = createServerFn({ method: "POST" })
 
 export const checkSlug = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ slug: z.string().max(SLUG_MAX), brandId: z.string().uuid() }).parse(d))
+  .inputValidator((d: unknown) => z.object({ slug: z.string().max(SLUG_MAX), brandId: z.string().uuid().nullable() }).parse(d))
   .handler(async ({ data, context }) => {
     const { data: st } = await (context.supabase as any).rpc("slug_status", { _slug: data.slug, _brand: data.brandId });
     return st as "invalid" | "reserved" | "yours" | "taken" | "available";
@@ -336,7 +336,7 @@ export const getBrandPage = createServerFn({ method: "GET" })
     const { publicClient } = await import("@/lib/site/reels.server");
     const { toCards } = await import("./directory.server");
     const pc = publicClient() as any;
-    const empty = { redirect: null as string | null, brand: null, reels: [] as DirectoryCard[], more: [] as { name: string; slug: string; poster: string | null }[] };
+    const empty = { redirect: null as string | null, brand: null, reels: [] as DirectoryCard[], siteReels: [] as import("@/lib/site/reels").SiteReel[], more: [] as { name: string; slug: string; poster: string | null }[] };
     const { data: b } = await pc.from("directory_brands").select("id, name, website_url, category, description, slug, logo_url").eq("slug", data.slug).maybeSingle();
     if (!b) {
       const { data: h } = await pc.from("directory_slug_history").select("brand_id").eq("old_slug", data.slug).order("changed_at", { ascending: false }).limit(1).maybeSingle();
@@ -347,9 +347,10 @@ export const getBrandPage = createServerFn({ method: "GET" })
       return empty;
     }
     const { data: reels } = await pc.from("directory_reels").select("id, tags, moods, formats, published_at, templates(name)").eq("brand_id", b.id).eq("status", "live").order("published_at", { ascending: false });
-    if (!reels?.length) return empty;
+    const { listSiteReels } = await import("@/lib/site/reels.functions");
+    const siteReels = (await listSiteReels()).filter((r) => r.brandSlug === b.slug);
     const { data: featured } = await pc.rpc("is_featured_brand", { _brand: b.id });
-    const cards = await toCards(reels.map((r: any) => ({ id: r.id, brand_name: b.name, brand_slug: b.slug, category: b.category, tags: r.tags, moods: r.moods, formats: r.formats, template_name: r.templates?.name ?? null, featured })));
+    const cards = await toCards((reels ?? []).map((r: any) => ({ id: r.id, brand_name: b.name, brand_slug: b.slug, category: b.category, tags: r.tags, moods: r.moods, formats: r.formats, template_name: r.templates?.name ?? null, featured })));
     const { data: similar } = await pc.rpc("search_directory", { q: "", size: null });
     const seen = new Set<string>([b.slug]);
     const moreRows = ((similar ?? []) as any[]).filter((r) => r.category === b.category && !seen.has(r.brand_slug) && seen.add(r.brand_slug)).slice(0, 12);
@@ -358,6 +359,7 @@ export const getBrandPage = createServerFn({ method: "GET" })
       redirect: null,
       brand: { id: b.id as string, name: b.name as string, website_url: b.website_url as string | null, category: b.category as string, description: b.description as string | null, slug: b.slug as string, logo_url: await signLogo(b.logo_url), featured: !!featured },
       reels: cards,
+      siteReels,
       more: moreCards.map((c) => ({ name: c.brand_name, slug: c.brand_slug, poster: c.poster })),
     };
   });
@@ -542,4 +544,129 @@ export const adminRenameReel = createServerFn({ method: "POST" })
     const { error } = await sb.from("directory_reels").update({ title: data.title }).eq("id", data.reelId);
     if (error) throw new Error(error.message);
     return { ok: true };
+  });
+
+/* ---------------- admin: create brand pages, link site reels, hand over to a client */
+
+/** Admin: workspaces a brand page can belong to (ones that don't already have a brand page). */
+export const adminBrandWorkspaces = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.supabase as any);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const admin = supabaseAdmin as any;
+    const [{ data: ws }, { data: brands }, { data: bill }] = await Promise.all([
+      admin.from("workspaces").select("id, name, owner_id, created_at").order("created_at", { ascending: false }).limit(1000),
+      admin.from("directory_brands").select("workspace_id"),
+      admin.from("workspace_billing").select("workspace_id, plan, status"),
+    ]);
+    const taken = new Set(((brands ?? []) as any[]).map((b) => b.workspace_id));
+    const plan = new Map(((bill ?? []) as any[]).map((b) => [b.workspace_id, b.plan as string]));
+    const emails = new Map<string, string>();
+    try {
+      const { data: u } = await supabaseAdmin.auth.admin.listUsers({ perPage: 1000 });
+      for (const x of u?.users ?? []) if (x.email) emails.set(x.id, x.email);
+    } catch { /* emails are a convenience */ }
+    return ((ws ?? []) as any[])
+      .filter((w) => w.owner_id && !taken.has(w.id))
+      .map((w) => ({ id: w.id as string, name: w.name as string, email: emails.get(w.owner_id) ?? null, plan: plan.get(w.id) ?? "none" }));
+  });
+
+const brandFields = {
+  name: z.string().trim().min(1).max(BRAND_NAME_MAX),
+  website: z.string().trim().max(200).refine((v) => !v || /^https?:\/\//.test(v), "Website must start with http:// or https://"),
+  category: z.enum(CATEGORIES), description: z.string().trim().max(BRAND_DESCRIPTION_MAX),
+};
+
+/** Admin: create a brand page, either for a client workspace or as an editorial page. */
+export const adminCreateBrand = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({
+    ...brandFields,
+    slug: z.string().regex(/^[a-z0-9-]{3,30}$/),
+    workspaceId: z.string().uuid().nullable(),
+    siteReelIds: z.array(z.string().uuid()).max(100),
+  }).parse(d))
+  .handler(async ({ data, context }) => {
+    const sb = context.supabase as any;
+    await assertAdmin(sb);
+    const { data: st } = await sb.rpc("slug_status", { _slug: data.slug, _brand: null });
+    if (st !== "available") throw new Error("That address is taken. Try another.");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const admin = supabaseAdmin as any;
+    let ws = data.workspaceId;
+    if (ws) {
+      const { data: existing } = await admin.from("directory_brands").select("id").eq("workspace_id", ws).maybeSingle();
+      if (existing) throw new Error("That workspace already has a brand page.");
+    } else {
+      const { data: w, error } = await admin.from("workspaces").insert({ name: `Editorial · ${data.name}`, owner_id: null }).select("id").single();
+      if (error) throw new Error("Couldn't set up the editorial page");
+      ws = w.id as string;
+    }
+    const { data: b, error } = await admin.from("directory_brands").insert({
+      workspace_id: ws, name: data.name, slug: data.slug, category: data.category,
+      website_url: data.website || null, description: data.description || null,
+      first_approved_at: new Date().toISOString(), is_editorial: !data.workspaceId,
+    }).select("id, slug").single();
+    if (error) throw new Error(error.message);
+    if (data.siteReelIds.length) await admin.from("site_reels").update({ brand_id: b.id }).in("id", data.siteReelIds);
+    await admin.from("admin_audit_log").insert({ admin_user_id: context.userId, action: "brand_create", workspace_id: ws, target: `directory_brands ${b.id}` });
+    return { id: b.id as string, slug: b.slug as string };
+  });
+
+/** Admin: choose which website reels show on a brand page. */
+export const adminSetBrandSiteReels = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ brandId: z.string().uuid(), reelIds: z.array(z.string().uuid()).max(100) }).parse(d))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase as any);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const admin = supabaseAdmin as any;
+    await admin.from("site_reels").update({ brand_id: null }).eq("brand_id", data.brandId);
+    if (data.reelIds.length) {
+      const { error } = await admin.from("site_reels").update({ brand_id: data.brandId }).in("id", data.reelIds);
+      if (error) throw new Error(error.message);
+    }
+    return { ok: true };
+  });
+
+/** Admin: hand a brand page over to a client's workspace (e.g. after they sign up and pick a plan). */
+export const adminAssignBrandWorkspace = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ brandId: z.string().uuid(), workspaceId: z.string().uuid(), keepEditorial: z.boolean() }).parse(d))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase as any);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const admin = supabaseAdmin as any;
+    const { data: existing } = await admin.from("directory_brands").select("id").eq("workspace_id", data.workspaceId).maybeSingle();
+    if (existing && existing.id !== data.brandId) throw new Error("That workspace already has a brand page.");
+    const { data: old } = await admin.from("directory_brands").select("workspace_id").eq("id", data.brandId).single();
+    const { error } = await admin.from("directory_brands").update({ workspace_id: data.workspaceId, is_editorial: data.keepEditorial, plan_ended_at: null }).eq("id", data.brandId);
+    if (error) throw new Error(error.message);
+    // Remove the placeholder editorial workspace if nothing else lives in it.
+    const { data: oldWs } = await admin.from("workspaces").select("id, owner_id, name").eq("id", old.workspace_id).maybeSingle();
+    if (oldWs && !oldWs.owner_id && String(oldWs.name).startsWith("Editorial · ")) {
+      const { count } = await admin.from("projects").select("id", { count: "exact", head: true }).eq("workspace_id", oldWs.id);
+      if (!count) { await admin.from("workspace_billing").delete().eq("workspace_id", oldWs.id); await admin.from("workspaces").delete().eq("id", oldWs.id); }
+    }
+    await admin.from("admin_audit_log").insert({ admin_user_id: context.userId, action: "brand_assign", workspace_id: data.workspaceId, target: `directory_brands ${data.brandId}` });
+    return { ok: true };
+  });
+
+/** Admin: ownership and linked website reels for one brand page. */
+export const adminBrandLinks = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ brandId: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase as any);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const admin = supabaseAdmin as any;
+    const { data: b } = await admin.from("directory_brands").select("workspace_id, is_editorial, workspaces(name, owner_id)").eq("id", data.brandId).single();
+    const { data: reels } = await admin.from("site_reels").select("id").eq("brand_id", data.brandId);
+    return {
+      workspaceName: (b?.workspaces?.name ?? null) as string | null,
+      editorial: !!b?.is_editorial,
+      placeholder: !b?.workspaces?.owner_id,
+      siteReelIds: ((reels ?? []) as any[]).map((r) => r.id as string),
+    };
   });

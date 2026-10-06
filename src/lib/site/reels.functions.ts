@@ -8,7 +8,7 @@ export const listSiteReels = createServerFn({ method: "GET" }).handler(async ():
   const db = publicClient();
   const { data, error } = await db
     .from("site_reels")
-    .select("id, brand, title, href, category, format, seconds, photos, video_url, video_webm_url, poster_url")
+    .select("id, brand, brand_id, title, href, category, format, seconds, photos, video_url, video_webm_url, poster_url")
     .eq("published", true)
     .order("sort_order")
     .order("created_at");
@@ -26,9 +26,10 @@ export const listSiteReels = createServerFn({ method: "GET" }).handler(async ():
   }
   const resolve = (u: string | null) => (u && u.startsWith(REEL_PREFIX) ? signed.get(u.slice(REEL_PREFIX.length)) ?? null : u);
   const slugs = new Map<string, string>();
+  const byId = new Map<string, string>();
   try {
-    const { data: brands } = await db.from("directory_brands").select("name, slug");
-    for (const b of brands ?? []) slugs.set((b.name ?? "").toLowerCase(), b.slug as string);
+    const { data: brands } = await db.from("directory_brands").select("id, name, slug");
+    for (const b of brands ?? []) { slugs.set((b.name ?? "").toLowerCase(), b.slug as string); byId.set(b.id as string, b.slug as string); }
   } catch {
     // Directory is optional; fall back to the slugified brand name.
   }
@@ -36,7 +37,7 @@ export const listSiteReels = createServerFn({ method: "GET" }).handler(async ():
     .map((r) => ({
       id: r.id,
       brand: r.brand,
-      brandSlug: slugs.get(r.brand.toLowerCase()) ?? null,
+      brandSlug: (r.brand_id ? byId.get(r.brand_id) : undefined) ?? slugs.get(r.brand.toLowerCase()) ?? null,
       title: r.title,
       href: r.href,
       category: r.category as SiteReel["category"],
