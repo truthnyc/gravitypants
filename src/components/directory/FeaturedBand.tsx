@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { Pause, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { FacetedReel } from "@/lib/directory/directory.functions";
@@ -17,8 +17,9 @@ function useReducedMotion() {
 }
 
 /** Drifting band of featured reels. Seamless loop: the list renders twice and slides by half. */
-export function FeaturedBand({ label, reels, secondsPerReel, seconds, onOpen }: {
+export function FeaturedBand({ label, reels, secondsPerReel, seconds, onOpen, filterGap = 24, labelSize = 13, labelGap = 16 }: {
   label: string; reels: FacetedReel[]; secondsPerReel: number; seconds: (r: FacetedReel) => number | null; onOpen: (r: FacetedReel) => void;
+  filterGap?: number; labelSize?: number; labelGap?: number;
 }) {
   const [paused, setPaused] = useState(false);
   const reduced = useReducedMotion();
@@ -26,17 +27,18 @@ export function FeaturedBand({ label, reels, secondsPerReel, seconds, onOpen }: 
   const setKey = reels.map((r) => r.id).join(",");
   const copies = reduced ? [0] : [0, 1];
   return (
-    <section aria-label={label} className="relative bg-ap-panel pt-14 pb-12">
-      <div className="pointer-events-none absolute inset-x-0 top-4 z-10 mx-auto flex max-w-[1280px] items-center justify-between px-6">
-        <p className="text-[13px] font-semibold text-ap-ink nums">{label}</p>
+    <section aria-label={label} className="dir-featured-band relative bg-ap-panel pt-4 pb-12"
+      style={{ "--featured-filter-gap": `${filterGap}px`, "--featured-label-size": `${labelSize}px`, "--featured-label-gap": `${labelGap}px` } as CSSProperties}>
+      <div className="dir-featured-heading pointer-events-none relative z-10 mx-auto flex min-h-8 max-w-[1280px] items-center justify-between gap-4 px-6">
+        <p className="dir-featured-label min-w-0 font-semibold text-ap-ink nums">{label}</p>
         {!reduced && (
           <button type="button" aria-pressed={paused} aria-label={paused ? "Play featured reels" : "Pause featured reels"} onClick={() => setPaused((p) => !p)}
-            className="pointer-events-auto grid size-8 place-items-center rounded-full bg-ap-card text-ap-ink shadow-ap-soft hover:bg-ap-media">
+            className="pointer-events-auto grid size-8 shrink-0 place-items-center rounded-full bg-ap-card text-ap-ink shadow-ap-soft hover:bg-ap-media">
             {paused ? <Play className="size-3.5" strokeWidth={1.7} /> : <Pause className="size-3.5" strokeWidth={1.7} />}
           </button>
         )}
       </div>
-      <div key={setKey} className={cn("dir-featured-fade", reduced ? "overflow-x-auto" : "overflow-hidden")}>
+      <div key={setKey} className={cn("dir-featured-fade pt-5", reduced ? "overflow-x-auto" : "overflow-hidden")}>
         <div data-paused={paused} className={cn("dir-marquee flex w-max items-center", reduced && "px-6")}
           style={{ animationDuration: `${Math.max(20, reels.length * secondsPerReel)}s` }}>
           {copies.map((c) => (

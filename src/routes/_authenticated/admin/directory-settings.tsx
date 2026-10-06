@@ -130,7 +130,7 @@ function DirectorySettingsAdmin() {
       await qc.invalidateQueries({ queryKey: ["admin", "directory-greeting"] });
     } catch (e) { toast.error(e instanceof Error ? e.message : "Couldn't save"); } finally { setBusy(false); }
   }
-  const num = (k: "count" | "pageSize" | "autoLoadPages", min: number, max: number) => (e: { target: { value: string } }) =>
+  const num = (k: "count" | "pageSize" | "autoLoadPages" | "filterCarouselGap" | "carouselLabelSize" | "carouselLabelGap", min: number, max: number) => (e: { target: { value: string } }) =>
     setS({ ...s, [k]: Math.min(max, Math.max(min, Math.round(Number(e.target.value) || min))) });
 
   if (saved.isLoading) return <p className="text-[14px] text-secondary-text">Loading…</p>;
@@ -147,7 +147,8 @@ function DirectorySettingsAdmin() {
         <div className="overflow-hidden rounded-sm border border-border font-ap">
           <div className="origin-top-left scale-[.6]" style={{ width: "166.67%", marginBottom: "-26%" }}>
             {s.showCarousel && preview.length ? (
-              <FeaturedBand label={s.title || "Featured this week"} reels={preview} secondsPerReel={SPEED_SECONDS[s.speed]} seconds={secondsOf} onOpen={() => {}} />
+              <FeaturedBand label={s.title || "Featured this week"} reels={preview} secondsPerReel={SPEED_SECONDS[s.speed]} seconds={secondsOf} onOpen={() => {}}
+                filterGap={s.filterCarouselGap} labelSize={s.carouselLabelSize} labelGap={s.carouselLabelGap} />
             ) : <p className="bg-ap-panel py-24 text-center text-[22px] text-ap-muted">{s.showCarousel ? "No reels to show yet" : "The carousel is turned off"}</p>}
           </div>
         </div>
@@ -164,6 +165,11 @@ function DirectorySettingsAdmin() {
         <h2 className="text-[17px] font-semibold">Featured carousel</h2>
         <Toggle label="Show the carousel" hint="Turn off to hide the reel strip on the Directory." checked={s.showCarousel} onChange={(showCarousel) => setS({ ...s, showCarousel })} />
         <Field label="Label above the carousel"><Input aria-label="Label above the carousel" value={s.title} maxLength={60} onChange={(e) => setS({ ...s, title: e.target.value })} /></Field>
+        <div className="grid gap-4 sm:grid-cols-3">
+          <Field label="Space below filters (px)"><Input aria-label="Space below filters (px)" type="number" min={0} max={96} value={s.filterCarouselGap} onChange={num("filterCarouselGap", 0, 96)} className="w-28 nums" /></Field>
+          <Field label="Label font size (px)"><Input aria-label="Label font size (px)" type="number" min={12} max={32} value={s.carouselLabelSize} onChange={num("carouselLabelSize", 12, 32)} className="w-28 nums" /></Field>
+          <Field label="Space below label (px)"><Input aria-label="Space below label (px)" type="number" min={0} max={96} value={s.carouselLabelGap} onChange={num("carouselLabelGap", 0, 96)} className="w-28 nums" /></Field>
+        </div>
         <Field label="Which reels">
           <div><Segmented label="Which reels" value={s.source} options={[["manual", "Hand-picked"], ["auto", "Automatic"]]} onChange={(source) => setS({ ...s, source })} /></div>
         </Field>

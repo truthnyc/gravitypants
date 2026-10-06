@@ -264,21 +264,20 @@ function DirectoryPage() {
     <SiteShell>
       <div className="font-ap text-ap-ink">
         <section className="mx-auto max-w-[900px] px-6 pt-20 pb-6 text-center">
-          <h1 className="mb-8 text-[clamp(21px,5vw,56px)] leading-[1.08] font-semibold tracking-[-0.035em] text-[#a1a1a6]">
-            <b className="font-semibold text-ap-ink">
+          <h1 className="dir-headline mb-8 font-semibold text-ap-muted">
+            <b className="dir-headline-greeting font-semibold text-ap-ink">
               <span key={greeting?.filled ?? "ssr"} className={greeting ? "animate-[dir-fade_.4s_ease] motion-reduce:animate-none" : undefined}>
-                {greeting ? greeting.segments.map((g, k) => <span key={k} className={g.bold ? "text-ap-ink" : "text-[#a1a1a6]"}>{g.text}</span>)
-                  : <><span className="text-[#a1a1a6]">Happy </span><span className="text-ap-ink">{day}.</span></>}
+                {greeting ? greeting.segments.map((g, k) => <span key={k} className={g.bold ? "text-ap-ink" : "text-ap-headline-muted"}>{g.text}</span>)
+                  : <><span className="text-ap-headline-muted">Happy </span><span className="text-ap-ink">{day}.</span></>}
               </span>
-              <span className="text-[#a1a1a6]"> Show me something:</span>
-              <br className="max-sm:hidden" />{" "}
+              <span className="text-ap-headline-muted"> Show me something:</span>
             </b>
-            <span className="text-ap-blue" aria-live="polite">
-              <span className="font-light text-[#c7c7cc]">[ </span>
-              <button type="button" onClick={applyMood} aria-label={`Show ${mood} reels`} className="rounded-lg underline-offset-8 hover:underline focus-visible:outline-2 focus-visible:outline-ap-blue">
+            <span className="dir-headline-mood text-ap-blue" aria-live="polite">
+              <span className="font-light text-ap-headline-bracket">[ </span>
+              <button type="button" onClick={applyMood} aria-label={`Show ${mood} reels`} className="min-w-0 rounded-lg underline-offset-8 hover:underline focus-visible:outline-2 focus-visible:outline-ap-blue">
                 <span key={mood} className="inline-block animate-[dir-mood_.3s_ease] motion-reduce:animate-none">{mood}</span>
               </button>
-              <span className="font-light text-[#c7c7cc]"> ]</span>
+              <span className="font-light text-ap-headline-bracket"> ]</span>
             </span>
           </h1>
           <form role="search" onSubmit={(e) => { e.preventDefault(); go(value); }}
@@ -317,6 +316,7 @@ function DirectoryPage() {
 
         {featuredReels.length > 0 && (
           <FeaturedBand label={featuredLabel} reels={featuredReels} secondsPerReel={SPEED_SECONDS[featured.speed]}
+            filterGap={featured.filterCarouselGap} labelSize={featured.carouselLabelSize} labelGap={featured.carouselLabelGap}
             seconds={(r) => (r.kind === "site" ? reels.find((x) => x.id === r.id)?.seconds ?? null : null)} onOpen={openReel} />
         )}
         <section id="directory-results" className="mx-auto max-w-[1280px] scroll-mt-32 px-6 py-14" aria-busy={results.isFetching}>
