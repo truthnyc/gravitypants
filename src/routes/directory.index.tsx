@@ -4,6 +4,7 @@ import { z } from "zod";
 import { keepPreviousData, useInfiniteQuery, useQueries, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { FilterBar, type FilterValue } from "@/components/directory/FilterBar";
+import { BrandLink } from "@/components/directory/BrandLink";
 import { DirectoryReelHeart } from "@/components/directory/LikeSave";
 import { X } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
@@ -335,9 +336,10 @@ function DirectoryPage() {
                     className="relative block aspect-square w-full overflow-hidden rounded-[8px] bg-ap-panel">
                     {r.poster && <img src={r.poster} alt="" loading="lazy" className={POSTER} />}
                   </button>
+                  <BrandLink tile name={r.brand_name} slug={r.brand_slug} logo={brands.find((b) => b.id === r.brand_id)?.logo_url} />
                   {r.kind === "site" ? <SiteReelHeart reelId={r.id} name={r.title} /> : <DirectoryReelHeart reelId={r.id} name={`${r.brand_name} reel`} />}
                   <p className="mt-2.5 truncate text-[14px] font-semibold">{r.title}</p>
-                  <p className="truncate text-[12px] text-ap-muted">{r.brand_name} · {r.category}</p>
+                  <p className="truncate text-[12px] text-ap-muted"><BrandLink name={r.brand_name} slug={r.brand_slug} /> · {r.category}</p>
                   {filters.moods.length > 0 && r.moods.length > 0 && (
                     <ul className="mt-1.5 flex flex-wrap gap-1" aria-label="Moods">
                       {r.moods.map((m) => {
