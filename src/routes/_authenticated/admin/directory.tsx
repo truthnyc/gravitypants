@@ -5,7 +5,8 @@ import { Fragment, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { adminDeleteReel, adminMoveReel, adminBrandDetail, adminRenameReel, adminSaveBrand, adminSaveBrandSlug, setBrandLogo, listDirectoryBrands, listDirectoryReview, resolveReport, reviewDirectoryReel } from "@/lib/directory/directory.functions";
-import { BRAND_DESCRIPTION_MAX, BRAND_NAME_MAX, CATEGORIES, MOODS, SLUG_MAX, BRAND_MOODS_MAX, moodLabel, moodsFor, STATUS_LABEL, nearLimit, type Category } from "@/lib/directory/directory";
+import { BRAND_DESCRIPTION_MAX, BRAND_NAME_MAX, CATEGORIES, SLUG_MAX, BRAND_MOODS_MAX, moodLabel, STATUS_LABEL, nearLimit, type Category } from "@/lib/directory/directory";
+import { useMoodCatalog } from "@/lib/directory/moods";
 import { cn } from "@/lib/utils";
 import { BrandOwnership, NewBrandPage } from "@/components/admin/BrandPageAdmin";
 
@@ -16,7 +17,7 @@ export const Route = createFileRoute("/_authenticated/admin/directory")({
 
 type Data = Awaited<ReturnType<typeof listDirectoryReview>>;
 type Row = Data["reels"][number];
-type Act = { id: string; action: "approve" | "reject" | "hide" | "review" | "edit"; reason?: string; tags?: string[]; moods?: (typeof MOODS)[number][]; category?: Category };
+type Act = { id: string; action: "approve" | "reject" | "hide" | "review" | "edit"; reason?: string; tags?: string[]; moods?: string[]; category?: Category };
 
 function AdminDirectory() {
   const list = useServerFn(listDirectoryReview);
@@ -163,12 +164,13 @@ function BrandAddresses() {
 }
 
 function ReviewCard({ r, act }: { r: Row; act: (a: Act, msg: string) => Promise<void> }) {
+  const { forCategory } = useMoodCatalog();
   const [tags, setTags] = useState(r.tags.join(", "));
   const [moods, setMoods] = useState<string[]>(r.moods);
   const [category, setCategory] = useState<Category>((r.category as Category) ?? "Other");
   const [rejecting, setRejecting] = useState(false);
   const [reason, setReason] = useState("");
-  const edits = { tags: tags.split(",").map((t) => t.trim()).filter(Boolean), moods: moods as (typeof MOODS)[number][], category };
+  const edits = { tags: tags.split(",").map((t) => t.trim()).filter(Boolean), moods: moods as string[], category };
   const p = r.permission;
   return (
     <div className="flex flex-col gap-4 rounded-sm bg-card p-4 shadow-card sm:flex-row">
@@ -181,7 +183,7 @@ function ReviewCard({ r, act }: { r: Row; act: (a: Act, msg: string) => Promise<
           <input value={tags} onChange={(e) => setTags(e.target.value)} aria-label="Tags" placeholder="Tags, comma separated" className="h-8 min-w-[220px] flex-1 rounded-sm bg-control-fill px-2 text-[13px]" />
         </div>
         <div className="flex flex-wrap gap-1">
-          {[...new Set([...moodsFor(category), ...moods])].map((m) => {
+          {[...new Set([...forCategory(category), ...moods])].map((m) => {
             const on = moods.includes(m);
             return <button key={m} type="button" disabled={!on && moods.length >= 3} onClick={() => setMoods(on ? moods.filter((x) => x !== m) : [...moods, m])} className={cn("rounded-lg border px-2 py-0.5 text-[12px] disabled:opacity-40", on ? "border-primary text-primary" : "border-border")}>{moodLabel(m)}</button>;
           })}
@@ -233,7 +235,8 @@ type Detail = Awaited<ReturnType<typeof adminBrandDetail>>;
 function BrandForm({ b, onSaved }: { b: Detail["brand"]; onSaved: () => void }) {
   const save = useServerFn(adminSaveBrand);
   const logo = useServerFn(setBrandLogo);
-  const [f, setF] = useState({ name: b.name, website: b.website, category: b.category as Category, description: b.description, moods: b.moods as (typeof MOODS)[number][] });
+  const { forCategory } = useMoodCatalog();
+  const [f, setF] = useState({ name: b.name, website: b.website, category: b.category as Category, description: b.description, moods: b.moods as string[] });
   const [busy, setBusy] = useState(false);
   const run = async (fn: () => Promise<unknown>, msg: string) => {
     setBusy(true);
@@ -261,7 +264,7 @@ function BrandForm({ b, onSaved }: { b: Detail["brand"]; onSaved: () => void }) 
       <div className="grid flex-1 gap-2 sm:grid-cols-2">
         <label className="space-y-1"><span className="flex justify-between text-[12px] text-secondary-text"><span>Brand name</span><span className={cn("nums", nearLimit(f.name.length, BRAND_NAME_MAX) && "text-warning-text")}>{f.name.length} / {BRAND_NAME_MAX}</span></span><input value={f.name} maxLength={BRAND_NAME_MAX} onChange={(e) => setF({ ...f, name: e.target.value })} className={field} /></label>
         <label className="space-y-1"><span className="text-[12px] text-secondary-text">Website</span><input value={f.website} maxLength={200} placeholder="https://" onChange={(e) => setF({ ...f, website: e.target.value })} className={field} /></label>
-        <label className="space-y-1"><span className="text-[12px] text-secondary-text">Category</span><select value={f.category} onChange={(e) => { const c = e.target.value as Category; setF({ ...f, category: c, moods: f.moods.filter((m) => moodsFor(c).includes(m)) }); }} className={field}>{CATEGORIES.map((c) => <option key={c}>{c}</option>)}</select></label>
+        <label className="space-y-1"><span className="text-[12px] text-secondary-text">Category</span><select value={f.category} onChange={(e) => { const c = e.target.value as Category; setF({ ...f, category: c, moods: f.moods.filter((m) => forCategory(c).includes(m)) }); }} className={field}>{CATEGORIES.map((c) => <option key={c}>{c}</option>)}</select></label>
         <div className="space-y-1 text-[12px] text-secondary-text">
           <div>Status: {b.approved ? `Approved ${new Date(b.approved).toLocaleDateString()}` : "Not approved yet"}</div>
           {b.planEnded && <div>Plan ended {new Date(b.planEnded).toLocaleDateString()}</div>}
@@ -270,7 +273,7 @@ function BrandForm({ b, onSaved }: { b: Detail["brand"]; onSaved: () => void }) 
         <div className="space-y-1 sm:col-span-2">
           <span className="text-[12px] text-secondary-text">Moods (up to {BRAND_MOODS_MAX}, from the {f.category} list)</span>
           <div className="flex flex-wrap gap-1.5">
-            {[...new Set([...moodsFor(f.category), ...f.moods])].map((m) => { const on = f.moods.includes(m); return (
+            {[...new Set([...forCategory(f.category), ...f.moods])].map((m) => { const on = f.moods.includes(m); return (
               <button key={m} type="button" aria-pressed={on} disabled={!on && f.moods.length >= BRAND_MOODS_MAX} onClick={() => setF({ ...f, moods: on ? f.moods.filter((x) => x !== m) : [...f.moods, m] })}
                 className={cn("h-7 rounded-lg px-2.5 text-[12px]", on ? "bg-primary text-primary-foreground" : "bg-control-fill", "disabled:opacity-40")}>{moodLabel(m)}</button>
             ); })}
@@ -289,6 +292,7 @@ function BrandForm({ b, onSaved }: { b: Detail["brand"]; onSaved: () => void }) 
 function AdminReel({ r, brandId, onChanged }: { r: Detail["reels"][number]; brandId: string; onChanged: () => void }) {
   const rename = useServerFn(adminRenameReel);
   const review = useServerFn(reviewDirectoryReel);
+  const moodCatalog = useMoodCatalog();
   const [title, setTitle] = useState(r.title);
   const [tags, setTags] = useState(r.tags.join(", "));
   const [moods, setMoods] = useState<string[]>(r.moods);
@@ -299,7 +303,7 @@ function AdminReel({ r, brandId, onChanged }: { r: Detail["reels"][number]; bran
   };
   const save = () => run(async () => {
     if (title.trim() && title.trim() !== r.title) await rename({ data: { reelId: r.id, title: title.trim() } });
-    await review({ data: { id: r.id, action: "edit", tags: tags.split(",").map((t) => t.trim()).filter(Boolean), moods: moods as (typeof MOODS)[number][] } });
+    await review({ data: { id: r.id, action: "edit", tags: tags.split(",").map((t) => t.trim()).filter(Boolean), moods: moods as string[] } });
   }, "Reel saved");
   return (
     <div className="flex gap-3 rounded-sm border border-border p-3">
@@ -312,7 +316,7 @@ function AdminReel({ r, brandId, onChanged }: { r: Detail["reels"][number]; bran
         </div>
         <input value={tags} onChange={(e) => setTags(e.target.value)} aria-label="Tags" placeholder="Tags, comma separated" className={field} />
         <div className="flex flex-wrap gap-1">
-          {MOODS.map((m) => {
+          {moodCatalog.all.map((m) => {
             const on = moods.includes(m);
             return <button key={m} type="button" disabled={!on && moods.length >= 3} onClick={() => setMoods(on ? moods.filter((x) => x !== m) : [...moods, m])} className={cn("rounded-lg border px-2 py-0.5 text-[12px] disabled:opacity-40", on ? "border-primary text-primary" : "border-border")}>{moodLabel(m)}</button>;
           })}

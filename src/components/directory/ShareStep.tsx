@@ -9,13 +9,14 @@ import { ReelCard, StepActions, StepShell, StepTitle } from "@/components/app-ui
 import { useReelPlayer } from "@/components/editor/ReelPreview";
 import { supabase } from "@/integrations/supabase/client";
 import { getShareContext, shareReel } from "@/lib/directory/directory.functions";
-import { BRAND_NAME_MAX, CATEGORIES, GRACE_DAYS, MOODS, REEL_DESCRIPTION_MAX, moodLabel, moodsFor, nearLimit, permissionWording, validFullName, type Category } from "@/lib/directory/directory";
+import { BRAND_NAME_MAX, CATEGORIES, GRACE_DAYS, REEL_DESCRIPTION_MAX, moodLabel, nearLimit, permissionWording, validFullName, type Category } from "@/lib/directory/directory";
 import { MEDIA_BUCKET } from "@/lib/stillframe/media";
 import { useTemplateName, type EditorDoc } from "@/lib/stillframe/data";
 import type { Format } from "@/lib/stillframe/types";
 import { FORMAT_SIZE } from "@/render/formats";
 import { loadImages } from "@/render/images";
 import { ensureFonts, mediaPaths, renderAt, restTime, type BrandStyle } from "@/render/renderFrame";
+import { useMoodCatalog } from "@/lib/directory/moods";
 import { cn } from "@/lib/utils";
 
 const PLAN_LABEL = { business: "Business plan", simple: "Simple plan", trial: "Trial", ended: "Plan ended" } as const;
@@ -78,6 +79,7 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
   const [touchedName, setTouchedName] = useState(false);
   const [busy, setBusy] = useState(false);
   const [thumbFrame, setThumbFrame] = useState(0);
+  const { forCategory } = useMoodCatalog();
   const suggestions = useMemo(() => suggestionsFrom(doc).filter((s) => !tags.includes(s)), [doc, tags]);
   const brandName = name.trim() || "your brand";
   const nameOk = validFullName(fullName);
@@ -110,7 +112,7 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
       }
       const res = await save({ data: {
         adId: doc.project.id, brand: { name: name.trim(), website_url: site.trim(), category }, description: desc.trim(),
-        tags, moods: moods as (typeof MOODS)[number][], show, fullName, jobTitle: title, agreed, posterPath,
+        tags, moods: moods as string[], show, fullName, jobTitle: title, agreed, posterPath,
       } });
       if (alreadyShared && show && !agreed) toast.success("Changes saved.");
       else if (res.status === "live") toast.success("Published. It's live in the Directory. Permission saved to your log.");
@@ -234,7 +236,7 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
 
         <AppField label="Mood" className="mb-[22px]">
           <div className="flex flex-wrap gap-1.5">
-            {[...new Set([...moodsFor(category), ...moods])].map((m) => {
+            {[...new Set([...forCategory(category), ...moods])].map((m) => {
               const on = moods.includes(m);
               return (
                 <button key={m} type="button" aria-pressed={on} disabled={!on && moods.length >= 3}

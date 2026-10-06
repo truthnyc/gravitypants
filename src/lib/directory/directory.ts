@@ -28,30 +28,9 @@ export const CATEGORY_COVERS: Record<Category, string> = {
 export const categorySlug = (c: string) =>
   c.toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 export const categoryFromSlug = (s: string): Category | null => CATEGORIES.find((c) => categorySlug(c) === s) ?? null;
-/** Master mood list (stored lowercase). Search draws from all of it. */
-export const MOODS = ["airy", "bold", "calm", "celebratory", "cheerful", "cinematic", "clean", "coastal", "cozy", "dramatic", "dreamy", "earthy", "edgy", "elegant", "empowering", "energetic", "energizing", "festive", "fresh", "fun", "heartfelt", "heritage", "homey", "hopeful", "human", "indulgent", "inspiring", "luxurious", "minimal", "modern", "moody", "mysterious", "natural", "nostalgic", "opulent", "organic", "playful", "quirky", "refined", "romantic", "rustic", "sensual", "serene", "sleek", "soft", "soothing", "sophisticated", "sunny", "timeless", "trustworthy", "urban", "urgent", "vibrant", "warm", "whimsical"] as const;
-export type Mood = (typeof MOODS)[number];
-/** Moods offered per category; Other gets every mood. */
-export const CATEGORY_MOODS: Record<Exclude<Category, "Other">, Mood[]> = {
-  "Fashion & Apparel": ["elegant", "luxurious", "bold", "edgy", "minimal", "urban", "timeless", "playful", "moody", "romantic"],
-  "Jewelry & Watches": ["elegant", "luxurious", "timeless", "romantic", "refined", "opulent", "minimal", "sophisticated", "festive"],
-  "Beauty & Fragrance": ["luxurious", "sensual", "soothing", "fresh", "clean", "dreamy", "elegant", "mysterious", "soft", "bold"],
-  "Health & Wellness": ["soothing", "calm", "fresh", "natural", "energetic", "empowering", "clean", "serene", "organic"],
-  "Food & Drink": ["indulgent", "warm", "cozy", "fresh", "playful", "rustic", "heritage", "vibrant", "festive", "homey"],
-  "Wine & Spirits": ["elegant", "rustic", "heritage", "warm", "sophisticated", "moody", "celebratory", "timeless", "earthy"],
-  "Restaurants & Cafés": ["cozy", "warm", "vibrant", "urban", "rustic", "indulgent", "fresh", "homey", "fun"],
-  "Home & Living": ["cozy", "serene", "minimal", "warm", "refined", "natural", "earthy", "timeless", "homey", "airy"],
-  "Travel & Hospitality": ["serene", "coastal", "sunny", "dreamy", "luxurious", "cinematic", "romantic", "airy", "natural"],
-  "Real Estate": ["elegant", "modern", "airy", "serene", "luxurious", "sleek", "warm", "trustworthy", "coastal"],
-  "Arts, Crafts & Hobbies": ["cozy", "playful", "whimsical", "natural", "nostalgic", "calm", "vibrant", "homey", "inspiring"],
-  "Kids & Family": ["playful", "cheerful", "fun", "whimsical", "soft", "warm", "sunny", "heartfelt"],
-  "Pets": ["playful", "cheerful", "fun", "heartfelt", "warm", "quirky", "cozy", "sunny"],
-  "Events & Entertainment": ["energetic", "bold", "festive", "celebratory", "urgent", "cinematic", "dramatic", "vibrant", "fun"],
-  "Services & Local Business": ["trustworthy", "clean", "modern", "warm", "cheerful", "bold", "minimal", "human"],
-  "Nonprofit & Causes": ["heartfelt", "hopeful", "inspiring", "human", "urgent", "empowering", "trustworthy", "calm"],
-};
+/** Moods live in the database (moods + category_moods); see src/lib/directory/moods.ts. Stored lowercase. */
+export type Mood = string;
 export const BRAND_MOODS_MAX = 3;
-export const moodsFor = (c: string): readonly Mood[] => (CATEGORY_MOODS as Record<string, Mood[]>)[c] ?? MOODS.filter((m) => !(["energizing"] as string[]).includes(m));
 export const moodLabel = (m: string) => m.charAt(0).toUpperCase() + m.slice(1);
 export const RESERVED_SLUGS = ["directory", "admin", "category", "search", "new", "edit", "api", "app"];
 export const WORDING_VERSION = "v1.0";

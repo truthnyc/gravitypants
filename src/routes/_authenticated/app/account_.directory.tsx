@@ -9,8 +9,9 @@ import { AppButton } from "@/components/app-ui";
 import { checkSlug, getDirectoryAccount, hideReel, renameDirectoryReel, saveBrandDescription, saveSlug, setBrandLogo } from "@/lib/directory/directory.functions";
 import { STATUS_LABEL } from "@/lib/directory/directory";
 import { getWorkspaceId } from "@/lib/stillframe/workspace";
+import { useMoodCatalog } from "@/lib/directory/moods";
 import { cn } from "@/lib/utils";
-import { BRAND_DESCRIPTION_MAX, BRAND_NAME_MAX, CATEGORIES, GRACE_DAYS, MOODS, SLUG_MAX, BRAND_MOODS_MAX, moodLabel, moodsFor, nearLimit } from "@/lib/directory/directory";
+import { BRAND_DESCRIPTION_MAX, BRAND_NAME_MAX, CATEGORIES, GRACE_DAYS, SLUG_MAX, BRAND_MOODS_MAX, moodLabel, nearLimit } from "@/lib/directory/directory";
 
 export const Route = createFileRoute("/_authenticated/app/account_/directory")({
   head: () => ({
@@ -158,6 +159,7 @@ function Counter({ n, max }: { n: number; max: number }) {
 }
 function DescriptionBox({ brand, onSaved }: { brand: BrandInfo; onSaved: () => void }) {
   const save = useServerFn(saveBrandDescription);
+  const { forCategory } = useMoodCatalog();
   const [name, setName] = useState(brand.name);
   const [website, setWebsite] = useState(brand.website);
   const [category, setCategory] = useState(brand.category);
@@ -168,7 +170,7 @@ function DescriptionBox({ brand, onSaved }: { brand: BrandInfo; onSaved: () => v
   const commit = async () => {
     setBusy(true);
     try {
-      await save({ data: { brandId: brand.id, description: value, name: name.trim(), website: website.trim(), category: category as (typeof CATEGORIES)[number], moods: moods as (typeof MOODS)[number][] } });
+      await save({ data: { brandId: brand.id, description: value, name: name.trim(), website: website.trim(), category: category as (typeof CATEGORIES)[number], moods: moods as string[] } });
       toast.success("Brand page saved.");
       onSaved();
     } catch (e) { toast.error(e instanceof Error ? e.message : "Couldn't save your brand page"); }
@@ -184,12 +186,12 @@ function DescriptionBox({ brand, onSaved }: { brand: BrandInfo; onSaved: () => v
           <input type="url" value={website} placeholder="https://yourbrand.com" onChange={(e) => setWebsite(e.target.value)} className={fieldCls} /></label>
       </div>
       <label className="mt-4 block sm:w-1/2 sm:pr-[7px]"><span className={lbl}>Category</span>
-        <select value={category} onChange={(e) => { const c = e.target.value; setCategory(c); setMoods(moods.filter((m) => (moodsFor(c) as string[]).includes(m))); }} className={fieldCls}>
+        <select value={category} onChange={(e) => { const c = e.target.value; setCategory(c); setMoods(moods.filter((m) => forCategory(c).includes(m))); }} className={fieldCls}>
           {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
         </select></label>
       <div className="mt-4"><span className={lbl}>Moods</span>
         <div className="flex flex-wrap gap-1.5">
-          {[...new Set([...moodsFor(category), ...moods])].map((m) => { const on = moods.includes(m); return (
+          {[...new Set([...forCategory(category), ...moods])].map((m) => { const on = moods.includes(m); return (
             <button key={m} type="button" aria-pressed={on} disabled={!on && moods.length >= BRAND_MOODS_MAX} onClick={() => setMoods(on ? moods.filter((x) => x !== m) : [...moods, m])}
               className={cn("h-9 rounded-lg px-3 text-[14px]", on ? "bg-ap-blue text-ap-card" : "bg-ap-panel text-ap-body hover:bg-ap-media", "disabled:opacity-40")}>{moodLabel(m)}</button>
           ); })}
