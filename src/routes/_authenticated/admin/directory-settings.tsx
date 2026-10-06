@@ -144,7 +144,7 @@ function DirectorySettingsAdmin() {
       <Card className="space-y-4">
         <h2 className="text-[17px] font-semibold">Featured carousel</h2>
         <Toggle label="Show the carousel" hint="Turn off to hide the reel strip on the Directory." checked={s.showCarousel} onChange={(showCarousel) => setS({ ...s, showCarousel })} />
-        <Field label="Label above the carousel"><Input value={s.title} maxLength={60} onChange={(e) => setS({ ...s, title: e.target.value })} /></Field>
+        <Field label="Label above the carousel"><Input aria-label="Label above the carousel" value={s.title} maxLength={60} onChange={(e) => setS({ ...s, title: e.target.value })} /></Field>
         <Field label="Which reels">
           <div><Segmented label="Which reels" value={s.source} options={[["manual", "Hand-picked"], ["auto", "Automatic"]]} onChange={(source) => setS({ ...s, source })} /></div>
         </Field>
@@ -170,7 +170,7 @@ function DirectorySettingsAdmin() {
           </div>
         )}
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="How many reels" hint="6 to 20."><Input type="number" min={6} max={20} value={s.count} onChange={num("count", 6, 20)} className="w-28 nums" /></Field>
+          <Field label="How many reels" hint="6 to 20."><Input aria-label="How many reels" type="number" min={6} max={20} value={s.count} onChange={num("count", 6, 20)} className="w-28 nums" /></Field>
           <Field label="Speed"><div><Segmented label="Speed" value={s.speed} options={[["slow", "Slow"], ["normal", "Normal"], ["fast", "Fast"]]} onChange={(speed) => setS({ ...s, speed })} /></div></Field>
         </div>
         <Field label="When visitors filter" hint="Follow filters shows the top matches and changes the label to 'Featured · N matches'.">
@@ -196,8 +196,8 @@ function DirectorySettingsAdmin() {
           </div>
         )}
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Show from (optional)"><Input type="datetime-local" value={s.showFrom ?? ""} onChange={(e) => setS({ ...s, showFrom: e.target.value || null })} /></Field>
-          <Field label="Until (optional)"><Input type="datetime-local" value={s.showUntil ?? ""} onChange={(e) => setS({ ...s, showUntil: e.target.value || null })} /></Field>
+          <Field label="Show from (optional)"><Input aria-label="Show from" type="datetime-local" value={s.showFrom ?? ""} onChange={(e) => setS({ ...s, showFrom: e.target.value || null })} /></Field>
+          <Field label="Until (optional)"><Input aria-label="Until" type="datetime-local" value={s.showUntil ?? ""} onChange={(e) => setS({ ...s, showUntil: e.target.value || null })} /></Field>
         </div>
       </Card>
 
@@ -205,8 +205,8 @@ function DirectorySettingsAdmin() {
         <h2 className="text-[17px] font-semibold">Filters & results</h2>
         <Toggle label="Show empty categories as 'Coming soon'" hint="Categories without reels stay visible in the Category filter." checked={s.comingSoon} onChange={(comingSoon) => setS({ ...s, comingSoon })} />
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Reels per page" hint="8 to 48."><Input type="number" min={8} max={48} value={s.pageSize} onChange={num("pageSize", 8, 48)} className="w-28 nums" /></Field>
-          <Field label="Auto-load pages after first 'Show more'" hint="0 to 5. 0 means visitors always click."><Input type="number" min={0} max={5} value={s.autoLoadPages} onChange={num("autoLoadPages", 0, 5)} className="w-28 nums" /></Field>
+          <Field label="Reels per page" hint="8 to 48."><Input aria-label="Reels per page" type="number" min={8} max={48} value={s.pageSize} onChange={num("pageSize", 8, 48)} className="w-28 nums" /></Field>
+          <Field label="Auto-load pages after first 'Show more'" hint="0 to 5. 0 means visitors always click."><Input aria-label="Auto-load pages" type="number" min={0} max={5} value={s.autoLoadPages} onChange={num("autoLoadPages", 0, 5)} className="w-28 nums" /></Field>
         </div>
         <Field label="Moods in the headline rotation" hint={s.headlineMoods.length ? `${s.headlineMoods.length} chosen.` : "None chosen — the headline rotates through every mood."}>
           <div className="space-y-2">
