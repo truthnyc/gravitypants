@@ -24,6 +24,7 @@ import { useMoodCatalog } from "@/lib/directory/moods";
 const POSTER =
   "absolute top-1/2 left-1/2 h-[72%] w-auto max-w-[72%] object-contain -translate-x-1/2 -translate-y-1/2 rounded-[6px] shadow-[0_0_0_1px_var(--ap-inner),0_18px_34px_-16px_rgba(29,29,31,.28)]";
 
+// Moods the headline cycles through when none are picked.
 const ROTATING = ["soothing", "energizing", "hopeful", "inspiring", "cozy", "luxurious", "playful"];
 export const Route = createFileRoute("/directory/")({
   validateSearch: z.object({
