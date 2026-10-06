@@ -61,6 +61,7 @@ function AdminDirectory() {
                 </div>
                 {r?.status === "live" && <Button size="sm" variant="plain" onClick={() => void act({ id: r.id, action: "review" }, "Pulled back into review")}>Pull back into review</Button>}
                 {r?.status === "live" && <Button size="sm" variant="plain" onClick={() => void act({ id: r.id, action: "hide" }, "Hidden")}>Hide</Button>}
+                {r?.status === "hidden" && <Button size="sm" variant="plain" onClick={() => void act({ id: r.id, action: "approve" }, "Visible again")}>Unhide</Button>}
                 <Button size="sm" onClick={async () => { await resolve({ data: { id: x.id } }); refresh(); }}>Mark resolved</Button>
               </div>
             );
@@ -82,6 +83,7 @@ function AdminDirectory() {
                 <td className="space-x-2 py-1.5 text-right">
                   {r.status === "live" && <Button size="sm" variant="plain" onClick={() => void act({ id: r.id, action: "review" }, "Pulled back into review")}>Pull back into review</Button>}
                   {r.status === "live" && <Button size="sm" variant="plain" onClick={() => void act({ id: r.id, action: "hide" }, "Hidden")}>Hide</Button>}
+                  {r.status === "hidden" && <Button size="sm" variant="plain" onClick={() => void act({ id: r.id, action: "approve" }, "Visible again")}>Unhide</Button>}
                 </td>
               </tr>
             ))}
@@ -310,6 +312,7 @@ function AdminReel({ r, onChanged }: { r: Detail["reels"][number]; onChanged: ()
           {r.status === "in_review" && <Button size="sm" variant="plain" disabled={busy} onClick={() => void run(() => review({ data: { id: r.id, action: "approve" } }), "Approved")}>Approve</Button>}
           {r.status === "live" && <Button size="sm" variant="plain" disabled={busy} onClick={() => void run(() => review({ data: { id: r.id, action: "review" } }), "Pulled back into review")}>Pull back into review</Button>}
           {r.status === "live" && <Button size="sm" variant="plain" disabled={busy} onClick={() => void run(() => review({ data: { id: r.id, action: "hide" } }), "Hidden")}>Hide</Button>}
+          {r.status === "hidden" && <Button size="sm" variant="plain" disabled={busy} onClick={() => void run(() => review({ data: { id: r.id, action: "approve" } }), "Visible again")}>Unhide</Button>}
         </div>
       </div>
     </div>
