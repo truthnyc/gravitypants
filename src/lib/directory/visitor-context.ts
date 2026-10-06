@@ -18,7 +18,7 @@ export function countryCode(value: unknown): string | null {
 
 export function parseLocation(value: unknown): ApproximateLocation | null {
   if (!value || typeof value !== "object") return null;
-  const geo = value as Record<string, unknown>;
+  const geo = value as { latitude?: unknown; longitude?: unknown; country_code?: unknown; country?: unknown; city?: unknown };
   const latitude = coordinate(geo.latitude, 90), longitude = coordinate(geo.longitude, 180);
   if (latitude === null || longitude === null) return null;
   return {

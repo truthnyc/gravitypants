@@ -20,7 +20,7 @@ export const getVisitorContext = createServerFn({ method: "GET" })
   .inputValidator((value: unknown) => z.object({ location: z.object({ country: z.string().length(2).nullable(), city: z.string().max(120).nullable(), latitude: z.number().min(-90).max(90), longitude: z.number().min(-180).max(180) }).optional() }).optional().parse(value))
   .handler(async ({ data }): Promise<VisitorContext> => {
     setResponseHeader("Cache-Control", "private, no-store");
-    const req = getRequest() as Request & { cf?: Record<string, unknown> };
+    const req = getRequest() as Request & { cf?: { country?: unknown; city?: unknown; latitude?: unknown; longitude?: unknown } };
     const cf = req.cf ?? {};
     const country = countryCode(cf.country ?? req.headers.get("cf-ipcountry"));
     const city = typeof cf.city === "string" ? cf.city : req.headers.get("cf-ipcity");
