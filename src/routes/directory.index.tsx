@@ -6,7 +6,7 @@ import { SiteShell } from "@/components/site/SiteShell";
 import { ReelCarousel } from "@/components/site/ReelCarousel";
 import { ReelVideo } from "@/components/site/ReelVideo";
 import { DirectoryGrid, ReelDetail } from "@/components/directory/DirectoryGrid";
-import { searchDirectory } from "@/lib/directory/directory.functions";
+import { listPublicBrands, searchDirectory } from "@/lib/directory/directory.functions";
 import type { DirectoryCard } from "@/lib/directory/directory";
 import { listSiteReels } from "@/lib/site/reels.functions";
 import { FORMAT_LABEL, type SiteReel } from "@/lib/site/reels";
