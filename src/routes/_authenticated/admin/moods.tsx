@@ -22,7 +22,7 @@ export const Route = createFileRoute("/_authenticated/admin/moods")({
     { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
     { name: "robots", content: "noindex" },
   ] }),
-  errorComponent: ({ error, reset }) => <div role="alert"><p>{error.message}</p><Button variant="plain" onClick={reset}>Try again</Button></div>,
+  errorComponent: ({ error, reset }) => <div role="alert"><p>{error instanceof Error ? error.message : "Couldn't load moods."}</p><Button variant="plain" onClick={reset}>Try again</Button></div>,
   notFoundComponent: () => <p>Moods page not found.</p>,
   component: Moods,
 });
