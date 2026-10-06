@@ -22,7 +22,7 @@ const PLAN_LABEL = { business: "Business plan", simple: "Simple plan", trial: "T
 const fmtDate = (d: string | Date) => new Date(d).toLocaleDateString(undefined, { dateStyle: "long" });
 
 /** Poster: frame 1 drawn at its resting point (after any fade-in), never a black first frame. */
-async function makePoster(doc: EditorDoc, brand: BrandStyle): Promise<Blob | null> {
+async function makePoster(doc: EditorDoc, brand: BrandStyle, frame = 0): Promise<Blob | null> {
   const format: Format = doc.project.primary_format;
   const { width, height } = FORMAT_SIZE[format];
   const scale = 720 / Math.max(width, height);
@@ -33,7 +33,7 @@ async function makePoster(doc: EditorDoc, brand: BrandStyle): Promise<Blob | nul
   canvas.height = H;
   const ctx = canvas.getContext("2d");
   if (!ctx) return null;
-  renderAt(ctx, doc.project, doc.frames, format, restTime(doc.frames, 0), { width: W, height: H, images, brand });
+  renderAt(ctx, doc.project, doc.frames, format, restTime(doc.frames, Math.min(frame, Math.max(0, doc.frames.length - 1))), { width: W, height: H, images, brand });
   return new Promise((res) => canvas.toBlob((b) => res(b), "image/jpeg", 0.86));
 }
 
@@ -77,6 +77,7 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
   const [title, setTitle] = useState("");
   const [touchedName, setTouchedName] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [thumbFrame, setThumbFrame] = useState(0);
   const suggestions = useMemo(() => suggestionsFrom(doc).filter((s) => !tags.includes(s)), [doc, tags]);
   const brandName = name.trim() || "your brand";
   const nameOk = validFullName(fullName);
@@ -100,7 +101,7 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
     try {
       let posterPath: string | null = null;
       if (show) {
-        const blob = await makePoster(doc, player.brand).catch(() => null);
+        const blob = await makePoster(doc, player.brand, thumbFrame).catch(() => null);
         if (blob) {
           const path = `${doc.project.workspace_id}/directory/${doc.project.id}.jpg`;
           const { error } = await supabase.storage.from(MEDIA_BUCKET).upload(path, blob, { contentType: "image/jpeg", upsert: true });
@@ -127,9 +128,9 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
   const [thumb, setThumb] = useState<string | null>(null);
   useEffect(() => {
     let url: string | null = null;
-    void makePoster(doc, player.brand).then((b) => { if (b) { url = URL.createObjectURL(b); setThumb(url); } }).catch(() => undefined);
+    void makePoster(doc, player.brand, thumbFrame).then((b) => { if (b) { url = URL.createObjectURL(b); setThumb(url); } }).catch(() => undefined);
     return () => { if (url) URL.revokeObjectURL(url); };
-  }, [doc, player.brand]);
+  }, [doc, player.brand, thumbFrame]);
   const graceEnd = ctx.plan.endedAt ? new Date(new Date(ctx.plan.endedAt).getTime() + GRACE_DAYS * 86_400_000) : null;
 
   return (
@@ -195,6 +196,20 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
             <FieldCount value={desc} max={REEL_DESCRIPTION_MAX} />
           </AppField>
         </div>
+
+        {doc.frames.length > 1 && (
+          <AppField label="Thumbnail" className="mb-[18px]">
+            <div className="flex flex-wrap gap-1.5" role="radiogroup" aria-label="Thumbnail photo">
+              {doc.frames.map((_, i) => (
+                <button key={i} type="button" role="radio" aria-checked={thumbFrame === i} onClick={() => setThumbFrame(i)}
+                  className={cn("h-9 min-w-11 rounded-lg px-3 text-[14px] nums", thumbFrame === i ? "bg-ap-blue text-ap-card" : "bg-ap-panel text-ap-body hover:bg-ap-media")}>
+                  Photo {i + 1}
+                </button>
+              ))}
+            </div>
+            <p className="mt-1.5 text-[12px] text-ap-muted">Pick the photo people see first in the Directory. The preview below updates.</p>
+          </AppField>
+        )}
 
         <AppField label="Keywords" className="mb-[18px]">
           <div className="flex min-h-11 flex-wrap gap-1.5 rounded-[12px] border border-ap-hairline bg-ap-card p-[7px] focus-within:border-ap-blue focus-within:shadow-ap-focus">
