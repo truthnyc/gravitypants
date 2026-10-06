@@ -48,6 +48,7 @@ import { Route as AuthenticatedAdminClientsRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminDirectoryRouteImport } from './routes/_authenticated/admin/directory'
 import { Route as AuthenticatedAdminExportsRouteImport } from './routes/_authenticated/admin/exports'
 import { Route as AuthenticatedAdminHomepageRouteImport } from './routes/_authenticated/admin/homepage'
+import { Route as AuthenticatedAdminMoodsRouteImport } from './routes/_authenticated/admin/moods'
 import { Route as AuthenticatedAdminNewsletterRouteImport } from './routes/_authenticated/admin/newsletter'
 import { Route as AuthenticatedAdminReelsRouteImport } from './routes/_authenticated/admin/reels'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app/index'
@@ -282,6 +283,11 @@ const AuthenticatedAdminHomepageRoute =
     path: '/homepage',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminMoodsRoute = AuthenticatedAdminMoodsRouteImport.update({
+  id: '/moods',
+  path: '/moods',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
 const AuthenticatedAdminNewsletterRoute =
   AuthenticatedAdminNewsletterRouteImport.update({
     id: '/newsletter',
@@ -505,6 +511,7 @@ export interface FileRoutesByFullPath {
   '/admin/directory': typeof AuthenticatedAdminDirectoryRoute
   '/admin/exports': typeof AuthenticatedAdminExportsRoute
   '/admin/homepage': typeof AuthenticatedAdminHomepageRoute
+  '/admin/moods': typeof AuthenticatedAdminMoodsRoute
   '/admin/newsletter': typeof AuthenticatedAdminNewsletterRoute
   '/admin/reels': typeof AuthenticatedAdminReelsRoute
   '/app/account': typeof AuthenticatedAppAccountRoute
@@ -575,6 +582,7 @@ export interface FileRoutesByTo {
   '/admin/directory': typeof AuthenticatedAdminDirectoryRoute
   '/admin/exports': typeof AuthenticatedAdminExportsRoute
   '/admin/homepage': typeof AuthenticatedAdminHomepageRoute
+  '/admin/moods': typeof AuthenticatedAdminMoodsRoute
   '/admin/newsletter': typeof AuthenticatedAdminNewsletterRoute
   '/admin/reels': typeof AuthenticatedAdminReelsRoute
   '/app/account': typeof AuthenticatedAppAccountRoute
@@ -650,6 +658,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/directory': typeof AuthenticatedAdminDirectoryRoute
   '/_authenticated/admin/exports': typeof AuthenticatedAdminExportsRoute
   '/_authenticated/admin/homepage': typeof AuthenticatedAdminHomepageRoute
+  '/_authenticated/admin/moods': typeof AuthenticatedAdminMoodsRoute
   '/_authenticated/admin/newsletter': typeof AuthenticatedAdminNewsletterRoute
   '/_authenticated/admin/reels': typeof AuthenticatedAdminReelsRoute
   '/_authenticated/app/account': typeof AuthenticatedAppAccountRoute
@@ -725,6 +734,7 @@ export interface FileRouteTypes {
     | '/admin/directory'
     | '/admin/exports'
     | '/admin/homepage'
+    | '/admin/moods'
     | '/admin/newsletter'
     | '/admin/reels'
     | '/app/account'
@@ -795,6 +805,7 @@ export interface FileRouteTypes {
     | '/admin/directory'
     | '/admin/exports'
     | '/admin/homepage'
+    | '/admin/moods'
     | '/admin/newsletter'
     | '/admin/reels'
     | '/app/account'
@@ -869,6 +880,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/directory'
     | '/_authenticated/admin/exports'
     | '/_authenticated/admin/homepage'
+    | '/_authenticated/admin/moods'
     | '/_authenticated/admin/newsletter'
     | '/_authenticated/admin/reels'
     | '/_authenticated/app/account'
@@ -1216,6 +1228,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminHomepageRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/moods': {
+      id: '/_authenticated/admin/moods'
+      path: '/moods'
+      fullPath: '/admin/moods'
+      preLoaderRoute: typeof AuthenticatedAdminMoodsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/newsletter': {
       id: '/_authenticated/admin/newsletter'
       path: '/newsletter'
@@ -1473,6 +1492,7 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminDirectoryRoute: typeof AuthenticatedAdminDirectoryRoute
   AuthenticatedAdminExportsRoute: typeof AuthenticatedAdminExportsRoute
   AuthenticatedAdminHomepageRoute: typeof AuthenticatedAdminHomepageRoute
+  AuthenticatedAdminMoodsRoute: typeof AuthenticatedAdminMoodsRoute
   AuthenticatedAdminNewsletterRoute: typeof AuthenticatedAdminNewsletterRoute
   AuthenticatedAdminReelsRoute: typeof AuthenticatedAdminReelsRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
@@ -1491,6 +1511,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminDirectoryRoute: AuthenticatedAdminDirectoryRoute,
     AuthenticatedAdminExportsRoute: AuthenticatedAdminExportsRoute,
     AuthenticatedAdminHomepageRoute: AuthenticatedAdminHomepageRoute,
+    AuthenticatedAdminMoodsRoute: AuthenticatedAdminMoodsRoute,
     AuthenticatedAdminNewsletterRoute: AuthenticatedAdminNewsletterRoute,
     AuthenticatedAdminReelsRoute: AuthenticatedAdminReelsRoute,
     AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
