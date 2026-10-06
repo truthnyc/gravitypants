@@ -806,13 +806,6 @@ export type Database = {
             referencedRelation: "directory_brands"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "permission_log_directory_reel_id_fkey"
-            columns: ["directory_reel_id"]
-            isOneToOne: false
-            referencedRelation: "directory_reels"
-            referencedColumns: ["id"]
-          },
         ]
       }
       plans: {
