@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Count intentional Directory reel opens and rank “Most viewed this week” using real weekly totals; verify recording and selection.
 - [x] Connect real visitor country and weather to Directory greetings and verify lookup/fallback behavior.
 - [x] Add brand-page links and expanding logo tiles to Browse reels and carousel captions; verify navigation, keyboard and touch behavior.
 - [x] Adjust filter-to-carousel spacing and add saved label size/spacing controls.
