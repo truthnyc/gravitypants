@@ -24,6 +24,7 @@ import { DEFAULT_DIRECTORY_SETTINGS, SPEED_SECONDS } from "@/lib/directory/setti
 import { getDirectoryPublic } from "@/lib/directory/settings.functions";
 import { useGreeting, logGreeting } from "@/components/directory/useGreeting";
 import { rememberVisit } from "@/lib/directory/greeting";
+import { recordDirectoryReelOpen } from "@/lib/directory/views.functions";
 
 const POSTER =
   "absolute top-1/2 left-1/2 h-[72%] w-auto max-w-[72%] object-contain -translate-x-1/2 -translate-y-1/2 rounded-[6px] shadow-[0_0_0_1px_var(--ap-inner),0_18px_34px_-16px_rgba(29,29,31,.28)]";
@@ -110,6 +111,7 @@ function DirectoryPage() {
   const [value, setValue] = useState(q);
   const [open, setOpen] = useState<DirectoryCard | null>(null);
   const [openSite, setOpenSite] = useState<SiteReel | null>(null);
+  const recordOpen = useServerFn(recordDirectoryReelOpen);
   const input = useRef<HTMLInputElement>(null);
   const sentinel = useRef<HTMLDivElement>(null);
   const [stuck, setStuck] = useState(false);
@@ -245,8 +247,16 @@ function DirectoryPage() {
     : !featured.showCarousel || featured.whenFiltering === "hide" || results.isPlaceholderData ? [] : matches;
   const featuredLabel = filtered && featured.whenFiltering === "follow" ? `Featured · ${total} ${total === 1 ? "match" : "matches"}` : featured.title;
   const openReel = (r: FacetedReel) => {
-    if (r.kind === "site") setOpenSite(reels.find((x) => x.id === r.id) ?? null);
-    else setOpen(allCards.find((c) => c.reel_id === r.id) ?? null);
+    if (r.kind === "site") {
+      const reel = reels.find((x) => x.id === r.id);
+      if (!reel) return;
+      setOpenSite(reel);
+    } else {
+      const card = allCards.find((c) => c.reel_id === r.id);
+      if (!card) return;
+      setOpen(card);
+    }
+    void recordOpen({ data: { eventId: crypto.randomUUID(), reelId: r.id, kind: r.kind } }).catch(() => {});
   };
 
   return (

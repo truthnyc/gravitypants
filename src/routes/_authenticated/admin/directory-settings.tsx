@@ -24,6 +24,7 @@ import { cn } from "@/lib/utils";
 import { HeadlineCard, greetingErrors } from "@/components/admin/HeadlineCard";
 import { getGreetingAdmin, saveGreetingConfig } from "@/lib/directory/greeting.functions";
 import { DEFAULT_GREETING, type GreetingConfig } from "@/lib/directory/greeting";
+import { getDirectoryWeeklyViews } from "@/lib/directory/views.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/directory-settings")({
   head: () => ({ meta: [
@@ -83,6 +84,13 @@ function DirectorySettingsAdmin() {
   const siteFn = useServerFn(listSiteReels);
   const saved = useQuery({ queryKey: ["admin", "directory-settings"], queryFn: () => load() });
   const library = useQuery({ queryKey: ["admin", "directory-library"], queryFn: async () => (await searchFn({ data: { pageSize: 240 } })).reels });
+  const [s, setS] = useState<DirectorySettings>(DEFAULT_DIRECTORY_SETTINGS);
+  const loadViews = useServerFn(getDirectoryWeeklyViews);
+  const weeklyViews = useQuery({
+    queryKey: ["admin", "directory-weekly-views", library.data?.map((r) => r.id)],
+    enabled: !!library.data && s.rule === "viewed",
+    queryFn: () => loadViews({ data: { ids: (library.data ?? []).map((r) => r.id) } }),
+  });
   const brands = useQuery({ queryKey: ["admin", "directory-public-brands"], queryFn: () => brandsFn() });
   const siteReels = useQuery({ queryKey: ["admin", "site-reels-public"], queryFn: () => siteFn() });
   const { families, all: allMoods } = useMoodCatalog();
@@ -93,7 +101,6 @@ function DirectorySettingsAdmin() {
   useEffect(() => { if (savedG.data) setG(savedG.data.config); }, [savedG.data]);
   const facets = useQuery({ queryKey: ["admin", "directory-facets"], queryFn: async () => (await searchFn({ data: { pageSize: 1 } })).facets });
 
-  const [s, setS] = useState<DirectorySettings>(DEFAULT_DIRECTORY_SETTINGS);
   const [picks, setPicks] = useState<FeaturedPick[]>([]);
   const [busy, setBusy] = useState(false);
   const [pickerFor, setPickerFor] = useState<string | null | undefined>(undefined); // undefined = closed; null = main list; date = week
@@ -118,7 +125,7 @@ function DirectorySettingsAdmin() {
   if (!s.title.trim()) errors.push("Add a label above the carousel.");
   errors.push(...greetingErrors(g));
 
-  const preview = resolveFeatured({ ...s, showFrom: null, showUntil: null, showCarousel: true }, picks, library.data ?? [], new Date());
+  const preview = resolveFeatured({ ...s, showFrom: null, showUntil: null, showCarousel: true }, picks, library.data ?? [], new Date(), {}, weeklyViews.data ?? {});
 
   async function run(value: DirectorySettings | null, msg: string) {
     setBusy(true);
@@ -180,7 +187,7 @@ function DirectorySettingsAdmin() {
         {(s.source === "auto" || s.rotateWeekly) && (
           <div className="space-y-3 rounded-sm border border-border p-4">
             {s.rotateWeekly && <p className="text-[13px] text-secondary-text">Used for any week without hand-picked reels.</p>}
-            <Field label="Rule" hint={s.rule === "viewed" ? "Reel views aren't counted yet, so this shows the newest reels for now." : undefined}>
+            <Field label="Rule">
               <select aria-label="Rule" value={s.rule} onChange={(e) => setS({ ...s, rule: e.target.value as DirectorySettings["rule"] })}
                 className="h-10 rounded-sm border border-input bg-card px-3 text-[14px]">
                 <option value="newest">Newest</option>

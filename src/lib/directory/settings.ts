@@ -60,10 +60,10 @@ export function inWindow(s: DirectorySettings, now: Date): boolean {
   return true;
 }
 
-type PoolReel = { id: string; moods: string[]; cat_slug: string; brand_slug: string };
+type PoolReel = { id: string; kind?: string; moods: string[]; cat_slug: string; brand_slug: string };
 
 /** Picks the featured reel ids: hand-picked (this week's list when rotating), else the automatic rule. */
-export function resolveFeatured<T extends PoolReel>(s: DirectorySettings, picks: FeaturedPick[], pool: T[], now: Date, saves: Record<string, number> = {}): T[] {
+export function resolveFeatured<T extends PoolReel>(s: DirectorySettings, picks: FeaturedPick[], pool: T[], now: Date, saves: Record<string, number> = {}, views: Record<string, number> = {}): T[] {
   if (!s.showCarousel || !inWindow(s, now)) return [];
   const byId = new Map(pool.map((r) => [r.id, r]));
   if (s.source === "manual" || s.rotateWeekly) {
@@ -77,6 +77,7 @@ export function resolveFeatured<T extends PoolReel>(s: DirectorySettings, picks:
     (!s.ruleCategories.length || s.ruleCategories.includes(r.cat_slug)) &&
     (!s.ruleBrands.length || s.ruleBrands.includes(r.brand_slug)));
   if (s.rule === "saved") list = [...list].sort((a, b) => (saves[b.id] ?? 0) - (saves[a.id] ?? 0));
+  if (s.rule === "viewed") list = [...list].sort((a, b) => (views[`${b.kind}:${b.id}`] ?? 0) - (views[`${a.kind}:${a.id}`] ?? 0));
   if (s.rule === "random") {
     // Same shuffle all week, so the band doesn't change on every visit.
     let seed = [...mondayOf(now)].reduce((n, c) => n * 31 + c.charCodeAt(0), 7) >>> 0;

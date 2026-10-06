@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { directorySettingsSchema, mergeSettings, pickSchema, resolveFeatured, type DirectorySettings, type FeaturedPick } from "./settings";
 import { searchDirectory, type FacetedReel } from "./directory.functions";
+import { getDirectoryWeeklyViews } from "./views.functions";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const KEY = "directory";
@@ -30,7 +31,9 @@ export const getDirectoryPublic = createServerFn({ method: "GET" }).handler(asyn
     const { data } = await (supabaseAdmin as any).rpc("directory_reel_save_counts", { _ids: pool.map((r) => r.id) });
     saves = Object.fromEntries(((data ?? []) as any[]).map((r) => [r.reel_id, Number(r.saves)]));
   }
-  return { settings, featured: resolveFeatured(settings, picks, pool, new Date(), saves) };
+  const views = settings.rule === "viewed"
+    ? await getDirectoryWeeklyViews({ data: { ids: pool.map((r) => r.id) } }) : {};
+  return { settings, featured: resolveFeatured(settings, picks, pool, new Date(), saves, views) };
 });
 
 async function adminDb(ctx: { supabase: any }) {
