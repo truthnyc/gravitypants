@@ -159,6 +159,7 @@ function Counter({ n, max }: { n: number; max: number }) {
 }
 function DescriptionBox({ brand, onSaved }: { brand: BrandInfo; onSaved: () => void }) {
   const save = useServerFn(saveBrandDescription);
+  const { forCategory } = useMoodCatalog();
   const [name, setName] = useState(brand.name);
   const [website, setWebsite] = useState(brand.website);
   const [category, setCategory] = useState(brand.category);

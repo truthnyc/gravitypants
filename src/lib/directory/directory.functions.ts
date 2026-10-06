@@ -3,13 +3,22 @@ import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
-  BRAND_DESCRIPTION_MAX, BRAND_NAME_MAX, CATEGORIES, GRACE_DAYS, MOODS, BRAND_MOODS_MAX, REEL_DESCRIPTION_MAX, SLUG_MAX,
+  BRAND_DESCRIPTION_MAX, BRAND_NAME_MAX, CATEGORIES, GRACE_DAYS, BRAND_MOODS_MAX, REEL_DESCRIPTION_MAX, SLUG_MAX,
   WORDING_VERSION, permissionWording, toSlug, validFullName,
   type DirStatus, type DirectoryCard, type PlanTag, type ShareBrand,
 } from "./directory";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const POSTER_PREFIX = "media:";
+
+/** Keep only moods that exist in the master moods table (deduped, in order). */
+async function cleanMoods(sb: any, moods: string[]): Promise<string[]> {
+  const uniq = [...new Set(moods)];
+  if (!uniq.length) return [];
+  const { data } = await sb.from("moods").select("name").in("name", uniq);
+  const ok = new Set(((data ?? []) as any[]).map((r) => r.name as string));
+  return uniq.filter((m) => ok.has(m));
+}
 
 async function signPosters<T extends { poster_url: string | null }>(rows: T[]): Promise<(T & { poster: string | null })[]> {
   const paths = rows.map((r) => r.poster_url).filter((p): p is string => !!p && p.startsWith(POSTER_PREFIX)).map((p) => p.slice(POSTER_PREFIX.length));
@@ -116,7 +125,7 @@ const shareSchema = z.object({
   }),
   description: z.string().trim().max(REEL_DESCRIPTION_MAX),
   tags: z.array(z.string().trim().min(1).max(40)).max(20),
-  moods: z.array(z.enum(MOODS)).max(3),
+  moods: z.array(z.string().trim().toLowerCase().max(30)).max(3),
   show: z.boolean(),
   fullName: z.string().trim().max(120),
   jobTitle: z.string().trim().max(120),
@@ -159,7 +168,7 @@ export const shareReel = createServerFn({ method: "POST" })
     const { findLatestVideo } = await import("./directory.server");
     const videoUrl = await findLatestVideo(sb, ad.workspace_id, ad.id).catch(() => null);
     const row = {
-      ad_id: ad.id, brand_id: brand.id, status, tags, moods: data.moods, template_id: ad.template_id, formats: (ad.formats as string[]).map((f) => f.replace(":", "x")),
+      ad_id: ad.id, brand_id: brand.id, status, tags, moods: await cleanMoods(sb, data.moods), template_id: ad.template_id, formats: (ad.formats as string[]).map((f) => f.replace(":", "x")),
       description: data.description || null,
       ...(prev?.title ? {} : { title: ad.name as string }),
       ...(data.posterPath ? { poster_url: `${POSTER_PREFIX}${data.posterPath}` } : {}),
@@ -263,11 +272,11 @@ export const saveBrandDescription = createServerFn({ method: "POST" })
     name: z.string().trim().min(1).max(50).optional(),
     website: z.string().trim().max(300).optional(),
     category: z.enum(CATEGORIES).optional(),
-    moods: z.array(z.enum(MOODS)).max(BRAND_MOODS_MAX).optional(),
+    moods: z.array(z.string().trim().toLowerCase().max(30)).max(BRAND_MOODS_MAX).optional(),
   }).parse(d))
   .handler(async ({ data, context }) => {
     const patch: Record<string, unknown> = { description: data.description || null };
-    if (data.moods) patch["moods"] = data.moods;
+    if (data.moods) patch["moods"] = await cleanMoods(context.supabase, data.moods);
     if (data.name) patch["name"] = data.name;
     if (data.category) patch["category"] = data.category;
     if (data.website !== undefined) {
@@ -434,7 +443,7 @@ export const reviewDirectoryReel = createServerFn({ method: "POST" })
     action: z.enum(["approve", "reject", "hide", "review", "edit"]),
     reason: z.string().trim().max(500).optional(),
     tags: z.array(z.string().trim().min(1).max(40)).max(20).optional(),
-    moods: z.array(z.enum(MOODS)).max(3).optional(),
+    moods: z.array(z.string().trim().toLowerCase().max(30)).max(3).optional(),
     category: z.enum(CATEGORIES).optional(),
   }).parse(d))
   .handler(async ({ data, context }) => {
@@ -443,7 +452,7 @@ export const reviewDirectoryReel = createServerFn({ method: "POST" })
     const { data: reel } = await sb.from("directory_reels").select("id, brand_id").eq("id", data.id).single();
     const { brandOwnerEmail, sendDirectoryEmail, SITE } = await import("./directory.server");
     if (data.tags || data.moods) {
-      const { error } = await sb.from("directory_reels").update({ ...(data.tags ? { tags: data.tags.map((t) => t.toLowerCase()) } : {}), ...(data.moods ? { moods: data.moods } : {}) }).eq("id", data.id);
+      const { error } = await sb.from("directory_reels").update({ ...(data.tags ? { tags: data.tags.map((t) => t.toLowerCase()) } : {}), ...(data.moods ? { moods: await cleanMoods(sb, data.moods) } : {}) }).eq("id", data.id);
       if (error) throw new Error(error.message);
     }
     if (data.category) await sb.from("directory_brands").update({ category: data.category }).eq("id", reel.brand_id);
@@ -535,12 +544,12 @@ export const adminSaveBrand = createServerFn({ method: "POST" })
     brandId: z.string().uuid(), name: z.string().trim().min(1).max(BRAND_NAME_MAX),
     website: z.string().trim().max(200).refine((v) => !v || /^https?:\/\//.test(v), "Website must start with http:// or https://"),
     category: z.enum(CATEGORIES), description: z.string().trim().max(BRAND_DESCRIPTION_MAX),
-    moods: z.array(z.enum(MOODS)).max(BRAND_MOODS_MAX).default([]),
+    moods: z.array(z.string().trim().toLowerCase().max(30)).max(BRAND_MOODS_MAX).default([]),
   }).parse(d))
   .handler(async ({ data, context }) => {
     const sb = context.supabase as any;
     await assertAdmin(sb);
-    const { error } = await sb.from("directory_brands").update({ name: data.name, website_url: data.website || null, category: data.category, description: data.description || null, moods: data.moods }).eq("id", data.brandId);
+    const { error } = await sb.from("directory_brands").update({ name: data.name, website_url: data.website || null, category: data.category, description: data.description || null, moods: await cleanMoods(sb, data.moods) }).eq("id", data.brandId);
     if (error) throw new Error(error.message);
     return { ok: true };
   });

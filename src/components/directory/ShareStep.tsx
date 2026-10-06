@@ -79,6 +79,7 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
   const [touchedName, setTouchedName] = useState(false);
   const [busy, setBusy] = useState(false);
   const [thumbFrame, setThumbFrame] = useState(0);
+  const { forCategory } = useMoodCatalog();
   const suggestions = useMemo(() => suggestionsFrom(doc).filter((s) => !tags.includes(s)), [doc, tags]);
   const brandName = name.trim() || "your brand";
   const nameOk = validFullName(fullName);

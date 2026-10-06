@@ -164,6 +164,7 @@ function BrandAddresses() {
 }
 
 function ReviewCard({ r, act }: { r: Row; act: (a: Act, msg: string) => Promise<void> }) {
+  const { forCategory } = useMoodCatalog();
   const [tags, setTags] = useState(r.tags.join(", "));
   const [moods, setMoods] = useState<string[]>(r.moods);
   const [category, setCategory] = useState<Category>((r.category as Category) ?? "Other");
@@ -234,6 +235,7 @@ type Detail = Awaited<ReturnType<typeof adminBrandDetail>>;
 function BrandForm({ b, onSaved }: { b: Detail["brand"]; onSaved: () => void }) {
   const save = useServerFn(adminSaveBrand);
   const logo = useServerFn(setBrandLogo);
+  const { forCategory } = useMoodCatalog();
   const [f, setF] = useState({ name: b.name, website: b.website, category: b.category as Category, description: b.description, moods: b.moods as string[] });
   const [busy, setBusy] = useState(false);
   const run = async (fn: () => Promise<unknown>, msg: string) => {
@@ -290,6 +292,7 @@ function BrandForm({ b, onSaved }: { b: Detail["brand"]; onSaved: () => void }) 
 function AdminReel({ r, brandId, onChanged }: { r: Detail["reels"][number]; brandId: string; onChanged: () => void }) {
   const rename = useServerFn(adminRenameReel);
   const review = useServerFn(reviewDirectoryReel);
+  const moodCatalog = useMoodCatalog();
   const [title, setTitle] = useState(r.title);
   const [tags, setTags] = useState(r.tags.join(", "));
   const [moods, setMoods] = useState<string[]>(r.moods);
