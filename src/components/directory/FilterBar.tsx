@@ -33,8 +33,8 @@ function Mark({ text, q }: { text: string; q: string }) {
   return <>{text.slice(0, i)}<mark className="rounded-[2px] bg-ap-soft-blue text-inherit">{text.slice(i, i + q.length)}</mark>{text.slice(i + q.length)}</>;
 }
 
-export function FilterBar({ value, onChange, facets, total, families, brands, compact = false }: {
-  compact?: boolean; value: FilterValue; onChange: (v: FilterValue) => void; facets: Facets; total: number; families: Family[]; brands: Brand[];
+export function FilterBar({ value, onChange, facets, total, families, brands, compact = false, comingSoon = true }: {
+  compact?: boolean; comingSoon?: boolean; value: FilterValue; onChange: (v: FilterValue) => void; facets: Facets; total: number; families: Family[]; brands: Brand[];
 }) {
   const [open, setOpen] = useState<Seg | null>(null);
   const [hover, setHover] = useState<Seg | null>(null);
@@ -146,7 +146,7 @@ export function FilterBar({ value, onChange, facets, total, families, brands, co
       {open === "mood" && panel("mood", "Mood", "Pick the feelings you're after. Tap a family to pick all of it.",
         <MoodBody families={families} selected={value.moods} counts={facets.moods} onChange={(m) => set("moods", m)} />, "moods")}
       {open === "category" && panel("category", "Category", "What the brand sells.",
-        <CategoryBody selected={value.categories} counts={facets.categories} narrow={narrow} onChange={(c) => set("categories", c)} />, "categories")}
+        <CategoryBody comingSoon={comingSoon} selected={value.categories} counts={facets.categories} narrow={narrow} onChange={(c) => set("categories", c)} />, "categories")}
       {open === "brand" && panel("brand", "Brand", "See reels from specific brands.",
         <BrandBody brands={brands} selected={value.brands} counts={facets.brands} onChange={(b) => set("brands", b)} />, "brands")}
     </div>
@@ -207,11 +207,11 @@ function MoodBody({ families, selected, counts, onChange }: { families: Family[]
   );
 }
 
-function CategoryBody({ selected, counts, narrow, onChange }: { selected: string[]; counts: Record<string, number>; narrow: boolean; onChange: (v: string[]) => void }) {
+function CategoryBody({ selected, counts, narrow, onChange, comingSoon }: { comingSoon: boolean; selected: string[]; counts: Record<string, number>; narrow: boolean; onChange: (v: string[]) => void }) {
   const list = CATEGORIES.map((c) => ({ name: c, slug: categorySlug(c), n: counts[categorySlug(c)] ?? 0 }));
   const groups = [
     { title: "With reels", items: list.filter((c) => c.n > 0 || selected.includes(c.slug)) },
-    { title: "Coming soon", items: list.filter((c) => c.n === 0 && !selected.includes(c.slug)) },
+    { title: "Coming soon", items: comingSoon ? list.filter((c) => c.n === 0 && !selected.includes(c.slug)) : [] },
   ].filter((g) => g.items.length);
   return (
     <div className="grid gap-4">

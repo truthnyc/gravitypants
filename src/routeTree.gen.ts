@@ -46,6 +46,7 @@ import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authe
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin/audit'
 import { Route as AuthenticatedAdminClientsRouteImport } from './routes/_authenticated/admin/clients'
 import { Route as AuthenticatedAdminDirectoryRouteImport } from './routes/_authenticated/admin/directory'
+import { Route as AuthenticatedAdminDirectorySettingsRouteImport } from './routes/_authenticated/admin/directory-settings'
 import { Route as AuthenticatedAdminExportsRouteImport } from './routes/_authenticated/admin/exports'
 import { Route as AuthenticatedAdminHomepageRouteImport } from './routes/_authenticated/admin/homepage'
 import { Route as AuthenticatedAdminMoodsRouteImport } from './routes/_authenticated/admin/moods'
@@ -269,6 +270,12 @@ const AuthenticatedAdminDirectoryRoute =
   AuthenticatedAdminDirectoryRouteImport.update({
     id: '/directory',
     path: '/directory',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminDirectorySettingsRoute =
+  AuthenticatedAdminDirectorySettingsRouteImport.update({
+    id: '/directory-settings',
+    path: '/directory-settings',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
 const AuthenticatedAdminExportsRoute =
@@ -509,6 +516,7 @@ export interface FileRoutesByFullPath {
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/clients': typeof AuthenticatedAdminClientsRoute
   '/admin/directory': typeof AuthenticatedAdminDirectoryRoute
+  '/admin/directory-settings': typeof AuthenticatedAdminDirectorySettingsRoute
   '/admin/exports': typeof AuthenticatedAdminExportsRoute
   '/admin/homepage': typeof AuthenticatedAdminHomepageRoute
   '/admin/moods': typeof AuthenticatedAdminMoodsRoute
@@ -580,6 +588,7 @@ export interface FileRoutesByTo {
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/clients': typeof AuthenticatedAdminClientsRoute
   '/admin/directory': typeof AuthenticatedAdminDirectoryRoute
+  '/admin/directory-settings': typeof AuthenticatedAdminDirectorySettingsRoute
   '/admin/exports': typeof AuthenticatedAdminExportsRoute
   '/admin/homepage': typeof AuthenticatedAdminHomepageRoute
   '/admin/moods': typeof AuthenticatedAdminMoodsRoute
@@ -656,6 +665,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/admin/clients': typeof AuthenticatedAdminClientsRoute
   '/_authenticated/admin/directory': typeof AuthenticatedAdminDirectoryRoute
+  '/_authenticated/admin/directory-settings': typeof AuthenticatedAdminDirectorySettingsRoute
   '/_authenticated/admin/exports': typeof AuthenticatedAdminExportsRoute
   '/_authenticated/admin/homepage': typeof AuthenticatedAdminHomepageRoute
   '/_authenticated/admin/moods': typeof AuthenticatedAdminMoodsRoute
@@ -732,6 +742,7 @@ export interface FileRouteTypes {
     | '/admin/audit'
     | '/admin/clients'
     | '/admin/directory'
+    | '/admin/directory-settings'
     | '/admin/exports'
     | '/admin/homepage'
     | '/admin/moods'
@@ -803,6 +814,7 @@ export interface FileRouteTypes {
     | '/admin/audit'
     | '/admin/clients'
     | '/admin/directory'
+    | '/admin/directory-settings'
     | '/admin/exports'
     | '/admin/homepage'
     | '/admin/moods'
@@ -878,6 +890,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/audit'
     | '/_authenticated/admin/clients'
     | '/_authenticated/admin/directory'
+    | '/_authenticated/admin/directory-settings'
     | '/_authenticated/admin/exports'
     | '/_authenticated/admin/homepage'
     | '/_authenticated/admin/moods'
@@ -1214,6 +1227,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminDirectoryRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/directory-settings': {
+      id: '/_authenticated/admin/directory-settings'
+      path: '/directory-settings'
+      fullPath: '/admin/directory-settings'
+      preLoaderRoute: typeof AuthenticatedAdminDirectorySettingsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/exports': {
       id: '/_authenticated/admin/exports'
       path: '/exports'
@@ -1490,6 +1510,7 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
   AuthenticatedAdminClientsRoute: typeof AuthenticatedAdminClientsRoute
   AuthenticatedAdminDirectoryRoute: typeof AuthenticatedAdminDirectoryRoute
+  AuthenticatedAdminDirectorySettingsRoute: typeof AuthenticatedAdminDirectorySettingsRoute
   AuthenticatedAdminExportsRoute: typeof AuthenticatedAdminExportsRoute
   AuthenticatedAdminHomepageRoute: typeof AuthenticatedAdminHomepageRoute
   AuthenticatedAdminMoodsRoute: typeof AuthenticatedAdminMoodsRoute
@@ -1509,6 +1530,8 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
     AuthenticatedAdminClientsRoute: AuthenticatedAdminClientsRoute,
     AuthenticatedAdminDirectoryRoute: AuthenticatedAdminDirectoryRoute,
+    AuthenticatedAdminDirectorySettingsRoute:
+      AuthenticatedAdminDirectorySettingsRoute,
     AuthenticatedAdminExportsRoute: AuthenticatedAdminExportsRoute,
     AuthenticatedAdminHomepageRoute: AuthenticatedAdminHomepageRoute,
     AuthenticatedAdminMoodsRoute: AuthenticatedAdminMoodsRoute,

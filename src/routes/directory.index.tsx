@@ -8,7 +8,7 @@ import { DirectoryReelHeart } from "@/components/directory/LikeSave";
 import { X } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { ReelDetail } from "@/components/directory/DirectoryGrid";
-import { DIRECTORY_AUTO_LOAD_PAGES, DIRECTORY_PAGE_SIZE, listPublicBrands, searchDirectory, searchDirectoryLegacy, type FacetedReel } from "@/lib/directory/directory.functions";
+import { listPublicBrands, searchDirectory, searchDirectoryLegacy, type FacetedReel } from "@/lib/directory/directory.functions";
 import { CATEGORIES, categorySlug, type DirectoryCard } from "@/lib/directory/directory";
 import { MOOD_FAMILY_COLORS, type MoodFamily } from "@/lib/directory/mood-admin";
 import { cn } from "@/lib/utils";
@@ -19,7 +19,8 @@ import { SiteReelHeart } from "@/components/site/SiteReelHeart";
 import { SiteReelModal } from "@/components/site/SiteReelModal";
 import { useMoodCatalog } from "@/lib/directory/moods";
 import { FeaturedBand } from "@/components/directory/FeaturedBand";
-import { DEFAULT_FEATURED } from "@/lib/directory/featured";
+import { DEFAULT_DIRECTORY_SETTINGS, SPEED_SECONDS } from "@/lib/directory/settings";
+import { getDirectoryPublic } from "@/lib/directory/settings.functions";
 
 const POSTER =
   "absolute top-1/2 left-1/2 h-[72%] w-auto max-w-[72%] object-contain -translate-x-1/2 -translate-y-1/2 rounded-[6px] shadow-[0_0_0_1px_var(--ap-inner),0_18px_34px_-16px_rgba(29,29,31,.28)]";
@@ -34,12 +35,13 @@ export const Route = createFileRoute("/directory/")({
   loaderDeps: ({ search }) => ({ q: (search.q ?? "").slice(0, 200) }),
   loader: async ({ deps }) => {
     // Lookups for the carousel, brand panel and reel pop-ups; the grid itself is filtered and paged on the server.
-    const [cards, reels, brands] = await Promise.all([
+    const [dir, cards, reels, brands] = await Promise.all([
+      getDirectoryPublic().catch(() => ({ settings: DEFAULT_DIRECTORY_SETTINGS, featured: [] as FacetedReel[] })),
       searchDirectoryLegacy({ data: { q: "", size: null } }).catch(() => [] as DirectoryCard[]),
       listSiteReels().catch(() => [] as SiteReel[]),
       listPublicBrands().catch(() => []),
     ]);
-    return { q: deps.q, cards, reels, brands };
+    return { q: deps.q, cards, reels, brands, settings: dir.settings, featuredReels: dir.featured };
   },
   head: ({ loaderData }) => {
     const base = siteHead({
@@ -79,17 +81,18 @@ function useReducedMotion() {
 }
 
 /** Rotates through moods, unless the visitor picked some (then the newest pick stays) or prefers less motion. */
-function useWeekdayMood(picked: string | undefined) {
+function useWeekdayMood(picked: string | undefined, pool: string[]) {
+  const words = pool.length ? pool : ROTATING;
   const [i, setI] = useState(0);
   const [day, setDay] = useState("today");
   const reduced = useReducedMotion();
   useEffect(() => setDay(new Date().toLocaleDateString("en-US", { weekday: "long" })), []);
   useEffect(() => {
     if (picked || reduced) return;
-    const t = setInterval(() => setI((x) => (x + 1) % ROTATING.length), 2200);
+    const t = setInterval(() => setI((x) => (x + 1) % words.length), 2200);
     return () => clearInterval(t);
-  }, [picked, reduced]);
-  return { day, mood: picked ?? ROTATING[i]! };
+  }, [picked, reduced, words.length]);
+  return { day, mood: picked ?? words[i % words.length]! };
 }
 
 const list = (v?: string) => (v ? v.split(",").map((x) => x.trim().toLowerCase()).filter(Boolean).slice(0, 60) : []);
@@ -97,7 +100,8 @@ const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 type Tag = { key: keyof FilterValue; value: string; label: string };
 
 function DirectoryPage() {
-  const { cards: allCards, reels, brands } = Route.useLoaderData();
+  const { cards: allCards, reels, brands, settings, featuredReels: featuredSet } = Route.useLoaderData();
+  const PAGE = settings.pageSize;
   const search = Route.useSearch();
   const q = (search.q ?? "").slice(0, 200);
   const page = Math.min(Math.max(1, Math.floor(Number(search.page) || 1)), 20);
@@ -108,7 +112,7 @@ function DirectoryPage() {
   const [value, setValue] = useState(q);
   const [open, setOpen] = useState<DirectoryCard | null>(null);
   const [openSite, setOpenSite] = useState<SiteReel | null>(null);
-  const { day, mood } = useWeekdayMood(filters.moods.at(-1));
+  const { day, mood } = useWeekdayMood(filters.moods.at(-1), settings.headlineMoods);
   const input = useRef<HTMLInputElement>(null);
   const sentinel = useRef<HTMLDivElement>(null);
   const [stuck, setStuck] = useState(false);
@@ -153,8 +157,8 @@ function DirectoryPage() {
     placeholderData: keepPreviousData,
     initialPageParam: startPage.current,
     queryFn: ({ pageParam }) => pageParam === startPage.current
-      ? searchFn({ data: { q, ...filters, page: 1, pageSize: DIRECTORY_PAGE_SIZE * pageParam } })
-      : searchFn({ data: { q, ...filters, page: pageParam } }),
+      ? searchFn({ data: { q, ...filters, page: 1, pageSize: PAGE * pageParam } })
+      : searchFn({ data: { q, ...filters, page: pageParam, pageSize: PAGE } }),
     getNextPageParam: (last, all) => {
       const loaded = all.reduce((n, p) => n + p.reels.length, 0);
       return loaded < last.total ? startPage.current + all.length : undefined;
@@ -216,20 +220,10 @@ function DirectoryPage() {
   const clearAll = () => setFilters({ moods: [], categories: [], brands: [] });
 
   // "Featured this week": featured reels when unfiltered; while filtering, follow the setting.
-  const featured = DEFAULT_FEATURED;
-  const featuredQ = useQuery({
-    queryKey: ["directory-featured", featured.source, featured.manualIds.join(",")],
-    staleTime: 60_000,
-    queryFn: async () => {
-      const r = await searchFn({ data: { pageSize: featured.source === "manual" ? 240 : featured.max } });
-      if (featured.source !== "manual") return r.reels;
-      const byId = new Map(r.reels.map((x) => [x.id, x]));
-      return featured.manualIds.map((id) => byId.get(id)).filter((x): x is FacetedReel => !!x).slice(0, featured.max);
-    },
-  });
-  const matches = found.slice(0, featured.max);
-  const featuredReels = !filtered || featured.whenFiltering === "fixed" ? featuredQ.data ?? []
-    : featured.whenFiltering === "hide" || results.isPlaceholderData ? [] : matches;
+  const featured = settings;
+  const matches = found.slice(0, featured.count);
+  const featuredReels = !filtered || featured.whenFiltering === "fixed" ? featuredSet
+    : !featured.showCarousel || featured.whenFiltering === "hide" || results.isPlaceholderData ? [] : matches;
   const featuredLabel = filtered && featured.whenFiltering === "follow" ? `Featured · ${total} ${total === 1 ? "match" : "matches"}` : featured.title;
   const openReel = (r: FacetedReel) => {
     if (r.kind === "site") setOpenSite(reels.find((x) => x.id === r.id) ?? null);
@@ -269,7 +263,7 @@ function DirectoryPage() {
         <div ref={sentinel} aria-hidden className="h-px" />
         <div className={cn("sticky top-16 z-30 px-6 transition-[background,padding] motion-reduce:transition-none",
           stuck ? "border-b border-ap-hairline bg-ap-card/80 py-2 backdrop-blur-xl" : "border-b border-transparent pb-2")}>
-          <FilterBar value={filters} onChange={setFilters} facets={facets} total={total} families={families} brands={brands} compact={stuck} />
+          <FilterBar comingSoon={settings.comingSoon} value={filters} onChange={setFilters} facets={facets} total={total} families={families} brands={brands} compact={stuck} />
           {tags.length > 0 && (
             <ul className="mx-auto mt-2 flex max-w-[680px] flex-wrap items-center gap-1.5" aria-label="Active filters">
               {tags.map((t) => (
@@ -288,7 +282,7 @@ function DirectoryPage() {
         </div>
 
         {featuredReels.length > 0 && (
-          <FeaturedBand label={featuredLabel} reels={featuredReels} secondsPerReel={featured.secondsPerReel}
+          <FeaturedBand label={featuredLabel} reels={featuredReels} secondsPerReel={SPEED_SECONDS[featured.speed]}
             seconds={(r) => (r.kind === "site" ? reels.find((x) => x.id === r.id)?.seconds ?? null : null)} onOpen={openReel} />
         )}
         <section className="mx-auto max-w-[1280px] px-6 py-14" aria-busy={results.isFetching}>
@@ -298,11 +292,11 @@ function DirectoryPage() {
               {results.data ? (filtered ? `${total} of ${allTotal} reels` : `${total} ${total === 1 ? "reel" : "reels"}`) : ""}
             </p>
           </div>
-          {results.isPending && <SkeletonGrid n={DIRECTORY_PAGE_SIZE} />}
+          {results.isPending && <SkeletonGrid n={PAGE} />}
           {found.length > 0 && (
             <ul className={cn("grid gap-5 transition-opacity [grid-template-columns:repeat(auto-fill,minmax(180px,1fr))] motion-reduce:transition-none", results.isPlaceholderData && "opacity-50")}>
               {found.map((r, i) => (
-                <li key={`${r.kind}-${r.id}`} data-reel-idx={i} className="dir-card-in relative" style={{ animationDelay: `${(i % DIRECTORY_PAGE_SIZE) * 40}ms` }}>
+                <li key={`${r.kind}-${r.id}`} data-reel-idx={i} className="dir-card-in relative" style={{ animationDelay: `${(i % PAGE) * 40}ms` }}>
                   <button type="button" onClick={() => openReel(r)} aria-label={`Open ${r.title}`}
                     className="relative block aspect-square w-full overflow-hidden rounded-[8px] bg-ap-panel">
                     {r.poster && <img src={r.poster} alt="" loading="lazy" className={POSTER} />}
@@ -322,7 +316,7 @@ function DirectoryPage() {
               ))}
             </ul>
           )}
-          {results.isFetchingNextPage && <SkeletonGrid n={Math.min(DIRECTORY_PAGE_SIZE, remaining)} className="mt-5" />}
+          {results.isFetchingNextPage && <SkeletonGrid n={Math.min(PAGE, remaining)} className="mt-5" />}
           {results.data && total === 0 && (
             filtered ? (
               <div role="status" className="rounded-[4px] bg-ap-panel px-6 py-10 text-center">
@@ -349,10 +343,10 @@ function DirectoryPage() {
                 <>
                   <link rel="next" href={`/directory?${nextQuery(search, loadedPages + 1)}`} />
                   <a ref={moreRef} href={`/directory?${nextQuery(search, loadedPages + 1)}`}
-                    onClick={(e) => { e.preventDefault(); if (autoLeft < 0) setAutoLeft(DIRECTORY_AUTO_LOAD_PAGES); loadMore(e.detail === 0); }}
+                    onClick={(e) => { e.preventDefault(); if (autoLeft < 0) setAutoLeft(settings.autoLoadPages); loadMore(e.detail === 0); }}
                     aria-disabled={results.isFetchingNextPage}
                     className="mt-1 inline-flex h-11 items-center rounded-lg bg-ap-panel px-5 text-[15px] font-medium text-ap-ink hover:bg-ap-media nums">
-                    {results.isFetchingNextPage ? "Loading…" : `Show ${Math.min(DIRECTORY_PAGE_SIZE, remaining)} more`}
+                    {results.isFetchingNextPage ? "Loading…" : `Show ${Math.min(PAGE, remaining)} more`}
                   </a>
                 </>
               ) : (
