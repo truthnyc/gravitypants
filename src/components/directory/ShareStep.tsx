@@ -9,7 +9,7 @@ import { ReelCard, StepActions, StepShell, StepTitle } from "@/components/app-ui
 import { useReelPlayer } from "@/components/editor/ReelPreview";
 import { supabase } from "@/integrations/supabase/client";
 import { getShareContext, shareReel } from "@/lib/directory/directory.functions";
-import { BRAND_NAME_MAX, CATEGORIES, GRACE_DAYS, MOODS, REEL_DESCRIPTION_MAX, nearLimit, permissionWording, validFullName, type Category } from "@/lib/directory/directory";
+import { BRAND_NAME_MAX, CATEGORIES, GRACE_DAYS, MOODS, REEL_DESCRIPTION_MAX, moodLabel, moodsFor, nearLimit, permissionWording, validFullName, type Category } from "@/lib/directory/directory";
 import { MEDIA_BUCKET } from "@/lib/stillframe/media";
 import { useTemplateName, type EditorDoc } from "@/lib/stillframe/data";
 import type { Format } from "@/lib/stillframe/types";
@@ -234,13 +234,13 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
 
         <AppField label="Mood" className="mb-[22px]">
           <div className="flex flex-wrap gap-1.5">
-            {MOODS.map((m) => {
+            {[...new Set([...moodsFor(category), ...moods])].map((m) => {
               const on = moods.includes(m);
               return (
                 <button key={m} type="button" aria-pressed={on} disabled={!on && moods.length >= 3}
                   onClick={() => setMoods(on ? moods.filter((x) => x !== m) : [...moods, m])}
                   className={cn("rounded-lg border bg-ap-card px-[13px] py-[7px] text-[14px] disabled:opacity-40", on ? "border-ap-blue font-semibold text-ap-blue" : "border-ap-hairline")}>
-                  {m}
+                  {moodLabel(m)}
                 </button>
               );
             })}
