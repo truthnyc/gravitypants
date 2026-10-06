@@ -2,7 +2,6 @@ import { useEffect, useState, type CSSProperties } from "react";
 import { Pause, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { FacetedReel } from "@/lib/directory/directory.functions";
-import { BrandLink } from "./BrandLink";
 
 const SIZE: Record<string, { w: number; h: number }> = { "9x16": { w: 165, h: 293 }, "1x1": { w: 200, h: 200 }, "16x9": { w: 256, h: 144 } };
 
@@ -56,7 +55,7 @@ export function FeaturedBand({ label, reels, secondsPerReel, seconds, onOpen, fi
                       {r.poster && <img src={r.poster} alt="" loading="lazy" className="size-full object-cover" />}
                     </button>
                     <p className="mt-2 h-4 text-center text-[12px] text-ap-muted opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 nums">
-                      <BrandLink name={r.brand_name} slug={r.brand_slug} hidden={c === 1} />{sec ? ` · ${sec} sec` : ""}
+                      {r.brand_name}{sec ? ` · ${sec} sec` : ""}
                     </p>
                   </li>
                 );
