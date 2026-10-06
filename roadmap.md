@@ -1,7 +1,7 @@
 # Roadmap
-- [ ] Add staff-only Moods page and family-grouped add/rename/delete controls.
-- [ ] Preserve category and brand/reel mood references on rename; remove deleted moods safely.
-- [ ] Verify mood management end to end.
+- [x] Add staff-only Moods page and family-grouped add/rename/delete controls.
+- [x] Preserve category and brand/reel mood references on rename; remove deleted moods safely.
+- [x] Verify mood management end to end.
 - [x] Update shared categories and preserve existing brand/mood assignments.
 - [x] Update reel category dropdowns and verify selection/save.
 - [x] Account Directory tab: name/website/category fields, featured note, split cards, reel thumbnails
