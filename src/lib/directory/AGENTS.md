@@ -2,6 +2,7 @@
 - Mood administration uses `moods.functions.ts` with server-verified staff access and audit logging; a database trigger synchronizes renamed/deleted names in brand/reel arrays atomically.
 - Likes/favorites/shared favorites pages: `favorites.functions.ts` (like counts via service-only SQL `directory_like_counts`; public page only when `favorite_pages.is_public`, filtered by `brand_visible`).
 - Directory page settings live in `site_settings` key `directory` (merged over defaults by `mergeSettings` in settings.ts); hand-picked featured reels in `directory_featured_reels`; featured selection is the pure `resolveFeatured()` so the admin preview and the site agree.
+- Directory opens are recorded from intentional page open handlers, never modal renders or admin previews; append-only events use server-derived workspace/time and idempotent event ids, with service-only validated SQL helpers exposing visible-reel weekly aggregates to the shared featured selector.
 
 - Directory: `directory.functions.ts` lists; `moods.functions.ts` manages moods with sync triggers; categories are shared. Mood filters match exact reel/brand moods.
 - Reel brand touch points share `BrandLink` (a plain text link to `/directory/$slug`); cards have no brand logo tile — the linked name carries the destination so the grid and featured captions keep one treatment without extra data reads.
