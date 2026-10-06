@@ -21,6 +21,9 @@ import {
   DEFAULT_DIRECTORY_SETTINGS, MIN_MANUAL_PICKS, SPEED_SECONDS, mondayOf, resolveFeatured, type DirectorySettings, type FeaturedPick,
 } from "@/lib/directory/settings";
 import { cn } from "@/lib/utils";
+import { HeadlineCard, greetingErrors } from "@/components/admin/HeadlineCard";
+import { getGreetingAdmin, saveGreetingConfig } from "@/lib/directory/greeting.functions";
+import { DEFAULT_GREETING, type GreetingConfig } from "@/lib/directory/greeting";
 
 export const Route = createFileRoute("/_authenticated/admin/directory-settings")({
   head: () => ({ meta: [
@@ -83,6 +86,12 @@ function DirectorySettingsAdmin() {
   const brands = useQuery({ queryKey: ["admin", "directory-public-brands"], queryFn: () => brandsFn() });
   const siteReels = useQuery({ queryKey: ["admin", "site-reels-public"], queryFn: () => siteFn() });
   const { families, all: allMoods } = useMoodCatalog();
+  const loadG = useServerFn(getGreetingAdmin);
+  const saveG = useServerFn(saveGreetingConfig);
+  const savedG = useQuery({ queryKey: ["admin", "directory-greeting"], queryFn: () => loadG() });
+  const [g, setG] = useState<GreetingConfig>(DEFAULT_GREETING);
+  useEffect(() => { if (savedG.data) setG(savedG.data.config); }, [savedG.data]);
+  const facets = useQuery({ queryKey: ["admin", "directory-facets"], queryFn: async () => (await searchFn({ data: { pageSize: 1 } })).facets });
 
   const [s, setS] = useState<DirectorySettings>(DEFAULT_DIRECTORY_SETTINGS);
   const [picks, setPicks] = useState<FeaturedPick[]>([]);
@@ -92,7 +101,8 @@ function DirectorySettingsAdmin() {
   const [tried, setTried] = useState(false);
   useEffect(() => { if (saved.data) { setS(saved.data.settings); setPicks(saved.data.picks); } }, [saved.data]);
 
-  const dirty = !!saved.data && JSON.stringify({ s, picks }) !== JSON.stringify({ s: saved.data.settings, picks: saved.data.picks });
+  const gDirty = !!savedG.data && JSON.stringify(g) !== JSON.stringify(savedG.data.config);
+  const dirty = (!!saved.data && JSON.stringify({ s, picks }) !== JSON.stringify({ s: saved.data.settings, picks: saved.data.picks })) || gDirty;
   useBlocker({ shouldBlockFn: () => dirty && !window.confirm("You have unsaved changes. Leave without saving?"), enableBeforeUnload: () => dirty });
 
   const byId = useMemo(() => new Map((library.data ?? []).map((r) => [r.id, r])), [library.data]);
@@ -106,6 +116,7 @@ function DirectorySettingsAdmin() {
   if (s.source === "manual" && !s.rotateWeekly && listFor(null).length < MIN_MANUAL_PICKS) errors.push(`Pick at least ${MIN_MANUAL_PICKS} reels for the hand-picked list.`);
   if (s.showFrom && s.showUntil && new Date(s.showUntil) <= new Date(s.showFrom)) errors.push("\"Until\" must be after \"Show from\".");
   if (!s.title.trim()) errors.push("Add a label above the carousel.");
+  errors.push(...greetingErrors(g));
 
   const preview = resolveFeatured({ ...s, showFrom: null, showUntil: null, showCarousel: true }, picks, library.data ?? [], new Date());
 
@@ -113,8 +124,10 @@ function DirectorySettingsAdmin() {
     setBusy(true);
     try {
       await save({ data: { value, picks: value ? picks : [] } });
+      if (!value || gDirty) await saveG({ data: { value: value ? g : null } });
       toast.success(msg);
       await qc.invalidateQueries({ queryKey: ["admin", "directory-settings"] });
+      await qc.invalidateQueries({ queryKey: ["admin", "directory-greeting"] });
     } catch (e) { toast.error(e instanceof Error ? e.message : "Couldn't save"); } finally { setBusy(false); }
   }
   const num = (k: "count" | "pageSize" | "autoLoadPages", min: number, max: number) => (e: { target: { value: string } }) =>
@@ -140,6 +153,12 @@ function DirectorySettingsAdmin() {
         </div>
         <p className="text-[12px] text-secondary-text">Updates as you change things. Save to make it live on the site.</p>
       </Card>
+
+      <HeadlineCard cfg={g} setCfg={setG} stats={savedG.data?.stats ?? []} families={families} brands={brands.data ?? []}
+        hasReels={(c, b) => {
+          const bs = b ? (brands.data ?? []).find((x) => x.name.toLowerCase() === b.toLowerCase())?.slug : null;
+          return (!c || (facets.data?.categories[categorySlug(c)] ?? 0) > 0) && (!b || (!!bs && (facets.data?.brands[bs] ?? 0) > 0));
+        }} />
 
       <Card className="space-y-4">
         <h2 className="text-[17px] font-semibold">Featured carousel</h2>
@@ -237,7 +256,7 @@ function DirectorySettingsAdmin() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Reset the Directory settings?</AlertDialogTitle>
-            <AlertDialogDescription>This puts every setting back to its default and removes all hand-picked reels. The site updates right away.</AlertDialogDescription>
+            <AlertDialogDescription>This puts every setting back to its default, restores the starter greetings and removes all hand-picked reels. The site updates right away.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
