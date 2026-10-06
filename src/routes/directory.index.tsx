@@ -7,7 +7,7 @@ import { SiteShell } from "@/components/site/SiteShell";
 import { ReelCarousel } from "@/components/site/ReelCarousel";
 import { ReelVideo } from "@/components/site/ReelVideo";
 import { DirectoryGrid, ReelDetail } from "@/components/directory/DirectoryGrid";
-import { listPublicBrands, searchDirectory } from "@/lib/directory/directory.functions";
+import { listPublicBrands, searchDirectoryLegacy } from "@/lib/directory/directory.functions";
 import { CATEGORIES, categorySlug, type DirectoryCard } from "@/lib/directory/directory";
 import { listSiteReels } from "@/lib/site/reels.functions";
 import { FORMAT_LABEL, type SiteReel } from "@/lib/site/reels";
@@ -48,10 +48,10 @@ export const Route = createFileRoute("/directory/")({
   loader: async ({ deps }) => {
     const size = deps.size === "9x16" || deps.size === "1x1" || deps.size === "16x9" ? deps.size : null;
     const [cards, reels, fallback, brands] = await Promise.all([
-      searchDirectory({ data: { q: deps.q, size } }).catch(() => [] as DirectoryCard[]),
+      searchDirectoryLegacy({ data: { q: deps.q, size } }).catch(() => [] as DirectoryCard[]),
       deps.q ? Promise.resolve([] as SiteReel[]) : listSiteReels().catch(() => [] as SiteReel[]),
       deps.q
-        ? searchDirectory({ data: { q: "", size: null } }).catch(() => [] as DirectoryCard[])
+        ? searchDirectoryLegacy({ data: { q: "", size: null } }).catch(() => [] as DirectoryCard[])
         : Promise.resolve([] as DirectoryCard[]),
       deps.q ? Promise.resolve([]) : listPublicBrands().catch(() => []),
     ]);

@@ -17,7 +17,7 @@ const log = (db: any, admin: string, action: string, target: string) =>
 export type AdminReel = {
   id: string; brand: string; title: string; href: string | null; category: string; format: string;
   seconds: number; photos: number; video_url: string; video_webm_url: string | null; poster_url: string | null;
-  sort_order: number; published: boolean; brand_id: string | null; posterView: string | null; videoView: string | null;
+  sort_order: number; published: boolean; brand_id: string | null; moods: string[]; posterView: string | null; videoView: string | null;
 };
 
 export const listAdminReels = createServerFn({ method: "GET" })
@@ -54,6 +54,7 @@ const reelSchema = z.object({
   poster_url: fileRef.nullable().optional(),
   published: z.boolean(),
   brand_id: z.string().uuid().nullable().optional(),
+  moods: z.array(z.string().trim().toLowerCase().max(30)).max(3).optional(),
 });
 
 export const saveSiteReel = createServerFn({ method: "POST" })
@@ -63,6 +64,11 @@ export const saveSiteReel = createServerFn({ method: "POST" })
     const db = await adminDb(context);
     const { id, ...fields } = data;
     const row: Record<string, unknown> = { ...fields };
+    if (fields.moods) {
+      const { data: ok } = await db.from("moods").select("name").in("name", fields.moods.length ? fields.moods : ["-"]);
+      const valid = new Set(((ok ?? []) as any[]).map((m) => m.name));
+      row["moods"] = [...new Set(fields.moods)].filter((m) => valid.has(m));
+    } else delete row["moods"];
     if (fields.video_url) row["video_webm_url"] = null; // a new upload replaces both old files
     if (fields.video_url === undefined) delete row["video_url"];
     if (fields.poster_url === undefined) delete row["poster_url"];

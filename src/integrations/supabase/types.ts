@@ -1022,6 +1022,7 @@ export type Database = {
           format: string
           href: string | null
           id: string
+          moods: string[]
           photos: number
           poster_url: string | null
           published: boolean
@@ -1040,6 +1041,7 @@ export type Database = {
           format?: string
           href?: string | null
           id?: string
+          moods?: string[]
           photos?: number
           poster_url?: string | null
           published?: boolean
@@ -1058,6 +1060,7 @@ export type Database = {
           format?: string
           href?: string | null
           id?: string
+          moods?: string[]
           photos?: number
           poster_url?: string | null
           published?: boolean
@@ -1516,8 +1519,20 @@ export type Database = {
         Args: { _stamp: string; _ws: string }
         Returns: boolean
       }
+      category_slug: { Args: { c: string }; Returns: string }
       delete_workspace: { Args: { _ws: string }; Returns: undefined }
       directory_effective_plan: { Args: { _ws: string }; Returns: string }
+      directory_faceted_search: {
+        Args: {
+          f_brands?: string[]
+          f_categories?: string[]
+          f_moods?: string[]
+          page?: number
+          page_size?: number
+          q?: string
+        }
+        Returns: Json
+      }
       directory_like_counts: {
         Args: { _ids: string[] }
         Returns: {

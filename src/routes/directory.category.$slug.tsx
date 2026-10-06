@@ -2,7 +2,7 @@ import { createFileRoute, notFound, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { DirectoryGrid, ReelDetail } from "@/components/directory/DirectoryGrid";
-import { listPublicBrands, searchDirectory } from "@/lib/directory/directory.functions";
+import { listPublicBrands, searchDirectoryLegacy } from "@/lib/directory/directory.functions";
 import { CATEGORIES, CATEGORY_COVERS, categoryFromSlug, categorySlug, type DirectoryCard } from "@/lib/directory/directory";
 import { listSiteReels } from "@/lib/site/reels.functions";
 import type { SiteReel } from "@/lib/site/reels";
@@ -18,7 +18,7 @@ export const Route = createFileRoute("/directory/category/$slug")({
     const category = categoryFromSlug(params.slug);
     if (!category) throw notFound();
     const [cards, reels, brands] = await Promise.all([
-      searchDirectory({ data: { q: "", size: null } }).catch(() => [] as DirectoryCard[]),
+      searchDirectoryLegacy({ data: { q: "", size: null } }).catch(() => [] as DirectoryCard[]),
       listSiteReels().catch(() => [] as SiteReel[]),
       listPublicBrands().catch(() => []),
     ]);
