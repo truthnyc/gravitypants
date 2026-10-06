@@ -12,6 +12,10 @@ import { listSiteReels } from "@/lib/site/reels.functions";
 import { FORMAT_LABEL, type SiteReel } from "@/lib/site/reels";
 import { siteHead } from "@/lib/site/seo";
 import { cn } from "@/lib/utils";
+import { SiteReelHeart } from "@/components/site/SiteReelHeart";
+import { SiteReelModal } from "@/components/site/SiteReelModal";
+
+const POSTER = "absolute top-1/2 left-1/2 h-[72%] w-auto max-w-[72%] object-contain -translate-x-1/2 -translate-y-1/2 rounded-[6px] shadow-[0_0_0_1px_var(--ap-inner),0_18px_34px_-16px_rgba(29,29,31,.28)]";
 
 const ROTATING = ["soothing", "energizing", "hopeful", "inspiring", "cozy", "luxurious", "playful"];
 const STARTERS: { label: string; q: string; mood?: boolean }[] = [
@@ -91,6 +95,8 @@ function DirectoryPage() {
   const navigate = useNavigate({ from: "/directory/" });
   const [value, setValue] = useState(q);
   const [open, setOpen] = useState<DirectoryCard | null>(null);
+  const [openSite, setOpenSite] = useState<SiteReel | null>(null);
+  const brandReels = reels.filter((r) => r.brandSlug);
   const { day, mood } = useWeekdayMood();
   useEffect(() => setValue(q), [q]);
   const go = (v: string) => void navigate({ search: { q: v.trim() || undefined } });
@@ -226,9 +232,22 @@ function DirectoryPage() {
             )}
             <section className="mx-auto max-w-[1280px] px-6 py-14">
               <h2 className="mb-5 text-[24px] font-semibold tracking-[-0.02em]">Browse the directory</h2>
-              {cards.length ? (
-                <DirectoryGrid cards={cards} onOpen={setOpen} />
-              ) : (
+              {cards.length > 0 && <DirectoryGrid cards={cards} onOpen={setOpen} />}
+              {brandReels.length > 0 && (
+                <ul className={`grid gap-5 [grid-template-columns:repeat(auto-fill,minmax(180px,1fr))] ${cards.length ? "mt-5" : ""}`}>
+                  {brandReels.map((r) => (
+                    <li key={r.id} className="relative">
+                      <button type="button" onClick={() => setOpenSite(r)} aria-label={`Open ${r.title}`} className="relative block aspect-square w-full overflow-hidden rounded-[8px] bg-ap-panel">
+                        {r.poster && <img src={r.poster} alt="" loading="lazy" className={POSTER} />}
+                      </button>
+                      <SiteReelHeart reelId={r.id} name={r.title} />
+                      <p className="mt-2.5 truncate text-[14px] font-semibold">{r.title}</p>
+                      <p className="truncate text-[12px] text-ap-muted nums">{r.brand} · {r.seconds} sec</p>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {cards.length === 0 && brandReels.length === 0 && (
                 <p className="text-ap-muted">The first reels are on their way.</p>
               )}
             </section>
@@ -298,6 +317,7 @@ function DirectoryPage() {
         )}
       </main>
       <ReelDetail card={open} onClose={() => setOpen(null)} />
+      <SiteReelModal reel={openSite} onClose={() => setOpenSite(null)} />
     </SiteShell>
   );
 }
