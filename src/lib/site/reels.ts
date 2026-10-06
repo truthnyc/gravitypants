@@ -1,8 +1,10 @@
+import { CATEGORIES, normalizeCategory } from "@/lib/directory/directory";
+
 export type ReelFormat = "916" | "11" | "169";
-/** Categories are free-text, managed from /admin/reels; known ones get nice labels. */
+/** Website reels use the shared brand categories; older values remain readable. */
 export type ReelCategory = string;
-export const CATEGORY_LABEL: Record<string, string> = { fashion: "Fashion", food: "Food & drink", beauty: "Beauty", home: "Home" };
-export const categoryLabel = (c: string) => CATEGORY_LABEL[c] ?? c.replace(/[-_]/g, " ").replace(/\b\w/g, (m) => m.toUpperCase());
+export const CATEGORY_LABEL: Record<string, string> = Object.fromEntries(CATEGORIES.map((c) => [c, c]));
+export const categoryLabel = (c: string) => normalizeCategory(c) ?? c.replace(/[-_]/g, " ").replace(/\b\w/g, (m) => m.toUpperCase());
 
 /** A brand reel managed from /admin/reels; drives home, Examples and Showcase. */
 export type SiteReel = {

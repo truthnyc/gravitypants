@@ -2,6 +2,8 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
+import { CATEGORIES, normalizeCategory } from "@/lib/directory/directory";
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 async function adminDb(ctx: { supabase: any }) {
   const { data, error } = await ctx.supabase.rpc("is_platform_admin");
@@ -44,7 +46,7 @@ const reelSchema = z.object({
   brand: z.string().trim().min(1).max(200),
   title: z.string().trim().min(1).max(200),
   href: z.string().trim().url().max(500).nullable(),
-  category: z.string().trim().min(1).max(50).transform((c) => c.toLowerCase().replace(/\s+/g, "-")),
+  category: z.preprocess((c) => typeof c === "string" ? normalizeCategory(c) ?? c : c, z.enum(CATEGORIES)),
   format: z.enum(["916", "11", "169"]),
   seconds: z.number().min(0.5).max(600),
   photos: z.number().int().min(1).max(50),
