@@ -70,6 +70,7 @@
   --ap-soft-blue: #eef4fb;
   --ap-panel: #f5f5f7;
   --ap-media: #ededf0;
+  --ap-segment-hover: #eaeaee;
   --ap-hairline: #e5e5ea;
   --ap-inner: #e8e8ed;
   --ap-green: #248a3d;
@@ -88,6 +89,7 @@
 
 @theme inline {
   --color-ap-ink: var(--ap-ink);
+  --color-ap-segment-hover: var(--ap-segment-hover);
   --color-ap-gold: var(--ap-gold);
   --color-ap-body: var(--ap-body);
   --color-ap-muted: var(--ap-muted);
