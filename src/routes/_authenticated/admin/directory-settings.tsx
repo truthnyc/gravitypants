@@ -38,7 +38,7 @@ export const Route = createFileRoute("/_authenticated/admin/directory-settings")
 const FORMAT: Record<string, string> = { "9x16": "9:16", "1x1": "1:1", "16x9": "16:9" };
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
-function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
+function Field({ label, hint, children }: { label: string; hint?: string | undefined; children: React.ReactNode }) {
   return <div className="space-y-1.5"><span className="block text-[13px] font-medium text-secondary-text">{label}</span>{children}{hint && <p className="text-[12px] text-secondary-text">{hint}</p>}</div>;
 }
 function Toggle({ label, hint, checked, onChange }: { label: string; hint: string; checked: boolean; onChange: (v: boolean) => void }) {
@@ -260,7 +260,7 @@ function DirectorySettingsAdmin() {
 
 function PickList({ list, byId, secondsOf, onChange, onAdd, error, emptyText }: {
   list: FeaturedPick[]; byId: Map<string, FacetedReel>; secondsOf: (r: FacetedReel) => number | null;
-  onChange: (l: FeaturedPick[]) => void; onAdd: () => void; error?: string | null; emptyText?: string;
+  onChange: (l: FeaturedPick[]) => void; onAdd: () => void; error?: string | null | undefined; emptyText?: string | undefined;
 }) {
   const [drag, setDrag] = useState<number | null>(null);
   const move = (from: number, to: number) => { if (to < 0 || to >= list.length) return; const l = [...list]; const [x] = l.splice(from, 1); l.splice(to, 0, x!); onChange(l); };
