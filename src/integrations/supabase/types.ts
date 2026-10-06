@@ -476,6 +476,38 @@ export type Database = {
           },
         ]
       }
+      directory_reel_views: {
+        Row: {
+          created_at: string
+          id: string
+          kind: string
+          reel_id: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          kind: string
+          reel_id: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: string
+          reel_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "directory_reel_views_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       directory_reels: {
         Row: {
           ad_id: string
@@ -1602,6 +1634,14 @@ export type Database = {
           saves: number
         }[]
       }
+      directory_reel_weekly_views: {
+        Args: { _ids: string[] }
+        Returns: {
+          kind: string
+          reel_id: string
+          views: number
+        }[]
+      }
       effective_billing: { Args: { _ws: string }; Returns: Json }
       ensure_workspace: { Args: never; Returns: string }
       export_status: { Args: { _ws: string }; Returns: Json }
@@ -1622,6 +1662,10 @@ export type Database = {
       is_workspace_member: { Args: { _ws: string }; Returns: boolean }
       kit_shared: { Args: { _ws: string }; Returns: boolean }
       kit_workspaces: { Args: { _ws: string }; Returns: string[] }
+      record_directory_reel_open: {
+        Args: { _event_id: string; _kind: string; _reel_id: string }
+        Returns: boolean
+      }
       record_export: {
         Args: { _project: string; _stamp: string; _ws: string }
         Returns: boolean
