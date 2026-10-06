@@ -10,6 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { Card, PageTitle, Pill } from "@/components/admin/AdminShell";
 import { supabase } from "@/integrations/supabase/client";
 import { deleteSiteReel, listAdminReels, moveSiteReel, saveSiteReel, type AdminReel } from "@/lib/stillframe/admin-reels.functions";
+import { listDirectoryBrands } from "@/lib/directory/directory.functions";
 import { CATEGORY_LABEL, FORMAT_LABEL, categoryLabel, type ReelFormat } from "@/lib/site/reels";
 
 export const Route = createFileRoute("/_authenticated/admin/reels")({
@@ -60,11 +61,13 @@ async function upload(blob: Blob, ext: string, type: string) {
   return `site-reels:${path}`;
 }
 
-type Draft = { id?: string; brand: string; title: string; href: string; category: string; published: boolean; photos: number };
+type Draft = { id?: string; brand: string; title: string; href: string; category: string; published: boolean; photos: number; brand_id?: string | null };
 const empty: Draft = { brand: "", title: "", href: "", category: "fashion", published: true, photos: 3 };
 
 function ReelForm({ initial, categories, onDone, onCancel }: { initial: Draft; categories: string[]; onDone: () => void; onCancel?: () => void }) {
   const save = useServerFn(saveSiteReel);
+  const brandsFn = useServerFn(listDirectoryBrands);
+  const { data: brands } = useQuery({ queryKey: ["admin", "directory-brands"], queryFn: () => brandsFn() });
   const [d, setD] = useState(initial);
   const [file, setFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
@@ -89,7 +92,7 @@ function ReelForm({ initial, categories, onDone, onCancel }: { initial: Draft; c
       await save({ data: {
         ...(d.id ? { id: d.id } : {}),
         brand: d.brand, title: d.title, href: href || null,
-        category: d.category, photos: d.photos, published: d.published,
+        category: d.category, photos: d.photos, published: d.published, brand_id: d.brand_id ?? null,
         format: files.format ?? current.format ?? "916",
         seconds: files.seconds ?? current.seconds ?? 8,
         ...(files.video_url ? { video_url: files.video_url, poster_url: files.poster_url ?? null } : {}),
@@ -134,6 +137,13 @@ function ReelForm({ initial, categories, onDone, onCancel }: { initial: Draft; c
         </div>
         <span>Size and length are read from the file, and a still frame is made for you.</span>
       </div>
+      <label className="grid gap-1 text-[13px] text-secondary-text">Brand page in Directory
+        <select value={d.brand_id ?? ""} onChange={(e) => setD({ ...d, brand_id: e.target.value || null })} className="h-11 rounded-sm border border-input bg-card px-3 text-[15px] text-foreground">
+          <option value="">None</option>
+          {(brands ?? []).map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
+        </select>
+        <span>The reel also shows on this brand page.</span>
+      </label>
       <label className="flex items-center gap-2 text-[14px]">
         <Switch checked={d.published} onCheckedChange={(v) => setD({ ...d, published: v })} /> Show on the website
       </label>
@@ -183,7 +193,7 @@ function Reels() {
                 </div>
                 <div className="min-w-0 flex-1 text-[14px]">
                   <div className="font-medium">{r.brand} · {r.title} {!r.published && <Pill>Hidden</Pill>}</div>
-                  <div className="text-[13px] text-secondary-text nums">{FORMAT_LABEL[r.format as ReelFormat] ?? r.format} · {r.seconds} sec · {r.href ?? "No link"}</div>
+                  <div className="text-[13px] text-secondary-text nums">{FORMAT_LABEL[r.format as ReelFormat] ?? r.format} · {r.seconds} sec · {r.href ?? "No link"}{r.brand_id ? " · On a brand page" : ""}</div>
                 </div>
                 <div className="flex gap-1">
                   <Button variant="plain" size="icon" aria-label="Move up" disabled={i === 0} onClick={() => void reorder(i, -1)}><ArrowUp className="size-4" strokeWidth={1.7} /></Button>
@@ -196,7 +206,7 @@ function Reels() {
                 <div className="mt-4">
                   <ReelForm
                     categories={categories}
-                    initial={{ id: r.id, brand: r.brand, title: r.title, href: r.href ?? "", category: r.category, published: r.published, photos: r.photos, ...({ format: r.format, seconds: r.seconds } as object) }}
+                    initial={{ id: r.id, brand: r.brand, title: r.title, href: r.href ?? "", category: r.category, published: r.published, photos: r.photos, brand_id: r.brand_id, ...({ format: r.format, seconds: r.seconds } as object) }}
                     onDone={() => { setEditing(null); void refetch(); }}
                     onCancel={() => setEditing(null)}
                   />
