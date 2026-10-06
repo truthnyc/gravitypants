@@ -340,6 +340,33 @@ export type Database = {
           },
         ]
       }
+      directory_featured_reels: {
+        Row: {
+          created_at: string
+          id: string
+          kind: string
+          position: number
+          reel_id: string
+          week_of: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind: string
+          position?: number
+          reel_id: string
+          week_of?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: string
+          position?: number
+          reel_id?: string
+          week_of?: string | null
+        }
+        Relationships: []
+      }
       directory_likes: {
         Row: {
           created_at: string
@@ -1541,6 +1568,13 @@ export type Database = {
         }[]
       }
       directory_paid_plans: { Args: never; Returns: string[] }
+      directory_reel_save_counts: {
+        Args: { _ids: string[] }
+        Returns: {
+          reel_id: string
+          saves: number
+        }[]
+      }
       effective_billing: { Args: { _ws: string }; Returns: Json }
       ensure_workspace: { Args: never; Returns: string }
       export_status: { Args: { _ws: string }; Returns: Json }
