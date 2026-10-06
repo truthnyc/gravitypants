@@ -554,6 +554,34 @@ export const adminRenameReel = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+/** Admin: delete a Directory reel for good (the client's ad itself is untouched). */
+export const adminDeleteReel = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ reelId: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const sb = supabaseAdmin as any;
+    const { error } = await sb.from("directory_reels").delete().eq("id", data.reelId);
+    if (error) throw new Error(error.message);
+    await sb.from("admin_audit_log").insert({ admin_user_id: context.userId, action: "directory_reel_delete", target: data.reelId });
+    return { ok: true };
+  });
+
+/** Admin: move a Directory reel to another brand page. */
+export const adminMoveReel = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ reelId: z.string().uuid(), brandId: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const sb = supabaseAdmin as any;
+    const { error } = await sb.from("directory_reels").update({ brand_id: data.brandId }).eq("id", data.reelId);
+    if (error) throw new Error(error.message);
+    await sb.from("admin_audit_log").insert({ admin_user_id: context.userId, action: "directory_reel_move", target: `${data.reelId} -> ${data.brandId}` });
+    return { ok: true };
+  });
+
 /* ---------------- admin: create brand pages, link site reels, hand over to a client */
 
 /** Admin: workspaces a brand page can belong to (ones that don't already have a brand page). */
