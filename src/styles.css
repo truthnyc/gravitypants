@@ -1130,3 +1130,7 @@ html:has(.acct), body:has(.acct), body:has(.acct) .bg-canvas { background: var(-
 .ap-steps-main.ap-large .ap-gif-grid { grid-template-columns: minmax(0, 1fr); }
 
 @keyframes dir-mood { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .dir-carousel *, [role="dialog"] { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
