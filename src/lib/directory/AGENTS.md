@@ -4,4 +4,5 @@
 - Directory page settings live in `site_settings` key `directory` (merged over defaults by `mergeSettings` in settings.ts); hand-picked featured reels in `directory_featured_reels`; featured selection is the pure `resolveFeatured()` so the admin preview and the site agree.
 
 - Directory: `directory.functions.ts` lists; `moods.functions.ts` manages moods with sync triggers; categories are shared. Mood filters match exact reel/brand moods.
+- Reel brand touch points share `BrandLink`, using existing signed public-brand logos for tiles, so the grid and featured captions keep one destination and interaction treatment without extra data reads.
 - Directory headline greeting: config in `site_settings` key `directory_greeting` (seeds in `greeting.ts`), one pure `chooseGreeting()` shared by site and admin preview; geo/weather via `getVisitorContext` (never stored); analytics in `directory_greeting_log`.

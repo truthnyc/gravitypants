@@ -1,4 +1,5 @@
 # Roadmap
+- [x] Add brand-page links and expanding logo tiles to Browse reels and carousel captions; verify navigation, keyboard and touch behavior.
 - [x] Adjust filter-to-carousel spacing and add saved label size/spacing controls.
 - [x] Stabilize changing Directory headlines and verify the page and admin controls.
 - [x] Add shared-list Moods filter to Directory and verify filtering/reset.
