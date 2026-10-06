@@ -11,6 +11,8 @@ import { siteHead } from "@/lib/site/seo";
 import { SiteReelHeart } from "@/components/site/SiteReelHeart";
 import { SiteReelModal } from "@/components/site/SiteReelModal";
 import type { SiteReel } from "@/lib/site/reels";
+import { useServerFn } from "@tanstack/react-start";
+import { recordDirectoryReelOpen } from "@/lib/directory/views.functions";
 
 const POSTER = "absolute top-1/2 left-1/2 h-[72%] w-auto max-w-[72%] object-contain -translate-x-1/2 -translate-y-1/2 rounded-[6px] shadow-[0_0_0_1px_var(--ap-inner),0_18px_34px_-16px_rgba(29,29,31,.28)]";
 
@@ -66,6 +68,12 @@ function BrandPage() {
   const { brand, reels, siteReels, more } = Route.useLoaderData();
   const [open, setOpen] = useState<DirectoryCard | null>(null);
   const [openSite, setOpenSite] = useState<SiteReel | null>(null);
+  const recordOpen = useServerFn(recordDirectoryReelOpen);
+  const track = (reelId: string, kind: "directory" | "site") => {
+    void recordOpen({ data: { eventId: crypto.randomUUID(), reelId, kind } }).catch(() => {});
+  };
+  const openDirectoryReel = (card: DirectoryCard) => { setOpen(card); track(card.reel_id, "directory"); };
+  const openSiteReel = (reel: SiteReel) => { setOpenSite(reel); track(reel.id, "site"); };
   const total = reels.length + siteReels.length;
   if (!brand) return null;
   const sizes = new Set([...reels.flatMap((r) => r.formats), ...siteReels.map((r) => r.format)]);
@@ -108,12 +116,12 @@ function BrandPage() {
             </div>
           </header>
           <h2 className="mb-5 text-[24px] font-semibold tracking-[-0.02em]">Reels</h2>
-          {reels.length > 0 && <DirectoryGrid cards={reels} onOpen={setOpen} />}
+          {reels.length > 0 && <DirectoryGrid cards={reels} onOpen={openDirectoryReel} />}
           {siteReels.length > 0 && (
             <ul className={`grid gap-5 [grid-template-columns:repeat(auto-fill,minmax(180px,1fr))] ${reels.length ? "mt-5" : ""}`}>
               {siteReels.map((r) => (
                 <li key={r.id} className="relative">
-                  <button type="button" onClick={() => setOpenSite(r)} aria-label={`Open ${r.title}`} className="relative block aspect-square w-full overflow-hidden rounded-[8px] bg-ap-panel">
+                  <button type="button" onClick={() => openSiteReel(r)} aria-label={`Open ${r.title}`} className="relative block aspect-square w-full overflow-hidden rounded-[8px] bg-ap-panel">
                     {r.poster && <img src={r.poster} alt="" loading="lazy" className={POSTER} />}
                   </button>
                   <SiteReelHeart reelId={r.id} name={r.title} />
