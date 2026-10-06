@@ -1,0 +1,67 @@
+import { useEffect, useState } from "react";
+import { Pause, Play } from "lucide-react";
+import { cn } from "@/lib/utils";
+import type { FacetedReel } from "@/lib/directory/directory.functions";
+
+const SIZE: Record<string, { w: number; h: number }> = { "9x16": { w: 165, h: 293 }, "1x1": { w: 200, h: 200 }, "16x9": { w: 256, h: 144 } };
+
+function useReducedMotion() {
+  const [r, setR] = useState(false);
+  useEffect(() => {
+    const m = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const f = () => setR(m.matches);
+    f(); m.addEventListener("change", f);
+    return () => m.removeEventListener("change", f);
+  }, []);
+  return r;
+}
+
+/** Drifting band of featured reels. Seamless loop: the list renders twice and slides by half. */
+export function FeaturedBand({ label, reels, secondsPerReel, seconds, onOpen }: {
+  label: string; reels: FacetedReel[]; secondsPerReel: number; seconds: (r: FacetedReel) => number | null; onOpen: (r: FacetedReel) => void;
+}) {
+  const [paused, setPaused] = useState(false);
+  const reduced = useReducedMotion();
+  if (!reels.length) return null;
+  const setKey = reels.map((r) => r.id).join(",");
+  const copies = reduced ? [0] : [0, 1];
+  return (
+    <section aria-label={label} className="relative bg-ap-panel pt-14 pb-12">
+      <div className="pointer-events-none absolute inset-x-0 top-4 z-10 mx-auto flex max-w-[1280px] items-center justify-between px-6">
+        <p className="text-[13px] font-semibold text-ap-ink nums">{label}</p>
+        {!reduced && (
+          <button type="button" aria-pressed={paused} aria-label={paused ? "Play featured reels" : "Pause featured reels"} onClick={() => setPaused((p) => !p)}
+            className="pointer-events-auto grid size-8 place-items-center rounded-full bg-ap-card text-ap-ink shadow-ap-soft hover:bg-ap-media">
+            {paused ? <Play className="size-3.5" strokeWidth={1.7} /> : <Pause className="size-3.5" strokeWidth={1.7} />}
+          </button>
+        )}
+      </div>
+      <div key={setKey} className={cn("dir-featured-fade", reduced ? "overflow-x-auto" : "overflow-hidden")}>
+        <div data-paused={paused} className={cn("dir-marquee flex w-max items-center", reduced && "px-6")}
+          style={{ animationDuration: `${Math.max(20, reels.length * secondsPerReel)}s` }}>
+          {copies.map((c) => (
+            <ul key={c} aria-hidden={c === 1 || undefined} className="flex items-center gap-8 pr-8">
+              {reels.map((r, i) => {
+                const s = SIZE[r.formats[0] ?? "9x16"] ?? SIZE["9x16"]!;
+                const sec = seconds(r);
+                const shift = i % 4 === 0 ? "translate-y-5" : i % 4 === 2 ? "-translate-y-5" : "";
+                return (
+                  <li key={r.id} className={cn("group shrink-0", shift)}>
+                    <button type="button" tabIndex={c === 1 ? -1 : undefined} onClick={() => onOpen(r)} aria-label={`Open ${r.title} by ${r.brand_name}`}
+                      className="dir-featured-reel block overflow-hidden rounded-[6px] bg-ap-card shadow-[0_0_0_1px_var(--ap-inner),0_18px_34px_-16px_rgba(29,29,31,.28)] transition-transform duration-200 group-hover:-translate-y-1.5 group-focus-within:-translate-y-1.5 motion-reduce:transition-none"
+                      style={{ ["--w" as string]: `${s.w}px`, ["--h" as string]: `${s.h}px` }}>
+                      {r.poster && <img src={r.poster} alt="" loading="lazy" className="size-full object-cover" />}
+                    </button>
+                    <p className="mt-2 h-4 text-center text-[12px] text-ap-muted opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 nums">
+                      {r.brand_name}{sec ? ` · ${sec} sec` : ""}
+                    </p>
+                  </li>
+                );
+              })}
+            </ul>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}

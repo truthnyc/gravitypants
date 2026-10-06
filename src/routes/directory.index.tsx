@@ -20,6 +20,8 @@ import { siteHead } from "@/lib/site/seo";
 import { SiteReelHeart } from "@/components/site/SiteReelHeart";
 import { SiteReelModal } from "@/components/site/SiteReelModal";
 import { useMoodCatalog } from "@/lib/directory/moods";
+import { FeaturedBand } from "@/components/directory/FeaturedBand";
+import { DEFAULT_FEATURED } from "@/lib/directory/featured";
 
 const POSTER =
   "absolute top-1/2 left-1/2 h-[72%] w-auto max-w-[72%] object-contain -translate-x-1/2 -translate-y-1/2 rounded-[6px] shadow-[0_0_0_1px_var(--ap-inner),0_18px_34px_-16px_rgba(29,29,31,.28)]";
@@ -215,6 +217,22 @@ function DirectoryPage() {
   const suggestions = loosen.map((x) => x.data).filter((x): x is { t: Tag; n: number } => !!x && x.n > 0).sort((a, b) => b.n - a.n).slice(0, 3);
   const clearAll = () => setFilters({ moods: [], categories: [], brands: [] });
 
+  // "Featured this week": featured reels when unfiltered; while filtering, follow the setting.
+  const featured = DEFAULT_FEATURED;
+  const featuredQ = useQuery({
+    queryKey: ["directory-featured", featured.source, featured.manualIds.join(",")],
+    staleTime: 60_000,
+    queryFn: async () => {
+      const r = await searchFn({ data: { pageSize: featured.source === "manual" ? 240 : featured.max } });
+      if (featured.source !== "manual") return r.reels;
+      const byId = new Map(r.reels.map((x) => [x.id, x]));
+      return featured.manualIds.map((id) => byId.get(id)).filter((x): x is FacetedReel => !!x).slice(0, featured.max);
+    },
+  });
+  const matches = found.slice(0, featured.max);
+  const featuredReels = !filtered || featured.whenFiltering === "fixed" ? featuredQ.data ?? []
+    : featured.whenFiltering === "hide" || results.isPlaceholderData ? [] : matches;
+  const featuredLabel = filtered && featured.whenFiltering === "follow" ? `Featured · ${total} ${total === 1 ? "match" : "matches"}` : featured.title;
   const openReel = (r: FacetedReel) => {
     if (r.kind === "site") setOpenSite(reels.find((x) => x.id === r.id) ?? null);
     else setOpen(allCards.find((c) => c.reel_id === r.id) ?? null);
@@ -271,23 +289,9 @@ function DirectoryPage() {
           )}
         </div>
 
-        {!filtered && reels.length > 0 && (
-          <section className="home-examples dir-carousel !min-h-0 !gap-8 !py-14">
-            <ReelCarousel
-              label="Reels made with Gravity Pants"
-              items={reels.map((r) => ({
-                key: r.id,
-                media: () => (
-                  <div className={`home-example-video home-example-video-${r.format}`}>
-                    <ReelVideo video={r.video} videoWebm={r.videoWebm ?? undefined} poster={r.poster ?? undefined} label={`${r.title} video ad`} />
-                  </div>
-                ),
-                title: r.title,
-                detail: `${r.photos} photos · ${r.seconds} sec · ${FORMAT_LABEL[r.format]} · ${r.brand}`,
-                visit: r.href ? { href: r.href, label: `Visit ${r.brand}` } : undefined,
-              }))}
-            />
-          </section>
+        {featuredReels.length > 0 && (
+          <FeaturedBand label={featuredLabel} reels={featuredReels} secondsPerReel={featured.secondsPerReel}
+            seconds={(r) => (r.kind === "site" ? reels.find((x) => x.id === r.id)?.seconds ?? null : null)} onOpen={openReel} />
         )}
         <section className="mx-auto max-w-[1280px] px-6 py-14" aria-busy={results.isFetching}>
           <div className="mb-5 flex items-baseline justify-between gap-4">

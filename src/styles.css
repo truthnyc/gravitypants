@@ -1138,3 +1138,12 @@ html:has(.acct), body:has(.acct), body:has(.acct) .bg-canvas { background: var(-
 @keyframes dir-card-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 .dir-card-in { animation: dir-card-in .35s ease both; }
 @media (prefers-reduced-motion: reduce) { .dir-card-in { animation: none; } }
+
+.dir-featured-reel { width: calc(var(--w) * .7); height: calc(var(--h) * .7); }
+@media (min-width: 640px) { .dir-featured-reel { width: var(--w); height: var(--h); } }
+@keyframes dir-marquee { to { transform: translateX(-50%); } }
+.dir-marquee { animation: dir-marquee linear infinite; }
+.dir-marquee[data-paused="true"], .dir-marquee:hover, .dir-marquee:focus-within { animation-play-state: paused; }
+@keyframes dir-fade { from { opacity: 0; } to { opacity: 1; } }
+.dir-featured-fade { animation: dir-fade .18s ease; }
+@media (prefers-reduced-motion: reduce) { .dir-marquee, .dir-featured-fade { animation: none; } }
