@@ -73,7 +73,7 @@ function FavoritesPublic() {
             <h2 className="mt-12 mb-5 text-[24px] font-semibold">Brands</h2>
             <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {brands.map((b) => (
-                <li key={b.id}><Link to="/directory" search={{ brand: b.slug }} className="block rounded-[4px] p-3 hover:text-ap-blue">
+                <li key={b.id}><Link to="/directory/" search={{ brand: b.slug }} className="block rounded-[4px] p-3 hover:text-ap-blue">
                   <span className="flex size-12 items-center justify-center rounded-[4px] border border-ap-hairline bg-ap-card">
                     {b.logo
                       ? <img src={b.logo} alt="" className="max-h-full max-w-full object-contain" />
