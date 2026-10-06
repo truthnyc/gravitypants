@@ -86,7 +86,7 @@ function useWeekdayMood() {
 }
 
 function DirectoryPage() {
-  const { q, cards, reels, fallback } = Route.useLoaderData();
+  const { q, cards, reels, fallback, brands } = Route.useLoaderData();
   const { size } = Route.useSearch();
   const navigate = useNavigate({ from: "/directory/" });
   const [value, setValue] = useState(q);
