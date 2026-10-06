@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -61,16 +61,55 @@ async function upload(blob: Blob, ext: string, type: string) {
   return `site-reels:${path}`;
 }
 
+/** Scrub the reel and grab the frame shown as its thumbnail everywhere. */
+function CoverPicker({ src, onPick }: { src: string; onPick: (b: Blob, preview: string) => void }) {
+  const v = useRef<HTMLVideoElement>(null);
+  const [dur, setDur] = useState(0);
+  const [t, setT] = useState(0);
+  const grab = () => {
+    const el = v.current; if (!el) return;
+    const c = document.createElement("canvas");
+    const scale = Math.min(1, 720 / Math.max(el.videoWidth, el.videoHeight));
+    c.width = Math.round(el.videoWidth * scale); c.height = Math.round(el.videoHeight * scale);
+    try {
+      c.getContext("2d")?.drawImage(el, 0, 0, c.width, c.height);
+      c.toBlob((b) => { if (b) { onPick(b, c.toDataURL("image/webp", 0.6)); toast("Cover frame picked — save to apply"); } }, "image/webp", 0.85);
+    } catch { toast.error("Couldn't read that frame. Replace the file to pick one."); }
+  };
+  return (
+    <div className="grid gap-2 sm:col-span-2 text-[13px] text-secondary-text">Thumbnail frame
+      <div className="flex flex-wrap items-end gap-4">
+        <video ref={v} src={src} crossOrigin="anonymous" muted playsInline preload="auto" className="h-40 w-auto rounded-sm bg-control-fill"
+          onLoadedMetadata={(e) => setDur(e.currentTarget.duration || 0)} />
+        <div className="grid min-w-[220px] flex-1 gap-2">
+          <input type="range" min={0} max={dur || 1} step={0.05} value={t} aria-label="Frame time"
+            onChange={(e) => { const x = Number(e.target.value); setT(x); if (v.current) v.current.currentTime = x; }} />
+          <span className="nums">{t.toFixed(1)} sec of {dur.toFixed(1)} sec</span>
+          <Button type="button" variant="plain" size="sm" className="w-fit" onClick={grab}>Use this frame</Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 type Draft = { id?: string; brand: string; title: string; href: string; category: string; published: boolean; photos: number; brand_id?: string | null };
 const empty: Draft = { brand: "", title: "", href: "", category: "fashion", published: true, photos: 3 };
 
-function ReelForm({ initial, categories, onDone, onCancel }: { initial: Draft; categories: string[]; onDone: () => void; onCancel?: () => void }) {
+function ReelForm({ initial, categories, onDone, onCancel, videoSrc }: { videoSrc?: string | null; initial: Draft; categories: string[]; onDone: () => void; onCancel?: () => void }) {
   const save = useServerFn(saveSiteReel);
   const brandsFn = useServerFn(listDirectoryBrands);
   const { data: brands } = useQuery({ queryKey: ["admin", "directory-brands"], queryFn: () => brandsFn() });
   const [d, setD] = useState(initial);
   const [file, setFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
+  const [cover, setCover] = useState<Blob | null>(null);
+  const [coverPreview, setCoverPreview] = useState<string | null>(null);
+  const [fileUrl, setFileUrl] = useState<string | null>(null);
+  useEffect(() => {
+    if (!file) { setFileUrl(null); return; }
+    const u = URL.createObjectURL(file); setFileUrl(u); setCover(null); setCoverPreview(null);
+    return () => URL.revokeObjectURL(u);
+  }, [file]);
   const input = useRef<HTMLInputElement>(null);
   const isNew = !initial.id;
 
@@ -88,6 +127,7 @@ function ReelForm({ initial, categories, onDone, onCancel }: { initial: Draft; c
         const poster_url = probe.poster ? await upload(probe.poster, "webp", "image/webp") : null;
         files = { video_url, poster_url, format: probe.format, seconds: probe.seconds };
       }
+      if (cover) files.poster_url = await upload(cover, "webp", "image/webp");
       const current = initial as Draft & { format?: ReelFormat; seconds?: number };
       await save({ data: {
         ...(d.id ? { id: d.id } : {}),
@@ -95,10 +135,11 @@ function ReelForm({ initial, categories, onDone, onCancel }: { initial: Draft; c
         category: d.category, photos: d.photos, published: d.published, brand_id: d.brand_id ?? null,
         format: files.format ?? current.format ?? "916",
         seconds: files.seconds ?? current.seconds ?? 8,
-        ...(files.video_url ? { video_url: files.video_url, poster_url: files.poster_url ?? null } : {}),
+        ...(files.video_url ? { video_url: files.video_url } : {}),
+        ...(files.video_url || cover ? { poster_url: files.poster_url ?? null } : {}),
       } });
       toast(isNew ? "Reel added to the website" : "Reel updated");
-      setD(empty); setFile(null);
+      setD(empty); setFile(null); setCover(null); setCoverPreview(null);
       onDone();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "That didn't work");
@@ -137,6 +178,12 @@ function ReelForm({ initial, categories, onDone, onCancel }: { initial: Draft; c
         </div>
         <span>Size and length are read from the file, and a still frame is made for you.</span>
       </div>
+      {(fileUrl ?? videoSrc) && (
+        <>
+          <CoverPicker key={fileUrl ?? videoSrc!} src={(fileUrl ?? videoSrc)!} onPick={(b, p) => { setCover(b); setCoverPreview(p); }} />
+          {coverPreview && <div className="sm:col-span-2 flex items-center gap-3 text-[13px] text-secondary-text"><img src={coverPreview} alt="Picked thumbnail" className="h-16 w-auto rounded-sm" /> New thumbnail — saves with the reel.</div>}
+        </>
+      )}
       <label className="grid gap-1 text-[13px] text-secondary-text">Brand page in Directory
         <select value={d.brand_id ?? ""} onChange={(e) => setD({ ...d, brand_id: e.target.value || null })} className="h-11 rounded-sm border border-input bg-card px-3 text-[15px] text-foreground">
           <option value="">None</option>
@@ -206,6 +253,7 @@ function Reels() {
                 <div className="mt-4">
                   <ReelForm
                     categories={categories}
+                    videoSrc={r.videoView}
                     initial={{ id: r.id, brand: r.brand, title: r.title, href: r.href ?? "", category: r.category, published: r.published, photos: r.photos, brand_id: r.brand_id, ...({ format: r.format, seconds: r.seconds } as object) }}
                     onDone={() => { setEditing(null); void refetch(); }}
                     onCancel={() => setEditing(null)}
