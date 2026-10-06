@@ -234,6 +234,7 @@ export type Database = {
           first_approved_at: string | null
           grace_emails_sent: number
           id: string
+          is_editorial: boolean
           logo_url: string | null
           name: string
           plan_ended_at: string | null
@@ -249,6 +250,7 @@ export type Database = {
           first_approved_at?: string | null
           grace_emails_sent?: number
           id?: string
+          is_editorial?: boolean
           logo_url?: string | null
           name: string
           plan_ended_at?: string | null
@@ -264,6 +266,7 @@ export type Database = {
           first_approved_at?: string | null
           grace_emails_sent?: number
           id?: string
+          is_editorial?: boolean
           logo_url?: string | null
           name?: string
           plan_ended_at?: string | null
@@ -967,6 +970,7 @@ export type Database = {
       site_reels: {
         Row: {
           brand: string
+          brand_id: string | null
           category: string
           created_at: string
           format: string
@@ -984,6 +988,7 @@ export type Database = {
         }
         Insert: {
           brand: string
+          brand_id?: string | null
           category?: string
           created_at?: string
           format?: string
@@ -1001,6 +1006,7 @@ export type Database = {
         }
         Update: {
           brand?: string
+          brand_id?: string | null
           category?: string
           created_at?: string
           format?: string
@@ -1016,7 +1022,15 @@ export type Database = {
           video_url?: string
           video_webm_url?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "site_reels_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "directory_brands"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       site_settings: {
         Row: {
