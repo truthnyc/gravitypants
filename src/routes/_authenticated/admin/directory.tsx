@@ -312,7 +312,7 @@ function AdminReel({ r, brandId, onChanged }: { r: Detail["reels"][number]; bran
         </div>
         <input value={tags} onChange={(e) => setTags(e.target.value)} aria-label="Tags" placeholder="Tags, comma separated" className={field} />
         <div className="flex flex-wrap gap-1">
-          {[...new Set([...moodsFor(category), ...moods])].map((m) => {
+          {MOODS.map((m) => {
             const on = moods.includes(m);
             return <button key={m} type="button" disabled={!on && moods.length >= 3} onClick={() => setMoods(on ? moods.filter((x) => x !== m) : [...moods, m])} className={cn("rounded-lg border px-2 py-0.5 text-[12px] disabled:opacity-40", on ? "border-primary text-primary" : "border-border")}>{moodLabel(m)}</button>;
           })}
