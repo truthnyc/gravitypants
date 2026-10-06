@@ -15,7 +15,7 @@ const log = (db: any, admin: string, action: string, target: string) =>
 export type AdminReel = {
   id: string; brand: string; title: string; href: string | null; category: string; format: string;
   seconds: number; photos: number; video_url: string; video_webm_url: string | null; poster_url: string | null;
-  sort_order: number; published: boolean; posterView: string | null;
+  sort_order: number; published: boolean; brand_id: string | null; posterView: string | null;
 };
 
 export const listAdminReels = createServerFn({ method: "GET" })
@@ -50,6 +50,7 @@ const reelSchema = z.object({
   video_url: fileRef.optional(),
   poster_url: fileRef.nullable().optional(),
   published: z.boolean(),
+  brand_id: z.string().uuid().nullable().optional(),
 });
 
 export const saveSiteReel = createServerFn({ method: "POST" })
