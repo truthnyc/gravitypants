@@ -38,14 +38,15 @@ export const Route = createFileRoute("/directory/")({
   loaderDeps: ({ search }) => ({ q: (search.q ?? "").slice(0, 200), size: search.size }),
   loader: async ({ deps }) => {
     const size = deps.size === "9x16" || deps.size === "1x1" || deps.size === "16x9" ? deps.size : null;
-    const [cards, reels, fallback] = await Promise.all([
+    const [cards, reels, fallback, brands] = await Promise.all([
       searchDirectory({ data: { q: deps.q, size } }).catch(() => [] as DirectoryCard[]),
       deps.q ? Promise.resolve([] as SiteReel[]) : listSiteReels().catch(() => [] as SiteReel[]),
       deps.q
         ? searchDirectory({ data: { q: "", size: null } }).catch(() => [] as DirectoryCard[])
         : Promise.resolve([] as DirectoryCard[]),
+      deps.q ? Promise.resolve([]) : listPublicBrands().catch(() => []),
     ]);
-    return { q: deps.q, cards, reels, fallback };
+    return { q: deps.q, cards, reels, fallback, brands };
   },
   head: ({ loaderData }) => {
     const base = siteHead({
@@ -201,6 +202,26 @@ function DirectoryPage() {
                     visit: r.href ? { href: r.href, label: `Visit ${r.brand}` } : undefined,
                   }))}
                 />
+              </section>
+            )}
+            {brands.length > 0 && (
+              <section className="mx-auto max-w-[1280px] px-6 pt-14">
+                <h2 className="mb-5 text-[24px] font-semibold tracking-[-0.02em]">Brands</h2>
+                <ul className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(220px,1fr))]">
+                  {brands.map((b) => (
+                    <li key={b.id}>
+                      <Link to="/directory/$slug" params={{ slug: b.slug }} className="flex items-center gap-3 rounded-lg bg-ap-panel p-3 hover:bg-ap-media">
+                        {b.logo_url?.startsWith("https://")
+                          ? <img src={b.logo_url} alt="" className="size-12 shrink-0 rounded-sm border border-ap-hairline bg-ap-card object-contain" />
+                          : <span className="grid size-12 shrink-0 place-items-center rounded-sm border border-ap-hairline bg-ap-card text-[16px] font-semibold">{b.name.split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase()}</span>}
+                        <span className="min-w-0">
+                          <span className="block truncate text-[15px] font-semibold">{b.name}</span>
+                          <span className="block truncate text-[13px] text-ap-muted">{b.category}</span>
+                        </span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
               </section>
             )}
             <section className="mx-auto max-w-[1280px] px-6 py-14">

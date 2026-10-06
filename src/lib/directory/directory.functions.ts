@@ -330,6 +330,14 @@ export const searchDirectory = createServerFn({ method: "GET" })
     return toCards(rows ?? []);
   });
 
+/** Public: every brand page visitors can see (RLS hides brands whose plan ended). */
+export const listPublicBrands = createServerFn({ method: "GET" }).handler(async () => {
+  const { publicClient } = await import("@/lib/site/reels.server");
+  const { data, error } = await (publicClient() as any).from("directory_brands").select("id, name, slug, category, logo_url").order("name");
+  if (error) { console.error(error); return [] as { id: string; name: string; slug: string; category: string; logo_url: string | null }[]; }
+  return Promise.all(((data ?? []) as any[]).map(async (b) => ({ id: b.id as string, name: b.name as string, slug: b.slug as string, category: b.category as string, logo_url: (await signLogo(b.logo_url)) as string | null })));
+});
+
 export const getBrandPage = createServerFn({ method: "GET" })
   .inputValidator((d: unknown) => z.object({ slug: z.string().max(60) }).parse(d))
   .handler(async ({ data }) => {
