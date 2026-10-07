@@ -5,6 +5,7 @@ import { keepPreviousData, useInfiniteQuery, useQueries, useQuery } from "@tanst
 import { useServerFn } from "@tanstack/react-start";
 import { FilterBar, type FilterValue } from "@/components/directory/FilterBar";
 import { BrandLink } from "@/components/directory/BrandLink";
+import { HoverReelPreview } from "@/components/directory/HoverReelPreview";
 import { DirectoryReelHeart } from "@/components/directory/LikeSave";
 import { X } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
@@ -342,7 +343,7 @@ function DirectoryPage() {
                 <li key={`${r.kind}-${r.id}`} data-reel-idx={i} className="dir-card-in relative" style={{ animationDelay: `${(i % PAGE) * 40}ms` }}>
                   <button type="button" onClick={() => openReel(r)} aria-label={`Open ${r.title}`}
                     className="relative block aspect-square w-full overflow-hidden rounded-[8px] bg-ap-panel">
-                    {r.poster && <img src={r.poster} alt="" loading="lazy" className={POSTER} />}
+                    <HoverReelPreview video={r.video_url ?? r.preview_url} poster={r.poster} className={POSTER} />
                   </button>
                   {r.kind === "site" ? <SiteReelHeart reelId={r.id} name={r.title} /> : <DirectoryReelHeart reelId={r.id} name={`${r.brand_name} reel`} />}
                   <p className="mt-2.5 truncate text-[14px] font-semibold">{r.title}</p>
