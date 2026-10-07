@@ -6,6 +6,7 @@ import { GravityPantsLogo } from "@/components/GravityPantsLogo";
 import { FooterNewsletter, NewsletterPopup } from "@/components/site/Newsletter";
 import { SHOW_DIRECTORY } from "@/lib/features";
 import { SOCIAL_LINKS } from "@/lib/site/social";
+import { AimanteShell, useBrandSite } from "@/components/site/AimanteShell";
 
 const STATUS_URL = "https://status.gravitypants.com";
 
@@ -118,5 +119,7 @@ function SiteFooter() {
 }
 
 export function SiteShell({ children }: { children: ReactNode }) {
+  const site = useBrandSite();
+  if (site === "aimante") return <AimanteShell>{children}</AimanteShell>;
   return <div className="flex min-h-dvh flex-col bg-site-page font-site text-site-ink"><SiteHeader variant="site" /><main className="min-h-[48dvh] flex-1">{children}</main><SiteFooter /><NewsletterPopup /></div>;
 }

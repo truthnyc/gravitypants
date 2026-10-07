@@ -12,6 +12,7 @@ import { SiteReelHeart } from "@/components/site/SiteReelHeart";
 import { SiteReelModal } from "@/components/site/SiteReelModal";
 import type { SiteReel } from "@/lib/site/reels";
 import { useServerFn } from "@tanstack/react-start";
+import { MadeWithGravityPants, useBrandSite } from "@/components/site/AimanteShell";
 import { recordDirectoryReelOpen } from "@/lib/directory/views.functions";
 
 const POSTER = "absolute top-1/2 left-1/2 h-[72%] w-auto max-w-[72%] object-contain -translate-x-1/2 -translate-y-1/2 rounded-[6px] shadow-[0_0_0_1px_var(--ap-inner),0_18px_34px_-16px_rgba(29,29,31,.28)]";
@@ -69,6 +70,7 @@ function BrandPage() {
   const [open, setOpen] = useState<DirectoryCard | null>(null);
   const [openSite, setOpenSite] = useState<SiteReel | null>(null);
   const recordOpen = useServerFn(recordDirectoryReelOpen);
+  const site = useBrandSite();
   const track = (reelId: string, kind: "directory" | "site") => {
     void recordOpen({ data: { eventId: crypto.randomUUID(), reelId, kind } }).catch(() => {});
   };
@@ -82,7 +84,7 @@ function BrandPage() {
     <SiteShell>
       <main className="font-ap text-ap-ink">
         <div className="mx-auto max-w-[1440px] px-6 pt-10 pb-16 sm:px-8 lg:px-10">
-          <Link to="/directory" className="inline-flex text-[15px] text-ap-blue">← Directory</Link>
+          <Link to="/directory" className="inline-flex text-[15px] text-ap-blue">← {site === "aimante" ? "Browse" : "Directory"}</Link>
           <header className="mt-10 mb-12 border-b border-ap-hairline pb-10 sm:mt-12 sm:pb-11">
             <div className="grid gap-x-5 gap-y-5 sm:grid-cols-[96px_minmax(0,1fr)] lg:grid-cols-[96px_minmax(0,1fr)_auto] lg:gap-x-6">
               <div className="flex flex-col items-end gap-4 self-start sm:col-start-2 sm:row-start-1 lg:col-start-3">
@@ -151,6 +153,7 @@ function BrandPage() {
             />
           </section>
         )}
+        {site === "aimante" && <MadeWithGravityPants />}
       </main>
       <ReelDetail card={open} onClose={() => setOpen(null)} />
       <SiteReelModal reel={openSite} onClose={() => setOpenSite(null)} />
