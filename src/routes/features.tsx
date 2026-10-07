@@ -112,7 +112,7 @@ const groups = [
     title: "Room for the people you work with.",
     points: [
       "Your ads, photos and exports stay private to your workspace",
-      "Team plan: 3 seats with shared templates and brand kits",
+      "Team plan: 5 seats with shared templates and brand kits",
       "Invite people by email, with owner, admin and editor roles",
       "Plan, exports and invoices on one billing page",
       "Priority support on paid plans",
