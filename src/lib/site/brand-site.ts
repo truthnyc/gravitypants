@@ -29,12 +29,14 @@ export function resolveSite(host: string, brandParam: string | null, cookie: str
   return cookie === "aimante" ? "aimante" : "gravitypants";
 }
 
+const isSiteParam = (v: string | null | undefined) => v === "aimante" || v === "gravitypants";
+
 const COOKIE_AGE = 60 * 60 * 24 * 30;
 
 const readCookie = createIsomorphicFn()
   .server(() => {
     // On the first preview visit the cookie isn't sent yet, so the request's own ?brand= counts too.
-    try { return getRequestUrl().searchParams.get("brand") ?? getCookie(BRAND_COOKIE); } catch { return undefined; }
+    try { const v = getRequestUrl().searchParams.get("brand"); return isSiteParam(v) ? v! : getCookie(BRAND_COOKIE); } catch { return undefined; }
   })
   .client(() => document.cookie.split("; ").find((c) => c.startsWith(`${BRAND_COOKIE}=`))?.split("=")[1]);
 
@@ -67,7 +69,8 @@ export function aimanteIn(url: URL, site: BrandSite = siteForUrl(url)): URL | un
   if (site !== "aimante") return undefined;
   const p = url.pathname.replace(/\/+$/, "") || "/";
   const out = new URL(url.href);
-  out.searchParams.delete("brand");
+  // ?brand= is also the Directory's brand filter; only drop the site-preview values.
+  if (isSiteParam(out.searchParams.get("brand"))) out.searchParams.delete("brand");
   let m: RegExpMatchArray | null;
   if (p === "/") out.pathname = "/directory";
   else if ((m = p.match(/^\/c\/([^/]+)$/))) { out.pathname = "/directory"; out.searchParams.set("category", decodeURIComponent(m[1] ?? "")); }
