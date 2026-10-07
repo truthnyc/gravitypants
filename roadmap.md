@@ -1,4 +1,5 @@
 # Roadmap
+- [x] Redesign Aimanté brand pages; verified desktop/phone layouts, reel dialog, related links and affiliation notice; browser-test playback unavailable (no supported media source).
 - [x] Update Aimanté phone home; verified 320/390/767 widths, all bottom sheets, pause and Purl Soho search; desktop preserved except requested About link visibility.
 - [x] Update Aimanté lockup, always-branded navigation, mobile panel and footer; verify signed-in and signed-out pages.
 - [x] Add a branded, domain-aware service-unavailable page for application and SSR failures.

@@ -356,8 +356,8 @@ export const getBrandPage = createServerFn({ method: "GET" })
     const { publicClient } = await import("@/lib/site/reels.server");
     const { toCards } = await import("./directory.server");
     const pc = publicClient() as any;
-    const empty = { redirect: null as string | null, brand: null, reels: [] as DirectoryCard[], siteReels: [] as import("@/lib/site/reels").SiteReel[], more: [] as { name: string; slug: string; poster: string | null }[] };
-    const { data: b } = await pc.from("directory_brands").select("id, name, website_url, category, description, slug, logo_url, moods, status, updated_at").eq("slug", data.slug).eq("status", "live").maybeSingle();
+    const empty = { redirect: null as string | null, brand: null, reels: [] as DirectoryCard[], siteReels: [] as import("@/lib/site/reels").SiteReel[], more: [] as { name: string; slug: string; poster: string | null; reason: string }[] };
+    const { data: b } = await pc.from("directory_brands").select("id, name, website_url, category, description, slug, logo_url, moods, affiliated, status, updated_at").eq("slug", data.slug).eq("status", "live").maybeSingle();
     if (!b) {
       const { data: h } = await pc.from("directory_slug_history").select("brand_id").eq("old_slug", data.slug).order("changed_at", { ascending: false }).limit(1).maybeSingle();
       if (h) {
@@ -368,19 +368,23 @@ export const getBrandPage = createServerFn({ method: "GET" })
     }
     const { data: reels } = await pc.from("directory_reels").select("id, tags, moods, formats, published_at, templates(name)").eq("brand_id", b.id).eq("status", "live").order("published_at", { ascending: false });
     const { listSiteReels } = await import("@/lib/site/reels.functions");
-    const siteReels = (await listSiteReels()).filter((r) => r.brandSlug === b.slug);
+    const allSiteReels = await listSiteReels();
+    const siteReels = allSiteReels.filter((r) => r.brandSlug === b.slug);
     const { data: featured } = await pc.rpc("is_featured_brand", { _brand: b.id });
     const cards = await toCards((reels ?? []).map((r: any) => ({ id: r.id, brand_name: b.name, brand_slug: b.slug, category: b.category, tags: r.tags, moods: r.moods, formats: r.formats, template_name: r.templates?.name ?? null, featured })));
     const { data: similar } = await pc.rpc("search_directory", { q: "", size: null });
     const seen = new Set<string>([b.slug]);
     const moreRows = ((similar ?? []) as any[]).filter((r) => r.category === b.category && !seen.has(r.brand_slug) && seen.add(r.brand_slug)).slice(0, 12);
     const moreCards = await toCards(moreRows);
+    const { relatedBrandReason } = await import("./brand-page");
+    const { data: relatedBrands } = await pc.from("directory_brands").select("name, slug, category, moods, logo_url").eq("status", "live").neq("id", b.id).order("name");
+    const related = (relatedBrands ?? []).map((other: any) => ({ ...other, reason: relatedBrandReason({ category: b.category, moods: b.moods ?? [] }, { category: other.category, moods: other.moods ?? [] }) })).filter((other: any) => other.reason).slice(0, 12);
     return {
       redirect: null,
-       brand: { id: b.id as string, name: b.name as string, website_url: b.website_url as string | null, category: b.category as string, description: b.description as string | null, slug: b.slug as string, logo_url: await signLogo(b.logo_url), moods: (b.moods ?? []) as string[], featured: !!featured, updated_at: b.updated_at as string },
+       brand: { id: b.id as string, name: b.name as string, website_url: b.website_url as string | null, category: b.category as string, description: b.description as string | null, slug: b.slug as string, logo_url: await signLogo(b.logo_url), moods: (b.moods ?? []) as string[], affiliated: b.affiliated as boolean, featured: !!featured, updated_at: b.updated_at as string },
       reels: cards,
       siteReels,
-      more: moreCards.map((c) => ({ name: c.brand_name, slug: c.brand_slug, poster: c.poster })),
+      more: await Promise.all(related.map(async (other: any) => ({ name: other.name as string, slug: other.slug as string, reason: other.reason as string, poster: allSiteReels.find((r) => r.brandSlug === other.slug)?.poster ?? moreCards.find((c) => c.brand_slug === other.slug)?.poster ?? await signLogo(other.logo_url) }))),
     };
   });
 
