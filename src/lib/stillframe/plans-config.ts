@@ -75,7 +75,7 @@ export const PLANS: PlanConfig[] = [
     monthly: 175,
     yearly: 1750,
     team: true,
-    features: ["Everything in Business", "You + 3 teammates", "150 exports a month, shared", "Shared brand kits", "Shared templates", "Priority support"],
+    features: ["Everything in Business", "You + 4 teammates", "150 exports a month, shared", "Shared brand kits", "Shared templates", "Priority support"],
   },
 ];
 
