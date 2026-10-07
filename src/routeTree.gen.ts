@@ -31,6 +31,8 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedAppRouteRouteImport } from './routes/_authenticated/app/route'
+import { Route as AimanteAboutRouteImport } from './routes/aimante.about'
+import { Route as AimanteJoinRouteImport } from './routes/aimante.join'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as DirectoryIndexRouteImport } from './routes/directory.index'
@@ -192,6 +194,16 @@ const AuthenticatedAppRouteRoute = AuthenticatedAppRouteRouteImport.update({
   id: '/app',
   path: '/app',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AimanteAboutRoute = AimanteAboutRouteImport.update({
+  id: '/aimante/about',
+  path: '/aimante/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AimanteJoinRoute = AimanteJoinRouteImport.update({
+  id: '/aimante/join',
+  path: '/aimante/join',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const BlogIndexRoute = BlogIndexRouteImport.update({
   id: '/',
@@ -502,6 +514,8 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/app': typeof AuthenticatedAppRouteRouteWithChildren
+  '/aimante/about': typeof AimanteAboutRoute
+  '/aimante/join': typeof AimanteJoinRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/directory/$slug': typeof DirectorySlugRoute
   '/favorites/$slug': typeof FavoritesSlugRoute
@@ -574,6 +588,8 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/aimante/about': typeof AimanteAboutRoute
+  '/aimante/join': typeof AimanteJoinRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/directory/$slug': typeof DirectorySlugRoute
   '/favorites/$slug': typeof FavoritesSlugRoute
@@ -651,6 +667,8 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/app': typeof AuthenticatedAppRouteRouteWithChildren
+  '/aimante/about': typeof AimanteAboutRoute
+  '/aimante/join': typeof AimanteJoinRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/directory/$slug': typeof DirectorySlugRoute
   '/favorites/$slug': typeof FavoritesSlugRoute
@@ -728,6 +746,8 @@ export interface FileRouteTypes {
     | '/terms'
     | '/admin'
     | '/app'
+    | '/aimante/about'
+    | '/aimante/join'
     | '/blog/$slug'
     | '/directory/$slug'
     | '/favorites/$slug'
@@ -800,6 +820,8 @@ export interface FileRouteTypes {
     | '/signup'
     | '/sitemap.xml'
     | '/terms'
+    | '/aimante/about'
+    | '/aimante/join'
     | '/blog/$slug'
     | '/directory/$slug'
     | '/favorites/$slug'
@@ -876,6 +898,8 @@ export interface FileRouteTypes {
     | '/terms'
     | '/_authenticated/admin'
     | '/_authenticated/app'
+    | '/aimante/about'
+    | '/aimante/join'
     | '/blog/$slug'
     | '/directory/$slug'
     | '/favorites/$slug'
@@ -951,6 +975,8 @@ export interface RootRouteChildren {
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
+  AimanteAboutRoute: typeof AimanteAboutRoute
+  AimanteJoinRoute: typeof AimanteJoinRoute
   DirectorySlugRoute: typeof DirectorySlugRoute
   FavoritesSlugRoute: typeof FavoritesSlugRoute
   InviteTokenRoute: typeof InviteTokenRoute
@@ -1121,6 +1147,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/app'
       preLoaderRoute: typeof AuthenticatedAppRouteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/aimante/about': {
+      id: '/aimante/about'
+      path: '/aimante/about'
+      fullPath: '/aimante/about'
+      preLoaderRoute: typeof AimanteAboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/aimante/join': {
+      id: '/aimante/join'
+      path: '/aimante/join'
+      fullPath: '/aimante/join'
+      preLoaderRoute: typeof AimanteJoinRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/blog/': {
       id: '/blog/'
@@ -1677,6 +1717,8 @@ const rootRouteChildren: RootRouteChildren = {
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
+  AimanteAboutRoute: AimanteAboutRoute,
+  AimanteJoinRoute: AimanteJoinRoute,
   DirectorySlugRoute: DirectorySlugRoute,
   FavoritesSlugRoute: FavoritesSlugRoute,
   InviteTokenRoute: InviteTokenRoute,
