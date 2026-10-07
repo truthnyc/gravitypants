@@ -1,0 +1,1 @@
+DO $$ DECLARE definition text; BEGIN SELECT pg_get_functiondef('private.approve_brand_request(uuid,uuid,text)'::regprocedure) INTO definition; definition := replace(definition, 'lower(unaccent(req.brand))', 'lower(translate(req.brand, ''ÀÁÂÃÄÅàáâãäåÈÉÊËèéêëÌÍÎÏìíîïÒÓÔÕÖòóôõöÙÚÛÜùúûüÇçÑñ'', ''AAAAAAaaaaaaEEEEeeeeIIIIiiiiOOOOOoooooUUUUuuuuCcNn''))'); EXECUTE definition; END $$;
