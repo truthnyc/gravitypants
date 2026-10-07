@@ -129,11 +129,11 @@ export function FilterBar({ value, onChange, facets, total, families, brands, co
                       <span aria-hidden className="hidden shrink-0 -space-x-1 sm:flex">
                         {value.moods.slice(0, 3).map((m) => <span key={m} className="size-2.5 rounded-full ring-2 ring-ap-panel" style={{ background: famColor(familyOf.get(m))?.bg }} />)}
                       </span>
-                 {phoneStyle && <span className="dir-phone-filter-label">{s.label}{active ? ` (${s.names.length})` : ""}<span aria-hidden="true" className="ml-2 text-ap-muted">▾</span></span>}
                     )}
                     <span className="truncate">{active ? summary(s.names) : s.empty}</span>
                   </span>
                 </span>
+                 {phoneStyle && <span className="dir-phone-filter-label">{s.label}{active ? ` (${s.names.length})` : ""}<span aria-hidden="true" className="ml-2 text-ap-muted">▾</span></span>}
                 {!active && <ChevronDown aria-hidden className={cn("hidden size-4 shrink-0 text-ap-muted transition-transform motion-reduce:transition-none sm:block", isOpen && "rotate-180")} strokeWidth={1.7} />}
                </Button>
               {active && (

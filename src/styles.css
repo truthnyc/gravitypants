@@ -1168,7 +1168,7 @@ html:has(.acct), body:has(.acct), body:has(.acct) .bg-canvas { background: var(-
   .aimante-filter-bar .dir-filter-row { display: flex; gap: 8px; overflow-x: auto; border-radius: 0; padding: 0; background: transparent; scrollbar-width: none; }
   .aimante-filter-bar .dir-filter-row > div { flex: 0 0 auto; }
   .aimante-filter-bar .dir-filter-row > div > span, .aimante-filter-bar .dir-filter-row > div > button:not(.dir-filter-trigger), .aimante-filter-bar .dir-filter-copy, .aimante-filter-bar .dir-filter-trigger > svg { display: none; }
-  .aimante-filter-bar .dir-filter-trigger { height: 40px; border: 1px solid var(--ap-hairline); border-radius: 8px; padding: 0 14px; background: var(--ap-card); }
+  .aimante-filter-bar .dir-filter-trigger { height: 40px; min-height: 0; border: 1px solid var(--ap-hairline); border-radius: 8px; padding: 0 14px; background: var(--ap-card); }
   .aimante-filter-bar .dir-phone-filter-label { display: inline; font-size: 14px; font-weight: 500; color: var(--ap-ink); }
   .aimante-home .dir-featured-heading { padding-inline: 16px; }
   .aimante-home .dir-featured-label { font-size: 20px; }
