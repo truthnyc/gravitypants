@@ -8,6 +8,7 @@ const tabs = [
   { to: "/app/account/billing", label: "Billing" },
   { to: "/app/account/directory", label: "Directory" },
   { to: "/app/account/favorites", label: "Favorites" },
+  { to: "/app/account/stats", label: "Stats" },
   { to: "/app/account/members", label: "Team" },
 ] as const;
 
