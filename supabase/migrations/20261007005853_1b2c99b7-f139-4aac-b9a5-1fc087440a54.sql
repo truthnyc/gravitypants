@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.brand_moods_limit() FROM PUBLIC, anon, authenticated;
