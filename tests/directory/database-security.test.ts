@@ -24,6 +24,21 @@ async function rpc(name: string, args: Record<string, unknown> = {}, bearer?: st
 }
 
 describe.skipIf(!url || !key)("Live database access boundaries", () => {
+  it('denies anonymous request reads', async () => {
+    const response = await fetch(`${url}/rest/v1/brand_requests?select=id`, { headers: { apikey: key } });
+    expect(response.ok).toBe(false);
+    expect([401, 403]).toContain(response.status);
+  });
+  it('denies direct request inserts that bypass spam protection', async () => {
+    const response = await fetch(`${url}/rest/v1/brand_requests`, { method: 'POST', headers: { apikey: key, 'Content-Type': 'application/json' }, body: JSON.stringify({ name: 'Denied check', email: 'denied@example.com', brand: 'Denied check', status: 'pending' }) });
+    expect(response.ok).toBe(false);
+    expect([401, 403]).toContain(response.status);
+  });
+  it('does not expose the visitor rate-limit counter to applicants', async () => {
+    const result = await rpc('consume_brand_request_limit', { _visitor_hash: 'a'.repeat(64) });
+    expect(result.ok).toBe(false);
+    expect([401, 403, 404]).toContain(result.status);
+  });
   it("keeps public directory search available", async () => {
     const result = await rpc("search_directory");
     expect(result.ok).toBe(true);

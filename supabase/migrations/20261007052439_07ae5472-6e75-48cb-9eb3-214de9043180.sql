@@ -1,0 +1,2 @@
+DELETE FROM public.brand_requests WHERE id IN ('6a002500-c2f8-439a-b3e9-ecaf22ac7a8f','1999bb5d-f795-4eeb-b0a1-51f681075ce3') AND brand IN ('QA Brand 1791350173','QA Brand 1791350173 Decline');
+DELETE FROM public.workspaces WHERE id='41188ddd-fb4a-4417-8c8b-10722e9c1d1d' AND name='Editorial · QA Brand 1791350173';
