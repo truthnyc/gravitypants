@@ -90,6 +90,7 @@ import { Route as AuthenticatedAppAdIdEditRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAppAdIdExportRouteImport } from './routes/_authenticated/app/ad.$id.export'
 import { Route as AuthenticatedAppAdIdPhotosRouteImport } from './routes/_authenticated/app/ad.$id.photos'
 import { Route as AuthenticatedAppAdIdShareRouteImport } from './routes/_authenticated/app/ad.$id.share'
+import { Route as ApiPublicOgBrandSlugRouteImport } from './routes/api/public/og.brand.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -524,6 +525,11 @@ const AuthenticatedAppAdIdShareRoute =
     path: '/ad/$id/share',
     getParentRoute: () => AuthenticatedAppRouteRoute,
   } as any)
+const ApiPublicOgBrandSlugRoute = ApiPublicOgBrandSlugRouteImport.update({
+  id: '/api/public/og/brand/$slug',
+  path: '/api/public/og/brand/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -606,6 +612,7 @@ export interface FileRoutesByFullPath {
   '/app/ad/$id/export': typeof AuthenticatedAppAdIdExportRoute
   '/app/ad/$id/photos': typeof AuthenticatedAppAdIdPhotosRoute
   '/app/ad/$id/share': typeof AuthenticatedAppAdIdShareRoute
+  '/api/public/og/brand/$slug': typeof ApiPublicOgBrandSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -685,6 +692,7 @@ export interface FileRoutesByTo {
   '/app/ad/$id/export': typeof AuthenticatedAppAdIdExportRoute
   '/app/ad/$id/photos': typeof AuthenticatedAppAdIdPhotosRoute
   '/app/ad/$id/share': typeof AuthenticatedAppAdIdShareRoute
+  '/api/public/og/brand/$slug': typeof ApiPublicOgBrandSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -769,6 +777,7 @@ export interface FileRoutesById {
   '/_authenticated/app/ad/$id/export': typeof AuthenticatedAppAdIdExportRoute
   '/_authenticated/app/ad/$id/photos': typeof AuthenticatedAppAdIdPhotosRoute
   '/_authenticated/app/ad/$id/share': typeof AuthenticatedAppAdIdShareRoute
+  '/api/public/og/brand/$slug': typeof ApiPublicOgBrandSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -853,6 +862,7 @@ export interface FileRouteTypes {
     | '/app/ad/$id/export'
     | '/app/ad/$id/photos'
     | '/app/ad/$id/share'
+    | '/api/public/og/brand/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -932,6 +942,7 @@ export interface FileRouteTypes {
     | '/app/ad/$id/export'
     | '/app/ad/$id/photos'
     | '/app/ad/$id/share'
+    | '/api/public/og/brand/$slug'
   id:
     | '__root__'
     | '/'
@@ -1015,6 +1026,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/ad/$id/export'
     | '/_authenticated/app/ad/$id/photos'
     | '/_authenticated/app/ad/$id/share'
+    | '/api/public/og/brand/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1054,6 +1066,7 @@ export interface RootRouteChildren {
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
+  ApiPublicOgBrandSlugRoute: typeof ApiPublicOgBrandSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1625,6 +1638,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppAdIdShareRouteImport
       parentRoute: typeof AuthenticatedAppRouteRoute
     }
+    '/api/public/og/brand/$slug': {
+      id: '/api/public/og/brand/$slug'
+      path: '/api/public/og/brand/$slug'
+      fullPath: '/api/public/og/brand/$slug'
+      preLoaderRoute: typeof ApiPublicOgBrandSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -1841,6 +1861,7 @@ const rootRouteChildren: RootRouteChildren = {
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
+  ApiPublicOgBrandSlugRoute: ApiPublicOgBrandSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
