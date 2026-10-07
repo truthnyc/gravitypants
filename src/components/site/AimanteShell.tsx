@@ -89,7 +89,7 @@ export function MadeWithGravityPants() {
   return (
     <p className="mx-auto max-w-[1440px] px-6 pb-16 text-center text-[15px] text-ap-body sm:px-8 lg:px-10">
       Reels made with Gravity Pants.{" "}
-      <a href="https://gravitypants.com" className="font-medium text-ap-blue hover:underline">Make yours →</a>
+      <Link to="/aimante/join" className="font-medium text-ap-blue hover:underline">List your brand free →</Link>
     </p>
   );
 }
