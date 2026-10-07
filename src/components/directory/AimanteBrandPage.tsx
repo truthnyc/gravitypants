@@ -8,7 +8,7 @@ import { showBrandConceptNotice } from "@/lib/directory/brand-page";
 import { recordBrandClick } from "@/lib/directory/brand-stats.functions";
 
 type Brand = { id: string; name: string; slug: string; category: string; logo_url: string | null; website_url: string | null; description: string | null; moods: string[]; affiliated: boolean };
-type Related = { name: string; slug: string; poster: string | null; reason: string };
+type Related = { name: string; slug: string; poster: string | null; category: string };
 
 export function AimanteBrandPage({ brand, reels, siteReels, more, onOpen, onOpenSite }: {
   brand: Brand; reels: DirectoryCard[]; siteReels: SiteReel[]; more: Related[]; onOpen: (r: DirectoryCard) => void; onOpenSite: (r: SiteReel) => void;
@@ -60,7 +60,7 @@ export function AimanteBrandPage({ brand, reels, siteReels, more, onOpen, onOpen
         {more.map((m) => <li key={m.slug} className="w-[150px] shrink-0">
           <Link to="/directory/$slug" params={{ slug: m.slug }} className="block">
             <div className="aspect-[4/5] overflow-hidden rounded-[8px] bg-ap-panel">{m.poster && <img src={m.poster} alt={`${m.name} reel`} loading="lazy" className="size-full object-cover" />}</div>
-            <p className="mt-2 text-[14px] font-semibold">{m.name}</p><p className="mt-0.5 text-[12px] text-ap-muted">{m.reason}</p>
+            <p className="mt-2 text-[14px] font-semibold">{m.name}</p><p className="mt-0.5 text-[12px] text-ap-muted">{m.category}</p>
           </Link>
         </li>)}
       </ul>

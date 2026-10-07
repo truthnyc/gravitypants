@@ -163,7 +163,7 @@ function BrandPage() {
                   </Link>
                 ),
                 title: m.name,
-                detail: brand.category,
+                detail: m.category,
               }))}
             />
           </section>

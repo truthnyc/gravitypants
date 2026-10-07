@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { relatedBrandReason, showBrandConceptNotice } from "../../src/lib/directory/brand-page";
+import { relatedBrandReason, relatedLabel, showBrandConceptNotice } from "../../src/lib/directory/brand-page";
 
 describe("Aimanté brand page rules", () => {
+  it("labels related brands with their own category, never a mood", () => {
+    expect(relatedLabel({ category: "Home & Living" })).toBe("Home & Living");
+    expect(relatedLabel({ category: undefined })).toBe("");
+  });
   it("shows the notice only for non-affiliated brands", () => {
     expect(showBrandConceptNotice(false)).toBe(true);
     expect(showBrandConceptNotice(true)).toBe(false);
