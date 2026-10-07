@@ -34,7 +34,7 @@ function AimanteHeader() {
 function AimanteFooter() {
   return (
     <footer className="mt-auto border-t border-ap-hairline bg-ap-panel font-ap text-ap-ink">
-      <div className="mx-auto flex max-w-[1280px] flex-wrap items-end gap-x-5 gap-y-3 px-6 py-8 text-[13px] text-ap-muted">
+      <div className="mx-auto flex max-w-[1280px] flex-wrap items-baseline gap-x-5 gap-y-3 px-6 py-8 text-[13px] text-ap-muted">
         <AimanteLogo />
         <span className="nums">© {new Date().getFullYear()} Gravity Pants</span>
         <Link to="/aimante/join" className="hover:text-ap-blue">List your brand</Link>
