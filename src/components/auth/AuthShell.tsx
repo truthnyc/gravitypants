@@ -17,7 +17,7 @@ export function safeRedirect(r: unknown, fallback = "/app/ads"): string {
   }
 }
 
-export function AuthShell({ eyebrow, title, subtitle, children, beforeForm }: { eyebrow?: string; title: string; subtitle: string; children: ReactNode; mode?: "signup" | "signin"; beforeForm?: ReactNode }) {
+export function AuthShell({ eyebrow, title, subtitle, children, beforeForm }: { eyebrow?: string | undefined; title: string; subtitle: string; children: ReactNode; mode?: "signup" | "signin"; beforeForm?: ReactNode }) {
   const aim = useBrandSite() === "aimante";
   const router = useRouter();
   const home = aim ? "/directory" : "/";
