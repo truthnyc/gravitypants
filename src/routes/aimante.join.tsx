@@ -148,7 +148,7 @@ function ForBrands() {
           <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-ap-blue">For brands</p>
           <h1 className="mt-3 text-[clamp(38px,5vw,60px)] font-semibold leading-[1.05] tracking-[-0.035em]">Get seen by people who'll love you.</h1>
           <p className="mt-5 max-w-[520px] text-[18px] leading-[1.5] text-ap-body">Aimanté is where shoppers browse brands by feeling. Put yours in front of them.</p>
-          <div className="mt-8 flex flex-wrap gap-3">
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <a href="#apply" className={primary}>List your brand →</a>
             <Link to="/aimante/about" className={grey}>See how it looks</Link>
           </div>
@@ -250,7 +250,7 @@ function Closing() {
     <section className="bg-ap-panel px-6 py-20 text-center font-ap text-ap-ink">
       <h2 className="text-[clamp(30px,4vw,48px)] font-semibold tracking-[-0.035em]">Let people fall for your brand.</h2>
       <a href="#apply" className={`${primary} mt-8`}>List your brand →</a>
-      <p className="mt-6 text-[13px] text-ap-muted">Already have reels? <a href="https://gravitypants.com/signin" className="text-ap-blue hover:underline">Sign in with your Gravity Pants account.</a></p>
+      <p className="mt-6 text-[13px] text-ap-muted">Already have reels? <Link to="/signin" className="text-ap-blue hover:underline">Sign in with your Gravity Pants account.</Link></p>
     </section>
   )
 }
