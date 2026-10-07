@@ -59,10 +59,11 @@ function Join() {
 
   return (
     <AimanteShell>
-      <main className="mx-auto max-w-[980px] px-5 py-14 font-ap text-ap-ink sm:px-8 sm:py-20">
+      <ForBrands />
+      <div id="apply" className="mx-auto max-w-[980px] scroll-mt-20 px-5 py-14 font-ap text-ap-ink sm:px-8 sm:py-20">
         <header className="max-w-[700px]">
-          <p className="text-[13px] font-semibold uppercase text-ap-badge">List your brand</p>
-          <h1 className="mt-3 text-[clamp(36px,5vw,58px)] font-semibold leading-[1.04]">Bring your brand to Aimanté.</h1>
+          <p className="text-[13px] font-semibold uppercase text-ap-blue">List your brand</p>
+          <h2 className="mt-3 text-[clamp(30px,4vw,44px)] font-semibold leading-[1.08] tracking-[-0.03em]">Bring your brand to Aimanté.</h2>
           <p className="mt-5 max-w-[620px] text-[18px] leading-[1.5] text-ap-body">Share your profile with our team. We review every application before creating a public brand page.</p>
         </header>
 
