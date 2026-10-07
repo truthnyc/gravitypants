@@ -1,0 +1,1 @@
+CREATE POLICY "No direct access to request counters" ON public.brand_request_limits FOR ALL TO anon,authenticated USING(false) WITH CHECK(false);
