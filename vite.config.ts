@@ -15,5 +15,7 @@ export default defineConfig({
   vite: {
     // ffmpeg.wasm spins up its own worker via new URL(); pre-bundling breaks that path.
     optimizeDeps: { exclude: ["@ffmpeg/ffmpeg", "@ffmpeg/util"] },
+    // Lets the dev preview be opened as aimante.co to check the second brand.
+    server: { allowedHosts: ["aimante.co", "www.aimante.co"] },
   },
 });
