@@ -22,3 +22,23 @@ describe("aimante domain", () => {
     expect(aimanteOut(u("https://aimante.co/directory?mood=cozy"))?.pathname).toBe("/mood/cozy");
   });
 });
+
+import { domainRedirect, resolveSite } from "@/lib/site/brand-site";
+
+describe("domain redirects", () => {
+  it("aimante.co sends non-Aimanté pages to the same path on gravitypants.com", () => {
+    expect(domainRedirect("https://aimante.co/pricing?x=1")).toBe("https://gravitypants.com/pricing?x=1");
+    expect(domainRedirect("https://aimante.co/b/purl-soho")).toBeNull();
+    expect(domainRedirect("https://aimante.co/")).toBeNull();
+  });
+  it("gravitypants.com/directory goes to aimante.co", () => {
+    expect(domainRedirect("https://gravitypants.com/directory")).toBe("https://aimante.co/");
+    expect(domainRedirect("https://www.gravitypants.com/directory/purl-soho")).toBe("https://aimante.co/b/purl-soho");
+    expect(domainRedirect("https://gravitypants.com/pricing")).toBeNull();
+  });
+  it("previews never redirect and honour ?brand=aimante", () => {
+    expect(domainRedirect("https://id-preview--x.lovable.app/directory")).toBeNull();
+    expect(resolveSite("id-preview--x.lovable.app", "aimante", null)).toBe("aimante");
+    expect(resolveSite("gravitypants.com", "aimante", "aimante")).toBe("gravitypants");
+  });
+});

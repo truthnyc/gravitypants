@@ -2,6 +2,7 @@ import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
+import { domainRedirect } from "./lib/site/brand-site";
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
@@ -46,6 +47,11 @@ function isH3SwallowedErrorBody(body: string): boolean {
 
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
+    // Page visits on the wrong domain go to the right one (only real domains; previews are untouched).
+    if (request.method === "GET" && (request.headers.get("accept") ?? "").includes("text/html")) {
+      const to = domainRedirect(request.url);
+      if (to) return Response.redirect(to, 301);
+    }
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);

@@ -24,6 +24,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ProductRouteImport } from './routes/product'
 import { Route as ProductCategoryRouteImport } from './routes/product-category'
 import { Route as ResetRouteImport } from './routes/reset'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as ShowcaseRouteImport } from './routes/showcase'
 import { Route as SigninRouteImport } from './routes/signin'
 import { Route as SignupRouteImport } from './routes/signup'
@@ -158,6 +159,11 @@ const ProductCategoryRoute = ProductCategoryRouteImport.update({
 const ResetRoute = ResetRouteImport.update({
   id: '/reset',
   path: '/reset',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ShowcaseRoute = ShowcaseRouteImport.update({
@@ -507,6 +513,7 @@ export interface FileRoutesByFullPath {
   '/product': typeof ProductRouteWithChildren
   '/product-category': typeof ProductCategoryRouteWithChildren
   '/reset': typeof ResetRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/showcase': typeof ShowcaseRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
@@ -583,6 +590,7 @@ export interface FileRoutesByTo {
   '/product': typeof ProductRouteWithChildren
   '/product-category': typeof ProductCategoryRouteWithChildren
   '/reset': typeof ResetRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/showcase': typeof ShowcaseRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
@@ -660,6 +668,7 @@ export interface FileRoutesById {
   '/product': typeof ProductRouteWithChildren
   '/product-category': typeof ProductCategoryRouteWithChildren
   '/reset': typeof ResetRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/showcase': typeof ShowcaseRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
@@ -739,6 +748,7 @@ export interface FileRouteTypes {
     | '/product'
     | '/product-category'
     | '/reset'
+    | '/robots.txt'
     | '/showcase'
     | '/signin'
     | '/signup'
@@ -815,6 +825,7 @@ export interface FileRouteTypes {
     | '/product'
     | '/product-category'
     | '/reset'
+    | '/robots.txt'
     | '/showcase'
     | '/signin'
     | '/signup'
@@ -891,6 +902,7 @@ export interface FileRouteTypes {
     | '/product'
     | '/product-category'
     | '/reset'
+    | '/robots.txt'
     | '/showcase'
     | '/signin'
     | '/signup'
@@ -970,6 +982,7 @@ export interface RootRouteChildren {
   ProductRoute: typeof ProductRouteWithChildren
   ProductCategoryRoute: typeof ProductCategoryRouteWithChildren
   ResetRoute: typeof ResetRoute
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
   ShowcaseRoute: typeof ShowcaseRoute
   SigninRoute: typeof SigninRoute
   SignupRoute: typeof SignupRoute
@@ -1097,6 +1110,13 @@ declare module '@tanstack/react-router' {
       path: '/reset'
       fullPath: '/reset'
       preLoaderRoute: typeof ResetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/showcase': {
@@ -1712,6 +1732,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProductRoute: ProductRouteWithChildren,
   ProductCategoryRoute: ProductCategoryRouteWithChildren,
   ResetRoute: ResetRoute,
+  RobotsDottxtRoute: RobotsDottxtRoute,
   ShowcaseRoute: ShowcaseRoute,
   SigninRoute: SigninRoute,
   SignupRoute: SignupRoute,

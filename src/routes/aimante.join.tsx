@@ -1,17 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { aimanteHead } from "@/lib/site/brand-site";
 import { AimanteShell } from "@/components/site/AimanteShell";
 
 export const Route = createFileRoute("/aimante/join")({
-  head: () => ({
-    meta: [
-      { title: "List your brand — Aimanté" },
-      { name: "description", content: "Get your brand's reels into Aimanté, the directory of video ads browsable by mood, category and brand." },
-      { property: "og:title", content: "List your brand — Aimanté" },
-      { property: "og:description", content: "Get your brand's reels into Aimanté, browsable by mood, category and brand." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
+  head: () => aimanteHead({ path: "/join", title: "List your brand — Aimanté", description: "Get your brand's reels into Aimanté, the directory of video ads browsable by mood, category and brand." }),
   component: Join,
 });
 
