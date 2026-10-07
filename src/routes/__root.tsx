@@ -17,6 +17,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { PaymentTestModeBanner } from "@/components/billing/BillingNotices";
 import { trackPageView } from "@/lib/site/track";
+import { currentSite } from "@/lib/site/brand-site";
 
 function NotFoundComponent() {
   return (
@@ -111,6 +112,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
     ],
   }),
+  beforeLoad: () => ({ site: currentSite() }),
   shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,

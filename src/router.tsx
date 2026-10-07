@@ -1,6 +1,7 @@
 import { QueryClient } from "@tanstack/react-query";
 import { createRouter } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
+import { aimanteRewrite } from "./lib/site/brand-site";
 
 export const getRouter = () => {
   const queryClient = new QueryClient();
@@ -10,6 +11,8 @@ export const getRouter = () => {
     context: { queryClient },
     scrollRestoration: true,
     defaultPreloadStaleTime: 0,
+    // aimante.co shows the Directory under its own short addresses (/, /c/…, /mood/…, /b/…).
+    rewrite: aimanteRewrite,
   });
 
   // Always land at the top of a new page (footer links included).
