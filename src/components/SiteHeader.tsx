@@ -9,7 +9,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { SHOW_DIRECTORY } from "@/lib/features";
 import { useMe } from "@/lib/stillframe/account";
 import { cn } from "@/lib/utils";
-import { NewAdButton } from "@/components/stillframe/DropZone";
 import { HelpMenu } from "@/components/stillframe/HelpMenu";
 import { Avatar, UserMenu, menuContent, menuItem, menuLabel } from "@/components/stillframe/UserMenu";
 import { WorkspaceSwitcher } from "@/components/stillframe/WorkspaceSwitcher";
@@ -147,7 +146,6 @@ function AppBar({ pathname }: { pathname: string }) {
           <Search size={15} strokeWidth={1.7} className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-ap-muted" aria-hidden="true" />
           <input type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search" aria-label="Search your ads" className="h-9 w-[210px] rounded-lg bg-ap-panel pl-8 pr-3 text-[14px] text-ap-ink placeholder:text-ap-muted focus-visible:outline-none" />
         </label>
-        <NewAdButton className={primary} />
         <div className="hidden lg:contents"><HelpMenu /><UserMenu /></div>
       </div>
     </>
