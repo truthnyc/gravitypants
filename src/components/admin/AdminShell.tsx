@@ -1,5 +1,8 @@
 import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
+import { useQuery } from '@tanstack/react-query';
+import { useServerFn } from '@tanstack/react-start';
+import { pendingBrandRequestCount } from '@/lib/directory/applications.functions';
 import { BarChart3, ChevronLeft, Clapperboard, FileClock, Home, Inbox, LayoutDashboard, LayoutTemplate, Mail, ShieldCheck, Users, Video , Search, Tags, LayoutGrid } from "lucide-react";
 
 const NAV = [
@@ -9,7 +12,7 @@ const NAV = [
   { to: "/admin/templates", label: "Templates", icon: LayoutTemplate },
   { to: "/admin/reels", label: "Website Reels", icon: Clapperboard },
   { to: "/admin/directory", label: "Directory", icon: Search },
-  { to: "/admin/brand-applications", label: "Brand applications", icon: Inbox },
+  { to: "/admin/brand-applications", label: "Brand requests", icon: Inbox },
   { to: "/admin/directory-settings", label: "Directory settings", icon: LayoutGrid },
   { to: "/admin/moods", label: "Moods", icon: Tags },
   { to: "/admin/categories", label: "Categories", icon: LayoutGrid },
@@ -21,6 +24,8 @@ const NAV = [
 ] as const;
 
 export function AdminShell({ children }: { children: ReactNode }) {
+  const count = useServerFn(pendingBrandRequestCount);
+  const pending = useQuery({ queryKey: ['admin', 'brand-request-count'], queryFn: () => count(), refetchInterval: 60_000 });
   return (
     <div className="min-h-dvh bg-canvas">
       <header className="sticky top-0 z-30 border-b border-border bg-card/90 backdrop-blur">
@@ -47,6 +52,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
                 >
                   <n.icon className="size-4" strokeWidth={1.7} />
                   {n.label}
+                  {n.to === '/admin/brand-applications' && <span className="ml-auto rounded-lg bg-primary/10 px-1.5 text-[12px] text-primary tabular-nums" aria-label={`${pending.data ?? 0} pending requests`}>{pending.data ?? 0}</span>}
                 </Link>
               </li>
             ))}

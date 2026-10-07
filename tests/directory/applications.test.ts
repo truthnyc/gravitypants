@@ -1,9 +1,16 @@
 import { describe, expect, it } from 'vitest'
-import { brandApplicationInput } from '../../src/lib/directory/applications.functions'
+import { brandApplicationInput, reviewInput } from '../../src/lib/directory/applications.functions'
+
+import { decodeApplicationLogo, normalizeWebsite } from '../../src/lib/directory/application-security'
 
 const valid = { name: 'Jane Smith', email: 'jane@example.com', brand: 'North Star', website: 'https://example.com', category: 'Crafts & Hobbies', description: 'Independent yarn and craft supplies made with care.', moods: ['cozy'], message: '', company: '', logo: { base64: 'aGVsbG8=', type: 'image/png' } }
 
 describe('Aimanté brand applications', () => {
+  it('matches www and scheme variants by website', () => expect(normalizeWebsite('http://www.EXAMPLE.com/shop').key).toBe(normalizeWebsite('https://example.com/').key))
+  it('rejects non-http websites', () => expect(brandApplicationInput.safeParse({ ...valid, website: 'javascript:alert(1)' }).success).toBe(false))
+  it('allows declining without a reason', () => expect(reviewInput.parse({ id: '00000000-0000-4000-8000-000000000001' }).note).toBe(''))
+  it('rejects disguised logo files', () => expect(() => decodeApplicationLogo(valid.logo)).toThrow('Use a PNG, JPG or WebP logo.'))
+  it('enforces a two MB decoded logo limit', () => expect(() => decodeApplicationLogo({ base64: btoa('a'.repeat(2_000_001)), type: 'image/png' })).toThrow('Use a logo under 2 MB.'))
   it('accepts a full profile with one to three moods', () => expect(brandApplicationInput.parse(valid).moods).toEqual(['cozy']))
   it('rejects an application without a mood', () => expect(brandApplicationInput.safeParse({ ...valid, moods: [] }).success).toBe(false))
   it('rejects more than three moods', () => expect(brandApplicationInput.safeParse({ ...valid, moods: ['cozy', 'warm', 'calm', 'bright'] }).success).toBe(false))

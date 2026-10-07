@@ -11,7 +11,6 @@
 
 ## Stillframe architecture rules
 
-- Use TanStack file routes in `src/routes`, never React Router.
 - All project/frame reads and writes go through the hooks in `src/lib/stillframe/data.ts` so the editor can autosave from one place.
 - Domain types and shared constants (workspace id, formats, defaults) live in `src/lib/stillframe/types.ts`.
 - The `media` storage bucket is private; resolve image URLs with `getMediaUrl()` in `src/lib/stillframe/media.ts` (workspace policy blocks public buckets).
@@ -35,7 +34,7 @@
 - Reusable kits: ads made from an `is_reusable` template store `projects.template_id`; `KitAgain.tsx` (useKit/KitAgainButton) drives the label, search and "Make another" (`/app/templates/$slug?from=<ad>` prefills text, no photos) from one place.
 - Staff role: `user_roles` (enum app_role, admin) checked via `has_role()`; `is_platform_admin()` wraps it; staff area at `/admin` (`_authenticated/admin/`) 404s non-admins — roles never live on profiles.
 - Site reels/homepage photos: private `site-reels` files, signed links; home banner/Example of the week in `site_settings`, bundled defaults. Project logos: light/dark artwork, per-frame visibility, auto/light/dark; drawn by `renderAt`.
-- Brand requests: /contact saves to `brand_requests` (anon insert only) and emails help@gravitypants.com via the `brand-request` template.
+- Brand requests use validated server inserts and shared persistent hashed-visitor limits; only admins read/update. Private approval SQL atomically creates a draft with category/mood links; SQL website uniqueness blocks races.
 - Free trial is usage-based (no time limit): SQL `export_status` returns `trial`, `watermark` (false only for the first export) and `clean_left`; the UI reads these flags, never `trial_ends_at`.
 
 - Folder rules: see `AGENTS.md` in src/components/editor, src/render, src/lib/stillframe (billing details), src/lib/directory and src/routes/_authenticated/admin.
