@@ -17,8 +17,8 @@ export function useBrandSite(): BrandSite {
 
 export function AimanteLogo({ footer = false }: { footer?: boolean }) {
   return (
-    <span className="flex flex-col items-start gap-[1px] whitespace-nowrap text-left">
-      <span className={cn("block font-semibold !leading-[0.9] text-ap-ink", footer ? "text-[20px] tracking-[-0.04em]" : "text-[24px] tracking-[-0.04em] md:text-[28px]")}>Aimanté</span>
+    <span className="flex flex-col items-start gap-0 whitespace-nowrap text-left">
+      <span className={cn("block font-semibold !leading-[0.82] text-ap-ink", footer ? "text-[20px] tracking-[-0.04em]" : "text-[24px] tracking-[-0.04em] md:text-[28px]")}>Aimanté</span>
       <span className="block pl-[1px] text-[10px] !leading-none tracking-normal text-ap-muted">by Gravity Pants</span>
     </span>
   );
