@@ -17,6 +17,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { MadeWithGravityPants, useBrandSite } from "@/components/site/AimanteShell";
 import { recordDirectoryReelOpen } from "@/lib/directory/views.functions";
 import { recordBrandClick } from "@/lib/directory/brand-stats.functions";
+import { AimanteBrandPage } from "@/components/directory/AimanteBrandPage";
 
 const POSTER = "absolute top-1/2 left-1/2 h-[72%] w-auto max-w-[72%] object-contain -translate-x-1/2 -translate-y-1/2 rounded-[6px] shadow-[0_0_0_1px_var(--ap-inner),0_18px_34px_-16px_rgba(29,29,31,.28)]";
 
@@ -89,6 +90,11 @@ function BrandPage() {
   if (!brand) return null;
   const sizes = new Set([...reels.flatMap((r) => r.formats), ...siteReels.map((r) => r.format)]);
   const initials = brand.name.split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase();
+  if (site === "aimante") return <SiteShell>
+    <AimanteBrandPage brand={brand} reels={reels} siteReels={siteReels} more={more} onOpen={openDirectoryReel} onOpenSite={openSiteReel} />
+    <ReelDetail card={open} onClose={() => setOpen(null)} />
+    <SiteReelModal reel={openSite} onClose={() => setOpenSite(null)} />
+  </SiteShell>;
   return (
     <SiteShell>
       <main className="font-ap text-ap-ink">

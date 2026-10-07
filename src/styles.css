@@ -1152,6 +1152,8 @@ html:has(.acct), body:has(.acct), body:has(.acct) .bg-canvas { background: var(-
 
 .dir-featured-reel { width: calc(var(--w) * .7); height: calc(var(--h) * .7); }
 .aimante-phone-greeting, .dir-phone-filter-label { display: none; }
+.aimante-brand-actions button { height: 40px; min-height: 0; border-radius: 8px; }
+.aimante-brand-actions button:not(:first-child) { width: 40px; min-width: 40px; }
 @media (max-width: 767px) {
   .aimante-home .dir-intro { padding: 40px 16px 20px; }
   .aimante-home .dir-headline { font-size: 34px; line-height: 1.1; letter-spacing: 0; margin-bottom: 28px; }
