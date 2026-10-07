@@ -60,15 +60,20 @@ function AimanteHeader() {
 
 function AimanteFooter() {
   return (
-    <footer className="mt-auto border-t border-ap-hairline bg-ap-panel font-ap text-ap-ink">
-      <div className="mx-auto flex max-w-[1280px] flex-wrap items-baseline gap-x-5 gap-y-3 px-6 py-8 text-[13px] text-ap-muted">
-        <AimanteLogo />
+    <footer className="mt-auto border-t border-ap-hairline bg-ap-card font-ap text-ap-ink tracking-[-0.01em]">
+      <div className="mx-auto flex max-w-[1280px] flex-wrap items-baseline gap-x-5 gap-y-3 px-6 py-14 text-[14px] text-site-nav md:px-12">
+        <span className="flex items-baseline gap-2 whitespace-nowrap">
+          <span className="text-[22px] font-semibold tracking-[-0.035em] text-ap-ink">Aimanté</span>
+          <span>— by Gravity Pants</span>
+        </span>
         <span className="nums">© {new Date().getFullYear()} Gravity Pants</span>
-        <Link to="/aimante/join" className="hover:text-ap-blue">List your brand</Link>
-        <Link to="/aimante/about" className="hover:text-ap-blue">About</Link>
-        <Link to="/privacy" className="hover:text-ap-blue">Privacy</Link>
-        <Link to="/terms" className="hover:text-ap-blue">Terms</Link>
-        <a href="https://gravitypants.com" className="ml-auto hover:text-ap-blue">Make reels with Gravity Pants</a>
+        <nav aria-label="Footer" className="flex flex-wrap items-baseline gap-x-6 gap-y-2 md:ml-auto">
+          <Link to="/aimante/join" className="hover:text-ap-ink">List your brand</Link>
+          <Link to="/aimante/about" className="hover:text-ap-ink">About</Link>
+          <Link to="/privacy" className="hover:text-ap-ink">Privacy</Link>
+          <Link to="/terms" className="hover:text-ap-ink">Terms</Link>
+          <a href="https://gravitypants.com" className="text-ap-blue hover:underline">Make reels with Gravity Pants</a>
+        </nav>
       </div>
     </footer>
   );
