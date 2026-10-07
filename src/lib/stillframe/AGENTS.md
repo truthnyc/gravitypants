@@ -1,4 +1,5 @@
 # Rules for this folder
+- Website reel descriptions persist on `site_reels` through staff-checked saves and public published reads, so popups always show edited copy.
 - The Google Fonts list comes from the `listGoogleFonts` server function (`src/lib/stillframe/fonts.functions.ts`, 24h in-memory cache, secret GOOGLE_FONTS_API_KEY) with a built-in fallback list — the stack uses server functions, not edge functions.
 
 - Export history lives in the `exports` table (status/error/bytes) for the admin Exports list; files themselves stay in storage.

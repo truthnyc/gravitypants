@@ -15,7 +15,7 @@ const log = (db: any, admin: string, action: string, target: string) =>
   db.from("admin_audit_log").insert({ admin_user_id: admin, action, workspace_id: null, target });
 
 export type AdminReel = {
-  id: string; brand: string; title: string; href: string | null; category: string; format: string;
+  id: string; brand: string; title: string; description: string; href: string | null; category: string; format: string;
   seconds: number; photos: number; video_url: string; video_webm_url: string | null; poster_url: string | null;
   sort_order: number; published: boolean; brand_id: string | null; moods: string[]; posterView: string | null; videoView: string | null;
 };
@@ -45,6 +45,7 @@ const reelSchema = z.object({
   id: z.string().uuid().optional(),
   brand: z.string().trim().min(1).max(200),
   title: z.string().trim().min(1).max(200),
+  description: z.string().trim().max(1000).optional(),
   href: z.string().trim().url().max(500).nullable(),
   category: z.preprocess((c) => typeof c === "string" ? normalizeCategory(c) ?? c : c, z.enum(CATEGORIES)),
   format: z.enum(["916", "11", "169"]),
