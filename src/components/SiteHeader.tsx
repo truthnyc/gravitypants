@@ -8,6 +8,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { supabase } from "@/integrations/supabase/client";
 import { SHOW_DIRECTORY } from "@/lib/features";
 import { useMe } from "@/lib/stillframe/account";
+import { usePlanAccess } from "@/lib/stillframe/plan";
 import { cn } from "@/lib/utils";
 import { HelpMenu } from "@/components/stillframe/HelpMenu";
 import { Avatar, UserMenu, menuContent, menuItem, menuLabel } from "@/components/stillframe/UserMenu";
