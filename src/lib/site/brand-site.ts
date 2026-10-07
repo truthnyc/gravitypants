@@ -32,7 +32,10 @@ export function resolveSite(host: string, brandParam: string | null, cookie: str
 const COOKIE_AGE = 60 * 60 * 24 * 30;
 
 const readCookie = createIsomorphicFn()
-  .server(() => { try { return getCookie(BRAND_COOKIE); } catch { return undefined; } })
+  .server(() => {
+    // On the first preview visit the cookie isn't sent yet, so the request's own ?brand= counts too.
+    try { return getRequestUrl().searchParams.get("brand") ?? getCookie(BRAND_COOKIE); } catch { return undefined; }
+  })
   .client(() => document.cookie.split("; ").find((c) => c.startsWith(`${BRAND_COOKIE}=`))?.split("=")[1]);
 
 /** Remembers ?brand=… so later pages in the preview keep the same brand. */
