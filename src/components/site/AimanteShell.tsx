@@ -126,9 +126,11 @@ export function AimanteHeader() {
           <Link to="/aimante/about" className={navLink} activeProps={navActive}>About</Link>
           <Link to="/aimante/join" className={navLink} activeProps={navActive} activeOptions={{ includeHash: false }}>For brands</Link>
           {!me && <Link to="/signin" search={signInSearch} className={navLink} activeProps={navActive}>Sign in</Link>}
-          <Button asChild variant="site" className="h-9 min-h-0 rounded-lg bg-ap-blue px-4 text-[14px] text-ap-card hover:bg-ap-blue-hover">
-            {me ? <Link to="/aimante/join" hash="apply">List your brand</Link> : <Link to="/signin" search={listSearch}>List your brand</Link>}
-          </Button>
+          {!me && (
+            <Button asChild variant="site" className="h-9 min-h-0 rounded-lg bg-ap-blue px-4 text-[14px] text-ap-card hover:bg-ap-blue-hover">
+              <Link to="/signin" search={listSearch}>List your brand</Link>
+            </Button>
+          )}
           {me && <AccountMenu me={me} />}
         </nav>
         <div className="flex items-center gap-1 md:hidden">
@@ -144,8 +146,7 @@ export function AimanteHeader() {
           <Link to="/directory" onClick={close} className={row}>Browse{chevron}</Link>
           <Link to="/aimante/about" onClick={close} className={row}>About{chevron}</Link>
           <Link to="/aimante/join" onClick={close} className={row}>For brands{chevron}</Link>
-          {me ? <Link to="/aimante/join" hash="apply" onClick={close} className={cn(row, "text-ap-blue")}>List your brand{chevron}</Link>
-            : <Link to="/signin" search={listSearch} onClick={close} className={cn(row, "text-ap-blue")}>List your brand{chevron}</Link>}
+          {!me && <Link to="/signin" search={listSearch} onClick={close} className={cn(row, "text-ap-blue")}>List your brand{chevron}</Link>}
           {me ? <>
             <div className="mt-5 flex items-center gap-3 rounded-[12px] bg-ap-panel p-3"><Avatar me={me} /><div className="min-w-0"><p className="truncate text-[15px] font-semibold text-ap-ink">{me.displayName || me.email}</p>{me.displayName && <p className="truncate text-[13px] text-ap-muted">{me.email}</p>}</div></div>
             {ACCOUNT_LINKS(saved).map((l) => "href" in l
