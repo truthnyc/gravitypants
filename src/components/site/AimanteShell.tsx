@@ -8,6 +8,7 @@ import { ChevronRight, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { BrandSite } from "@/lib/site/brand-site";
+import { usePlanAccess } from "@/lib/stillframe/plan";
 
 /** Which brand this visit is on (decided once per request by hostname). */
 export function useBrandSite(): BrandSite {
@@ -62,6 +63,8 @@ const ACCOUNT_LINKS = (saved: number, stats = false) => [
 function AccountMenu({ me }: { me: Me }) {
   const saved = useSavedCount(me.id);
   const signOut = useAimanteSignOut();
+  const { data: access, canUse } = usePlanAccess();
+  const statsOk = !!access && canUse("brand_stats");
   return (
     <DropdownMenu>
       <DropdownMenuTrigger aria-label="Your account" className="rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue"><Avatar me={me} /></DropdownMenuTrigger>
