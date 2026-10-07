@@ -1,5 +1,6 @@
 import { Link, useRouteContext } from "@tanstack/react-router";
 import type { ReactNode } from "react";
+import { cn } from "@/lib/utils";
 import type { BrandSite } from "@/lib/site/brand-site";
 
 /** Which brand this visit is on (decided once per request by hostname). */
@@ -17,11 +18,14 @@ export function AimanteLogo() {
   );
 }
 
+const primary = "inline-flex h-9 shrink-0 items-center justify-center whitespace-nowrap rounded-lg bg-ap-blue px-4 text-[14px] font-medium text-ap-card hover:bg-ap-blue-hover";
+
 function AimanteHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-ap-hairline bg-ap-card/[.92] backdrop-blur-[14px] safe-top">
       <div className="mx-auto flex h-[63px] max-w-[1280px] items-center px-4 md:px-6">
         <Link to="/directory" aria-label="Aimanté home" className="shrink-0"><AimanteLogo /></Link>
+        <Link to="/aimante/join" className={cn(primary, "ml-auto")}>List your brand</Link>
       </div>
     </header>
   );
