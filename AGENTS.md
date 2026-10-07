@@ -43,4 +43,4 @@
 - Shared `SiteHeader` (site|app) delegates Aimanté to `AimanteHeader` regardless of session; `AimanteShell` shares its logo/footer with auth. Directory links use `SHOW_DIRECTORY`.
 - Website reel favorites use own `site_reel_favorites` rows via `SiteReelHeart`/`useSiteReelFavorites`; Favorites includes Directory reels.
 - App/SSR failures share dependency-free `ServiceUnavailable`.
-- Scope phone CSS to `aimante-home` to preserve desktop/other sites.
+- Scope Aimanté by site; `brand-page` helpers centralize brand rules.
