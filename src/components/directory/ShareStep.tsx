@@ -161,7 +161,7 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
       <StepTitle
         title="Share to the Directory"
         tag={<span className={cn("rounded-md border border-ap-hairline px-2 py-0.5 text-[12px] font-semibold", locked ? "text-ap-muted" : "text-ap-badge")}>{PLAN_LABEL[ctx.plan.tag]}</span>}
-        lead="Your files are ready. You can also add this reel to the Gravity Pants Directory (gravitypants.com/directory), where people search for ideas by mood, product or brand. It also appears on your brand page."
+        lead="Your files are ready. You can also share this reel on Aimanté (aimante.co), where people search for ideas by mood, product or brand, and on the Gravity Pants Showcase and Examples pages. It also appears on your Aimanté brand page."
       />
 
       {ctx.plan.tag === "trial" && (
@@ -253,7 +253,7 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
         <div className="mb-[22px] flex items-start gap-4 rounded-[18px] bg-ap-soft-blue p-5">
           <div className="flex-1">
             <b className="mb-1 block text-[17px]">Show this reel in the Directory</b>
-            <p className="text-[14px] leading-normal text-ap-body">Off by default. Turn it on to let people find it in search and on your brand page, then give permission below. Your first reel gets a quick review. After that, new reels go live straight away. You can hide any reel from My reels.</p>
+            <p className="text-[14px] leading-normal text-ap-body">Off by default. Turn it on to let people find it on Aimanté, your brand page, and the Gravity Pants Showcase and Examples pages, then give permission below. Your first reel gets a quick review. After that, new reels go live straight away. You can hide any reel from My reels.</p>
           </div>
           <AppSwitch checked={show} onCheckedChange={setShow} aria-label="Show this reel in the Directory" />
         </div>
