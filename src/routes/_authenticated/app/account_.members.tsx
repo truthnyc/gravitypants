@@ -195,7 +195,7 @@ function MembersPage() {
     window.location.href = "/app/ads";
   }
 
-  const seats = billing?.plan === "team" || billing?.plan === "team_yearly" ? 4 : 1;
+  const seats = billing?.plan === "team" || billing?.plan === "team_yearly" ? 5 : 1;
 
   return (
     <main className="acct mx-auto flex w-full max-w-[780px] flex-col gap-4 px-4 pb-20 pt-9 sm:px-6">
