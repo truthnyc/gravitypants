@@ -403,7 +403,7 @@ function DirectoryPage() {
         </section>
       </div>
       <ReelDetail card={open} onClose={() => setOpen(null)} />
-      <SiteReelModal reel={openSite} onClose={() => setOpenSite(null)} />
+      <SiteReelModal reel={openSite} tags={found.find((r) => r.id === openSite?.id)?.moods ?? featuredSet.find((r) => r.id === openSite?.id)?.moods ?? []} onClose={() => setOpenSite(null)} />
     </SiteShell>
   );
 }
