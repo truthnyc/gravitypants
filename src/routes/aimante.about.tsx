@@ -1,17 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { aimanteHead } from "@/lib/site/brand-site";
 import { AimanteShell } from "@/components/site/AimanteShell";
 
 export const Route = createFileRoute("/aimante/about")({
-  head: () => ({
-    meta: [
-      { title: "About Aimanté — video ads by mood" },
-      { name: "description", content: "Aimanté is a directory of short video ads from independent brands, browsable by mood, category and brand. By Gravity Pants." },
-      { property: "og:title", content: "About Aimanté" },
-      { property: "og:description", content: "A directory of short video ads from independent brands, browsable by mood. By Gravity Pants." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
+  head: () => aimanteHead({ path: "/about", title: "About Aimanté — video ads by mood", description: "Aimanté is a directory of short video ads from independent brands, browsable by mood, category and brand. By Gravity Pants." }),
   component: About,
 });
 
