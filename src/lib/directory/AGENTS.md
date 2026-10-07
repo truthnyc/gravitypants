@@ -8,3 +8,5 @@
 - Reel brand touch points share `BrandLink` (a plain text link to `/directory/$slug`); cards have no brand logo tile — the linked name carries the destination so the grid and featured captions keep one treatment without extra data reads.
 - Directory headline greeting: config in `site_settings` key `directory_greeting` (seeds in `greeting.ts`), one pure `chooseGreeting()` shared by site and admin preview; geo/weather via `getVisitorContext` (never stored); analytics in `directory_greeting_log`.
 - aimante.co is served by the same Directory routes via the router `rewrite` in `src/lib/site/brand-site.ts`; cross-domain 301s live in `src/server.ts` (`domainRedirect`, real domains only); previews use `?brand=aimante` (cookie); root context `site` picks the shell, head tags, robots and sitemap.
+- Category hints are read from `categories` through `categories.functions.ts`, with staff-only edits and audit records; public filters share its catalog query so edits reach visitors without duplicating copy.
+- Greeting events go through a validated public server function; direct browser inserts are revoked so clients cannot supply record ids or timestamps.

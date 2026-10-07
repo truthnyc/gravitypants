@@ -1,4 +1,7 @@
 # Roadmap
+- [x] Add admin brand affiliation/draft controls and category-line editing; verify saved values.
+- [x] Review current security findings; revoke unchecked greeting inserts, protect staff brand fields, patch vulnerable dependencies; retain intentional public catalog reads and reviewed helper/extension advisories.
+- [x] Replace invented Aimanté share art with real reel imagery, review Join/About copy, and correct Purl Soho's address with an old-address redirect.
 - [x] Count intentional Directory reel opens and rank “Most viewed this week” using real weekly totals; verify recording and selection.
 - [ ] Verify the staff carousel preview visually — blocked: requesting account has no staff role, so /admin/directory-settings correctly returns not found.
 - [x] Connect real visitor country and weather to Directory greetings and verify lookup/fallback behavior.

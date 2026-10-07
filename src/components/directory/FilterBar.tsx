@@ -3,6 +3,8 @@ import { Check, ChevronDown, Search, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CATEGORIES, categorySlug } from "@/lib/directory/directory";
 import { MOOD_FAMILY_COLORS, type MoodFamily } from "@/lib/directory/mood-admin";
+import { useQuery } from "@tanstack/react-query";
+import { listCategories } from "@/lib/directory/categories.functions";
 
 export type Facets = { moods: Record<string, number>; categories: Record<string, number>; brands: Record<string, number> };
 export type FilterValue = { moods: string[]; categories: string[]; brands: string[] };
@@ -208,6 +210,8 @@ function MoodBody({ families, selected, counts, onChange }: { families: Family[]
 }
 
 function CategoryBody({ selected, counts, narrow, onChange, comingSoon }: { comingSoon: boolean; selected: string[]; counts: Record<string, number>; narrow: boolean; onChange: (v: string[]) => void }) {
+  const catalog = useQuery({ queryKey: ["category-catalog"], queryFn: () => listCategories(), staleTime: 30_000 });
+  const hints = new Map((catalog.data ?? []).map((c) => [c.name, c.hint]));
   const list = CATEGORIES.map((c) => ({ name: c, slug: categorySlug(c), n: counts[categorySlug(c)] ?? 0 }));
   const groups = [
     { title: "With reels", items: list.filter((c) => c.n > 0 || selected.includes(c.slug)) },
@@ -220,9 +224,9 @@ function CategoryBody({ selected, counts, narrow, onChange, comingSoon }: { comi
           <legend className="mb-1.5 text-[11px] font-semibold tracking-[.06em] text-ap-muted uppercase">{g.title}</legend>
           <div className={cn("grid gap-x-4", !narrow && "grid-cols-2")}>
             {g.items.map((c) => (
-              <label key={c.slug} className={cn("flex h-10 cursor-pointer items-center gap-2.5 rounded-sm text-[14px]", g.title === "Coming soon" && "text-ap-muted")}>
+              <label key={c.slug} className={cn("flex min-h-12 cursor-pointer items-center gap-2.5 rounded-sm py-2 text-[14px]", g.title === "Coming soon" && "text-ap-muted")}>
                 <input type="checkbox" checked={selected.includes(c.slug)} onChange={() => onChange(toggleIn(selected, c.slug))} className="size-4 accent-ap-blue" />
-                <span className="min-w-0 flex-1 truncate">{c.name}</span>
+                <span className="min-w-0 flex-1"><span className="block break-words">{c.name}</span>{hints.get(c.name) && <span className="block text-[12px] leading-4 text-ap-muted">{hints.get(c.name)}</span>}</span>
                 <span className="text-[13px] text-ap-muted nums">{c.n}</span>
               </label>
             ))}
