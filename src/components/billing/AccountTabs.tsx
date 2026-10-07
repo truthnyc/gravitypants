@@ -13,10 +13,11 @@ const tabs = [
 ] as const;
 
 export function AccountTabs() {
-  const { data: access } = usePlanAccess();
+  const { data: access, canUse } = usePlanAccess();
+  const statsOk = !!access && canUse("brand_stats");
   return (
     <nav className="mb-2 flex gap-[3px] rounded-[10px] bg-ap-inner p-[3px] font-ap" aria-label="Account sections">
-      {tabs.filter((t) => (t.label !== "Team" || access?.team) && (t.label !== "Directory" || SHOW_SHARE)).map((t) => (
+      {tabs.filter((t) => (t.label !== "Team" || access?.team) && (t.label !== "Directory" || SHOW_SHARE) && (t.label !== "Stats" || statsOk)).map((t) => (
         <Link
           key={t.to}
           to={t.to}

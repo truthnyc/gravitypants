@@ -8,6 +8,8 @@ import { ChevronRight, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { BrandSite } from "@/lib/site/brand-site";
+import { usePlanAccess } from "@/lib/stillframe/plan";
+import { peekWorkspaceId } from "@/lib/stillframe/workspace";
 
 /** Which brand this visit is on (decided once per request by hostname). */
 export function useBrandSite(): BrandSite {
@@ -51,23 +53,40 @@ function useAimanteSignOut() {
   return async () => { await signOutEverywhere(qc); navigate({ to: "/directory", replace: true }); };
 }
 
-const ACCOUNT_LINKS = (saved: number) => [
+const ACCOUNT_LINKS = (saved: number, stats = false) => [
   { label: "Your brand page", to: "/app/account/directory" as const },
+  ...(stats ? [{ label: "Brand stats", to: "/app/account/stats" as const }] : []),
   { label: "Saved reels", to: "/app/account/favorites" as const, count: saved },
   { label: "Make reels on Gravity Pants ↗", href: "https://gravitypants.com/app/ads" },
   { label: "Account settings", to: "/app/account" as const },
 ];
 
+/** Brand stats gate for site pages, where the app's sign-in gate never ran: resolve the user's workspace first. */
+function useStatsOk(userId: string | undefined) {
+  const [ws, setWs] = useState<string | null>(() => peekWorkspaceId());
+  useEffect(() => {
+    if (ws || !userId) return;
+    let live = true;
+    void supabase.rpc("ensure_workspace").then(({ data }) => {
+      if (live && typeof data === "string") setWs(data);
+    });
+    return () => { live = false; };
+  }, [ws, userId]);
+  const { data: access, canUse } = usePlanAccess(ws);
+  return !!access && canUse("brand_stats");
+}
+
 function AccountMenu({ me }: { me: Me }) {
   const saved = useSavedCount(me.id);
   const signOut = useAimanteSignOut();
+  const statsOk = useStatsOk(me.id);
   return (
     <DropdownMenu>
       <DropdownMenuTrigger aria-label="Your account" className="rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue"><Avatar me={me} /></DropdownMenuTrigger>
       <DropdownMenuContent align="end" sideOffset={10} className="w-[280px] rounded-[12px] border-aimante-divider bg-ap-card p-2 font-ap shadow-aimante-menu">
         <div className="px-3 py-2.5"><p className="truncate text-[15px] font-semibold text-ap-ink">{me.displayName || me.email}</p>{me.displayName && <p className="truncate text-[13px] text-ap-muted">{me.email}</p>}</div>
         <DropdownMenuSeparator className="bg-aimante-divider" />
-        {ACCOUNT_LINKS(saved).map((l) => (
+        {ACCOUNT_LINKS(saved, statsOk).map((l) => (
           <DropdownMenuItem key={l.label} asChild className="h-10 cursor-pointer rounded-lg px-3 text-[14px] text-ap-ink">
             {"href" in l ? <a href={l.href} target="_blank" rel="noreferrer">{l.label}</a> : <Link to={l.to} className="flex justify-between">{l.label}{"count" in l && <span className="text-ap-muted tabular-nums">{l.count}</span>}</Link>}
           </DropdownMenuItem>
@@ -88,6 +107,7 @@ export function AimanteHeader() {
   const close = () => setOpen(false);
   const me = useMe().data ?? null;
   const saved = useSavedCount(me?.id);
+  const statsOk = useStatsOk(me?.id);
   const signOut = useAimanteSignOut();
   const here = useRouterState({ select: (s) => s.location.pathname + s.location.searchStr });
   const signInSearch = { redirect: here };
@@ -149,7 +169,7 @@ export function AimanteHeader() {
           {!me && <Link to="/signin" search={listSearch} onClick={close} className={cn(row, "text-ap-blue")}>List your brand{chevron}</Link>}
           {me ? <>
             <div className="mt-5 flex items-center gap-3 rounded-[12px] bg-ap-panel p-3"><Avatar me={me} /><div className="min-w-0"><p className="truncate text-[15px] font-semibold text-ap-ink">{me.displayName || me.email}</p>{me.displayName && <p className="truncate text-[13px] text-ap-muted">{me.email}</p>}</div></div>
-            {ACCOUNT_LINKS(saved).map((l) => "href" in l
+            {ACCOUNT_LINKS(saved, statsOk).map((l) => "href" in l
               ? <a key={l.label} href={l.href} target="_blank" rel="noreferrer" onClick={close} className="flex h-12 items-center border-b border-aimante-divider text-[16px] text-site-nav hover:text-ap-ink">{l.label}</a>
               : <Link key={l.label} to={l.to} onClick={close} className="flex h-12 items-center justify-between border-b border-aimante-divider text-[16px] text-site-nav hover:text-ap-ink">{l.label}{"count" in l && <span className="text-ap-muted tabular-nums">{l.count}</span>}</Link>)}
             <a href="#" onClick={(e) => { e.preventDefault(); close(); void signOut(); }} className="flex h-12 items-center text-[16px] text-site-nav hover:text-ap-ink">Sign out</a>

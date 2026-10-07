@@ -8,6 +8,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { supabase } from "@/integrations/supabase/client";
 import { SHOW_DIRECTORY } from "@/lib/features";
 import { useMe } from "@/lib/stillframe/account";
+import { usePlanAccess } from "@/lib/stillframe/plan";
 import { cn } from "@/lib/utils";
 import { HelpMenu } from "@/components/stillframe/HelpMenu";
 import { Avatar, UserMenu, menuContent, menuItem, menuLabel } from "@/components/stillframe/UserMenu";
@@ -36,7 +37,7 @@ const appNav: NavItem[] = [
   { label: "Your Ads", to: "/app/ads", exact: true },
   { label: "Brand Kit", to: "/app/brand" },
   { label: "Previous Exports", to: "/app/exports" },
-  { label: "Stats", to: "/app/stats" },
+  { label: "Brand stats", to: "/app/stats" },
   ...(SHOW_DIRECTORY ? [{ label: "Directory", to: "/directory" }] : []),
 ];
 
@@ -135,11 +136,13 @@ function SiteBar({ pathname, signedIn, close }: { pathname: string; signedIn: bo
 
 function AppBar({ pathname }: { pathname: string }) {
   const { query, setQuery } = useSearch();
+  const { data: access, canUse } = usePlanAccess();
+  const navItems = appNav.filter((i) => i.label !== "Brand stats" || (!!access && canUse("brand_stats")));
   return (
     <>
       <div className="hidden min-w-0 md:block"><WorkspaceSwitcher /></div>
       <nav aria-label="App" className="hidden items-center gap-1 lg:flex">
-        <NavLinks items={appNav} pathname={pathname} />
+        <NavLinks items={navItems} pathname={pathname} />
       </nav>
       <div className="ml-auto flex shrink-0 items-center gap-2 lg:gap-3">
         <label className="relative hidden lg:block">

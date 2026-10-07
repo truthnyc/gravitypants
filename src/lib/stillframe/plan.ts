@@ -51,9 +51,10 @@ export function canUseWith(e: Entitlements | undefined, f: Feature): boolean {
   }
 }
 
-/** Plan checks for the active workspace. Server/RLS enforce the same rules; this only drives the UI. */
-export function usePlanAccess() {
-  const wsId = peekWorkspaceId();
+/** Plan checks for the active workspace. Server/RLS enforce the same rules; this only drives the UI.
+ *  Pass a workspace id on pages the sign-in gate never runs on (public site pages); it falls back to the active workspace. */
+export function usePlanAccess(wsOverride?: string | null) {
+  const wsId = wsOverride ?? peekWorkspaceId();
   const q = useQuery({
     queryKey: [...billingKey, "entitlements", wsId],
     enabled: !!wsId,
