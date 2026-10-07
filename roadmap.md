@@ -1,5 +1,5 @@
 # Roadmap
-- [ ] Update Aimanté phone home layout and verify search, bottom-sheet filters and reel grid without desktop changes.
+- [x] Update Aimanté phone home; verified 320/390/767 widths, all bottom sheets, pause and Purl Soho search; desktop preserved except requested About link visibility.
 - [x] Update Aimanté lockup, always-branded navigation, mobile panel and footer; verify signed-in and signed-out pages.
 - [x] Add a branded, domain-aware service-unavailable page for application and SSR failures.
 - [x] Complete brand-request spam protection, website deduplication, private admin details/actions/nav count and emails; verified upload, confirmation/alert sends, duplicate rejection, Needs info, approval into linked draft, optional-reason decline, and rate-limit rejection.

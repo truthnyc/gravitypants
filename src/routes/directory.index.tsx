@@ -128,6 +128,15 @@ function DirectoryPage() {
   const input = useRef<HTMLInputElement>(null);
   const sentinel = useRef<HTMLDivElement>(null);
   const [stuck, setStuck] = useState(false);
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 767px)");
+    const update = () => {
+      if (input.current) input.current.placeholder = isAim && media.matches ? "Try: cozy knitwear, Purl Soho" : "Try: cozy knitwear, square, Purl Soho";
+    };
+    update();
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, [isAim]);
 
   useEffect(() => setValue(q), [q]);
   const go = (v: string) => void navigate({ replace: true, resetScroll: false, search: (prev) => ({ ...prev, q: v.trim() || undefined, page: undefined }) });
@@ -297,7 +306,7 @@ function DirectoryPage() {
           </h1>
           <form role="search" onSubmit={(e) => { e.preventDefault(); go(value); }}
              className="dir-search-bar mx-auto flex h-[60px] max-w-[680px] items-center gap-2.5 rounded-[12px] border border-transparent bg-ap-panel pr-2 pl-5 transition-[background,border-color,box-shadow] motion-reduce:transition-none focus-within:border-ap-hairline focus-within:bg-ap-card focus-within:shadow-[0_10px_30px_rgba(20,30,50,.10)]">
-            <input ref={input} value={value} onChange={(e) => setValue(e.target.value)} placeholder={isAim ? "Try: cozy knitwear, Purl Soho" : "Try: cozy knitwear, square, Purl Soho"}
+            <input ref={input} value={value} onChange={(e) => setValue(e.target.value)} placeholder="Try: cozy knitwear, square, Purl Soho"
               aria-label="Search the Directory" aria-keyshortcuts="/"
               className="dir-search-input h-full min-w-0 flex-1 bg-transparent text-[19px] outline-hidden placeholder:text-ap-muted" />
             {value && (
