@@ -13,6 +13,7 @@ export type SiteReel = {
   /** Slug of the matching Directory brand page (/directory/<slug>), when one exists. */
   brandSlug: string | null;
   title: string;
+  description?: string;
   href: string | null;
   category: ReelCategory;
   format: ReelFormat;

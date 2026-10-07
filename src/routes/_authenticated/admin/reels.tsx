@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { ArrowDown, ArrowUp, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Card, PageTitle, Pill } from "@/components/admin/AdminShell";
 import { supabase } from "@/integrations/supabase/client";
@@ -119,8 +120,8 @@ function CoverPicker({ src, onPick }: { src: string; onPick: (b: Blob, preview: 
   );
 }
 
-type Draft = { id?: string; brand: string; title: string; href: string; category: string; published: boolean; photos: number; brand_id?: string | null; moods?: string[] };
-const empty: Draft = { brand: "", title: "", href: "", category: "Fashion & Apparel", published: true, photos: 3, moods: [] };
+type Draft = { id?: string; brand: string; title: string; description: string; href: string; category: string; published: boolean; photos: number; brand_id?: string | null; moods?: string[] };
+const empty: Draft = { brand: "", title: "", description: "", href: "", category: "Fashion & Apparel", published: true, photos: 3, moods: [] };
 
 function ReelForm({ initial, onDone, onCancel, videoSrc }: { videoSrc?: string | null; initial: Draft; onDone: () => void; onCancel?: () => void }) {
   const save = useServerFn(saveSiteReel);
@@ -159,7 +160,7 @@ function ReelForm({ initial, onDone, onCancel, videoSrc }: { videoSrc?: string |
       const current = initial as Draft & { format?: ReelFormat; seconds?: number };
       await save({ data: {
         ...(d.id ? { id: d.id } : {}),
-        brand: d.brand, title: d.title, href: href || null,
+        brand: d.brand, title: d.title, description: d.description, href: href || null,
         category: d.category, photos: d.photos, published: d.published, brand_id: d.brand_id ?? null, moods: d.moods ?? [],
         format: files.format ?? current.format ?? "916",
         seconds: files.seconds ?? current.seconds ?? 8,
@@ -184,6 +185,9 @@ function ReelForm({ initial, onDone, onCancel, videoSrc }: { videoSrc?: string |
       </label>
       <label className="grid gap-1 text-[13px] text-secondary-text">Brand link
         <Input value={d.href} onChange={(e) => setD({ ...d, href: e.target.value })} placeholder="https://brand.com" inputMode="url" className="h-11 bg-card text-[15px] text-foreground" />
+      </label>
+      <label className="grid gap-1 text-[13px] text-secondary-text sm:col-span-2">Description
+        <Textarea aria-label="Description" value={d.description} onChange={(e) => setD({ ...d, description: e.target.value })} maxLength={1000} rows={3} className="bg-card text-[15px] text-foreground" />
       </label>
       <label className="grid gap-1 text-[13px] text-secondary-text">Photos used
         <Input required type="number" min={1} max={50} step={1} value={d.photos} onChange={(e) => setD({ ...d, photos: Math.max(1, Math.round(Number(e.target.value) || 1)) })} className="h-11 bg-card text-[15px] text-foreground" />
@@ -269,6 +273,7 @@ function Reels() {
                 <div className="min-w-0 flex-1 text-[14px]">
                   <div className="font-medium">{r.brand} · {r.title} {!r.published && <Pill>Hidden</Pill>}</div>
                   <div className="text-[13px] text-secondary-text nums">{FORMAT_LABEL[r.format as ReelFormat] ?? r.format} · {r.seconds} sec · {r.href ?? "No link"}{r.brand_id ? " · On a brand page" : ""}</div>
+                  {r.description && <p className="mt-1 text-[13px] text-secondary-text">{r.description}</p>}
                 </div>
                 <div className="flex gap-1">
                   <Button variant="plain" size="icon" aria-label="Move up" disabled={i === 0} onClick={() => void reorder(i, -1)}><ArrowUp className="size-4" strokeWidth={1.7} /></Button>
@@ -282,7 +287,7 @@ function Reels() {
                   <ReelForm
                    
                     videoSrc={r.videoView}
-                    initial={{ id: r.id, brand: r.brand, title: r.title, href: r.href ?? "", category: r.category, published: r.published, photos: r.photos, brand_id: r.brand_id, moods: r.moods ?? [], ...({ format: r.format, seconds: r.seconds } as object) }}
+                    initial={{ id: r.id, brand: r.brand, title: r.title, description: r.description ?? "", href: r.href ?? "", category: r.category, published: r.published, photos: r.photos, brand_id: r.brand_id, moods: r.moods ?? [], ...({ format: r.format, seconds: r.seconds } as object) }}
                     onDone={() => { setEditing(null); void refetch(); }}
                     onCancel={() => setEditing(null)}
                   />

@@ -1,4 +1,5 @@
 # Roadmap
+- [x] Add editable website reel descriptions; all 12 published reels have starter copy, with authenticated save/reload and public popup readback verified.
 - [x] Match Directory reel popups to the reference; verified playback, closing, brand links and mobile layout.
 - [x] Resolve 32 exposed-definer warnings; verify public browsing, account/staff reads and access-denial regressions (20 tests passed).
 - [ ] Remaining managed pg_net extension registration warning — safe relocation requires provider-supported maintenance; drop/recreate could disrupt scheduled jobs, so retain it rather than suppress the warning.
