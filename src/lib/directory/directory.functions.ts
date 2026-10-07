@@ -52,6 +52,8 @@ export const setBrandLogo = createServerFn({ method: "POST" })
     const sb = context.supabase as any;
     const { data: b } = await sb.from("directory_brands").select("id, workspace_id").eq("id", data.brandId).maybeSingle();
     if (!b) throw new Error("This brand page isn't available");
+    const { data: canEdit } = await sb.rpc("is_workspace_admin", { _ws: b.workspace_id });
+    if (canEdit !== true) throw new Error("Only this brand's workspace owner or admins can change its logo");
     let logo: string | null = null;
     if (data.file) {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

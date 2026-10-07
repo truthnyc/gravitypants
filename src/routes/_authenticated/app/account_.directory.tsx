@@ -38,7 +38,7 @@ function DirectoryAccount() {
 
   const downloadCsv = () => {
     if (!d) return;
-    const esc = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+    const esc = (v: unknown) => { let s = String(v ?? ""); if (typeof v === "string" && /^[=+\-@\t\r]/.test(s)) s = `'${s}`; return `"${s.replace(/"/g, '""')}"`; };
     const rows = [["timestamp_utc", "reel", "action", "full_name", "job_title", "email", "brand", "wording_version"],
       ...d.log.map((l) => [new Date(l.created_at).toISOString(), l.reel, l.action, l.full_name, l.job_title, l.email, d.brand.name, l.wording_version])];
     const blob = new Blob([rows.map((r) => r.map(esc).join(",")).join("\n")], { type: "text/csv" });

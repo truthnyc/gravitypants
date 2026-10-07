@@ -75,6 +75,8 @@ export const resendInvite = createServerFn({ method: "POST" })
       .is("accepted_at", null)
       .maybeSingle();
     if (!inv) return { error: "That invite is no longer pending." };
+    const { data: isAdmin } = await supabase.rpc("is_workspace_admin", { _ws: inv.workspace_id });
+    if (isAdmin !== true) return { error: "Only owners and admins can resend invites." };
     const { data: ws } = await supabase.from("workspaces").select("name").eq("id", inv.workspace_id).single();
     try {
       const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
