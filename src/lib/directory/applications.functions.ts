@@ -111,7 +111,7 @@ export const approveBrandApplication = createServerFn({ method: 'POST' })
     await assertAdmin(context)
     const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
     const { data: request } = await supabaseAdmin.from('brand_requests').select('email,brand').eq('id', data.id).single()
-    const { data: brandId, error } = await supabaseAdmin.rpc('approve_brand_request', { _request_id: data.id, _admin_id: context.userId, _admin_note: data.note || null })
+    const { data: brandId, error } = await supabaseAdmin.rpc('approve_brand_request', { _request_id: data.id, _admin_id: context.userId, _admin_note: data.note || undefined })
     if (error) throw new Error(error.message)
     if (request) {
       try {
