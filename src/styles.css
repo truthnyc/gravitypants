@@ -1272,12 +1272,12 @@ p.concept-reel-notice { font-size: 10px !important; }
 .auth-label-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 7px; }
 .auth-label-row label { margin-bottom: 0 !important; }
 .auth-label-row button { height: auto; min-height: 0; padding: 0; font-size: 13px; font-weight: 500; }
-.aimante-auth .auth-google { height: 48px; border-radius: 8px; border-color: var(--ap-hairline); background: var(--ap-card); }
-.aimante-auth .auth-field label { font-size: 13px; font-weight: 600; }
-.aimante-auth .auth-input-wrap input { height: 48px; border-radius: 8px; border-color: var(--ap-hairline); background: var(--ap-card); font-size: 16px; }
-.aimante-auth .auth-submit { height: 48px; border-radius: 8px; background: var(--ap-blue); }
-.aimante-auth .auth-submit:hover { background: var(--ap-blue-hover); }
-.aimante-auth .auth-switch { text-align: center; font-size: 14px; }
+.brand-auth .auth-google { height: 48px; border-radius: 8px; border-color: var(--ap-hairline); background: var(--ap-card); }
+.brand-auth .auth-field label { font-size: 13px; font-weight: 600; }
+.brand-auth .auth-input-wrap input { height: 48px; border-radius: 8px; border-color: var(--ap-hairline); background: var(--ap-card); font-size: 16px; }
+.brand-auth .auth-submit { height: 48px; border-radius: 8px; background: var(--ap-blue); }
+.brand-auth .auth-submit:hover { background: var(--ap-blue-hover); }
+.brand-auth .auth-switch { text-align: center; font-size: 14px; }
 @media (max-width: 767px) {
-  .aimante-auth .auth-google, .aimante-auth .auth-input-wrap input, .aimante-auth .auth-submit { height: 50px; }
+  .brand-auth .auth-google, .brand-auth .auth-input-wrap input, .brand-auth .auth-submit { height: 50px; }
 }

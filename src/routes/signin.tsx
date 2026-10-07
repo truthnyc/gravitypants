@@ -31,7 +31,6 @@ function SignIn() {
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [keepSignedIn, setKeepSignedIn] = useState(true);
-  const [resetSent, setResetSent] = useState(false);
   const target = typeof window === "undefined" ? "/app/ads" : safeRedirect(redirect, aim ? "/directory" : "/app/ads");
 
   // Already signed in (or returning from Google): go on.
@@ -77,28 +76,18 @@ function SignIn() {
     }
   }
 
-  async function forgot() {
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) { setEmailError("Enter your email above first, then choose Forgot password."); return; }
-    setBusy(true); setError(null); setEmailError(null);
-    const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo: window.location.origin + "/reset" });
-    setBusy(false);
-    if (error) setError(plainAuthError(error.message));
-    else setResetSent(true);
-  }
-
   return (
-    <AuthShell mode="signin" title={aim ? "Sign in to Aimanté" : "Welcome back."} subtitle={aim ? "Use your Gravity Pants account. It works on both sites." : "Sign in to open your ads and keep working."}>
+    <AuthShell mode="signin" title={aim ? "Sign in to Aimanté" : "Sign in to Gravity Pants"} subtitle={aim ? "Use your Gravity Pants account. It works on both sites." : "Welcome back. Your account also works on Aimanté."}>
       <GoogleButton redirectTo={target} />
       <form onSubmit={submit} noValidate>
         <FieldGroup
           error={error}
           fields={[
             { id: "email", label: "Email", type: "email", autoComplete: "email", value: email, placeholder: "you@yourbrand.com", onChange: (value) => { setEmail(value); setEmailError(null); }, error: emailError },
-            { id: "password", label: "Password", labelAction: <Button type="button" variant="link" className="auth-link" onClick={() => void forgot()} disabled={busy}>Forgot password?</Button>, type: "password", autoComplete: "current-password", value: password, placeholder: "Your password", onChange: (value) => { setPassword(value); setPasswordError(null); }, error: passwordError },
+            { id: "password", label: "Password", labelAction: <Link to="/reset" className="auth-link text-[13px] font-medium">Forgot password?</Link>, type: "password", autoComplete: "current-password", value: password, placeholder: "Your password", onChange: (value) => { setPassword(value); setPasswordError(null); }, error: passwordError },
           ]}
         />
         <div className="auth-options"><label><input type="checkbox" checked={keepSignedIn} onChange={(e) => setKeepSignedIn(e.target.checked)} /> Keep me signed in</label></div>
-        {resetSent && <p role="status" className="auth-reset-sent">If that email has an account, a reset link is on its way.</p>}
         <Button type="submit" variant="site" disabled={busy || !email || !password} className="auth-submit">
           {busy ? "Signing in…" : <>Sign in <ArrowRight size={17} strokeWidth={1.7} /></>}
         </Button>

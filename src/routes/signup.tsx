@@ -174,9 +174,9 @@ function RegularSignUp({ redirect, plan, billing, template }: { redirect?: strin
 
   return (
     <AuthShell
-      eyebrow={joining ? "Team invite" : "3 free exports, no card needed"}
-      title={joining ? "Join your team\non Gravity Pants." : "Your first reel is\nthree photos away."}
-      subtitle={joining ? "Use the email address that received the invite. After you sign up, you can open the team's ads, brand kits and templates." : "Create an account, add a few photos and make your first video ad. You do not need video editing experience."}
+      eyebrow={joining ? "Team invite" : undefined}
+      title={joining ? "Join your team on Gravity Pants." : "Create your account"}
+      subtitle={joining ? "Use the email address that received the invite. After you sign up, you can open the team's ads, brand kits and templates." : "Free to start. No card required."}
       beforeForm={!joining && choice && <div className="auth-plan-chip">Selected: {planById(choice.plan).name} · ${choice.billing === "yearly" ? planById(choice.plan).yearly?.toLocaleString() : planById(choice.plan).monthly}/{choice.billing === "yearly" ? "year" : "month"} · <Link to="/pricing">Change</Link></div>}
     >
       <GoogleButton redirectTo={target} onStart={() => sessionStorage.setItem("gravity-pants:welcome", "1")} />
@@ -184,13 +184,13 @@ function RegularSignUp({ redirect, plan, billing, template }: { redirect?: strin
         <FieldGroup
           error={error}
           fields={[
-            { id: "name", label: "Your name", type: "text", autoComplete: "name", value: name, placeholder: "Alex Rivera", onChange: setName },
-            { id: "email", label: "Work email", type: "email", autoComplete: "email", value: email, placeholder: "you@yourbrand.com", onChange: setEmail, error: emailError },
+            { id: "name", label: "Name", type: "text", autoComplete: "name", value: name, placeholder: "Alex Rivera", onChange: setName },
+            { id: "email", label: "Email", type: "email", autoComplete: "email", value: email, placeholder: "you@yourbrand.com", onChange: setEmail, error: emailError },
             { id: "password", label: "Password", type: "password", autoComplete: "new-password", value: password, placeholder: "At least 8 characters", onChange: setPassword, error: passwordError },
           ]}
         />
         <Button type="submit" variant="site" disabled={busy || !name || !email || !password} className="auth-submit">
-          {busy ? "Creating…" : <>{joining ? "Join the team" : "Start free trial"} <ArrowRight size={17} strokeWidth={1.7} /></>}
+          {busy ? "Creating…" : <>{joining ? "Join the team" : "Create account"} <ArrowRight size={17} strokeWidth={1.7} /></>}
         </Button>
       </form>
       <p className="auth-legal">
