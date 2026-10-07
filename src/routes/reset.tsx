@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { ArrowRight } from "lucide-react";
 import { AuthShell, FieldGroup, plainAuthError } from "@/components/auth/AuthShell";
 import { siteHead } from "@/lib/site/seo";
 
@@ -15,6 +16,7 @@ function Reset() {
   const [recovery, setRecovery] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
@@ -41,6 +43,7 @@ function Reset() {
 
   async function setNew(e: React.FormEvent) {
     e.preventDefault();
+    if (password !== confirm) return setError("The two passwords don't match.");
     if (password.length < 6) return setError("Please use a password with at least 6 characters.");
     setBusy(true);
     setError(null);
@@ -52,14 +55,14 @@ function Reset() {
 
   if (recovery) {
     return (
-      <AuthShell title="Choose a new password" subtitle="You'll use it the next time you sign in.">
+      <AuthShell title="Set a new password" subtitle="You'll use it the next time you sign in.">
         <form onSubmit={setNew} noValidate>
           <FieldGroup
             error={error}
-            fields={[{ id: "password", label: "New password", type: "password", autoComplete: "new-password", value: password, onChange: setPassword }]}
+            fields={[{ id: "password", label: "New password", type: "password", autoComplete: "new-password", value: password, onChange: setPassword }, { id: "confirm", label: "Confirm password", type: "password", autoComplete: "new-password", value: confirm, onChange: setConfirm }]}
           />
-          <Button type="submit" disabled={busy || !password} className="mt-4 h-11 w-full text-[15px]">
-            Save Password
+          <Button type="submit" variant="site" disabled={busy || !password || !confirm} className="auth-submit">
+            Save and sign in <ArrowRight size={17} strokeWidth={1.7} />
           </Button>
         </form>
       </AuthShell>
@@ -69,7 +72,7 @@ function Reset() {
   return (
     <AuthShell
       title="Reset your password"
-      subtitle={sent ? `If ${email} has an account, a link is on its way.` : "We'll email you a link to choose a new one."}
+      subtitle={sent ? `If ${email} has an account, a link is on its way.` : "We'll email you a link to set a new one."}
     >
       {!sent && (
         <form onSubmit={sendLink} noValidate>
@@ -77,13 +80,13 @@ function Reset() {
             error={error}
             fields={[{ id: "email", label: "Email", type: "email", autoComplete: "email", value: email, onChange: setEmail }]}
           />
-          <Button type="submit" disabled={busy || !email} className="mt-4 h-11 w-full text-[15px]">
-            Send Reset Link
+          <Button type="submit" variant="site" disabled={busy || !email} className="auth-submit">
+            Send reset link <ArrowRight size={17} strokeWidth={1.7} />
           </Button>
         </form>
       )}
-      <p className="mt-5 text-center text-[14px]">
-        <Link to="/signin" className="text-primary hover:underline">Already have an account? Sign in</Link>
+      <p className="auth-switch">
+        <Link to="/signin" className="auth-link">Back to sign in</Link>
       </p>
     </AuthShell>
   );

@@ -1,15 +1,10 @@
 import { useState, type ReactNode } from "react";
-import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GravityPantsLogo } from "@/components/GravityPantsLogo";
 import { AimanteLogo, useBrandSite } from "@/components/site/AimanteShell";
 import { Link, useRouter } from "@tanstack/react-router";
 import { ArrowLeft, X } from "lucide-react";
 import { lovable } from "@/integrations/lovable";
-import { FeaturedAdVideo } from "@/components/site/FeaturedAdVideo";
-import photo1 from "@/assets/site/purl-soho-photo-1.webp.asset.json";
-import photo2 from "@/assets/site/purl-soho-photo-2.webp.asset.json";
-import photo3 from "@/assets/site/purl-soho-photo-3.webp.asset.json";
 
 export function safeRedirect(r: unknown, fallback = "/app/ads"): string {
   if (typeof r !== "string" || !r) return fallback;
@@ -22,74 +17,33 @@ export function safeRedirect(r: unknown, fallback = "/app/ads"): string {
   }
 }
 
-/** Aimanté sign-in screens: grey page, simple header, centred card. */
-function AimanteAuth({ title, subtitle, beforeForm, children }: { title: string; subtitle: string; beforeForm?: ReactNode; children: ReactNode }) {
+export function AuthShell({ eyebrow, title, subtitle, children, beforeForm }: { eyebrow?: string | undefined; title: string; subtitle: string; children: ReactNode; mode?: "signup" | "signin"; beforeForm?: ReactNode }) {
+  const aim = useBrandSite() === "aimante";
   const router = useRouter();
-  const back = () => { if (window.history.length > 1) router.history.back(); else void router.navigate({ to: "/directory" }); };
+  const home = aim ? "/directory" : "/";
+  const back = () => { if (window.history.length > 1) router.history.back(); else void router.navigate({ to: home }); };
   return (
-    <div className="aimante-auth flex min-h-dvh flex-col bg-ap-panel font-ap text-ap-ink">
+    <div className="brand-auth flex min-h-dvh flex-col bg-ap-panel font-ap text-ap-ink">
       <header className="border-b border-aimante-divider bg-ap-card">
         <div className="mx-auto flex h-14 max-w-[1280px] items-center justify-between px-4 md:h-16 md:px-6">
-          <Link to="/directory" aria-label="Aimanté home"><AimanteLogo /></Link>
-          <Link to="/directory" className="hidden items-center gap-1.5 text-[14px] text-site-nav hover:text-ap-ink md:inline-flex"><ArrowLeft size={16} strokeWidth={1.7} aria-hidden />Back to browsing</Link>
+          <Link to={home} aria-label={aim ? "Aimanté home" : "Gravity Pants home"} className="flex items-center gap-2">
+            {aim ? <AimanteLogo /> : <><GravityPantsLogo size={28} /><span className="text-[19px] font-semibold tracking-[-0.035em]">Gravity Pants</span></>}
+          </Link>
+          <Link to={home} className="hidden items-center gap-1.5 text-[14px] text-site-nav hover:text-ap-ink md:inline-flex"><ArrowLeft size={16} strokeWidth={1.7} aria-hidden />{aim ? "Back to browsing" : "Back to Gravity Pants"}</Link>
           <Button type="button" variant="ghost" size="icon" aria-label="Go back" onClick={back} className="size-11 min-h-0 min-w-0 text-ap-ink md:hidden"><X size={22} strokeWidth={1.7} /></Button>
         </div>
       </header>
       <main className="flex flex-1 flex-col items-center px-5 py-8 md:px-6 md:py-16">
         <div className="w-full max-w-[420px] md:rounded-[12px] md:bg-ap-card md:p-8 md:shadow-ap-soft">
-          <h1 className="text-[28px] font-semibold leading-[1.1] tracking-[-0.035em]">{title}</h1>
+          {eyebrow && <p className="mb-2 text-[12px] font-semibold uppercase tracking-[0.08em] text-ap-blue">{eyebrow}</p>}
+          <h1 className="whitespace-pre-line text-[28px] font-semibold leading-[1.1] tracking-[-0.035em]">{title}</h1>
           <p className="mt-2 text-[15px] leading-[1.45] text-ap-body">{subtitle}</p>
           {beforeForm}
           <div className="mt-6">{children}</div>
         </div>
-        <p className="mt-6 text-center text-[13px] text-ap-muted">One account for Aimanté and Gravity Pants. <Link to="/privacy" className="hover:text-ap-ink">Privacy</Link> · <Link to="/terms" className="hover:text-ap-ink">Terms</Link></p>
+        <p className="mt-6 text-center text-[13px] text-ap-muted">{aim ? "One account for Aimanté and Gravity Pants." : "One account for Gravity Pants and Aimanté."} <Link to="/privacy" className="hover:text-ap-ink">Privacy</Link> · <Link to="/terms" className="hover:text-ap-ink">Terms</Link></p>
       </main>
     </div>
-  );
-}
-
-
-function AuthVisual({ mode }: { mode: "signup" | "signin" }) {
-  return <div className="auth-visual auth-hero" aria-hidden="true">
-    {[photo1, photo2, photo3].map((p, i) => <div key={p.url} className={`auth-hero-drop auth-hero-drop-${i + 1}`}><img src={p.url} alt="" /></div>)}
-    <div className="auth-hero-phone"><FeaturedAdVideo tapToggle /></div>
-    {mode === "signup" ? (
-      <div className="auth-hero-exported auth-hero-trial">
-        <span>Your free trial includes</span>
-        <div><span>3 exports</span><span>Every format</span></div>
-        <b><Check size={14} strokeWidth={2} /> Every feature, incl. brand kit</b>
-      </div>
-    ) : (
-      <div className="auth-hero-exported">
-        <span>Exported</span>
-        <div><span>9:16</span><span>1:1</span><span>16:9</span></div>
-        <b><Check size={14} strokeWidth={2} /> MP4 + GIF ready</b>
-      </div>
-    )}
-  </div>;
-}
-
-export function AuthShell({ eyebrow, title, subtitle, children, mode = "signup", beforeForm }: { eyebrow?: string; title: string; subtitle: string; children: ReactNode; mode?: "signup" | "signin"; beforeForm?: ReactNode }) {
-  const site = useBrandSite();
-  if (site === "aimante") return <AimanteAuth title={title} subtitle={subtitle} beforeForm={beforeForm}>{children}</AimanteAuth>;
-  return (
-    <main className={`auth-page auth-page-${mode}`}>
-      <div className="auth-form-side">
-        <a href="/" className="auth-brand">
-          <GravityPantsLogo size={30} /><span>Gravity Pants</span>
-        </a>
-        <div className="auth-form-inner">
-          {eyebrow && <p className="auth-eyebrow">{eyebrow}</p>}
-          <h1 className="auth-title">{title}</h1>
-          <p className="auth-subtitle">{subtitle}</p>
-          {beforeForm}
-          <div className="auth-form-body">{children}</div>
-        </div>
-      </div>
-      <div className="auth-visual-side">
-        <AuthVisual mode={mode} />
-      </div>
-    </main>
   );
 }
 
