@@ -88,7 +88,7 @@ export function LikeSave({ kind, id, name, showSave = true, brand = false }: { k
 const DIR_FAVS_KEY = ["directory-reel-favs"];
 
 /** Same heart as website reel tiles, top-right of a Directory reel thumbnail. */
-export function DirectoryReelHeart({ reelId, name }: { reelId: string; name: string }) {
+export function DirectoryReelHeart({ reelId, name, inline = false }: { reelId: string; name: string; inline?: boolean }) {
   const qc = useQueryClient();
   const gate = useSignupGate();
   const q = useQuery({
@@ -118,7 +118,7 @@ export function DirectoryReelHeart({ reelId, name }: { reelId: string; name: str
   };
   return (
     <button type="button" onClick={(e) => void toggle(e)} aria-pressed={saved} aria-label={saved ? `Remove ${name} from favorites` : `Save ${name} to favorites`}
-      className={cn("absolute top-1.5 right-1.5 z-10 grid size-[30px] min-h-0 place-items-center rounded-[8px] bg-ap-card/95", saved ? "text-destructive" : "text-ap-body hover:text-ap-ink")}>
+      className={cn(inline ? "grid size-11 place-items-center rounded-lg bg-ap-panel" : "absolute top-1.5 right-1.5 z-10 grid size-[30px] min-h-0 place-items-center rounded-[8px] bg-ap-card/95", saved ? "text-destructive" : "text-ap-body hover:text-ap-ink")}>
       <Heart className={cn("size-4", saved && "fill-current")} strokeWidth={1.7} />
     </button>
   );

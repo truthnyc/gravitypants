@@ -15,7 +15,8 @@
 - All project/frame reads and writes go through the hooks in `src/lib/stillframe/data.ts` so the editor can autosave from one place.
 - Domain types and shared constants (workspace id, formats, defaults) live in `src/lib/stillframe/types.ts`.
 - The `media` storage bucket is private; resolve image URLs with `getMediaUrl()` in `src/lib/stillframe/media.ts` (workspace policy blocks public buckets).
-- Design tokens live only in `src/styles.css`; components use semantic classes (`bg-canvas`, `text-secondary-text`, `bg-control-fill`), never raw colors.
+- Colors use semantic tokens in `src/styles.css`, never raw component colors.
+- Reel details share `ReelPopup` to keep site and Directory layouts identical.
 - Preview and export both draw through `renderAt()` in `src/render/renderFrame.ts`; never add a second drawing path — the look must match everywhere.
 - Exports go to the private media bucket (500MB limit for GIFs), listed from storage.
 - Export: finished files are kept 30 days; daily 03:00 UTC cleanup via /api/public/cleanup-exports (only removes expired files, so no caller secret).

@@ -1,17 +1,9 @@
-import { useState } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
-import { ArrowUpRight } from "lucide-react";
-import { toast } from "sonner";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { Drawer, DrawerContent, DrawerTitle } from "@/components/ui/drawer";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { supabase } from "@/integrations/supabase/client";
-import { makeOneLikeThis, reportReel } from "@/lib/directory/directory.functions";
-import { ratio, type DirectoryCard } from "@/lib/directory/directory";
+import { Link } from "@tanstack/react-router";
+import { type DirectoryCard } from "@/lib/directory/directory";
 import { ReelVideo } from "@/components/site/ReelVideo";
 import { ReelCarousel } from "@/components/site/ReelCarousel";
-import { DirectoryReelHeart, LikeSave } from "./LikeSave";
+import { DirectoryReelHeart } from "./LikeSave";
+import { ReelPopup, ReelPopupBody } from "./ReelPopup";
 
 const shape = (f: string | undefined) => (f === "9x16" ? "aspect-[9/16] h-full" : f === "16x9" ? "aspect-[16/9] w-full" : "aspect-square h-full");
 
@@ -93,93 +85,15 @@ export function CardCarousel({ cards, label, onOpen }: { cards: DirectoryCard[];
   );
 }
 
-/** Reel detail: pop-up on desktop, bottom sheet on phones. */
+/** Shared reel detail presentation. */
 export function ReelDetail({ card, onClose }: { card: DirectoryCard | null; onClose: () => void }) {
-  const mobile = useIsMobile();
   if (!card) return null;
-  const body = <DetailBody card={card} onClose={onClose} />;
-  return mobile ? (
-    <Drawer open onOpenChange={(o) => !o && onClose()}>
-      <DrawerContent className="max-h-[92dvh] font-ap"><DrawerTitle className="sr-only">{card.brand_name} reel</DrawerTitle><div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto pb-6">{body}</div></DrawerContent>
-    </Drawer>
-  ) : (
-    <Dialog open onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-[860px] gap-0 overflow-hidden rounded-[24px] p-0 font-ap"><DialogTitle className="sr-only">{card.brand_name} reel</DialogTitle>{body}</DialogContent>
-    </Dialog>
-  );
-}
-
-function DetailBody({ card, onClose }: { card: DirectoryCard; onClose: () => void }) {
-  const navigate = useNavigate();
-  const make = useServerFn(makeOneLikeThis);
-  const report = useServerFn(reportReel);
-  const [busy, setBusy] = useState(false);
-  const [reporting, setReporting] = useState(false);
-  const [reason, setReason] = useState("");
-  const tname = card.template_name ?? "this";
-
-  const start = async () => {
-    if (!card.template_id) return;
-    setBusy(true);
-    try {
-      const { data } = await supabase.auth.getSession();
-      if (!data.session) {
-        const target = `/app/templates?template=${card.template_id}`;
-        void navigate({ to: "/signup", search: { redirect: target, template: card.template_id } });
-        return;
-      }
-      const t = await make({ data: { reelId: card.reel_id, templateId: card.template_id } });
-      toast.success(`Started from the ${t.name} template.`);
-      if (t.slug) void navigate({ to: "/app/templates/$slug", params: { slug: t.slug } });
-      else void navigate({ to: "/app/templates", search: { template: t.id } });
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "That didn't work. Try again.");
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  return (
-    <div className="grid min-w-0 text-ap-ink sm:grid-cols-[1fr_1fr]">
-      {card.video ? (
-        <div className="grid h-[min(52dvh,100vw)] grid-rows-[minmax(0,1fr)] place-items-center overflow-hidden bg-ap-panel p-5 sm:h-auto sm:min-h-[460px] sm:p-[10%]">
-          <video src={card.video} poster={card.poster ?? undefined} controls autoPlay loop muted playsInline className="h-full max-h-full w-auto max-w-full rounded-lg object-contain shadow-ap-soft sm:h-auto sm:max-h-[520px]" />
-        </div>
-      ) : (
-        <ReelPoster card={card} className="h-[min(52dvh,100vw)] grid-rows-[minmax(0,1fr)] overflow-hidden sm:h-auto sm:min-h-[460px]" />
-      )}
-      <div className="flex min-w-0 flex-col gap-3 p-5 sm:p-8">
-        <p className="text-[14px] font-semibold text-ap-badge">{card.category}</p>
-        <h2 className="text-[22px] break-words sm:text-[26px] leading-tight font-semibold tracking-[-0.02em]">{card.title ?? card.template_name ?? "Custom reel"}</h2>
-        <p className="text-[15px]">by <Link to="/directory/$slug" params={{ slug: card.brand_slug }} onClick={onClose} className="font-semibold hover:text-ap-blue">{card.brand_name}</Link></p>
-        <div className="flex gap-2"><LikeSave kind="reel" id={card.reel_id} name={card.title ?? `${card.brand_name} reel`} /></div>
-        {card.website_url && <a href={card.website_url} target="_blank" rel="noreferrer" className="inline-flex w-fit items-center gap-1 text-[14px] text-ap-blue">Visit {card.brand_name} <ArrowUpRight className="size-3.5" strokeWidth={1.7} /></a>}
-        {card.description && <p className="text-[15px] leading-normal text-ap-body">{card.description}</p>}
-        <div className="flex flex-wrap gap-1.5 text-[13px] nums">
-          {[`${card.photos} photos`, `${card.seconds} sec`, ...card.formats.map(ratio)].map((c) => <span key={c} className="rounded-lg bg-ap-panel px-2.5 py-1">{c}</span>)}
-        </div>
-        {card.template_id && (
-          <div className="mt-auto rounded-[14px] bg-ap-panel p-4 text-[14px] leading-normal">
-            <p>Make one like this starts with: <b>{tname} template</b></p>
-            <p className="mt-1 text-ap-body">You add your own photos, words, colors and fonts, or use your brand kit.</p>
-          </div>
-        )}
-        <button type="button" disabled={!card.template_id || busy} onClick={() => void start()} className="mt-1 h-12 rounded-lg bg-ap-blue text-[16px] font-semibold text-ap-card disabled:opacity-40">
-          {busy ? "Starting…" : "Make one like this"}
-        </button>
-        {reporting ? (
-          <form className="flex gap-2" onSubmit={async (e) => {
-            e.preventDefault();
-            try { await report({ data: { reelId: card.reel_id, reason } }); toast("Thanks. We'll take a look."); setReporting(false); }
-            catch (err) { toast.error(err instanceof Error ? err.message : "Couldn't send that."); }
-          }}>
-            <input autoFocus value={reason} onChange={(e) => setReason(e.target.value)} maxLength={500} placeholder="What's wrong with this reel?" className="h-9 min-w-0 flex-1 rounded-lg border border-ap-hairline px-2.5 text-[14px]" />
-            <button type="submit" disabled={!reason.trim()} className="text-[14px] text-ap-blue disabled:opacity-40">Send</button>
-          </form>
-        ) : (
-          <button type="button" onClick={() => setReporting(true)} className="w-fit text-[12px] text-ap-muted underline-offset-2 hover:underline">Report</button>
-        )}
-      </div>
-    </div>
-  );
+  const title = card.title ?? card.template_name ?? "Custom reel";
+  return <ReelPopup title={title} onClose={onClose}><ReelPopupBody
+    category={card.category} title={title} brandName={card.brand_name} href={card.website_url}
+    description={card.description} tags={[...card.moods, ...card.tags]}
+    brand={<Link to="/directory/$slug" params={{ slug: card.brand_slug }} onClick={onClose} className="font-semibold hover:text-ap-blue">{card.brand_name}</Link>}
+    favorite={<DirectoryReelHeart inline reelId={card.reel_id} name={title} />}
+    media={card.video ? <video src={card.video} poster={card.poster ?? undefined} controls autoPlay loop muted playsInline /> : card.poster ? <img src={card.poster} alt={`${card.brand_name} reel`} /> : null}
+  /></ReelPopup>;
 }
