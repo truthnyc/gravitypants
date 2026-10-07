@@ -187,7 +187,7 @@ function ReelForm({ initial, onDone, onCancel, videoSrc }: { videoSrc?: string |
         <Input value={d.href} onChange={(e) => setD({ ...d, href: e.target.value })} placeholder="https://brand.com" inputMode="url" className="h-11 bg-card text-[15px] text-foreground" />
       </label>
       <label className="grid gap-1 text-[13px] text-secondary-text sm:col-span-2">Description
-        <Textarea value={d.description} onChange={(e) => setD({ ...d, description: e.target.value })} maxLength={1000} rows={3} className="bg-card text-[15px] text-foreground" />
+        <Textarea aria-label="Description" value={d.description} onChange={(e) => setD({ ...d, description: e.target.value })} maxLength={1000} rows={3} className="bg-card text-[15px] text-foreground" />
       </label>
       <label className="grid gap-1 text-[13px] text-secondary-text">Photos used
         <Input required type="number" min={1} max={50} step={1} value={d.photos} onChange={(e) => setD({ ...d, photos: Math.max(1, Math.round(Number(e.target.value) || 1)) })} className="h-11 bg-card text-[15px] text-foreground" />
