@@ -33,8 +33,9 @@ export const Route = createFileRoute("/directory/$slug")({
   head: ({ loaderData, params }) => {
     if (!loaderData?.brand) return { meta: [{ title: "Not in the Directory right now — Gravity Pants" }, { name: "robots", content: "noindex" }] };
     const b = loaderData.brand;
-    const image = b.logo_url?.startsWith("https://") ? b.logo_url : loaderData.reels.find((r) => r.poster)?.poster ?? undefined;
     const aim = loaderData.site === "aimante";
+    const hasImage = b.logo_url?.startsWith("https://") || loaderData.reels.some((r) => r.poster);
+    const image = hasImage ? `${aim ? AIMANTE_ORIGIN : ORIGIN}/api/public/og/brand/${params.slug}` : undefined;
     const head = aim ? aimanteHead({
       path: `/b/${params.slug}`,
       title: `${b.name} video ads — Aimanté`,
