@@ -321,7 +321,7 @@ function DirectoryPage() {
         <div className={cn("dir-filter-wrap sticky top-16 z-30 px-6 transition-[background,padding] motion-reduce:transition-none",
           stuck ? "border-b border-ap-hairline bg-ap-card/80 py-2 backdrop-blur-xl" : "border-b border-transparent pb-2")}>
           <FilterBar phoneStyle={isAim} comingSoon={settings.comingSoon} value={filters} onChange={setFilters} facets={facets} total={total} families={families} brands={brands} compact={stuck} />
-          {isAim && <p className="mt-2 text-center text-[13px] text-ap-muted"><Link to="/aimante/about" className="hover:text-ap-ink">New here? See how Aimanté works →</Link></p>}
+          {isAim && <p className="mt-2 text-center text-[13px]"><Link to="/aimante/about" className="text-ap-blue hover:underline">New here? See how Aimanté works →</Link></p>}
           {tags.length > 0 && (
             <ul className="mx-auto mt-2 flex max-w-[680px] flex-wrap items-center gap-1.5" aria-label="Active filters">
               {tags.map((t) => (
