@@ -26,8 +26,8 @@ export function aimanteIn(url: URL): URL | undefined {
   const out = new URL(url.href);
   let m: RegExpMatchArray | null;
   if (p === "/") out.pathname = "/directory";
-  else if ((m = p.match(/^\/c\/([^/]+)$/))) { out.pathname = "/directory"; out.searchParams.set("category", decodeURIComponent(m[1])); }
-  else if ((m = p.match(/^\/mood\/([^/]+)$/))) { out.pathname = "/directory"; out.searchParams.set("mood", decodeURIComponent(m[1])); }
+  else if ((m = p.match(/^\/c\/([^/]+)$/))) { out.pathname = "/directory"; out.searchParams.set("category", decodeURIComponent(m[1] ?? "")); }
+  else if ((m = p.match(/^\/mood\/([^/]+)$/))) { out.pathname = "/directory"; out.searchParams.set("mood", decodeURIComponent(m[1] ?? "")); }
   else if ((m = p.match(/^\/b\/([^/]+)$/))) out.pathname = `/directory/${m[1]}`;
   else if (p === "/join" || p === "/about") out.pathname = `/aimante${p}`;
   else return undefined;
