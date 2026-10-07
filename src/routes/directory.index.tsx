@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils";
 import { listSiteReels } from "@/lib/site/reels.functions";
 import { type SiteReel } from "@/lib/site/reels";
 import { siteHead } from "@/lib/site/seo";
+import { aimanteHead } from "@/lib/site/brand-site";
 import { SiteReelHeart } from "@/components/site/SiteReelHeart";
 import { SiteReelModal } from "@/components/site/SiteReelModal";
 import { useMoodCatalog } from "@/lib/directory/moods";
@@ -36,8 +37,8 @@ export const Route = createFileRoute("/directory/")({
     q: z.string().optional(), mood: z.string().optional(), category: z.string().optional(), brand: z.string().optional(),
     page: z.union([z.number(), z.string()]).optional(),
   }),
-  loaderDeps: ({ search }) => ({ q: (search.q ?? "").slice(0, 200) }),
-  loader: async ({ deps }) => {
+  loaderDeps: ({ search }) => ({ q: (search.q ?? "").slice(0, 200), category: search.category, mood: search.mood }),
+  loader: async ({ deps, context }) => {
     // Lookups for the carousel, brand panel and reel pop-ups; the grid itself is filtered and paged on the server.
     const [dir, cards, reels, brands] = await Promise.all([
       getDirectoryPublic().catch(() => ({ settings: DEFAULT_DIRECTORY_SETTINGS, featured: [] as FacetedReel[] })),
@@ -45,9 +46,16 @@ export const Route = createFileRoute("/directory/")({
       listSiteReels().catch(() => [] as SiteReel[]),
       listPublicBrands().catch(() => []),
     ]);
-    return { q: deps.q, cards, reels, brands, settings: dir.settings, featuredReels: dir.featured };
+    return { q: deps.q, category: deps.category, mood: deps.mood, site: (context as { site?: string }).site, cards, reels, brands, settings: dir.settings, featuredReels: dir.featured };
   },
   head: ({ loaderData }) => {
+    if (loaderData?.site === "aimante") {
+      const cat = loaderData.category && !loaderData.category.includes(",") ? CATEGORIES.find((c) => categorySlug(c) === loaderData.category) : undefined;
+      const mood = !cat && loaderData.mood && !loaderData.mood.includes(",") ? loaderData.mood : undefined;
+      if (cat) return aimanteHead({ path: `/c/${loaderData.category}`, title: `${cat} video ads — Aimanté`, description: `Short video ads and Reels from ${cat} brands. Browse by mood and brand on Aimanté.` });
+      if (mood) return aimanteHead({ path: `/mood/${encodeURIComponent(mood)}`, title: `${cap(mood)} video ads — Aimanté`, description: `Video ads and Reels that feel ${mood}, from independent brands on Aimanté.` });
+      return aimanteHead({ path: "/", title: "Aimanté — Video ads by mood, category and brand", description: "Tell us your mood and we'll show you something. Browse short video ads and Reels from independent brands, by mood, category or brand." });
+    }
     const base = siteHead({
       path: "/directory",
       title: loaderData?.q

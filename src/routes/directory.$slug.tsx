@@ -8,6 +8,7 @@ import { getBrandPage } from "@/lib/directory/directory.functions";
 import type { DirectoryCard } from "@/lib/directory/directory";
 import { BrandActions } from "@/components/directory/BrandActions";
 import { siteHead } from "@/lib/site/seo";
+import { aimanteHead, AIMANTE_ORIGIN } from "@/lib/site/brand-site";
 import { SiteReelHeart } from "@/components/site/SiteReelHeart";
 import { SiteReelModal } from "@/components/site/SiteReelModal";
 import type { SiteReel } from "@/lib/site/reels";
@@ -20,27 +21,33 @@ const POSTER = "absolute top-1/2 left-1/2 h-[72%] w-auto max-w-[72%] object-cont
 const ORIGIN = "https://gravitypants.com";
 
 export const Route = createFileRoute("/directory/$slug")({
-  loader: async ({ params }) => {
+  loader: async ({ params, context }) => {
     const page = await getBrandPage({ data: { slug: params.slug } });
     if (page.redirect) throw redirect({ to: "/directory/$slug", params: { slug: page.redirect }, statusCode: 301 });
     if (!page.brand) throw notFound();
-    return page;
+    return { ...page, site: (context as { site?: string }).site };
   },
   head: ({ loaderData, params }) => {
     if (!loaderData?.brand) return { meta: [{ title: "Not in the Directory right now — Gravity Pants" }, { name: "robots", content: "noindex" }] };
     const b = loaderData.brand;
     const image = b.logo_url?.startsWith("https://") ? b.logo_url : loaderData.reels.find((r) => r.poster)?.poster ?? undefined;
-    const head = siteHead({
+    const aim = loaderData.site === "aimante";
+    const head = aim ? aimanteHead({
+      path: `/b/${params.slug}`,
+      title: `${b.name} video ads — Aimanté`,
+      description: b.description || `Reels and video ads by ${b.name} on Aimanté.`,
+      ...(image ? { image } : {}),
+    }) : siteHead({
       path: `/directory/${params.slug}`,
       title: `${b.name} video ads — Gravity Pants Directory`,
       description: b.description || `Reels and video ads by ${b.name}, made with Gravity Pants.`,
       ...(image ? { image } : {}),
     });
-    head.meta = [...(head.meta ?? []), { name: "robots", content: "noindex" }]; // Directory isn't on the marketing site yet
+    if (!aim) head.meta = [...(head.meta ?? []), { name: "robots", content: "noindex" }]; // gravitypants.com/directory sends visitors to aimante.co
     const ld = {
       "@context": "https://schema.org",
       "@graph": [
-        { "@type": "Organization", name: b.name, url: b.website_url ?? `${ORIGIN}/directory/${b.slug}`, ...(b.description ? { description: b.description } : {}) },
+        { "@type": "Organization", name: b.name, url: b.website_url ?? (aim ? `${AIMANTE_ORIGIN}/b/${b.slug}` : `${ORIGIN}/directory/${b.slug}`), ...(b.description ? { description: b.description } : {}) },
         ...loaderData.reels.map((r) => ({
           "@type": "VideoObject",
           name: `${b.name} — ${r.template_name ?? "reel"}`,
