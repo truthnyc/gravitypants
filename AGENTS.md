@@ -11,7 +11,7 @@
 
 ## Stillframe architecture rules
 
-- Routing uses TanStack Router file routes in `src/routes` (`ad.$id.edit.tsx` etc.), not React Router — the stack fixes the router.
+- Routing uses TanStack Router file routes in `src/routes`, never React Router.
 - All project/frame reads and writes go through the hooks in `src/lib/stillframe/data.ts` so the editor can autosave from one place.
 - Domain types and shared constants (workspace id, formats, defaults) live in `src/lib/stillframe/types.ts`.
 - The `media` storage bucket is private; resolve image URLs with `getMediaUrl()` in `src/lib/stillframe/media.ts` (workspace policy blocks public buckets).
@@ -20,7 +20,8 @@
 - Exports go to the private media bucket (500MB limit for GIFs), listed from storage.
 - Export: finished files are kept 30 days; daily 03:00 UTC cleanup via /api/public/cleanup-exports (only removes expired files, so no caller secret).
 - Accounts: authenticated routes call `ensure_workspace()`; the gate verifies membership before restoring a per-user workspace preference. Data reads `getWorkspaceId()`, not a constant — reloads preserve the selection safely.
-- Privacy: RLS on every table via `is_workspace_member()`; media files live under `<workspace_id>/…` (exports at `<workspace_id>/exports/<project>/<stamp>/`) and storage policies check the first folder.
+- Privacy: every table uses RLS via `is_workspace_member()`; media paths start with `<workspace_id>/`, exports add `exports/<project>/<stamp>/`; storage policies check the first folder.
+- Client RPCs use granted public SECURITY INVOKER wrappers over non-exposed private definer implementations; preserve identity/workspace guards and RPC names to keep RLS and account access safe.
 - Billing: per-workspace in `workspace_billing` (synced only by /api/public/payments/webhook), plans in `plans`; export gating via SQL `export_status`/`record_export` plus a restrictive storage policy on `<ws>/exports/` — the browser is never trusted for plan status.
 - AI calls go through `src/lib/ai/gateway.server.ts`; the billing helper is `diagnoseBilling` in `billing-help.functions.ts`, owners/admins only.
 - Brand kits: named kits live in `brand_kits` (logos in private `brand-assets` bucket, paths prefixed `brand-assets:` so `getMediaUrl` picks the bucket); ads link via `projects.brand_kit_id`; `effectiveKit()` merges the kit over the legacy `brand_kit` row, which now only holds workspace ad settings (placement, size, end card). Gating via SQL `brand_kits_enabled()` in RLS.
@@ -39,5 +40,5 @@
 - Folder rules: see `AGENTS.md` in src/components/editor, src/render, src/lib/stillframe (billing details), src/lib/directory and src/routes/_authenticated/admin.
 - Directory greetings use hosting geo or browser GeoJS, then server weather; no stored location or shared cache. Reduced motion removes transitions, not word rotation.
 - Admin analytics: public visits go to `page_views` (anon insert) via `src/lib/site/track.ts`; sign-up UTM in user metadata; `analytics.server.ts` feeds the Analytics page and deduped Monday `/api/public/weekly-report`.
-- One shared `SiteHeader` (`src/components/SiteHeader.tsx`, variant site|app) is the header everywhere except the editor; feature flags live in `src/lib/features.ts` (`SHOW_DIRECTORY` gates every Directory link) — headers can't drift and Directory ships when ready.
+- Shared `SiteHeader` (variant site|app) is used everywhere except the editor; `SHOW_DIRECTORY` in `src/lib/features.ts` gates every Directory link.
 - Website reel favorites: `site_reel_favorites` (own rows only) via `SiteReelHeart`/`useSiteReelFavorites` in src/components/site/SiteReelHeart.tsx; the Favorites page shows them alongside Directory reels — one heart for every reel tile.

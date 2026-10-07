@@ -1,5 +1,6 @@
 # Roadmap
-- [ ] Fix the 33 older database linter warnings without weakening workspace access; rerun the linter and verify public and signed-in flows.
+- [x] Resolve 32 exposed-definer warnings; verify public browsing, account/staff reads and access-denial regressions (20 tests passed).
+- [ ] Remaining managed pg_net extension registration warning — safe relocation requires provider-supported maintenance; drop/recreate could disrupt scheduled jobs, so retain it rather than suppress the warning.
 - [x] Complete Aimanté brand pages and verify all 12 live brands.
 - [x] Build `/join` submission, confirmation email, and staff approval into a draft brand.
 - [ ] Submit Aimanté's sitemap to Google — blocked until aimante.co is verified in Google Search Console. Publishing requested; recheck production redirects after deployment completes.
@@ -7,7 +8,7 @@
 - [x] Review current security findings; revoke unchecked greeting inserts, protect staff brand fields, patch vulnerable dependencies; retain intentional public catalog reads and reviewed helper/extension advisories.
 - [x] Replace invented Aimanté share art with real reel imagery, review Join/About copy, and correct Purl Soho's address with an old-address redirect.
 - [x] Count intentional Directory reel opens and rank “Most viewed this week” using real weekly totals; verify recording and selection.
-- [ ] Verify the staff carousel preview visually — blocked: requesting account has no staff role, so /admin/directory-settings correctly returns not found.
+- [x] Verify the staff carousel preview visually — current staff session opens settings and renders real reel previews.
 - [x] Connect real visitor country and weather to Directory greetings and verify lookup/fallback behavior.
 - [x] Add brand-page links and expanding logo tiles to Browse reels and carousel captions; verify navigation, keyboard and touch behavior.
 - [x] Adjust filter-to-carousel spacing and add saved label size/spacing controls.
