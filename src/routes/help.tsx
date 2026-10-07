@@ -14,7 +14,7 @@ const guides = [
   { q: "Where do my exports go?", a: "Every finished export appears on the Export page under Previous exports and stays available to download for 30 days." },
   { q: "What counts as one export?", a: "One export is one reel, however many formats and files it produces. Export counts reset on each billing date." },
   { q: "Can I use my own fonts and logo?", a: "Yes. Add your logo, colors and fonts to a brand kit, then use it when you make a new ad. Every Google Font is included on all plans." },
-  { q: "How do I work with my team?", a: "The Team plan lets you invite 3 teammates with shared brand kits, shared templates and 150 exports a month shared across the workspace. Invite people from Account → Team." },
+  { q: "How do I work with my team?", a: "The Team plan lets you invite 4 teammates with shared brand kits, shared templates and 150 exports a month shared across the workspace. Invite people from Account → Team." },
   { q: "How do I change or cancel my plan?", a: "Go to Account → Billing to switch plans, update your card or cancel. Changes start right away; cancellations keep your access until the end of the paid period." },
 ];
 
