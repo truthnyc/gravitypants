@@ -1,5 +1,6 @@
 import { ConceptReelNotice } from "@/components/directory/ConceptReelNotice";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useBrandSite } from "@/components/site/AimanteShell";
 import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { keepPreviousData, useInfiniteQuery, useQueries, useQuery } from "@tanstack/react-query";
@@ -111,6 +112,7 @@ type Tag = { key: keyof FilterValue; value: string; label: string };
 function DirectoryPage() {
   const { cards: allCards, reels, brands, settings, featuredReels: featuredSet } = Route.useLoaderData();
   const PAGE = settings.pageSize;
+  const isAim = useBrandSite() === "aimante";
   const search = Route.useSearch();
   const q = (search.q ?? "").slice(0, 200);
   const page = Math.min(Math.max(1, Math.floor(Number(search.page) || 1)), 20);
@@ -308,6 +310,7 @@ function DirectoryPage() {
         <div className={cn("sticky top-16 z-30 px-6 transition-[background,padding] motion-reduce:transition-none",
           stuck ? "border-b border-ap-hairline bg-ap-card/80 py-2 backdrop-blur-xl" : "border-b border-transparent pb-2")}>
           <FilterBar comingSoon={settings.comingSoon} value={filters} onChange={setFilters} facets={facets} total={total} families={families} brands={brands} compact={stuck} />
+          {isAim && !stuck && <p className="mt-2 text-center text-[13px] text-ap-muted"><Link to="/aimante/about" className="hover:text-ap-ink">New here? See how Aimanté works →</Link></p>}
           {tags.length > 0 && (
             <ul className="mx-auto mt-2 flex max-w-[680px] flex-wrap items-center gap-1.5" aria-label="Active filters">
               {tags.map((t) => (
@@ -399,6 +402,9 @@ function DirectoryPage() {
                   You've seen them all ·{" "}
                   <button type="button" onClick={() => { window.scrollTo({ top: 0, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }); input.current?.focus({ preventScroll: true }); }} className="font-medium text-ap-blue">Back to top ↑</button>
                 </p>
+              )}
+              {!hasMore && isAim && (
+                <p className="text-[14px] text-ap-muted"><Link to="/aimante/join" className="font-medium text-ap-blue hover:underline">Your brand here? List it free →</Link></p>
               )}
             </div>
           )}
