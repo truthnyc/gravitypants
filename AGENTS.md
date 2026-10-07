@@ -11,7 +11,7 @@
 
 ## Stillframe architecture rules
 
-- Routing uses TanStack Router file routes in `src/routes`, never React Router.
+- Use TanStack file routes in `src/routes`, never React Router.
 - All project/frame reads and writes go through the hooks in `src/lib/stillframe/data.ts` so the editor can autosave from one place.
 - Domain types and shared constants (workspace id, formats, defaults) live in `src/lib/stillframe/types.ts`.
 - The `media` storage bucket is private; resolve image URLs with `getMediaUrl()` in `src/lib/stillframe/media.ts` (workspace policy blocks public buckets).
