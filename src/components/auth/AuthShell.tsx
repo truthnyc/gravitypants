@@ -2,6 +2,7 @@ import { useState, type ReactNode } from "react";
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GravityPantsLogo } from "@/components/GravityPantsLogo";
+import { AimanteShell, AimanteLogo, useBrandSite } from "@/components/site/AimanteShell";
 import { lovable } from "@/integrations/lovable";
 import { FeaturedAdVideo } from "@/components/site/FeaturedAdVideo";
 import photo1 from "@/assets/site/purl-soho-photo-1.webp.asset.json";
@@ -41,12 +42,12 @@ function AuthVisual({ mode }: { mode: "signup" | "signin" }) {
 }
 
 export function AuthShell({ eyebrow, title, subtitle, children, mode = "signup", beforeForm }: { eyebrow?: string; title: string; subtitle: string; children: ReactNode; mode?: "signup" | "signin"; beforeForm?: ReactNode }) {
-  return (
+  const site = useBrandSite();
+  const content = (
     <main className={`auth-page auth-page-${mode}`}>
       <div className="auth-form-side">
         <a href="/" className="auth-brand">
-          <GravityPantsLogo size={30} />
-          <span>Gravity Pants</span>
+          {site === "aimante" ? <AimanteLogo /> : <><GravityPantsLogo size={30} /><span>Gravity Pants</span></>}
         </a>
         <div className="auth-form-inner">
           {eyebrow && <p className="auth-eyebrow">{eyebrow}</p>}
@@ -61,6 +62,7 @@ export function AuthShell({ eyebrow, title, subtitle, children, mode = "signup",
       </div>
     </main>
   );
+  return site === "aimante" ? <AimanteShell>{content}</AimanteShell> : content;
 }
 
 export function GoogleButton({ redirectTo, onStart }: { redirectTo: string; onStart?: () => void }) {

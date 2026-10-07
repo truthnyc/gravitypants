@@ -1,6 +1,7 @@
-import { Link, useRouteContext } from "@tanstack/react-router";
+import { Link, useRouteContext, useRouterState } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { Menu, X } from "lucide-react";
+import { ChevronRight, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { BrandSite } from "@/lib/site/brand-site";
 
@@ -10,70 +11,97 @@ export function useBrandSite(): BrandSite {
   return ctx.site ?? "gravitypants";
 }
 
-export function AimanteLogo() {
+export function AimanteLogo({ footer = false }: { footer?: boolean }) {
   return (
-    <span className="flex items-baseline gap-2 whitespace-nowrap">
-      <span className="text-[32px] font-semibold tracking-[-0.035em] text-ap-ink">Aimanté</span>
-      <span className="text-[13px] text-ap-muted">— by Gravity Pants</span>
+    <span className="flex flex-col items-start gap-[3px] whitespace-nowrap text-left">
+      <span className={cn("font-semibold leading-none text-ap-ink", footer ? "text-[20px] tracking-normal" : "text-[24px] tracking-[-1px] md:text-[28px]")}>Aimanté</span>
+      <span className="text-[10px] leading-none tracking-normal text-ap-muted">by Gravity Pants</span>
     </span>
   );
 }
 
-const primary = "inline-flex h-9 shrink-0 items-center justify-center whitespace-nowrap rounded-lg bg-ap-blue px-4 text-[14px] font-medium text-ap-card hover:bg-ap-blue-hover";
 const navLink = "text-[14px] text-site-nav hover:text-ap-ink";
 const navActive = { className: "!text-ap-ink font-semibold" };
 
-function AimanteHeader() {
+export function AimanteHeader() {
   const [open, setOpen] = useState(false);
-  const wrap = useRef<HTMLDivElement>(null);
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const menuButton = useRef<HTMLButtonElement>(null);
+  const panel = useRef<HTMLElement>(null);
+  const close = () => setOpen(false);
+  useEffect(() => { setOpen(false); }, [pathname]);
   useEffect(() => {
     if (!open) return;
-    const down = (e: MouseEvent) => { if (wrap.current && !wrap.current.contains(e.target as Node)) setOpen(false); };
-    const key = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
-    document.addEventListener("mousedown", down); document.addEventListener("keydown", key);
-    return () => { document.removeEventListener("mousedown", down); document.removeEventListener("keydown", key); };
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    panel.current?.querySelector<HTMLAnchorElement>("a")?.focus();
+    const key = (e: KeyboardEvent) => {
+      if (e.key === "Escape") { setOpen(false); menuButton.current?.focus(); }
+      if (e.key === "Tab") {
+        const links = Array.from(panel.current?.querySelectorAll<HTMLAnchorElement>("a") ?? []);
+        const first = links[0];
+        const last = links[links.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); menuButton.current?.focus(); }
+        else if (e.shiftKey && document.activeElement === menuButton.current) { e.preventDefault(); last?.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); menuButton.current?.focus(); }
+        else if (!e.shiftKey && document.activeElement === menuButton.current) { e.preventDefault(); first?.focus(); }
+      }
+    };
+    const media = window.matchMedia("(min-width: 768px)");
+    const resize = () => { if (media.matches) setOpen(false); };
+    document.addEventListener("keydown", key);
+    media.addEventListener("change", resize);
+    return () => { document.body.style.overflow = previous; document.removeEventListener("keydown", key); media.removeEventListener("change", resize); };
   }, [open]);
+  const row = "flex h-14 items-center justify-between border-b border-aimante-divider text-[20px] font-semibold text-ap-ink hover:bg-ap-panel";
+  const chevron = <ChevronRight size={20} strokeWidth={1.7} className="shrink-0 text-ap-headline-bracket" aria-hidden="true" />;
   return (
-    <header className="sticky top-0 z-50 border-b border-ap-hairline bg-ap-card/[.92] backdrop-blur-[14px] safe-top tracking-[-0.035em]">
-      <div className="mx-auto flex h-[63px] max-w-[1280px] items-center gap-3 px-4 md:px-6">
-        <Link to="/directory" aria-label="Aimanté home" className="shrink-0"><AimanteLogo /></Link>
-        <nav aria-label="Main" className="ml-auto hidden items-center gap-9 md:flex">
+    <header className="sticky top-0 z-50 border-b border-aimante-divider bg-ap-card font-ap">
+      <div className="mx-auto grid h-[55px] max-w-[1280px] grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 md:h-[63px] md:px-6">
+        <Link to="/directory" onClick={close} aria-label="Aimanté home" className="min-w-0 w-fit"><AimanteLogo /></Link>
+        <nav aria-label="Main" className="hidden shrink-0 items-center gap-7 md:flex">
           <Link to="/aimante/about" className={navLink} activeProps={navActive}>About</Link>
           <Link to="/aimante/join" className={navLink} activeProps={navActive} activeOptions={{ includeHash: false }}>For brands</Link>
+          <Link to="/signin" className={navLink} activeProps={navActive}>Sign in</Link>
+          <Button asChild variant="site" className="h-9 min-h-0 rounded-lg bg-ap-blue px-4 text-[14px] text-ap-card hover:bg-ap-blue-hover">
+            <Link to="/aimante/join" hash="apply">List your brand</Link>
+          </Button>
         </nav>
-        <Link to="/aimante/join" hash="apply" className={cn(primary, "ml-auto md:ml-6")}>List your brand</Link>
-        <div ref={wrap} className="relative md:hidden">
-          <button type="button" aria-label="Menu" aria-expanded={open} onClick={() => setOpen((o) => !o)} className="grid size-9 place-items-center rounded-lg text-ap-ink hover:bg-ap-panel">
-            {open ? <X className="size-5" strokeWidth={1.7} /> : <Menu className="size-5" strokeWidth={1.7} />}
-          </button>
-          {open && (
-            <div className="absolute right-0 top-11 w-44 rounded-lg bg-ap-card p-1.5 shadow-ap-soft ring-1 ring-ap-hairline">
-              <Link to="/aimante/about" onClick={() => setOpen(false)} className="block rounded-md px-3 py-2 text-[14px] text-site-nav hover:bg-ap-panel" activeProps={navActive}>About</Link>
-              <Link to="/aimante/join" onClick={() => setOpen(false)} className="block rounded-md px-3 py-2 text-[14px] text-site-nav hover:bg-ap-panel" activeProps={navActive}>For brands</Link>
-            </div>
-          )}
-        </div>
+        <Button ref={menuButton} variant="ghost" size="icon" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} aria-controls="aimante-mobile-menu" onClick={() => setOpen((o) => !o)} className="size-11 min-h-0 min-w-0 shrink-0 text-ap-ink md:hidden">
+          {open ? <X size={24} strokeWidth={1.7} /> : <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" /></svg>}
+        </Button>
       </div>
+      {open && <>
+        <div className="absolute inset-x-0 top-full h-dvh bg-aimante-dim md:hidden" onClick={() => { close(); menuButton.current?.focus(); }} aria-hidden="true" />
+        <nav ref={panel} id="aimante-mobile-menu" aria-label="Mobile navigation" className="absolute inset-x-0 top-full max-h-[calc(100dvh-56px)] overflow-y-auto rounded-b-[12px] bg-ap-card px-6 pb-6 shadow-aimante-menu md:hidden">
+          <Link to="/directory" onClick={close} className={row}>Browse{chevron}</Link>
+          <Link to="/aimante/about" onClick={close} className={row}>About{chevron}</Link>
+          <Link to="/aimante/join" onClick={close} className={row}>For brands{chevron}</Link>
+          <Link to="/aimante/join" hash="apply" onClick={close} className={cn(row, "text-ap-blue")}>List your brand{chevron}</Link>
+          <Link to="/signin" onClick={close} className="flex h-14 items-center text-[16px] text-site-nav hover:text-ap-ink">Sign in</Link>
+          <a href="https://gravitypants.com" onClick={close} className="inline-flex min-h-10 items-center text-[13px] text-ap-muted hover:text-ap-blue">Make reels with Gravity Pants →</a>
+        </nav>
+      </>}
     </header>
   );
 }
 
-function AimanteFooter() {
+export function AimanteFooter() {
   return (
-    <footer className="mt-auto border-t border-ap-hairline bg-ap-card font-ap text-ap-ink tracking-[-0.01em]">
-      <div className="mx-auto flex max-w-[1280px] flex-wrap items-baseline gap-x-5 gap-y-3 px-6 py-14 text-[14px] text-site-nav md:px-12">
-        <span className="flex items-baseline gap-2 whitespace-nowrap">
-          <span className="text-[22px] font-semibold tracking-[-0.035em] text-ap-ink">Aimanté</span>
-          <span>— by Gravity Pants</span>
-        </span>
-        <span className="nums">© {new Date().getFullYear()} Gravity Pants</span>
-        <nav aria-label="Footer" className="flex flex-wrap items-baseline gap-x-6 gap-y-2 md:ml-auto">
+    <footer className="mt-auto border-t border-aimante-divider bg-ap-card font-ap">
+      <div className="mx-auto grid max-w-[1280px] gap-y-6 px-6 py-10 text-[14px] text-site-nav md:grid-cols-[auto_minmax(0,1fr)] md:items-center md:gap-x-8 md:py-12">
+        <div className="flex min-w-0 items-center gap-5">
+          <Link to="/directory" aria-label="Aimanté home"><AimanteLogo footer /></Link>
+          <span className="hidden whitespace-nowrap text-[13px] text-ap-muted tabular-nums md:block">© {new Date().getFullYear()} Gravity Pants</span>
+        </div>
+        <nav aria-label="Footer" className="grid min-w-0 grid-cols-2 gap-x-6 gap-y-5 md:flex md:flex-wrap md:items-center md:justify-end md:gap-x-5 md:gap-y-3">
           <Link to="/aimante/join" className="hover:text-ap-ink">List your brand</Link>
           <Link to="/aimante/about" className="hover:text-ap-ink">About</Link>
           <Link to="/privacy" className="hover:text-ap-ink">Privacy</Link>
           <Link to="/terms" className="hover:text-ap-ink">Terms</Link>
-          <a href="https://gravitypants.com" className="text-ap-blue hover:underline">Make reels with Gravity Pants</a>
+          <a href="https://gravitypants.com" className="col-span-2 text-ap-blue hover:underline">Make reels with Gravity Pants</a>
         </nav>
+        <span className="text-[13px] text-ap-muted tabular-nums md:hidden">© {new Date().getFullYear()} Gravity Pants</span>
       </div>
     </footer>
   );

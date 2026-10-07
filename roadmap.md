@@ -1,4 +1,5 @@
 # Roadmap
+- [x] Update Aimanté lockup, always-branded navigation, mobile panel and footer; verify signed-in and signed-out pages.
 - [x] Add a branded, domain-aware service-unavailable page for application and SSR failures.
 - [x] Complete brand-request spam protection, website deduplication, private admin details/actions/nav count and emails; verified upload, confirmation/alert sends, duplicate rejection, Needs info, approval into linked draft, optional-reason decline, and rate-limit rejection.
 - [x] Set the shared concept disclaimer to 10px.
