@@ -35,7 +35,7 @@ export function renderErrorPage({ host }: ErrorPageOptions = {}): string {
       h1 { max-width: 560px; margin: 0; font-size: clamp(42px, 5vw, 58px); line-height: 1.08; letter-spacing: -.035em; font-weight: 600; }
       p { max-width: 520px; margin: 20px 0 0; color: #57575c; font-size: 17px; line-height: 1.6; }
       .actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
-      button, .home { min-height: 50px; padding: 0 28px; border-radius: 8px; font: 500 15px/1 inherit; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
+      button, .home { min-height: 50px; padding: 0 28px; border-radius: 8px; font: inherit; font-size: 15px; font-weight: 500; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
       button { border: 1px solid #0071e3; color: #fff; background: #0071e3; }
       button:hover { background: #0077ed; }
       .home { border: 1px solid #e5e5ea; color: #1d1d1f; background: #fff; }
