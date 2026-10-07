@@ -229,6 +229,27 @@ export type Database = {
           },
         ]
       }
+      brand_request_limits: {
+        Row: {
+          attempts: number
+          updated_at: string
+          visitor_hash: string
+          window_started_at: string
+        }
+        Insert: {
+          attempts?: number
+          updated_at?: string
+          visitor_hash: string
+          window_started_at?: string
+        }
+        Update: {
+          attempts?: number
+          updated_at?: string
+          visitor_hash?: string
+          window_started_at?: string
+        }
+        Relationships: []
+      }
       brand_requests: {
         Row: {
           admin_note: string | null
@@ -243,11 +264,13 @@ export type Database = {
           message: string | null
           moods: string[]
           name: string
+          needs_info_at: string | null
           reviewed_at: string | null
           reviewed_by: string | null
           status: string
           updated_at: string
           website: string | null
+          website_key: string | null
         }
         Insert: {
           admin_note?: string | null
@@ -262,11 +285,13 @@ export type Database = {
           message?: string | null
           moods?: string[]
           name: string
+          needs_info_at?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: string
           updated_at?: string
           website?: string | null
+          website_key?: string | null
         }
         Update: {
           admin_note?: string | null
@@ -281,11 +306,13 @@ export type Database = {
           message?: string | null
           moods?: string[]
           name?: string
+          needs_info_at?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: string
           updated_at?: string
           website?: string | null
+          website_key?: string | null
         }
         Relationships: [
           {
@@ -1769,6 +1796,10 @@ export type Database = {
         Returns: boolean
       }
       category_slug: { Args: { c: string }; Returns: string }
+      consume_brand_request_limit: {
+        Args: { _visitor_hash: string }
+        Returns: boolean
+      }
       decline_brand_request: {
         Args: { _admin_id: string; _admin_note: string; _request_id: string }
         Returns: boolean
