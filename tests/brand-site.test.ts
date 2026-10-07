@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { aimanteIn, aimanteOut, siteForHost } from "@/lib/site/brand-site";
+import { aimanteIn, aimanteOut, domainRedirect, siteForHost } from "@/lib/site/brand-site";
 
 const u = (s: string) => new URL(s);
 
