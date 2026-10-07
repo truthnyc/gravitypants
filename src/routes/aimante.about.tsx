@@ -37,9 +37,9 @@ function About() {
       <div className="font-ap text-ap-ink">
         <section className="mx-auto max-w-[1200px] px-6 pb-16 pt-20 text-center">
           <h1 className="text-[clamp(38px,5vw,64px)] font-semibold leading-[1.05] tracking-[-0.035em]">Find brands you'll love.</h1>
-          <p className="mt-2 text-[clamp(26px,3.4vw,44px)] font-semibold leading-[1.1] tracking-[-0.035em] text-ap-headline-muted">Browse by feeling, not by search terms.</p>
+          <p className="mt-2 text-[clamp(26px,3.4vw,44px)] font-semibold leading-[1.1] tracking-[-0.035em] text-ap-subhead">Browse by feeling, not by search terms.</p>
           <p className="mx-auto mt-6 max-w-[620px] text-[18px] leading-[1.5] text-ap-body">Aimanté is a visual directory of brands, shown through short reels. Tell us how you want to feel today, and we'll show you something.</p>
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
+          <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
             <Link to="/directory" className={primary}>Show me something →</Link>
             <Link to="/directory" hash="directory-results" className={grey}>Browse all reels</Link>
           </div>
@@ -47,7 +47,7 @@ function About() {
 
         {reels.length > 0 && (
           <section aria-label="Featured this week" className="bg-ap-panel py-14">
-            <div className="mx-auto flex max-w-[1200px] items-center justify-center gap-6 overflow-x-auto px-6">
+            <div className="mx-auto flex max-w-[1200px] items-center gap-4 overflow-x-auto px-4 sm:gap-6 sm:px-6 lg:justify-center">
               {reels.map((r) => (
                 <Link key={r.id} to="/directory/$slug" params={{ slug: r.brand_slug }} aria-label={`${r.title} by ${r.brand_name}`}
                   className={`${SHAPE[r.formats[0] ?? "9x16"] ?? SHAPE["9x16"]} shrink-0 overflow-hidden rounded-[8px] bg-ap-card shadow-ap-soft`}>
@@ -87,7 +87,7 @@ function About() {
         </section>
 
         <section className="bg-ap-panel px-6 py-20 text-center">
-          <p className="text-[clamp(30px,4vw,48px)] font-semibold tracking-[-0.035em]">Show me something: <span className="text-ap-headline-muted">[ <span className="text-ap-ink">mood</span> ]</span></p>
+          <p className="text-[clamp(30px,4vw,48px)] font-semibold tracking-[-0.035em]"><span className="text-ap-headline-muted">Show me something:</span> <span className="text-ap-headline-bracket">[</span> <span className="text-ap-blue">mood</span> <span className="text-ap-headline-bracket">]</span></p>
           <div className="mx-auto mt-8 flex max-w-[720px] flex-wrap justify-center gap-3">
             {MOODS.map((m) => (
               <Link key={m} to="/directory" search={{ mood: m } as never} className="inline-flex h-10 items-center rounded-lg bg-ap-card px-4 text-[15px] font-medium text-ap-ink shadow-ap-soft hover:text-ap-blue">{m}</Link>
