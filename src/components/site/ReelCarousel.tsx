@@ -25,7 +25,7 @@ export function ReelCarousel({ items, label, loop = true }: { items: CarouselIte
               <figcaption>
                 <b>{it.title}</b>
                 <span>{it.detail}</span>
-                <ConceptReelNotice brandName={it.visit?.label} />
+                <ConceptReelNotice brandName={it.visit?.label ?? (typeof it.title === "string" ? it.title : undefined)} />
                 {it.visit && (
                   <a className="showcase-visit" href={it.visit.href} target="_blank" rel="noreferrer" tabIndex={hidden ? -1 : undefined}>
                     {it.visit.label} <ArrowUpRight size={13} strokeWidth={1.7} />
