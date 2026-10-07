@@ -16,7 +16,7 @@
 - Domain types and shared constants (workspace id, formats, defaults) live in `src/lib/stillframe/types.ts`.
 - The `media` storage bucket is private; resolve image URLs with `getMediaUrl()` in `src/lib/stillframe/media.ts` (workspace policy blocks public buckets).
 - Colors use semantic tokens in `src/styles.css`, never raw component colors.
-- Share `ReelPopup` for detail layouts; `HoverReelPreview` for on-demand thumbnail playback.
+- Share `ReelPopup`, `HoverReelPreview` and `ConceptReelNotice` for consistent reel UI.
 - Preview and export both draw through `renderAt()` in `src/render/renderFrame.ts`; never add a second drawing path — the look must match everywhere.
 - Exports go to the private media bucket (500MB limit for GIFs), listed from storage.
 - Export: finished files are kept 30 days; daily 03:00 UTC cleanup via /api/public/cleanup-exports (only removes expired files, so no caller secret).

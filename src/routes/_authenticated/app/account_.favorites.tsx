@@ -16,9 +16,14 @@ import { listSiteReels } from "@/lib/site/reels.functions";
 import { type SiteReel } from "@/lib/site/reels";
 import { getMyFavorites, saveFavoritePage } from "@/lib/directory/favorites.functions";
 import { ratio, type DirectoryCard } from "@/lib/directory/directory";
+import { ConceptReelNotice } from "@/components/directory/ConceptReelNotice";
+import { siteHead } from "@/lib/site/seo";
 
 export const Route = createFileRoute("/_authenticated/app/account_/favorites")({
-  head: () => ({ meta: [{ title: "My favorites — Gravity Pants" }, { name: "robots", content: "noindex" }] }),
+  head: () => {
+    const head = siteHead({ path: "/app/account/favorites", title: "My favorites — Gravity Pants", description: "Your saved brand reels and favorite brands on Gravity Pants." });
+    return { ...head, meta: [...(head.meta ?? []), { name: "robots", content: "noindex" }] };
+  },
   component: FavoritesPage,
 });
 
@@ -119,6 +124,7 @@ function FavoritesPage() {
                   </button>
                   <p className="mt-2 truncate text-[14px] font-semibold">{c.title ?? c.template_name ?? "Custom reel"}</p>
                   <p className="text-[12px] text-ap-body nums">{c.seconds.toFixed(1)} sec · {c.brand_name}</p>
+                  <ConceptReelNotice brandName={c.brand_name} brandSlug={c.brand_slug} />
                   {c.tags.length > 0 && <p className="truncate text-[12px] text-ap-badge">{c.tags.slice(0, 3).join(" · ")}</p>}
                 </div>
               ))}
@@ -130,6 +136,7 @@ function FavoritesPage() {
                   <SiteReelHeart reelId={r.id} name={r.title} />
                   <p className="mt-2 truncate text-[14px] font-semibold">{r.title}</p>
                   <p className="text-[12px] text-ap-body nums">{r.seconds} sec · {r.brand}</p>
+                  <ConceptReelNotice brandName={r.brand} brandSlug={r.brandSlug} />
                 </div>
               ))}
             </div>
@@ -150,6 +157,7 @@ function FavoritesPage() {
                 </span>
                 <p className="mt-2.5 text-[12px] text-ap-muted">{b.category}</p>
                 <p className="mt-0.5 truncate text-[14px] font-semibold">{b.name}</p>
+                <ConceptReelNotice brandName={b.name} brandSlug={b.slug} />
               </Link></li>
             ))}
           </ul>
