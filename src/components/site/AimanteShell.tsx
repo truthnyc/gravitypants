@@ -12,7 +12,7 @@ export function useBrandSite(): BrandSite {
 export function AimanteLogo() {
   return (
     <span className="flex items-baseline gap-2 whitespace-nowrap">
-      <span className="text-[32px] font-semibold tracking-[-0.02em] text-ap-ink">Aimanté</span>
+      <span className="text-[32px] font-semibold tracking-[-0.035em] text-ap-ink">Aimanté</span>
       <span className="text-[13px] text-ap-muted">— by Gravity Pants</span>
     </span>
   );
@@ -22,7 +22,7 @@ const primary = "inline-flex h-9 shrink-0 items-center justify-center whitespace
 
 function AimanteHeader() {
   return (
-    <header className="sticky top-0 z-50 border-b border-ap-hairline bg-ap-card/[.92] backdrop-blur-[14px] safe-top">
+    <header className="sticky top-0 z-50 border-b border-ap-hairline bg-ap-card/[.92] backdrop-blur-[14px] safe-top tracking-[-0.035em]">
       <div className="mx-auto flex h-[63px] max-w-[1280px] items-center px-4 md:px-6">
         <Link to="/directory" aria-label="Aimanté home" className="shrink-0"><AimanteLogo /></Link>
         <Link to="/aimante/join" className={cn(primary, "ml-auto")}>List your brand</Link>
