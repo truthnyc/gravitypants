@@ -135,6 +135,13 @@ const shareSchema = z.object({
 });
 
 /** Saves the brand and the reel's listing; when shown, records the permission in the same request. */
+/** Plain wording for the database's listing rules (see reel_listing_guard). */
+export function listingError(message: string): string {
+  if (message.includes("LISTING_LIMIT")) return "Your free trial brand page shows up to 3 reels. Upgrade to show unlimited reels.";
+  if (message.includes("LISTING_WATERMARK")) return "Only watermark-free reels can be added to your brand page. Upgrade to export without a watermark.";
+  return message;
+}
+
 export const shareReel = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => shareSchema.parse(d))
@@ -143,7 +150,7 @@ export const shareReel = createServerFn({ method: "POST" })
     const { data: ad } = await sb.from("projects").select("id, workspace_id, name, template_id, formats").eq("id", data.adId).maybeSingle();
     if (!ad) throw new Error("This ad isn't available");
     const plan = await planState(sb, ad.workspace_id, null);
-    if (plan.tag === "trial" || plan.tag === "ended") throw new Error("Sharing to the Directory is part of paid plans.");
+    if (plan.tag === "ended") throw new Error("Sharing to the Directory is part of paid plans.");
     const { data: before } = await sb.from("directory_reels").select("status").eq("ad_id", data.adId).maybeSingle();
     // Already-shared reels can update their listing without re-recording permission.
     const keepShared = data.show && !data.agreed && (before?.status === "live" || before?.status === "in_review");
@@ -178,7 +185,7 @@ export const shareReel = createServerFn({ method: "POST" })
     const { data: reel, error } = prev
       ? await sb.from("directory_reels").update(row).eq("id", prev.id).select("id, status").single()
       : await sb.from("directory_reels").insert(row).select("id, status").single();
-    if (error) throw new Error(error.message);
+    if (error) throw new Error(listingError(error.message));
 
     if (data.show && !keepShared) {
       const req = getRequest();
