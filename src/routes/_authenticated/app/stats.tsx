@@ -1,4 +1,5 @@
 import { useState } from "react";
+import type React from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -27,7 +28,7 @@ const RANGES = [7, 30, 90] as const;
 const pct = (n: number) => `${(n * 100).toFixed(1)}%`;
 const change = (a: number, b: number) => (b === 0 ? (a > 0 ? "New" : "—") : `${a >= b ? "+" : ""}${Math.round(((a - b) / b) * 100)}%`);
 
-function StatsPage() {
+export function StatsPage({ tabs }: { tabs?: React.ReactNode } = {}) {
   const { canUse, isLoading } = usePlanAccess();
   const allowed = canUse("brand_stats");
   const [days, setDays] = useState<(typeof RANGES)[number]>(30);
@@ -42,6 +43,7 @@ function StatsPage() {
 
   return (
     <main className="mx-auto max-w-[1100px] px-5 py-10 font-ap text-ap-ink">
+      {tabs}
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-[32px] font-semibold tracking-[-0.035em]">Brand stats</h1>
