@@ -1,29 +1,69 @@
 import { createIsomorphicFn } from "@tanstack/react-start";
-import { getRequestHost } from "@tanstack/react-start/server";
+import { getCookie, getRequestHost } from "@tanstack/react-start/server";
 import type { LocationRewrite } from "@tanstack/react-router";
 
-/** Which brand a hostname serves. aimante.co shows the Aimanté directory; everything else is Gravity Pants. */
+/** Which brand a visit is on. aimante.co shows the Aimanté directory; everything else is Gravity Pants. */
 export type BrandSite = "gravitypants" | "aimante";
 
+export const AIMANTE_ORIGIN = "https://aimante.co";
+export const GP_ORIGIN = "https://gravitypants.com";
 const AIMANTE_HOSTS = new Set(["aimante.co", "www.aimante.co"]);
+const GP_HOSTS = new Set(["gravitypants.com", "www.gravitypants.com"]);
+/** Preview override: ?brand=aimante (remembered in this cookie), ?brand=gravitypants turns it off. */
+export const BRAND_COOKIE = "gp_brand_preview";
+
+const hostOf = (host: string | null | undefined) => (host ?? "").toLowerCase().split(":")[0] ?? "";
+export const isAimanteHost = (host: string | null | undefined) => AIMANTE_HOSTS.has(hostOf(host));
+export const isGravityPantsHost = (host: string | null | undefined) => GP_HOSTS.has(hostOf(host));
 
 export function siteForHost(host: string | null | undefined): BrandSite {
-  const h = (host ?? "").toLowerCase().split(":")[0] ?? "";
-  return AIMANTE_HOSTS.has(h) ? "aimante" : "gravitypants";
+  return isAimanteHost(host) ? "aimante" : "gravitypants";
+}
+
+/** Real domains always win; any other host (Lovable preview, localhost) may use the override. */
+export function resolveSite(host: string, brandParam: string | null, cookie: string | null | undefined): BrandSite {
+  if (isAimanteHost(host)) return "aimante";
+  if (isGravityPantsHost(host)) return "gravitypants";
+  if (brandParam === "aimante") return "aimante";
+  if (brandParam === "gravitypants") return "gravitypants";
+  return cookie === "aimante" ? "aimante" : "gravitypants";
+}
+
+const readCookie = createIsomorphicFn()
+  .server(() => { try { return getCookie(BRAND_COOKIE); } catch { return undefined; } })
+  .client(() => document.cookie.split("; ").find((c) => c.startsWith(`${BRAND_COOKIE}=`))?.split("=")[1]);
+
+export function siteForUrl(url: URL): BrandSite {
+  return resolveSite(url.host, url.searchParams.get("brand"), readCookie());
 }
 
 export const currentSite = createIsomorphicFn()
-  .server(() => siteForHost(getRequestHost({ xForwardedHost: true })))
-  .client(() => siteForHost(window.location.hostname));
+  .server(() => {
+    let host = "";
+    try { host = getRequestHost({ xForwardedHost: true }); } catch { /* outside a request */ }
+    return resolveSite(host, null, readCookie());
+  })
+  .client(() => {
+    const url = new URL(window.location.href);
+    const param = url.searchParams.get("brand");
+    if (param === "aimante" || param === "gravitypants") {
+      document.cookie = `${BRAND_COOKIE}=${param}; path=/; max-age=${60 * 60 * 24 * 30}; samesite=lax`;
+    }
+    return siteForUrl(url);
+  });
 
-/**
- * Public Aimanté URLs ↔ the app's internal Directory routes, so both brands share one set of pages.
- * Pure: only rewrites when the URL's host is an Aimanté host.
- */
-export function aimanteIn(url: URL): URL | undefined {
-  if (siteForHost(url.host) !== "aimante") return undefined;
+/** True for the public paths that belong to Aimanté. */
+export function isAimantePath(pathname: string): boolean {
+  const p = pathname.replace(/\/+$/, "") || "/";
+  return p === "/" || p === "/join" || p === "/about" || /^\/(c|mood|b)\/[^/]+$/.test(p);
+}
+
+/** Public Aimanté URL → the app's internal page. Pure apart from the site check. */
+export function aimanteIn(url: URL, site: BrandSite = siteForUrl(url)): URL | undefined {
+  if (site !== "aimante") return undefined;
   const p = url.pathname.replace(/\/+$/, "") || "/";
   const out = new URL(url.href);
+  out.searchParams.delete("brand");
   let m: RegExpMatchArray | null;
   if (p === "/") out.pathname = "/directory";
   else if ((m = p.match(/^\/c\/([^/]+)$/))) { out.pathname = "/directory"; out.searchParams.set("category", decodeURIComponent(m[1] ?? "")); }
@@ -34,8 +74,9 @@ export function aimanteIn(url: URL): URL | undefined {
   return out;
 }
 
-export function aimanteOut(url: URL): URL | undefined {
-  if (siteForHost(url.host) !== "aimante") return undefined;
+/** Internal page → the public Aimanté URL. */
+export function aimanteOut(url: URL, site: BrandSite = siteForUrl(url)): URL | undefined {
+  if (site !== "aimante") return undefined;
   const p = url.pathname;
   const out = new URL(url.href);
   let m: RegExpMatchArray | null;
@@ -57,3 +98,48 @@ export const aimanteRewrite: LocationRewrite = {
   input: ({ url }) => aimanteIn(url),
   output: ({ url }) => aimanteOut(url),
 };
+
+/**
+ * Cross-domain redirects for the real domains only (previews never redirect):
+ * aimante.co → gravitypants.com for anything that isn't an Aimanté page;
+ * gravitypants.com/directory… → the matching aimante.co page.
+ */
+export function domainRedirect(href: string): string | null {
+  const url = new URL(href);
+  if (isAimanteHost(url.host)) {
+    if (url.pathname.startsWith("/directory")) {
+      const out = aimanteOut(url, "aimante");
+      return out ? `${AIMANTE_ORIGIN}${out.pathname}${out.search}` : null;
+    }
+    if (isAimantePath(url.pathname)) return null;
+    return `${GP_ORIGIN}${url.pathname}${url.search}`;
+  }
+  if (isGravityPantsHost(url.host) && /^\/directory(\/|$)/.test(url.pathname)) {
+    const out = aimanteOut(url, "aimante");
+    return out ? `${AIMANTE_ORIGIN}${out.pathname}${out.search}` : AIMANTE_ORIGIN;
+  }
+  return null;
+}
+
+/** Head tags for an Aimanté page: its own origin, canonical and share image. */
+export function aimanteHead({ path, title, description, image = `${AIMANTE_ORIGIN}/og-aimante.jpg` }: { path: string; title: string; description: string; image?: string }) {
+  const url = `${AIMANTE_ORIGIN}${path}`;
+  return {
+    meta: [
+      { title },
+      { name: "description", content: description },
+      { property: "og:site_name", content: "Aimanté" },
+      { property: "og:title", content: title },
+      { property: "og:description", content: description },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: url },
+      { property: "og:image", content: image },
+      { property: "og:image:alt", content: title },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: title },
+      { name: "twitter:description", content: description },
+      { name: "twitter:image", content: image },
+    ],
+    links: [{ rel: "canonical", href: url }],
+  };
+}
