@@ -1,0 +1,1 @@
+ALTER TABLE public.site_reels ADD COLUMN description text NOT NULL DEFAULT '';
