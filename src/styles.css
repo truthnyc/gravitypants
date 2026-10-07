@@ -1277,7 +1277,7 @@ p.concept-reel-notice { font-size: 10px !important; }
 .brand-auth .auth-input-wrap input { height: 48px; border-radius: 8px; border-color: var(--ap-hairline); background: var(--ap-card); font-size: 16px; }
 .brand-auth .auth-submit { height: 48px; border-radius: 8px; background: var(--ap-blue); }
 .brand-auth .auth-submit:hover { background: var(--ap-blue-hover); }
-.brand-auth .auth-switch { text-align: center; font-size: 14px; }
+.brand-auth .auth-switch { text-align: center; font-size: 14px; margin-top: 16px; }
 @media (max-width: 767px) {
   .brand-auth .auth-google, .brand-auth .auth-input-wrap input, .brand-auth .auth-submit { height: 50px; }
 }
