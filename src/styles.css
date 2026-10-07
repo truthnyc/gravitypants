@@ -1158,13 +1158,13 @@ html:has(.acct), body:has(.acct), body:has(.acct) .bg-canvas { background: var(-
 .aimante-brand-actions button:not(:first-child) { width: 40px; min-width: 40px; }
 @media (max-width: 767px) {
   .aimante-home .dir-intro { padding: 40px 16px 20px; }
-  .aimante-home .dir-headline { font-size: 34px; line-height: 1.1; letter-spacing: 0; margin-bottom: 28px; }
+  .aimante-home .dir-headline { font-size: 32px; line-height: 1.1; letter-spacing: -0.035em; margin-bottom: 24px; }
   .aimante-home .aimante-desktop-greeting { display: none; }
   .aimante-home .aimante-phone-greeting { display: block; color: var(--ap-muted); }
   .aimante-phone-greeting > span { display: block; }
   .aimante-home .dir-headline-mood { display: inline-flex; width: auto; gap: .12em; align-items: center; margin-top: 0; height: 1.1lh; }
   .aimante-home .dir-mood-button { font-size: inherit; line-height: inherit; }
-  .aimante-home .dir-search-bar { height: 56px; padding-left: 12px; gap: 6px; background: var(--ap-panel); }
+  .aimante-home .dir-search-bar { height: 52px; padding-left: 12px; gap: 6px; background: var(--ap-panel); }
   .aimante-home .dir-search-bar > button[type="submit"] { padding-inline: 14px; font-size: 14px; }
   .aimante-home input, .aimante-home .dir-search-input::placeholder { font-size: 16px; }
   .aimante-home .dir-filter-wrap { top: 56px; padding-inline: 16px; }
@@ -1187,7 +1187,10 @@ html:has(.acct), body:has(.acct), body:has(.acct) .bg-canvas { background: var(-
   .aimante-home .dir-results-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 12px; }
   .aimante-home .dir-results-grid > li { min-width: 0; }
   .aimante-home .dir-result-tile { background: var(--ap-media); }
-  .aimante-home .dir-result-title { font-size: 15px; }
+  .aimante-home .dir-result-title { font-size: 15px; white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.2; }
+  .aimante-home .dir-marquee ul { align-items: flex-start; }
+  .aimante-home .dir-featured-band { padding-top: 28px; padding-bottom: 24px; }
+  .aimante-home .dir-featured-heading { margin-bottom: 16px; }
   .aimante-home .dir-result-meta { white-space: normal; overflow-wrap: anywhere; font-size: 12px; }
   .aimante-home .aimante-list-link { width: 100%; }
   .aimante-home .aimante-list-link a { display: block; padding-block: 12px; }
