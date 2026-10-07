@@ -1148,7 +1148,7 @@ html:has(.acct), body:has(.acct), body:has(.acct) .bg-canvas { background: var(-
 .dir-featured-band { margin-top: var(--featured-filter-gap); }
 .dir-featured-heading { margin-bottom: var(--featured-label-gap); }
 .dir-featured-label { font-size: var(--featured-label-size); line-height: 1.3; overflow-wrap: anywhere; }
-.dir-headline { font-size: 24px; line-height: 1.12; letter-spacing: 0; }
+.dir-headline { font-size: 24px; line-height: 1.12; letter-spacing: -0.035em; }
 .dir-headline-greeting { display: block; height: 3.25lh; text-wrap: balance; }
 .dir-headline-mood { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; width: 14ch; max-width: 100%; margin-inline: auto; align-items: center; height: 1.2lh; }
 @media (max-width: 359px) { .dir-headline { font-size: 22px; } }
@@ -1156,7 +1156,7 @@ html:has(.acct), body:has(.acct), body:has(.acct) .bg-canvas { background: var(-
 @media (min-width: 1024px) { .dir-headline { font-size: 56px; } }
 @media (max-width: 639px) {
   .dir-intro { padding-top: 32px; padding-bottom: 20px; }
-  .dir-headline { font-size: 32px; line-height: 1.125; letter-spacing: -0.01em; margin-bottom: 28px; }
+  .dir-headline { font-size: 32px; line-height: 1.125; letter-spacing: -0.035em; margin-bottom: 28px; }
   .dir-headline-greeting { display: block; height: 2lh; }
   .dir-headline-greeting > span { display: block; }
   .dir-headline-greeting > span > span { display: block; }
