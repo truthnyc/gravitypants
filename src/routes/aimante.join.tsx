@@ -1,17 +1,17 @@
 import { useState } from 'react'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useServerFn } from '@tanstack/react-start'
-import { Check } from 'lucide-react'
+import { Check, LayoutTemplate, Sparkles, Users, BadgeCheck } from 'lucide-react'
 import { AimanteShell } from '@/components/site/AimanteShell'
 import { Button } from '@/components/ui/button'
-import { CATEGORIES, BRAND_DESCRIPTION_MAX, BRAND_MOODS_MAX, type Category } from '@/lib/directory/directory'
+import { categorySlug, CATEGORIES, BRAND_DESCRIPTION_MAX, BRAND_MOODS_MAX, type Category } from '@/lib/directory/directory'
 import { useMoodCatalog } from '@/lib/directory/moods'
 import { brandApplicationInput, submitBrandApplication } from '@/lib/directory/applications.functions'
 import { aimanteHead } from '@/lib/site/brand-site'
 import { cn } from '@/lib/utils'
 
 export const Route = createFileRoute('/aimante/join')({
-  head: () => aimanteHead({ path: '/join', title: 'List your brand — Aimanté', description: 'Apply for an Aimanté brand page and share your short video ads with people browsing by mood, category and brand.' }),
+  head: () => aimanteHead({ path: '/join', title: 'List your brand on Aimanté', description: 'Get your brand discovered by mood. List your reels free on Aimanté with your Gravity Pants account.' }),
   component: Join,
 })
 
@@ -104,11 +104,153 @@ function Join() {
             </form>
           )}
         </section>
-      </main>
+      </div>
+      <Closing />
     </AimanteShell>
   )
 }
 
 function Field({ label, note, optional, wide, children }: { label: string; note?: string; optional?: boolean; wide?: boolean; children: React.ReactNode }) {
   return <label className={cn('space-y-1.5', wide && 'sm:col-span-2')}><span className="flex justify-between text-[14px] font-medium"><span>{label}{optional && <span className="font-normal text-ap-muted"> (optional)</span>}</span>{note && <span className="font-normal text-ap-muted nums">{note}</span>}</span>{children}</label>
+}
+const primary = 'inline-flex h-11 items-center justify-center rounded-lg bg-ap-blue px-5 text-[15px] font-medium text-ap-card hover:bg-ap-blue-hover'
+const grey = 'inline-flex h-11 items-center justify-center rounded-lg bg-ap-panel px-5 text-[15px] font-medium text-ap-ink hover:bg-ap-hairline'
+const h2 = 'text-[clamp(28px,3.4vw,40px)] font-semibold leading-[1.1] tracking-[-0.03em]'
+const GETS = [
+  [LayoutTemplate, 'A brand page that looks the part.', 'Your reels, your story, your link, in a clean, elegant layout.'],
+  [Sparkles, 'Found by mood, not just by name.', "Shoppers looking for 'cozy' or 'elegant' find you, even if they've never heard of you."],
+  [Users, 'Side by side with names people know.', 'Small makers and well-known houses share the same space and the same spotlight.'],
+  [BadgeCheck, 'Free to list.', 'Your brand page is free with any Gravity Pants account. No ad budget needed.'],
+] as const
+const STEPS = [
+  ['Make your reels with Gravity Pants', 'Add a few photos, pick a template, and get a polished reel in minutes. No editing skills needed.'],
+  ['Create your brand page', 'Pick your category and up to three moods that fit your brand. Add a short description and your website.'],
+  ['Go live on Aimanté', 'Your reels appear in the directory, in your category and moods, linking straight to you.'],
+]
+const PLANS = [
+  { eyebrow: 'Brand page', price: 'Free', note: 'With any Gravity Pants account', items: ['Your brand page with logo, description and website link', 'One category and up to three moods', 'Up to 3 reels'] },
+  { eyebrow: 'Full brand page', price: 'Included', note: 'With Simple, from $35/month', items: ['Everything in Brand page', 'Unlimited reels on your page', 'Every reel shown in mood and category search'], highlight: true },
+  { eyebrow: 'Brand stats', price: 'Included', note: 'With Business and Team', items: ['Everything in Full brand page', 'Views, saves and clicks to your website', 'See which reels and moods work best'] },
+]
+const WHO: [string, string][] = [['Fashion', 'Fashion & Apparel'], ['Beauty', 'Beauty & Fragrance'], ['Food & Drink', 'Food & Drink'], ['Home', 'Home & Living'], ['Travel', 'Travel & Hospitality'], ['Crafts', 'Crafts & Hobbies'], ['Photography', 'Photography & Visual Arts'], ['Nonprofits', 'Nonprofit & Causes']]
+const FAQ = [
+  ['Do I need a Gravity Pants account?', 'Yes, your reels and your brand page live in the same account. Your first reel is free.'],
+  ['Does it cost anything?', 'Listing is free. Paid Gravity Pants plans let you add more reels and see how your page performs.'],
+  ['Can I change my moods or reels later?', 'Any time, from your brand page.'],
+  ['Who can list a brand?', "Anyone who owns or represents it. You'll confirm that when you sign up."],
+]
+
+function ForBrands() {
+  return (
+    <div className="font-ap text-ap-ink">
+      <section className="mx-auto grid max-w-[1200px] items-center gap-12 px-6 py-16 md:grid-cols-2 md:py-24">
+        <div>
+          <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-ap-blue">For brands</p>
+          <h1 className="mt-3 text-[clamp(38px,5vw,60px)] font-semibold leading-[1.05] tracking-[-0.035em]">Get seen by people who'll love you.</h1>
+          <p className="mt-5 max-w-[520px] text-[18px] leading-[1.5] text-ap-body">Aimanté is where shoppers browse brands by feeling. Put yours in front of them.</p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <a href="#apply" className={primary}>List your brand →</a>
+            <Link to="/aimante/about" className={grey}>See how it looks</Link>
+          </div>
+        </div>
+        <div className="rounded-[12px] bg-ap-panel p-6 sm:p-8">
+          <div className="rounded-[12px] bg-ap-card p-6 shadow-ap-soft">
+            <div className="flex items-center gap-3">
+              <span className="size-11 shrink-0 rounded-full bg-ap-hairline" aria-hidden />
+              <div className="min-w-0 flex-1"><p className="text-[17px] font-semibold">[Your brand]</p><p className="text-[13px] text-ap-muted">Home & Living · cozy · warm · natural</p></div>
+              <span className="text-[14px] font-medium text-ap-blue">Visit →</span>
+            </div>
+            <p className="mt-4 text-[14px] leading-[1.5] text-ap-body">Handmade pieces for slow mornings and long evenings. Made in small batches from natural materials.</p>
+            <div className="mt-5 grid grid-cols-3 gap-3">{[0, 1, 2].map((i) => <div key={i} className="aspect-[9/16] rounded-[6px] bg-ap-media" />)}</div>
+            <p className="mt-4 text-center text-[12px] text-ap-muted">Reels made with Gravity Pants</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-ap-panel px-6 py-20">
+        <div className="mx-auto max-w-[1200px]">
+          <h2 className={`${h2} text-center`}>What you get</h2>
+          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {GETS.map(([Icon, t, d]) => (
+              <div key={t} className="rounded-[12px] bg-ap-card p-6">
+                <Icon className="size-6 text-ap-blue" strokeWidth={1.7} aria-hidden />
+                <h3 className="mt-4 text-[17px] font-semibold">{t}</h3>
+                <p className="mt-2 text-[15px] leading-[1.5] text-ap-body">{d}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-[1200px] px-6 py-20">
+        <h2 className={`${h2} text-center`}>How it works</h2>
+        <ol className="mt-10 grid gap-8 md:grid-cols-3">
+          {STEPS.map(([t, d], i) => (
+            <li key={t}>
+              <span className="grid size-9 place-items-center rounded-full bg-ap-blue text-[15px] font-semibold text-ap-card nums">{i + 1}</span>
+              <h3 className="mt-4 text-[19px] font-semibold">{t}</h3>
+              <p className="mt-2 text-[15px] leading-[1.5] text-ap-body">{d}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section className="mx-auto max-w-[1200px] px-6">
+        <div className="rounded-[12px] bg-ap-soft-blue px-6 py-12 text-center sm:px-12">
+          <h2 className={h2}>Why reels made with Gravity Pants</h2>
+          <p className="mx-auto mt-4 max-w-[720px] text-[17px] leading-[1.55] text-ap-body">Every reel on Aimanté is made with Gravity Pants, so every brand looks professional, whatever its size. The same reels work on Instagram, TikTok, Pinterest and your website too.</p>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-[1200px] px-6 py-20">
+        <div className="text-center">
+          <h2 className={h2}>Free to list. Grow with Gravity Pants.</h2>
+          <p className="mx-auto mt-4 max-w-[640px] text-[17px] leading-[1.5] text-ap-body">Your brand page comes with your Gravity Pants account. Paid plans add more reels and show how your page performs.</p>
+        </div>
+        <div className="mt-10 grid gap-5 rounded-[12px] bg-ap-panel p-5 sm:p-8 md:grid-cols-3">
+          {PLANS.map((p) => (
+            <div key={p.eyebrow} className={cn('rounded-[12px] bg-ap-card p-6', p.highlight && 'ring-2 ring-ap-blue')}>
+              <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-ap-blue">{p.eyebrow}</p>
+              <p className="mt-3 text-[34px] font-semibold tracking-[-0.03em]">{p.price}</p>
+              <p className="text-[14px] text-ap-muted nums">{p.note}</p>
+              <ul className="mt-5 space-y-2.5">
+                {p.items.map((it) => <li key={it} className="flex gap-2 text-[14px] leading-[1.45] text-ap-body"><Check className="mt-0.5 size-4 shrink-0 text-ap-blue" strokeWidth={1.7} aria-hidden />{it}</li>)}
+              </ul>
+            </div>
+          ))}
+        </div>
+        <p className="mt-6 text-center text-[13px] text-ap-muted">
+          Listed reels must be watermark-free. Coming later: featured spots in Featured this week and Orbite Love.{' '}
+          <a href="https://gravitypants.com/pricing" className="font-medium text-ap-blue hover:underline">See Gravity Pants plans →</a>
+        </p>
+      </section>
+
+      <section className="mx-auto max-w-[1200px] px-6 pb-20 text-center">
+        <h2 className={h2}>Who it's for</h2>
+        <div className="mx-auto mt-8 flex max-w-[760px] flex-wrap justify-center gap-3">
+          {WHO.map(([label, cat]) => (
+            <Link key={label} to="/directory/category/$slug" params={{ slug: categorySlug(cat) }} className="inline-flex h-10 items-center rounded-lg bg-ap-panel px-4 text-[15px] font-medium text-ap-ink hover:bg-ap-hairline">{label}</Link>
+          ))}
+          <Link to="/directory" className="inline-flex h-10 items-center rounded-lg border border-ap-hairline bg-ap-card px-4 text-[15px] font-medium text-ap-ink hover:text-ap-blue">and more</Link>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-[760px] px-6 pb-8">
+        <h2 className={`${h2} text-center`}>Questions</h2>
+        <dl className="mt-8 divide-y divide-ap-hairline border-y border-ap-hairline">
+          {FAQ.map(([q, a]) => <div key={q} className="py-5"><dt className="text-[17px] font-semibold">{q}</dt><dd className="mt-1.5 text-[15px] leading-[1.5] text-ap-body">{a}</dd></div>)}
+        </dl>
+      </section>
+    </div>
+  )
+}
+
+function Closing() {
+  return (
+    <section className="bg-ap-panel px-6 py-20 text-center font-ap text-ap-ink">
+      <h2 className="text-[clamp(30px,4vw,48px)] font-semibold tracking-[-0.035em]">Let people fall for your brand.</h2>
+      <a href="#apply" className={`${primary} mt-8`}>List your brand →</a>
+      <p className="mt-6 text-[13px] text-ap-muted">Already have reels? <a href="https://gravitypants.com/signin" className="text-ap-blue hover:underline">Sign in with your Gravity Pants account.</a></p>
+    </section>
+  )
 }
