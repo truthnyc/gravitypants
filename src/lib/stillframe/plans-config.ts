@@ -69,7 +69,7 @@ export const PLANS: PlanConfig[] = [
     id: "team",
     name: "Team",
     tagline: "For teams working across shared ads and brands.",
-    seats: 4,
+    seats: 5,
     monthlyExports: 150,
     sharedExports: true,
     monthly: 175,
