@@ -34,7 +34,12 @@ describe("domain redirects", () => {
   it("gravitypants.com/directory goes to aimante.co", () => {
     expect(domainRedirect("https://gravitypants.com/directory")).toBe("https://aimante.co/");
     expect(domainRedirect("https://www.gravitypants.com/directory/purl-soho")).toBe("https://aimante.co/b/purl-soho");
+    expect(domainRedirect("https://gravitypants.com/directory/category/crafts-hobbies")).toBeNull();
     expect(domainRedirect("https://gravitypants.com/pricing")).toBeNull();
+  });
+  it("uses the original visitor domain forwarded by hosting", () => {
+    expect(domainRedirect("https://gravitypants.lovable.app/directory/purl-soho", "gravitypants.com")).toBe("https://aimante.co/b/purl-soho");
+    expect(domainRedirect("https://gravitypants.lovable.app/pricing?x=1", "aimante.co")).toBe("https://gravitypants.com/pricing?x=1");
   });
   it("previews never redirect and honour ?brand=aimante", () => {
     expect(domainRedirect("https://id-preview--x.lovable.app/directory")).toBeNull();

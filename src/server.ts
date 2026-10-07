@@ -48,8 +48,11 @@ function isH3SwallowedErrorBody(body: string): boolean {
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     // Page visits on the wrong domain go to the right one (only real domains; previews are untouched).
-    if (request.method === "GET" && (request.headers.get("accept") ?? "").includes("text/html")) {
-      const to = domainRedirect(request.url);
+    if ((request.method === "GET" || request.method === "HEAD") && (request.headers.get("accept") ?? "").includes("text/html")) {
+      // Hosting may preserve its internal URL and expose the visitor's real domain in this header.
+      // Resolve that domain here so the redirect happens before TanStack renders any HTML.
+      const forwardedHost = request.headers.get("x-forwarded-host") ?? request.headers.get("host");
+      const to = domainRedirect(request.url, forwardedHost);
       if (to) return Response.redirect(to, 301);
     }
     try {

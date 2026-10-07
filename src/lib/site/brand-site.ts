@@ -108,8 +108,9 @@ export const aimanteRewrite: LocationRewrite = {
  * aimante.co → gravitypants.com for anything that isn't an Aimanté page;
  * gravitypants.com/directory… → the matching aimante.co page.
  */
-export function domainRedirect(href: string): string | null {
+export function domainRedirect(href: string, forwardedHost?: string | null): string | null {
   const url = new URL(href);
+  if (forwardedHost) url.host = hostOf(forwardedHost);
   if (isAimanteHost(url.host)) {
     if (url.pathname.startsWith("/directory")) {
       const out = aimanteOut(url, "aimante");
@@ -118,7 +119,7 @@ export function domainRedirect(href: string): string | null {
     if (isAimantePath(url.pathname)) return null;
     return `${GP_ORIGIN}${url.pathname}${url.search}`;
   }
-  if (isGravityPantsHost(url.host) && /^\/directory(\/|$)/.test(url.pathname)) {
+  if (isGravityPantsHost(url.host) && (/^\/directory\/?$/.test(url.pathname) || /^\/directory\/[^/]+\/?$/.test(url.pathname))) {
     const out = aimanteOut(url, "aimante");
     return out ? `${AIMANTE_ORIGIN}${out.pathname}${out.search}` : AIMANTE_ORIGIN;
   }
