@@ -21,6 +21,7 @@ import { template as brandRequest } from './brand-request'
 import { template as weeklyReport } from './weekly-report'
 import { template as clientInviteCopy } from './client-invite-copy'
 import { template as directoryNotice } from './directory-notice'
+import { template as brandApplication } from './brand-application'
 
 /**
  * Template registry — maps template names to their React Email components.
@@ -39,4 +40,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'weekly-report': weeklyReport,
   'client-invite-copy': clientInviteCopy,
   'directory-notice': directoryNotice,
+  'brand-application': brandApplication,
 }

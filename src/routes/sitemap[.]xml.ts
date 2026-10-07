@@ -55,7 +55,7 @@ async function aimanteEntries(): Promise<Entry[]> {
     { loc: `${AIMANTE_ORIGIN}/about`, lastmod: "2026-10-07", changefreq: "yearly", priority: "0.5" },
     { loc: `${AIMANTE_ORIGIN}/join`, lastmod: "2026-10-07", changefreq: "monthly", priority: "0.6" },
     ...CATEGORIES.map((c) => ({ loc: `${AIMANTE_ORIGIN}/c/${categorySlug(c)}`, lastmod: today, changefreq: "weekly", priority: "0.7" })),
-    ...brands.map((b) => ({ loc: `${AIMANTE_ORIGIN}/b/${b.slug}`, lastmod: today, changefreq: "weekly", priority: "0.8" })),
+    ...brands.map((b) => ({ loc: `${AIMANTE_ORIGIN}/b/${b.slug}`, lastmod: isoDate(b.updated_at), changefreq: "weekly", priority: "0.8" })),
   ];
 }
 

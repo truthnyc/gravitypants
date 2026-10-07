@@ -345,9 +345,9 @@ export const searchDirectoryLegacy = createServerFn({ method: "GET" })
 /** Public: every brand page visitors can see (RLS hides brands whose plan ended). */
 export const listPublicBrands = createServerFn({ method: "GET" }).handler(async () => {
   const { publicClient } = await import("@/lib/site/reels.server");
-  const { data, error } = await (publicClient() as any).from("directory_brands").select("id, name, slug, category, logo_url").order("name");
-  if (error) { console.error(error); return [] as { id: string; name: string; slug: string; category: string; logo_url: string | null }[]; }
-  return Promise.all(((data ?? []) as any[]).map(async (b) => ({ id: b.id as string, name: b.name as string, slug: b.slug as string, category: b.category as string, logo_url: (await signLogo(b.logo_url)) as string | null })));
+  const { data, error } = await (publicClient() as any).from("directory_brands").select("id, name, slug, category, logo_url, updated_at").eq("status", "live").order("name");
+  if (error) { console.error(error); return [] as { id: string; name: string; slug: string; category: string; logo_url: string | null; updated_at: string }[]; }
+  return Promise.all(((data ?? []) as any[]).map(async (b) => ({ id: b.id as string, name: b.name as string, slug: b.slug as string, category: b.category as string, logo_url: (await signLogo(b.logo_url)) as string | null, updated_at: b.updated_at as string })));
 });
 
 export const getBrandPage = createServerFn({ method: "GET" })
@@ -357,7 +357,7 @@ export const getBrandPage = createServerFn({ method: "GET" })
     const { toCards } = await import("./directory.server");
     const pc = publicClient() as any;
     const empty = { redirect: null as string | null, brand: null, reels: [] as DirectoryCard[], siteReels: [] as import("@/lib/site/reels").SiteReel[], more: [] as { name: string; slug: string; poster: string | null }[] };
-    const { data: b } = await pc.from("directory_brands").select("id, name, website_url, category, description, slug, logo_url, moods").eq("slug", data.slug).maybeSingle();
+    const { data: b } = await pc.from("directory_brands").select("id, name, website_url, category, description, slug, logo_url, moods, status, updated_at").eq("slug", data.slug).eq("status", "live").maybeSingle();
     if (!b) {
       const { data: h } = await pc.from("directory_slug_history").select("brand_id").eq("old_slug", data.slug).order("changed_at", { ascending: false }).limit(1).maybeSingle();
       if (h) {
@@ -377,7 +377,7 @@ export const getBrandPage = createServerFn({ method: "GET" })
     const moreCards = await toCards(moreRows);
     return {
       redirect: null,
-      brand: { id: b.id as string, name: b.name as string, website_url: b.website_url as string | null, category: b.category as string, description: b.description as string | null, slug: b.slug as string, logo_url: await signLogo(b.logo_url), moods: (b.moods ?? []) as string[], featured: !!featured },
+       brand: { id: b.id as string, name: b.name as string, website_url: b.website_url as string | null, category: b.category as string, description: b.description as string | null, slug: b.slug as string, logo_url: await signLogo(b.logo_url), moods: (b.moods ?? []) as string[], featured: !!featured, updated_at: b.updated_at as string },
       reels: cards,
       siteReels,
       more: moreCards.map((c) => ({ name: c.brand_name, slug: c.brand_slug, poster: c.poster })),

@@ -1,4 +1,7 @@
 # Roadmap
+- [ ] Complete Aimanté brand pages and verify all 12 live brands.
+- [ ] Build `/join` submission, confirmation email, and staff approval into a draft brand.
+- [ ] Verify Aimanté SEO, submit its sitemap to Google, publish, and check production redirects.
 - [x] Add admin brand affiliation/draft controls and category-line editing; verify saved values.
 - [x] Review current security findings; revoke unchecked greeting inserts, protect staff brand fields, patch vulnerable dependencies; retain intentional public catalog reads and reviewed helper/extension advisories.
 - [x] Replace invented Aimanté share art with real reel imagery, review Join/About copy, and correct Purl Soho's address with an old-address redirect.

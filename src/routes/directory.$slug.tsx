@@ -100,7 +100,7 @@ function BrandPage() {
                 </div>
                 {brand.website_url && (
                   <a href={brand.website_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-[15px] text-ap-blue">
-                    Visit {brand.name} <ArrowUpRight className="size-4" strokeWidth={1.7} />
+                    Shop {brand.name} <ArrowUpRight className="size-4" strokeWidth={1.7} />
                   </a>
                 )}
               </div>
