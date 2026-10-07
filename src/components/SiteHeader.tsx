@@ -2,6 +2,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { ChevronDown, Menu, Search, X } from "lucide-react";
 import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import { GravityPantsLogo } from "@/components/GravityPantsLogo";
+import { AimanteHeader, useBrandSite } from "@/components/site/AimanteShell";
 import { MobileMenu } from "@/components/MobileNavMenu";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
@@ -82,6 +83,7 @@ const MenuButton = forwardRef<HTMLButtonElement, { open: boolean; onToggle: () =
 
 /** One header for the marketing site and the app (the editor keeps its own). */
 export function SiteHeader({ variant }: { variant: "site" | "app" }) {
+  const site = useBrandSite();
   const siteSignedIn = useSignedIn();
   const signedIn = variant === "app" || siteSignedIn;
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -95,6 +97,7 @@ export function SiteHeader({ variant }: { variant: "site" | "app" }) {
     wasOpen.current = open;
   }, [open]);
 
+  if (site === "aimante") return <AimanteHeader />;
   return (
     <header className="sticky top-0 z-50 border-b border-ap-hairline bg-ap-card/[.92] backdrop-blur-[14px] safe-top tracking-[-0.035em]">
       <div className="mx-auto flex h-[63px] max-w-[1280px] items-center gap-3 px-4 md:px-6 lg:gap-5">

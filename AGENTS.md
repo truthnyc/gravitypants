@@ -40,6 +40,6 @@
 - Folder rules: see `AGENTS.md` in src/components/editor, src/render, src/lib/stillframe (billing details), src/lib/directory and src/routes/_authenticated/admin.
 - Directory greetings use hosting geo or browser GeoJS, then server weather; no stored location or shared cache. Reduced motion removes transitions, not word rotation.
 - Admin analytics: public visits go to `page_views` (anon insert) via `src/lib/site/track.ts`; sign-up UTM in user metadata; `analytics.server.ts` feeds the Analytics page and deduped Monday `/api/public/weekly-report`.
-- Shared `SiteHeader` (variant site|app) is used everywhere except the editor; `SHOW_DIRECTORY` in `src/lib/features.ts` gates every Directory link.
+- Shared `SiteHeader` (site|app) delegates Aimanté to `AimanteHeader` regardless of session; `AimanteShell` shares its logo/footer with auth. Directory links use `SHOW_DIRECTORY`.
 - Website reel favorites use own `site_reel_favorites` rows via `SiteReelHeart`/`useSiteReelFavorites`; Favorites includes Directory reels.
 - App and SSR failures share `ServiceUnavailable`; its HTML fallback stays dependency-free.

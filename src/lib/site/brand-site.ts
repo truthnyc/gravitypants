@@ -59,7 +59,7 @@ export const currentSite = createIsomorphicFn()
 /** True for the public paths that belong to Aimanté. */
 export function isAimantePath(pathname: string): boolean {
   const p = pathname.replace(/\/+$/, "") || "/";
-  return p === "/" || p === "/join" || p === "/about" || /^\/(c|mood|b)\/[^/]+$/.test(p);
+  return p === "/" || p === "/join" || p === "/about" || p === "/sign-in" || /^\/(c|mood|b)\/[^/]+$/.test(p);
 }
 
 /** Public Aimanté URL → the app's internal page. Pure apart from the site check. */
@@ -74,6 +74,7 @@ export function aimanteIn(url: URL, site: BrandSite = siteForUrl(url)): URL | un
   else if ((m = p.match(/^\/mood\/([^/]+)$/))) { out.pathname = "/directory"; out.searchParams.set("mood", decodeURIComponent(m[1] ?? "")); }
   else if ((m = p.match(/^\/b\/([^/]+)$/))) out.pathname = `/directory/${m[1]}`;
   else if (p === "/join" || p === "/about") out.pathname = `/aimante${p}`;
+  else if (p === "/sign-in") out.pathname = "/signin";
   else return undefined;
   return out;
 }
@@ -94,6 +95,7 @@ export function aimanteOut(url: URL, site: BrandSite = siteForUrl(url)): URL | u
   } else if ((m = p.match(/^\/directory\/category\/([^/]+)$/))) out.pathname = `/c/${m[1]}`;
   else if ((m = p.match(/^\/directory\/([^/]+)$/))) out.pathname = `/b/${m[1]}`;
   else if ((m = p.match(/^\/aimante\/(join|about)$/))) out.pathname = `/${m[1]}`;
+  else if (p === "/signin") out.pathname = "/sign-in";
   else return undefined;
   return out;
 }

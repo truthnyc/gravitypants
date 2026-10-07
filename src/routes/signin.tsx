@@ -8,10 +8,13 @@ import { Button } from "@/components/ui/button";
 import { rememberSignupChoice } from "@/lib/stillframe/signup-choice";
 import { PLANS } from "@/lib/stillframe/plans-config";
 import { siteHead } from "@/lib/site/seo";
+import { aimanteHead, currentSite } from "@/lib/site/brand-site";
 
 export const Route = createFileRoute("/signin")({
   validateSearch: z.object({ redirect: z.string().optional() }),
-  head: () => siteHead({ path: "/signin", title: "Sign in — Gravity Pants", description: "Sign in to Gravity Pants to make video ads and GIFs from your photos.", noindex: true }),
+  head: () => currentSite() === "aimante"
+    ? aimanteHead({ path: "/sign-in", title: "Sign in — Aimanté", description: "Sign in to your Aimanté account." })
+    : siteHead({ path: "/signin", title: "Sign in — Gravity Pants", description: "Sign in to Gravity Pants to make video ads and GIFs from your photos.", noindex: true }),
   component: SignIn,
 });
 

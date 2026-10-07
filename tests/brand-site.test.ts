@@ -4,6 +4,12 @@ import { aimanteIn, aimanteOut, siteForHost } from "@/lib/site/brand-site";
 const u = (s: string) => new URL(s);
 
 describe("aimante domain", () => {
+  it("keeps Aimanté sign-in on its own domain and maps the shared sign-in page", () => {
+    expect(domainRedirect("https://aimante.co/sign-in")).toBeNull();
+    expect(domainRedirect("https://www.aimante.co/sign-in")).toBeNull();
+    expect(aimanteIn(u("https://aimante.co/sign-in"))?.pathname).toBe("/signin");
+    expect(aimanteOut(u("https://aimante.co/signin"))?.pathname).toBe("/sign-in");
+  });
   it("only aimante.co and www.aimante.co serve Aimanté", () => {
     expect(siteForHost("aimante.co")).toBe("aimante");
     expect(siteForHost("www.aimante.co")).toBe("aimante");
