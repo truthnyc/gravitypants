@@ -6,6 +6,17 @@ import { type StripeEnv, createStripeClient, getStripeErrorMessage } from "@/lib
 import { ensurePortalConfig } from "./portal.server";
 
 const idRe = /^[a-zA-Z0-9_-]+$/;
+const RETURN_HOSTS = ["gravitypants.com", "aimante.co", "lovable.app", "lovableproject.com"];
+/** Only send people back to this app's own sites after Stripe. */
+function safeReturnUrl(u: unknown): string {
+  let url: URL;
+  try { url = new URL(String(u)); } catch { throw new Error("Invalid return address"); }
+  const host = url.hostname.toLowerCase();
+  const ok = (url.protocol === "https:" && RETURN_HOSTS.some((h) => host === h || host.endsWith(`.${h}`)))
+    || (url.protocol === "http:" && host === "localhost");
+  if (!ok) throw new Error("Invalid return address");
+  return url.toString();
+}
 type Env = { environment: StripeEnv };
 
 function checkEnv(e: unknown): StripeEnv {
@@ -17,7 +28,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { priceId: string; workspaceId: string; returnUrl: string } & Env) => {
     if (!idRe.test(d.priceId) || !idRe.test(d.workspaceId)) throw new Error("Invalid input");
-    return { ...d, environment: checkEnv(d.environment) };
+    return { ...d, returnUrl: safeReturnUrl(d.returnUrl), environment: checkEnv(d.environment) };
   })
   .handler(async ({ data, context }): Promise<{ clientSecret: string } | { error: string }> => {
     const { supabase, userId } = context;
@@ -100,7 +111,7 @@ export const createTopUpSession = createServerFn({ method: "POST" })
     if (!idRe.test(d.workspaceId)) throw new Error("Invalid input");
     const pack = EXPORT_PACKS.find((p) => p.id === (d.packId ?? "extra_exports_5"));
     if (!pack) throw new Error("Invalid pack");
-    return { ...d, packId: pack.id, environment: checkEnv(d.environment) };
+    return { ...d, returnUrl: safeReturnUrl(d.returnUrl), packId: pack.id, environment: checkEnv(d.environment) };
   })
   .handler(async ({ data, context }): Promise<{ clientSecret: string } | { error: string }> => {
     const { supabase, userId } = context;
@@ -148,7 +159,7 @@ export const createPortalSession = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { workspaceId: string; returnUrl: string } & Env) => {
     if (!idRe.test(d.workspaceId)) throw new Error("Invalid input");
-    return { ...d, environment: checkEnv(d.environment) };
+    return { ...d, returnUrl: safeReturnUrl(d.returnUrl), environment: checkEnv(d.environment) };
   })
   .handler(async ({ data, context }): Promise<{ url: string } | { error: string }> => {
     const { data: isAdmin } = await context.supabase.rpc("is_workspace_admin", { _ws: data.workspaceId });
