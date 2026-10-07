@@ -62,7 +62,7 @@
   --ap-ink: #1d1d1f;
   --ap-body: #57575c;
   --ap-muted: #6e6e73;
-  --ap-headline-muted: #a1a1a6;
+  --ap-headline-muted: #86868b;
   --ap-headline-bracket: #c7c7cc;
   --ap-blue: #0071e3;
   --ap-red: #c62828;
@@ -1155,11 +1155,13 @@ html:has(.acct), body:has(.acct), body:has(.acct) .bg-canvas { background: var(-
 @media (min-width: 640px) { .dir-headline { font-size: 40px; } .dir-headline-greeting { height: 2.25lh; } }
 @media (min-width: 1024px) { .dir-headline { font-size: 56px; } }
 @media (max-width: 639px) {
-  .dir-intro { padding-top: 24px; padding-bottom: 20px; }
-  .dir-headline { font-size: 30px; line-height: 1.12; margin-bottom: 24px; }
-  .dir-headline-greeting { display: flex; align-items: flex-end; height: 3lh; }
-  .dir-headline-greeting > span { width: 100%; }
-  .dir-headline-mood { margin-top: 6px; }
+  .dir-intro { padding-top: 32px; padding-bottom: 20px; }
+  .dir-headline { font-size: 32px; line-height: 1.125; letter-spacing: -0.01em; margin-bottom: 28px; }
+  .dir-headline-greeting { display: block; height: 2lh; }
+  .dir-headline-greeting > span { display: block; }
+  .dir-headline-greeting > span > span { display: block; }
+  .dir-headline-mood { display: inline-flex; align-items: center; gap: 0.12em; width: auto; margin-top: 8px; }
+  .dir-headline-mood > .font-light { font-weight: 300; color: #c7c7cc; }
   .dir-search-input { font-size: 16px; }
   .dir-search-input::placeholder { font-size: 14px; }
 }
