@@ -1,0 +1,2 @@
+ALTER TABLE public.brand_requests DROP CONSTRAINT IF EXISTS brand_requests_moods_limit;
+ALTER TABLE public.brand_requests ADD CONSTRAINT brand_requests_moods_limit CHECK (cardinality(moods) BETWEEN 0 AND 3);
