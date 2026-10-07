@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { aimanteIn } from "./brand-site";
+import { aimanteIn } from "@/lib/site/brand-site";
 
 describe("Aimanté brand filter", () => {
   it("keeps a chosen brand on aimante.co", () => {
