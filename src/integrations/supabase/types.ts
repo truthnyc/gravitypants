@@ -231,33 +231,71 @@ export type Database = {
       }
       brand_requests: {
         Row: {
+          admin_note: string | null
           brand: string
+          category: string | null
           created_at: string
+          created_brand_id: string | null
+          description: string | null
           email: string
           id: string
+          logo_url: string | null
           message: string | null
+          moods: string[]
           name: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          updated_at: string
           website: string | null
         }
         Insert: {
+          admin_note?: string | null
           brand: string
+          category?: string | null
           created_at?: string
+          created_brand_id?: string | null
+          description?: string | null
           email: string
           id?: string
+          logo_url?: string | null
           message?: string | null
+          moods?: string[]
           name: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
           website?: string | null
         }
         Update: {
+          admin_note?: string | null
           brand?: string
+          category?: string | null
           created_at?: string
+          created_brand_id?: string | null
+          description?: string | null
           email?: string
           id?: string
+          logo_url?: string | null
           message?: string | null
+          moods?: string[]
           name?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
           website?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "brand_requests_created_brand_id_fkey"
+            columns: ["created_brand_id"]
+            isOneToOne: true
+            referencedRelation: "directory_brands"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       categories: {
         Row: {
@@ -1715,6 +1753,10 @@ export type Database = {
           workspace_id: string
         }[]
       }
+      approve_brand_request: {
+        Args: { _admin_note?: string; _request_id: string }
+        Returns: string
+      }
       billing_covered: { Args: { _src: string }; Returns: string[] }
       billing_source: { Args: { _ws: string }; Returns: string }
       brand_kits_enabled: { Args: { _ws: string }; Returns: boolean }
@@ -1724,6 +1766,10 @@ export type Database = {
         Returns: boolean
       }
       category_slug: { Args: { c: string }; Returns: string }
+      decline_brand_request: {
+        Args: { _admin_note: string; _request_id: string }
+        Returns: boolean
+      }
       delete_workspace: { Args: { _ws: string }; Returns: undefined }
       directory_effective_plan: { Args: { _ws: string }; Returns: string }
       directory_faceted_search: {
