@@ -61,9 +61,17 @@ const ACCOUNT_LINKS = (saved: number, stats = false) => [
   { label: "Account settings", to: "/app/account" as const },
 ];
 
-/** Brand stats gate for site pages, where the app's sign-in gate never ran: fall back to the user's saved workspace. */
+/** Brand stats gate for site pages, where the app's sign-in gate never ran: resolve the user's workspace first. */
 function useStatsOk(userId: string | undefined) {
-  const ws = peekWorkspaceId() ?? (userId ? preferredWorkspaceId(userId) : null);
+  const [ws, setWs] = useState<string | null>(() => peekWorkspaceId());
+  useEffect(() => {
+    if (ws || !userId) return;
+    let live = true;
+    void supabase.rpc("ensure_workspace").then(({ data }) => {
+      if (live && typeof data === "string") setWs(data);
+    });
+    return () => { live = false; };
+  }, [ws, userId]);
   const { data: access, canUse } = usePlanAccess(ws);
   return !!access && canUse("brand_stats");
 }
