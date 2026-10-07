@@ -99,8 +99,7 @@ export function AimanteHeader() {
   const close = () => setOpen(false);
   const me = useMe().data ?? null;
   const saved = useSavedCount(me?.id);
-  const { data: statsAccess, canUse: statsCanUse } = usePlanAccess();
-  const statsOk = !!statsAccess && statsCanUse("brand_stats");
+  const statsOk = useStatsOk(me?.id);
   const signOut = useAimanteSignOut();
   const here = useRouterState({ select: (s) => s.location.pathname + s.location.searchStr });
   const signInSearch = { redirect: here };
