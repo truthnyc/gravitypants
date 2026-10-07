@@ -1154,6 +1154,16 @@ html:has(.acct), body:has(.acct), body:has(.acct) .bg-canvas { background: var(-
 @media (max-width: 359px) { .dir-headline { font-size: 22px; } }
 @media (min-width: 640px) { .dir-headline { font-size: 40px; } .dir-headline-greeting { height: 2.25lh; } }
 @media (min-width: 1024px) { .dir-headline { font-size: 56px; } }
+@media (max-width: 639px) {
+  .dir-intro { padding-top: 24px; padding-bottom: 20px; }
+  .dir-headline { font-size: 30px; line-height: 1.12; margin-bottom: 24px; }
+  .dir-headline-greeting { display: flex; align-items: flex-end; height: 3lh; }
+  .dir-headline-greeting > span { width: 100%; }
+  .dir-headline-mood { margin-top: 6px; }
+  .dir-search-input { font-size: 16px; }
+  .dir-search-input::placeholder { font-size: 14px; }
+}
+@media (max-width: 359px) { .dir-headline { font-size: 28px; } }
 @media (min-width: 640px) { .dir-featured-reel { width: var(--w); height: var(--h); } }
 @keyframes dir-marquee { to { transform: translateX(-50%); } }
 .dir-marquee { animation: dir-marquee linear infinite; }

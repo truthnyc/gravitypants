@@ -270,14 +270,16 @@ function DirectoryPage() {
   return (
     <SiteShell>
       <div className="font-ap text-ap-ink">
-        <section className="mx-auto max-w-[900px] px-6 pt-20 pb-6 text-center">
+        <section className="dir-intro mx-auto max-w-[900px] px-6 pt-20 pb-6 text-center">
           <h1 className="dir-headline mb-8 font-semibold text-ap-muted">
             <b className="dir-headline-greeting font-semibold text-ap-ink">
+              <span>
               <span key={greeting?.filled ?? "ssr"} className={greeting ? "animate-[dir-fade_.4s_ease] motion-reduce:animate-none" : undefined}>
                 {greeting ? greeting.segments.map((g, k) => <span key={k} className={g.bold ? "text-ap-ink" : "text-ap-headline-muted"}>{g.text}</span>)
                   : <><span className="text-ap-headline-muted">Happy </span><span className="text-ap-ink">{day}.</span></>}
               </span>
               <span className="text-ap-headline-muted"> Show me something:</span>
+              </span>
             </b>
             <span className="dir-headline-mood text-ap-blue" aria-live="polite">
               <span className="font-light text-ap-headline-bracket">[ </span>
@@ -291,7 +293,7 @@ function DirectoryPage() {
             className="mx-auto flex h-[60px] max-w-[680px] items-center gap-2.5 rounded-[12px] border border-transparent bg-ap-panel pr-2 pl-5 transition-[background,border-color,box-shadow] motion-reduce:transition-none focus-within:border-ap-hairline focus-within:bg-ap-card focus-within:shadow-[0_10px_30px_rgba(20,30,50,.10)]">
             <input ref={input} value={value} onChange={(e) => setValue(e.target.value)} placeholder="Try: cozy knitwear, square, Purl Soho"
               aria-label="Search the Directory" aria-keyshortcuts="/"
-              className="h-full min-w-0 flex-1 bg-transparent text-[19px] outline-hidden placeholder:text-[#8e8e93]" />
+              className="dir-search-input h-full min-w-0 flex-1 bg-transparent text-[19px] outline-hidden placeholder:text-ap-muted" />
             {value && (
               <button type="button" aria-label="Clear search" onClick={() => { setValue(""); go(""); }} className="grid size-8 place-items-center text-ap-muted">
                 <X className="size-4" strokeWidth={1.7} />
