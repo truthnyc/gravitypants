@@ -72,7 +72,7 @@ export function AimanteHeader() {
         </Button>
       </div>
       {open && <>
-        <div className="fixed inset-x-0 bottom-0 top-14 bg-aimante-dim md:hidden" onClick={() => { close(); menuButton.current?.focus(); }} aria-hidden="true" />
+        <div className="absolute inset-x-0 top-full h-dvh bg-aimante-dim md:hidden" onClick={() => { close(); menuButton.current?.focus(); }} aria-hidden="true" />
         <nav ref={panel} id="aimante-mobile-menu" aria-label="Mobile navigation" className="absolute inset-x-0 top-full max-h-[calc(100dvh-56px)] overflow-y-auto rounded-b-[12px] bg-ap-card px-6 pb-6 shadow-aimante-menu md:hidden">
           <Link to="/directory" onClick={close} className={row}>Browse{chevron}</Link>
           <Link to="/aimante/about" onClick={close} className={row}>About{chevron}</Link>
