@@ -17,9 +17,9 @@ export function useBrandSite(): BrandSite {
 
 export function AimanteLogo({ footer = false }: { footer?: boolean }) {
   return (
-    <span className="flex flex-col items-start gap-[2px] whitespace-nowrap text-left">
-      <span className={cn("block font-semibold leading-[0.78] text-ap-ink", footer ? "text-[20px] tracking-[-0.6px]" : "text-[24px] tracking-[-1px] md:text-[28px]")}>Aimanté</span>
-      <span className="block text-[11px] leading-[1] tracking-normal text-ap-muted">by Gravity Pants</span>
+    <span className="flex flex-col items-start gap-[3px] whitespace-nowrap text-left">
+      <span className={cn("block font-semibold leading-none text-ap-ink", footer ? "text-[20px] tracking-[-0.04em]" : "text-[24px] tracking-[-0.04em] md:text-[28px]")}>Aimanté</span>
+      <span className="block pl-[1px] text-[10px] leading-none tracking-normal text-ap-muted">by Gravity Pants</span>
     </span>
   );
 }
@@ -165,19 +165,19 @@ export function AimanteHeader() {
 export function AimanteFooter() {
   return (
     <footer className="mt-auto border-t border-aimante-divider bg-ap-card font-ap">
-      <div className="mx-auto grid max-w-[1280px] gap-y-6 px-6 py-10 text-[14px] text-ap-muted md:px-10 md:grid-cols-[auto_minmax(0,1fr)] md:items-center md:gap-x-8 md:py-12">
+      <div className="mx-auto grid max-w-[1280px] gap-y-4 px-4 py-8 text-[14px] leading-[1.3] text-ap-muted md:px-10 md:grid-cols-[auto_minmax(0,1fr)] md:items-center md:gap-x-8 md:gap-y-6 md:py-12">
         <div className="flex min-w-0 items-center gap-4">
           <Link to="/directory" aria-label="Aimanté home"><AimanteLogo footer /></Link>
           <span className="hidden whitespace-nowrap text-[14px] text-ap-muted tabular-nums md:block">© {new Date().getFullYear()} Gravity Pants</span>
         </div>
-        <nav aria-label="Footer" className="grid min-w-0 grid-cols-2 gap-x-6 gap-y-5 md:flex md:flex-wrap md:items-center md:justify-end md:gap-x-5 md:gap-y-3">
+        <nav aria-label="Footer" className="grid min-w-0 grid-cols-2 gap-x-6 gap-y-2.5 md:flex md:flex-wrap md:items-center md:justify-end md:gap-x-5 md:gap-y-3">
           <Link to="/aimante/join" className="hover:text-ap-ink">List your brand</Link>
           <Link to="/aimante/about" className="hover:text-ap-ink">About</Link>
           <Link to="/privacy" className="hover:text-ap-ink">Privacy</Link>
           <Link to="/terms" className="hover:text-ap-ink">Terms</Link>
-          <a href="https://gravitypants.com" className="col-span-2 text-ap-blue hover:underline">Make reels with Gravity Pants</a>
+          <a href="https://gravitypants.com" className="col-span-2 mt-1 text-ap-blue hover:underline">Make reels with Gravity Pants</a>
         </nav>
-        <span className="text-[13px] text-ap-muted tabular-nums md:hidden">© {new Date().getFullYear()} Gravity Pants</span>
+        <span className="-mt-1 text-[12px] text-ap-muted tabular-nums md:hidden">© {new Date().getFullYear()} Gravity Pants</span>
       </div>
     </footer>
   );
