@@ -49,7 +49,7 @@ type Entry = { loc: string; lastmod: string; changefreq: string; priority: strin
 /** aimante.co lists only its own pages: home, About, List your brand, every category and brand. */
 async function aimanteEntries(): Promise<Entry[]> {
   const today = new Date().toISOString().slice(0, 10);
-  const brands = await listPublicBrands().catch(() => [] as Awaited<ReturnType<typeof listPublicBrands>>);
+  const brands = await listPublicBrands();
   return [
     { loc: `${AIMANTE_ORIGIN}/`, lastmod: today, changefreq: "daily", priority: "1.0" },
     { loc: `${AIMANTE_ORIGIN}/about`, lastmod: "2026-10-07", changefreq: "yearly", priority: "0.5" },
