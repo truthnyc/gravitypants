@@ -51,8 +51,9 @@ function useAimanteSignOut() {
   return async () => { await signOutEverywhere(qc); navigate({ to: "/directory", replace: true }); };
 }
 
-const ACCOUNT_LINKS = (saved: number) => [
+const ACCOUNT_LINKS = (saved: number, stats = false) => [
   { label: "Your brand page", to: "/app/account/directory" as const },
+  ...(stats ? [{ label: "Brand stats", to: "/app/account/stats" as const }] : []),
   { label: "Saved reels", to: "/app/account/favorites" as const, count: saved },
   { label: "Make reels on Gravity Pants ↗", href: "https://gravitypants.com/app/ads" },
   { label: "Account settings", to: "/app/account" as const },
