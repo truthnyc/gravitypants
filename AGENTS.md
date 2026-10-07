@@ -11,7 +11,7 @@
 
 ## Stillframe architecture rules
 
-- All project/frame reads and writes go through the hooks in `src/lib/stillframe/data.ts` so the editor can autosave from one place.
+- Project/frame reads and writes use `src/lib/stillframe/data.ts` hooks for centralized autosave.
 - Domain types and shared constants (workspace id, formats, defaults) live in `src/lib/stillframe/types.ts`.
 - The `media` storage bucket is private; resolve image URLs with `getMediaUrl()` in `src/lib/stillframe/media.ts` (workspace policy blocks public buckets).
 - Colors use semantic tokens in `src/styles.css`, never raw component colors.
@@ -30,7 +30,7 @@
 - Plan gates: every feature check goes through `usePlanAccess().canUse(feature)` in `src/lib/stillframe/plan.ts`; blocked features call `openUpgrade()` (one shared dialog) instead of hiding — one place for plan rules.
 - Support: tickets in `support_tickets` via `submitTicket` server fn; priority set by SQL trigger from the plan (never the browser); each ticket emails help@gravitypants.com.
 
-- Public art uses `public/site-art`; the Purl Soho video uses shared `FeaturedAdVideo` and CDN pointers, keeping site media separate from private workspace assets.
+- Public art uses `public/site-art`; site video uses shared `FeaturedAdVideo` and CDN pointers.
 - Reusable kits: ads made from an `is_reusable` template store `projects.template_id`; `KitAgain.tsx` (useKit/KitAgainButton) drives the label, search and "Make another" (`/app/templates/$slug?from=<ad>` prefills text, no photos) from one place.
 - Staff role: `user_roles` (enum app_role, admin) checked via `has_role()`; `is_platform_admin()` wraps it; staff area at `/admin` (`_authenticated/admin/`) 404s non-admins — roles never live on profiles.
 - Site reels/homepage photos: private `site-reels` files, signed links; home banner/Example of the week in `site_settings`, bundled defaults. Project logos: light/dark artwork, per-frame visibility, auto/light/dark; drawn by `renderAt`.
@@ -41,4 +41,5 @@
 - Directory greetings use hosting geo or browser GeoJS, then server weather; no stored location or shared cache. Reduced motion removes transitions, not word rotation.
 - Admin analytics: public visits go to `page_views` (anon insert) via `src/lib/site/track.ts`; sign-up UTM in user metadata; `analytics.server.ts` feeds the Analytics page and deduped Monday `/api/public/weekly-report`.
 - Shared `SiteHeader` (variant site|app) is used everywhere except the editor; `SHOW_DIRECTORY` in `src/lib/features.ts` gates every Directory link.
-- Website reel favorites: `site_reel_favorites` (own rows only) via `SiteReelHeart`/`useSiteReelFavorites` in src/components/site/SiteReelHeart.tsx; the Favorites page shows them alongside Directory reels — one heart for every reel tile.
+- Website reel favorites use own `site_reel_favorites` rows via `SiteReelHeart`/`useSiteReelFavorites`; Favorites includes Directory reels.
+- App and SSR failures share `ServiceUnavailable`; its HTML fallback stays dependency-free.
