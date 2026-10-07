@@ -10,6 +10,7 @@ import { BrandLink } from "@/components/directory/BrandLink";
 import { HoverReelPreview } from "@/components/directory/HoverReelPreview";
 import { DirectoryReelHeart } from "@/components/directory/LikeSave";
 import { X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { SiteShell } from "@/components/site/SiteShell";
 import { ReelDetail } from "@/components/directory/DirectoryGrid";
 import { listPublicBrands, searchDirectory, searchDirectoryLegacy, type FacetedReel } from "@/lib/directory/directory.functions";
@@ -273,10 +274,11 @@ function DirectoryPage() {
 
   return (
     <SiteShell>
-      <div className="font-ap text-ap-ink">
+      <div className={cn("font-ap text-ap-ink", isAim && "aimante-home")}>
         <section className="dir-intro mx-auto max-w-[900px] px-6 pt-20 pb-6 text-center">
           <h1 className="dir-headline mb-8 font-semibold text-ap-muted">
-            <b className="dir-headline-greeting font-semibold text-ap-ink">
+            {isAim && <span className="aimante-phone-greeting"><span>Happy <span className="text-ap-ink">{day}</span>.</span><span>Show me something:</span></span>}
+            <b className={cn("dir-headline-greeting font-semibold text-ap-ink", isAim && "aimante-desktop-greeting")}>
               <span>
               <span key={greeting?.filled ?? "ssr"} className={greeting ? "animate-[dir-fade_.4s_ease] motion-reduce:animate-none" : undefined}>
                 {greeting ? greeting.segments.map((g, k) => <span key={k} className={g.bold ? "text-ap-ink" : "text-ap-headline-muted"}>{g.text}</span>)
@@ -287,15 +289,15 @@ function DirectoryPage() {
             </b>
             <span className="dir-headline-mood text-ap-blue" aria-live="polite">
               <span className="font-light text-ap-headline-bracket">[ </span>
-              <button type="button" onClick={applyMood} aria-label={`Show ${mood} reels`} className="min-w-0 rounded-lg underline-offset-8 hover:underline focus-visible:outline-2 focus-visible:outline-ap-blue">
+              <Button variant="ghost" type="button" onClick={applyMood} aria-label={`Show ${mood} reels`} className="dir-mood-button h-auto min-w-0 rounded-lg p-0 text-inherit text-[length:inherit] font-semibold leading-[inherit] underline-offset-8 hover:bg-transparent hover:underline focus-visible:outline-2 focus-visible:outline-ap-blue">
                 <span key={mood} className="inline-block animate-[dir-mood_.3s_ease] motion-reduce:animate-none">{mood}</span>
-              </button>
+              </Button>
               <span className="font-light text-ap-headline-bracket"> ]</span>
             </span>
           </h1>
           <form role="search" onSubmit={(e) => { e.preventDefault(); go(value); }}
-            className="mx-auto flex h-[60px] max-w-[680px] items-center gap-2.5 rounded-[12px] border border-transparent bg-ap-panel pr-2 pl-5 transition-[background,border-color,box-shadow] motion-reduce:transition-none focus-within:border-ap-hairline focus-within:bg-ap-card focus-within:shadow-[0_10px_30px_rgba(20,30,50,.10)]">
-            <input ref={input} value={value} onChange={(e) => setValue(e.target.value)} placeholder="Try: cozy knitwear, square, Purl Soho"
+             className="dir-search-bar mx-auto flex h-[60px] max-w-[680px] items-center gap-2.5 rounded-[12px] border border-transparent bg-ap-panel pr-2 pl-5 transition-[background,border-color,box-shadow] motion-reduce:transition-none focus-within:border-ap-hairline focus-within:bg-ap-card focus-within:shadow-[0_10px_30px_rgba(20,30,50,.10)]">
+            <input ref={input} value={value} onChange={(e) => setValue(e.target.value)} placeholder={isAim ? "Try: cozy knitwear, Purl Soho" : "Try: cozy knitwear, square, Purl Soho"}
               aria-label="Search the Directory" aria-keyshortcuts="/"
               className="dir-search-input h-full min-w-0 flex-1 bg-transparent text-[19px] outline-hidden placeholder:text-ap-muted" />
             {value && (
@@ -303,14 +305,14 @@ function DirectoryPage() {
                 <X className="size-4" strokeWidth={1.7} />
               </button>
             )}
-            <button type="submit" className="h-11 rounded-lg bg-ap-blue px-5 text-[16px] text-ap-card hover:bg-ap-blue-hover">Search</button>
+            <Button variant="site" type="submit" className="h-11 shrink-0 rounded-lg bg-ap-blue px-5 text-[16px] text-ap-card hover:bg-ap-blue-hover">Search</Button>
           </form>
         </section>
         <div ref={sentinel} aria-hidden className="h-px" />
-        <div className={cn("sticky top-16 z-30 px-6 transition-[background,padding] motion-reduce:transition-none",
+        <div className={cn("dir-filter-wrap sticky top-16 z-30 px-6 transition-[background,padding] motion-reduce:transition-none",
           stuck ? "border-b border-ap-hairline bg-ap-card/80 py-2 backdrop-blur-xl" : "border-b border-transparent pb-2")}>
-          <FilterBar comingSoon={settings.comingSoon} value={filters} onChange={setFilters} facets={facets} total={total} families={families} brands={brands} compact={stuck} />
-          {isAim && !stuck && <p className="mt-2 text-center text-[13px] text-ap-muted"><Link to="/aimante/about" className="hover:text-ap-ink">New here? See how Aimanté works →</Link></p>}
+          <FilterBar phoneStyle={isAim} comingSoon={settings.comingSoon} value={filters} onChange={setFilters} facets={facets} total={total} families={families} brands={brands} compact={stuck} />
+          {isAim && <p className="mt-2 text-center text-[13px] text-ap-muted"><Link to="/aimante/about" className="hover:text-ap-ink">New here? See how Aimanté works →</Link></p>}
           {tags.length > 0 && (
             <ul className="mx-auto mt-2 flex max-w-[680px] flex-wrap items-center gap-1.5" aria-label="Active filters">
               {tags.map((t) => (
@@ -330,7 +332,7 @@ function DirectoryPage() {
 
         {featuredReels.length > 0 && (
           <FeaturedBand label={featuredLabel} reels={featuredReels} secondsPerReel={SPEED_SECONDS[featured.speed]}
-            filterGap={featured.filterCarouselGap} labelSize={featured.carouselLabelSize} labelGap={featured.carouselLabelGap}
+            phoneStyle={isAim} filterGap={featured.filterCarouselGap} labelSize={featured.carouselLabelSize} labelGap={featured.carouselLabelGap}
             seconds={(r) => (r.kind === "site" ? reels.find((x) => x.id === r.id)?.seconds ?? null : null)} onOpen={openReel} />
         )}
         <section id="directory-results" className="mx-auto max-w-[1280px] scroll-mt-32 px-6 py-14" aria-busy={results.isFetching}>
@@ -342,16 +344,16 @@ function DirectoryPage() {
           </div>
           {results.isPending && <SkeletonGrid n={PAGE} />}
           {found.length > 0 && (
-            <ul className={cn("grid gap-5 transition-opacity [grid-template-columns:repeat(auto-fill,minmax(180px,1fr))] motion-reduce:transition-none", results.isPlaceholderData && "opacity-50")}>
+            <ul className={cn("dir-results-grid grid gap-5 transition-opacity [grid-template-columns:repeat(auto-fill,minmax(180px,1fr))] motion-reduce:transition-none", results.isPlaceholderData && "opacity-50")}>
               {found.map((r, i) => (
                 <li key={`${r.kind}-${r.id}`} data-reel-idx={i} className="dir-card-in relative" style={{ animationDelay: `${(i % PAGE) * 40}ms` }}>
                   <button type="button" onClick={() => openReel(r)} aria-label={`Open ${r.title}`}
-                    className="relative block aspect-square w-full overflow-hidden rounded-[8px] bg-ap-panel">
+                    className="dir-result-tile relative block aspect-square w-full overflow-hidden rounded-[8px] bg-ap-panel">
                     <HoverReelPreview video={r.video_url ?? r.preview_url} poster={r.poster} className={POSTER} />
                   </button>
                   {r.kind === "site" ? <SiteReelHeart reelId={r.id} name={r.title} /> : <DirectoryReelHeart reelId={r.id} name={`${r.brand_name} reel`} />}
-                  <p className="mt-2.5 truncate text-[14px] font-semibold">{r.title}</p>
-                  <p className="truncate text-[12px] text-ap-muted"><BrandLink name={r.brand_name} slug={r.brand_slug} /> · {r.category}</p><ConceptReelNotice brandName={r.brand_name} brandSlug={r.brand_slug} />
+                  <p className="dir-result-title mt-2.5 truncate text-[14px] font-semibold">{r.title}</p>
+                  <p className="dir-result-meta truncate text-[12px] text-ap-muted"><BrandLink name={r.brand_name} slug={r.brand_slug} /> · {r.category}</p><ConceptReelNotice brandName={r.brand_name} brandSlug={r.brand_slug} />
                   {filters.moods.length > 0 && r.moods.length > 0 && (
                     <ul className="mt-1.5 flex flex-wrap gap-1" aria-label="Moods">
                       {r.moods.map((m) => {
@@ -404,7 +406,7 @@ function DirectoryPage() {
                 </p>
               )}
               {!hasMore && isAim && (
-                <p className="text-[14px] text-ap-muted"><Link to="/aimante/join" className="font-medium text-ap-blue hover:underline">Your brand here? List it free →</Link></p>
+                <p className="aimante-list-link text-[14px] text-ap-muted"><Link to="/aimante/join" className="font-medium text-ap-blue hover:underline">Your brand here? List it free →</Link></p>
               )}
             </div>
           )}
@@ -425,7 +427,7 @@ function nextQuery(search: Record<string, unknown>, page: number) {
 
 function SkeletonGrid({ n, className }: { n: number; className?: string }) {
   return (
-    <ul aria-hidden className={cn("grid gap-5 [grid-template-columns:repeat(auto-fill,minmax(180px,1fr))]", className)}>
+    <ul aria-hidden className={cn("dir-results-grid grid gap-5 [grid-template-columns:repeat(auto-fill,minmax(180px,1fr))]", className)}>
       {Array.from({ length: n }, (_, i) => (
         <li key={i}>
           <div className="aspect-square w-full animate-pulse rounded-[8px] bg-ap-panel motion-reduce:animate-none" />
