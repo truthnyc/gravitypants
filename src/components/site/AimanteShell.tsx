@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { BrandSite } from "@/lib/site/brand-site";
 import { usePlanAccess } from "@/lib/stillframe/plan";
-import { peekWorkspaceId, preferredWorkspaceId } from "@/lib/stillframe/workspace";
+import { peekWorkspaceId } from "@/lib/stillframe/workspace";
 
 /** Which brand this visit is on (decided once per request by hostname). */
 export function useBrandSite(): BrandSite {
