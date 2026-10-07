@@ -8,7 +8,7 @@ export type BrandSite = "gravitypants" | "aimante";
 const AIMANTE_HOSTS = new Set(["aimante.co", "www.aimante.co"]);
 
 export function siteForHost(host: string | null | undefined): BrandSite {
-  const h = (host ?? "").toLowerCase().split(":")[0];
+  const h = (host ?? "").toLowerCase().split(":")[0] ?? "";
   return AIMANTE_HOSTS.has(h) ? "aimante" : "gravitypants";
 }
 
