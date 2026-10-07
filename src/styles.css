@@ -1161,7 +1161,6 @@ html:has(.acct), body:has(.acct), body:has(.acct) .bg-canvas { background: var(-
   .dir-headline-greeting > span { display: block; }
   .dir-headline-greeting > span > span { display: block; }
   .dir-headline-mood { display: inline-flex; align-items: center; gap: 0.12em; width: auto; margin-top: 8px; }
-  .dir-headline-mood > .font-light { font-weight: 300; color: #c7c7cc; }
   .dir-search-input { font-size: 16px; }
   .dir-search-input::placeholder { font-size: 14px; }
 }
