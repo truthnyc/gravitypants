@@ -64,7 +64,7 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
   doc: EditorDoc; player: ReturnType<typeof useReelPlayer>; templateName: string | null; ctx: Ctx;
   save: ReturnType<typeof useServerFn<typeof shareReel>>; onSaved: () => void;
 }) {
-  const locked = ctx.plan.tag === "trial" || ctx.plan.tag === "ended";
+  const locked = ctx.plan.tag === "ended";
   const [name, setName] = useState(ctx.brand.name);
   const [site, setSite] = useState(ctx.brand.website_url);
   const [category, setCategory] = useState<Category>(ctx.brand.category);
@@ -121,7 +121,9 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
       setAgreed(false);
       onSaved();
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "That didn't save. Try again.");
+      const msg = e instanceof Error ? e.message : "That didn't save. Try again.";
+      if (/Upgrade/.test(msg)) toast.error(msg, { action: { label: "See plans", onClick: () => window.open("https://gravitypants.com/pricing", "_blank", "noopener") } });
+      else toast.error(msg);
     } finally {
       setBusy(false);
     }
@@ -165,8 +167,8 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
       />
 
       {ctx.plan.tag === "trial" && (
-        <Notice action={<AppButton asChild size="sm"><Link to="/app/account/billing">See plans</Link></AppButton>}>
-          Sharing to the Directory is part of paid plans. Upgrade to show your reels in search and get your own brand page.
+        <Notice action={<AppButton asChild size="sm"><a href="https://gravitypants.com/pricing" target="_blank" rel="noreferrer">See plans</a></AppButton>}>
+          On the free trial your brand page shows up to 3 watermark-free reels. Upgrade for unlimited reels.
         </Notice>
       )}
       {ctx.plan.tag === "ended" && ctx.plan.endedAt && graceEnd && (
