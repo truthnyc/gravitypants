@@ -25,49 +25,49 @@ export function AimanteBrandPage({ brand, reels, siteReels, more, onOpen, onOpen
         <Link to="/directory" className="min-w-0 text-[15px] text-ap-blue">← Browse</Link>
         <div className="aimante-brand-actions flex shrink-0 items-center gap-2"><BrandActions brandId={brand.id} name={brand.name} /></div>
       </div>
-      <div className="mt-6 grid grid-cols-[72px_minmax(0,1fr)] items-start gap-4">
-        {brand.logo_url ? <img src={brand.logo_url} alt={`${brand.name} logo`} className="size-[72px] rounded-[12px] border border-ap-hairline bg-ap-card object-contain" /> : <div className="grid size-[72px] place-items-center rounded-[12px] border border-ap-hairline text-[24px] font-semibold">{brand.name.slice(0, 2)}</div>}
+      <div className="mt-5 grid grid-cols-[72px_minmax(0,1fr)] items-start gap-4">
+        {brand.logo_url ? <img src={brand.logo_url} alt={`${brand.name} logo`} className="size-[72px] rounded-[12px] border border-ap-hairline bg-ap-card object-contain" /> : <div className="grid size-[72px] place-items-center rounded-[12px] border border-ap-hairline bg-ap-card text-[12px] text-ap-muted">Logo</div>}
         <div className="min-w-0">
           <Link to="/directory/category/$slug" params={{ slug: categorySlug(brand.category) }} className="text-[14px] font-semibold text-ap-blue">{brand.category}</Link>
-          <h1 className="mt-1 text-[30px] leading-[1.1] font-semibold break-words md:text-[40px]">{brand.name}</h1>
+          <h1 className="mt-0.5 text-[30px] leading-[1.1] font-semibold tracking-[-0.03em] break-words md:text-[40px]">{brand.name}</h1>
           {brand.website_url && <a href={brand.website_url} target="_blank" rel="noopener noreferrer" onClick={() => void recordBrandClick({ data: { kind: "brand", id: brand.id } }).catch(() => {})} className="mt-2 inline-block text-[16px] text-ap-blue-strong">Visit {brand.name} ↗</a>}
         </div>
       </div>
       {brand.description && <p className="mt-5 text-[17px] leading-[1.5] text-ap-body">{brand.description}</p>}
       {showBrandConceptNotice(brand.affiliated) && <p className="mt-2 text-[11px] leading-[1.5] text-ap-muted">Concept reels by Gravity Pants. Not affiliated with or endorsed by the brand.</p>}
       <div className="mt-4 flex flex-wrap items-center gap-2 text-[13px]" aria-label="Moods and reel counts">
-        {brand.moods.map((m) => <Link key={m} to="/directory" search={{ mood: m }} className="rounded-lg bg-ap-soft-blue px-2.5 py-1 text-ap-badge hover:underline">{m.charAt(0).toUpperCase() + m.slice(1)}</Link>)}
+        {brand.moods.map((m) => <Link key={m} to="/directory" search={{ mood: m }} className="rounded-lg bg-ap-soft-blue px-3 py-1.5 text-[13px] font-medium text-ap-badge hover:underline">{m.toLowerCase()}</Link>)}
         <span className="text-ap-muted tabular-nums">· {total} {total === 1 ? "reel" : "reels"} · {sizes.size} {sizes.size === 1 ? "size" : "sizes"}</span>
       </div>
     </header>
     <section className="mt-8" aria-labelledby="brand-reels-title">
-      <h2 id="brand-reels-title" className="mb-4 text-[24px] font-semibold">Reels</h2>
+      <h2 id="brand-reels-title" className="mb-4 text-[22px] font-semibold tracking-[-0.02em]">Reels</h2>
       <div className="grid items-start gap-5 md:grid-cols-2">
         {cards.map((r) => <article key={r.id} className="overflow-hidden rounded-[12px] bg-ap-panel p-3">
           <Button variant="ghost" onClick={r.open} aria-label={`Play ${r.title}`} className="relative block h-auto w-full overflow-hidden rounded-lg p-0" style={{ aspectRatio: r.format.replace(":", "/") }}>
-            {r.poster ? <img src={r.poster} alt="" loading="lazy" className="size-full object-contain" /> : <video src={r.video ?? undefined} preload="metadata" muted playsInline className="size-full object-contain" />}
+            {r.poster ? <img src={r.poster} alt="" loading="lazy" className="size-full object-contain" /> : <video src={r.video ?? undefined} preload="metadata" muted playsInline className="size-full object-cover" />}
             <span className="absolute top-1/2 left-1/2 grid size-12 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-ap-card text-ap-ink shadow-ap-soft"><Play aria-hidden className="ml-0.5 size-5" strokeWidth={1.7} /></span>
           </Button>
-          <h3 className="mt-3 text-[16px] font-semibold">{r.title}</h3>
-          <p className="mt-1 text-[13px] text-ap-muted tabular-nums">{r.seconds} sec · {r.format}</p>
+          <h3 className="mt-3 px-1 text-[16px] font-semibold">{r.title}</h3>
+          <p className="mt-0.5 px-1 pb-1 text-[13px] text-ap-muted tabular-nums">{r.seconds} sec · {r.format}</p>
         </article>)}
       </div>
       {total === 0 && <p className="py-8 text-ap-muted">No reels yet. Check back soon.</p>}
     </section>
     {more.length > 0 && <section className="mt-8" aria-labelledby="related-brands-title">
-      <h2 id="related-brands-title" className="mb-4 text-[24px] font-semibold">More like this</h2>
+      <h2 id="related-brands-title" className="mb-4 text-[22px] font-semibold tracking-[-0.02em]">More like this</h2>
       <ul className="flex gap-3 overflow-x-auto pb-3">
         {more.map((m) => <li key={m.slug} className="w-[150px] shrink-0">
           <Link to="/directory/$slug" params={{ slug: m.slug }} className="block">
-            <div className="aspect-[4/5] overflow-hidden rounded-lg bg-ap-panel">{m.poster && <img src={m.poster} alt={`${m.name} reel`} loading="lazy" className="size-full object-cover" />}</div>
+            <div className="aspect-[4/5] overflow-hidden rounded-[8px] bg-ap-panel">{m.poster && <img src={m.poster} alt={`${m.name} reel`} loading="lazy" className="size-full object-cover" />}</div>
             <p className="mt-2 text-[14px] font-semibold">{m.name}</p><p className="mt-0.5 text-[12px] text-ap-muted">{m.reason}</p>
           </Link>
         </li>)}
       </ul>
     </section>}
-    <div className="mx-auto mt-8 max-w-[720px] bg-ap-soft-blue px-5 py-5 text-[16px] text-ap-body">
+    <div className="mx-auto mt-8 max-w-[720px] rounded-[12px] bg-ap-soft-blue px-5 py-6 text-center text-[15px] text-ap-body">
       <p>Reels made with Gravity Pants.</p>
-      <Link to="/aimante/join" className="mt-1 inline-block font-semibold text-ap-blue">List your brand free →</Link>
+      <Link to="/aimante/join" className="mt-1 inline-block text-[16px] font-semibold text-ap-blue">List your brand free →</Link>
     </div>
   </main>;
 }
