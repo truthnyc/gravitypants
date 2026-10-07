@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { BrandSite } from "@/lib/site/brand-site";
 import { usePlanAccess } from "@/lib/stillframe/plan";
+import { peekWorkspaceId, preferredWorkspaceId } from "@/lib/stillframe/workspace";
 
 /** Which brand this visit is on (decided once per request by hostname). */
 export function useBrandSite(): BrandSite {
@@ -60,11 +61,17 @@ const ACCOUNT_LINKS = (saved: number, stats = false) => [
   { label: "Account settings", to: "/app/account" as const },
 ];
 
+/** Brand stats gate for site pages, where the app's sign-in gate never ran: fall back to the user's saved workspace. */
+function useStatsOk(userId: string | undefined) {
+  const ws = peekWorkspaceId() ?? (userId ? preferredWorkspaceId(userId) : null);
+  const { data: access, canUse } = usePlanAccess(ws);
+  return !!access && canUse("brand_stats");
+}
+
 function AccountMenu({ me }: { me: Me }) {
   const saved = useSavedCount(me.id);
   const signOut = useAimanteSignOut();
-  const { data: access, canUse } = usePlanAccess();
-  const statsOk = !!access && canUse("brand_stats");
+  const statsOk = useStatsOk(me.id);
   return (
     <DropdownMenu>
       <DropdownMenuTrigger aria-label="Your account" className="rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue"><Avatar me={me} /></DropdownMenuTrigger>
