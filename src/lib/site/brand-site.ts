@@ -1,5 +1,5 @@
 import { createIsomorphicFn } from "@tanstack/react-start";
-import { getCookie, getRequestHost } from "@tanstack/react-start/server";
+import { getCookie, getRequestHost, getRequestUrl, setCookie } from "@tanstack/react-start/server";
 import type { LocationRewrite } from "@tanstack/react-router";
 
 /** Which brand a visit is on. aimante.co shows the Aimanté directory; everything else is Gravity Pants. */
@@ -29,28 +29,29 @@ export function resolveSite(host: string, brandParam: string | null, cookie: str
   return cookie === "aimante" ? "aimante" : "gravitypants";
 }
 
+const COOKIE_AGE = 60 * 60 * 24 * 30;
+
 const readCookie = createIsomorphicFn()
   .server(() => { try { return getCookie(BRAND_COOKIE); } catch { return undefined; } })
   .client(() => document.cookie.split("; ").find((c) => c.startsWith(`${BRAND_COOKIE}=`))?.split("=")[1]);
 
+/** Remembers ?brand=… so later pages in the preview keep the same brand. */
+const writeCookie = createIsomorphicFn()
+  .server((v: string) => { try { setCookie(BRAND_COOKIE, v, { path: "/", maxAge: COOKIE_AGE, sameSite: "lax" }); } catch { /* outside a request */ } })
+  .client((v: string) => { document.cookie = `${BRAND_COOKIE}=${v}; path=/; max-age=${COOKIE_AGE}; samesite=lax`; });
+
 export function siteForUrl(url: URL): BrandSite {
-  return resolveSite(url.host, url.searchParams.get("brand"), readCookie());
+  const param = url.searchParams.get("brand");
+  if ((param === "aimante" || param === "gravitypants") && !isAimanteHost(url.host) && !isGravityPantsHost(url.host)) writeCookie(param);
+  return resolveSite(url.host, param, readCookie());
 }
 
 export const currentSite = createIsomorphicFn()
   .server(() => {
-    let host = "";
-    try { host = getRequestHost({ xForwardedHost: true }); } catch { /* outside a request */ }
-    return resolveSite(host, null, readCookie());
+    try { return siteForUrl(getRequestUrl({ xForwardedHost: true })); } catch { /* outside a request */ }
+    try { return siteForHost(getRequestHost({ xForwardedHost: true })); } catch { return "gravitypants" as BrandSite; }
   })
-  .client(() => {
-    const url = new URL(window.location.href);
-    const param = url.searchParams.get("brand");
-    if (param === "aimante" || param === "gravitypants") {
-      document.cookie = `${BRAND_COOKIE}=${param}; path=/; max-age=${60 * 60 * 24 * 30}; samesite=lax`;
-    }
-    return siteForUrl(url);
-  });
+  .client(() => siteForUrl(new URL(window.location.href)));
 
 /** True for the public paths that belong to Aimanté. */
 export function isAimantePath(pathname: string): boolean {
