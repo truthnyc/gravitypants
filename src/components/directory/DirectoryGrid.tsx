@@ -5,6 +5,7 @@ import { ReelVideo } from "@/components/site/ReelVideo";
 import { ReelCarousel } from "@/components/site/ReelCarousel";
 import { DirectoryReelHeart } from "./LikeSave";
 import { ReelPopup, ReelPopupBody } from "./ReelPopup";
+import { recordBrandClick } from "@/lib/directory/brand-stats.functions";
 
 const shape = (f: string | undefined) => (f === "9x16" ? "aspect-[9/16] h-full" : f === "16x9" ? "aspect-[16/9] w-full" : "aspect-square h-full");
 
@@ -91,7 +92,7 @@ export function ReelDetail({ card, onClose }: { card: DirectoryCard | null; onCl
   if (!card) return null;
   const title = card.title ?? card.template_name ?? "Custom reel";
   return <ReelPopup title={title} onClose={onClose}><ReelPopupBody
-    category={card.category} title={title} brandName={card.brand_name} href={card.website_url}
+    category={card.category} title={title} brandName={card.brand_name} href={card.website_url} onVisit={() => void recordBrandClick({ data: { kind: "directory", id: card.reel_id } }).catch(() => {})}
     description={card.description} tags={[...card.moods, ...card.tags]}
     brand={<Link to="/directory/$slug" params={{ slug: card.brand_slug }} onClick={onClose} className="font-semibold hover:text-ap-blue">{card.brand_name}</Link>}
     favorite={<DirectoryReelHeart inline reelId={card.reel_id} name={title} />}

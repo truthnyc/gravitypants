@@ -9,6 +9,7 @@ const COPY: Record<Feature, { title: string; body: string }> = {
   brand_kits: { title: "Brand kits come with a paid plan", body: "Save your logos, colors and fonts once and put them on any ad in one tap." },
   templates: { title: "Templates come with a paid plan", body: "Save an ad's look as a template and reuse it with new photos." },
   team_sharing: { title: "Sharing is part of the Team plan", body: "On Team, you and up to 3 teammates share brand kits, templates and 150 exports a month." },
+  brand_stats: { title: "Brand stats are part of Business and Team", body: "See views, saves and website clicks for every reel, and which moods work best." },
   priority_support: { title: "Priority support is part of the Team plan", body: "Team customers get a reply within 6 hours." },
 };
 

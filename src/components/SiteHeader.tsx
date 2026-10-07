@@ -36,6 +36,7 @@ const appNav: NavItem[] = [
   { label: "Your Ads", to: "/app/ads", exact: true },
   { label: "Brand Kit", to: "/app/brand" },
   { label: "Previous Exports", to: "/app/exports" },
+  { label: "Stats", to: "/app/stats" },
   ...(SHOW_DIRECTORY ? [{ label: "Directory", to: "/directory" }] : []),
 ];
 

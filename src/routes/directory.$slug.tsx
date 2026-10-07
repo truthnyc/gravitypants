@@ -16,6 +16,7 @@ import type { SiteReel } from "@/lib/site/reels";
 import { useServerFn } from "@tanstack/react-start";
 import { MadeWithGravityPants, useBrandSite } from "@/components/site/AimanteShell";
 import { recordDirectoryReelOpen } from "@/lib/directory/views.functions";
+import { recordBrandClick } from "@/lib/directory/brand-stats.functions";
 
 const POSTER = "absolute top-1/2 left-1/2 h-[72%] w-auto max-w-[72%] object-contain -translate-x-1/2 -translate-y-1/2 rounded-[6px] shadow-[0_0_0_1px_var(--ap-inner),0_18px_34px_-16px_rgba(29,29,31,.28)]";
 
@@ -100,7 +101,7 @@ function BrandPage() {
                   <BrandActions brandId={brand.id} name={brand.name} />
                 </div>
                 {brand.website_url && (
-                  <a href={brand.website_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-[15px] text-ap-blue">
+                  <a href={brand.website_url} target="_blank" rel="noreferrer" onClick={() => void recordBrandClick({ data: { kind: "brand", id: brand.id } }).catch(() => {})} className="inline-flex items-center gap-1.5 text-[15px] text-ap-blue">
                     Shop {brand.name} <ArrowUpRight className="size-4" strokeWidth={1.7} />
                   </a>
                 )}
