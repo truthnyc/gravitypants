@@ -6,7 +6,7 @@ import { billingKey, fetchExportStatus, type ExportStatus } from "./billing";
 import { TRIAL } from "./plans-config";
 
 /** Every plan-gated feature. Add new gates here so the whole app checks plans in one place. */
-export type Feature = "export" | "gif" | "brand_kits" | "templates" | "team_sharing" | "priority_support";
+export type Feature = "export" | "gif" | "brand_kits" | "templates" | "team_sharing" | "priority_support" | "brand_stats";
 
 /** Free trial limit, from the shared plan config (also enforced in SQL export_status). */
 export const FREE_EXPORTS = TRIAL.exports;
@@ -46,6 +46,8 @@ export function canUseWith(e: Entitlements | undefined, f: Feature): boolean {
     case "team_sharing":
     case "priority_support":
       return e.team;
+    case "brand_stats":
+      return Boolean(e.admin) || e.tier === "business" || e.tier === "team";
   }
 }
 
