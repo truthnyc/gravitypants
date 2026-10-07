@@ -64,6 +64,7 @@
   --ap-muted: #6e6e73;
   --ap-headline-muted: #86868b;
   --ap-headline-bracket: #c7c7cc;
+  --ap-subhead: #a1a1a6;
   --ap-blue: #0071e3;
   --ap-red: #c62828;
   --ap-blue-hover: #0077ed;
@@ -101,6 +102,7 @@
   --color-ap-muted: var(--ap-muted);
   --color-ap-headline-muted: var(--ap-headline-muted);
   --color-ap-headline-bracket: var(--ap-headline-bracket);
+  --color-ap-subhead: var(--ap-subhead);
   --color-ap-blue: var(--ap-blue);
   --color-ap-blue-strong: var(--ap-blue-strong);
   --color-ap-red: var(--ap-red);
