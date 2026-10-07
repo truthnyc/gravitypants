@@ -363,7 +363,7 @@ export const getBrandPage = createServerFn({ method: "GET" })
     const { publicClient } = await import("@/lib/site/reels.server");
     const { toCards } = await import("./directory.server");
     const pc = publicClient() as any;
-    const empty = { redirect: null as string | null, brand: null, reels: [] as DirectoryCard[], siteReels: [] as import("@/lib/site/reels").SiteReel[], more: [] as { name: string; slug: string; poster: string | null; reason: string }[] };
+    const empty = { redirect: null as string | null, brand: null, reels: [] as DirectoryCard[], siteReels: [] as import("@/lib/site/reels").SiteReel[], more: [] as { name: string; slug: string; poster: string | null; category: string }[] };
     const { data: b } = await pc.from("directory_brands").select("id, name, website_url, category, description, slug, logo_url, moods, affiliated, status, updated_at").eq("slug", data.slug).eq("status", "live").maybeSingle();
     if (!b) {
       const { data: h } = await pc.from("directory_slug_history").select("brand_id").eq("old_slug", data.slug).order("changed_at", { ascending: false }).limit(1).maybeSingle();
@@ -391,7 +391,7 @@ export const getBrandPage = createServerFn({ method: "GET" })
        brand: { id: b.id as string, name: b.name as string, website_url: b.website_url as string | null, category: b.category as string, description: b.description as string | null, slug: b.slug as string, logo_url: await signLogo(b.logo_url), moods: (b.moods ?? []) as string[], affiliated: b.affiliated as boolean, featured: !!featured, updated_at: b.updated_at as string },
       reels: cards,
       siteReels,
-      more: await Promise.all(related.map(async (other: any) => ({ name: other.name as string, slug: other.slug as string, reason: other.reason as string, poster: allSiteReels.find((r) => r.brandSlug === other.slug)?.poster ?? moreCards.find((c) => c.brand_slug === other.slug)?.poster ?? await signLogo(other.logo_url) }))),
+      more: await Promise.all(related.map(async (other: any) => ({ name: other.name as string, slug: other.slug as string, category: other.category as string, poster: allSiteReels.find((r) => r.brandSlug === other.slug)?.poster ?? moreCards.find((c) => c.brand_slug === other.slug)?.poster ?? await signLogo(other.logo_url) }))),
     };
   });
 
