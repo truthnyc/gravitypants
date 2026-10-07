@@ -5,6 +5,7 @@ import { CATEGORIES, categorySlug } from "@/lib/directory/directory";
 import { MOOD_FAMILY_COLORS, type MoodFamily } from "@/lib/directory/mood-admin";
 import { useQuery } from "@tanstack/react-query";
 import { listCategories } from "@/lib/directory/categories.functions";
+import { Button } from "@/components/ui/button";
 
 export type Facets = { moods: Record<string, number>; categories: Record<string, number>; brands: Record<string, number> };
 export type FilterValue = { moods: string[]; categories: string[]; brands: string[] };
@@ -17,14 +18,14 @@ const famColor = (f?: string) => (f ? MOOD_FAMILY_COLORS[f as MoodFamily] : unde
 const summary = (names: string[]) => (names.length >= 3 ? `${names[0]} +${names.length - 1}` : names.join(", "));
 const toggleIn = (list: string[], v: string) => (list.includes(v) ? list.filter((x) => x !== v) : [...list, v]);
 
-function useNarrow() {
+function useNarrow(phoneStyle: boolean) {
   const [n, setN] = useState(false);
   useEffect(() => {
-    const m = window.matchMedia("(max-width: 639px)");
+    const m = window.matchMedia(phoneStyle ? "(max-width: 767px)" : "(max-width: 639px)");
     const f = () => setN(m.matches);
     f(); m.addEventListener("change", f);
     return () => m.removeEventListener("change", f);
-  }, []);
+  }, [phoneStyle]);
   return n;
 }
 
@@ -35,12 +36,12 @@ function Mark({ text, q }: { text: string; q: string }) {
   return <>{text.slice(0, i)}<mark className="rounded-[2px] bg-ap-soft-blue text-inherit">{text.slice(i, i + q.length)}</mark>{text.slice(i + q.length)}</>;
 }
 
-export function FilterBar({ value, onChange, facets, total, families, brands, compact = false, comingSoon = true }: {
-  compact?: boolean; comingSoon?: boolean; value: FilterValue; onChange: (v: FilterValue) => void; facets: Facets; total: number; families: Family[]; brands: Brand[];
+export function FilterBar({ value, onChange, facets, total, families, brands, compact = false, comingSoon = true, phoneStyle = false }: {
+  phoneStyle?: boolean; compact?: boolean; comingSoon?: boolean; value: FilterValue; onChange: (v: FilterValue) => void; facets: Facets; total: number; families: Family[]; brands: Brand[];
 }) {
   const [open, setOpen] = useState<Seg | null>(null);
   const [hover, setHover] = useState<Seg | null>(null);
-  const narrow = useNarrow();
+  const narrow = useNarrow(phoneStyle);
   const wrap = useRef<HTMLDivElement>(null);
   const segRefs = { mood: useRef<HTMLButtonElement>(null), category: useRef<HTMLButtonElement>(null), brand: useRef<HTMLButtonElement>(null) };
   const familyOf = new Map(families.flatMap((f) => f.moods.map((m) => [m, f.family] as const)));
@@ -104,9 +105,9 @@ export function FilterBar({ value, onChange, facets, total, families, brands, co
   };
 
   return (
-    <div ref={wrap} className="relative mx-auto max-w-[680px]">
-      <div className={cn("grid transition-[height] motion-reduce:transition-none", compact ? "h-[52px]" : "h-[60px]")}>
-      <div className="grid h-full grid-cols-[1.15fr_1fr_1fr] rounded-[14px] bg-ap-panel p-1" role="group" aria-label="Filter reels">
+    <div ref={wrap} className={cn("relative mx-auto max-w-[680px]", phoneStyle && "aimante-filter-bar")}>
+      <div className={cn("dir-filter-height grid transition-[height] motion-reduce:transition-none", compact ? "h-[52px]" : "h-[60px]")}>
+      <div className="dir-filter-row grid h-full grid-cols-[1.15fr_1fr_1fr] rounded-[14px] bg-ap-panel p-1" role="group" aria-label="Filter reels">
         {segs.map((s, i) => {
           const active = s.names.length > 0;
           const isOpen = open === s.id;
@@ -115,13 +116,13 @@ export function FilterBar({ value, onChange, facets, total, families, brands, co
           return (
             <div key={s.id} className="relative min-w-0">
               {!hideDivider && <span aria-hidden className="absolute top-3 bottom-3 left-0 w-px bg-ap-hairline" />}
-              <button ref={segRefs[s.id]} type="button" aria-haspopup="dialog" aria-expanded={isOpen} aria-controls={`dir-panel-${s.id}`}
+               <Button variant="ghost" ref={segRefs[s.id]} type="button" aria-haspopup="dialog" aria-expanded={isOpen} aria-controls={`dir-panel-${s.id}`}
                 aria-label={`${s.label}: ${active ? s.names.join(", ") : s.empty}`}
                 onClick={() => setOpen(isOpen ? null : s.id)}
                 onMouseEnter={() => setHover(s.id)} onMouseLeave={() => setHover(null)}
-                className={cn("flex h-full w-full items-center gap-2 rounded-[10px] px-2.5 text-left transition-[background,box-shadow] motion-reduce:transition-none sm:px-4 focus-visible:outline-2 focus-visible:outline-ap-blue",
+                 className={cn("dir-filter-trigger flex h-full w-full items-center gap-2 rounded-[10px] px-2.5 text-left transition-[background,box-shadow] motion-reduce:transition-none sm:px-4 focus-visible:outline-2 focus-visible:outline-ap-blue",
                   isOpen ? "bg-ap-card shadow-ap-soft" : "hover:bg-ap-segment-hover", active && "pr-9 sm:pr-10")}>
-                <span className="min-w-0 flex-1">
+                 <span className="dir-filter-copy min-w-0 flex-1">
                   <span className={cn("block text-[10.5px] font-semibold tracking-[.06em] uppercase", active ? "text-ap-blue-strong" : "text-ap-muted")}>{s.label}</span>
                   <span className={cn("flex items-center gap-1.5 text-[15px]", active ? "font-medium text-ap-ink" : "text-ap-muted")}>
                     {s.id === "mood" && active && (
@@ -132,8 +133,9 @@ export function FilterBar({ value, onChange, facets, total, families, brands, co
                     <span className="truncate">{active ? summary(s.names) : s.empty}</span>
                   </span>
                 </span>
+                 {phoneStyle && <span className="dir-phone-filter-label">{s.label}{active ? ` (${s.names.length})` : ""}<span aria-hidden="true" className="ml-2 text-ap-muted">▾</span></span>}
                 {!active && <ChevronDown aria-hidden className={cn("hidden size-4 shrink-0 text-ap-muted transition-transform motion-reduce:transition-none sm:block", isOpen && "rotate-180")} strokeWidth={1.7} />}
-              </button>
+               </Button>
               {active && (
                 <button type="button" aria-label={`Clear ${s.label.toLowerCase()} filter`} onClick={() => set(s.key, [])}
                   className="absolute top-1/2 right-2 grid size-6 -translate-y-1/2 place-items-center rounded-full bg-ap-media text-ap-ink hover:bg-ap-switch-off sm:right-3">
