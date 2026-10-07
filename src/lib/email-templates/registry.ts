@@ -42,4 +42,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'client-invite-copy': clientInviteCopy,
   'directory-notice': directoryNotice,
   'brand-application': brandApplication,
+  'trial-signup': trialSignup,
 }

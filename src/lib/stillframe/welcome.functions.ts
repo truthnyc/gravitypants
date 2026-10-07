@@ -30,8 +30,14 @@ export const sendWelcomeEmail = createServerFn({ method: "POST" })
     const { data: p } = await supabaseAdmin.from("profiles").select("display_name").eq("user_id", userId).maybeSingle();
 
     const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
+    const name = (p?.display_name as string | null) ?? undefined;
+    // Notify the team about the new trial; failure must not block the welcome email.
+    void sendTemplateEmail("trial-signup", email, {
+      templateData: { email, name },
+      idempotencyKey: `trial-signup-${ws}`,
+    }).catch(() => {});
     return sendTemplateEmail("welcome", email, {
-      templateData: { name: (p?.display_name as string | null) ?? undefined },
+      templateData: { name },
       idempotencyKey: `welcome-${ws}`,
     });
   });
