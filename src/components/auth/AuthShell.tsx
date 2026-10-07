@@ -2,22 +2,50 @@ import { useState, type ReactNode } from "react";
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GravityPantsLogo } from "@/components/GravityPantsLogo";
-import { AimanteShell, AimanteLogo, useBrandSite } from "@/components/site/AimanteShell";
+import { AimanteLogo, useBrandSite } from "@/components/site/AimanteShell";
+import { Link, useRouter } from "@tanstack/react-router";
+import { ArrowLeft, X } from "lucide-react";
 import { lovable } from "@/integrations/lovable";
 import { FeaturedAdVideo } from "@/components/site/FeaturedAdVideo";
 import photo1 from "@/assets/site/purl-soho-photo-1.webp.asset.json";
 import photo2 from "@/assets/site/purl-soho-photo-2.webp.asset.json";
 import photo3 from "@/assets/site/purl-soho-photo-3.webp.asset.json";
 
-export function safeRedirect(r: unknown): string {
-  if (typeof r !== "string") return "/app/ads";
+export function safeRedirect(r: unknown, fallback = "/app/ads"): string {
+  if (typeof r !== "string" || !r) return fallback;
   try {
     const u = new URL(r, window.location.origin);
-    if (u.origin !== window.location.origin) return "/app/ads";
+    if (u.origin !== window.location.origin || !r.startsWith("/") || r.startsWith("//")) return fallback;
     return u.pathname + u.search + u.hash;
   } catch {
-    return "/app/ads";
+    return fallback;
   }
+}
+
+/** Aimanté sign-in screens: grey page, simple header, centred card. */
+function AimanteAuth({ title, subtitle, beforeForm, children }: { title: string; subtitle: string; beforeForm?: ReactNode; children: ReactNode }) {
+  const router = useRouter();
+  const back = () => { if (window.history.length > 1) router.history.back(); else void router.navigate({ to: "/directory" }); };
+  return (
+    <div className="aimante-auth flex min-h-dvh flex-col bg-ap-panel font-ap text-ap-ink">
+      <header className="border-b border-aimante-divider bg-ap-card">
+        <div className="mx-auto flex h-14 max-w-[1280px] items-center justify-between px-4 md:h-16 md:px-6">
+          <Link to="/directory" aria-label="Aimanté home"><AimanteLogo /></Link>
+          <Link to="/directory" className="hidden items-center gap-1.5 text-[14px] text-site-nav hover:text-ap-ink md:inline-flex"><ArrowLeft size={16} strokeWidth={1.7} aria-hidden />Back to browsing</Link>
+          <Button type="button" variant="ghost" size="icon" aria-label="Go back" onClick={back} className="size-11 min-h-0 min-w-0 text-ap-ink md:hidden"><X size={22} strokeWidth={1.7} /></Button>
+        </div>
+      </header>
+      <main className="flex flex-1 flex-col items-center px-5 py-8 md:px-6 md:py-16">
+        <div className="w-full max-w-[420px] md:rounded-[12px] md:bg-ap-card md:p-8 md:shadow-ap-soft">
+          <h1 className="text-[28px] font-semibold leading-[1.1] tracking-[-0.035em]">{title}</h1>
+          <p className="mt-2 text-[15px] leading-[1.45] text-ap-body">{subtitle}</p>
+          {beforeForm}
+          <div className="mt-6">{children}</div>
+        </div>
+        <p className="mt-6 text-center text-[13px] text-ap-muted">One account for Aimanté and Gravity Pants. <Link to="/privacy" className="hover:text-ap-ink">Privacy</Link> · <Link to="/terms" className="hover:text-ap-ink">Terms</Link></p>
+      </main>
+    </div>
+  );
 }
 
 
@@ -43,11 +71,12 @@ function AuthVisual({ mode }: { mode: "signup" | "signin" }) {
 
 export function AuthShell({ eyebrow, title, subtitle, children, mode = "signup", beforeForm }: { eyebrow?: string; title: string; subtitle: string; children: ReactNode; mode?: "signup" | "signin"; beforeForm?: ReactNode }) {
   const site = useBrandSite();
-  const content = (
+  if (site === "aimante") return <AimanteAuth title={title} subtitle={subtitle} beforeForm={beforeForm}>{children}</AimanteAuth>;
+  return (
     <main className={`auth-page auth-page-${mode}`}>
       <div className="auth-form-side">
         <a href="/" className="auth-brand">
-          {site === "aimante" ? <AimanteLogo /> : <><GravityPantsLogo size={30} /><span>Gravity Pants</span></>}
+          <GravityPantsLogo size={30} /><span>Gravity Pants</span>
         </a>
         <div className="auth-form-inner">
           {eyebrow && <p className="auth-eyebrow">{eyebrow}</p>}
@@ -62,12 +91,12 @@ export function AuthShell({ eyebrow, title, subtitle, children, mode = "signup",
       </div>
     </main>
   );
-  return site === "aimante" ? <AimanteShell>{content}</AimanteShell> : content;
 }
 
 export function GoogleButton({ redirectTo, onStart }: { redirectTo: string; onStart?: () => void }) {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const site = useBrandSite();
   return (
     <>
       <Button
@@ -80,7 +109,7 @@ export function GoogleButton({ redirectTo, onStart }: { redirectTo: string; onSt
           onStart?.();
           sessionStorage.setItem("sf-after-signin", redirectTo);
           try {
-            const res = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin + "/signin" });
+            const res = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin + (site === "aimante" ? "/sign-in" : "/signin") });
             if (res.error) {
               sessionStorage.removeItem("gravity-pants:welcome");
               setErr("Google sign-in didn't work. Please try again.");
@@ -120,6 +149,7 @@ export type FieldDef = {
   value: string;
   placeholder?: string;
   error?: string | null;
+  labelAction?: ReactNode;
   onChange: (v: string) => void;
 };
 
@@ -132,7 +162,7 @@ export function FieldGroup({ fields, error }: { fields: FieldDef[]; error?: stri
         const type = isPassword && shown[f.id] ? "text" : f.type;
         return (
           <div key={f.id} className="auth-field">
-            <label htmlFor={f.id}>{f.label}</label>
+            {f.labelAction ? <div className="auth-label-row"><label htmlFor={f.id}>{f.label}</label>{f.labelAction}</div> : <label htmlFor={f.id}>{f.label}</label>}
             <div className="auth-input-wrap">
               <input
                 id={f.id}

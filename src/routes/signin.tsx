@@ -9,6 +9,7 @@ import { rememberSignupChoice } from "@/lib/stillframe/signup-choice";
 import { PLANS } from "@/lib/stillframe/plans-config";
 import { siteHead } from "@/lib/site/seo";
 import { aimanteHead, currentSite } from "@/lib/site/brand-site";
+import { useBrandSite } from "@/components/site/AimanteShell";
 
 export const Route = createFileRoute("/signin")({
   validateSearch: z.object({ redirect: z.string().optional() }),
@@ -21,6 +22,8 @@ export const Route = createFileRoute("/signin")({
 function SignIn() {
   const { redirect } = Route.useSearch();
   const navigate = useNavigate();
+  const site = useBrandSite();
+  const aim = site === "aimante";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -29,7 +32,7 @@ function SignIn() {
   const [busy, setBusy] = useState(false);
   const [keepSignedIn, setKeepSignedIn] = useState(true);
   const [resetSent, setResetSent] = useState(false);
-  const target = typeof window === "undefined" ? "/app/ads" : safeRedirect(redirect);
+  const target = typeof window === "undefined" ? "/app/ads" : safeRedirect(redirect, aim ? "/directory" : "/app/ads");
 
   // Already signed in (or returning from Google): go on.
   useEffect(() => {
@@ -41,7 +44,7 @@ function SignIn() {
       } catch { /* Invalid old selection. */ }
       const saved = sessionStorage.getItem("sf-after-signin");
       sessionStorage.removeItem("sf-after-signin");
-      navigate({ to: saved ? safeRedirect(saved) : target, replace: true });
+      navigate({ to: saved ? safeRedirect(saved, target) : target, replace: true });
     };
     supabase.auth.getSession().then(({ data }) => data.session && go(data.session.user.id));
     const { data } = supabase.auth.onAuthStateChange((e, s) => {
@@ -84,24 +87,24 @@ function SignIn() {
   }
 
   return (
-    <AuthShell mode="signin" title="Welcome back." subtitle="Sign in to open your ads and keep working.">
+    <AuthShell mode="signin" title={aim ? "Sign in to Aimanté" : "Welcome back."} subtitle={aim ? "Use your Gravity Pants account. It works on both sites." : "Sign in to open your ads and keep working."}>
       <GoogleButton redirectTo={target} />
       <form onSubmit={submit} noValidate>
         <FieldGroup
           error={error}
           fields={[
             { id: "email", label: "Email", type: "email", autoComplete: "email", value: email, placeholder: "you@yourbrand.com", onChange: (value) => { setEmail(value); setEmailError(null); }, error: emailError },
-            { id: "password", label: "Password", type: "password", autoComplete: "current-password", value: password, placeholder: "Your password", onChange: (value) => { setPassword(value); setPasswordError(null); }, error: passwordError },
+            { id: "password", label: "Password", labelAction: <Button type="button" variant="link" className="auth-link" onClick={() => void forgot()} disabled={busy}>Forgot password?</Button>, type: "password", autoComplete: "current-password", value: password, placeholder: "Your password", onChange: (value) => { setPassword(value); setPasswordError(null); }, error: passwordError },
           ]}
         />
-        <div className="auth-options"><label><input type="checkbox" checked={keepSignedIn} onChange={(e) => setKeepSignedIn(e.target.checked)} /> Keep me signed in</label><Button type="button" variant="link" className="auth-link" onClick={() => void forgot()} disabled={busy}>Forgot password?</Button></div>
+        <div className="auth-options"><label><input type="checkbox" checked={keepSignedIn} onChange={(e) => setKeepSignedIn(e.target.checked)} /> Keep me signed in</label></div>
         {resetSent && <p role="status" className="auth-reset-sent">If that email has an account, a reset link is on its way.</p>}
         <Button type="submit" variant="site" disabled={busy || !email || !password} className="auth-submit">
           {busy ? "Signing in…" : <>Sign in <ArrowRight size={17} strokeWidth={1.7} /></>}
         </Button>
       </form>
       <p className="auth-switch">
-        New to Gravity Pants? <Link to="/signup" search={{ redirect }} className="auth-link">Start your free trial</Link>
+        {aim ? "New here?" : "New to Gravity Pants?"} <Link to="/signup" search={{ redirect: aim ? target : redirect }} className="auth-link">{aim ? "Create a free account" : "Start your free trial"}</Link>
       </p>
     </AuthShell>
   );
