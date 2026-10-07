@@ -47,6 +47,7 @@ import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminAdminsRouteImport } from './routes/_authenticated/admin/admins'
 import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin/analytics'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin/audit'
+import { Route as AuthenticatedAdminBrandApplicationsRouteImport } from './routes/_authenticated/admin/brand-applications'
 import { Route as AuthenticatedAdminCategoriesRouteImport } from './routes/_authenticated/admin/categories'
 import { Route as AuthenticatedAdminClientsRouteImport } from './routes/_authenticated/admin/clients'
 import { Route as AuthenticatedAdminDirectoryRouteImport } from './routes/_authenticated/admin/directory'
@@ -279,6 +280,12 @@ const AuthenticatedAdminAuditRoute = AuthenticatedAdminAuditRouteImport.update({
   path: '/audit',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
 } as any)
+const AuthenticatedAdminBrandApplicationsRoute =
+  AuthenticatedAdminBrandApplicationsRouteImport.update({
+    id: '/brand-applications',
+    path: '/brand-applications',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminCategoriesRoute =
   AuthenticatedAdminCategoriesRouteImport.update({
     id: '/categories',
@@ -542,6 +549,7 @@ export interface FileRoutesByFullPath {
   '/admin/admins': typeof AuthenticatedAdminAdminsRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/admin/brand-applications': typeof AuthenticatedAdminBrandApplicationsRoute
   '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
   '/admin/clients': typeof AuthenticatedAdminClientsRoute
   '/admin/directory': typeof AuthenticatedAdminDirectoryRoute
@@ -618,6 +626,7 @@ export interface FileRoutesByTo {
   '/admin/admins': typeof AuthenticatedAdminAdminsRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/admin/brand-applications': typeof AuthenticatedAdminBrandApplicationsRoute
   '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
   '/admin/clients': typeof AuthenticatedAdminClientsRoute
   '/admin/directory': typeof AuthenticatedAdminDirectoryRoute
@@ -699,6 +708,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/admins': typeof AuthenticatedAdminAdminsRoute
   '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/_authenticated/admin/brand-applications': typeof AuthenticatedAdminBrandApplicationsRoute
   '/_authenticated/admin/categories': typeof AuthenticatedAdminCategoriesRoute
   '/_authenticated/admin/clients': typeof AuthenticatedAdminClientsRoute
   '/_authenticated/admin/directory': typeof AuthenticatedAdminDirectoryRoute
@@ -780,6 +790,7 @@ export interface FileRouteTypes {
     | '/admin/admins'
     | '/admin/analytics'
     | '/admin/audit'
+    | '/admin/brand-applications'
     | '/admin/categories'
     | '/admin/clients'
     | '/admin/directory'
@@ -856,6 +867,7 @@ export interface FileRouteTypes {
     | '/admin/admins'
     | '/admin/analytics'
     | '/admin/audit'
+    | '/admin/brand-applications'
     | '/admin/categories'
     | '/admin/clients'
     | '/admin/directory'
@@ -936,6 +948,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/admins'
     | '/_authenticated/admin/analytics'
     | '/_authenticated/admin/audit'
+    | '/_authenticated/admin/brand-applications'
     | '/_authenticated/admin/categories'
     | '/_authenticated/admin/clients'
     | '/_authenticated/admin/directory'
@@ -1286,6 +1299,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminAuditRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/brand-applications': {
+      id: '/_authenticated/admin/brand-applications'
+      path: '/brand-applications'
+      fullPath: '/admin/brand-applications'
+      preLoaderRoute: typeof AuthenticatedAdminBrandApplicationsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/categories': {
       id: '/_authenticated/admin/categories'
       path: '/categories'
@@ -1588,6 +1608,7 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminAdminsRoute: typeof AuthenticatedAdminAdminsRoute
   AuthenticatedAdminAnalyticsRoute: typeof AuthenticatedAdminAnalyticsRoute
   AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
+  AuthenticatedAdminBrandApplicationsRoute: typeof AuthenticatedAdminBrandApplicationsRoute
   AuthenticatedAdminCategoriesRoute: typeof AuthenticatedAdminCategoriesRoute
   AuthenticatedAdminClientsRoute: typeof AuthenticatedAdminClientsRoute
   AuthenticatedAdminDirectoryRoute: typeof AuthenticatedAdminDirectoryRoute
@@ -1609,6 +1630,8 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminAdminsRoute: AuthenticatedAdminAdminsRoute,
     AuthenticatedAdminAnalyticsRoute: AuthenticatedAdminAnalyticsRoute,
     AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
+    AuthenticatedAdminBrandApplicationsRoute:
+      AuthenticatedAdminBrandApplicationsRoute,
     AuthenticatedAdminCategoriesRoute: AuthenticatedAdminCategoriesRoute,
     AuthenticatedAdminClientsRoute: AuthenticatedAdminClientsRoute,
     AuthenticatedAdminDirectoryRoute: AuthenticatedAdminDirectoryRoute,

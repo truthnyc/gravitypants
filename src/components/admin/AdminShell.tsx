@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import { BarChart3, ChevronLeft, Clapperboard, FileClock, Home, LayoutDashboard, LayoutTemplate, Mail, ShieldCheck, Users, Video , Search, Tags, LayoutGrid } from "lucide-react";
+import { BarChart3, ChevronLeft, Clapperboard, FileClock, Home, Inbox, LayoutDashboard, LayoutTemplate, Mail, ShieldCheck, Users, Video , Search, Tags, LayoutGrid } from "lucide-react";
 
 const NAV = [
   { to: "/admin", label: "Overview", icon: LayoutDashboard, exact: true },
@@ -9,6 +9,7 @@ const NAV = [
   { to: "/admin/templates", label: "Templates", icon: LayoutTemplate },
   { to: "/admin/reels", label: "Website Reels", icon: Clapperboard },
   { to: "/admin/directory", label: "Directory", icon: Search },
+  { to: "/admin/brand-applications", label: "Brand applications", icon: Inbox },
   { to: "/admin/directory-settings", label: "Directory settings", icon: LayoutGrid },
   { to: "/admin/moods", label: "Moods", icon: Tags },
   { to: "/admin/categories", label: "Categories", icon: LayoutGrid },

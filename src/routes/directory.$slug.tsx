@@ -100,7 +100,7 @@ function BrandPage() {
                 </div>
                 {brand.website_url && (
                   <a href={brand.website_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-[15px] text-ap-blue">
-                    Visit {brand.name} <ArrowUpRight className="size-4" strokeWidth={1.7} />
+                    Shop {brand.name} <ArrowUpRight className="size-4" strokeWidth={1.7} />
                   </a>
                 )}
               </div>
@@ -127,7 +127,7 @@ function BrandPage() {
           <h2 className="mb-5 text-[24px] font-semibold tracking-[-0.02em]">Reels</h2>
           {reels.length > 0 && <DirectoryGrid cards={reels} onOpen={openDirectoryReel} />}
           {siteReels.length > 0 && (
-            <ul className={`grid gap-5 [grid-template-columns:repeat(auto-fill,minmax(180px,1fr))] ${reels.length ? "mt-5" : ""}`}>
+            <ul className={`grid gap-5 ${site === "aimante" ? "grid-cols-2 md:grid-cols-3 xl:grid-cols-4" : "[grid-template-columns:repeat(auto-fill,minmax(180px,1fr))]"} ${reels.length ? "mt-5" : ""}`}>
               {siteReels.map((r) => (
                 <li key={r.id} className="relative">
                   <button type="button" onClick={() => openSiteReel(r)} aria-label={`Open ${r.title}`} className="relative block aspect-square w-full overflow-hidden rounded-[8px] bg-ap-panel">
