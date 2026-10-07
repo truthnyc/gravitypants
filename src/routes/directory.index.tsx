@@ -1,3 +1,4 @@
+import { ConceptReelNotice } from "@/components/directory/ConceptReelNotice";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
@@ -347,7 +348,7 @@ function DirectoryPage() {
                   </button>
                   {r.kind === "site" ? <SiteReelHeart reelId={r.id} name={r.title} /> : <DirectoryReelHeart reelId={r.id} name={`${r.brand_name} reel`} />}
                   <p className="mt-2.5 truncate text-[14px] font-semibold">{r.title}</p>
-                  <p className="truncate text-[12px] text-ap-muted"><BrandLink name={r.brand_name} slug={r.brand_slug} /> · {r.category}</p>
+                  <p className="truncate text-[12px] text-ap-muted"><BrandLink name={r.brand_name} slug={r.brand_slug} /> · {r.category}</p><ConceptReelNotice brandName={r.brand_name} brandSlug={r.brand_slug} />
                   {filters.moods.length > 0 && r.moods.length > 0 && (
                     <ul className="mt-1.5 flex flex-wrap gap-1" aria-label="Moods">
                       {r.moods.map((m) => {

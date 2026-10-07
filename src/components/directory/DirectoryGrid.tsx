@@ -1,3 +1,4 @@
+import { ConceptReelNotice } from "@/components/directory/ConceptReelNotice";
 import { Link } from "@tanstack/react-router";
 import { type DirectoryCard } from "@/lib/directory/directory";
 import { ReelVideo } from "@/components/site/ReelVideo";
@@ -56,7 +57,7 @@ export function DirectoryGrid({ cards, q = "", onOpen }: { cards: DirectoryCard[
           <div className="truncate text-[13px] text-ap-muted nums">
             {c.title ?? c.template_name ?? "Custom reel"} · {c.seconds} sec
           </div>
-          <div className="mt-0.5 text-[12px] text-ap-badge">{matched(c, q).join(" · ")}</div>
+          <div className="mt-0.5 text-[12px] text-ap-badge">{matched(c, q).join(" · ")}</div><ConceptReelNotice brandName={c.brand_name} brandSlug={c.brand_slug} />
         </article>
       ))}
     </div>

@@ -1,3 +1,4 @@
+import { ConceptReelNotice } from "@/components/directory/ConceptReelNotice";
 import { useEffect, useState, type CSSProperties } from "react";
 import { Pause, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -57,6 +58,7 @@ export function FeaturedBand({ label, reels, secondsPerReel, seconds, onOpen, fi
                     <p className="mt-2 h-4 text-center text-[12px] text-ap-muted opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 nums">
                       {r.brand_name}{sec ? ` · ${sec} sec` : ""}
                     </p>
+                    <ConceptReelNotice brandName={r.brand_name} brandSlug={r.brand_slug} className="max-w-[165px] text-center" />
                   </li>
                 );
               })}

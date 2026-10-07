@@ -1,3 +1,4 @@
+import { ConceptReelNotice } from "@/components/directory/ConceptReelNotice";
 import { createFileRoute, notFound, redirect, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowUpRight } from "lucide-react";
@@ -112,7 +113,7 @@ function BrandPage() {
                 <div className="mt-2 flex flex-wrap items-center gap-3">
                 <h1 className="text-[clamp(36px,4vw,52px)] leading-[1.05] font-semibold tracking-[-0.035em]">{brand.name}</h1>
                 </div>
-                {brand.description && <p className="mt-5 max-w-[760px] text-[18px] leading-[1.5] text-ap-body">{brand.description}</p>}
+                {brand.description && <p className="mt-5 max-w-[760px] text-[18px] leading-[1.5] text-ap-body">{brand.description}</p>}<ConceptReelNotice brandName={brand.name} brandSlug={brand.slug} className="max-w-[760px] text-[14px]" />
                 {brand.moods.length > 0 && (
                   <p className="mt-3 flex flex-wrap text-[14px] font-medium text-ap-badge" aria-label="Moods">
                     {brand.moods.map((m, i) => <span key={m}>{i > 0 && <span className="mx-1.5 text-ap-muted">·</span>}<Link to="/directory" search={{ mood: m }} className="hover:underline">{m.charAt(0).toUpperCase() + m.slice(1)}</Link></span>)}

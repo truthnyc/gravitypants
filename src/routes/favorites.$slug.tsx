@@ -1,3 +1,4 @@
+import { ConceptReelNotice } from "@/components/directory/ConceptReelNotice";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState } from "react";
 import { SiteShell } from "@/components/site/SiteShell";
@@ -62,7 +63,7 @@ function FavoritesPublic() {
                   <button type="button" onClick={() => setOpenSite(r)} aria-label={`Open ${r.title}`} className={cls}>{inner}</button>
                   <SiteReelHeart reelId={r.id} name={r.title} />
                   <p className="mt-2.5 truncate text-[14px] font-semibold">{r.title}</p>
-                  <p className="truncate text-[12px] text-ap-muted nums">{r.seconds} sec · {r.brand}</p>
+                  <p className="truncate text-[12px] text-ap-muted nums">{r.seconds} sec · {r.brand}</p><ConceptReelNotice brandName={r.brand} brandSlug={r.brandSlug} />
                 </li>
               );
             })}
@@ -80,7 +81,7 @@ function FavoritesPublic() {
                       : <span className="text-[16px] font-semibold text-ap-muted">{b.name.charAt(0).toUpperCase()}</span>}
                   </span>
                   <p className="mt-2.5 text-[12px] text-ap-muted">{b.category}</p>
-                  <p className="mt-0.5 truncate text-[14px] font-semibold">{b.name}</p>
+                  <p className="mt-0.5 truncate text-[14px] font-semibold">{b.name}</p><ConceptReelNotice brandName={b.name} brandSlug={b.slug} />
                 </Link></li>
               ))}
             </ul>
