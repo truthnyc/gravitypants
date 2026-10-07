@@ -1211,6 +1211,8 @@ html:has(.acct), body:has(.acct), body:has(.acct) .bg-canvas { background: var(-
 .reel-popup-tags li { border: 1px solid var(--ap-hairline); border-radius: 4px; padding: 2px 10px; font-size: 13px; line-height: 20px; }
 .reel-popup-credit { margin-top: 46px; font-size: 13px; }
 .reel-popup-drawer { max-height: 92dvh; background: var(--ap-card); }
+/* Keep notices consistent despite page-specific paragraph typography. */
+p.concept-reel-notice { font-size: 10px !important; }
 @media (max-width: 767px) {
  .reel-popup-layout { grid-template-columns: 1fr; }
  .reel-popup-media { height: min(52dvh, 500px); padding: 20px 50px; }
