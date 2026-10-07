@@ -12,7 +12,7 @@ export function useBrandSite(): BrandSite {
 export function AimanteLogo() {
   return (
     <span className="flex items-baseline gap-2 whitespace-nowrap">
-      <span className="text-[19px] font-semibold tracking-[-0.02em] text-ap-ink">Aimanté</span>
+      <span className="text-[32px] font-semibold tracking-[-0.02em] text-ap-ink">Aimanté</span>
       <span className="text-[13px] text-ap-muted">— by Gravity Pants</span>
     </span>
   );
