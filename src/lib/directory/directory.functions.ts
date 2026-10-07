@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { brandPublicationFields } from "./admin-fields";
 import {
   BRAND_DESCRIPTION_MAX, BRAND_NAME_MAX, CATEGORIES, categorySlug, GRACE_DAYS, BRAND_MOODS_MAX, REEL_DESCRIPTION_MAX, SLUG_MAX,
   WORDING_VERSION, permissionWording, toSlug, validFullName,
@@ -545,7 +546,7 @@ export const adminSaveBrand = createServerFn({ method: "POST" })
     website: z.string().trim().max(200).refine((v) => !v || /^https?:\/\//.test(v), "Website must start with http:// or https://"),
     category: z.enum(CATEGORIES), description: z.string().trim().max(BRAND_DESCRIPTION_MAX),
     moods: z.array(z.string().trim().toLowerCase().max(30)).max(BRAND_MOODS_MAX).default([]),
-    affiliated: z.boolean().optional(), status: z.enum(["draft", "live"]).optional(),
+    ...brandPublicationFields,
   }).parse(d))
   .handler(async ({ data, context }) => {
     const sb = context.supabase as any;
@@ -640,7 +641,7 @@ export const adminCreateBrand = createServerFn({ method: "POST" })
     slug: z.string().regex(/^[a-z0-9-]{3,30}$/),
     workspaceId: z.string().uuid().nullable(),
     siteReelIds: z.array(z.string().uuid()).max(100),
-    affiliated: z.boolean().default(false), status: z.enum(["draft", "live"]).default("live"),
+    affiliated: brandPublicationFields.affiliated.default(false), status: brandPublicationFields.status.default("live"),
   }).parse(d))
   .handler(async ({ data, context }) => {
     const sb = context.supabase as any;
