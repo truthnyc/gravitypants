@@ -236,7 +236,7 @@ function BrandForm({ b, onSaved }: { b: Detail["brand"]; onSaved: () => void }) 
   const save = useServerFn(adminSaveBrand);
   const logo = useServerFn(setBrandLogo);
   const { forCategory } = useMoodCatalog();
-  const [f, setF] = useState({ name: b.name, website: b.website, category: b.category as Category, description: b.description, moods: b.moods as string[] });
+  const [f, setF] = useState({ name: b.name, website: b.website, category: b.category as Category, description: b.description, moods: b.moods as string[], affiliated: b.affiliated, status: b.status });
   const [busy, setBusy] = useState(false);
   const run = async (fn: () => Promise<unknown>, msg: string) => {
     setBusy(true);
@@ -270,6 +270,8 @@ function BrandForm({ b, onSaved }: { b: Detail["brand"]; onSaved: () => void }) 
           {b.planEnded && <div>Plan ended {new Date(b.planEnded).toLocaleDateString()}</div>}
           <a href={`/directory/${b.slug}`} target="_blank" rel="noreferrer" className="text-link">View brand page</a>
         </div>
+        <label className="space-y-1"><span className="text-[12px] text-secondary-text">Publication</span><select aria-label="Brand publication" value={f.status} onChange={(e) => setF({ ...f, status: e.target.value === "draft" ? "draft" : "live" })} className={field}><option value="draft">Draft</option><option value="live">Live</option></select></label>
+        <label className="flex items-center gap-2 text-[13px]"><input type="checkbox" checked={f.affiliated} onChange={(e) => setF({ ...f, affiliated: e.target.checked })} />Affiliated</label>
         <div className="space-y-1 sm:col-span-2">
           <span className="text-[12px] text-secondary-text">Moods (up to {BRAND_MOODS_MAX}, from the {f.category} list)</span>
           <div className="flex flex-wrap gap-1.5">

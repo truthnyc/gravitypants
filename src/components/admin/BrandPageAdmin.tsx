@@ -61,7 +61,7 @@ export function NewBrandPage({ onCreated }: { onCreated: () => void }) {
   const create = useServerFn(adminCreateBrand);
   const check = useServerFn(checkSlug);
   const [open, setOpen] = useState(false);
-  const [f, setF] = useState({ name: "", slug: "", slugTouched: false, category: "Other" as Category, website: "", description: "", owner: "editorial" as "editorial" | "client", workspaceId: "", reels: [] as string[] });
+  const [f, setF] = useState({ name: "", slug: "", slugTouched: false, category: "Other" as Category, website: "", description: "", owner: "editorial" as "editorial" | "client", workspaceId: "", reels: [] as string[], affiliated: false, publication: "live" as "draft" | "live" });
   const [status, setStatus] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const setSlug = async (slug: string) => {
@@ -72,7 +72,7 @@ export function NewBrandPage({ onCreated }: { onCreated: () => void }) {
   const save = async () => {
     setBusy(true);
     try {
-      const r = await create({ data: { name: f.name, slug: f.slug, category: f.category, website: f.website, description: f.description, workspaceId: f.owner === "client" ? f.workspaceId || null : null, siteReelIds: f.reels } });
+      const r = await create({ data: { name: f.name, slug: f.slug, category: f.category, website: f.website, description: f.description, workspaceId: f.owner === "client" ? f.workspaceId || null : null, siteReelIds: f.reels, affiliated: f.affiliated, status: f.publication } });
       toast.success(`Brand page created at /directory/${r.slug}`);
       setOpen(false); setF({ ...f, name: "", slug: "", slugTouched: false, website: "", description: "", workspaceId: "", reels: [] }); onCreated();
     } catch (e) { err(e); } finally { setBusy(false); }
@@ -107,6 +107,8 @@ export function NewBrandPage({ onCreated }: { onCreated: () => void }) {
               <textarea value={f.description} maxLength={BRAND_DESCRIPTION_MAX} rows={3} onChange={(e) => setF({ ...f, description: e.target.value })} className="w-full rounded-sm bg-control-fill p-2 text-[13px]" />
               <span className="text-secondary-text nums">{f.description.length} / {BRAND_DESCRIPTION_MAX}</span>
             </label>
+            <label className="block space-y-1"><span className="font-medium">Publication</span><select value={f.publication} onChange={(e) => setF({ ...f, publication: e.target.value === "draft" ? "draft" : "live" })} className={field}><option value="draft">Draft</option><option value="live">Live</option></select></label>
+            <label className="flex items-center gap-2"><input type="checkbox" checked={f.affiliated} onChange={(e) => setF({ ...f, affiliated: e.target.checked })} />Affiliated</label>
             <div className="space-y-1.5"><span className="font-medium">Belongs to</span>
               <div className="flex gap-1">
                 {(["editorial", "client"] as const).map((o) => (

@@ -11,6 +11,7 @@ const NAV = [
   { to: "/admin/directory", label: "Directory", icon: Search },
   { to: "/admin/directory-settings", label: "Directory settings", icon: LayoutGrid },
   { to: "/admin/moods", label: "Moods", icon: Tags },
+  { to: "/admin/categories", label: "Categories", icon: LayoutGrid },
   { to: "/admin/homepage", label: "Homepage", icon: Home },
   { to: "/admin/newsletter", label: "Newsletter", icon: Mail },
   { to: "/admin/exports", label: "Exports", icon: Video },

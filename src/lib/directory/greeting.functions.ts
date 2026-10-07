@@ -5,6 +5,16 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { greetingConfigSchema, mergeGreeting, RULE_TYPES, type GreetingConfig } from "./greeting";
 
 import { countryCode, parseLocation, fetchLocalWeather, type VisitorContext } from "./visitor-context";
+import { greetingEventInput } from "./admin-fields";
+
+export const recordGreetingEvent = createServerFn({ method: "POST" })
+  .inputValidator((data: unknown) => greetingEventInput.parse(data))
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.from("directory_greeting_log").insert(data);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const KEY = "directory_greeting";
@@ -62,7 +72,7 @@ export const getGreetingAdmin = createServerFn({ method: "GET" })
     for (const r of (log ?? []) as any[]) {
       const m = r.action === "shown" ? shownSessions : r.action === "mood_click" ? clickSessions : filterSessions;
       if (!m.has(r.rule)) m.set(r.rule, new Set());
-      m.get(r.rule)!.add(r.session_id);
+      m.get(r.rule)?.add(r.session_id);
       const st = (stats[r.rule] ??= { shown: 0, clicks: 0, filters: 0 });
       if (r.action === "shown") st.shown++;
     }
@@ -70,5 +80,5 @@ export const getGreetingAdmin = createServerFn({ method: "GET" })
       st.clicks = clickSessions.get(rule)?.size ?? 0;
       st.filters = filterSessions.get(rule)?.size ?? 0;
     }
-    return { config: mergeGreeting(row?.value), saved: !!row, stats: RULE_TYPES.filter((r) => stats[r]).map((rule) => ({ rule, shown: stats[rule]!.shown, sessions: shownSessions.get(rule)?.size ?? 0, clicks: stats[rule]!.clicks, filters: stats[rule]!.filters })) };
+    return { config: mergeGreeting(row?.value), saved: !!row, stats: RULE_TYPES.flatMap((rule) => { const stat = stats[rule]; return stat ? [{ rule, shown: stat.shown, sessions: shownSessions.get(rule)?.size ?? 0, clicks: stat.clicks, filters: stat.filters }] : []; }) };
   });

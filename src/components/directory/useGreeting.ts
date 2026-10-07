@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { chooseGreeting, readReturning, rememberVisit, type Chosen } from "@/lib/directory/greeting";
-import { getGreetingConfig, getVisitorContext } from "@/lib/directory/greeting.functions";
+import { getGreetingConfig, getVisitorContext, recordGreetingEvent } from "@/lib/directory/greeting.functions";
 
 import { lookupBrowserLocation } from "@/lib/directory/visitor-context";
 
@@ -18,7 +17,7 @@ const sid = () => {
 export function logGreeting(c: Chosen | null, action: "shown" | "mood_click" | "filter") {
   if (!c) return;
   try {
-    void supabase.from("directory_greeting_log" as never).insert({ session_id: sid(), rule: c.rule, greeting: c.filled.replace(/\*\*/g, "").slice(0, 80), action } as never).then(() => undefined);
+    void recordGreetingEvent({ data: { session_id: sid(), rule: c.rule, greeting: c.filled.replace(/\*\*/g, "").slice(0, 80), action } }).catch(() => {});
   } catch { /* analytics must never break the page */ }
 }
 

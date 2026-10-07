@@ -527,12 +527,12 @@ export const adminBrandDetail = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const sb = context.supabase as any;
     await assertAdmin(sb);
-    const { data: b, error } = await sb.from("directory_brands").select("id, name, slug, website_url, category, description, logo_url, moods, first_approved_at, plan_ended_at, created_at").eq("id", data.brandId).single();
+    const { data: b, error } = await sb.from("directory_brands").select("id, name, slug, website_url, category, description, logo_url, moods, first_approved_at, plan_ended_at, created_at, affiliated, status").eq("id", data.brandId).single();
     if (error) throw new Error(error.message);
     const { data: reels } = await sb.from("directory_reels").select("id, ad_id, title, description, status, tags, moods, formats, poster_url, published_at, review_note, hidden_reason, projects(name)").eq("brand_id", b.id).order("created_at", { ascending: false });
     const signed = await signPosters((reels ?? []) as any[]);
     return {
-      brand: { id: b.id as string, name: b.name as string, slug: b.slug as string, website: (b.website_url ?? "") as string, category: b.category as string, description: (b.description ?? "") as string, moods: (b.moods ?? []) as string[], logo: await signLogo(b.logo_url), approved: b.first_approved_at as string | null, planEnded: b.plan_ended_at as string | null },
+      brand: { id: b.id as string, name: b.name as string, slug: b.slug as string, website: (b.website_url ?? "") as string, category: b.category as string, description: (b.description ?? "") as string, moods: (b.moods ?? []) as string[], logo: await signLogo(b.logo_url), approved: b.first_approved_at as string | null, planEnded: b.plan_ended_at as string | null, affiliated: !!b.affiliated, status: b.status as "draft" | "live" },
       reels: signed.map((r: any) => ({ id: r.id as string, title: (r.title ?? r.projects?.name ?? "Untitled") as string, description: (r.description ?? "") as string, ad: (r.projects?.name ?? "Removed ad") as string, status: r.status as DirStatus, tags: (r.tags ?? []) as string[], moods: (r.moods ?? []) as string[], formats: (r.formats ?? []) as string[], poster: r.poster as string | null, published: r.published_at as string | null, note: (r.review_note ?? r.hidden_reason ?? null) as string | null })),
     };
   });
@@ -545,12 +545,18 @@ export const adminSaveBrand = createServerFn({ method: "POST" })
     website: z.string().trim().max(200).refine((v) => !v || /^https?:\/\//.test(v), "Website must start with http:// or https://"),
     category: z.enum(CATEGORIES), description: z.string().trim().max(BRAND_DESCRIPTION_MAX),
     moods: z.array(z.string().trim().toLowerCase().max(30)).max(BRAND_MOODS_MAX).default([]),
+    affiliated: z.boolean().optional(), status: z.enum(["draft", "live"]).optional(),
   }).parse(d))
   .handler(async ({ data, context }) => {
     const sb = context.supabase as any;
     await assertAdmin(sb);
-    const { error } = await sb.from("directory_brands").update({ name: data.name, website_url: data.website || null, category: data.category, description: data.description || null, moods: await cleanMoods(sb, data.moods) }).eq("id", data.brandId);
+    const { data: category, error: categoryError } = await sb.from("categories").select("id").eq("name", data.category).single();
+    if (categoryError) throw new Error(categoryError.message);
+    const { error } = await sb.from("directory_brands").update({ name: data.name, website_url: data.website || null, category: data.category, category_id: category.id, description: data.description || null, moods: await cleanMoods(sb, data.moods), ...(data.affiliated !== undefined ? { affiliated: data.affiliated } : {}), ...(data.status ? { status: data.status } : {}) }).eq("id", data.brandId);
     if (error) throw new Error(error.message);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error: auditError } = await supabaseAdmin.from("admin_audit_log").insert({ admin_user_id: context.userId, action: "brand.update", target: data.brandId });
+    if (auditError) throw new Error(auditError.message);
     return { ok: true };
   });
 
@@ -634,6 +640,7 @@ export const adminCreateBrand = createServerFn({ method: "POST" })
     slug: z.string().regex(/^[a-z0-9-]{3,30}$/),
     workspaceId: z.string().uuid().nullable(),
     siteReelIds: z.array(z.string().uuid()).max(100),
+    affiliated: z.boolean().default(false), status: z.enum(["draft", "live"]).default("live"),
   }).parse(d))
   .handler(async ({ data, context }) => {
     const sb = context.supabase as any;
@@ -655,6 +662,7 @@ export const adminCreateBrand = createServerFn({ method: "POST" })
       workspace_id: ws, name: data.name, slug: data.slug, category: data.category,
       website_url: data.website || null, description: data.description || null,
       first_approved_at: new Date().toISOString(), is_editorial: !data.workspaceId,
+      affiliated: data.affiliated, status: data.status,
     }).select("id, slug").single();
     if (error) throw new Error(error.message);
     if (data.siteReelIds.length) await admin.from("site_reels").update({ brand_id: b.id }).in("id", data.siteReelIds);

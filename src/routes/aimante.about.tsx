@@ -13,9 +13,9 @@ function About() {
       <section className="mx-auto max-w-[720px] px-6 py-20 font-ap text-ap-ink">
         <h1 className="text-[clamp(34px,4vw,48px)] font-semibold leading-[1.08] tracking-[-0.03em]">About Aimanté</h1>
         <p className="mt-5 text-[18px] leading-[1.5] text-ap-body">
-          Aimanté is a place to find brands by how they feel. Every reel here was made from still photos with Gravity Pants, and you can browse them by mood, category or brand.
+          Aimanté brings together short video ads from brands. Browse by mood, category or brand, and visit a brand's website when something catches your eye.
         </p>
-        <p className="mt-4 text-[18px] leading-[1.5] text-ap-body">Tell us your mood and we'll show you something.</p>
+        <p className="mt-4 text-[18px] leading-[1.5] text-ap-body">Aimanté is by Gravity Pants, which turns still photos into short video ads and GIFs.</p>
         <div className="mt-10 flex flex-wrap gap-3">
           <Link to="/directory" className="inline-flex h-11 items-center rounded-lg bg-ap-blue px-5 text-[15px] font-medium text-ap-card hover:bg-ap-blue-hover">Browse reels</Link>
           <Link to="/aimante/join" className="inline-flex h-11 items-center rounded-lg bg-ap-panel px-5 text-[15px] font-medium text-ap-ink hover:bg-ap-hairline">List your brand</Link>
