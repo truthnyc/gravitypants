@@ -73,7 +73,7 @@ export function FeaturedBand({ label, reels, secondsPerReel, seconds, onOpen, fi
                       className="dir-featured-reel block overflow-hidden rounded-[6px] bg-ap-card shadow-[0_0_0_1px_var(--ap-inner),0_18px_34px_-16px_rgba(29,29,31,.28)] transition-transform duration-200 group-hover:-translate-y-1.5 group-focus-within:-translate-y-1.5 motion-reduce:transition-none"
                       style={{ ["--w" as string]: `${s.w}px`, ["--h" as string]: `${s.h}px` }}>
                       {r.poster && <img src={r.poster} alt="" loading="lazy" className="size-full object-cover" />}
-                    </Button>
+                    </button>
                     <p className="mt-2 h-4 text-center text-[12px] text-ap-muted opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 nums">
                       {r.brand_name}{sec ? ` · ${sec} sec` : ""}
                     </p>
