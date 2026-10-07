@@ -855,6 +855,7 @@ export type Database = {
           id: string
           project_id: string | null
           stamp: string
+          watermarked: boolean
           workspace_id: string
         }
         Insert: {
@@ -862,6 +863,7 @@ export type Database = {
           id?: string
           project_id?: string | null
           stamp: string
+          watermarked?: boolean
           workspace_id: string
         }
         Update: {
@@ -869,6 +871,7 @@ export type Database = {
           id?: string
           project_id?: string | null
           stamp?: string
+          watermarked?: boolean
           workspace_id?: string
         }
         Relationships: [
