@@ -1,4 +1,6 @@
 # Roadmap
+- [ ] Complete brand-request spam protection, website deduplication, private admin details/actions/nav count and emails; verify submission and review readback.
+- [x] Set the shared concept disclaimer to 10px.
 - [x] Add the concept-reel notice for Agnona and Maison Francis Kurkdjian across brand/reel displays; both brand pages and popups, Showcase/Examples, and unaffected Purl Soho verified.
 - [x] Add editable website reel descriptions; all 12 published reels have starter copy, with authenticated save/reload and public popup readback verified.
 - [x] Match Directory reel popups to the reference; verified playback, closing, brand links and mobile layout.

@@ -5,5 +5,5 @@ export function ConceptReelNotice({ brandName, brandSlug, className }: {
   brandName?: string | null | undefined; brandSlug?: string | null | undefined; className?: string | undefined;
 }) {
   if (!isConceptBrand(brandName, brandSlug)) return null;
-  return <p className={cn("mt-3 text-[12px] leading-relaxed font-normal text-ap-muted whitespace-normal", className)}>{CONCEPT_REEL_NOTICE}</p>;
+  return <p className={cn("mt-3 text-[10px] leading-relaxed font-normal text-ap-muted whitespace-normal", className)}>{CONCEPT_REEL_NOTICE}</p>;
 }
