@@ -34,7 +34,7 @@ export type Mood = string;
 export const BRAND_MOODS_MAX = 3;
 export const moodLabel = (m: string) => m.charAt(0).toUpperCase() + m.slice(1);
 export const RESERVED_SLUGS = ["directory", "admin", "category", "search", "new", "edit", "api", "app"];
-export const WORDING_VERSION = "v1.0";
+export const WORDING_VERSION = "v1.1";
 export const GRACE_DAYS = 30;
 export const BRAND_NAME_MAX = 50;
 export const BRAND_DESCRIPTION_MAX = 300;
@@ -44,7 +44,7 @@ export const SLUG_MAX = 30;
 export const nearLimit = (length: number, limit: number) => length >= Math.ceil(limit * 0.85);
 
 export function permissionWording(brand: string) {
-  return `I confirm that I'm authorized to act for ${brand}, and that we own or have permission to use the photos, logo, words and music in this reel. I give Gravity Pants permission to publish it in the Gravity Pants Directory and on our brand page, with a link to our website. I understand that other people can start their own reel from its template (never our photos, logo, words, colors or fonts), and that we can remove it from the Directory at any time.`;
+  return `I confirm that I'm authorized to act for ${brand}, and that we own or have permission to use the photos, logo, words and music in this reel. I give Gravity Pants permission to publish it on Aimanté (aimante.co), including its directory and our brand page, and on the Gravity Pants Showcase and Examples pages, with a link to our website. I understand that other people can start their own reel from its template (never our photos, logo, words, colors or fonts), and that we can withdraw this sharing permission at any time.`;
 }
 
 export function toSlug(name: string) {
