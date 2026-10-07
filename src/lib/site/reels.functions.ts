@@ -66,13 +66,16 @@ export const submitBrandRequest = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => requestSchema.parse(d))
   .handler(async ({ data }): Promise<{ ok: true } | { error: string }> => {
     if (data.company) return { ok: true };
-    const { publicClient } = await import("./reels.server");
-    const { error } = await publicClient().from("brand_requests").insert({
+    const { allowBrandRequest } = await import('@/lib/directory/application-limit.server');
+    if (!await allowBrandRequest()) return { error: 'Too many submissions. Please try again in an hour.' };
+    const { supabaseAdmin } = await import('@/integrations/supabase/client.server');
+    const { error } = await supabaseAdmin.from("brand_requests").insert({
       name: data.name,
       email: data.email,
       brand: data.brand,
       website: data.website || null,
       message: data.message || null,
+      status: 'pending',
     });
     if (error) return { error: "We couldn't send your message. Please try again." };
     try {

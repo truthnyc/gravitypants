@@ -6,7 +6,7 @@ import { AimanteShell } from '@/components/site/AimanteShell'
 import { Button } from '@/components/ui/button'
 import { CATEGORIES, BRAND_DESCRIPTION_MAX, BRAND_MOODS_MAX, type Category } from '@/lib/directory/directory'
 import { useMoodCatalog } from '@/lib/directory/moods'
-import { submitBrandApplication } from '@/lib/directory/applications.functions'
+import { brandApplicationInput, submitBrandApplication } from '@/lib/directory/applications.functions'
 import { aimanteHead } from '@/lib/site/brand-site'
 import { cn } from '@/lib/utils'
 
@@ -39,15 +39,18 @@ function Join() {
   const [form, setForm] = useState<Form>(empty)
   const [state, setState] = useState<'idle' | 'sending' | 'sent'>('idle')
   const [error, setError] = useState<string | null>(null)
+  const [confirmationSent, setConfirmationSent] = useState(false)
   const available = moods.forCategory(form.category)
   const set = <K extends keyof Form>(key: K, value: Form[K]) => setForm((current) => ({ ...current, [key]: value }))
 
   async function submit(event: React.FormEvent) {
     event.preventDefault(); setError(null); setState('sending')
     try {
-      const result = await submitApplication({ data: { ...form, logo: await encodeLogo(form.logo) } })
+      const parsed = brandApplicationInput.safeParse({ ...form, logo: await encodeLogo(form.logo) })
+      if (!parsed.success) { setError(parsed.error.issues[0]?.message ?? 'Check your details.'); setState('idle'); return }
+      const result = await submitApplication({ data: parsed.data })
       if ('error' in result) { setError(result.error); setState('idle'); return }
-      setState('sent')
+      setConfirmationSent(result.confirmationSent === true); setState('sent')
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'Check your details and try again.')
       setState('idle')
@@ -68,7 +71,7 @@ function Join() {
             <div className="max-w-[620px] py-10" role="status">
               <span className="grid size-11 place-items-center rounded-full bg-ap-soft-blue text-ap-blue"><Check className="size-5" strokeWidth={1.7} /></span>
               <h2 className="mt-5 text-[28px] font-semibold">Your application is with us.</h2>
-              <p className="mt-3 text-[16px] leading-[1.5] text-ap-body">We sent a confirmation to {form.email}. Nothing will appear publicly until our team approves and prepares the page.</p>
+              <p className="mt-3 text-[16px] leading-[1.5] text-ap-body">{confirmationSent ? `We sent a confirmation to ${form.email}. ` : 'Your application has been saved. '}Nothing will appear publicly until our team approves and prepares the page.</p>
               <Button asChild className="mt-7"><Link to="/directory">Browse Aimanté</Link></Button>
             </div>
           ) : (
