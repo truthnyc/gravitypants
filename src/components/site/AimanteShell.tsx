@@ -1,4 +1,8 @@
-import { Link, useRouteContext, useRouterState } from "@tanstack/react-router";
+import { Link, useNavigate, useRouteContext, useRouterState } from "@tanstack/react-router";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { initialsOf, signOutEverywhere, useMe, type Me } from "@/lib/stillframe/account";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { ChevronRight, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -21,6 +25,59 @@ export function AimanteLogo({ footer = false }: { footer?: boolean }) {
 }
 
 const navLink = "text-[14px] text-site-nav hover:text-ap-ink";
+
+function useSavedCount(userId: string | undefined) {
+  return useQuery({
+    queryKey: ["aimante-saved-count", userId],
+    enabled: !!userId,
+    queryFn: async () => {
+      const sb = supabase as any;
+      const [a, b] = await Promise.all([
+        sb.from("directory_reel_favorites").select("reel_id", { count: "exact", head: true }),
+        sb.from("site_reel_favorites").select("reel_id", { count: "exact", head: true }),
+      ]);
+      return (a.count ?? 0) + (b.count ?? 0);
+    },
+  }).data ?? 0;
+}
+
+function Avatar({ me, small = false }: { me: Me; small?: boolean }) {
+  return <span aria-hidden className={cn("grid shrink-0 place-items-center rounded-full bg-ap-soft-blue font-semibold text-ap-blue ring-2 ring-ap-blue", small ? "size-7 text-[11px]" : "size-9 text-[13px]")}>{initialsOf(me)}</span>;
+}
+
+function useAimanteSignOut() {
+  const qc = useQueryClient();
+  const navigate = useNavigate();
+  return async () => { await signOutEverywhere(qc); navigate({ to: "/directory", replace: true }); };
+}
+
+const ACCOUNT_LINKS = (saved: number) => [
+  { label: "Your brand page", to: "/app/account/directory" as const },
+  { label: "Saved reels", to: "/app/account/favorites" as const, count: saved },
+  { label: "Make reels on Gravity Pants ↗", href: "https://gravitypants.com/app/ads" },
+  { label: "Account settings", to: "/app/account" as const },
+];
+
+function AccountMenu({ me }: { me: Me }) {
+  const saved = useSavedCount(me.id);
+  const signOut = useAimanteSignOut();
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger aria-label="Your account" className="rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ap-blue"><Avatar me={me} /></DropdownMenuTrigger>
+      <DropdownMenuContent align="end" sideOffset={10} className="w-[280px] rounded-[12px] border-aimante-divider bg-ap-card p-2 font-ap shadow-aimante-menu">
+        <div className="px-3 py-2.5"><p className="truncate text-[15px] font-semibold text-ap-ink">{me.displayName || me.email}</p>{me.displayName && <p className="truncate text-[13px] text-ap-muted">{me.email}</p>}</div>
+        <DropdownMenuSeparator className="bg-aimante-divider" />
+        {ACCOUNT_LINKS(saved).map((l) => (
+          <DropdownMenuItem key={l.label} asChild className="h-10 cursor-pointer rounded-lg px-3 text-[14px] text-ap-ink">
+            {"href" in l ? <a href={l.href} target="_blank" rel="noreferrer">{l.label}</a> : <Link to={l.to} className="flex justify-between">{l.label}{"count" in l && <span className="text-ap-muted tabular-nums">{l.count}</span>}</Link>}
+          </DropdownMenuItem>
+        ))}
+        <DropdownMenuSeparator className="bg-aimante-divider" />
+        <DropdownMenuItem onSelect={() => void signOut()} className="h-10 cursor-pointer rounded-lg px-3 text-[14px] text-ap-ink">Sign out</DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
 const navActive = { className: "!text-ap-ink font-semibold" };
 
 export function AimanteHeader() {
@@ -29,6 +86,12 @@ export function AimanteHeader() {
   const menuButton = useRef<HTMLButtonElement>(null);
   const panel = useRef<HTMLElement>(null);
   const close = () => setOpen(false);
+  const me = useMe().data ?? null;
+  const saved = useSavedCount(me?.id);
+  const signOut = useAimanteSignOut();
+  const here = useRouterState({ select: (s) => s.location.pathname + s.location.searchStr });
+  const signInSearch = { redirect: here };
+  const listSearch = { redirect: "/aimante/join#apply" };
   useEffect(() => { setOpen(false); }, [pathname]);
   useEffect(() => {
     if (!open) return;
@@ -62,14 +125,18 @@ export function AimanteHeader() {
         <nav aria-label="Main" className="hidden shrink-0 items-center gap-7 md:flex">
           <Link to="/aimante/about" className={navLink} activeProps={navActive}>About</Link>
           <Link to="/aimante/join" className={navLink} activeProps={navActive} activeOptions={{ includeHash: false }}>For brands</Link>
-          <Link to="/signin" className={navLink} activeProps={navActive}>Sign in</Link>
+          {!me && <Link to="/signin" search={signInSearch} className={navLink} activeProps={navActive}>Sign in</Link>}
           <Button asChild variant="site" className="h-9 min-h-0 rounded-lg bg-ap-blue px-4 text-[14px] text-ap-card hover:bg-ap-blue-hover">
-            <Link to="/aimante/join" hash="apply">List your brand</Link>
+            {me ? <Link to="/aimante/join" hash="apply">List your brand</Link> : <Link to="/signin" search={listSearch}>List your brand</Link>}
           </Button>
+          {me && <AccountMenu me={me} />}
         </nav>
+        <div className="flex items-center gap-1 md:hidden">
+        {me && <Avatar me={me} small />}
         <Button ref={menuButton} variant="ghost" size="icon" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} aria-controls="aimante-mobile-menu" onClick={() => setOpen((o) => !o)} className="size-11 min-h-0 min-w-0 shrink-0 text-ap-ink md:hidden">
           {open ? <X size={24} strokeWidth={1.7} /> : <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" /></svg>}
         </Button>
+        </div>
       </div>
       {open && <>
         <div className="absolute inset-x-0 top-full h-dvh bg-aimante-dim md:hidden" onClick={() => { close(); menuButton.current?.focus(); }} aria-hidden="true" />
@@ -77,9 +144,18 @@ export function AimanteHeader() {
           <Link to="/directory" onClick={close} className={row}>Browse{chevron}</Link>
           <Link to="/aimante/about" onClick={close} className={row}>About{chevron}</Link>
           <Link to="/aimante/join" onClick={close} className={row}>For brands{chevron}</Link>
-          <Link to="/aimante/join" hash="apply" onClick={close} className={cn(row, "text-ap-blue")}>List your brand{chevron}</Link>
-          <Link to="/signin" onClick={close} className="flex h-14 items-center text-[16px] text-site-nav hover:text-ap-ink">Sign in</Link>
-          <a href="https://gravitypants.com" onClick={close} className="inline-flex min-h-10 items-center text-[13px] text-ap-muted hover:text-ap-blue">Make reels with Gravity Pants →</a>
+          {me ? <Link to="/aimante/join" hash="apply" onClick={close} className={cn(row, "text-ap-blue")}>List your brand{chevron}</Link>
+            : <Link to="/signin" search={listSearch} onClick={close} className={cn(row, "text-ap-blue")}>List your brand{chevron}</Link>}
+          {me ? <>
+            <div className="mt-5 flex items-center gap-3 rounded-[12px] bg-ap-panel p-3"><Avatar me={me} /><div className="min-w-0"><p className="truncate text-[15px] font-semibold text-ap-ink">{me.displayName || me.email}</p>{me.displayName && <p className="truncate text-[13px] text-ap-muted">{me.email}</p>}</div></div>
+            {ACCOUNT_LINKS(saved).map((l) => "href" in l
+              ? <a key={l.label} href={l.href} target="_blank" rel="noreferrer" onClick={close} className="flex h-12 items-center border-b border-aimante-divider text-[16px] text-site-nav hover:text-ap-ink">{l.label}</a>
+              : <Link key={l.label} to={l.to} onClick={close} className="flex h-12 items-center justify-between border-b border-aimante-divider text-[16px] text-site-nav hover:text-ap-ink">{l.label}{"count" in l && <span className="text-ap-muted tabular-nums">{l.count}</span>}</Link>)}
+            <a href="#" onClick={(e) => { e.preventDefault(); close(); void signOut(); }} className="flex h-12 items-center text-[16px] text-site-nav hover:text-ap-ink">Sign out</a>
+          </> : <>
+            <Link to="/signin" search={signInSearch} onClick={close} className="flex h-14 items-center text-[16px] text-site-nav hover:text-ap-ink">Sign in</Link>
+            <a href="https://gravitypants.com" onClick={close} className="inline-flex min-h-10 items-center text-[13px] text-ap-muted hover:text-ap-blue">Make reels with Gravity Pants →</a>
+          </>}
         </nav>
       </>}
     </header>
