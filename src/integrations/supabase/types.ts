@@ -1754,7 +1754,7 @@ export type Database = {
         }[]
       }
       approve_brand_request: {
-        Args: { _admin_note?: string; _request_id: string }
+        Args: { _admin_id: string; _admin_note?: string; _request_id: string }
         Returns: string
       }
       billing_covered: { Args: { _src: string }; Returns: string[] }
@@ -1767,7 +1767,7 @@ export type Database = {
       }
       category_slug: { Args: { c: string }; Returns: string }
       decline_brand_request: {
-        Args: { _admin_note: string; _request_id: string }
+        Args: { _admin_id: string; _admin_note: string; _request_id: string }
         Returns: boolean
       }
       delete_workspace: { Args: { _ws: string }; Returns: undefined }
