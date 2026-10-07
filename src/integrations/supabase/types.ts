@@ -196,6 +196,39 @@ export type Database = {
           },
         ]
       }
+      brand_moods: {
+        Row: {
+          brand_id: string
+          created_at: string
+          mood_id: string
+        }
+        Insert: {
+          brand_id: string
+          created_at?: string
+          mood_id: string
+        }
+        Update: {
+          brand_id?: string
+          created_at?: string
+          mood_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_moods_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "directory_brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brand_moods_mood_id_fkey"
+            columns: ["mood_id"]
+            isOneToOne: false
+            referencedRelation: "moods"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       brand_requests: {
         Row: {
           brand: string
@@ -226,23 +259,60 @@ export type Database = {
         }
         Relationships: []
       }
+      categories: {
+        Row: {
+          created_at: string
+          hint: string
+          id: string
+          name: string
+          slug: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          hint?: string
+          id?: string
+          name: string
+          slug: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          hint?: string
+          id?: string
+          name?: string
+          slug?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
       category_moods: {
         Row: {
           category: string
+          category_id: string | null
           mood_id: string
           sort_order: number
         }
         Insert: {
           category: string
+          category_id?: string | null
           mood_id: string
           sort_order?: number
         }
         Update: {
           category?: string
+          category_id?: string | null
           mood_id?: string
           sort_order?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "category_moods_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "category_moods_mood_id_fkey"
             columns: ["mood_id"]
@@ -254,7 +324,9 @@ export type Database = {
       }
       directory_brands: {
         Row: {
+          affiliated: boolean
           category: string
+          category_id: string | null
           created_at: string
           description: string | null
           first_approved_at: string | null
@@ -266,12 +338,15 @@ export type Database = {
           name: string
           plan_ended_at: string | null
           slug: string
+          status: string
           updated_at: string
           website_url: string | null
           workspace_id: string
         }
         Insert: {
+          affiliated?: boolean
           category?: string
+          category_id?: string | null
           created_at?: string
           description?: string | null
           first_approved_at?: string | null
@@ -283,12 +358,15 @@ export type Database = {
           name: string
           plan_ended_at?: string | null
           slug: string
+          status?: string
           updated_at?: string
           website_url?: string | null
           workspace_id: string
         }
         Update: {
+          affiliated?: boolean
           category?: string
+          category_id?: string | null
           created_at?: string
           description?: string | null
           first_approved_at?: string | null
@@ -300,11 +378,19 @@ export type Database = {
           name?: string
           plan_ended_at?: string | null
           slug?: string
+          status?: string
           updated_at?: string
           website_url?: string | null
           workspace_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "directory_brands_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "directory_brands_workspace_id_fkey"
             columns: ["workspace_id"]
@@ -825,10 +911,32 @@ export type Database = {
           },
         ]
       }
+      mood_families: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
       moods: {
         Row: {
           created_at: string
           family: string
+          family_id: string | null
           id: string
           name: string
           sort_order: number
@@ -836,6 +944,7 @@ export type Database = {
         Insert: {
           created_at?: string
           family: string
+          family_id?: string | null
           id?: string
           name: string
           sort_order?: number
@@ -843,11 +952,20 @@ export type Database = {
         Update: {
           created_at?: string
           family?: string
+          family_id?: string | null
           id?: string
           name?: string
           sort_order?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "moods_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "mood_families"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       page_views: {
         Row: {
