@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Add the concept-reel notice for Agnona and Maison Francis Kurkdjian across public brand/reel displays; verify both and unaffected brands.
 - [x] Add editable website reel descriptions; all 12 published reels have starter copy, with authenticated save/reload and public popup readback verified.
 - [x] Match Directory reel popups to the reference; verified playback, closing, brand links and mobile layout.
 - [x] Resolve 32 exposed-definer warnings; verify public browsing, account/staff reads and access-denial regressions (20 tests passed).
