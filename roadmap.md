@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Fix the 33 older database linter warnings without weakening workspace access; rerun the linter and verify public and signed-in flows.
 - [x] Complete Aimanté brand pages and verify all 12 live brands.
 - [x] Build `/join` submission, confirmation email, and staff approval into a draft brand.
 - [ ] Submit Aimanté's sitemap to Google — blocked until aimante.co is verified in Google Search Console. Publishing requested; recheck production redirects after deployment completes.
