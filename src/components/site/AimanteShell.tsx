@@ -18,8 +18,8 @@ export function useBrandSite(): BrandSite {
 export function AimanteLogo({ footer = false }: { footer?: boolean }) {
   return (
     <span className="flex flex-col items-start gap-[3px] whitespace-nowrap text-left">
-      <span className={cn("font-semibold leading-none text-ap-ink", footer ? "text-[20px] tracking-normal" : "text-[24px] tracking-[-1px] md:text-[28px]")}>Aimanté</span>
-      <span className="text-[10px] leading-none tracking-normal text-ap-muted">by Gravity Pants</span>
+      <span className={cn("block font-semibold leading-[0.82] text-ap-ink", footer ? "text-[20px] tracking-[-0.6px]" : "text-[24px] tracking-[-1px] md:text-[28px]")}>Aimanté</span>
+      <span className="block text-[11px] leading-[1] tracking-normal text-ap-muted">by Gravity Pants</span>
     </span>
   );
 }
@@ -120,7 +120,7 @@ export function AimanteHeader() {
   const chevron = <ChevronRight size={20} strokeWidth={1.7} className="shrink-0 text-ap-headline-bracket" aria-hidden="true" />;
   return (
     <header className="sticky top-0 z-50 border-b border-aimante-divider bg-ap-card font-ap">
-      <div className="mx-auto grid h-[55px] max-w-[1280px] grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 md:h-[63px] md:px-6">
+      <div className="mx-auto grid h-[55px] max-w-[1280px] grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 md:h-[63px] md:px-10">
         <Link to="/directory" onClick={close} aria-label="Aimanté home" className="min-w-0 w-fit"><AimanteLogo /></Link>
         <nav aria-label="Main" className="hidden shrink-0 items-center gap-7 md:flex">
           <Link to="/aimante/about" className={navLink} activeProps={navActive}>About</Link>
@@ -165,10 +165,10 @@ export function AimanteHeader() {
 export function AimanteFooter() {
   return (
     <footer className="mt-auto border-t border-aimante-divider bg-ap-card font-ap">
-      <div className="mx-auto grid max-w-[1280px] gap-y-6 px-6 py-10 text-[14px] text-site-nav md:grid-cols-[auto_minmax(0,1fr)] md:items-center md:gap-x-8 md:py-12">
-        <div className="flex min-w-0 items-center gap-5">
+      <div className="mx-auto grid max-w-[1280px] gap-y-6 px-6 py-10 text-[14px] text-ap-muted md:px-10 md:grid-cols-[auto_minmax(0,1fr)] md:items-center md:gap-x-8 md:py-12">
+        <div className="flex min-w-0 items-center gap-4">
           <Link to="/directory" aria-label="Aimanté home"><AimanteLogo footer /></Link>
-          <span className="hidden whitespace-nowrap text-[13px] text-ap-muted tabular-nums md:block">© {new Date().getFullYear()} Gravity Pants</span>
+          <span className="hidden whitespace-nowrap text-[14px] text-ap-muted tabular-nums md:block">© {new Date().getFullYear()} Gravity Pants</span>
         </div>
         <nav aria-label="Footer" className="grid min-w-0 grid-cols-2 gap-x-6 gap-y-5 md:flex md:flex-wrap md:items-center md:justify-end md:gap-x-5 md:gap-y-3">
           <Link to="/aimante/join" className="hover:text-ap-ink">List your brand</Link>
