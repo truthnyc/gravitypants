@@ -9,6 +9,9 @@ describe("aimante domain", () => {
     expect(domainRedirect("https://www.aimante.co/sign-in")).toBeNull();
     expect(aimanteIn(u("https://aimante.co/sign-in"))?.pathname).toBe("/signin");
     expect(aimanteOut(u("https://aimante.co/signin"))?.pathname).toBe("/sign-in");
+    expect(domainRedirect("https://aimante.co/sign-up")).toBeNull();
+    expect(aimanteIn(u("https://aimante.co/sign-up"))?.pathname).toBe("/signup");
+    expect(aimanteOut(u("https://aimante.co/signup"))?.pathname).toBe("/sign-up");
   });
   it("only aimante.co and www.aimante.co serve Aimanté", () => {
     expect(siteForHost("aimante.co")).toBe("aimante");
