@@ -35,12 +35,12 @@ export const Route = createFileRoute("/directory/$slug")({
     const b = loaderData.brand;
     const aim = loaderData.site === "aimante";
     const hasImage = b.logo_url?.startsWith("https://") || loaderData.reels.some((r) => r.poster);
-    const image = hasImage ? `${aim ? AIMANTE_ORIGIN : ORIGIN}/api/public/og/brand/${params.slug}` : undefined;
+    const image = hasImage ? `${ORIGIN}/api/public/og/brand/${params.slug}` : undefined;
     const head = aim ? aimanteHead({
       path: `/b/${params.slug}`,
       title: `${b.name} video ads — Aimanté`,
       description: b.description || `Reels and video ads by ${b.name} on Aimanté.`,
-      ...(image ? { image } : {}),
+      // Every aimante.co page shares the home page card (og-aimante.jpg).
     }) : siteHead({
       path: `/directory/${params.slug}`,
       title: `${b.name} video ads — Gravity Pants Directory`,
