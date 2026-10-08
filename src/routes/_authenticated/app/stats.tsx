@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type React from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
@@ -7,8 +7,9 @@ import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "rec
 import { Button } from "@/components/ui/button";
 import { getBrandStats } from "@/lib/directory/brand-stats.functions";
 import { getWorkspaceId } from "@/lib/stillframe/workspace";
+import { getMediaUrl } from "@/lib/stillframe/media";
 import { openUpgrade, usePlanAccess } from "@/lib/stillframe/plan";
-import type { StatRow } from "@/lib/directory/brand-stats";
+import { DEFAULT_AOV, DEFAULT_CONVERSION, estimateRevenue, type StatRow } from "@/lib/directory/brand-stats";
 
 export const Route = createFileRoute("/_authenticated/app/stats")({
   head: () => ({
@@ -26,13 +27,23 @@ export const Route = createFileRoute("/_authenticated/app/stats")({
 
 const RANGES = [7, 30, 90] as const;
 const pct = (n: number) => `${(n * 100).toFixed(1)}%`;
+const money = (n: number) => `$${n >= 100 ? Math.round(n).toLocaleString() : n.toFixed(2)}`;
 const change = (a: number, b: number) => (b === 0 ? (a > 0 ? "New" : "—") : `${a >= b ? "+" : ""}${Math.round(((a - b) / b) * 100)}%`);
+
+/** Remembers the brand's own order value and buy rate in this browser. */
+function useStored(key: string, initial: number): [number, (n: number) => void] {
+  const [v, setV] = useState(initial);
+  useEffect(() => { const n = Number(localStorage.getItem(key)); if (n > 0) setV(n); }, [key]);
+  return [v, (n) => { setV(n); localStorage.setItem(key, String(n)); }];
+}
 
 export function StatsPage({ tabs }: { tabs?: React.ReactNode } = {}) {
   const { canUse, isLoading } = usePlanAccess();
   const allowed = canUse("brand_stats");
   const [days, setDays] = useState<(typeof RANGES)[number]>(30);
   const [brandId, setBrandId] = useState<string | null>(null);
+  const [aov, setAov] = useStored("brand-stats-aov", DEFAULT_AOV);
+  const [conv, setConv] = useStored("brand-stats-conv", DEFAULT_CONVERSION);
   const fetchStats = useServerFn(getBrandStats);
   const q = useQuery({
     queryKey: ["brand-stats", getWorkspaceId(), days, brandId],
@@ -83,11 +94,21 @@ export function StatsPage({ tabs }: { tabs?: React.ReactNode } = {}) {
         ) : (
           <>
             {s.tip && <p className="mt-8 rounded bg-ap-soft-blue px-4 py-3 text-[15px]">{s.tip}</p>}
-            <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-5">
+              <Kpi label="Estimated revenue" value={money(estimateRevenue(s.totals.clicks, aov, conv))} delta={change(s.totals.clicks, s.previous.clicks)} />
+              <Kpi label="Ad clicks" value={s.totals.clicks} delta={change(s.totals.clicks, s.previous.clicks)} />
               <Kpi label="Views" value={s.totals.views} delta={change(s.totals.views, s.previous.views)} />
-              <Kpi label="Saves" value={s.totals.saves} delta={change(s.totals.saves, s.previous.saves)} />
-              <Kpi label="Website clicks" value={s.totals.clicks} delta={change(s.totals.clicks, s.previous.clicks)} />
               <Kpi label="Click rate" value={pct(s.totals.views ? s.totals.clicks / s.totals.views : 0)} />
+              <Kpi label="Saves" value={s.totals.saves} delta={change(s.totals.saves, s.previous.saves)} />
+            </div>
+            <div className="mt-3 flex flex-wrap items-center gap-3 text-[13px] text-ap-muted">
+              <span>Revenue is an estimate: ad clicks × how many buy × average order.</span>
+              <label className="flex items-center gap-1.5">Average order $
+                <input type="number" min={1} value={aov} onChange={(e) => setAov(Math.max(0, Number(e.target.value) || 0))} className="h-8 w-20 rounded border border-ap-hairline bg-ap-card px-2 tabular-nums text-ap-ink" />
+              </label>
+              <label className="flex items-center gap-1.5">Buy rate
+                <input type="number" min={0.1} step={0.1} value={+(conv * 100).toFixed(2)} onChange={(e) => setConv(Math.max(0, Number(e.target.value) || 0) / 100)} className="h-8 w-16 rounded border border-ap-hairline bg-ap-card px-2 tabular-nums text-ap-ink" />%
+              </label>
             </div>
             <section className="mt-6 h-[260px] rounded border border-ap-hairline bg-ap-card p-4">
               <ResponsiveContainer width="100%" height="100%">
@@ -97,11 +118,18 @@ export function StatsPage({ tabs }: { tabs?: React.ReactNode } = {}) {
                   <Tooltip />
                   <Line type="monotone" dataKey="views" name="Views" stroke="var(--chart-1)" dot={false} strokeWidth={2} />
                   <Line type="monotone" dataKey="saves" name="Saves" stroke="var(--chart-2)" dot={false} strokeWidth={2} />
-                  <Line type="monotone" dataKey="clicks" name="Clicks" stroke="var(--chart-3)" dot={false} strokeWidth={2} />
+                  <Line type="monotone" dataKey="clicks" name="Ad clicks" stroke="var(--chart-3)" dot={false} strokeWidth={2} />
                 </LineChart>
               </ResponsiveContainer>
             </section>
-            <Table title="Top reels" rows={s.reels} />
+            {s.reelCards.length > 0 && (
+              <section className="mt-6">
+                <h2 className="text-[17px] font-semibold">Reel performance</h2>
+                <div className="mt-3 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
+                  {s.reelCards.map((r, i) => <ReelCard key={r.id} r={r} top={i === 0 && r.clicks > 0} revenue={estimateRevenue(r.clicks, aov, conv)} />)}
+                </div>
+              </section>
+            )}
             <div className="grid gap-6 lg:grid-cols-2">
               <Table title="Moods" rows={s.moods} />
               <Table title="Formats" rows={s.formats} />
@@ -141,5 +169,36 @@ function Table({ title, rows }: { title: string; rows: StatRow[] }) {
         </tbody>
       </table>
     </section>
+  );
+}
+
+type ReelCardData = { id: string; name: string; poster: string | null; moods: string[]; views: number; saves: number; clicks: number; rate: number };
+
+function ReelCard({ r, top, revenue }: { r: ReelCardData; top: boolean; revenue: number }) {
+  const [src, setSrc] = useState<string | null>(null);
+  useEffect(() => {
+    if (!r.poster) return;
+    if (/^https?:/.test(r.poster)) { setSrc(r.poster); return; }
+    let live = true;
+    void getMediaUrl(r.poster).then((u) => { if (live) setSrc(u); });
+    return () => { live = false; };
+  }, [r.poster]);
+  return (
+    <article className="overflow-hidden rounded border border-ap-hairline bg-ap-card">
+      <div className="relative aspect-[4/5] bg-ap-panel">
+        {src && <img src={src} alt={r.name} loading="lazy" className="h-full w-full object-cover" />}
+        {top && <span className="absolute left-2 top-2 rounded-lg bg-ap-card px-2 py-0.5 text-[12px] font-semibold">Top performer</span>}
+      </div>
+      <div className="p-3">
+        <p className="truncate text-[14px] font-semibold">{r.name}</p>
+        {r.moods.length > 0 && <p className="truncate text-[12px] capitalize text-ap-muted">{r.moods.join(" · ")}</p>}
+        <p className="mt-2 text-[20px] font-semibold tabular-nums">{money(revenue)}</p>
+        <dl className="mt-1 grid grid-cols-3 gap-1 text-[12px] tabular-nums text-ap-muted">
+          <div><dt>Views</dt><dd className="text-ap-ink">{r.views}</dd></div>
+          <div><dt>Clicks</dt><dd className="text-ap-ink">{r.clicks}</dd></div>
+          <div><dt>Click rate</dt><dd className="text-ap-ink">{pct(r.rate)}</dd></div>
+        </dl>
+      </div>
+    </article>
   );
 }

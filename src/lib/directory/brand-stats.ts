@@ -9,6 +9,14 @@ export function clickRate(clicks: number, views: number): number {
   return views > 0 ? clicks / views : 0;
 }
 
+/** Estimated revenue from shop clicks: clicks × conversion rate × average order value. */
+export const DEFAULT_AOV = 75;
+export const DEFAULT_CONVERSION = 0.025;
+export function estimateRevenue(clicks: number, aov = DEFAULT_AOV, conversion = DEFAULT_CONVERSION): number {
+  if (clicks <= 0 || aov <= 0 || conversion <= 0) return 0;
+  return clicks * conversion * aov;
+}
+
 export type StatRow = { name: string; views: number; saves: number; clicks: number; rate: number };
 
 export function rankRows(rows: Omit<StatRow, "rate">[]): StatRow[] {
