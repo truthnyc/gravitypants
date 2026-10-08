@@ -171,3 +171,34 @@ function Table({ title, rows }: { title: string; rows: StatRow[] }) {
     </section>
   );
 }
+
+type ReelCardData = { id: string; name: string; poster: string | null; moods: string[]; views: number; saves: number; clicks: number; rate: number };
+
+function ReelCard({ r, top, revenue }: { r: ReelCardData; top: boolean; revenue: number }) {
+  const [src, setSrc] = useState<string | null>(null);
+  useEffect(() => {
+    if (!r.poster) return;
+    if (/^https?:/.test(r.poster)) { setSrc(r.poster); return; }
+    let live = true;
+    void getMediaUrl(r.poster).then((u) => { if (live) setSrc(u); });
+    return () => { live = false; };
+  }, [r.poster]);
+  return (
+    <article className="overflow-hidden rounded border border-ap-hairline bg-ap-card">
+      <div className="relative aspect-[4/5] bg-ap-panel">
+        {src && <img src={src} alt={r.name} loading="lazy" className="h-full w-full object-cover" />}
+        {top && <span className="absolute left-2 top-2 rounded-lg bg-ap-card px-2 py-0.5 text-[12px] font-semibold">Top performer</span>}
+      </div>
+      <div className="p-3">
+        <p className="truncate text-[14px] font-semibold">{r.name}</p>
+        {r.moods.length > 0 && <p className="truncate text-[12px] capitalize text-ap-muted">{r.moods.join(" · ")}</p>}
+        <p className="mt-2 text-[20px] font-semibold tabular-nums">{money(revenue)}</p>
+        <dl className="mt-1 grid grid-cols-3 gap-1 text-[12px] tabular-nums text-ap-muted">
+          <div><dt>Views</dt><dd className="text-ap-ink">{r.views}</dd></div>
+          <div><dt>Clicks</dt><dd className="text-ap-ink">{r.clicks}</dd></div>
+          <div><dt>Click rate</dt><dd className="text-ap-ink">{pct(r.rate)}</dd></div>
+        </dl>
+      </div>
+    </article>
+  );
+}
