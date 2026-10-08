@@ -30,7 +30,21 @@ export const Route = createFileRoute("/_authenticated/app/account_/members")({
 const inputCls =
   "h-10 w-full rounded-sm bg-card px-3 text-[16px] sm:text-[14px] outline outline-[0.5px] outline-border focus-visible:outline-2 focus-visible:outline-primary";
 
-type Member = { user_id: string; role: string; email: string; display_name: string | null };
+type Member = { user_id: string; role: string; email: string; display_name: string | null; last_sign_in_at: string | null };
+
+function lastSignInLabel(iso: string | null): string {
+  if (!iso) return "Never signed in";
+  const d = new Date(iso);
+  const now = Date.now();
+  const mins = Math.floor((now - d.getTime()) / 60000);
+  if (mins < 1) return "Signed in just now";
+  if (mins < 60) return `Signed in ${mins} min ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `Signed in ${hours} h ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `Signed in ${days} d ago`;
+  return `Last signed in ${d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}`;
+}
 type Invite = { id: string; email: string; role: string; expires_at: string };
 
 const useWorkspaces = useMyWorkspaces;
@@ -40,7 +54,7 @@ function useMembers(ws: string) {
   return useQuery({
     queryKey: ["members", ws],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("workspace_member_list" as never, { _ws: ws } as never);
+      const { data, error } = await supabase.rpc("workspace_seat_activity" as never, { _ws: ws } as never);
       if (error) throw error;
       return (data ?? []) as unknown as Member[];
     },
@@ -257,7 +271,10 @@ function MembersPage() {
               <span className="grid size-8 flex-none place-items-center rounded-full bg-ap-ink text-[13px] font-semibold text-ap-card">{(m.display_name || m.email).charAt(0).toUpperCase()}</span>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-[14px] font-medium">{m.display_name || m.email}</p>
-                {m.display_name && <p className="truncate text-[12px] text-secondary-text">{m.email}</p>}
+                <p className="truncate text-[12px] text-secondary-text">
+                  {m.display_name ? `${m.email} · ` : ""}
+                  <span className="nums">{lastSignInLabel(m.last_sign_in_at)}</span>
+                </p>
               </div>
               {isAdmin && m.role !== "owner" ? (
                 <>
