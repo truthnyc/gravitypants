@@ -124,6 +124,8 @@ export function domainRedirect(href: string, forwardedHost?: string | null): str
       return out ? `${AIMANTE_ORIGIN}${out.pathname}${out.search}` : null;
     }
     if (isAimantePath(url.pathname)) return null;
+    // Signed-in account pages stay on aimante.co: the session lives per domain.
+    if (/^\/app\/account(\/|_|$)/.test(url.pathname)) return null;
     return `${GP_ORIGIN}${url.pathname}${url.search}`;
   }
   if (isGravityPantsHost(url.host) && (/^\/directory\/?$/.test(url.pathname) || /^\/directory\/[^/]+\/?$/.test(url.pathname))) {

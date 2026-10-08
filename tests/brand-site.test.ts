@@ -56,3 +56,11 @@ describe("domain redirects", () => {
     expect(resolveSite("gravitypants.com", "aimante", "aimante")).toBe("gravitypants");
   });
 });
+
+describe("aimante account pages", () => {
+  it("stay on aimante.co on reload and after checkout", () => {
+    expect(domainRedirect("https://aimante.co/app/account")).toBeNull();
+    expect(domainRedirect("https://aimante.co/app/account/billing?checkout=success")).toBeNull();
+    expect(domainRedirect("https://aimante.co/app/ads")).toBe("https://gravitypants.com/app/ads");
+  });
+});
