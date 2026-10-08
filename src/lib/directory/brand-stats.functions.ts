@@ -50,7 +50,7 @@ export const getBrandStats = createServerFn({ method: "POST" })
     const ids = data.brandId ? all.filter((b) => b.id === data.brandId).map((b) => b.id) : all.map((b) => b.id);
     const now = Date.now(), span = data.days * 86400000;
     const since = new Date(now - span).toISOString(), prevSince = new Date(now - 2 * span).toISOString();
-    const empty = { allowed: true as const, brands: all, totals: { views: 0, saves: 0, clicks: 0 }, previous: { views: 0, saves: 0, clicks: 0 }, days: [] as any[], reels: [] as any[], moods: [] as any[], formats: [] as any[], tip: null as string | null };
+    const empty = { allowed: true as const, brands: all, totals: { views: 0, saves: 0, clicks: 0 }, previous: { views: 0, saves: 0, clicks: 0 }, days: [] as any[], reels: [] as any[], reelCards: [] as { id: string; name: string; poster: string | null; moods: string[]; views: number; saves: number; clicks: number; rate: number }[], moods: [] as any[], formats: [] as any[], tip: null as string | null };
     if (!ids.length) return empty;
 
     const [{ data: dReels }, { data: sReels }] = await Promise.all([
@@ -97,6 +97,8 @@ export const getBrandStats = createServerFn({ method: "POST" })
       ...empty, totals, previous,
       days: [...dayMap].map(([day, s]) => ({ day, ...s })),
       reels: rankRows(reelIds.map((id) => ({ name: reels.get(id)!.name, ...(per.get(id) ?? { views: 0, saves: 0, clicks: 0 }) }))).slice(0, 25),
+      reelCards: reelIds.map((id) => { const r = reels.get(id)!; const s = per.get(id) ?? { views: 0, saves: 0, clicks: 0 }; return { id, name: r.name, poster: r.poster, moods: r.moods.slice(0, 2), ...s, rate: s.views ? s.clicks / s.views : 0 }; })
+        .sort((a, b) => b.clicks - a.clicks || b.views - a.views).slice(0, 12),
       moods, formats: group((id) => reels.get(id)!.formats), tip: tipFor(moods),
     };
   });
