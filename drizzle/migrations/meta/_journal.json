@@ -29,6 +29,13 @@
       "when": 1791410967824,
       "tag": "0003_trial_one_teammate_fix",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1791477787940,
+      "tag": "0004_workspace_seat_activity",
+      "breakpoints": true
     }
   ]
 }

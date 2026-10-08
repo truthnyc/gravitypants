@@ -1941,6 +1941,17 @@ export type Database = {
           user_id: string
         }[]
       }
+      workspace_seat_activity: {
+        Args: { _ws: string }
+        Returns: {
+          created_at: string
+          display_name: string
+          email: string
+          last_sign_in_at: string
+          role: string
+          user_id: string
+        }[]
+      }
       workspace_seats: { Args: { _ws: string }; Returns: number }
     }
     Enums: {
