@@ -28,7 +28,7 @@ export function useEditorDoc(initial: EditorDoc) {
     setState((s) => {
       const next = fn(s.doc);
       if (next === s.doc) return s;
-      return { doc: next, past: coalesce ? s.past : [...s.past.slice(-99), s.doc], future: [] };
+      return { doc: next, past: coalesce ? s.past : [...s.past.slice(-79), s.doc], future: [] };
     });
   }, []);
 

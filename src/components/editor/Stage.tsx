@@ -64,9 +64,10 @@ export function Stage({
   const sessions = useRef(0);
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const surfaceRef = useRef<HTMLDivElement>(null);
   const [box, setBox] = useState({ w: 0, h: 0 });
   const [layout, setLayout] = useState<FrameLayout | null>(null);
-  const [drag, setDrag] = useState<{ el: DragEl; x: number; y: number; moving: boolean; anchor: Anchor | null } | null>(null);
+  const [drag, setDrag] = useState<{ el: DragEl; x: number; y: number; moving: boolean; anchor: Anchor | null; was: boolean } | null>(null);
   const [editing, setEditing] = useState<"headline" | "subline" | null>(null);
 
   const size = FORMAT_SIZE[format];
@@ -102,7 +103,7 @@ export function Stage({
     const rect = canvasRef.current!.getBoundingClientRect();
     const px = (clientX - rect.left) * dpr;
     const py = (clientY - rect.top) * dpr;
-    const choices = el === "logo" ? ANCHORS.filter((a) => !a.startsWith("middle") && a !== "center") : ANCHORS;
+    const choices = ANCHORS;
     let best: Anchor = "center";
     let bestD = Infinity;
     for (const a of choices) {
@@ -118,9 +119,11 @@ export function Stage({
 
   const down = (el: DragEl) => (e: RPointerEvent) => {
     e.stopPropagation();
+    if (editing === el) return;
+    const was = selected === el;
     onSelect(el);
     (e.target as HTMLElement).setPointerCapture(e.pointerId);
-    setDrag({ el, x: e.clientX, y: e.clientY, moving: false, anchor: null });
+    setDrag({ el, x: e.clientX, y: e.clientY, moving: false, anchor: null, was });
   };
   const move = (e: RPointerEvent) => {
     if (!drag || !layout) return;
@@ -130,13 +133,67 @@ export function Stage({
   };
   const up = () => {
     if (drag?.moving && drag.anchor) onMove(drag.el, drag.anchor);
+    // A plain click on an already selected text box starts typing in place.
+    else if (drag && !drag.moving && drag.was && drag.el !== "logo") setEditing(drag.el);
     setDrag(null);
   };
 
   const frame = doc.frames[frameIndex];
-  const showTags = interactive && !playing && !adjusting && layout;
+  const showTags = interactive && !playing && layout;
+  const photoMode = interactive && !playing && (selected === "photo" || adjusting);
 
-  const tag = (el: ElementKey, b: Box | null, draggable: boolean, text?: TextSettings | null) => {
+  // Wheel / trackpad pinch zoom (1x-2.5x); native non-passive listener so the page doesn't scroll.
+  const wheelRef = useRef<(e: WheelEvent) => void>(() => {});
+  wheelRef.current = (e: WheelEvent) => {
+    if (!photoMode || !frame) return;
+    e.preventDefault();
+    const dy = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? 100 : 1);
+    const z = frame.photo?.zoom ?? 1;
+    onFocus({ zoom: Math.min(2.5, Math.max(1, z * Math.exp(-dy * 0.0015))) }, "zoom-wheel");
+  };
+  useEffect(() => {
+    const el = surfaceRef.current;
+    if (!el) return;
+    const h = (e: WheelEvent) => wheelRef.current(e);
+    el.addEventListener("wheel", h, { passive: false });
+    return () => el.removeEventListener("wheel", h);
+  }, []);
+
+  const placeholderBox = (el: "headline" | "subline"): Box | null => {
+    if (!layout || !frame) return null;
+    if (el === "subline" && frame.subline?.mode === "image") return null;
+    const t = frame[el];
+    const under = el === "subline" && (t?.keep_under_headline ?? true);
+    const safe = layout.safe;
+    const fontPx = ((t?.size_px ?? (el === "headline" ? 108 : 48)) / 1080) * Math.min(W, H);
+    const w = safe.w * 0.6;
+    const h = fontPx * 1.3;
+    if (under && layout.headline) return { x: layout.headline.x + (layout.headline.w - w) / 2, y: layout.headline.y + layout.headline.h + h * 0.2, w, h };
+    const a = (t?.position ?? (el === "headline" ? "center" : "bottom-center")) as Anchor;
+    const p = anchorPoint(a, safe);
+    const x = a.endsWith("left") ? p.x : a.endsWith("right") ? p.x - w : p.x - w / 2;
+    const y = a.startsWith("top") ? p.y : a.startsWith("bottom") ? p.y - h : p.y - h / 2;
+    return { x, y, w, h };
+  };
+
+  const logoKey = (e: React.KeyboardEvent) => {
+    if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(e.key)) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const cur = (doc.project.logo.frame_positions?.[frame?.id ?? ""]?.[format] ?? doc.project.logo.positions?.[format] ?? "top-right") as Anchor;
+    const i = Math.max(0, ANCHORS.indexOf(cur));
+    let r = Math.floor(i / 3), c = i % 3;
+    if (e.key === "ArrowLeft") c = Math.max(0, c - 1);
+    if (e.key === "ArrowRight") c = Math.min(2, c + 1);
+    if (e.key === "ArrowUp") r = Math.max(0, r - 1);
+    if (e.key === "ArrowDown") r = Math.min(2, r + 1);
+    const next = ANCHORS[r * 3 + c];
+    if (next && next !== cur) onMove("logo", next);
+  };
+
+  const tag = (el: ElementKey, real: Box | null, draggable: boolean, text?: TextSettings | null) => {
+    const empty = !real && (el === "headline" || el === "subline");
+    const b = real ?? (empty ? placeholderBox(el as "headline" | "subline") : null);
     if (!b) return null;
     const meta = ELEMENT_META[el];
     const active = selected === el;
@@ -145,23 +202,28 @@ export function Stage({
     return (
       <div
         key={el}
-        className={cn("absolute", draggable && "cursor-grab", drag?.el === el && drag.moving && "cursor-grabbing")}
+        className={cn("stage-el group/el absolute", active && "is-active", empty && !active && editing !== el && "opacity-0 hover:opacity-100", draggable && "cursor-grab", drag?.el === el && drag.moving && "cursor-grabbing")}
+        tabIndex={el === "logo" ? 0 : undefined}
+        aria-label={el === "logo" ? "Logo — use arrow keys to move" : undefined}
+        onKeyDown={el === "logo" ? logoKey : undefined}
         style={{
           left: css.left - pad,
           top: css.top - pad,
           width: css.width + pad * 2,
           height: css.height + pad * 2,
-          outline: `2px ${active ? "solid" : "dashed"} var(--accent-blue)`,
-          outlineOffset: 0,
           borderRadius: 4,
-          opacity: active ? 1 : 0.85,
         }}
         onPointerDown={draggable ? down(el as DragEl) : undefined}
         onPointerMove={move}
         onPointerUp={up}
         onDoubleClick={() => (el === "headline" || el === "subline") && setEditing(el)}
       >
-        <Tag el={el} active={active} className="absolute -top-[22px] left-[-2px]" />
+        {empty && editing !== el && (
+          <span className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-sm text-[12px] font-medium text-background [text-shadow:0_1px_2px_rgb(0_0_0/0.5)]">
+            {el === "headline" ? "Add a headline" : "Add a subline"}
+          </span>
+        )}
+        <Tag el={el} active={active} className={cn("absolute -top-[22px] left-[-2px]", !active && "opacity-0 group-hover/el:opacity-100")} />
         {active && draggable && !editing && (
           <span
             role="presentation"
@@ -185,24 +247,24 @@ export function Stage({
             }}
           />
         )}
-        {editing === el && text && (
+        {editing === el && (
           <textarea
             autoFocus
-            defaultValue={text.text}
+            defaultValue={text?.text ?? ""}
             aria-label={`${meta.label} text`}
             className="absolute inset-0 resize-none rounded-sm bg-foreground/50 p-1 text-center leading-tight text-background outline-none"
-            style={{ fontFamily: `"${fontFamilyOf(text)}"`, fontWeight: text.font_weight ?? 700, fontSize: Math.max(12, (layoutFont(layout, el) / dpr) * 0.9) }}
+            style={{ fontFamily: `"${fontFamilyOf(text ?? {})}"`, fontWeight: text?.font_weight ?? 700, fontSize: Math.max(12, (layoutFont(layout, el) / dpr) * 0.9) }}
             onPointerDown={(e) => e.stopPropagation()}
             onBlur={(e) => {
               onText(el as "headline" | "subline", e.currentTarget.value);
               setEditing(null);
             }}
             onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
+              e.stopPropagation();
+              if (e.key === "Escape") {
                 e.preventDefault();
                 e.currentTarget.blur();
               }
-              if (e.key === "Escape") setEditing(null);
             }}
           />
         )}
@@ -213,9 +275,26 @@ export function Stage({
   return (
     <div ref={wrapRef} className="flex h-full min-h-0 w-full min-w-0 items-center justify-center">
       <div
-        className="relative rounded-lg shadow-ap-thumb"
-        style={{ width: box.w, height: box.h, outline: selected === "photo" && showTags ? `2px solid var(--accent-blue)` : undefined, outlineOffset: 3 }}
-        onPointerDown={() => onSelect("photo")}
+        ref={surfaceRef}
+        style={{ width: box.w, height: box.h, outline: selected === "photo" && showTags ? `2px solid var(--accent-blue)` : undefined, outlineOffset: 3, touchAction: photoMode ? "none" : undefined }}
+        className={cn("relative rounded-lg shadow-ap-thumb", photoMode && (pan ? "cursor-grabbing" : "cursor-grab"))}
+        onPointerDown={(e) => {
+          onSelect("photo");
+          if (!interactive || playing || !frame) return;
+          (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+          const f = frame.photo?.focus ?? { x: 0.5, y: 0.5 };
+          setPan({ x: e.clientX, y: e.clientY, fx: f.x, fy: f.y, id: ++sessions.current });
+        }}
+        onPointerMove={(e) => {
+          if (!pan || !frame) return;
+          if (Math.hypot(e.clientX - pan.x, e.clientY - pan.y) < 3) return;
+          const z = frame.photo?.zoom ?? 1;
+          const x = Math.min(1, Math.max(0, pan.fx - (e.clientX - pan.x) / (box.w * z * 1.4)));
+          const y = Math.min(1, Math.max(0, pan.fy - (e.clientY - pan.y) / (box.h * z * 1.4)));
+          onFocus({ focus: { x, y } }, `drag:focus:${pan.id}`);
+        }}
+        onPointerUp={() => setPan(null)}
+        onPointerCancel={() => setPan(null)}
       >
         <canvas ref={canvasRef} width={W || 1} height={H || 1} className="block h-full w-full rounded-lg" aria-label="Ad preview" role="img" />
         {showTags && frame && (
@@ -235,59 +314,14 @@ export function Stage({
             {tag("logo", layout.logo, true)}
           </>
         )}
-        {adjusting && frame && (
-          <div
-            className="absolute inset-0 cursor-move rounded-sm ring-2 ring-primary"
-            onPointerDown={(e) => {
-              e.stopPropagation();
-              (e.target as HTMLElement).setPointerCapture(e.pointerId);
-              const f = frame.photo?.focus ?? { x: 0.5, y: 0.5 };
-              setPan({ x: e.clientX, y: e.clientY, fx: f.x, fy: f.y, id: ++sessions.current });
-            }}
-            onPointerMove={(e) => {
-              if (!pan) return;
-              const z = frame.photo?.zoom ?? 1;
-              const x = Math.min(1, Math.max(0, pan.fx - (e.clientX - pan.x) / (box.w * z * 1.4)));
-              const y = Math.min(1, Math.max(0, pan.fy - (e.clientY - pan.y) / (box.h * z * 1.4)));
-              onFocus({ focus: { x, y } }, `drag:focus:${pan.id}`);
-            }}
-            onPointerUp={() => setPan(null)}
-            onWheel={(e) => {
-              const z = frame.photo?.zoom ?? 1;
-              onFocus({ zoom: Math.min(3, Math.max(1, z - e.deltaY * 0.002)) }, "zoom-wheel");
-            }}
-          >
-            <div className="pointer-events-none absolute inset-0 grid grid-cols-3 grid-rows-3">
-              {Array.from({ length: 9 }, (_, i) => (
-                <span key={i} className="border border-background/30" />
-              ))}
-            </div>
-            <div
-              className="absolute inset-x-4 bottom-4 flex items-center gap-3 rounded-lg bg-card/95 px-3 py-2 shadow-popover"
-              onPointerDown={(e) => e.stopPropagation()}
-            >
-              <span className="text-[12px] font-medium">Zoom</span>
-              <input
-                type="range"
-                min={100}
-                max={300}
-                value={Math.round((frame.photo?.zoom ?? 1) * 100)}
-                onChange={(e) => onFocus({ zoom: Number(e.target.value) / 100 }, "zoom-range")}
-                aria-label="Zoom"
-                className="flex-1 accent-[var(--el-photo)]"
-              />
-              <button type="button" onClick={onAdjustDone} className="text-[13px] font-semibold text-link">
-                Done
-              </button>
-            </div>
-            <span className="pointer-events-none absolute left-1/2 top-3 -translate-x-1/2 rounded-lg bg-foreground/70 px-2.5 py-1 text-[12px] text-background">
-              {adjustHint ?? "Drag to choose what stays in view"}
-            </span>
-          </div>
+        {photoMode && !drag && (
+          <span className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-foreground/70 px-2.5 py-1 text-[12px] text-background">
+            {adjustHint ?? "Drag to reposition · scroll to zoom"}
+          </span>
         )}
         {drag?.moving && layout && (
           <div className="pointer-events-none absolute inset-0">
-            {(drag.el === "logo" ? ANCHORS.filter((a) => !a.startsWith("middle") && a !== "center") : ANCHORS).map((a) => {
+            {ANCHORS.map((a) => {
               const p = anchorPoint(a, layout.safe);
               return (
                 <span
