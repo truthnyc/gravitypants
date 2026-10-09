@@ -44,7 +44,6 @@ export const Route = createFileRoute("/directory/$slug")({
       path: `/directory/${params.slug}`,
       title: `${b.name} video ads — Gravity Pants Directory`,
       description: b.description || `Reels and video ads by ${b.name}, made with Gravity Pants.`,
-      ...(image ? { image } : {}),
     });
     if (!aim) head.meta = [...(head.meta ?? []), { name: "robots", content: "noindex" }]; // gravitypants.com/directory sends visitors to aimante.co
     const ld = {
