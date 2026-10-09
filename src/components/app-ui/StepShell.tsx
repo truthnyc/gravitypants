@@ -182,8 +182,10 @@ const FORMATS = ["9:16", "1:1", "16:9"] as const;
 
 /** Left card: reel preview, play + progress, name and meta, sizes. Same on every step. */
 export function ReelCard({
-  preview, playing, onTogglePlay, segments, time, total, name, onRename, meta, status, formats, format, onFormat, onToggleFormat, exported, readOnly, sizesSlot,
+  preview, playing, onTogglePlay, segments, time, total, name, onRename, meta, status, formats, format, onFormat, onToggleFormat, exported, readOnly, sizesSlot, onSegment,
 }: {
+  /** Clicking a play-bar segment jumps to that frame and stops. */
+  onSegment?: (i: number) => void;
   preview: ReactNode;
   playing: boolean;
   onTogglePlay: () => void;
@@ -227,13 +229,20 @@ export function ReelCard({
         <button type="button" onClick={onTogglePlay} aria-label={playing ? "Pause" : "Play"} className="grid size-9 shrink-0 place-items-center rounded-lg bg-ap-blue text-ap-card hover:bg-ap-blue-hover">
           {playing ? <Pause className="size-4" fill="currentColor" /> : <Play className="ml-0.5 size-4" fill="currentColor" />}
         </button>
-        <div className="flex h-1 flex-1 gap-[3px]" aria-hidden>
+        <div className={cn("flex flex-1 gap-[3px]", onSegment ? "h-3 items-center" : "h-1")} aria-hidden={!onSegment}>
           {segments.map((d, i) => {
             const start = acc;
             acc += d;
             const p = Math.max(0, Math.min(1, (time - start) / (d || 1)));
             return (
-              <span key={i} className="relative flex-1 overflow-hidden rounded-full bg-ap-inner" style={{ flexGrow: d }}>
+              <span
+                key={i}
+                role={onSegment ? "button" : undefined}
+                aria-label={onSegment ? `Go to frame ${i + 1}` : undefined}
+                onClick={onSegment ? () => onSegment(i) : undefined}
+                className={cn("relative h-1 flex-1 overflow-hidden rounded-full bg-ap-inner", onSegment && "cursor-pointer")}
+                style={{ flexGrow: d }}
+              >
                 <span className="absolute inset-y-0 left-0 bg-ap-blue" style={{ width: `${p * 100}%` }} />
               </span>
             );
