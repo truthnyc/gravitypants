@@ -35,6 +35,7 @@ export function Stage({
   onResize,
   onFocus,
   onAdjustDone,
+  adjustHint,
   interactive = true,
   brand,
 }: {
@@ -55,6 +56,7 @@ export function Stage({
   onResize: (el: DragEl, value: number, key: string) => void;
   onFocus: (patch: { focus?: { x: number; y: number }; zoom?: number }, key: string) => void;
   onAdjustDone: () => void;
+  adjustHint?: string;
   interactive?: boolean;
 }) {
   const [resize, setResize] = useState<{ el: DragEl; x: number; w: number; v: number; id: number } | null>(null);
@@ -279,7 +281,7 @@ export function Stage({
               </button>
             </div>
             <span className="pointer-events-none absolute left-1/2 top-3 -translate-x-1/2 rounded-lg bg-foreground/70 px-2.5 py-1 text-[12px] text-background">
-              Drag to choose what stays in view
+              {adjustHint ?? "Drag to choose what stays in view"}
             </span>
           </div>
         )}
