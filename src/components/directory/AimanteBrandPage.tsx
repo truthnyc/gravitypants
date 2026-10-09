@@ -28,9 +28,9 @@ export function AimanteBrandPage({ brand, reels, siteReels, more, onOpen, onOpen
       <div className="mt-4 grid h-[80px] grid-cols-[80px_minmax(0,1fr)] gap-4 md:gap-5">
         {brand.logo_url ? <img src={brand.logo_url} alt={`${brand.name} logo`} className="size-[80px] rounded-[12px] border border-ap-hairline bg-ap-card object-contain" /> : <div className="grid size-[80px] place-items-center rounded-[12px] border border-ap-hairline bg-ap-card text-[12px] text-ap-muted">Logo</div>}
         <div className="flex h-[80px] min-w-0 flex-col justify-between">
-          <Link to="/directory/category/$slug" params={{ slug: categorySlug(brand.category) }} className="block !min-h-0 truncate text-[12px] leading-none font-semibold text-ap-blue [text-box:trim-both_cap_alphabetic]">{brand.category}</Link>
-          <h1 className="truncate text-[26px] leading-none font-semibold tracking-[-0.03em] [text-box:trim-both_cap_alphabetic] md:text-[32px]">{brand.name}</h1>
-          {brand.website_url ? <a href={brand.website_url} target="_blank" rel="noopener noreferrer" onClick={() => void recordBrandClick({ data: { kind: "brand", id: brand.id } }).catch(() => {})} className="block !min-h-0 truncate text-[14px] leading-none text-ap-blue-strong [text-box:trim-both_cap_alphabetic]">Visit {brand.name} ↗</a> : <span aria-hidden />}
+          <Link to="/directory/category/$slug" params={{ slug: categorySlug(brand.category) }} className="block !min-h-0 whitespace-nowrap text-[12px] leading-none font-semibold text-ap-blue [text-box:trim-both_cap_alphabetic]">{brand.category}</Link>
+          <h1 className="truncate text-[26px] leading-[1.2] font-semibold tracking-[-0.03em] md:text-[32px]">{brand.name}</h1>
+          {brand.website_url ? <a href={brand.website_url} target="_blank" rel="noopener noreferrer" onClick={() => void recordBrandClick({ data: { kind: "brand", id: brand.id } }).catch(() => {})} className="block !min-h-0 whitespace-nowrap text-[14px] leading-none text-ap-blue-strong [text-box:trim-both_cap_alphabetic]">Visit {brand.name} ↗</a> : <span aria-hidden />}
         </div>
       </div>
       {brand.description && <p className="mt-4 text-[17px] leading-[1.45] text-ap-body">{brand.description}</p>}
