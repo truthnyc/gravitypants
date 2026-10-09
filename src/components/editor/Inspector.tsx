@@ -81,6 +81,11 @@ export type InspectorActions = {
   onReplacePhoto: () => void;
   onAdjust: () => void;
   onAddLogo: (file: File, variant: "light" | "dark") => void;
+  /** Apply a photo patch to every frame (one undo step). */
+  onPhotoAll?: (patch: Partial<PhotoSettings>, key?: string) => void;
+  /** Play the current frame once on the preview. */
+  onPlayFrame?: () => void;
+  onUndo?: () => void;
 };
 
 export function Inspector({
@@ -92,14 +97,18 @@ export function Inspector({
   kit,
   kits = [],
   kitId = null,
-  adjusting,
   onSelect,
   actions,
-  endSeconds = 0,
   mobile = false,
   embedded = false,
   hideKit = false,
+  image,
+  keyframe = null,
+  onKeyframe = () => {},
 }: {
+  image?: HTMLImageElement;
+  keyframe?: "start" | "end" | null;
+  onKeyframe?: (k: "start" | "end" | null) => void;
   hideKit?: boolean;
   endSeconds?: number;
   doc: EditorDoc;
@@ -129,10 +138,36 @@ export function Inspector({
   const scope = selected === "logo" ? "Whole video" : selected === "transition" ? `Into frame ${frameIndex + 1}` : `Frame ${frameIndex + 1}`;
   const colors = [...new Set([...(kit?.colors ?? []), ...TEXT_COLORS].map((c) => c.toUpperCase()))];
 
+  const brandName = kits.find((k) => k.id === kitId)?.name ?? "Brand";
+
   return (
     <aside className={cn("flex shrink-0 flex-col", embedded ? "w-full" : "overflow-y-auto bg-inspector p-4", mobile ? "h-full w-full" : embedded ? "" : "hidden w-[344px] lg:flex")}>
       {!hideKit && <BrandKitRow embedded={embedded} kits={kits} kitId={kitId} onKit={actions.onKit} />}
-      <div className={cn(mobile ? "flex gap-2 overflow-x-auto pb-1" : embedded ? "ap-tiles grid grid-cols-2 gap-2 sm:grid-cols-4" : "grid grid-cols-2 gap-2")}>
+      {embedded ? (
+        <div className="mb-1 flex flex-wrap items-center gap-3">
+          <span className="mr-auto text-[15px] font-semibold nums">Frame {frameIndex + 1} of {doc.frames.length}</span>
+          <div className="flex rounded-lg bg-control-fill p-0.5" role="tablist" aria-label="What to edit">
+            {(["photo", "headline", "subline", "logo"] as ElementKey[]).map((el) => {
+              const m = ELEMENT_META[el];
+              const active = selected === el;
+              return (
+                <button
+                  key={el}
+                  type="button"
+                  role="tab"
+                  aria-selected={active}
+                  onClick={() => onSelect(el)}
+                  className={cn("flex h-8 items-center gap-1.5 rounded-lg px-3 text-[13px] font-medium", active ? "bg-card shadow-segment" : "text-ap-body")}
+                >
+                  <span className="size-2 rounded-full" style={{ background: m.color }} />
+                  {m.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ) : (
+      <div className={cn(mobile ? "flex gap-2 overflow-x-auto pb-1" : "grid grid-cols-2 gap-2")}>
         {(["photo", "headline", "subline", "logo"] as ElementKey[]).map((el) => {
           const m = ELEMENT_META[el];
           const Icon = ICONS[el];
@@ -142,8 +177,8 @@ export function Inspector({
               key={el}
               type="button"
               onClick={() => onSelect(el)}
-              className={cn("flex shrink-0 bg-card text-left transition-shadow", embedded ? "min-w-0 rounded-[12px] border border-ap-hairline" : "rounded-sm shadow-card", mobile ? "h-11 flex-row items-center gap-2 px-3" : "flex-col items-start gap-1.5 p-2.5")}
-              style={active ? (embedded ? { boxShadow: "0 0 0 2px var(--ap-blue)", borderColor: "var(--ap-blue)" } : { boxShadow: `0 0 0 2px ${m.color}`, background: `color-mix(in srgb, ${m.color} 7%, var(--card))` }) : undefined}
+              className={cn("flex shrink-0 bg-card text-left transition-shadow rounded-sm shadow-card", mobile ? "h-11 flex-row items-center gap-2 px-3" : "flex-col items-start gap-1.5 p-2.5")}
+              style={active ? { boxShadow: `0 0 0 2px ${m.color}`, background: `color-mix(in srgb, ${m.color} 7%, var(--card))` } : undefined}
             >
               <span className="flex size-[22px] items-center justify-center rounded-full" style={{ background: m.color }}>
                 <Icon className="size-3 text-primary-foreground" strokeWidth={1.7} />
@@ -154,11 +189,12 @@ export function Inspector({
           );
         })}
       </div>
+      )}
 
       {embedded ? (
-        <div className="mt-6 flex items-center gap-2 text-[12px] font-semibold tracking-[0.06em] text-ap-body uppercase">
+        <div className="mt-5 flex items-center gap-2 text-[12px] font-semibold tracking-[0.06em] text-ap-body uppercase">
           {meta.label} · Frame {frameIndex + 1}
-          <span className="ml-auto font-normal tracking-normal normal-case nums">{scope}</span>
+          <span className="ml-auto font-normal tracking-normal normal-case nums">{selected === "logo" ? "Whole video" : `Frame ${frameIndex + 1}`}</span>
         </div>
       ) : (
       <div className="mt-4 flex items-center gap-2">
@@ -169,7 +205,19 @@ export function Inspector({
       )}
 
       <div className={cn("mt-3 space-y-4", embedded ? "" : "rounded-sm bg-card p-4 shadow-card")}>
-        {selected === "photo" && <PhotoPanel photo={frame.photo ?? {}} adjusting={adjusting} actions={actions} />}
+        {selected === "photo" && (
+          <PhotoPanel
+            photo={frame.photo ?? {}}
+            frameIndex={frameIndex}
+            hasWords={Boolean(frame.headline?.text?.trim() || frame.subline?.text?.trim())}
+            brandName={brandName}
+            brandColors={(kit?.colors ?? []).map((c) => c.toUpperCase())}
+            image={image}
+            keyframe={keyframe}
+            onKeyframe={onKeyframe}
+            actions={actions}
+          />
+        )}
         {(selected === "headline" || selected === "subline") && (
           <TextPanel key={selected} el={selected} text={frame[selected]} colors={colors} onChange={(p, k) => actions.onText(selected, p, k)} />
         )}
