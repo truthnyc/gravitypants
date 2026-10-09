@@ -34,8 +34,7 @@ export const Route = createFileRoute("/directory/$slug")({
     if (!loaderData?.brand) return { meta: [{ title: "Not in the Directory right now — Gravity Pants" }, { name: "robots", content: "noindex" }] };
     const b = loaderData.brand;
     const aim = loaderData.site === "aimante";
-    const hasImage = b.logo_url?.startsWith("https://") || loaderData.reels.some((r) => r.poster);
-    const image = hasImage ? `${ORIGIN}/api/public/og/brand/${params.slug}` : undefined;
+    // Every gravitypants.com page shares the home page card (og-cover.jpg), so no per-brand image.
     const head = aim ? aimanteHead({
       path: `/b/${params.slug}`,
       title: `${b.name} video ads — Aimanté`,

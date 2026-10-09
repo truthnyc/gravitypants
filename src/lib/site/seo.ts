@@ -3,8 +3,9 @@ export const SITE_ORIGIN = "https://gravitypants.com";
 export const SITE_NAME = "Gravity Pants";
 /** Absolute URL: social networks never resolve bundled or relative image paths. */
 export const SITE_OG_IMAGE = `${SITE_ORIGIN}/og-cover.jpg`;
-export const SHOWCASE_OG_IMAGE = `${SITE_ORIGIN}/og-showcase.jpg`;
-export const EXAMPLES_OG_IMAGE = `${SITE_ORIGIN}/og-examples.jpg`;
+// Every gravitypants.com page shares the home page card.
+export const SHOWCASE_OG_IMAGE = SITE_OG_IMAGE;
+export const EXAMPLES_OG_IMAGE = SITE_OG_IMAGE;
 
 type HeadInput = {
   /** Route path starting with a slash, e.g. "/pricing". */
