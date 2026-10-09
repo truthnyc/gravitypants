@@ -28,6 +28,7 @@ import { cn } from "@/lib/utils";
 import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { uploadMedia } from "@/lib/stillframe/media";
+import { clampFrameSeconds, matchingPace, FRAME_MIN_SECONDS, FRAME_MAX_SECONDS } from "./frame-timing";
 
 const ICONS: Record<ElementKey, typeof Type> = {
   photo: ImageIcon,
@@ -131,8 +132,8 @@ export function Inspector({
   return (
     <aside className={cn("flex shrink-0 flex-col", embedded ? "w-full" : "overflow-y-auto bg-inspector p-4", mobile ? "h-full w-full" : embedded ? "" : "hidden w-[344px] lg:flex")}>
       {!hideKit && <BrandKitRow embedded={embedded} kits={kits} kitId={kitId} onKit={actions.onKit} />}
-      <div className={cn(mobile ? "flex gap-2 overflow-x-auto pb-1" : embedded ? "ap-tiles grid grid-cols-3 gap-2 sm:grid-cols-6" : "grid grid-cols-3 gap-2")}>
-        {(Object.keys(ELEMENT_META) as ElementKey[]).map((el) => {
+      <div className={cn(mobile ? "flex gap-2 overflow-x-auto pb-1" : embedded ? "ap-tiles grid grid-cols-2 gap-2 sm:grid-cols-4" : "grid grid-cols-2 gap-2")}>
+        {(["photo", "headline", "subline", "logo"] as ElementKey[]).map((el) => {
           const m = ELEMENT_META[el];
           const Icon = ICONS[el];
           const active = selected === el;
@@ -175,8 +176,6 @@ export function Inspector({
         {selected === "logo" && (
           <LogoPanel logo={doc.project.logo} format={format} frame={frame} hasLogo={hasLogo} kit={kit} actions={actions} />
         )}
-        {selected === "timing" && <TimingPanel frames={doc.frames} frame={frame} actions={actions} endSeconds={endSeconds} />}
-        {selected === "transition" && <TransitionPanel frames={doc.frames} frame={frame} first={frameIndex === 0} actions={actions} />}
       </div>
     </aside>
   );
@@ -924,27 +923,27 @@ function LogoPanel({
 
 /* ---------------- Timing */
 
-function TimingPanel({ frames, frame, actions, endSeconds }: { frames: Frame[]; frame: Frame; actions: InspectorActions; endSeconds: number }) {
+export function TimingPanel({ frames, frame, actions, endSeconds }: { frames: Frame[]; frame: Frame; actions: InspectorActions; endSeconds: number }) {
   const d = frame.duration_sec;
   const same = actions.sameLength;
-  const pace = (Object.keys(PACE_SECONDS) as Pace[]).find((p) => frames.every((f) => f.duration_sec === PACE_SECONDS[p]));
-  const set = (v: number) => actions.onDuration(Math.max(0.5, Math.min(15, Math.round(v * 2) / 2)));
+  const pace = matchingPace(frames);
+  const set = (v: number) => actions.onDuration(clampFrameSeconds(v));
   return (
     <>
       <Field label="Show this frame for">
         <div className="flex items-center justify-between">
-          <Button variant="default" size="icon" aria-label="Shorter" onClick={() => set(d - 0.5)} disabled={d <= 0.5}>
+          <Button variant="default" size="icon" aria-label="Shorter" onClick={() => set(d - 0.5)} disabled={d <= FRAME_MIN_SECONDS}>
             <Minus strokeWidth={1.7} />
           </Button>
           <div className="text-center">
             <span className="text-[34px] font-semibold tracking-[-0.02em] nums">{formatSeconds(d)}</span>
             <span className="ml-1 text-[13px] text-secondary-text">seconds</span>
           </div>
-          <Button variant="default" size="icon" aria-label="Longer" onClick={() => set(d + 0.5)} disabled={d >= 15}>
+          <Button variant="default" size="icon" aria-label="Longer" onClick={() => set(d + 0.5)} disabled={d >= FRAME_MAX_SECONDS}>
             <Plus strokeWidth={1.7} />
           </Button>
         </div>
-        <ElementSlider name="Frame length" color="var(--el-timing)" min={0.5} max={10} step={0.5} value={d} onChange={(v, k) => actions.onDuration(v, k)} />
+        <ElementSlider name="Frame length" color="var(--ap-blue)" min={FRAME_MIN_SECONDS} max={FRAME_MAX_SECONDS} step={0.5} value={d} onChange={(v, k) => actions.onDuration(clampFrameSeconds(v), k)} />
       </Field>
       <Field label="Pace for the whole video">
         <Segmented
@@ -978,7 +977,7 @@ const TR_ANIM: Record<TransitionSettings["type"], string> = {
   dip_black: "tr-dip-b",
 };
 
-function TransitionPanel({ frames, frame, first, actions }: { frames: Frame[]; frame: Frame; first: boolean; actions: InspectorActions }) {
+export function TransitionPanel({ frames, frame, first, actions }: { frames: Frame[]; frame: Frame; first: boolean; actions: InspectorActions }) {
   if (first) {
     return (
       <p className="py-2 text-center text-[13px] text-secondary-text">The first frame starts the video.</p>
@@ -990,21 +989,21 @@ function TransitionPanel({ frames, frame, first, actions }: { frames: Frame[]; f
     <>
       <div className="grid grid-cols-3 gap-2">
         {(Object.keys(TRANSITION_LABEL) as TransitionSettings["type"][]).map((type) => (
-          <button
+          <Button variant="ghost"
             key={type}
             type="button"
             data-type={type}
             aria-pressed={tr.type === type}
             onClick={() => actions.onTransition({ type })}
-            className={cn("tr-tile flex flex-col items-center gap-1.5 rounded-sm p-1.5", tr.type === type ? "ring-2 ring-primary" : "ring-1 ring-border")}
+            className={cn("tr-tile h-auto min-w-0 flex flex-col items-center gap-1.5 rounded-sm p-1.5", tr.type === type ? "ring-2 ring-primary" : "ring-1 ring-border")}
             style={{ "--tr-anim": TR_ANIM[type] } as React.CSSProperties}
           >
-            <span className="relative block h-12 w-full overflow-hidden rounded-[3px] bg-secondary-text/40">
-              <span className="tr-b absolute inset-0 bg-el-photo/80" />
+            <span className="relative block h-12 w-full overflow-hidden rounded-[3px] bg-ap-panel">
+              <span className="tr-b absolute inset-0 bg-ap-blue" />
               {type === "dip_black" && <span className="tr-k absolute inset-0 bg-foreground" />}
             </span>
-            <span className="text-[12px] font-medium">{TRANSITION_LABEL[type]}</span>
-          </button>
+            <span className="text-[11px] font-medium">{TRANSITION_LABEL[type]}</span>
+          </Button>
         ))}
       </div>
       <Field label="Speed">

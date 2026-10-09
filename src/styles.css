@@ -437,8 +437,11 @@
 .tr-tile[data-type="slide"] .tr-b, .tr-tile[data-type="wipe"] .tr-b { opacity: 1; }
 .tr-tile[data-type="slide"] .tr-b { transform: translateX(100%); }
 .tr-tile[data-type="wipe"] .tr-b { clip-path: inset(0 100% 0 0); }
-.tr-tile:hover .tr-b { animation: var(--tr-anim) 1.4s ease-in-out infinite; }
-.tr-tile:hover .tr-k { animation: tr-dip-k 1.4s ease-in-out infinite; }
+.tr-tile:hover .tr-b, .tr-tile:focus-visible .tr-b { animation: var(--tr-anim) 1.4s ease-in-out infinite; }
+.tr-tile:hover .tr-k, .tr-tile:focus-visible .tr-k { animation: tr-dip-k 1.4s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .tr-tile .tr-b, .tr-tile .tr-k { animation: none !important; }
+}
 
 /* Public home reference: page-specific palette and layout; app styles remain untouched. */
 :root {
@@ -1159,7 +1162,7 @@ html:has(.acct), body:has(.acct), body:has(.acct) .bg-canvas { background: var(-
   .ap-steps-main.ap-large .ap-preview-box { height: min(78vh, 860px); }
   .ap-steps-main.ap-large .ap-step-inner { max-width: 760px; margin-inline: auto; }
 }
-.ap-steps-main.ap-large .ap-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.ap-steps-main.ap-large .ap-tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .ap-steps-main.ap-large .ap-gif-grid { grid-template-columns: minmax(0, 1fr); }
 
 @keyframes dir-mood { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }

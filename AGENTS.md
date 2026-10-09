@@ -11,7 +11,7 @@
 
 ## Stillframe architecture rules
 
-- Project/frame reads and writes use `src/lib/stillframe/data.ts` hooks for centralized autosave.
+- Project/frame data uses `data.ts` autosave; strip popovers reuse Inspector panels and editor undo actions to avoid parallel logic.
 - Domain types and shared constants (workspace id, formats, defaults) live in `src/lib/stillframe/types.ts`.
 - The `media` storage bucket is private; resolve image URLs with `getMediaUrl()` in `src/lib/stillframe/media.ts` (workspace policy blocks public buckets).
 - Colors use semantic tokens in `src/styles.css`, never raw component colors.

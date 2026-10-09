@@ -86,7 +86,7 @@ const dur = (f: Frame | undefined) => Math.max(0.1, Number(f?.duration_sec ?? 2.
 
 export function transitionDuration(tr?: TransitionSettings | null) {
   if (!tr || tr.type === "cut") return 0;
-  return tr.speed === "quick" ? 0.3 : 0.6;
+  return tr.speed === "quick" ? 0.35 : 0.75;
 }
 
 /** Incoming transition length for frame j, clamped so it never exceeds either neighbour. */
