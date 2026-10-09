@@ -36,7 +36,9 @@ export function FrameRail({ doc, format, frameIndex, images, version, uploading,
     if (!e.currentTarget.contains(e.target as Node)) return;
     if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
     e.preventDefault(); e.stopPropagation();
-    const next = Math.max(0, Math.min(doc.frames.length - 1, frameIndex + (e.key === "ArrowLeft" ? -1 : 1)));
+    const focused = (e.target as HTMLElement).closest<HTMLElement>("[data-select-frame]")?.dataset["selectFrame"];
+    const from = focused === undefined ? frameIndex : Number(focused);
+    const next = Math.max(0, Math.min(doc.frames.length - 1, from + (e.key === "ArrowLeft" ? -1 : 1)));
     onSelect(next); navRef.current?.querySelector<HTMLButtonElement>(`[data-select-frame="${next}"]`)?.focus();
   }}>
     {doc.frames.map((frame, i) => <div key={frame.id} className="flex shrink-0 items-start gap-2">
