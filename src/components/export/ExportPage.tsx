@@ -378,13 +378,39 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
         </>
       ) : (
         <>
-          <StepTitle title="Where will this ad play?" lead="Pick every place you'll post it. You'll get a file in the right size for each." />
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-            {CHANNELS.map((c) => (
-              <ChannelCard key={c.id} name={c.name} format={c.format} size={FORMAT_SIZE[c.format]} selected={selected.has(c.id)} onClick={() => toggle(c.id)} project={project} frames={frames} brand={brand} images={images} />
-            ))}
-            <CustomCard value={custom} onChange={setCustom} />
+          <StepTitle title="Where will this ad play?" lead="Pick the shapes you need. One file per shape works everywhere listed under it." />
+          <div className="-mt-2 mb-4 flex flex-wrap items-center gap-2">
+            <span className="mr-1 text-[13px] text-ap-muted">Posting to</span>
+            {PLATFORMS.map((p) => {
+              const st = platformState(p.id, selected);
+              return (
+                <button
+                  key={p.id}
+                  type="button"
+                  aria-pressed={st === "on" ? true : st === "mixed" ? "mixed" : false}
+                  onMouseEnter={() => setHoverP(p.id)}
+                  onMouseLeave={() => setHoverP(null)}
+                  onFocus={() => setHoverP(p.id)}
+                  onBlur={() => setHoverP(null)}
+                  onClick={() => changeSizes(togglePlatform(p.id, selected))}
+                  className={cn(
+                    "inline-flex min-h-0 items-center gap-1 rounded-full px-3 py-1.5 text-[13px] font-medium transition-colors",
+                    st === "on" ? "bg-ap-ink text-ap-card" : st === "mixed" ? "bg-ap-soft-blue text-ap-blue" : "bg-ap-panel text-ap-ink hover:bg-ap-inner",
+                  )}
+                >
+                  {st === "on" && <Check className="size-3" strokeWidth={2.5} />}
+                  {p.name}
+                </button>
+              );
+            })}
           </div>
+          <div className="flex flex-col gap-2.5">
+            {EXPORT_SIZES.map((s) => (
+              <SizeCard key={s.id} size={s} selected={selected.has(s.id)} pulse={pulse.has(s.id)} hover={hoverP} onClick={() => toggleSize(s.id)} project={project} frames={frames} brand={brand} images={images} />
+            ))}
+            <CustomSizes on={customOn} setOn={setCustomOn} rows={customs} setRows={setCustoms} />
+          </div>
+          <p className="mt-3 text-[13px] text-ap-muted">Posting to Reels and TikTok? One vertical file covers both.</p>
 
           {issues.length > 0 && (
             <div className="mt-5 space-y-2">
@@ -401,32 +427,34 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
 
           <AppSectionLabel className="mt-7 mb-2.5">Save as</AppSectionLabel>
           <div className="grid grid-cols-2 gap-3">
-            <PickCard on={mp4} onClick={() => setMp4((v) => !v)} icon={<Film className="size-4" strokeWidth={1.7} />} title="Video MP4" sub="With motion" />
+            <PickCard on={mp4} onClick={() => setMp4((v) => !v)} icon={<Film className="size-4" strokeWidth={1.7} />} title="Video MP4" sub="With motion and sound" />
             <PickCard on={gif} onClick={() => (gif || canUse("gif") ? setGif((v) => !v) : openUpgrade("gif"))} icon={<ImageIcon className="size-4" strokeWidth={1.7} />} title="Animated GIF" sub="Plays anywhere, no sound" />
           </div>
 
-          {mp4 && (
-            <>
-              <div className="mt-5 mb-2 text-[13px] font-semibold">Video motion</div>
-              <Seg value={fps} onChange={setFps} options={[{ v: 30, l: "Standard", s: "30 fps" }, { v: 60, l: "Smooth", s: "60 fps" }, { v: 24, l: "Film", s: "24 fps" }]} />
-            </>
-          )}
+          <Reveal show={mp4}>
+            <div className="mt-5 mb-2 text-[13px] font-semibold" id="vm-label">Video motion</div>
+            <Seg label="Video motion" value={fps} onChange={setFps} options={[{ v: 30, l: "Standard", s: "30 fps" }, { v: 60, l: "Smooth", s: "60 fps" }, { v: 24, l: "Film", s: "24 fps" }]} />
+          </Reveal>
 
-          {gif && (
+          <Reveal show={gif}>
             <div className="mt-6 border-t border-ap-hairline pt-5">
               <AppSectionLabel className="mb-3">GIF quality</AppSectionLabel>
               <div className="ap-gif-grid grid gap-4 sm:grid-cols-2">
-                <Sub label="Size"><Seg value={gSize} onChange={setGSize} options={[{ v: "full", l: "Full", s: "same as video" }, { v: "half", l: "Half" }, { v: "small", l: "Small", s: "480 px" }]} /></Sub>
-                <Sub label="Colors"><Seg value={gColors} onChange={setGColors} options={[{ v: "best", l: "Best" }, { v: "balanced", l: "Balanced" }, { v: "smallest", l: "Smallest" }]} /></Sub>
-                <Sub label="Frame rate"><Seg value={gFps} onChange={setGFps} options={[{ v: 25, l: "Smooth", s: "25 fps" }, { v: 15, l: "Light", s: "15 fps" }, { v: 10, l: "Minimal", s: "10 fps" }]} /></Sub>
-                <Sub label="Loop"><Seg value={gLoop} onChange={setGLoop} options={[{ v: "forever", l: "Forever" }, { v: "once", l: "Once" }]} /></Sub>
+                <Sub label="Size"><Seg label="GIF size" value={gSize} onChange={setGSize} options={[{ v: "full", l: "Full", s: "same as video" }, { v: "half", l: "Half" }, { v: "small", l: "Small", s: "480 px" }]} /></Sub>
+                <Sub label="Colors"><Seg label="GIF colors" value={gColors} onChange={setGColors} options={[{ v: "best", l: "Best" }, { v: "balanced", l: "Balanced" }, { v: "smallest", l: "Smallest" }]} /></Sub>
+                <Sub label="Frame rate"><Seg label="GIF frame rate" value={gFps} onChange={setGFps} options={[{ v: 25, l: "Smooth", s: "25 fps" }, { v: 15, l: "Light", s: "15 fps" }, { v: 10, l: "Minimal", s: "10 fps" }]} /></Sub>
+                <Sub label="Loop"><Seg label="GIF loop" value={gLoop} onChange={setGLoop} options={[{ v: "forever", l: "Forever" }, { v: "once", l: "Once" }]} /></Sub>
               </div>
               <p className="mt-3 text-[12px] text-ap-muted">Full-size GIFs are large files. Pick a smaller size for email.</p>
             </div>
-          )}
+          </Reveal>
 
-          <div className="mt-6 rounded-[14px] bg-ap-panel p-4 text-[14px]">
-            <p className="nums"><b>{files.length} {files.length === 1 ? "file" : "files"}</b>{summaryLine && ` · ${summaryLine}`} · {formatSeconds(seconds)} seconds each</p>
+          <div className="mt-6 rounded-[14px] bg-ap-panel p-4 text-[14px]" aria-live="polite">
+            {files.length ? (
+              <p className="nums"><b>{files.length} {files.length === 1 ? "file" : "files"}</b> · {targets.map((t) => t.name).join(" + ")} · {[mp4 && "MP4", gif && "GIF"].filter(Boolean).join(" + ")} · {formatSeconds(seconds)} sec each</p>
+            ) : (
+              <p><b>Nothing to export yet</b> · {targets.length ? "pick a file type" : "pick at least one size"}</p>
+            )}
             <p className="mt-1 text-[13px] text-ap-muted nums">
               {[
                 exportStatus?.limit != null ? `${Math.max(0, exportStatus.limit - (exportStatus.used ?? 0))} of ${exportStatus.limit} left${exportStatus.trial ? " in your free trial" : " this month"}` : null,
