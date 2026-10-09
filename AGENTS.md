@@ -24,7 +24,7 @@
 - Client RPCs use granted public SECURITY INVOKER wrappers over non-exposed private definer implementations; preserve identity/workspace guards and RPC names to keep RLS and account access safe.
 - Billing: per-workspace in `workspace_billing` (synced only by /api/public/payments/webhook), plans in `plans`; export gating via SQL `export_status`/`record_export` plus a restrictive storage policy on `<ws>/exports/` — the browser is never trusted for plan status.
 - AI calls go through `src/lib/ai/gateway.server.ts`; the billing helper is `diagnoseBilling` in `billing-help.functions.ts`, owners/admins only.
-- Brand kits: named kits live in `brand_kits` (logos in private `brand-assets` bucket, paths prefixed `brand-assets:` so `getMediaUrl` picks the bucket); ads link via `projects.brand_kit_id`; `effectiveKit()` merges the kit over the legacy `brand_kit` row, which now only holds workspace ad settings (placement, size, end card). Gating via SQL `brand_kits_enabled()` in RLS.
+- Brand kits: `brand_kits` (logos in private `brand-assets` bucket, `brand-assets:` path prefix for `getMediaUrl`); ads link via `projects.brand_kit_id`; `effectiveKit()` merges over the legacy `brand_kit` row (workspace ad settings only). Gated by SQL `brand_kits_enabled()` in RLS.
 - Templates are photo-less styles; examples reuse `insertCopy`; imported system templates preserve per-slide overrides and logo visibility.
 
 - Plan gates: every feature check goes through `usePlanAccess().canUse(feature)` in `src/lib/stillframe/plan.ts`; blocked features call `openUpgrade()` (one shared dialog) instead of hiding — one place for plan rules.
