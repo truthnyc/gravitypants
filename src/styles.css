@@ -1283,3 +1283,9 @@ p.concept-reel-notice { font-size: 10px !important; }
 @media (max-width: 767px) {
   .brand-auth .auth-google, .brand-auth .auth-input-wrap input, .brand-auth .auth-submit { height: 50px; }
 }
+
+/* Export step: size card pulse + smooth reveal */
+@keyframes ap-pulse-ring { 0% { box-shadow: 0 0 0 1px var(--ap-blue), 0 0 0 0 color-mix(in srgb, var(--ap-blue) 45%, transparent); } 100% { box-shadow: 0 0 0 1px var(--ap-blue), 0 0 0 8px transparent; } }
+.ap-pulse { animation: ap-pulse-ring 0.6s ease-out 1; }
+.ap-reveal { transition: grid-template-rows 0.3s cubic-bezier(.2,.8,.2,1); }
+@media (prefers-reduced-motion: reduce) { .ap-pulse { animation: none; } .ap-reveal { transition: none; } }

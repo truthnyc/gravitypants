@@ -5,7 +5,7 @@ import { Link } from "@tanstack/react-router";
 import { KitAgainButton } from "@/components/templates/KitAgain";
 import { TRIAL, planById } from "@/lib/stillframe/plans-config";
 import { getSignupChoice } from "@/lib/stillframe/signup-choice";
-import { AlertCircle, Check, ChevronDown, ChevronLeft, ChevronRight, Download, Film, Image as ImageIcon } from "lucide-react";
+import { AlertCircle, Check, ChevronDown, ChevronLeft, ChevronRight, Download, Film, Image as ImageIcon, Plus, X } from "lucide-react";
 import { AppButton, AppSectionLabel } from "@/components/app-ui";
 import { SHOW_SHARE } from "@/lib/features";
 import { ReelCard, StepActions, StepShell, StepTitle } from "@/components/app-ui/StepShell";
@@ -560,9 +560,9 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
 
 /* ================================================================== pieces */
 
-function MiniRender({ project, frames, brand, images, format, width, index = 0 }: { project: Project; frames: Frame[]; brand: BrandStyle; images: Map<string, HTMLImageElement> | null; format: Format; width: number; index?: number }) {
+function MiniRender({ project, frames, brand, images, format, width, index = 0, w: outW, h: outH }: { project: Project; frames: Frame[]; brand: BrandStyle; images: Map<string, HTMLImageElement> | null; format: Format; width: number; index?: number; w?: number; h?: number }) {
   const ref = useRef<HTMLCanvasElement>(null);
-  const s = FORMAT_SIZE[format];
+  const s = outW && outH ? { width: outW, height: outH } : FORMAT_SIZE[format];
   const W = Math.round(width * 2);
   const H = Math.round((W * s.height) / s.width);
   useEffect(() => {
@@ -573,83 +573,170 @@ function MiniRender({ project, frames, brand, images, format, width, index = 0 }
   return <canvas ref={ref} width={W} height={H} className="max-w-full rounded-[2px] bg-control-fill" style={{ width, height: H / 2 }} />;
 }
 
-function ChannelCard(props: {
-  name: string;
-  format: Format;
-  size: { width: number; height: number };
+/** Left preview: the ad drawn by renderAt at the chosen size's shape. */
+function ExportStage({ target, time, project, frames, brand, images }: { target: Target; time: number; project: Project; frames: Frame[]; brand: BrandStyle; images: Map<string, HTMLImageElement> | null }) {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const scale = Math.min(1, 900 / Math.max(target.width, target.height));
+  const W = Math.round(target.width * scale);
+  const H = Math.round(target.height * scale);
+  useEffect(() => {
+    const ctx = ref.current?.getContext("2d");
+    if (!ctx || !images) return;
+    renderAt(ctx, project, frames, target.format, time, { width: W, height: H, images, brand });
+  }, [project, frames, brand, images, target.format, W, H, time]);
+  const wide = target.width >= target.height;
+  return (
+    <>
+      <div className="flex h-full w-full items-center justify-center">
+        <canvas
+          ref={ref}
+          width={W}
+          height={H}
+          className="ap-stage-shape rounded-[4px] bg-ap-inner shadow-ap-soft"
+          style={{ aspectRatio: `${target.width} / ${target.height}`, width: wide ? "100%" : "auto", height: wide ? "auto" : "100%", maxWidth: "100%", maxHeight: "100%" }}
+        />
+      </div>
+      <span className="absolute bottom-2.5 left-2.5 rounded-full bg-ap-card px-2 py-0.5 text-[11px] text-ap-muted shadow-ap-soft nums">
+        {target.width.toLocaleString()} × {target.height.toLocaleString()}
+      </span>
+    </>
+  );
+}
+
+function SizeCard({ size, selected, pulse, hover, onClick, ...r }: {
+  size: (typeof EXPORT_SIZES)[number];
   selected: boolean;
+  pulse: boolean;
+  hover: PlatformId | null;
   onClick: () => void;
   project: Project;
   frames: Frame[];
   brand: BrandStyle;
   images: Map<string, HTMLImageElement> | null;
 }) {
-  const { name, format, size, selected, onClick } = props;
-  const w = format === "9:16" ? 68 : format === "1:1" ? 110 : 150;
+  const ratio = size.width / size.height;
+  const thumbW = ratio >= 1 ? 44 : Math.round(44 * ratio);
   return (
     <button
       type="button"
+      role="checkbox"
+      aria-checked={selected}
       onClick={onClick}
-      aria-pressed={selected}
-      className={cn("relative flex flex-col items-center rounded-[14px] border bg-ap-card p-3 text-center", selected ? "border-ap-blue shadow-[0_0_0_1px_var(--ap-blue)]" : "border-ap-hairline")}
+      className={cn("flex w-full items-center gap-3.5 rounded-[14px] border bg-ap-card p-3 text-left sm:p-3.5", selected ? "border-ap-blue shadow-[0_0_0_1px_var(--ap-blue)]" : "border-ap-hairline", pulse && "ap-pulse")}
     >
-      <span className={cn("absolute top-2 right-2 grid size-5 place-items-center rounded-full", selected ? "bg-ap-blue text-ap-card" : "border-[1.5px] border-ap-hairline")}>
+      <span className="grid size-16 shrink-0 place-items-center rounded-[10px] bg-ap-panel">
+        <MiniRender {...r} format={size.layout} width={thumbW} w={size.width} h={size.height} />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
+          <span className="text-[16px] font-semibold">{size.name}</span>
+          <span className="text-[15px] text-ap-muted nums">{size.ratio}</span>
+          {size.badge && <span className="rounded-md bg-ap-soft-blue px-1.5 py-0.5 text-[11px] font-medium text-ap-blue">{size.badge}</span>}
+        </span>
+        <span className="mt-0.5 block text-[13px] leading-snug text-ap-muted">
+          <span className="nums">{size.width.toLocaleString()} × {size.height.toLocaleString()}</span>
+          {" "}
+          {size.uses.map((u, i) => (
+            <span key={u.label}>
+              <span className={cn("transition-colors", hover && u.platforms.includes(hover) && "font-medium text-ap-blue")}>{u.label}</span>
+              {i < size.uses.length - 1 && " · "}
+            </span>
+          ))}
+        </span>
+      </span>
+      <span className={cn("grid size-[22px] shrink-0 place-items-center rounded-full", selected ? "bg-ap-blue text-ap-card" : "border-[1.5px] border-ap-hairline")}>
         {selected && <Check className="size-3" strokeWidth={2.5} />}
       </span>
-      <span className="mt-1 block px-4 text-[13px] font-semibold leading-tight">{name}</span>
-      <span className="mt-0.5 block text-[11px] text-ap-muted nums">{format} · {size.width} × {size.height}</span>
-      <div className="mt-2.5 flex h-[96px] w-full items-center justify-center">
-        <MiniRender {...props} width={Math.round(w * 0.62)} />
-      </div>
     </button>
   );
 }
 
-function CustomCard({ value, onChange }: { value: { on: boolean; w: number; h: number }; onChange: (v: { on: boolean; w: number; h: number }) => void }) {
-  const input = (k: "w" | "h", label: string) => (
-    <input
-      type="number"
-      aria-label={label}
-      min={64}
-      max={3840}
-      value={value[k] || ""}
-      onClick={(e) => e.stopPropagation()}
-      onChange={(e) => onChange({ ...value, on: true, [k]: Number(e.target.value) })}
-      className="h-9 w-[64px] rounded-lg border border-ap-hairline bg-ap-card px-2 text-center text-[13px] nums"
-    />
-  );
+function CustomSizes({ on, setOn, rows, setRows }: { on: boolean; setOn: (v: boolean) => void; rows: CustomRow[]; setRows: (r: CustomRow[]) => void }) {
+  const toggle = () => {
+    if (!on && !rows.length) setRows([{ id: rid(), w: "", h: "" }]);
+    setOn(!on);
+  };
+  const update = (id: string, k: "w" | "h", v: string) => setRows(rows.map((r) => (r.id === id ? { ...r, [k]: v.replace(/[^0-9]/g, "") } : r)));
+  const preset = (w: number, h: number) => {
+    if (rows.some((r) => num(r.w) === w && num(r.h) === h)) return;
+    const empty = rows.find((r) => !r.w && !r.h);
+    setRows(empty ? rows.map((r) => (r === empty ? { ...r, w: String(w), h: String(h) } : r)) : [...rows, { id: rid(), w: String(w), h: String(h) }]);
+  };
   return (
-    <div
-      role="button"
-      tabIndex={0}
-      aria-pressed={value.on}
-      onClick={() => onChange({ ...value, on: !value.on })}
-      onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && e.target === e.currentTarget && onChange({ ...value, on: !value.on })}
-      className={cn("relative flex cursor-pointer flex-col items-center rounded-[14px] border border-dashed bg-ap-card p-3 text-center", value.on ? "border-solid border-ap-blue shadow-[0_0_0_1px_var(--ap-blue)]" : "border-ap-hairline")}
-    >
-      <span className={cn("absolute top-2 right-2 grid size-5 place-items-center rounded-full", value.on ? "bg-ap-blue text-ap-card" : "border-[1.5px] border-ap-hairline")}>
-        {value.on && <Check className="size-3" strokeWidth={2.5} />}
-      </span>
-      <span className="mt-1 block text-[13px] font-semibold">Custom size</span>
-      <span className="mt-0.5 block text-[11px] text-ap-muted nums">Any width × height</span>
-      <div className="mt-2.5 flex h-[96px] items-center justify-center gap-1.5 text-[13px] text-ap-muted">
-        {input("w", "Width in pixels")} × {input("h", "Height in pixels")}
-      </div>
+    <div className={cn("rounded-[14px] border bg-ap-card", on ? "border-ap-blue shadow-[0_0_0_1px_var(--ap-blue)]" : "border-dashed border-ap-hairline")}>
+      <button type="button" role="checkbox" aria-checked={on} onClick={toggle} className="flex w-full items-center gap-3.5 p-3 text-left sm:p-3.5">
+        <span className="grid size-16 shrink-0 place-items-center rounded-[10px] bg-ap-panel text-ap-muted"><Plus className="size-5" strokeWidth={1.7} /></span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-[16px] font-semibold">Custom size</span>
+          <span className="mt-0.5 block text-[13px] text-ap-muted">Any width × height, for ad networks and banners</span>
+        </span>
+        <span className={cn("grid size-[22px] shrink-0 place-items-center rounded-full", on ? "bg-ap-blue text-ap-card" : "border-[1.5px] border-ap-hairline")}>
+          {on && <Check className="size-3" strokeWidth={2.5} />}
+        </span>
+      </button>
+      <Reveal show={on}>
+        <div className="space-y-3 px-3 pb-3.5 sm:px-3.5">
+          {rows.map((r, i) => {
+            const w = num(r.w), h = num(r.h);
+            const err = r.w || r.h ? customError(w, h) : null;
+            const eid = `cs-err-${r.id}`;
+            return (
+              <div key={r.id}>
+                <div className="flex flex-wrap items-center gap-2 text-[13px]">
+                  <label className="sr-only" htmlFor={`cw-${r.id}`}>Width in pixels, size {i + 1}</label>
+                  <input id={`cw-${r.id}`} inputMode="numeric" placeholder="Width" value={r.w} onChange={(e) => update(r.id, "w", e.target.value)} aria-invalid={!!err} aria-describedby={err ? eid : undefined}
+                    className="h-9 w-[84px] rounded-lg border border-ap-hairline bg-ap-card px-2 text-center nums" />
+                  <span className="text-ap-muted">×</span>
+                  <label className="sr-only" htmlFor={`ch-${r.id}`}>Height in pixels, size {i + 1}</label>
+                  <input id={`ch-${r.id}`} inputMode="numeric" placeholder="Height" value={r.h} onChange={(e) => update(r.id, "h", e.target.value)} aria-invalid={!!err} aria-describedby={err ? eid : undefined}
+                    className="h-9 w-[84px] rounded-lg border border-ap-hairline bg-ap-card px-2 text-center nums" />
+                  <span className="text-ap-muted">px</span>
+                  {!err && w && h && <span className="text-ap-muted nums">{ratioLabel(w, h)}</span>}
+                  {rows.length > 1 && (
+                    <button type="button" aria-label={`Remove size ${i + 1}`} onClick={() => setRows(rows.filter((x) => x.id !== r.id))} className="ml-auto grid size-8 min-h-0 min-w-0 place-items-center rounded-lg text-ap-muted hover:bg-ap-panel">
+                      <X className="size-4" strokeWidth={1.7} />
+                    </button>
+                  )}
+                </div>
+                {err && <p id={eid} className="mt-1 text-[12px] text-destructive">{err}</p>}
+              </div>
+            );
+          })}
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="mr-1 text-[12px] text-ap-muted">Quick add</span>
+            {CUSTOM_PRESETS.map((p) => (
+              <button key={p.label} type="button" onClick={() => preset(p.w, p.h)} className="min-h-0 rounded-full bg-ap-panel px-2.5 py-1 text-[12px] hover:bg-ap-inner">
+                <span className="nums">{p.w}×{p.h}</span> <span className="text-ap-muted">{p.label}</span>
+              </button>
+            ))}
+          </div>
+          <button type="button" onClick={() => setRows([...rows, { id: rid(), w: "", h: "" }])} className="min-h-0 text-[13px] font-medium text-ap-blue hover:underline">+ Add another size</button>
+          <p className="sr-only">Sizes from {CUSTOM_MIN} to {CUSTOM_MAX} px.</p>
+        </div>
+      </Reveal>
     </div>
   );
+}
+
+/** Smooth collapse; hidden content is inert so keyboard and screen readers skip it. Values are kept. */
+function Reveal({ show, children }: { show: boolean; children: React.ReactNode }) {
+  return (
+    <div className="ap-reveal grid" style={{ gridTemplateRows: show ? "1fr" : "0fr" }} inert={!show} aria-hidden={!show}>
+      <div className="min-h-0 overflow-hidden">{children}</div>
+    </div>
+  );
+}
+
+/** Rough file size estimate for the file list. */
+function estimateMb(f: FileRow, seconds: number, fps: number, gFps: number, colors: GifColors) {
+  const px = f.width * f.height * seconds;
+  const bytes = f.kind === "mp4" ? px * 0.24 * Math.sqrt(fps / 30) : px * gFps * 0.059 * (colors === "best" ? 1 : colors === "balanced" ? 0.75 : 0.5);
+  const mb = bytes / 1_000_000;
+  return mb < 10 ? mb.toFixed(1) : Math.round(mb).toString();
 }
 
 function IssueThumb({ project, frames, index, images, brand }: { project: Project; frames: Frame[]; index: number; images: Map<string, HTMLImageElement> | null; brand: BrandStyle }) {
   return <MiniRender project={project} frames={frames} brand={brand} images={images} format="1:1" width={36} index={index} />;
-}
-
-function Group({ label, children, className }: { label: string; children: React.ReactNode; className?: string }) {
-  return (
-    <div className={cn("rounded-sm bg-card p-4 shadow-card", className)}>
-      <div className="mb-2.5 text-[12px] font-medium text-secondary-text">{label}</div>
-      {children}
-    </div>
-  );
 }
 
 function Sub({ label, children }: { label: string; children: React.ReactNode }) {
@@ -661,14 +748,15 @@ function Sub({ label, children }: { label: string; children: React.ReactNode }) 
   );
 }
 
-function Seg<T extends string | number>({ value, onChange, options }: { value: T; onChange: (v: T) => void; options: { v: T; l: string; s?: string }[] }) {
+function Seg<T extends string | number>({ value, onChange, options, label }: { value: T; onChange: (v: T) => void; options: { v: T; l: string; s?: string }[]; label: string }) {
   return (
-    <div className="flex gap-[3px] rounded-[10px] bg-ap-panel p-[3px]">
+    <div role="radiogroup" aria-label={label} className="flex gap-[3px] rounded-[10px] bg-ap-panel p-[3px]">
       {options.map((o) => (
         <button
           key={String(o.v)}
           type="button"
-          aria-pressed={value === o.v}
+          role="radio"
+          aria-checked={value === o.v}
           onClick={() => onChange(o.v)}
           className={cn("flex min-h-10 flex-1 flex-col items-center justify-center rounded-[7px] px-1.5 py-1 text-[13px] leading-tight", value === o.v && "bg-ap-card font-semibold shadow-ap-soft")}
         >
@@ -682,9 +770,9 @@ function Seg<T extends string | number>({ value, onChange, options }: { value: T
 
 function PickCard({ on, onClick, icon, title, sub }: { on: boolean; onClick: () => void; icon: React.ReactNode; title: string; sub: string }) {
   return (
-    <button type="button" aria-pressed={on} onClick={onClick} className={cn("relative min-h-16 rounded-[14px] border bg-ap-card p-3.5 text-left", on ? "border-ap-blue shadow-[0_0_0_1px_var(--ap-blue)]" : "border-ap-hairline")}>
-      <span className={cn("absolute top-3 right-3 grid size-5 place-items-center rounded-full", on ? "bg-ap-blue text-ap-card" : "border-[1.5px] border-ap-hairline")}>
-        {on && <Check className="size-2.5" strokeWidth={2.5} />}
+    <button type="button" role="checkbox" aria-checked={on} onClick={onClick} className={cn("relative min-h-16 rounded-[14px] border bg-ap-card p-3.5 text-left", on ? "border-ap-blue shadow-[0_0_0_1px_var(--ap-blue)]" : "border-ap-hairline")}>
+      <span className={cn("absolute top-3 right-3 grid size-[22px] place-items-center rounded-full", on ? "bg-ap-blue text-ap-card" : "border-[1.5px] border-ap-hairline")}>
+        {on && <Check className="size-3" strokeWidth={2.5} />}
       </span>
       {icon}
       <div className="mt-2 text-[14px] font-semibold">{title}</div>
@@ -806,7 +894,7 @@ function PreviousExports({ projectId, version }: { projectId: string; version: n
             <ul className="space-y-1">
               {it.files.map((n) => (
                 <li key={n} className="flex items-center justify-between gap-2 text-[13px]">
-                  <span className="truncate">{n}</span>
+                  <span className="truncate">{n}{sizeLabelForFile(n) && <span className="ml-2 text-secondary-text">{sizeLabelForFile(n)}</span>}</span>
                   <Button variant="ghost" size="sm" onClick={() => void download(it.stamp, n)}>
                     <Download strokeWidth={1.7} /> Download
                   </Button>
