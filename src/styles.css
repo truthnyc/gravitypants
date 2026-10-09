@@ -1153,7 +1153,12 @@ html:has(.acct), body:has(.acct), body:has(.acct) .bg-canvas { background: var(-
 @media (max-width: 1099px) { .ap-steps-main.ap-large { --ap-left: 480px; } }
 @media (min-width: 1024px) { .ap-steps-main { grid-template-columns: var(--ap-left) minmax(0, 1fr); } }
 .ap-steps-main .ap-preview-box { transition: height 0.35s ease; }
-@media (min-width: 768px) { .ap-steps-main.ap-large .ap-preview-box { height: 640px; } }
+@media (min-width: 1024px) {
+  .ap-steps-main.ap-large { grid-template-columns: minmax(0, 1fr); max-width: 1100px; }
+  .ap-steps-main.ap-large > div:first-child { position: static; }
+  .ap-steps-main.ap-large .ap-preview-box { height: min(78vh, 860px); }
+  .ap-steps-main.ap-large .ap-step-inner { max-width: 760px; margin-inline: auto; }
+}
 .ap-steps-main.ap-large .ap-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .ap-steps-main.ap-large .ap-gif-grid { grid-template-columns: minmax(0, 1fr); }
 

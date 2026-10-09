@@ -97,7 +97,9 @@ export function Inspector({
   endSeconds = 0,
   mobile = false,
   embedded = false,
+  hideKit = false,
 }: {
+  hideKit?: boolean;
   endSeconds?: number;
   doc: EditorDoc;
   frame: Frame;
@@ -128,7 +130,7 @@ export function Inspector({
 
   return (
     <aside className={cn("flex shrink-0 flex-col", embedded ? "w-full" : "overflow-y-auto bg-inspector p-4", mobile ? "h-full w-full" : embedded ? "" : "hidden w-[344px] lg:flex")}>
-      <BrandKitRow embedded={embedded} kits={kits} kitId={kitId} onKit={actions.onKit} />
+      {!hideKit && <BrandKitRow embedded={embedded} kits={kits} kitId={kitId} onKit={actions.onKit} />}
       <div className={cn(mobile ? "flex gap-2 overflow-x-auto pb-1" : embedded ? "ap-tiles grid grid-cols-3 gap-2 sm:grid-cols-6" : "grid grid-cols-3 gap-2")}>
         {(Object.keys(ELEMENT_META) as ElementKey[]).map((el) => {
           const m = ELEMENT_META[el];
