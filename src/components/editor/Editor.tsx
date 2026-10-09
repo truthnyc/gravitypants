@@ -182,7 +182,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
         if (!ctx) return;
         ctx.drawImage(img, 0, 0, c.width, c.height);
         const light = isLightArtwork(ctx.getImageData(0, 0, c.width, c.height).data);
-        updateLogo(light ? { light_path: lg.path } : { dark_path: lg.path });
+        const p = lg.path ?? null; updateLogo(light ? { light_path: p } : { dark_path: p });
       } catch { /* cross-origin image: leave as is */ }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
