@@ -182,6 +182,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
   const [preferredPlan, setPreferredPlan] = useState<string | null>(null);
   useEffect(() => { void supabase.auth.getUser().then(({ data }) => {
     if (data.user) {
+      setUserId(data.user.id);
       const choice = getSignupChoice(data.user.id);
       setPreferredPlan(choice ? `${planById(choice.plan).name} ${choice.billing}` : null);
     }
@@ -316,19 +317,26 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
     killFFmpeg();
   };
 
-  const toggle = (id: string) =>
-    setSelected((s) => {
-      const n = new Set(s);
-      if (n.has(id)) n.delete(id);
-      else n.add(id);
-      return n;
-    });
+  const [hoverP, setHoverP] = useState<PlatformId | null>(null);
+  const [pulse, setPulse] = useState<Set<SizeId>>(new Set());
+  const changeSizes = (next: Set<SizeId>) => {
+    const added = new Set([...next].filter((s) => !selected.has(s)));
+    setSelected(next);
+    if (added.size) { setPulse(added); window.setTimeout(() => setPulse(new Set()), 700); }
+  };
+  const toggleSize = (id: SizeId) => {
+    const n = new Set(selected);
+    if (n.has(id)) n.delete(id); else n.add(id);
+    changeSizes(n);
+  };
 
   const player = useReelPlayer({ project, frames });
+  const [previewKey, setPreviewKey] = useState<string | null>(null);
+  const previewT = targets.find((t) => t.key === previewKey) ?? targets[0] ?? null;
   const doneCount = files.filter((f) => state[f.job]?.blob).length;
   const ready = open && !running && doneCount > 0;
   const overall = files.length ? files.reduce((n, f) => n + (state[f.job]?.progress ?? 0), 0) / files.length : 0;
-  const summaryLine = [videos ? `${videos} ${videos === 1 ? "video" : "videos"}` : null, gifs ? `${gifs} animated ${gifs === 1 ? "GIF" : "GIFs"}` : null].filter(Boolean).join(" + ");
+  void videos; void gifs;
   const exportButton = exportStatus && !exportStatus.allowed ? (
     <AppButton size="lg" onClick={() => setPlanSheet(exportStatus.reason ?? "no_plan")}>Choose a Plan to Export</AppButton>
   ) : (
@@ -473,6 +481,21 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
                 <div className="h-1.5 overflow-hidden rounded-full bg-ap-inner"><div className="h-full bg-ap-blue transition-[width]" style={{ width: `${overall * 100}%` }} /></div>
                 <p className="mt-1.5 text-[12px] text-ap-muted">Making your files… Keep this tab open until everything is done.</p>
               </div>
+            )}
+            {files.length > 0 && !running && (
+              <Collapsible className="mt-2">
+                <CollapsibleTrigger className="text-[13px] font-medium text-ap-blue hover:underline">See the file list</CollapsibleTrigger>
+                <CollapsibleContent>
+                  <ul className="mt-2 space-y-1 text-[13px]">
+                    {files.map((f) => (
+                      <li key={f.name} className="flex justify-between gap-3 nums">
+                        <span className="min-w-0 truncate">{f.name}</span>
+                        <span className="shrink-0 text-ap-muted">~{estimateMb(f, seconds, fps, gFps, gColors)} MB</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CollapsibleContent>
+              </Collapsible>
             )}
           </div>
           {running && <div className="mt-3"><FileList files={files} state={state} /></div>}
