@@ -121,7 +121,6 @@ function SiteBar({ pathname, signedIn, close }: { pathname: string; signedIn: bo
           <>
             <Link to="/app/ads" className={cn(secondary, "hidden lg:inline-flex")}>Your Ads</Link>
             <div className="hidden lg:block"><UserMenu websiteMenu /></div>
-            <Link to="/app/ads" onClick={close} className={cn(primary, "lg:hidden")}>+ New ad</Link>
           </>
         ) : (
           <>
