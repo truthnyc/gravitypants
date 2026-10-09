@@ -1,5 +1,6 @@
-import { useRef, useState } from "react";
-import { ChevronRight, Clock, Crop, Image as ImageIcon, Minus, Plus, RefreshCw, Shapes, Sparkles, TextQuote, Type } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { normalizeHex, photoName, photoPalette } from "@/lib/stillframe/palette";
+import { ChevronRight, Clock, Crop, Play, Image as ImageIcon, Minus, Plus, RefreshCw, Shapes, Sparkles, TextQuote, Type } from "lucide-react";
 import type { EditorDoc } from "@/lib/stillframe/data";
 import {
   PACE_SECONDS,
@@ -379,8 +380,8 @@ function ToggleRow({ label, checked, onChange }: { label: string; checked: boole
 
 const MOVEMENTS: { value: NonNullable<PhotoSettings["movement"]>; label: string }[] = [
   { value: "none", label: "None" },
-  { value: "slow_zoom_in", label: "Slow zoom in" },
-  { value: "slow_zoom_out", label: "Slow zoom out" },
+  { value: "slow_zoom_in", label: "Zoom in" },
+  { value: "slow_zoom_out", label: "Zoom out" },
   { value: "pan_left", label: "Pan left" },
   { value: "pan_right", label: "Pan right" },
   { value: "custom", label: "Custom" },
@@ -390,170 +391,280 @@ const INTENSITIES: { value: NonNullable<PhotoSettings["movement_intensity"]>; la
   { value: "standard", label: "Standard" },
   { value: "dramatic", label: "Dramatic" },
 ];
-const BG_COLORS = ["#000000", "#1D1D1F", "#FFFFFF", "#F1F3F0"];
+const NEUTRALS = ["#000000", "#1D1D1F", "#8E8E93", "#D1D1D6", "#F5F5F0", "#FFFFFF"];
+const RECENT_KEY = "sf-recent-bg-colors";
 
-function PhotoPanel({ photo, adjusting, actions }: { photo: PhotoSettings; adjusting: boolean; actions: InspectorActions }) {
+/** Collapses with grid rows 0fr/1fr; hidden content is inert. */
+export function Reveal({ open, children }: { open: boolean; children: React.ReactNode }) {
+  return (
+    <div className={cn("grid transition-[grid-template-rows] duration-200 motion-reduce:transition-none", open ? "grid-rows-[1fr]" : "grid-rows-[0fr]")} inert={!open} aria-hidden={!open}>
+      <div className="min-h-0 overflow-hidden">{children}</div>
+    </div>
+  );
+}
+
+function ApplyAll({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
+  return (
+    <label className="flex items-center gap-2 text-[12px] font-medium text-secondary-text">
+      Apply to all frames
+      <Switch checked={checked} onCheckedChange={onChange} className="data-[state=checked]:bg-toggle-on" />
+    </label>
+  );
+}
+
+function Swatch({ c, active, onPick }: { c: string; active: boolean; onPick: (c: string) => void }) {
+  return (
+    <button
+      type="button"
+      aria-label={`Background ${c}`}
+      aria-pressed={active}
+      onClick={() => onPick(c)}
+      className={cn("size-7 rounded-full border border-border", active && "ring-2 ring-primary ring-offset-2")}
+      style={{ background: c }}
+    />
+  );
+}
+
+function PhotoPanel({
+  photo,
+  frameIndex,
+  hasWords,
+  brandName,
+  brandColors,
+  image,
+  keyframe,
+  onKeyframe,
+  actions,
+}: {
+  photo: PhotoSettings;
+  frameIndex: number;
+  hasWords: boolean;
+  brandName: string;
+  brandColors: string[];
+  image?: HTMLImageElement;
+  keyframe: "start" | "end" | null;
+  onKeyframe: (k: "start" | "end" | null) => void;
+  actions: InspectorActions;
+}) {
   const brightness = Math.round(Number(photo.brightness ?? 0) * 200);
   const fit = photo.fit ?? "fill";
   const move = photo.movement ?? "none";
-  const zoomStart = Math.round(Number(photo.zoom_start ?? 1) * 100);
-  const zoomEnd = Math.round(Number(photo.zoom_end ?? 1) * 100);
-  const panX = Number(photo.pan_x ?? 0);
-  const panDir: "none" | "left" | "right" = panX === 0 ? "none" : panX < 0 ? "left" : "right";
-  const panAmount = Math.round(Math.abs(panX) * 100);
+  const bgMode = photo.background ?? (photo.background_color ? "solid" : "blur");
+  const bg = (photo.background_color ?? "").toUpperCase();
+  const [allBg, setAllBg] = useState(false);
+  const [allMove, setAllMove] = useState(false);
+  const [look, setLook] = useState(false);
+  const [recent, setRecent] = useState<string[]>([]);
+  const [hex, setHex] = useState(bg);
+  const [hexBad, setHexBad] = useState(false);
+  useEffect(() => {
+    try { setRecent(JSON.parse(localStorage.getItem(RECENT_KEY) ?? "[]").slice(0, 4)); } catch { /* ignore */ }
+  }, []);
+  useEffect(() => { setHex(bg); setHexBad(false); }, [bg]);
+  const palette = useMemo(() => photoPalette(photo.path, image), [photo.path, image]);
+  const moved = Boolean((photo.zoom ?? 1) !== 1 || (photo.focus && (photo.focus.x !== 0.5 || photo.focus.y !== 0.5)));
+  const name = photoName(photo, frameIndex);
+
+  const send = (patch: Partial<PhotoSettings>, all: boolean, key?: string) =>
+    all && actions.onPhotoAll ? actions.onPhotoAll(patch, key) : actions.onPhoto(patch, key);
+
+  const pickBackground = (patch: Partial<PhotoSettings>, key?: string) => {
+    const switching = fit !== "fit";
+    send(switching ? { ...patch, fit: "fit" } : patch, allBg, key);
+    if (switching) toast(`Frame ${frameIndex + 1} switched to Fit so the background shows`, actions.onUndo ? { action: { label: "Undo", onClick: actions.onUndo } } : undefined);
+  };
+  const pickColor = (c: string, key?: string) => {
+    pickBackground({ background: "solid", background_color: c }, key);
+    const all = [...NEUTRALS, ...palette, ...brandColors];
+    if (!all.includes(c)) {
+      const next = [c, ...recent.filter((x) => x !== c)].slice(0, 4);
+      setRecent(next);
+      try { localStorage.setItem(RECENT_KEY, JSON.stringify(next)); } catch { /* ignore */ }
+    }
+  };
+  const chooseMove = (m: NonNullable<PhotoSettings["movement"]>) => {
+    const patch: Partial<PhotoSettings> = m === "custom"
+      ? { movement: "custom", zoom_start: photo.zoom_start ?? 1, zoom_end: photo.zoom_end ?? 1.1, pan_x: photo.pan_x ?? 0 }
+      : { movement: m };
+    send(patch, allMove);
+    if (m === "custom") onKeyframe("start");
+    else {
+      onKeyframe(null);
+      if (m !== "none") actions.onPlayFrame?.();
+    }
+  };
+
   return (
     <>
       <div className="flex items-center gap-3">
-        <div className="size-14 shrink-0 overflow-hidden rounded-sm bg-control-fill">
+        <div className="size-[72px] shrink-0 overflow-hidden rounded-sm bg-control-fill">
           {photo.path && <MediaImage path={photo.path} className="size-full object-cover" alt="" />}
         </div>
         <div className="min-w-0 flex-1">
-          <div className="truncate text-[13px] font-medium">{fileName(photo.path)}</div>
-          <Button variant="plain" size="sm" className="-ml-2 mt-0.5" onClick={actions.onReplacePhoto}>
-            Replace Photo
-          </Button>
+          <div className="truncate text-[14px] font-semibold">{name}</div>
+          <div className="mt-0.5 text-[12px] leading-snug text-secondary-text">Drag on the preview to reposition · scroll to zoom</div>
+          {moved && (
+            <button type="button" className="mt-1 text-[12px] font-medium text-link" onClick={() => actions.onPhoto({ focus: { x: 0.5, y: 0.5 }, zoom: 1 })}>
+              Reset framing
+            </button>
+          )}
         </div>
+        <Button variant="default" size="sm" onClick={actions.onReplacePhoto}>Replace</Button>
       </div>
+
       <Field label="Fill the frame">
         <Segmented
           value={fit}
           options={[
-            { value: "fill", label: "Fill" },
-            { value: "fit", label: "Fit" },
+            { value: "fill", label: "Fill (crop to fit)" },
+            { value: "fit", label: "Fit (show whole photo)" },
           ]}
           onChange={(v) => actions.onPhoto({ fit: v })}
         />
       </Field>
-      <Field label="Background color">
-        <div className="flex items-center gap-2">
-          {BG_COLORS.map((c) => (
-            <button
-              key={c}
-              type="button"
-              aria-label={`Background ${c}`}
-              onClick={() => actions.onPhoto({ background_color: c })}
-              className={cn("size-8 rounded-full border border-border lg:size-7", (photo.background_color ?? "").toUpperCase() === c && "ring-2 ring-primary ring-offset-2")}
-              style={{ background: c }}
-            />
-          ))}
-          <CustomColor onPick={(c) => actions.onPhoto({ background_color: c }, "drag:photo-bg")} />
+
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <span className="text-[12px] font-medium text-secondary-text">Background</span>
+          <ApplyAll
+            checked={allBg}
+            onChange={(v) => {
+              setAllBg(v);
+              if (v) actions.onPhotoAll?.({ fit: photo.fit ?? "fill", background: bgMode, background_color: photo.background_color ?? null });
+            }}
+          />
         </div>
-      </Field>
-      {fit === "fill" && (
-        <Field label="Crop & focus">
-          <Button variant={adjusting ? "primary" : "default"} size="sm" onClick={actions.onAdjust}>
-            <Crop strokeWidth={1.7} /> {adjusting ? "Done" : "Adjust…"}
-          </Button>
-        </Field>
-      )}
-      <Field label="Movement">
+        {fit === "fill" && (
+          <p className="text-[12px] leading-snug text-secondary-text">Shows around the photo when it's set to Fit. Picking a background switches this frame to Fit.</p>
+        )}
+        <Segmented
+          value={bgMode}
+          options={[
+            { value: "blur", label: "Blurred photo" },
+            { value: "solid", label: "Solid colour" },
+          ]}
+          onChange={(v) => pickBackground(v === "solid" ? { background: "solid", background_color: photo.background_color || "#1D1D1F" } : { background: "blur" })}
+        />
+        {bgMode === "blur" && <p className="text-[12px] text-secondary-text">Soft, matches the photo.</p>}
+        <Reveal open={bgMode === "solid"}>
+          <div className="space-y-3 pt-1">
+            {palette.length > 0 && (
+              <div className="space-y-1.5">
+                <div className="text-[12px] text-secondary-text">From this photo</div>
+                <div className="flex flex-wrap gap-2">{palette.map((c) => <Swatch key={c} c={c} active={bg === c} onPick={pickColor} />)}</div>
+              </div>
+            )}
+            {brandColors.length > 0 && (
+              <div className="space-y-1.5">
+                <div className="text-[12px] text-secondary-text">{brandName} brand colours</div>
+                <div className="flex flex-wrap gap-2">{brandColors.map((c) => <Swatch key={c} c={c} active={bg === c} onPick={pickColor} />)}</div>
+              </div>
+            )}
+            <div className="space-y-1.5">
+              <div className="text-[12px] text-secondary-text">Neutrals &amp; recent</div>
+              <div className="flex flex-wrap items-center gap-2">
+                {[...NEUTRALS, ...recent.filter((c) => !NEUTRALS.includes(c))].map((c) => <Swatch key={c} c={c} active={bg === c} onPick={pickColor} />)}
+                <CustomColor onPick={(c) => pickColor(c, "drag:photo-bg")} />
+                <input
+                  aria-label="Hex colour"
+                  aria-invalid={hexBad}
+                  value={hex}
+                  onChange={(e) => {
+                    setHex(e.target.value);
+                    const n = normalizeHex(e.target.value);
+                    setHexBad(!n && e.target.value.trim() !== "");
+                    if (n) pickColor(n, "drag:photo-hex");
+                  }}
+                  placeholder="#1D1D1F"
+                  className={cn("h-8 w-[92px] rounded-sm border bg-card px-2 text-[13px] uppercase nums", hexBad ? "border-destructive" : "border-ap-hairline")}
+                />
+              </div>
+            </div>
+          </div>
+        </Reveal>
+      </div>
+
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <span className="text-[12px] font-medium text-secondary-text">Movement</span>
+          <ApplyAll
+            checked={allMove}
+            onChange={(v) => {
+              setAllMove(v);
+              if (v) actions.onPhotoAll?.({ movement: move, movement_intensity: photo.movement_intensity, zoom_start: photo.zoom_start, zoom_end: photo.zoom_end, pan_x: photo.pan_x, pan_y: photo.pan_y });
+            }}
+          />
+        </div>
         <div className="flex flex-wrap gap-1.5">
           {MOVEMENTS.map((m) => (
             <button
               key={m.value}
               type="button"
-              onClick={() =>
-                actions.onPhoto(
-                  m.value === "custom"
-                    ? {
-                        movement: "custom",
-                        zoom_start: photo.zoom_start ?? 1,
-                        zoom_end: photo.zoom_end ?? 1.1,
-                        pan_x: photo.pan_x ?? 0,
-                      }
-                    : { movement: m.value },
-                )
-              }
+              onClick={() => chooseMove(m.value)}
               aria-pressed={move === m.value}
-              className={cn(
-                "h-7 rounded-lg px-2.5 text-[12px] font-medium",
-                move === m.value ? "bg-el-photo text-primary-foreground" : "bg-control-fill",
-              )}
+              className={cn("mv-chip flex h-8 items-center gap-1.5 rounded-lg pl-1 pr-2.5 text-[12px] font-medium", move === m.value ? "bg-el-photo text-primary-foreground" : "bg-control-fill")}
             >
+              <span className="mv-thumb size-6 overflow-hidden rounded-sm bg-card" data-mv={m.value}>
+                {photo.path && <MediaImage path={photo.path} className="size-full object-cover" alt="" />}
+              </span>
               {m.label}
             </button>
           ))}
         </div>
-      </Field>
-      {move !== "none" && move !== "custom" && (
-        <Field label="Amount">
-          <Segmented
-            value={photo.movement_intensity ?? "standard"}
-            options={INTENSITIES}
-            onChange={(v) => actions.onPhoto({ movement_intensity: v })}
-          />
-        </Field>
-      )}
-      {move === "custom" && (
-        <>
-          <Field label="Start size" value={`${zoomStart}%`}>
-            <ElementSlider
-              name="Start size"
-              color="var(--el-photo)"
-              min={100}
-              max={150}
-              value={zoomStart}
-              snap={(v) => (v <= 103 ? 100 : v)}
-              onChange={(v, k) => actions.onPhoto({ zoom_start: v / 100 }, k)}
-            />
-          </Field>
-          <Field label="End size" value={`${zoomEnd}%`}>
-            <ElementSlider
-              name="End size"
-              color="var(--el-photo)"
-              min={100}
-              max={150}
-              value={zoomEnd}
-              snap={(v) => (v <= 103 ? 100 : v)}
-              onChange={(v, k) => actions.onPhoto({ zoom_end: v / 100 }, k)}
-            />
-          </Field>
-          <Button
-            variant="default"
-            size="sm"
-            onClick={() => actions.onPhoto({ zoom_start: zoomEnd / 100, zoom_end: zoomStart / 100 })}
-          >
-            <RefreshCw strokeWidth={1.7} /> Reverse
-          </Button>
-          <Field label="Move sideways">
+        <Reveal open={move !== "none" && move !== "custom"}>
+          <div className="pt-1">
+            <Field label="Amount">
+              <Segmented value={photo.movement_intensity ?? "standard"} options={INTENSITIES} onChange={(v) => { send({ movement_intensity: v }, allMove); actions.onPlayFrame?.(); }} />
+            </Field>
+          </div>
+        </Reveal>
+        <Reveal open={move === "custom"}>
+          <div className="space-y-2 pt-1">
             <Segmented
-              value={panDir}
+              value={keyframe ?? "start"}
               options={[
-                { value: "none", label: "None" },
-                { value: "left", label: "Left" },
-                { value: "right", label: "Right" },
+                { value: "start", label: "Start framing" },
+                { value: "end", label: "End framing" },
               ]}
-              onChange={(v) =>
-                actions.onPhoto({ pan_x: v === "none" ? 0 : (v === "left" ? -1 : 1) * (panAmount / 100 || 0.5) })
-              }
+              onChange={(v) => onKeyframe(v)}
             />
-          </Field>
-          {panDir !== "none" && (
-            <Field label="Distance" value={`${panAmount}%`}>
+            <p className="text-[12px] leading-snug text-secondary-text">Drag and zoom the photo on the preview to set where the movement starts and where it ends.</p>
+            <Button variant="default" size="sm" onClick={() => { onKeyframe(null); actions.onPlayFrame?.(); }}>
+              <Play strokeWidth={1.7} /> Preview movement
+            </Button>
+          </div>
+        </Reveal>
+      </div>
+
+      <div>
+        <button type="button" aria-expanded={look} onClick={() => setLook((v) => !v)} className="flex w-full items-center gap-1 text-[12px] font-medium text-secondary-text">
+          <ChevronRight className={cn("size-3.5 transition-transform motion-reduce:transition-none", look && "rotate-90")} strokeWidth={1.7} /> Look
+        </button>
+        <Reveal open={look}>
+          <div className="space-y-4 pt-3">
+            <Field label="Brightness" value={brightness > 0 ? `+${brightness}` : brightness}>
               <ElementSlider
-                name="Pan distance"
+                name="Brightness"
                 color="var(--el-photo)"
-                min={10}
-                max={100}
-                value={panAmount}
-                onChange={(v, k) => actions.onPhoto({ pan_x: (panDir === "left" ? -1 : 1) * (v / 100) }, k)}
+                min={-40}
+                max={40}
+                value={Math.max(-40, Math.min(40, brightness))}
+                snap={(v) => (Math.abs(v) <= 2 ? 0 : v)}
+                onChange={(v, k) => actions.onPhoto({ brightness: v / 200 }, k)}
               />
             </Field>
-          )}
-        </>
-      )}
-      <Field label="Brightness" value={brightness > 0 ? `+${brightness}` : brightness}>
-        <ElementSlider
-          name="Brightness"
-          color="var(--el-photo)"
-          min={-100}
-          max={100}
-          value={brightness}
-          snap={(v) => (Math.abs(v) <= 5 ? 0 : v)}
-          onChange={(v, k) => actions.onPhoto({ brightness: v / 200 }, k)}
-        />
-      </Field>
-      <ToggleRow label="Darken for text" checked={Boolean(photo.darken_for_text)} onChange={(v) => actions.onPhoto({ darken_for_text: v })} />
+            {hasWords && (
+              <label className="flex items-center justify-between gap-3">
+                <span>
+                  <span className="block text-[13px]">Darken for text</span>
+                  <span className="block text-[12px] text-secondary-text">Keeps words readable on bright photos</span>
+                </span>
+                <Switch checked={Boolean(photo.darken_for_text)} onCheckedChange={(v) => actions.onPhoto({ darken_for_text: v, darken_set: true })} className="data-[state=checked]:bg-toggle-on" />
+              </label>
+            )}
+          </div>
+        </Reveal>
+      </div>
     </>
   );
 }
