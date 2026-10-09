@@ -20,11 +20,11 @@ export function sanitizeSvg(source: string): string {
   const parser = new XMLParser({ preserveOrder: true, ignoreAttributes: false, processEntities: false, trimValues: false });
   const nodes = parser.parse(source) as Node[];
   const roots = nodes.filter((node) => Object.keys(node).some((key) => key !== ":@" && !key.startsWith("?")));
-  if (roots.length !== 1 || !roots[0]?.svg) throw new Error("Choose a valid SVG logo.");
+  if (roots.length !== 1 || !roots[0]?.["svg"]) throw new Error("Choose a valid SVG logo.");
   let count = 0;
   const clean = (list: Node[], depth: number): Node[] => {
     if (depth > 64 || (count += list.length) > 20_000) throw new Error("That SVG is too complex. Try a simpler SVG or a PNG logo.");
-    return list.flatMap((node) => {
+    return list.flatMap<Node>((node) => {
       const tag = Object.keys(node).find((key) => key !== ":@");
       if (tag === "#text") return [{ "#text": node[tag] }];
       if (!tag || !TAGS.has(tag)) return [];
@@ -32,7 +32,7 @@ export function sanitizeSvg(source: string): string {
       for (const [key, raw] of Object.entries((node[":@"] ?? {}) as Node)) {
         const name = key.replace(/^@_/, "");
         const value = String(raw);
-        if (!ATTRS.has(name) || !safeValue(value)) continue;
+        if (!ATTRS.has(name) || (!name.startsWith("xmlns") && !safeValue(value))) continue;
         if ((name === "href" || name === "xlink:href") && !/^#[\w.-]+$/.test(value)) continue;
         if (name === "xmlns" && value !== "http://www.w3.org/2000/svg") continue;
         if (name === "xmlns:xlink" && value !== "http://www.w3.org/1999/xlink") continue;

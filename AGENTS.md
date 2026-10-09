@@ -13,11 +13,11 @@
 
 - Project/frame data uses `data.ts` autosave; strip popovers reuse Inspector panels and editor undo actions to avoid parallel logic.
 - Domain types and shared constants (workspace id, formats, defaults) live in `src/lib/stillframe/types.ts`.
-- The `media` storage bucket is private; resolve image URLs with `getMediaUrl()` in `src/lib/stillframe/media.ts` (workspace policy blocks public buckets).
+- Private media URLs use `getMediaUrl()` in `src/lib/stillframe/media.ts`.
 - Colors use semantic tokens in `src/styles.css`, never raw component colors.
 - Share `ReelPopup`, `HoverReelPreview` and `ConceptReelNotice` for consistent reel UI.
-- Preview and export both draw through `renderAt()` in `src/render/renderFrame.ts`; never add a second drawing path — the look must match everywhere.
-- Exports go to the private media bucket (500MB limit for GIFs), listed from storage.
+- Preview/export share `renderAt()` in `src/render/renderFrame.ts` to match.
+- Exports: private media storage, listed from storage; GIF limit 500MB.
 - Export: finished files are kept 30 days; daily 03:00 UTC cleanup via /api/public/cleanup-exports (only removes expired files, so no caller secret).
 - Accounts: authenticated routes call `ensure_workspace()`; the gate verifies membership before restoring a per-user workspace preference. Data reads `getWorkspaceId()`, not a constant — reloads preserve the selection safely.
 - Privacy: every table uses RLS via `is_workspace_member()`; media paths start with `<workspace_id>/`, exports add `exports/<project>/<stamp>/`; storage policies check the first folder.
@@ -44,3 +44,6 @@
 - Website reel favorites use own `site_reel_favorites` rows via `SiteReelHeart`/`useSiteReelFavorites`; Favorites includes Directory reels.
 - App/SSR failures share dependency-free `ServiceUnavailable`.
 - Scope Aimanté by site; `brand-page` helpers centralize brand rules.
+
+- SVG uploads share `svg-safety.ts` before preview/storage, including Directory server uploads, to remove active content.
+- Export font loading is strict to prevent fallback files; FontPicker shares phone Drawer and desktop Popover controls.
