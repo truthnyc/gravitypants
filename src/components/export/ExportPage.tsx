@@ -69,8 +69,25 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
     };
   }, [project, frames, brand, kit?.custom_fonts]);
 
-  const [selected, setSelected] = useState<Set<string>>(() => new Set(project.formats.map((f) => DEFAULT_CHANNEL[f])));
-  const [custom, setCustom] = useState({ on: false, w: 1200, h: 628 });
+  const [selected, setSelected] = useState<Set<SizeId>>(() => new Set(DEFAULT_SIZES));
+  const [customs, setCustoms] = useState<CustomRow[]>([]);
+  const [customOn, setCustomOn] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+  const loaded = useRef(false);
+  // Remember the last size choice per user (stored as size ids; old platform ids are migrated).
+  useEffect(() => {
+    if (!userId) return;
+    try {
+      const raw = localStorage.getItem(`gp.exportSizes.${userId}`);
+      if (raw) {
+        const v = JSON.parse(raw) as { sizes?: string[]; channels?: string[]; custom?: { w: number; h: number }[] };
+        const sizes = migrateSizes([...(v.sizes ?? []), ...(v.channels ?? [])]);
+        if (sizes.length || v.custom?.length) setSelected(new Set(sizes));
+        if (v.custom?.length) { setCustoms(v.custom.map((c) => ({ id: rid(), w: String(c.w), h: String(c.h) }))); setCustomOn(true); }
+      }
+    } catch { /* ignore */ }
+    loaded.current = true;
+  }, [userId]);
   const [mp4, setMp4] = useState(true);
   const { canUse, isSuccess: accessReady } = usePlanAccess();
   const [gif, setGif] = useState(true);
@@ -82,38 +99,39 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
   const [gLoop, setGLoop] = useState<"forever" | "once">("forever");
   const templateName = useTemplateName(project.template_id);
 
+  const validCustoms = useMemo(
+    () => (customOn ? customs.filter((c) => !customError(num(c.w), num(c.h))).map((c) => ({ w: even(num(c.w)!), h: even(num(c.h)!) })) : [])
+      .filter((c, i, a) => a.findIndex((x) => x.w === c.w && x.h === c.h) === i && !EXPORT_SIZES.some((s) => selected.has(s.id) && s.width === c.w && s.height === c.h)),
+    [customs, customOn, selected],
+  );
+  useEffect(() => {
+    if (!userId || !loaded.current) return;
+    try { localStorage.setItem(`gp.exportSizes.${userId}`, JSON.stringify({ sizes: [...selected], custom: validCustoms })); } catch { /* ignore */ }
+  }, [userId, selected, validCustoms]);
+
   const targets: Target[] = useMemo(() => {
-    const list: Target[] = CHANNELS.filter((c) => selected.has(c.id)).map((c) => ({
-      key: c.id,
-      name: c.name,
-      slug: c.slug,
-      format: c.format,
-      ...FORMAT_SIZE[c.format],
+    const list: Target[] = EXPORT_SIZES.filter((s) => selected.has(s.id)).map((s) => ({
+      key: s.id, name: s.name, ratio: s.ratio, format: s.layout, width: s.width, height: s.height,
     }));
-    if (custom.on) {
-      const w = even(Math.min(3840, Math.max(64, custom.w || 0)));
-      const h = even(Math.min(3840, Math.max(64, custom.h || 0)));
-      list.push({ key: "custom", name: "Custom size", slug: "custom", format: nearestFormat(w, h), width: w, height: h });
-    }
+    for (const c of validCustoms) list.push({ key: `c${c.w}x${c.h}`, name: `${c.w}×${c.h}`, ratio: ratioLabel(c.w, c.h), format: nearestFormat(c.w, c.h), width: c.w, height: c.h, custom: true });
     return list;
-  }, [selected, custom]);
+  }, [selected, validCustoms]);
 
   const base = slugify(project.name);
   const { files, jobs } = useMemo(() => {
     const files: FileRow[] = [];
     const jobs = new Map<string, { kind: "mp4" | "gif"; format: Format; width: number; height: number }>();
     for (const t of targets) {
-      const ratio = t.key === "custom" ? `${t.width}x${t.height}` : t.format.replace(":", "x");
       if (mp4) {
         const job = `mp4:${t.width}x${t.height}:${t.format}`;
         jobs.set(job, { kind: "mp4", format: t.format, width: t.width, height: t.height });
-        files.push({ name: `${base}_${t.slug}_${ratio}.mp4`, kind: "mp4", job });
+        files.push({ name: exportFileName(base, t.width, t.height, "mp4"), kind: "mp4", job, width: t.width, height: t.height });
       }
       if (gif) {
         const s = gifSize(t.width, t.height, gSize);
         const job = `gif:${s.width}x${s.height}:${t.format}`;
         jobs.set(job, { kind: "gif", format: t.format, ...s });
-        files.push({ name: `${base}_${t.slug}_${ratio}.gif`, kind: "gif", job });
+        files.push({ name: exportFileName(base, t.width, t.height, "gif"), kind: "gif", job, width: s.width, height: s.height });
       }
     }
     return { files, jobs };
