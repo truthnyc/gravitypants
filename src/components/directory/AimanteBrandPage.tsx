@@ -25,12 +25,14 @@ export function AimanteBrandPage({ brand, reels, siteReels, more, onOpen, onOpen
         <Link to="/directory" className="min-w-0 text-[15px] text-ap-blue">← Browse</Link>
         <div className="aimante-brand-actions flex shrink-0 items-center gap-2"><BrandActions brandId={brand.id} name={brand.name} /></div>
       </div>
-      <div className="mt-4 grid grid-cols-[72px_minmax(0,1fr)] items-start gap-4">
+      <div className="mt-4 grid grid-cols-[72px_minmax(0,1fr)] gap-4">
         {brand.logo_url ? <img src={brand.logo_url} alt={`${brand.name} logo`} className="size-[72px] rounded-[12px] border border-ap-hairline bg-ap-card object-contain" /> : <div className="grid size-[72px] place-items-center rounded-[12px] border border-ap-hairline bg-ap-card text-[12px] text-ap-muted">Logo</div>}
-        <div className="min-w-0">
-          <Link to="/directory/category/$slug" params={{ slug: categorySlug(brand.category) }} className="text-[14px] font-semibold text-ap-blue">{brand.category}</Link>
-          <h1 className="mt-0.5 text-[30px] leading-[1.1] font-semibold tracking-[-0.03em] break-words md:text-[40px]">{brand.name}</h1>
-          {brand.website_url && <a href={brand.website_url} target="_blank" rel="noopener noreferrer" onClick={() => void recordBrandClick({ data: { kind: "brand", id: brand.id } }).catch(() => {})} className="mt-1.5 inline-block !min-h-0 text-[16px] text-ap-blue-strong">Visit {brand.name} ↗</a>}
+        <div className="flex min-w-0 flex-col">
+          <div>
+            <Link to="/directory/category/$slug" params={{ slug: categorySlug(brand.category) }} className="text-[14px] font-semibold text-ap-blue">{brand.category}</Link>
+            <h1 className="mt-0.5 text-[30px] leading-[1.1] font-semibold tracking-[-0.03em] break-words md:text-[40px]">{brand.name}</h1>
+          </div>
+          {brand.website_url && <a href={brand.website_url} target="_blank" rel="noopener noreferrer" onClick={() => void recordBrandClick({ data: { kind: "brand", id: brand.id } }).catch(() => {})} className="mt-auto inline-block !min-h-0 pt-1.5 text-[16px] text-ap-blue-strong">Visit {brand.name} ↗</a>}
         </div>
       </div>
       {brand.description && <p className="mt-4 text-[17px] leading-[1.45] text-ap-body">{brand.description}</p>}
