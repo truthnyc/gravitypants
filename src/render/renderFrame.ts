@@ -298,6 +298,31 @@ export function layoutFrame(
 
 /* ----------------------------------------------------------------- drawing */
 
+const blurCache = new WeakMap<HTMLImageElement, HTMLCanvasElement>();
+/** Soft "blurred photo" background: a tiny downscale stretched to cover (no ctx.filter, works in Safari). */
+function drawBlurred(ctx: CanvasRenderingContext2D, img: HTMLImageElement, W: number, H: number) {
+  if (typeof document === "undefined") return;
+  let small = blurCache.get(img);
+  if (!small) {
+    small = document.createElement("canvas");
+    const s = 18 / Math.max(img.naturalWidth, img.naturalHeight);
+    small.width = Math.max(1, Math.round(img.naturalWidth * s));
+    small.height = Math.max(1, Math.round(img.naturalHeight * s));
+    small.getContext("2d")?.drawImage(img, 0, 0, small.width, small.height);
+    blurCache.set(img, small);
+  }
+  const sc = Math.max(W / small.width, H / small.height) * 1.15;
+  const dw = small.width * sc;
+  const dh = small.height * sc;
+  ctx.save();
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+  ctx.drawImage(small, (W - dw) / 2, (H - dh) / 2, dw, dh);
+  ctx.fillStyle = "rgba(0,0,0,0.12)";
+  ctx.fillRect(0, 0, W, H);
+  ctx.restore();
+}
+
 function drawPhoto(
   ctx: CanvasRenderingContext2D,
   frame: Frame,
