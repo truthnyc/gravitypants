@@ -1330,3 +1330,8 @@ p.concept-reel-notice { font-size: 10px !important; }
 /* Checkerboard behind logo/badge previews, split dark/light behind Auto logo */
 .checker { background-color: var(--card); background-image: conic-gradient(var(--control-fill) 25%, transparent 0 50%, var(--control-fill) 0 75%, transparent 0); background-size: 12px 12px; }
 .logo-split { background: linear-gradient(90deg, var(--foreground) 50%, var(--background) 50%); }
+
+/* Preview editing: faint dashed outline on hover, solid blue when selected */
+.stage-el { outline: 2px dashed transparent; }
+.stage-el:hover, .stage-el:focus-visible { outline-color: color-mix(in srgb, var(--accent-blue) 55%, transparent); }
+.stage-el.is-active { outline: 2px solid var(--accent-blue); }
