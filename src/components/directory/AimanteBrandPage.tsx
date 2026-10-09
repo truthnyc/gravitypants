@@ -26,7 +26,7 @@ export function AimanteBrandPage({ brand, reels, siteReels, more, onOpen, onOpen
         <div className="aimante-brand-actions flex shrink-0 items-center gap-2"><BrandActions brandId={brand.id} name={brand.name} /></div>
       </div>
       <div className="mt-4 grid grid-cols-[72px_minmax(0,1fr)] gap-4">
-        {brand.logo_url ? <img src={brand.logo_url} alt={`${brand.name} logo`} className="size-[72px] rounded-[12px] border border-ap-hairline bg-ap-card object-contain" /> : <div className="grid size-[72px] place-items-center rounded-[12px] border border-ap-hairline bg-ap-card text-[12px] text-ap-muted">Logo</div>}
+        {brand.logo_url ? <img src={brand.logo_url} alt={`${brand.name} logo`} className="h-full min-h-[72px] w-[72px] rounded-[12px] border border-ap-hairline bg-ap-card object-contain" /> : <div className="grid h-full min-h-[72px] w-[72px] place-items-center rounded-[12px] border border-ap-hairline bg-ap-card text-[12px] text-ap-muted">Logo</div>}
         <div className="flex min-w-0 flex-col">
           <div>
             <Link to="/directory/category/$slug" params={{ slug: categorySlug(brand.category) }} className="text-[14px] font-semibold text-ap-blue">{brand.category}</Link>
