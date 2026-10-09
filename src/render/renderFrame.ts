@@ -521,7 +521,9 @@ function drawFrame(
     }
   }
 
-  for (const t of texts) drawText(ctx, t, localT, H, images);
+  // Headline starts ~0.15s into the frame, subline ~0.45s.
+  if (layout.headline) drawText(ctx, layout.headline, layout.headline.animation === "none" ? localT : localT - 0.15, H, images);
+  if (layout.subline) drawText(ctx, layout.subline, layout.subline.animation === "none" ? localT : localT - 0.45, H, images);
 }
 
 /** Draws exactly what the viewer sees at timeSec. Pure: the same call serves preview and export. */
