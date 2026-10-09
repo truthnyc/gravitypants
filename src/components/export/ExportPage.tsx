@@ -5,7 +5,7 @@ import { Link } from "@tanstack/react-router";
 import { KitAgainButton } from "@/components/templates/KitAgain";
 import { TRIAL, planById } from "@/lib/stillframe/plans-config";
 import { getSignupChoice } from "@/lib/stillframe/signup-choice";
-import { AlertCircle, Check, ChevronDown, ChevronLeft, ChevronRight, Download, Film, Image as ImageIcon } from "lucide-react";
+import { AlertCircle, Check, ChevronDown, ChevronLeft, ChevronRight, Download, Film, Image as ImageIcon, Plus, X } from "lucide-react";
 import { AppButton, AppSectionLabel } from "@/components/app-ui";
 import { SHOW_SHARE } from "@/lib/features";
 import { ReelCard, StepActions, StepShell, StepTitle } from "@/components/app-ui/StepShell";
@@ -19,7 +19,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { effectiveKit, useBrandKit, useBrandKits, useTemplateName } from "@/lib/stillframe/data";
 import { MEDIA_BUCKET } from "@/lib/stillframe/media";
 import { registerCustomFonts } from "@/lib/stillframe/fonts";
-import { CHANNELS, DEFAULT_CHANNEL, nearestFormat, slugify } from "@/lib/stillframe/channels";
+import { nearestFormat, slugify } from "@/lib/stillframe/channels";
+import { CUSTOM_MAX, CUSTOM_MIN, CUSTOM_PRESETS, DEFAULT_SIZES, EXPORT_SIZES, PLATFORMS, customError, exportFileName, migrateSizes, platformState, ratioLabel, sizeLabelForFile, togglePlatform, type PlatformId, type SizeId } from "@/lib/stillframe/export-sizes";
 import { formatSeconds, type Format, type Frame, type Project } from "@/lib/stillframe/types";
 import { FORMAT_SIZE } from "@/render/formats";
 import { loadImages } from "@/render/images";
@@ -30,8 +31,11 @@ import { fetchExportStatus, useExportStatus, useRefreshBilling } from "@/lib/sti
 import { PlanCards } from "@/components/billing/PlanCards";
 
 type GifSize = "full" | "half" | "small";
-type Target = { key: string; name: string; slug: string; format: Format; width: number; height: number };
-type FileRow = { name: string; kind: "mp4" | "gif"; job: string };
+type Target = { key: string; name: string; ratio: string; format: Format; width: number; height: number; custom?: boolean };
+type CustomRow = { id: string; w: string; h: string };
+type FileRow = { name: string; kind: "mp4" | "gif"; job: string; width: number; height: number };
+const num = (s: string) => (s.trim() === "" ? null : Number(s));
+const rid = () => Math.random().toString(36).slice(2, 9);
 type JobState = { progress: number; status: "waiting" | "working" | "done" | "error" | "cancelled"; blob?: Blob; note?: string };
 
 const even = (n: number) => Math.max(2, Math.round(n / 2) * 2);
@@ -69,8 +73,25 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
     };
   }, [project, frames, brand, kit?.custom_fonts]);
 
-  const [selected, setSelected] = useState<Set<string>>(() => new Set(project.formats.map((f) => DEFAULT_CHANNEL[f])));
-  const [custom, setCustom] = useState({ on: false, w: 1200, h: 628 });
+  const [selected, setSelected] = useState<Set<SizeId>>(() => new Set(DEFAULT_SIZES));
+  const [customs, setCustoms] = useState<CustomRow[]>([]);
+  const [customOn, setCustomOn] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+  const loaded = useRef(false);
+  // Remember the last size choice per user (stored as size ids; old platform ids are migrated).
+  useEffect(() => {
+    if (!userId) return;
+    try {
+      const raw = localStorage.getItem(`gp.exportSizes.${userId}`);
+      if (raw) {
+        const v = JSON.parse(raw) as { sizes?: string[]; channels?: string[]; custom?: { w: number; h: number }[] };
+        const sizes = migrateSizes([...(v.sizes ?? []), ...(v.channels ?? [])]);
+        if (sizes.length || v.custom?.length) setSelected(new Set(sizes));
+        if (v.custom?.length) { setCustoms(v.custom.map((c) => ({ id: rid(), w: String(c.w), h: String(c.h) }))); setCustomOn(true); }
+      }
+    } catch { /* ignore */ }
+    loaded.current = true;
+  }, [userId]);
   const [mp4, setMp4] = useState(true);
   const { canUse, isSuccess: accessReady } = usePlanAccess();
   const [gif, setGif] = useState(true);
@@ -82,38 +103,39 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
   const [gLoop, setGLoop] = useState<"forever" | "once">("forever");
   const templateName = useTemplateName(project.template_id);
 
+  const validCustoms = useMemo(
+    () => (customOn ? customs.filter((c) => !customError(num(c.w), num(c.h))).map((c) => ({ w: even(num(c.w)!), h: even(num(c.h)!) })) : [])
+      .filter((c, i, a) => a.findIndex((x) => x.w === c.w && x.h === c.h) === i && !EXPORT_SIZES.some((s) => selected.has(s.id) && s.width === c.w && s.height === c.h)),
+    [customs, customOn, selected],
+  );
+  useEffect(() => {
+    if (!userId || !loaded.current) return;
+    try { localStorage.setItem(`gp.exportSizes.${userId}`, JSON.stringify({ sizes: [...selected], custom: validCustoms })); } catch { /* ignore */ }
+  }, [userId, selected, validCustoms]);
+
   const targets: Target[] = useMemo(() => {
-    const list: Target[] = CHANNELS.filter((c) => selected.has(c.id)).map((c) => ({
-      key: c.id,
-      name: c.name,
-      slug: c.slug,
-      format: c.format,
-      ...FORMAT_SIZE[c.format],
+    const list: Target[] = EXPORT_SIZES.filter((s) => selected.has(s.id)).map((s) => ({
+      key: s.id, name: s.name, ratio: s.ratio, format: s.layout, width: s.width, height: s.height,
     }));
-    if (custom.on) {
-      const w = even(Math.min(3840, Math.max(64, custom.w || 0)));
-      const h = even(Math.min(3840, Math.max(64, custom.h || 0)));
-      list.push({ key: "custom", name: "Custom size", slug: "custom", format: nearestFormat(w, h), width: w, height: h });
-    }
+    for (const c of validCustoms) list.push({ key: `c${c.w}x${c.h}`, name: `${c.w}×${c.h}`, ratio: ratioLabel(c.w, c.h), format: nearestFormat(c.w, c.h), width: c.w, height: c.h, custom: true });
     return list;
-  }, [selected, custom]);
+  }, [selected, validCustoms]);
 
   const base = slugify(project.name);
   const { files, jobs } = useMemo(() => {
     const files: FileRow[] = [];
     const jobs = new Map<string, { kind: "mp4" | "gif"; format: Format; width: number; height: number }>();
     for (const t of targets) {
-      const ratio = t.key === "custom" ? `${t.width}x${t.height}` : t.format.replace(":", "x");
       if (mp4) {
         const job = `mp4:${t.width}x${t.height}:${t.format}`;
         jobs.set(job, { kind: "mp4", format: t.format, width: t.width, height: t.height });
-        files.push({ name: `${base}_${t.slug}_${ratio}.mp4`, kind: "mp4", job });
+        files.push({ name: exportFileName(base, t.width, t.height, "mp4"), kind: "mp4", job, width: t.width, height: t.height });
       }
       if (gif) {
         const s = gifSize(t.width, t.height, gSize);
         const job = `gif:${s.width}x${s.height}:${t.format}`;
         jobs.set(job, { kind: "gif", format: t.format, ...s });
-        files.push({ name: `${base}_${t.slug}_${ratio}.gif`, kind: "gif", job });
+        files.push({ name: exportFileName(base, t.width, t.height, "gif"), kind: "gif", job, width: s.width, height: s.height });
       }
     }
     return { files, jobs };
@@ -160,6 +182,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
   const [preferredPlan, setPreferredPlan] = useState<string | null>(null);
   useEffect(() => { void supabase.auth.getUser().then(({ data }) => {
     if (data.user) {
+      setUserId(data.user.id);
       const choice = getSignupChoice(data.user.id);
       setPreferredPlan(choice ? `${planById(choice.plan).name} ${choice.billing}` : null);
     }
@@ -294,19 +317,26 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
     killFFmpeg();
   };
 
-  const toggle = (id: string) =>
-    setSelected((s) => {
-      const n = new Set(s);
-      if (n.has(id)) n.delete(id);
-      else n.add(id);
-      return n;
-    });
+  const [hoverP, setHoverP] = useState<PlatformId | null>(null);
+  const [pulse, setPulse] = useState<Set<SizeId>>(new Set());
+  const changeSizes = (next: Set<SizeId>) => {
+    const added = new Set([...next].filter((s) => !selected.has(s)));
+    setSelected(next);
+    if (added.size) { setPulse(added); window.setTimeout(() => setPulse(new Set()), 700); }
+  };
+  const toggleSize = (id: SizeId) => {
+    const n = new Set(selected);
+    if (n.has(id)) n.delete(id); else n.add(id);
+    changeSizes(n);
+  };
 
   const player = useReelPlayer({ project, frames });
+  const [previewKey, setPreviewKey] = useState<string | null>(null);
+  const previewT = targets.find((t) => t.key === previewKey) ?? targets[0] ?? null;
   const doneCount = files.filter((f) => state[f.job]?.blob).length;
   const ready = open && !running && doneCount > 0;
   const overall = files.length ? files.reduce((n, f) => n + (state[f.job]?.progress ?? 0), 0) / files.length : 0;
-  const summaryLine = [videos ? `${videos} ${videos === 1 ? "video" : "videos"}` : null, gifs ? `${gifs} animated ${gifs === 1 ? "GIF" : "GIFs"}` : null].filter(Boolean).join(" + ");
+  void videos; void gifs;
   const exportButton = exportStatus && !exportStatus.allowed ? (
     <AppButton size="lg" onClick={() => setPlanSheet(exportStatus.reason ?? "no_plan")}>Choose a Plan to Export</AppButton>
   ) : (
@@ -322,7 +352,11 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
       title={{ name: project.name, status: "saved" }}
       left={
         <ReelCard
-          preview={player.preview}
+          preview={previewT ? (
+            <ExportStage target={previewT} time={player.time} project={project} frames={frames} brand={brand} images={images} />
+          ) : (
+            <p className="text-center text-[14px] text-ap-muted">Pick a size on the right to preview it.</p>
+          )}
           playing={player.playing}
           onTogglePlay={player.toggle}
           segments={player.segments}
@@ -334,6 +368,25 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
           formats={project.formats}
           format={player.format}
           onFormat={(f) => player.setFormat(f as Format)}
+          sizesSlot={targets.length > 0 && (
+            <>
+              <AppSectionLabel className="mt-5 mb-2">Preview size</AppSectionLabel>
+              <div role="tablist" aria-label="Preview size" className="flex flex-wrap gap-2">
+                {targets.map((t) => {
+                  const on = t.key === previewT?.key;
+                  const r = t.width / t.height;
+                  return (
+                    <button key={t.key} type="button" role="tab" aria-selected={on} onClick={() => setPreviewKey(t.key)}
+                      className={cn("inline-flex min-h-0 items-center gap-2 rounded-lg border bg-ap-card px-3 py-2 text-[13px] font-medium", on ? "border-ap-blue shadow-[0_0_0_1px_var(--ap-blue)]" : "border-ap-hairline")}>
+                      <span aria-hidden className="rounded-[2px] border-[1.5px] border-current" style={{ width: r >= 1 ? 14 : 14 * r, height: r >= 1 ? 14 / r : 14 }} />
+                      {t.name}
+                      <span className="text-[11px] font-normal text-ap-muted nums">{t.ratio}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          )}
         />
       }
     >
@@ -356,13 +409,39 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
         </>
       ) : (
         <>
-          <StepTitle title="Where will this ad play?" lead="Pick every place you'll post it. You'll get a file in the right size for each." />
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-            {CHANNELS.map((c) => (
-              <ChannelCard key={c.id} name={c.name} format={c.format} size={FORMAT_SIZE[c.format]} selected={selected.has(c.id)} onClick={() => toggle(c.id)} project={project} frames={frames} brand={brand} images={images} />
-            ))}
-            <CustomCard value={custom} onChange={setCustom} />
+          <StepTitle title="Where will this ad play?" lead="Pick the shapes you need. One file per shape works everywhere listed under it." />
+          <div className="-mt-2 mb-4 flex flex-wrap items-center gap-2">
+            <span className="mr-1 text-[13px] text-ap-muted">Posting to</span>
+            {PLATFORMS.map((p) => {
+              const st = platformState(p.id, selected);
+              return (
+                <button
+                  key={p.id}
+                  type="button"
+                  aria-pressed={st === "on" ? true : st === "mixed" ? "mixed" : false}
+                  onMouseEnter={() => setHoverP(p.id)}
+                  onMouseLeave={() => setHoverP(null)}
+                  onFocus={() => setHoverP(p.id)}
+                  onBlur={() => setHoverP(null)}
+                  onClick={() => changeSizes(togglePlatform(p.id, selected))}
+                  className={cn(
+                    "inline-flex min-h-0 items-center gap-1 rounded-full px-3 py-1.5 text-[13px] font-medium transition-colors",
+                    st === "on" ? "bg-ap-ink text-ap-card" : st === "mixed" ? "bg-ap-soft-blue text-ap-blue" : "bg-ap-panel text-ap-ink hover:bg-ap-inner",
+                  )}
+                >
+                  {st === "on" && <Check className="size-3" strokeWidth={2.5} />}
+                  {p.name}
+                </button>
+              );
+            })}
           </div>
+          <div className="flex flex-col gap-2.5">
+            {EXPORT_SIZES.map((s) => (
+              <SizeCard key={s.id} size={s} selected={selected.has(s.id)} pulse={pulse.has(s.id)} hover={hoverP} onClick={() => toggleSize(s.id)} project={project} frames={frames} brand={brand} images={images} />
+            ))}
+            <CustomSizes on={customOn} setOn={setCustomOn} rows={customs} setRows={setCustoms} />
+          </div>
+          <p className="mt-3 text-[13px] text-ap-muted">Posting to Reels and TikTok? One vertical file covers both.</p>
 
           {issues.length > 0 && (
             <div className="mt-5 space-y-2">
@@ -379,32 +458,34 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
 
           <AppSectionLabel className="mt-7 mb-2.5">Save as</AppSectionLabel>
           <div className="grid grid-cols-2 gap-3">
-            <PickCard on={mp4} onClick={() => setMp4((v) => !v)} icon={<Film className="size-4" strokeWidth={1.7} />} title="Video MP4" sub="With motion" />
+            <PickCard on={mp4} onClick={() => setMp4((v) => !v)} icon={<Film className="size-4" strokeWidth={1.7} />} title="Video MP4" sub="With motion and sound" />
             <PickCard on={gif} onClick={() => (gif || canUse("gif") ? setGif((v) => !v) : openUpgrade("gif"))} icon={<ImageIcon className="size-4" strokeWidth={1.7} />} title="Animated GIF" sub="Plays anywhere, no sound" />
           </div>
 
-          {mp4 && (
-            <>
-              <div className="mt-5 mb-2 text-[13px] font-semibold">Video motion</div>
-              <Seg value={fps} onChange={setFps} options={[{ v: 30, l: "Standard", s: "30 fps" }, { v: 60, l: "Smooth", s: "60 fps" }, { v: 24, l: "Film", s: "24 fps" }]} />
-            </>
-          )}
+          <Reveal show={mp4}>
+            <div className="mt-5 mb-2 text-[13px] font-semibold" id="vm-label">Video motion</div>
+            <Seg label="Video motion" value={fps} onChange={setFps} options={[{ v: 30, l: "Standard", s: "30 fps" }, { v: 60, l: "Smooth", s: "60 fps" }, { v: 24, l: "Film", s: "24 fps" }]} />
+          </Reveal>
 
-          {gif && (
+          <Reveal show={gif}>
             <div className="mt-6 border-t border-ap-hairline pt-5">
               <AppSectionLabel className="mb-3">GIF quality</AppSectionLabel>
               <div className="ap-gif-grid grid gap-4 sm:grid-cols-2">
-                <Sub label="Size"><Seg value={gSize} onChange={setGSize} options={[{ v: "full", l: "Full", s: "same as video" }, { v: "half", l: "Half" }, { v: "small", l: "Small", s: "480 px" }]} /></Sub>
-                <Sub label="Colors"><Seg value={gColors} onChange={setGColors} options={[{ v: "best", l: "Best" }, { v: "balanced", l: "Balanced" }, { v: "smallest", l: "Smallest" }]} /></Sub>
-                <Sub label="Frame rate"><Seg value={gFps} onChange={setGFps} options={[{ v: 25, l: "Smooth", s: "25 fps" }, { v: 15, l: "Light", s: "15 fps" }, { v: 10, l: "Minimal", s: "10 fps" }]} /></Sub>
-                <Sub label="Loop"><Seg value={gLoop} onChange={setGLoop} options={[{ v: "forever", l: "Forever" }, { v: "once", l: "Once" }]} /></Sub>
+                <Sub label="Size"><Seg label="GIF size" value={gSize} onChange={setGSize} options={[{ v: "full", l: "Full", s: "same as video" }, { v: "half", l: "Half" }, { v: "small", l: "Small", s: "480 px" }]} /></Sub>
+                <Sub label="Colors"><Seg label="GIF colors" value={gColors} onChange={setGColors} options={[{ v: "best", l: "Best" }, { v: "balanced", l: "Balanced" }, { v: "smallest", l: "Smallest" }]} /></Sub>
+                <Sub label="Frame rate"><Seg label="GIF frame rate" value={gFps} onChange={setGFps} options={[{ v: 25, l: "Smooth", s: "25 fps" }, { v: 15, l: "Light", s: "15 fps" }, { v: 10, l: "Minimal", s: "10 fps" }]} /></Sub>
+                <Sub label="Loop"><Seg label="GIF loop" value={gLoop} onChange={setGLoop} options={[{ v: "forever", l: "Forever" }, { v: "once", l: "Once" }]} /></Sub>
               </div>
               <p className="mt-3 text-[12px] text-ap-muted">Full-size GIFs are large files. Pick a smaller size for email.</p>
             </div>
-          )}
+          </Reveal>
 
-          <div className="mt-6 rounded-[14px] bg-ap-panel p-4 text-[14px]">
-            <p className="nums"><b>{files.length} {files.length === 1 ? "file" : "files"}</b>{summaryLine && ` · ${summaryLine}`} · {formatSeconds(seconds)} seconds each</p>
+          <div className="mt-6 rounded-[14px] bg-ap-panel p-4 text-[14px]" aria-live="polite">
+            {files.length ? (
+              <p className="nums"><b>{files.length} {files.length === 1 ? "file" : "files"}</b> · {targets.map((t) => t.name).join(" + ")} · {[mp4 && "MP4", gif && "GIF"].filter(Boolean).join(" + ")} · {formatSeconds(seconds)} sec each</p>
+            ) : (
+              <p><b>Nothing to export yet</b> · {targets.length ? "pick a file type" : "pick at least one size"}</p>
+            )}
             <p className="mt-1 text-[13px] text-ap-muted nums">
               {[
                 exportStatus?.limit != null ? `${Math.max(0, exportStatus.limit - (exportStatus.used ?? 0))} of ${exportStatus.limit} left${exportStatus.trial ? " in your free trial" : " this month"}` : null,
@@ -423,6 +504,21 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
                 <div className="h-1.5 overflow-hidden rounded-full bg-ap-inner"><div className="h-full bg-ap-blue transition-[width]" style={{ width: `${overall * 100}%` }} /></div>
                 <p className="mt-1.5 text-[12px] text-ap-muted">Making your files… Keep this tab open until everything is done.</p>
               </div>
+            )}
+            {files.length > 0 && !running && (
+              <Collapsible className="mt-2">
+                <CollapsibleTrigger className="text-[13px] font-medium text-ap-blue hover:underline">See the file list</CollapsibleTrigger>
+                <CollapsibleContent>
+                  <ul className="mt-2 space-y-1 text-[13px]">
+                    {files.map((f) => (
+                      <li key={f.name} className="flex justify-between gap-3 nums">
+                        <span className="min-w-0 truncate">{f.name}</span>
+                        <span className="shrink-0 text-ap-muted">~{estimateMb(f, seconds, fps, gFps, gColors)} MB</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CollapsibleContent>
+              </Collapsible>
             )}
           </div>
           {running && <div className="mt-3"><FileList files={files} state={state} /></div>}
@@ -464,9 +560,9 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
 
 /* ================================================================== pieces */
 
-function MiniRender({ project, frames, brand, images, format, width, index = 0 }: { project: Project; frames: Frame[]; brand: BrandStyle; images: Map<string, HTMLImageElement> | null; format: Format; width: number; index?: number }) {
+function MiniRender({ project, frames, brand, images, format, width, index = 0, w: outW, h: outH }: { project: Project; frames: Frame[]; brand: BrandStyle; images: Map<string, HTMLImageElement> | null; format: Format; width: number; index?: number; w?: number; h?: number }) {
   const ref = useRef<HTMLCanvasElement>(null);
-  const s = FORMAT_SIZE[format];
+  const s = outW && outH ? { width: outW, height: outH } : FORMAT_SIZE[format];
   const W = Math.round(width * 2);
   const H = Math.round((W * s.height) / s.width);
   useEffect(() => {
@@ -477,83 +573,170 @@ function MiniRender({ project, frames, brand, images, format, width, index = 0 }
   return <canvas ref={ref} width={W} height={H} className="max-w-full rounded-[2px] bg-control-fill" style={{ width, height: H / 2 }} />;
 }
 
-function ChannelCard(props: {
-  name: string;
-  format: Format;
-  size: { width: number; height: number };
+/** Left preview: the ad drawn by renderAt at the chosen size's shape. */
+function ExportStage({ target, time, project, frames, brand, images }: { target: Target; time: number; project: Project; frames: Frame[]; brand: BrandStyle; images: Map<string, HTMLImageElement> | null }) {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const scale = Math.min(1, 900 / Math.max(target.width, target.height));
+  const W = Math.round(target.width * scale);
+  const H = Math.round(target.height * scale);
+  useEffect(() => {
+    const ctx = ref.current?.getContext("2d");
+    if (!ctx || !images) return;
+    renderAt(ctx, project, frames, target.format, time, { width: W, height: H, images, brand });
+  }, [project, frames, brand, images, target.format, W, H, time]);
+  const wide = target.width >= target.height;
+  return (
+    <>
+      <div className="flex h-full w-full items-center justify-center">
+        <canvas
+          ref={ref}
+          width={W}
+          height={H}
+          className="ap-stage-shape rounded-[4px] bg-ap-inner shadow-ap-soft"
+          style={{ aspectRatio: `${target.width} / ${target.height}`, width: wide ? "100%" : "auto", height: wide ? "auto" : "100%", maxWidth: "100%", maxHeight: "100%" }}
+        />
+      </div>
+      <span className="absolute bottom-2.5 left-2.5 rounded-full bg-ap-card px-2 py-0.5 text-[11px] text-ap-muted shadow-ap-soft nums">
+        {target.width.toLocaleString()} × {target.height.toLocaleString()}
+      </span>
+    </>
+  );
+}
+
+function SizeCard({ size, selected, pulse, hover, onClick, ...r }: {
+  size: (typeof EXPORT_SIZES)[number];
   selected: boolean;
+  pulse: boolean;
+  hover: PlatformId | null;
   onClick: () => void;
   project: Project;
   frames: Frame[];
   brand: BrandStyle;
   images: Map<string, HTMLImageElement> | null;
 }) {
-  const { name, format, size, selected, onClick } = props;
-  const w = format === "9:16" ? 68 : format === "1:1" ? 110 : 150;
+  const ratio = size.width / size.height;
+  const thumbW = ratio >= 1 ? 44 : Math.round(44 * ratio);
   return (
     <button
       type="button"
+      role="checkbox"
+      aria-checked={selected}
       onClick={onClick}
-      aria-pressed={selected}
-      className={cn("relative flex flex-col items-center rounded-[14px] border bg-ap-card p-3 text-center", selected ? "border-ap-blue shadow-[0_0_0_1px_var(--ap-blue)]" : "border-ap-hairline")}
+      className={cn("flex w-full items-center gap-3.5 rounded-[14px] border bg-ap-card p-3 text-left sm:p-3.5", selected ? "border-ap-blue shadow-[0_0_0_1px_var(--ap-blue)]" : "border-ap-hairline", pulse && "ap-pulse")}
     >
-      <span className={cn("absolute top-2 right-2 grid size-5 place-items-center rounded-full", selected ? "bg-ap-blue text-ap-card" : "border-[1.5px] border-ap-hairline")}>
+      <span className="grid size-16 shrink-0 place-items-center rounded-[10px] bg-ap-panel">
+        <MiniRender {...r} format={size.layout} width={thumbW} w={size.width} h={size.height} />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
+          <span className="text-[16px] font-semibold">{size.name}</span>
+          <span className="text-[15px] text-ap-muted nums">{size.ratio}</span>
+          {size.badge && <span className="rounded-md bg-ap-soft-blue px-1.5 py-0.5 text-[11px] font-medium text-ap-blue">{size.badge}</span>}
+        </span>
+        <span className="mt-0.5 block text-[13px] leading-snug text-ap-muted">
+          <span className="nums">{size.width.toLocaleString()} × {size.height.toLocaleString()}</span>
+          {" "}
+          {size.uses.map((u, i) => (
+            <span key={u.label}>
+              <span className={cn("transition-colors", hover && u.platforms.includes(hover) && "font-medium text-ap-blue")}>{u.label}</span>
+              {i < size.uses.length - 1 && " · "}
+            </span>
+          ))}
+        </span>
+      </span>
+      <span className={cn("grid size-[22px] shrink-0 place-items-center rounded-full", selected ? "bg-ap-blue text-ap-card" : "border-[1.5px] border-ap-hairline")}>
         {selected && <Check className="size-3" strokeWidth={2.5} />}
       </span>
-      <span className="mt-1 block px-4 text-[13px] font-semibold leading-tight">{name}</span>
-      <span className="mt-0.5 block text-[11px] text-ap-muted nums">{format} · {size.width} × {size.height}</span>
-      <div className="mt-2.5 flex h-[96px] w-full items-center justify-center">
-        <MiniRender {...props} width={Math.round(w * 0.62)} />
-      </div>
     </button>
   );
 }
 
-function CustomCard({ value, onChange }: { value: { on: boolean; w: number; h: number }; onChange: (v: { on: boolean; w: number; h: number }) => void }) {
-  const input = (k: "w" | "h", label: string) => (
-    <input
-      type="number"
-      aria-label={label}
-      min={64}
-      max={3840}
-      value={value[k] || ""}
-      onClick={(e) => e.stopPropagation()}
-      onChange={(e) => onChange({ ...value, on: true, [k]: Number(e.target.value) })}
-      className="h-9 w-[64px] rounded-lg border border-ap-hairline bg-ap-card px-2 text-center text-[13px] nums"
-    />
-  );
+function CustomSizes({ on, setOn, rows, setRows }: { on: boolean; setOn: (v: boolean) => void; rows: CustomRow[]; setRows: (r: CustomRow[]) => void }) {
+  const toggle = () => {
+    if (!on && !rows.length) setRows([{ id: rid(), w: "", h: "" }]);
+    setOn(!on);
+  };
+  const update = (id: string, k: "w" | "h", v: string) => setRows(rows.map((r) => (r.id === id ? { ...r, [k]: v.replace(/[^0-9]/g, "") } : r)));
+  const preset = (w: number, h: number) => {
+    if (rows.some((r) => num(r.w) === w && num(r.h) === h)) return;
+    const empty = rows.find((r) => !r.w && !r.h);
+    setRows(empty ? rows.map((r) => (r === empty ? { ...r, w: String(w), h: String(h) } : r)) : [...rows, { id: rid(), w: String(w), h: String(h) }]);
+  };
   return (
-    <div
-      role="button"
-      tabIndex={0}
-      aria-pressed={value.on}
-      onClick={() => onChange({ ...value, on: !value.on })}
-      onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && e.target === e.currentTarget && onChange({ ...value, on: !value.on })}
-      className={cn("relative flex cursor-pointer flex-col items-center rounded-[14px] border border-dashed bg-ap-card p-3 text-center", value.on ? "border-solid border-ap-blue shadow-[0_0_0_1px_var(--ap-blue)]" : "border-ap-hairline")}
-    >
-      <span className={cn("absolute top-2 right-2 grid size-5 place-items-center rounded-full", value.on ? "bg-ap-blue text-ap-card" : "border-[1.5px] border-ap-hairline")}>
-        {value.on && <Check className="size-3" strokeWidth={2.5} />}
-      </span>
-      <span className="mt-1 block text-[13px] font-semibold">Custom size</span>
-      <span className="mt-0.5 block text-[11px] text-ap-muted nums">Any width × height</span>
-      <div className="mt-2.5 flex h-[96px] items-center justify-center gap-1.5 text-[13px] text-ap-muted">
-        {input("w", "Width in pixels")} × {input("h", "Height in pixels")}
-      </div>
+    <div className={cn("rounded-[14px] border bg-ap-card", on ? "border-ap-blue shadow-[0_0_0_1px_var(--ap-blue)]" : "border-dashed border-ap-hairline")}>
+      <button type="button" role="checkbox" aria-checked={on} onClick={toggle} className="flex w-full items-center gap-3.5 p-3 text-left sm:p-3.5">
+        <span className="grid size-16 shrink-0 place-items-center rounded-[10px] bg-ap-panel text-ap-muted"><Plus className="size-5" strokeWidth={1.7} /></span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-[16px] font-semibold">Custom size</span>
+          <span className="mt-0.5 block text-[13px] text-ap-muted">Any width × height, for ad networks and banners</span>
+        </span>
+        <span className={cn("grid size-[22px] shrink-0 place-items-center rounded-full", on ? "bg-ap-blue text-ap-card" : "border-[1.5px] border-ap-hairline")}>
+          {on && <Check className="size-3" strokeWidth={2.5} />}
+        </span>
+      </button>
+      <Reveal show={on}>
+        <div className="space-y-3 px-3 pb-3.5 sm:px-3.5">
+          {rows.map((r, i) => {
+            const w = num(r.w), h = num(r.h);
+            const err = r.w || r.h ? customError(w, h) : null;
+            const eid = `cs-err-${r.id}`;
+            return (
+              <div key={r.id}>
+                <div className="flex flex-wrap items-center gap-2 text-[13px]">
+                  <label className="sr-only" htmlFor={`cw-${r.id}`}>Width in pixels, size {i + 1}</label>
+                  <input id={`cw-${r.id}`} inputMode="numeric" placeholder="Width" value={r.w} onChange={(e) => update(r.id, "w", e.target.value)} aria-invalid={!!err} aria-describedby={err ? eid : undefined}
+                    className="h-9 w-[84px] rounded-lg border border-ap-hairline bg-ap-card px-2 text-center nums" />
+                  <span className="text-ap-muted">×</span>
+                  <label className="sr-only" htmlFor={`ch-${r.id}`}>Height in pixels, size {i + 1}</label>
+                  <input id={`ch-${r.id}`} inputMode="numeric" placeholder="Height" value={r.h} onChange={(e) => update(r.id, "h", e.target.value)} aria-invalid={!!err} aria-describedby={err ? eid : undefined}
+                    className="h-9 w-[84px] rounded-lg border border-ap-hairline bg-ap-card px-2 text-center nums" />
+                  <span className="text-ap-muted">px</span>
+                  {!err && w && h && <span className="text-ap-muted nums">{ratioLabel(w, h)}</span>}
+                  {rows.length > 1 && (
+                    <button type="button" aria-label={`Remove size ${i + 1}`} onClick={() => setRows(rows.filter((x) => x.id !== r.id))} className="ml-auto grid size-8 min-h-0 min-w-0 place-items-center rounded-lg text-ap-muted hover:bg-ap-panel">
+                      <X className="size-4" strokeWidth={1.7} />
+                    </button>
+                  )}
+                </div>
+                {err && <p id={eid} className="mt-1 text-[12px] text-destructive">{err}</p>}
+              </div>
+            );
+          })}
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="mr-1 text-[12px] text-ap-muted">Quick add</span>
+            {CUSTOM_PRESETS.map((p) => (
+              <button key={p.label} type="button" onClick={() => preset(p.w, p.h)} className="min-h-0 rounded-full bg-ap-panel px-2.5 py-1 text-[12px] hover:bg-ap-inner">
+                <span className="nums">{p.w}×{p.h}</span> <span className="text-ap-muted">{p.label}</span>
+              </button>
+            ))}
+          </div>
+          <button type="button" onClick={() => setRows([...rows, { id: rid(), w: "", h: "" }])} className="min-h-0 text-[13px] font-medium text-ap-blue hover:underline">+ Add another size</button>
+          <p className="sr-only">Sizes from {CUSTOM_MIN} to {CUSTOM_MAX} px.</p>
+        </div>
+      </Reveal>
     </div>
   );
+}
+
+/** Smooth collapse; hidden content is inert so keyboard and screen readers skip it. Values are kept. */
+function Reveal({ show, children }: { show: boolean; children: React.ReactNode }) {
+  return (
+    <div className="ap-reveal grid" style={{ gridTemplateRows: show ? "1fr" : "0fr" }} inert={!show} aria-hidden={!show}>
+      <div className="min-h-0 overflow-hidden">{children}</div>
+    </div>
+  );
+}
+
+/** Rough file size estimate for the file list. */
+function estimateMb(f: FileRow, seconds: number, fps: number, gFps: number, colors: GifColors) {
+  const px = f.width * f.height * seconds;
+  const bytes = f.kind === "mp4" ? px * 0.24 * Math.sqrt(fps / 30) : px * gFps * 0.059 * (colors === "best" ? 1 : colors === "balanced" ? 0.75 : 0.5);
+  const mb = bytes / 1_000_000;
+  return mb < 10 ? mb.toFixed(1) : Math.round(mb).toString();
 }
 
 function IssueThumb({ project, frames, index, images, brand }: { project: Project; frames: Frame[]; index: number; images: Map<string, HTMLImageElement> | null; brand: BrandStyle }) {
   return <MiniRender project={project} frames={frames} brand={brand} images={images} format="1:1" width={36} index={index} />;
-}
-
-function Group({ label, children, className }: { label: string; children: React.ReactNode; className?: string }) {
-  return (
-    <div className={cn("rounded-sm bg-card p-4 shadow-card", className)}>
-      <div className="mb-2.5 text-[12px] font-medium text-secondary-text">{label}</div>
-      {children}
-    </div>
-  );
 }
 
 function Sub({ label, children }: { label: string; children: React.ReactNode }) {
@@ -565,14 +748,15 @@ function Sub({ label, children }: { label: string; children: React.ReactNode }) 
   );
 }
 
-function Seg<T extends string | number>({ value, onChange, options }: { value: T; onChange: (v: T) => void; options: { v: T; l: string; s?: string }[] }) {
+function Seg<T extends string | number>({ value, onChange, options, label }: { value: T; onChange: (v: T) => void; options: { v: T; l: string; s?: string }[]; label: string }) {
   return (
-    <div className="flex gap-[3px] rounded-[10px] bg-ap-panel p-[3px]">
+    <div role="radiogroup" aria-label={label} className="flex gap-[3px] rounded-[10px] bg-ap-panel p-[3px]">
       {options.map((o) => (
         <button
           key={String(o.v)}
           type="button"
-          aria-pressed={value === o.v}
+          role="radio"
+          aria-checked={value === o.v}
           onClick={() => onChange(o.v)}
           className={cn("flex min-h-10 flex-1 flex-col items-center justify-center rounded-[7px] px-1.5 py-1 text-[13px] leading-tight", value === o.v && "bg-ap-card font-semibold shadow-ap-soft")}
         >
@@ -586,9 +770,9 @@ function Seg<T extends string | number>({ value, onChange, options }: { value: T
 
 function PickCard({ on, onClick, icon, title, sub }: { on: boolean; onClick: () => void; icon: React.ReactNode; title: string; sub: string }) {
   return (
-    <button type="button" aria-pressed={on} onClick={onClick} className={cn("relative min-h-16 rounded-[14px] border bg-ap-card p-3.5 text-left", on ? "border-ap-blue shadow-[0_0_0_1px_var(--ap-blue)]" : "border-ap-hairline")}>
-      <span className={cn("absolute top-3 right-3 grid size-5 place-items-center rounded-full", on ? "bg-ap-blue text-ap-card" : "border-[1.5px] border-ap-hairline")}>
-        {on && <Check className="size-2.5" strokeWidth={2.5} />}
+    <button type="button" role="checkbox" aria-checked={on} onClick={onClick} className={cn("relative min-h-16 rounded-[14px] border bg-ap-card p-3.5 text-left", on ? "border-ap-blue shadow-[0_0_0_1px_var(--ap-blue)]" : "border-ap-hairline")}>
+      <span className={cn("absolute top-3 right-3 grid size-[22px] place-items-center rounded-full", on ? "bg-ap-blue text-ap-card" : "border-[1.5px] border-ap-hairline")}>
+        {on && <Check className="size-3" strokeWidth={2.5} />}
       </span>
       {icon}
       <div className="mt-2 text-[14px] font-semibold">{title}</div>
@@ -710,7 +894,7 @@ function PreviousExports({ projectId, version }: { projectId: string; version: n
             <ul className="space-y-1">
               {it.files.map((n) => (
                 <li key={n} className="flex items-center justify-between gap-2 text-[13px]">
-                  <span className="truncate">{n}</span>
+                  <span className="truncate">{n}{sizeLabelForFile(n) && <span className="ml-2 text-secondary-text">{sizeLabelForFile(n)}</span>}</span>
                   <Button variant="ghost" size="sm" onClick={() => void download(it.stamp, n)}>
                     <Download strokeWidth={1.7} /> Download
                   </Button>

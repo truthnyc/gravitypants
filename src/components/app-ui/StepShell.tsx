@@ -181,7 +181,7 @@ const FORMATS = ["9:16", "1:1", "16:9"] as const;
 
 /** Left card: reel preview, play + progress, name and meta, sizes. Same on every step. */
 export function ReelCard({
-  preview, playing, onTogglePlay, segments, time, total, name, onRename, meta, status, formats, format, onFormat, onToggleFormat, exported, readOnly,
+  preview, playing, onTogglePlay, segments, time, total, name, onRename, meta, status, formats, format, onFormat, onToggleFormat, exported, readOnly, sizesSlot,
 }: {
   preview: ReactNode;
   playing: boolean;
@@ -199,6 +199,8 @@ export function ReelCard({
   onToggleFormat?: (f: (typeof FORMATS)[number], on: boolean) => void;
   exported?: string[];
   readOnly?: boolean;
+  /** Replaces the Sizes section (Export step shows its own preview-size tabs). */
+  sizesSlot?: ReactNode;
 }) {
   const fmt = (s: number) => `${Math.floor(s / 60)}:${(s % 60).toFixed(1).padStart(4, "0")}`;
   const lp = useContext(LargeCtx);
@@ -261,7 +263,7 @@ export function ReelCard({
           )}
         </p>
       </div>
-      {exported ? (
+      {sizesSlot ? sizesSlot : exported ? (
         <div className="mt-3.5 flex flex-wrap gap-1.5">
           {exported.map((e) => <span key={e} className="rounded-[10px] bg-ap-panel px-2.5 py-1.5 text-[13px] font-medium"><span className="text-ap-green">✓ </span>{e}</span>)}
         </div>
