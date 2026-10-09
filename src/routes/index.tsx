@@ -210,7 +210,7 @@ const tabCopy: Record<Tab, { title: string; body: string }> = {
   },
   Export: {
     title: "Download every size you need.",
-    body: "Export 9:16, 1:1 and 16:9 together. Choose MP4 for ads and social posts, or GIF for email and websites.",
+    body: "Export 9:16, 4:5, 1:1, 16:9 and custom sizes together. Choose MP4 for ads and social posts, or GIF for email and websites.",
   },
 };
 function Primary({ children, to = "/signup" }: { children: React.ReactNode; to?: "/signup" | "/examples" }) {
@@ -670,7 +670,7 @@ function Home() {
               <div className="home-step-copy">
                 <span>03</span>
                 <h3>Download your files</h3>
-                <p>Get 9:16, 1:1 and 16:9 versions as MP4 or GIF, ready for social, ads, email and websites.</p>
+                <p>Get 9:16, 4:5, 1:1, 16:9 and custom-size versions as MP4 or GIF, ready for social, ads, email and websites.</p>
               </div>
             </article>
           </div>

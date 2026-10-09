@@ -51,7 +51,7 @@ export const PLANS: PlanConfig[] = [
     monthly: 35,
     yearly: 350,
     team: false,
-    features: ["1 seat", "10 exports a month", "9:16, 1:1 and 16:9", "MP4 and GIF", "Every Google Font", "Brand kit: logo, colors, fonts", "Duplicate with new photos", "Save as template", "No watermark", "Need more? Packs of 5, 10 or 20 extra exports"],
+    features: ["1 seat", "10 exports a month", "9:16, 4:5, 1:1, 16:9 and custom", "MP4 and GIF", "Every Google Font", "Brand kit: logo, colors, fonts", "Duplicate with new photos", "Save as template", "No watermark", "Need more? Packs of 5, 10 or 20 extra exports"],
   },
   {
     id: "business",
@@ -118,7 +118,7 @@ export const COMPARE: CompareGroup[] = [
   },
   {
     group: "Create & export",
-    rows: ["9:16, 1:1 and 16:9", "MP4", "GIF", "Every Google Font"].map((label) => ({ label, cells: [true, true, true, true] as [Cell, Cell, Cell, Cell] })),
+    rows: ["9:16, 4:5, 1:1, 16:9 and custom", "MP4", "GIF", "Every Google Font"].map((label) => ({ label, cells: [true, true, true, true] as [Cell, Cell, Cell, Cell] })),
   },
   {
     group: "Brand & reuse",

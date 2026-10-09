@@ -13,7 +13,7 @@ export const Route = createFileRoute("/aimante/about")({
   component: About,
 });
 
-const SHAPE: Record<string, string> = { "9x16": "w-[150px] aspect-[9/16]", "1x1": "w-[200px] aspect-square", "16x9": "w-[280px] aspect-video" };
+const SHAPE: Record<string, string> = { "9x16": "w-[150px] aspect-[9/16]", "4x5": "w-[180px] aspect-[4/5]", "1x1": "w-[200px] aspect-square", "16x9": "w-[280px] aspect-video" };
 const MOODS = ["soothing", "elegant", "cozy", "playful", "bold", "inspiring"];
 const primary = "inline-flex h-11 items-center justify-center rounded-lg bg-ap-blue px-5 text-[15px] font-medium text-ap-card hover:bg-ap-blue-hover";
 const grey = "inline-flex h-11 items-center justify-center rounded-lg bg-ap-panel px-5 text-[15px] font-medium text-ap-ink hover:bg-ap-hairline";
