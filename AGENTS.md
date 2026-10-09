@@ -44,4 +44,3 @@
 - Website reel favorites use own `site_reel_favorites` rows via `SiteReelHeart`/`useSiteReelFavorites`; Favorites includes Directory reels.
 - App/SSR failures share dependency-free `ServiceUnavailable`.
 - Scope Aimanté by site; `brand-page` helpers centralize brand rules.
-- Export sizes and platform shortcuts live only in `src/lib/stillframe/export-sizes.ts`; non-built-in shapes (4:5, custom) render through `renderAt` using the nearest built-in layout — one config, no second drawing path.
