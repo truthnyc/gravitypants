@@ -655,7 +655,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
         />
       </div>
       <StepActions>
-        <AppButton variant="ghost" size="sm" onClick={undo} disabled={!canUndo || readOnly} aria-label="Undo"><Undo2 className="size-4" strokeWidth={1.7} /> Undo <kbd className="ml-1 font-ap text-[11px] text-ap-faint">{isMac ? "⌘Z" : "Ctrl+Z"}</kbd></AppButton>
+        <AppButton variant="ghost" size="sm" onClick={undo} disabled={!canUndo || readOnly} aria-label="Undo"><Undo2 className="size-4" strokeWidth={1.7} /> Undo <kbd suppressHydrationWarning className="ml-1 font-ap text-[11px] text-ap-faint">{isMac ? "⌘Z" : "Ctrl+Z"}</kbd></AppButton>
         <KitAgainButton adId={doc.project.id} templateId={doc.project.template_id} />
         <span className="flex-1" />
         {exportDisabled ? (
