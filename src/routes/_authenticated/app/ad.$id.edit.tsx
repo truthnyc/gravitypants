@@ -14,6 +14,8 @@ export const Route = createFileRoute("/_authenticated/app/ad/$id/edit")({
       { name: "description", content: "Edit photos, text, timing and transitions for your ad." },
       { property: "og:title", content: "Edit ad — Gravity Pants" },
       { property: "og:description", content: "Edit photos, text, timing and transitions." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: EditPage,

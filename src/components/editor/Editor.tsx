@@ -29,6 +29,8 @@ import { Inspector, type InspectorActions } from "./Inspector";
 import { Stage } from "./Stage";
 import { useAutosave, useEditorDoc, useRenderAssets, type ElementKey } from "./use-editor";
 import { cn } from "@/lib/utils";
+import { changeFrameLength } from "./frame-timing";
+import { frameStarts, transitionDuration } from "@/render/renderFrame";
 
 const NEW_HEADLINE: TextSettings = {
   text: "",
@@ -160,6 +162,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
 
   /* ---------------- playback */
   const raf = useRef(0);
+  const previewStop = useRef<number | null>(null);
   useEffect(() => {
     if (!playing) return;
     let last = performance.now();
@@ -169,9 +172,11 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
       let stop = false;
       setTime((t) => {
         const next = t + dt;
-        if (next >= total) {
+        const end = previewStop.current ?? total;
+        if (next >= end) {
           stop = true;
-          return total;
+          previewStop.current = null;
+          return end;
         }
         return next;
       });
@@ -190,6 +195,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
   }, [playing, time, frames]);
 
   const togglePlay = useCallback(() => {
+    previewStop.current = null;
     setPlaying((p) => {
       if (!p && time >= total - 0.05) setTime(0);
       return !p;
@@ -261,8 +267,20 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
     }));
   };
 
-  const setDuration = (i: number, seconds: number) =>
-    updateFrame(i, (f) => ({ ...f, duration_sec: seconds }), `duration-${i}`);
+  const setDuration = (i: number, seconds: number, key?: string) =>
+    apply((d) => ({ ...d, frames: changeFrameLength(d.frames, i, seconds, sameLength) }), key ?? `duration-${i}`);
+
+  const playTransition = (i: number, patch: Partial<TransitionSettings>) => {
+    const target = frames[i];
+    if (!target || i === 0) return;
+    const transition = { ...target.transition_in, ...patch };
+    const start = frameStarts(frames)[i] ?? 0;
+    const duration = Math.min(transitionDuration(transition), frames[i - 1]?.duration_sec ?? 0, target.duration_sec);
+    previewStop.current = start + Math.min(0.25, target.duration_sec / 2);
+    setTime(Math.max(0, start - Math.max(0.1, duration)));
+    setFrameIndex(i);
+    setPlaying(true);
+  };
 
   const duplicateFrame = (at = idx) => {
     const src = frames[at];
@@ -454,6 +472,25 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
     onAddLogo: (file, variant) => void addLogo(file, variant),
   };
 
+  const actionsForFrame = (i: number): InspectorActions => ({
+    ...actions,
+    onDuration: (seconds, key) => setDuration(i, seconds, key),
+    onSameLength: (on) => {
+      setSameLength(on);
+      const target = frames[i];
+      if (on && target) apply((d) => ({ ...d, frames: changeFrameLength(d.frames, i, target.duration_sec, true) }));
+    },
+    onTransition: (patch) => {
+      apply((d) => ({ ...d, frames: d.frames.map((f, j) => (j > 0 && (sameTransition || j === i)) ? { ...f, transition_in: { type: "cut", speed: "smooth", ...f.transition_in, ...patch } } : f) }));
+      playTransition(i, patch);
+    },
+    onSameTransition: (on) => {
+      setSameTransition(on);
+      const target = frames[i];
+      if (on && target) apply((d) => ({ ...d, frames: d.frames.map((f, j) => j > 0 ? { ...f, transition_in: { ...target.transition_in } } : f) }));
+    },
+  });
+
   /* ---------------- keyboard */
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -466,6 +503,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
         return;
       }
       if (isTyping(e.target) || mod) return;
+      if ((e.target as HTMLElement | null)?.closest('[role="dialog"], [role="menu"], [role="slider"], [role="switch"], [role="radiogroup"]')) return;
       if (e.altKey && (e.key === "ArrowUp" || e.key === "ArrowDown")) {
         if (selected === "headline" || selected === "subline") {
           e.preventDefault();
@@ -590,9 +628,6 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-[220px]">
                 <DropdownMenuItem asChild><Link to="/app/ad/$id/photos" params={{ id: doc.project.id }}>Replace all photos…</Link></DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => duplicateFrame()}>Duplicate this frame</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-destructive" onSelect={() => deleteFrame()}>Delete this frame</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
             <StaffMenu adId={doc.project.id} />
@@ -609,10 +644,8 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
           version={version}
           uploading={uploading}
           onSelect={selectFrame}
-          onSelectTransition={(i) => {
-            selectFrame(i);
-            setSelected("transition");
-          }}
+          actionsForFrame={actionsForFrame}
+          endSeconds={endSeconds}
           onReorder={reorder}
           onAddFiles={addFiles}
           canPaste={Boolean(styleClip)}
