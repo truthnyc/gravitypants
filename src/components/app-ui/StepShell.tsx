@@ -152,16 +152,17 @@ export function StepShell({ adId, step, left, children, banner, back, title }: {
       <LargeCtx.Provider value={{ large, toggle }}>
         <main className={cn("ap-steps-main mx-auto grid max-w-[1180px] items-start gap-7 px-4 pt-6 pb-20 sm:px-6 sm:pt-8", large && "ap-large")}>
           <div className="min-w-0 lg:sticky lg:top-6">{left}</div>
-          <AppCard className="min-w-0">{children}</AppCard>
+          <AppCard id="step-editor" className="ap-step-card min-w-0 scroll-mt-20"><div className="ap-step-inner">{children}</div></AppCard>
         </main>
       </LargeCtx.Provider>
     </div>
   );
 }
 
-export function StepTitle({ title, lead, tag }: { title: string; lead?: ReactNode; tag?: ReactNode }) {
+export function StepTitle({ title, lead, tag, actions }: { title: string; lead?: ReactNode; tag?: ReactNode; actions?: ReactNode }) {
   return (
     <div className="mb-[22px]">
+      {actions && <div className="float-right ml-3 flex items-center gap-2">{actions}</div>}
       <h1 className="mb-1.5 flex flex-wrap items-center gap-2 text-[30px] font-bold tracking-[-0.03em]">{title}{tag}</h1>
       {lead && <p className="leading-normal text-ap-body">{lead}</p>}
     </div>
@@ -215,7 +216,7 @@ export function ReelCard({
             onClick={lp.toggle}
             aria-pressed={lp.large}
             title="Shortcut: \"
-            className="absolute top-2.5 right-2.5 hidden items-center gap-1.5 rounded-lg bg-ap-card px-2.5 py-1.5 text-[12px] font-medium text-ap-ink shadow-ap-soft hover:text-ap-blue md:inline-flex"
+            className="absolute top-2.5 right-2.5 hidden items-center gap-1.5 rounded-lg bg-ap-card px-2.5 py-1.5 text-[12px] font-medium text-ap-ink shadow-ap-soft hover:text-ap-blue lg:inline-flex"
           >
             {lp.large ? <Minimize2 className="size-3.5" strokeWidth={1.7} /> : <Maximize2 className="size-3.5" strokeWidth={1.7} />}
             {lp.large ? "Smaller preview" : "Larger preview"}
@@ -263,6 +264,11 @@ export function ReelCard({
           )}
         </p>
       </div>
+      {lp?.large && (
+        <button type="button" className="mt-3 hidden text-[13px] text-ap-blue hover:text-ap-blue-hover lg:block" onClick={() => document.getElementById("step-editor")?.scrollIntoView({ behavior: "smooth", block: "start" })}>
+          Editing controls are below the preview ↓
+        </button>
+      )}
       {sizesSlot ? sizesSlot : exported ? (
         <div className="mt-3.5 flex flex-wrap gap-1.5">
           {exported.map((e) => <span key={e} className="rounded-[10px] bg-ap-panel px-2.5 py-1.5 text-[13px] font-medium"><span className="text-ap-green">✓ </span>{e}</span>)}
