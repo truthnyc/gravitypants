@@ -32,7 +32,7 @@ export function sanitizeSvg(source: string): string {
       for (const [key, raw] of Object.entries((node[":@"] ?? {}) as Node)) {
         const name = key.replace(/^@_/, "");
         const value = String(raw);
-        if (!ATTRS.has(name) || (!name.startsWith("xmlns") && !safeValue(value))) continue;
+        if (!ATTRS.has(name) || (name !== "style" && !name.startsWith("xmlns") && !safeValue(value))) continue;
         if ((name === "href" || name === "xlink:href") && !/^#[\w.-]+$/.test(value)) continue;
         if (name === "xmlns" && value !== "http://www.w3.org/2000/svg") continue;
         if (name === "xmlns:xlink" && value !== "http://www.w3.org/1999/xlink") continue;
