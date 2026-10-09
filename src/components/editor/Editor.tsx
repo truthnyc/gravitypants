@@ -145,6 +145,12 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
   const frames = doc.frames;
   const idx = Math.min(frameIndex, Math.max(0, frames.length - 1));
   const frame = frames[idx];
+  // Font picker hover shows the font on the preview without touching the saved ad.
+  const stageDoc = useMemo(() => {
+    if (!fontPreview || !frame?.[fontPreview.el]) return doc;
+    const patch = { font_family: fontPreview.family, font_weight: fontPreview.weight };
+    return { ...doc, frames: doc.frames.map((f, j) => (j === idx ? { ...f, [fontPreview.el]: { ...f[fontPreview.el], ...patch } } : f)) };
+  }, [doc, fontPreview, idx, frame]);
   const total = videoDuration(doc.project, frames, brand);
 
   const selectFrame = useCallback(
