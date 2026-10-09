@@ -1,0 +1,1 @@
+grant execute on function private.workspace_seat_activity(uuid) to authenticated;
