@@ -52,11 +52,14 @@ export const setBrandLogo = createServerFn({ method: "POST" })
     const sb = context.supabase as any;
     const { data: b } = await sb.from("directory_brands").select("id, workspace_id").eq("id", data.brandId).maybeSingle();
     if (!b) throw new Error("This brand page isn't available");
-    const { data: canEdit } = await sb.rpc("is_workspace_admin", { _ws: b.workspace_id });
-    if (canEdit !== true) throw new Error("Only this brand's workspace owner or admins can change its logo");
+    const [{ data: canEdit }, { data: isStaff }] = await Promise.all([
+      sb.rpc("is_workspace_admin", { _ws: b.workspace_id }),
+      sb.rpc("is_platform_admin"),
+    ]);
+    if (canEdit !== true && isStaff !== true) throw new Error("Only this brand's workspace owner or admins can change its logo");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     let logo: string | null = null;
     if (data.file) {
-      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       const ext = { "image/png": "png", "image/jpeg": "jpg", "image/webp": "webp", "image/svg+xml": "svg" }[data.file.type];
       const path = `${b.workspace_id}/directory-logo-${Date.now()}.${ext}`;
       const bytes = Uint8Array.from(atob(data.file.base64), (c) => c.charCodeAt(0));
@@ -64,8 +67,12 @@ export const setBrandLogo = createServerFn({ method: "POST" })
       if (error) throw new Error("Couldn't upload the logo");
       logo = LOGO_PREFIX + path;
     }
-    const { error } = await sb.from("directory_brands").update({ logo_url: logo }).eq("id", b.id);
+    const db = (canEdit === true ? sb : supabaseAdmin) as any;
+    const { error } = await db.from("directory_brands").update({ logo_url: logo }).eq("id", b.id);
     if (error) throw new Error("Couldn't save the logo");
+    if (canEdit !== true) {
+      await (supabaseAdmin as any).from("admin_audit_log").insert({ admin_user_id: context.userId, action: logo ? "brand.logo.set" : "brand.logo.remove", workspace_id: b.workspace_id, target: b.id });
+    }
     return { ok: true };
   });
 
