@@ -1,4 +1,5 @@
 # Roadmap
+- [x] Replace phone font popover with a bottom sheet; verified phone search/close and desktop popover, saved SVG readback without active content, export font outage/retry and nine passing tests.
 - [x] Move timing and transitions to frame-strip popovers; verified menus, delete/toast undo, keyboard navigation and shared timing saved across reload; nine timing/transition tests pass.
 - [x] Update and verify four-shape descriptions and illustrations on Home, Features, Pricing, About, Help, How it Works and Aimanté About; seven pages load with metadata, four-shape artwork checked, five export-size tests pass.
 - [x] Redesign Aimanté brand pages; verified desktop/phone layouts, reel dialog, related links and affiliation notice; browser-test playback unavailable (no supported media source).

@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { getWorkspaceId } from "./workspace";
+import { sanitizeLogoFile } from "./svg-safety";
 
 export const MEDIA_BUCKET = "media";
 export const BRAND_BUCKET = "brand-assets";
@@ -10,6 +11,7 @@ export const BRAND_PREFIX = "brand-assets:";
 export async function uploadBrandAsset(file: File): Promise<string> {
   if (!file.type.startsWith("image/")) throw new Error("Choose an image file (PNG, SVG, JPG or WebP).");
   if (file.size > 5 * 1024 * 1024) throw new Error("That image is over 5 MB. Choose a smaller one.");
+  file = await sanitizeLogoFile(file);
   const extByType: Record<string, string> = { "image/png": "png", "image/jpeg": "jpg", "image/webp": "webp", "image/svg+xml": "svg", "image/gif": "gif" };
   const ext = extByType[file.type];
   if (!ext) throw new Error("Choose a PNG, SVG, JPG, WebP or GIF image.");
@@ -74,6 +76,7 @@ export async function uploadMedia(
   file: File,
   kind: "photo" | "logo" | "font" = "photo",
 ): Promise<UploadedPhoto> {
+  if (kind !== "font") file = await sanitizeLogoFile(file);
   const path = `${getWorkspaceId()}/${kind}/${crypto.randomUUID()}-${safeName(file.name)}`;
   const { error: uploadError } = await supabase.storage
     .from(MEDIA_BUCKET)

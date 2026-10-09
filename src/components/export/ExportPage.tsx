@@ -18,7 +18,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { supabase } from "@/integrations/supabase/client";
 import { effectiveKit, useBrandKit, useBrandKits, useTemplateName } from "@/lib/stillframe/data";
 import { MEDIA_BUCKET } from "@/lib/stillframe/media";
-import { registerCustomFonts } from "@/lib/stillframe/fonts";
+import { FontLoadError, registerCustomFonts } from "@/lib/stillframe/fonts";
 import { nearestFormat, slugify } from "@/lib/stillframe/channels";
 import { CUSTOM_MAX, CUSTOM_MIN, CUSTOM_PRESETS, DEFAULT_SIZES, EXPORT_SIZES, PLATFORMS, customError, exportFileName, migrateSizes, platformState, ratioLabel, sizeLabelForFile, togglePlatform, type PlatformId, type SizeId } from "@/lib/stillframe/export-sizes";
 import { formatSeconds, type Format, type Frame, type Project } from "@/lib/stillframe/types";
@@ -59,19 +59,27 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
 
   const [images, setImages] = useState<Map<string, HTMLImageElement> | null>(null);
   const [fontsReady, setFontsReady] = useState(false);
+  const [fontError, setFontError] = useState<string | null>(null);
+  const [fontRetry, setFontRetry] = useState(0);
   useEffect(() => {
     let alive = true;
+    setFontsReady(false);
+    setFontError(null);
     void (async () => {
       if (kit?.custom_fonts.length) await registerCustomFonts(kit.custom_fonts);
-      const [map] = await Promise.all([loadImages(mediaPaths(project, frames)), ensureFonts(frames, brand)]);
+      const map = await loadImages(mediaPaths(project, frames));
+      if (alive) setImages(map);
+      await ensureFonts(frames, brand, true);
       if (!alive) return;
       setImages(map);
       setFontsReady(true);
-    })();
+    })().catch((error) => {
+      if (alive) setFontError(error instanceof FontLoadError ? error.message : "Couldn't prepare this ad. Check your connection and retry.");
+    });
     return () => {
       alive = false;
     };
-  }, [project, frames, brand, kit?.custom_fonts]);
+  }, [project, frames, brand, kit?.custom_fonts, fontRetry]);
 
   const [selected, setSelected] = useState<Set<SizeId>>(() => new Set(DEFAULT_SIZES));
   const [customs, setCustoms] = useState<CustomRow[]>([]);
@@ -225,7 +233,13 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
     await wake();
     try {
       await runJobs(ac);
+    } catch (error) {
+      const note = error instanceof FontLoadError ? error.message : "Couldn't prepare this export. Please try again.";
+      setFontError(note);
+      setState(Object.fromEntries([...jobs.keys()].map((k) => [k, { progress: 0, status: "error" as const, note }])));
+      toast.error(note);
     } finally {
+      setRunning(false);
       document.removeEventListener("visibilitychange", onVis);
       void holder.lock?.release().catch(() => undefined);
     }
@@ -233,7 +247,8 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
 
   const runJobs = async (ac: AbortController) => {
     if (!images) return;
-    await ensureFonts(frames, brand);
+    if (kit?.custom_fonts.length) await registerCustomFonts(kit.custom_fonts);
+    await ensureFonts(frames, brand, true);
     const stamp = new Date().toISOString().replace(/[:.]/g, "-");
     let counted = false;
     const ws = project.workspace_id;
@@ -341,7 +356,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
     <AppButton size="lg" onClick={() => setPlanSheet(exportStatus.reason ?? "no_plan")}>Choose a Plan to Export</AppButton>
   ) : (
     <AppButton size="lg" disabled={!files.length || blocked || !images || !fontsReady || running} onClick={() => void start()}>
-      {!images || !fontsReady ? "Getting ready…" : running ? "Exporting…" : `Export ${files.length} ${files.length === 1 ? "File" : "Files"}`}
+      {fontError ? "Export unavailable" : !images || !fontsReady ? "Getting ready…" : running ? "Exporting…" : `Export ${files.length} ${files.length === 1 ? "File" : "Files"}`}
     </AppButton>
   );
 
@@ -523,6 +538,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
           </div>
           {running && <div className="mt-3"><FileList files={files} state={state} /></div>}
           {open && !running && !doneCount && <p className="mt-3 text-[13px] text-destructive">No files were made. Try again, or pick a smaller GIF size.</p>}
+          {fontError && <div role="alert" className="mt-3 text-[13px] text-destructive"><p>{fontError}</p><Button variant="plain" className="mt-2" onClick={() => setFontRetry((v) => v + 1)}>Retry loading fonts</Button></div>}
           {blocked && <p className="mt-3 text-[12px] text-destructive">Add a photo to every frame to export.</p>}
           <PreviousExports projectId={project.id} version={historyVersion} />
 

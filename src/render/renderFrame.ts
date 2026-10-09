@@ -700,7 +700,7 @@ function drawEndCard(
 /* ------------------------------------------------------------ preparation */
 
 /** Awaits every font the frames use so canvas text never falls back. */
-export async function ensureFonts(frames: Frame[], brand?: BrandStyle) {
+export async function ensureFonts(frames: Frame[], brand?: BrandStyle, strict = false) {
   if (typeof document === "undefined" || !document.fonts) return;
   const specs = new Set<string>();
   for (const f of frames) {
@@ -712,7 +712,8 @@ export async function ensureFonts(frames: Frame[], brand?: BrandStyle) {
   await Promise.all(
     [...specs].map((s) => {
       const [w, family] = s.split("|");
-      return loadFont(family!, Number(w));
+      if (!family) return;
+      return loadFont(family, Number(w), { strict, text: frames.map((f) => `${f.headline?.text ?? ""} ${f.subline?.mode === "image" ? "" : f.subline?.text ?? ""}`).join(" ") + " Made with Gravity Pants " });
     }),
   );
 }
