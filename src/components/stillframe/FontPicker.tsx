@@ -11,6 +11,9 @@ import {
   closestWeight,
   loadFont,
   loadFontPreview,
+  recentFonts,
+  rememberFont,
+  scriptsOf,
   registerCustomFonts,
   useFontList,
   weightsOf,
@@ -22,10 +25,11 @@ import { cn } from "@/lib/utils";
 
 const CHIPS: { value: FontCategory; label: string }[] = [
   { value: "all", label: "All" },
-  { value: "sans-serif", label: "Sans" },
   { value: "serif", label: "Serif" },
+  { value: "sans-serif", label: "Sans serif" },
   { value: "display", label: "Display" },
   { value: "handwriting", label: "Handwriting" },
+  { value: "monospace", label: "Mono" },
 ];
 
 type Row = { kind: "header"; label: string } | { kind: "font"; font: WebFont };
@@ -39,7 +43,13 @@ export function FontPicker({
   onChange,
   side = "left",
   children,
+  onPreview,
+  sampleText = "",
+  brandName = "Brand",
 }: {
+  onPreview?: (family: string | null, weight: number) => void;
+  sampleText?: string;
+  brandName?: string;
   title: string;
   family: string;
   weight: number;
@@ -69,21 +79,39 @@ export function FontPicker({
     if (kit?.custom_fonts.length) void registerCustomFonts(kit.custom_fonts);
   }, [kit?.custom_fonts]);
 
+  const needs = useMemo(() => scriptsOf(sampleText), [sampleText]);
+  const [recentList, setRecentList] = useState<string[]>([]);
+  useEffect(() => { if (open) setRecentList(recentFonts()); }, [open]);
+  const preview = (font: WebFont | null) => {
+    if (!onPreview) return;
+    if (!font) return onPreview(null, weight);
+    const w = closestWeight(weightsOf(font), weight);
+    void loadFont(font.family, w);
+    onPreview(font.family, w);
+  };
+  const setOpenAndRestore = (v: boolean) => {
+    if (!v) onPreview?.(null, weight);
+    setOpen(v);
+  };
+
   const rows: Row[] = useMemo(() => {
     const q = query.trim().toLowerCase();
-    const match = (f: WebFont) => (cat === "all" || f.category === cat) && (!q || f.family.toLowerCase().includes(q));
+    const match = (f: WebFont) =>
+      (cat === "all" || f.category === cat) && (!q || f.family.toLowerCase().includes(q)) && (!needs.length || f.category === "custom" || !f.subsets || needs.every((n) => f.subsets!.includes(n)));
     const brand = [kit?.headline_font, kit?.body_font, ...custom.map((c) => c.family)]
       .filter((x, i, a): x is string => Boolean(x) && a.indexOf(x) === i)
       .map((n) => byName.get(n) ?? { family: n, category: "sans-serif", variants: ["regular", "700"] })
       .filter(match);
     const popular = POPULAR.map((n) => byName.get(n)).filter((f): f is WebFont => Boolean(f) && match(f!));
+    const recent = q ? [] : recentList.map((n) => byName.get(n)).filter((f): f is WebFont => Boolean(f) && match(f!));
     const rest = all.filter((f) => f.category !== "custom" && match(f));
     const out: Row[] = [];
-    if (brand.length) out.push({ kind: "header", label: "Brand Kit" }, ...brand.map((font) => ({ kind: "font" as const, font })));
-    if (popular.length && !q) out.push({ kind: "header", label: "Popular" }, ...popular.map((font) => ({ kind: "font" as const, font })));
+    if (brand.length) out.push({ kind: "header", label: `${brandName} brand fonts` }, ...brand.map((font) => ({ kind: "font" as const, font })));
+    if (recent.length) out.push({ kind: "header", label: "Recently used" }, ...recent.map((font) => ({ kind: "font" as const, font })));
+    if (popular.length && !q) out.push({ kind: "header", label: "Popular for ads" }, ...popular.map((font) => ({ kind: "font" as const, font })));
     if (rest.length) out.push({ kind: "header", label: q ? "Results" : "All fonts" }, ...rest.map((font) => ({ kind: "font" as const, font })));
     return out;
-  }, [query, cat, kit, custom, byName, all]);
+  }, [query, cat, kit, custom, byName, all, needs, recentList, brandName]);
 
   // offsets for the virtualized list
   const offsets = useMemo(() => {
@@ -122,6 +150,8 @@ export function FontPicker({
 
   const choose = (font: WebFont) => {
     const w = closestWeight(weightsOf(font), weight);
+    onPreview?.(null, weight);
+    rememberFont(font.family);
     void loadFont(font.family, w).then(() => onChange(font.family, w));
     onChange(font.family, w);
   };
@@ -134,6 +164,8 @@ export function FontPicker({
       if (next !== undefined) {
         setActive(next);
         scrollTo(next);
+        const r = rows[next];
+        if (r?.kind === "font") preview(r.font);
       }
     } else if (e.key === "Enter") {
       e.preventDefault();
@@ -164,7 +196,7 @@ export function FontPicker({
   };
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={setOpenAndRestore}>
       <PopoverTrigger asChild>{children}</PopoverTrigger>
       <PopoverContent
         side={side}
@@ -175,7 +207,7 @@ export function FontPicker({
       >
         <div className="px-4 pb-3 pt-4">
           <div className="text-[15px] font-semibold">{title}</div>
-          <div className="text-[12px] text-secondary-text">1,700+ Google Fonts</div>
+          {needs.length > 0 && <div className="text-[12px] text-secondary-text">Showing fonts that support your text</div>}
           <div className="relative mt-3">
             <Search className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-icon" strokeWidth={1.7} />
             <input
@@ -185,7 +217,7 @@ export function FontPicker({
                 setQuery(e.target.value);
                 listRef.current?.scrollTo({ top: 0 });
               }}
-              placeholder="Search fonts"
+              placeholder="Search Google Fonts…"
               aria-label="Search fonts"
               className="h-8 w-full rounded-sm bg-control-fill pl-8 pr-2 text-[13px] outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             />
@@ -212,6 +244,7 @@ export function FontPicker({
           aria-label="Fonts"
           className="relative min-h-0 flex-1 overflow-y-auto border-t"
           onScroll={(e) => setScrollTop(e.currentTarget.scrollTop)}
+          onMouseLeave={() => preview(null)}
         >
           {rows.length === 0 && <p className="p-6 text-center text-[13px] text-secondary-text">No fonts match “{query}”.</p>}
           <div style={{ height: totalH }} className="relative">
@@ -230,7 +263,7 @@ export function FontPicker({
                   type="button"
                   role="option"
                   aria-selected={r.font.family === family}
-                  onMouseEnter={() => setActive(i)}
+                  onMouseEnter={() => { setActive(i); preview(r.font); }}
                   onClick={() => choose(r.font)}
                   className={cn("absolute inset-x-0 flex items-center gap-2 px-4 text-left", active === i && "bg-control-fill")}
                   style={{ top: y, height: ROW_H }}
@@ -245,7 +278,11 @@ export function FontPicker({
             )}
           </div>
         </div>
-        <div className="flex items-center gap-2 border-t px-4 py-3">
+        <div className="flex items-center gap-1 border-t px-4 pt-2 text-[11px] text-secondary-text nums">
+          {(data?.fonts.length ?? 0).toLocaleString()} fonts · free for commercial use ·
+          <a href="https://fonts.google.com" target="_blank" rel="noreferrer" className="text-link">Google Fonts ↗</a>
+        </div>
+        <div className="flex items-center gap-2 px-4 py-3">
           <button
             type="button"
             onClick={() => fileRef.current?.click()}

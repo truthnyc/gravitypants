@@ -5,7 +5,7 @@ import { getMediaUrl } from "./media";
 import type { CustomFont } from "./types";
 
 export type { WebFont };
-export type FontCategory = "all" | "sans-serif" | "serif" | "display" | "handwriting";
+export type FontCategory = "all" | "sans-serif" | "serif" | "display" | "handwriting" | "monospace";
 
 const v = (...w: number[]) => w.map((n) => (n === 400 ? "regular" : String(n)));
 
@@ -154,4 +154,33 @@ export async function registerCustomFonts(fonts: CustomFont[]) {
       }
     }),
   );
+}
+
+/** Subsets a piece of text needs beyond Latin (rough script detection). */
+export function scriptsOf(text: string): string[] {
+  const need = new Set<string>();
+  for (const ch of text) {
+    const c = ch.codePointAt(0) ?? 0;
+    if (c < 0x250) continue;
+    if (c >= 0x370 && c < 0x400) need.add("greek");
+    else if (c >= 0x400 && c < 0x530) need.add("cyrillic");
+    else if (c >= 0x590 && c < 0x600) need.add("hebrew");
+    else if (c >= 0x600 && c < 0x700) need.add("arabic");
+    else if (c >= 0x900 && c < 0x980) need.add("devanagari");
+    else if (c >= 0xe00 && c < 0xe80) need.add("thai");
+    else if (c >= 0x3040 && c < 0x3100) need.add("japanese");
+    else if (c >= 0xac00 && c < 0xd7b0) need.add("korean");
+    else if (c >= 0x4e00 && c < 0xa000) need.add("chinese-simplified");
+    else if (c >= 0x1e00 && c < 0x1f00) need.add("vietnamese");
+    else if (c >= 0x250) need.add("latin-ext");
+  }
+  return [...need];
+}
+
+const RECENT_FONTS = "sf-recent-fonts";
+export function recentFonts(): string[] {
+  try { return JSON.parse(localStorage.getItem(RECENT_FONTS) ?? "[]").slice(0, 5); } catch { return []; }
+}
+export function rememberFont(family: string) {
+  try { localStorage.setItem(RECENT_FONTS, JSON.stringify([family, ...recentFonts().filter((f) => f !== family)].slice(0, 5))); } catch { /* ignore */ }
 }

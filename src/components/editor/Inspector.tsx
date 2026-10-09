@@ -16,7 +16,8 @@ import {
   type TextSettings,
   type TransitionSettings,
 } from "@/lib/stillframe/types";
-import { WEIGHT_NAMES } from "@/lib/stillframe/fonts";
+import { WEIGHT_NAMES, closestWeight, loadFont, useFontList, weightsOf } from "@/lib/stillframe/fonts";
+import { LOGO_TYPES, logoFileError, weightChoices } from "@/lib/stillframe/logo-file";
 import { ANCHORS, DEFAULT_FONT, totalDuration } from "@/render/renderFrame";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -81,7 +82,11 @@ export type InspectorActions = {
   onSameTransition: (on: boolean) => void;
   onReplacePhoto: () => void;
   onAdjust: () => void;
-  onAddLogo: (file: File, variant: "light" | "dark") => void;
+  onAddLogo: (file: File, variant: "light" | "dark" | "auto") => void;
+  /** Builds the missing logo version from the other one. */
+  onMakeLogo?: (variant: "light" | "dark") => void;
+  /** Live font preview on the frame while browsing the picker; null restores. */
+  onFontPreview?: (p: { el: "headline" | "subline"; family: string; weight: number } | null) => void;
   /** Apply a photo patch to every frame (one undo step). */
   onPhotoAll?: (patch: Partial<PhotoSettings>, key?: string) => void;
   /** Play the current frame once on the preview. */
@@ -220,10 +225,10 @@ export function Inspector({
           />
         )}
         {(selected === "headline" || selected === "subline") && (
-          <TextPanel key={selected} el={selected} text={frame[selected]} colors={colors} onChange={(p, k) => actions.onText(selected, p, k)} />
+          <TextPanel key={selected} el={selected} text={frame[selected]} brandColors={(kit?.colors ?? []).map((c) => c.toUpperCase())} brandName={brandName} logoPath={doc.project.logo.dark_path ?? doc.project.logo.light_path ?? doc.project.logo.path ?? null} actions={actions} onChange={(p, k) => actions.onText(selected, p, k)} />
         )}
         {selected === "logo" && (
-          <LogoPanel logo={doc.project.logo} format={format} frame={frame} hasLogo={hasLogo} kit={kit} actions={actions} />
+          <LogoPanel logo={doc.project.logo} format={format} frame={frame} frameIndex={frameIndex} hasLogo={hasLogo} actions={actions} />
         )}
       </div>
     </aside>
@@ -688,15 +693,24 @@ const ANIMATIONS: { value: NonNullable<TextSettings["animation"]>; label: string
   { value: "typewriter", label: "Typewriter" },
 ];
 
+const TEXT_SWATCHES = ["#FFFFFF", "#000000", "#FFD60A", "#FF9F0A", "#0A84FF", "#BF5AF2"];
+const RECENT_TEXT = "sf-recent-text-colors";
+
 function TextPanel({
   el,
   text,
-  colors,
+  brandColors,
+  brandName,
+  logoPath,
+  actions,
   onChange,
 }: {
   el: "headline" | "subline";
   text: TextSettings | null;
-  colors: string[];
+  brandColors: string[];
+  brandName: string;
+  logoPath: string | null;
+  actions: InspectorActions;
   onChange: (patch: Partial<TextSettings>, key?: string) => void;
 }) {
   const isHead = el === "headline";
@@ -707,14 +721,37 @@ function TextPanel({
   const weight = t.font_weight ?? (isHead ? 700 : 500);
   const under = t.keep_under_headline ?? true;
   const current = (t.color ?? "#FFFFFF").toUpperCase();
-  const [extra, setExtra] = useState<string[]>([]);
-  const swatches = [...new Set([...colors.map((c) => c.toUpperCase()), ...extra, ...(colors.map((c) => c.toUpperCase()).includes(current) ? [] : [current])])];
+  const [recent, setRecent] = useState<string[]>([]);
+  useEffect(() => {
+    try { setRecent(JSON.parse(localStorage.getItem(RECENT_TEXT) ?? "[]").slice(0, 4)); } catch { /* ignore */ }
+  }, []);
+  const base = [...brandColors, ...TEXT_SWATCHES];
+  const swatches = [...new Set([...base, ...recent, ...(base.includes(current) || recent.includes(current) ? [] : [current])])];
   const spacing = t.letter_spacing ?? 0;
   const lineHeight = t.line_height ?? (isHead ? 1.08 : 1.25);
   const imageMode = !isHead && t.mode === "image";
   const imgSize = t.image_size_pct ?? 30;
   const fileRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
+  const [dropErr, setDropErr] = useState<string | null>(null);
+  const [over, setOver] = useState(false);
+  const { data: fontList } = useFontList();
+  const weights = weightChoices(weightsOf(fontList?.fonts.find((f) => f.family === family)));
+
+  const uploadBadge = async (file: File) => {
+    const err = logoFileError(file);
+    setDropErr(err);
+    if (err) return;
+    setBusy(true);
+    try {
+      const up = await uploadMedia(file, "logo");
+      onChange({ image_path: up.path });
+    } catch {
+      toast.error("That image couldn't be uploaded. Try again.");
+    } finally {
+      setBusy(false);
+    }
+  };
 
   return (
     <>
@@ -730,157 +767,163 @@ function TextPanel({
           />
         </Field>
       )}
-      {!imageMode && (
-      <>
-      <Field label="Text">
-        <Textarea
-          value={t.text ?? ""}
-          placeholder={isHead ? "Add a headline" : "Add a line under the headline"}
-          onChange={(e) => onChange({ text: e.target.value }, `${el}-text`)}
-          className="min-h-[72px] rounded-sm text-[15px]"
-        />
-      </Field>
-      <Field label="Font">
-        <FontPicker
-          title={isHead ? "Headline font" : "Subline font"}
-          family={family}
-          weight={weight}
-          onChange={(f, w) => onChange({ font_family: f, font_weight: w })}
-        >
-          <button
-            type="button"
-            className="flex h-9 w-full items-center justify-between rounded-sm border bg-card px-3 text-left text-[14px]"
-            aria-label={`Font: ${family}`}
-          >
-            <span className="truncate" style={{ fontFamily: `"${family}"`, fontWeight: weight }}>
-              {family}
-            </span>
-            <span className="flex items-center gap-1 text-[12px] text-secondary-text">
-              {WEIGHT_NAMES[weight] ?? weight}
-              <ChevronRight className="size-3.5" strokeWidth={1.7} />
-            </span>
-          </button>
-        </FontPicker>
-      </Field>
-      <Field label="Size" value={`${size} px`}>
-        <ElementSlider
-          name={`${isHead ? "Headline" : "Subline"} size`}
-          color={color}
-          min={24}
-          max={240}
-          value={size}
-          onChange={(v, k) => onChange({ size_px: v }, k)}
-          left={<span className="text-[11px] font-semibold text-secondary-text">A</span>}
-          right={<span className="text-[19px] font-semibold text-secondary-text">A</span>}
-        />
-      </Field>
-      <Field label="Letter spacing" value={`${spacing > 0 ? "+" : ""}${spacing}`}>
-        <ElementSlider
-          name={`${isHead ? "Headline" : "Subline"} letter spacing`}
-          color={color}
-          min={-10}
-          max={50}
-          value={spacing}
-          snap={(v) => (Math.abs(v) <= 1 ? 0 : v)}
-          onChange={(v, k) => onChange({ letter_spacing: v }, k)}
-        />
-      </Field>
-      <Field label="Line height" value={lineHeight.toFixed(2)}>
-        <ElementSlider
-          name={`${isHead ? "Headline" : "Subline"} line height`}
-          color={color}
-          min={80}
-          max={200}
-          value={Math.round(lineHeight * 100)}
-          onChange={(v, k) => onChange({ line_height: v / 100 }, k)}
-        />
-      </Field>
-      </>
-      )}
-      {imageMode && (
-        <>
-          <Field label="Image">
-            <div className="flex items-center gap-3">
-              {t.image_path ? (
-                <MediaImage path={t.image_path} alt="Subline image" className="h-12 w-20 rounded-sm border bg-control-fill object-contain" />
-              ) : (
-                <div className="flex h-12 w-20 items-center justify-center rounded-sm border border-dashed border-placeholder-border text-icon">
-                  <ImageIcon className="size-4" strokeWidth={1.7} />
-                </div>
-              )}
-              <div className="flex flex-col gap-1.5">
-                <Button size="sm" variant="default" disabled={busy} onClick={() => fileRef.current?.click()}>
-                  {busy ? "Uploading…" : t.image_path ? "Replace" : "Upload logo or badge"}
-                </Button>
-                {t.image_path && (
-                  <button type="button" className="text-left text-[12px] text-secondary-text" onClick={() => onChange({ image_path: null })}>
-                    Remove
-                  </button>
-                )}
+      <Reveal open={!imageMode}>
+        <div className="space-y-4">
+          <Field label="Text">
+            <Textarea
+              value={t.text ?? ""}
+              placeholder={isHead ? "Add a headline" : "Add a line under the headline"}
+              onChange={(e) => onChange({ text: e.target.value }, `${el}-text`)}
+              className="min-h-[72px] rounded-sm text-[15px]"
+            />
+          </Field>
+          <Field label="Font">
+            <FontPicker
+              title={isHead ? "Headline font" : "Subline font"}
+              family={family}
+              weight={weight}
+              brandName={brandName}
+              sampleText={t.text ?? ""}
+              onPreview={(f, w) => actions.onFontPreview?.(f ? { el, family: f, weight: w } : null)}
+              onChange={(f, w) => onChange({ font_family: f, font_weight: w })}
+            >
+              <button
+                type="button"
+                className="flex h-9 w-full items-center justify-between rounded-sm border bg-card px-3 text-left text-[14px]"
+                aria-label={`Font: ${family}`}
+              >
+                <span className="truncate" style={{ fontFamily: `"${family}"`, fontWeight: weight }}>
+                  {family} · {WEIGHT_NAMES[weight] ?? weight}
+                </span>
+                <ChevronRight className="size-3.5 text-secondary-text" strokeWidth={1.7} />
+              </button>
+            </FontPicker>
+            {weights.length > 1 && (
+              <div className="pt-1.5">
+                <Segmented
+                  value={String(closestWeight(weights, weight))}
+                  options={weights.map((w) => ({ value: String(w), label: WEIGHT_NAMES[w] ?? String(w) }))}
+                  onChange={(v) => {
+                    const w = Number(v);
+                    void loadFont(family, w).then(() => onChange({ font_weight: w }));
+                    onChange({ font_weight: w });
+                  }}
+                />
               </div>
-              <input
-                ref={fileRef}
-                type="file"
-                accept="image/png,image/jpeg,image/webp,image/svg+xml"
-                className="hidden"
-                onChange={async (e) => {
-                  const file = e.target.files?.[0];
-                  e.target.value = "";
-                  if (!file) return;
-                  setBusy(true);
-                  try {
-                    const up = await uploadMedia(file, "logo");
-                    onChange({ image_path: up.path });
-                  } catch {
-                    toast.error("That image couldn't be uploaded. Try again.");
-                  } finally {
-                    setBusy(false);
+            )}
+          </Field>
+          <Field label="Size" value={`${size} px`}>
+            <ElementSlider
+              name={`${isHead ? "Headline" : "Subline"} size`}
+              color={color}
+              min={24}
+              max={240}
+              value={size}
+              onChange={(v, k) => onChange({ size_px: v }, k)}
+              left={<span className="text-[11px] font-semibold text-secondary-text">A</span>}
+              right={<span className="text-[19px] font-semibold text-secondary-text">A</span>}
+            />
+          </Field>
+          <Field label="Letter spacing" value={`${spacing > 0 ? "+" : ""}${spacing}`}>
+            <ElementSlider
+              name={`${isHead ? "Headline" : "Subline"} letter spacing`}
+              color={color}
+              min={-10}
+              max={50}
+              value={spacing}
+              snap={(v) => (Math.abs(v) <= 1 ? 0 : v)}
+              onChange={(v, k) => onChange({ letter_spacing: v }, k)}
+            />
+          </Field>
+          <Field label="Line height" value={lineHeight.toFixed(2)}>
+            <ElementSlider
+              name={`${isHead ? "Headline" : "Subline"} line height`}
+              color={color}
+              min={80}
+              max={200}
+              value={Math.round(lineHeight * 100)}
+              onChange={(v, k) => onChange({ line_height: v / 100 }, k)}
+            />
+          </Field>
+          <Field label="Color">
+            <div className="flex flex-wrap items-center gap-2">
+              {swatches.map((c) => (
+                <button
+                  key={c}
+                  type="button"
+                  aria-label={`Color ${c}`}
+                  aria-pressed={current === c}
+                  onClick={() => onChange({ color: c })}
+                  className={cn("size-8 rounded-full border border-border lg:size-7", current === c && "ring-2 ring-offset-2")}
+                  style={{ background: c, ["--tw-ring-color" as string]: color }}
+                />
+              ))}
+              <CustomColor
+                onPick={(c) => {
+                  if (!base.includes(c)) {
+                    const next = [c, ...recent.filter((x) => x !== c)].slice(0, 4);
+                    setRecent(next);
+                    try { localStorage.setItem(RECENT_TEXT, JSON.stringify(next)); } catch { /* ignore */ }
                   }
+                  onChange({ color: c }, `drag:${el}-color`);
                 }}
               />
             </div>
           </Field>
-          <Field label="Size" value={`${imgSize}%`}>
-            <ElementSlider
-              name="Subline image size"
-              color={color}
-              min={5}
-              max={100}
-              value={imgSize}
-              onChange={(v, k) => onChange({ image_size_pct: v }, k)}
-            />
-          </Field>
-        </>
-      )}
-      {!imageMode && (
-      <Field label="Color">
-        <div className="flex flex-wrap items-center gap-2">
-          {swatches.map((c) => (
-            <button
-              key={c}
-              type="button"
-              aria-label={`Color ${c}`}
-              onClick={() => onChange({ color: c })}
-              className={cn("size-8 rounded-full border border-border lg:size-7", current === c && "ring-2 ring-offset-2")}
-              style={{ background: c, ["--tw-ring-color" as string]: color }}
-            />
-          ))}
-          <CustomColor
-            onPick={(c) => {
-              setExtra((x) => (x.includes(c) ? x : [...x, c]));
-              onChange({ color: c }, `drag:${el}-color`);
+        </div>
+      </Reveal>
+      <Reveal open={imageMode}>
+        <div className="space-y-4">
+          {t.image_path ? (
+            <div className="flex items-center gap-3 rounded-sm border border-ap-hairline p-2.5">
+              <span className="checker flex h-12 w-20 items-center justify-center rounded-sm">
+                <MediaImage path={t.image_path} alt="Badge" className="max-h-10 max-w-[90%] object-contain" />
+              </span>
+              <span className="min-w-0 flex-1 truncate text-[13px] font-medium">Badge</span>
+              <Button size="sm" variant="default" disabled={busy} onClick={() => fileRef.current?.click()}>Replace</Button>
+              <button type="button" className="text-[12px] text-destructive" onClick={() => onChange({ image_path: null })}>Remove</button>
+            </div>
+          ) : (
+            <div
+              onDragOver={(e) => { e.preventDefault(); setOver(true); }}
+              onDragLeave={() => setOver(false)}
+              onDrop={(e) => { e.preventDefault(); setOver(false); const f = e.dataTransfer.files?.[0]; if (f) void uploadBadge(f); }}
+              className={cn("rounded-sm border border-dashed p-4 text-center", over ? "border-primary bg-primary/5" : "border-placeholder-border")}
+            >
+              <p className="text-[13px] font-medium">Drop a badge or second logo…</p>
+              <p className="mt-1 text-[12px] text-secondary-text">e.g. "New season", a partner logo or an award · PNG or SVG · up to 5 MB</p>
+              <div className="mt-3 flex justify-center gap-2">
+                <Button size="sm" variant="default" disabled={busy} onClick={() => fileRef.current?.click()}>{busy ? "Uploading…" : "Choose a file"}</Button>
+                {logoPath && <Button size="sm" variant="plain" onClick={() => onChange({ image_path: logoPath })}>Use my logo</Button>}
+              </div>
+            </div>
+          )}
+          {dropErr && <p className="text-[12px] text-destructive">{dropErr}</p>}
+          <input
+            ref={fileRef}
+            type="file"
+            accept={LOGO_TYPES.join(",")}
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              e.target.value = "";
+              if (file) void uploadBadge(file);
             }}
           />
+          <Reveal open={Boolean(t.image_path)}>
+            <Field label="Size" value={`${imgSize}% of width`}>
+              <ElementSlider name="Subline image size" color={color} min={5} max={100} value={imgSize} onChange={(v, k) => onChange({ image_size_pct: v }, k)} />
+            </Field>
+          </Reveal>
         </div>
-      </Field>
-      )}
+      </Reveal>
       <Field label="Animation">
         <div className="flex flex-wrap gap-1.5">
           {ANIMATIONS.map((a) => (
             <button
               key={a.value}
               type="button"
-              onClick={() => onChange({ animation: a.value })}
+              onClick={() => { onChange({ animation: a.value }); if (a.value !== "none") actions.onPlayFrame?.(); }}
               aria-pressed={(t.animation ?? "none") === a.value}
               className={cn("h-7 rounded-lg px-2.5 text-[12px] font-medium", (t.animation ?? "none") !== a.value && "bg-control-fill")}
               style={(t.animation ?? "none") === a.value ? { background: color, color: "var(--on-accent)" } : undefined}
@@ -891,92 +934,151 @@ function TextPanel({
         </div>
       </Field>
       {!isHead && (
-        <ToggleRow label="Keep under headline" checked={under} onChange={(v) => onChange({ keep_under_headline: v })} />
+        <label className="flex items-center justify-between gap-3">
+          <span>
+            <span className="block text-[13px]">Keep under headline</span>
+            <span className="block text-[12px] text-secondary-text">Moves with the headline</span>
+          </span>
+          <Switch checked={under} onCheckedChange={(v) => onChange({ keep_under_headline: v })} className="data-[state=checked]:bg-toggle-on" />
+        </label>
       )}
-      {(isHead || !under) && (
+      <Reveal open={isHead || !under}>
         <Field label="Position">
-          <PositionGrid value={t.position ?? (isHead ? "center" : "bottom-center")} color={color} onChange={(a) => onChange({ position: a })} />
+          <div className="flex items-center gap-3">
+            <PositionGrid value={t.position ?? (isHead ? "center" : "bottom-center")} color={color} onChange={(a) => onChange({ position: a })} />
+            <p className="text-[12px] leading-snug text-secondary-text">Or drag it on the preview — it snaps into place. Use the corner handle to resize.</p>
+          </div>
         </Field>
-      )}
-      <ToggleRow label="Same on all frames" checked={Boolean(t.same_on_all)} onChange={(v) => onChange({ same_on_all: v })} />
+      </Reveal>
+      <label className="flex items-center justify-between gap-3">
+        <span>
+          <span className="block text-[13px]">Same on all frames</span>
+          <span className="block text-[12px] text-secondary-text">Style changes apply to every frame. Words stay per frame.</span>
+        </span>
+        <Switch
+          checked={Boolean(t.same_on_all)}
+          onCheckedChange={(v) => {
+            onChange({ same_on_all: v });
+            if (v) toast(`${isHead ? "Headline" : "Subline"} style copied to every frame`, actions.onUndo ? { action: { label: "Undo", onClick: actions.onUndo } } : undefined);
+          }}
+          className="data-[state=checked]:bg-toggle-on"
+        />
+      </label>
     </>
   );
 }
 
 /* ---------------- Logo */
 
+function LogoFileRow({ label, path, onUpload, onRemove, onMake, makeLabel }: { label: string; path: string | null | undefined; onUpload: () => void; onRemove: () => void; onMake?: (() => void) | undefined; makeLabel: string }) {
+  return (
+    <div className="flex items-center gap-3 rounded-sm border border-ap-hairline p-2.5">
+      <span className="checker flex h-11 w-16 shrink-0 items-center justify-center rounded-sm">
+        {path && <MediaImage path={path} alt="" className="max-h-9 max-w-[90%] object-contain" />}
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-[13px] font-medium">{label}</span>
+        <span className="block truncate text-[12px] text-secondary-text">{path ? photoName({ path }, 0).replace(/^Photo 1$/, "Uploaded") : "Not added yet"}</span>
+      </span>
+      {path ? (
+        <>
+          <Button size="sm" variant="default" onClick={onUpload}>Replace</Button>
+          <button type="button" className="text-[12px] text-destructive" onClick={onRemove}>Remove</button>
+        </>
+      ) : (
+        <>
+          <Button size="sm" variant="default" onClick={onUpload}>Upload</Button>
+          {onMake && <button type="button" className="text-[12px] font-medium text-link" onClick={onMake}>{makeLabel}</button>}
+        </>
+      )}
+    </div>
+  );
+}
+
 function LogoPanel({
   logo,
   format,
   frame,
+  frameIndex,
   hasLogo,
-  kit,
   actions,
 }: {
   logo: LogoSettings;
   format: Format;
   frame: Frame;
+  frameIndex: number;
   hasLogo: boolean;
-  kit: BrandKit | null | undefined;
   actions: InspectorActions;
 }) {
-  const lightRef = useRef<HTMLInputElement>(null);
-  const darkRef = useRef<HTMLInputElement>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const target = useRef<"auto" | "light" | "dark">("auto");
+  const [err, setErr] = useState<string | null>(null);
+  const [over, setOver] = useState(false);
   const posScopeState = useState<"all" | "frame" | null>(null);
-  const logoInput = (variant: "light" | "dark", ref: { current: HTMLInputElement | null }) => (
-    <input ref={ref} type="file" accept="image/png,image/svg+xml,image/webp" className="hidden" onChange={(e) => {
+  const pick = (v: "auto" | "light" | "dark") => { target.current = v; fileRef.current?.click(); };
+  const take = (f: File | undefined) => {
+    if (!f) return;
+    const e = logoFileError(f);
+    setErr(e);
+    if (!e) actions.onAddLogo(f, target.current);
+  };
+  const input = (
+    <input ref={fileRef} type="file" accept={LOGO_TYPES.join(",")} className="hidden" onChange={(e) => {
       const f = e.target.files?.[0];
       e.target.value = "";
-      if (f) actions.onAddLogo(f, variant);
+      take(f);
     }} />
   );
   if (!hasLogo) {
     return (
-      <div className="flex flex-col items-center py-4 text-center">
-        <span className="flex size-11 items-center justify-center rounded-full bg-control-fill">
-          <Shapes className="size-5 text-el-logo" strokeWidth={1.7} />
-        </span>
-        <div className="mt-3 text-[14px] font-semibold">Add your logo</div>
-        <p className="mt-1 max-w-[230px] text-[13px] text-secondary-text">
-          It's saved to your Brand Kit and shows on every ad. A PNG or SVG with a see-through background works best.
-        </p>
-        <div className="mt-4 flex gap-2">
-          <Button variant="primary" size="sm" onClick={() => darkRef.current?.click()}>Add dark logo</Button>
-          <Button variant="plain" size="sm" onClick={() => lightRef.current?.click()}>Add light logo</Button>
+      <>
+        <div
+          onDragOver={(e) => { e.preventDefault(); setOver(true); }}
+          onDragLeave={() => setOver(false)}
+          onDrop={(e) => { e.preventDefault(); setOver(false); target.current = "auto"; take(e.dataTransfer.files?.[0]); }}
+          className={cn("flex flex-col items-center rounded-sm border border-dashed px-4 py-6 text-center", over ? "border-primary bg-primary/5" : "border-placeholder-border")}
+        >
+          <span className="flex size-11 items-center justify-center rounded-full bg-control-fill">
+            <Shapes className="size-5 text-el-logo" strokeWidth={1.7} />
+          </span>
+          <p className="mt-3 text-[14px] font-semibold">Drop your logo here or <button type="button" className="text-link" onClick={() => pick("auto")}>choose a file</button></p>
+          <p className="mt-1 max-w-[300px] text-[12px] text-secondary-text">PNG or SVG with a transparent background works best · up to 5 MB. We'll tell if it's a light or dark logo.</p>
         </div>
-        {logoInput("light", lightRef)}{logoInput("dark", darkRef)}
-      </div>
+        {err && <p className="text-[12px] text-destructive">{err}</p>}
+        {input}
+      </>
     );
   }
   const size = logo.size_pct ?? 16;
-  const posScope = posScopeState[0] ?? (logo.frame_positions?.[frame.id]?.[format] || logo.show_on === "selected" ? "frame" : "all");
+  const ownPos = Boolean(logo.frame_positions?.[frame.id]?.[format]);
+  const posScope = posScopeState[0] ?? (ownPos ? "frame" : "all");
   const setPosScope = posScopeState[1];
   const version = frame.logo_variant ?? logo.version ?? "auto";
   const show = logo.show_on ?? "all";
-  const tiles: { value: NonNullable<LogoSettings["version"]>; label: string; hint: string; path: string | null | undefined }[] = [
-    { value: "auto", label: "Auto", hint: "Best contrast", path: logo.dark_path ?? logo.path },
-    { value: "light", label: "Light logo", hint: "For dark photos", path: logo.light_path },
-    { value: "dark", label: "Dark logo", hint: "For light photos", path: logo.dark_path },
+  const light = logo.light_path;
+  const dark = logo.dark_path ?? (logo.path && logo.path !== light ? logo.path : null);
+  const tiles: { value: NonNullable<LogoSettings["version"]>; label: string; hint: string; bg: string; path: string | null | undefined }[] = [
+    { value: "auto", label: "Auto", hint: "Best contrast", bg: "logo-split", path: dark ?? light },
+    { value: "light", label: "Light logo", hint: "For dark photos", bg: "bg-foreground", path: light },
+    { value: "dark", label: "Dark logo", hint: "For light photos", bg: "bg-background", path: dark },
   ];
+  const clearFormat = () => Object.fromEntries(Object.entries(logo.frame_positions ?? {}).map(([k, v]) => { const { [format]: _x, ...rest } = v; return [k, rest]; }));
   return (
     <>
       <Field label="Version">
         <div className="grid grid-cols-3 gap-2">
           {tiles.map((t) => {
-            const disabled = t.value !== "auto" && !t.path;
+            const disabled = !t.path;
             return (
               <button
                 key={t.value}
                 type="button"
                 disabled={disabled}
+                aria-pressed={version === t.value}
                 onClick={() => actions.onLogoVariant(t.value)}
-                title={disabled ? "Add this version in your Brand Kit" : undefined}
-                className={cn(
-                  "flex flex-col items-center gap-1 rounded-sm p-2 text-center disabled:opacity-40",
-                  version === t.value ? "ring-2 ring-primary" : "ring-1 ring-border",
-                )}
+                className={cn("flex flex-col items-center gap-1 rounded-sm p-2 text-center disabled:opacity-40", version === t.value ? "ring-2 ring-primary" : "ring-1 ring-border")}
               >
-                <span className={cn("flex h-9 w-full items-center justify-center rounded-sm", t.value === "light" ? "bg-foreground" : "bg-control-fill")}>
+                <span className={cn("flex h-10 w-full items-center justify-center rounded-sm border border-ap-hairline", t.bg)}>
                   {t.path && <MediaImage path={t.path} className="max-h-6 max-w-[80%] object-contain" alt="" />}
                 </span>
                 <span className="text-[12px] font-medium leading-tight">{t.label}</span>
@@ -985,11 +1087,17 @@ function LogoPanel({
             );
           })}
         </div>
-        {kit && !kit.logos.some((l) => l.role === "reversed") && (
-          <p className="text-[11px] text-secondary-text">Add a reversed logo in your Brand Kit so Auto can switch on dark photos.</p>
+        {(!light || !dark) && (
+          <p className="text-[12px] text-secondary-text">{!dark ? "Add a dark version so Auto can switch on light photos." : "Add a light version so Auto can switch on dark photos."}</p>
         )}
       </Field>
-      <Field label={`Position on ${format}`}>
+      <div className="space-y-2">
+        <LogoFileRow label="Light logo" path={light} onUpload={() => pick("light")} onRemove={() => actions.onLogo({ light_path: null, path: dark ?? null })} onMake={dark ? () => actions.onMakeLogo?.("light") : undefined} makeLabel="Make from your dark logo" />
+        <LogoFileRow label="Dark logo" path={dark} onUpload={() => pick("dark")} onRemove={() => actions.onLogo({ dark_path: null, path: light ?? null })} onMake={light ? () => actions.onMakeLogo?.("dark") : undefined} makeLabel="Make from your light logo" />
+        {err && <p className="text-[12px] text-destructive">{err}</p>}
+        {input}
+      </div>
+      <Field label={`Position on ${format.replace("x", ":")}`}>
         <PositionGrid
           value={logo.frame_positions?.[frame.id]?.[format] ?? logo.positions?.[format] ?? "top-right"}
           color="var(--accent-blue)"
@@ -998,18 +1106,28 @@ function LogoPanel({
               const fp = logo.frame_positions ?? {};
               actions.onLogo({ frame_positions: { ...fp, [frame.id]: { ...fp[frame.id], [format]: a } } });
             } else {
-              // Applying to all frames clears per-frame overrides for this format.
-              const fp = Object.fromEntries(Object.entries(logo.frame_positions ?? {}).map(([k, v]) => { const { [format]: _x, ...rest } = v; return [k, rest]; }));
-              actions.onLogo({ positions: { ...logo.positions, [format]: a }, frame_positions: fp });
+              actions.onLogo({ positions: { ...logo.positions, [format]: a }, frame_positions: clearFormat() });
             }
           }}
         />
-        <div className="mt-2 grid grid-cols-2 gap-1 rounded-md bg-control-fill p-0.5" role="radiogroup" aria-label="Apply position to">
-          {([["all", "All frames"], ["frame", "This frame"]] as const).map(([v, l]) => (
-            <button key={v} type="button" role="radio" aria-checked={posScope === v} onClick={() => setPosScope(v)}
-              className={cn("h-7 rounded-md text-[12px] font-medium", posScope === v ? "bg-card shadow-card" : "text-secondary-text")}>{l}</button>
-          ))}
-        </div>
+        <div className="mt-2"><Segmented value={posScope} options={[{ value: "all", label: "All frames" }, { value: "frame", label: "This frame" }]} onChange={setPosScope} /></div>
+        {ownPos && (
+          <p className="text-[12px] text-secondary-text">
+            Frame {frameIndex + 1} has its own position ·{" "}
+            <button
+              type="button"
+              className="font-medium text-link"
+              onClick={() => {
+                const fp = logo.frame_positions ?? {};
+                const { [format]: _x, ...rest } = fp[frame.id] ?? {};
+                actions.onLogo({ frame_positions: { ...fp, [frame.id]: rest } });
+                setPosScope("all");
+              }}
+            >
+              Use the same as other frames
+            </button>
+          </p>
+        )}
       </Field>
       <Field label="Size" value={`${size}% of width`}>
         <ElementSlider
@@ -1028,54 +1146,36 @@ function LogoPanel({
           value={logo.opacity ?? "solid"}
           options={[
             { value: "solid", label: "Solid" },
-            { value: "soft", label: "Soft" },
+            { value: "soft", label: "Soft (70% opacity)" },
           ]}
           onChange={(v) => actions.onLogo({ opacity: v })}
         />
       </Field>
       <Field label="Show logo on">
-        <div className="flex gap-1.5">
-          {(
-            [
-              { value: "all", label: "All frames" },
-              { value: "first_last", label: "First & last" },
-              { value: "selected", label: "This frame" },
-            ] as const
-          ).map((o) => (
-            <button
-              key={o.value}
-              type="button"
-              aria-pressed={show === o.value}
-              onClick={() => {
-                actions.onLogoScope(o.value);
-              }}
-              className={cn("h-7 rounded-lg px-2.5 text-[12px] font-medium", show === o.value ? "bg-primary text-primary-foreground" : "bg-control-fill")}
-            >
-              {o.label}
-            </button>
-          ))}
-        </div>
-        {show === "selected" && (
-          <ToggleRow label="Show on this frame" checked={frame.logo_visible} onChange={actions.onLogoVisible} />
-        )}
+        <Segmented
+          value={show}
+          options={[
+            { value: "all", label: "All frames" },
+            { value: "first_last", label: "First & last" },
+            { value: "selected", label: "Choose frames" },
+          ]}
+          onChange={(v) => actions.onLogoScope(v)}
+        />
+        <Reveal open={show === "selected"}>
+          <div className="pt-2"><ToggleRow label={`Show on frame ${frameIndex + 1}`} checked={frame.logo_visible} onChange={actions.onLogoVisible} /></div>
+        </Reveal>
       </Field>
-      <div className="grid grid-cols-2 gap-2">
-        <Button variant="plain" size="sm" onClick={() => lightRef.current?.click()}>
-          {logo.light_path ? "Replace light" : "Add light"}
-        </Button>
-        <Button variant="plain" size="sm" onClick={() => darkRef.current?.click()}>
-          {logo.dark_path ? "Replace dark" : "Add dark"}
-        </Button>
-        <Button
-          variant="destructive-plain"
-          size="sm"
-          className="col-span-2"
-          onClick={() => actions.onLogo({ path: null, light_path: null, dark_path: null, asset_id: null })}
-        >
-          Remove logo
-        </Button>
-      </div>
-      {logoInput("light", lightRef)}{logoInput("dark", darkRef)}
+      <Button
+        variant="destructive-plain"
+        size="sm"
+        className="w-full"
+        onClick={() => {
+          actions.onLogo({ path: null, light_path: null, dark_path: null, asset_id: null });
+          toast("Logo removed", actions.onUndo ? { action: { label: "Undo", onClick: actions.onUndo } } : undefined);
+        }}
+      >
+        Remove logo
+      </Button>
     </>
   );
 }
