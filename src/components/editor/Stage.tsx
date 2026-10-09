@@ -315,7 +315,7 @@ export function Stage({
           </>
         )}
         {photoMode && !drag && (
-          <span className="pointer-events-none absolute left-1/2 top-3 -translate-x-1/2 whitespace-nowrap rounded-lg bg-foreground/70 px-2.5 py-1 text-[12px] text-background">
+          <span className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-foreground/70 px-2.5 py-1 text-[12px] text-background">
             {adjustHint ?? "Drag to reposition · scroll to zoom"}
           </span>
         )}
