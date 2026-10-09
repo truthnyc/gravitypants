@@ -3,6 +3,7 @@ import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { brandPublicationFields } from "./admin-fields";
+import { sanitizeSvg } from "@/lib/stillframe/svg-safety";
 import {
   BRAND_DESCRIPTION_MAX, BRAND_NAME_MAX, CATEGORIES, categorySlug, GRACE_DAYS, BRAND_MOODS_MAX, REEL_DESCRIPTION_MAX, SLUG_MAX,
   WORDING_VERSION, permissionWording, toSlug, validFullName,
@@ -62,7 +63,8 @@ export const setBrandLogo = createServerFn({ method: "POST" })
     if (data.file) {
       const ext = { "image/png": "png", "image/jpeg": "jpg", "image/webp": "webp", "image/svg+xml": "svg" }[data.file.type];
       const path = `${b.workspace_id}/directory-logo-${Date.now()}.${ext}`;
-      const bytes = Uint8Array.from(atob(data.file.base64), (c) => c.charCodeAt(0));
+      const raw = Uint8Array.from(atob(data.file.base64), (c) => c.charCodeAt(0));
+      const bytes = data.file.type === "image/svg+xml" ? new TextEncoder().encode(sanitizeSvg(new TextDecoder().decode(raw))) : raw;
       const { error } = await supabaseAdmin.storage.from("brand-assets").upload(path, bytes, { contentType: data.file.type });
       if (error) throw new Error("Couldn't upload the logo");
       logo = LOGO_PREFIX + path;

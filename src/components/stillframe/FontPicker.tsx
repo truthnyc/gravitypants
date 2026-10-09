@@ -2,6 +2,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, Search, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Drawer, DrawerClose, DrawerContent, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
+import { Button } from "@/components/ui/button";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useBrandKit, useUpdateBrandKit } from "@/lib/stillframe/data";
 import {
@@ -58,6 +61,7 @@ export function FontPicker({
   children: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
+  const isMobile = useIsMobile();
   const [query, setQuery] = useState("");
   const [cat, setCat] = useState<FontCategory>("all");
   const [active, setActive] = useState(0);
@@ -195,18 +199,9 @@ export function FontPicker({
     }
   };
 
-  return (
-    <Popover open={open} onOpenChange={setOpenAndRestore}>
-      <PopoverTrigger asChild>{children}</PopoverTrigger>
-      <PopoverContent
-        side={side}
-        align="start"
-        sideOffset={12}
-        className="flex h-[600px] w-[340px] flex-col gap-0 rounded-lg p-0 shadow-popover"
-        onKeyDown={onKey}
-      >
+  const content = <>
         <div className="px-4 pb-3 pt-4">
-          <div className="text-[15px] font-semibold">{title}</div>
+          {isMobile ? <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2"><DrawerTitle className="min-w-0 text-[15px] font-semibold">{title}</DrawerTitle><DrawerClose asChild><Button variant="ghost" size="sm">Done</Button></DrawerClose></div> : <div className="text-[15px] font-semibold">{title}</div>}
           {needs.length > 0 && <div className="text-[12px] text-secondary-text">Showing fonts that support your text</div>}
           <div className="relative mt-3">
             <Search className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-icon" strokeWidth={1.7} />
@@ -224,7 +219,7 @@ export function FontPicker({
           </div>
           <div className="mt-2.5 flex flex-wrap gap-1.5">
             {CHIPS.map((c) => (
-              <button
+              <Button
                 key={c.value}
                 type="button"
                 onClick={() => setCat(c.value)}
@@ -234,7 +229,7 @@ export function FontPicker({
                 )}
               >
                 {c.label}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
@@ -258,14 +253,15 @@ export function FontPicker({
                   {r.label.toUpperCase()}
                 </div>
               ) : (
-                <button
+                 <Button
                   key={`${i}-${r.font.family}`}
                   type="button"
                   role="option"
                   aria-selected={r.font.family === family}
                   onMouseEnter={() => { setActive(i); preview(r.font); }}
                   onClick={() => choose(r.font)}
-                  className={cn("absolute inset-x-0 flex items-center gap-2 px-4 text-left", active === i && "bg-control-fill")}
+                   variant="ghost"
+                   className={cn("absolute inset-x-0 flex justify-start items-center gap-2 rounded-none px-4 text-left", active === i && "bg-control-fill")}
                   style={{ top: y, height: ROW_H }}
                 >
                   <span className="min-w-0 flex-1 truncate text-[17px]" style={{ fontFamily: `"${r.font.family}", var(--font-sans)` }}>
@@ -273,7 +269,7 @@ export function FontPicker({
                   </span>
                   <span className="text-[11px] text-secondary-text">{categoryLabel(r.font.category)}</span>
                   <Check className={cn("size-4 text-primary", r.font.family !== family && "invisible")} strokeWidth={1.7} />
-                </button>
+                 </Button>
               ),
             )}
           </div>
@@ -283,13 +279,14 @@ export function FontPicker({
           <a href="https://fonts.google.com" target="_blank" rel="noreferrer" className="text-link">Google Fonts ↗</a>
         </div>
         <div className="flex items-center gap-2 px-4 py-3">
-          <button
+          <Button
+            variant="ghost"
             type="button"
             onClick={() => fileRef.current?.click()}
             className="inline-flex items-center gap-1.5 text-[13px] font-medium text-link"
           >
             <Upload className="size-3.5" strokeWidth={1.7} /> Upload a font…
-          </button>
+          </Button>
           <input
             ref={fileRef}
             type="file"
@@ -323,6 +320,20 @@ export function FontPicker({
             </Select>
           </div>
         </div>
+      </>;
+  if (isMobile) return (
+    <Drawer open={open} onOpenChange={setOpenAndRestore} shouldScaleBackground={false} autoFocus>
+      <DrawerTrigger asChild>{children}</DrawerTrigger>
+      <DrawerContent aria-describedby={undefined} className="h-[85dvh] gap-0" onKeyDown={onKey}>
+        {content}
+      </DrawerContent>
+    </Drawer>
+  );
+  return (
+    <Popover open={open} onOpenChange={setOpenAndRestore}>
+      <PopoverTrigger asChild>{children}</PopoverTrigger>
+      <PopoverContent side={side} align="start" sideOffset={12} className="flex h-[600px] w-[340px] flex-col gap-0 rounded-lg p-0 shadow-popover" onKeyDown={onKey}>
+        {content}
       </PopoverContent>
     </Popover>
   );

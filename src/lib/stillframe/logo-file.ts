@@ -1,4 +1,5 @@
 /** Logo upload checks for the Logo tab: type/size rules, trimming, light/dark detection. */
+import { sanitizeLogoFile } from "./svg-safety";
 
 export const LOGO_TYPES = ["image/png", "image/svg+xml", "image/jpeg", "image/webp"];
 export const LOGO_MAX_BYTES = 5 * 1024 * 1024;
@@ -37,6 +38,7 @@ export type PreparedLogo = { file: File; light: boolean; warning: string | null 
 
 /** Trims transparent edges of raster logos, detects light/dark and flags small or opaque artwork. */
 export async function prepareLogo(file: File): Promise<PreparedLogo> {
+  file = await sanitizeLogoFile(file);
   const isSvg = file.type === "image/svg+xml" || /\.svg$/i.test(file.name);
   const url = URL.createObjectURL(file);
   try {

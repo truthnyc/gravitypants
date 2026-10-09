@@ -112,6 +112,7 @@ function addLink(href: string) {
   const link = document.createElement("link");
   link.rel = "stylesheet";
   link.href = href;
+  link.addEventListener("error", () => { loaded.delete(href); link.remove(); }, { once: true });
   document.head.appendChild(link);
 }
 
@@ -122,16 +123,24 @@ export function loadFontPreview(family: string) {
 }
 
 /** Full stylesheet for one weight, then wait until the browser has the face. */
-export async function loadFont(family: string, weight: number) {
+export async function loadFont(family: string, weight: number, options: { strict?: boolean; text?: string } = {}) {
   if (typeof document === "undefined") return;
   if (!customFamilies.has(family)) {
     addLink(`https://fonts.googleapis.com/css2?family=${encodeURIComponent(family)}:wght@${weight}&display=swap`);
   }
   // the stylesheet itself needs a moment to arrive before fonts.load can see the face
-  for (let i = 0; i < 20; i++) {
-    const faces = await document.fonts.load(`${weight} 48px "${family}"`).catch(() => []);
+  for (let i = 0; i < (options.strict ? 80 : 20); i++) {
+    const faces = await document.fonts.load(`${weight} 48px "${family}"`, options.text).catch(() => []);
     if (faces.length) return;
     await new Promise((r) => setTimeout(r, 100));
+  }
+  if (options.strict) throw new FontLoadError(family);
+}
+
+export class FontLoadError extends Error {
+  constructor(public readonly family: string) {
+    super(`The font “${family}” couldn't load. Check your connection and retry, or choose another font in Edit. No export was used.`);
+    this.name = "FontLoadError";
   }
 }
 
@@ -142,13 +151,13 @@ export async function registerCustomFonts(fonts: CustomFont[]) {
   await Promise.all(
     fonts.map(async (f) => {
       if (customFamilies.has(f.family)) return;
-      customFamilies.add(f.family);
       const url = await getMediaUrl(f.path);
       if (!url) return;
       const face = new FontFace(f.family, `url(${url})`);
       try {
         await face.load();
         document.fonts.add(face);
+        customFamilies.add(f.family);
       } catch {
         customFamilies.delete(f.family);
       }
