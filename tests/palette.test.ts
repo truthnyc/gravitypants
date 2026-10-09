@@ -18,5 +18,6 @@ describe("photo tab colours", () => {
     expect(photoName({ path: "ws/photos/3f2a9c1e-1111-2222-3333-444455556666-a8f9c0d1e2b3c4d5.jpg" }, 4)).toBe("Photo 5");
     expect(photoName({ path: "ws/photos/3f2a9c1e-1111-2222-3333-444455556666-Linen-throw.jpg" }, 0)).toBe("Linen-throw");
     expect(photoName({ name: "Spring scarf" }, 0)).toBe("Spring scarf");
+    expect(photoName({ path: "ws/photos/84d5cb9435b50015b12aa5d69b840382e0d61076-5000x4034.jpg" }, 0)).toBe("Photo 1");
   });
 });

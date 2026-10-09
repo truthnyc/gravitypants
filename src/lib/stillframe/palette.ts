@@ -70,6 +70,6 @@ export function photoName(photo: { name?: string | null; path?: string | null },
   const fallback = `Photo ${index + 1}`;
   const raw = photo.name?.trim() || (photo.path?.split("/").pop() ?? "").replace(/^[0-9a-f-]{36}-/i, "");
   const base = raw.replace(/\.[a-z0-9]{2,5}$/i, "").trim();
-  if (!base || /^[0-9a-f-]{12,}$/i.test(base) || /^[0-9a-f]{8}-/i.test(base)) return fallback;
+  if (!base || /[0-9a-f]{16,}/i.test(base) || /^[0-9a-f-]{12,}$/i.test(base) || /^[0-9a-f]{8}-/i.test(base)) return fallback;
   return base;
 }
