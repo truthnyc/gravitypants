@@ -90,6 +90,8 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
   const [playing, setPlaying] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [adjusting, setAdjusting] = useState(false);
+  const [keyframe, setKeyframe] = useState<"start" | "end" | null>(null);
+  const keyDrag = useRef<{ key: string; pan0: number } | null>(null);
   const [styleClip, setStyleClip] = useState<FrameStyle | null>(null);
   const [sameLength, setSameLength] = useState(false);
   const [sameTransition, setSameTransition] = useState(false);
@@ -226,10 +228,13 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
       const current = { ...base, ...(d.frames[idx]?.[el] ?? {}), ...patch };
       const shareStyle = current.same_on_all;
       const style = Object.fromEntries(STYLE_KEYS.map((k) => [k, current[k]]));
+      const was = d.frames[idx];
+      const hadWords = Boolean(was?.headline?.text?.trim() || was?.subline?.text?.trim());
+      const autoDarken = !hadWords && Boolean(patch.text?.trim()) && !was?.photo?.darken_set;
       return {
         ...d,
         frames: d.frames.map((f, j) => {
-          if (j === idx) return { ...f, [el]: current };
+          if (j === idx) return { ...f, [el]: current, ...(autoDarken ? { photo: { ...f.photo, darken_for_text: true } } : {}) };
           if (shareStyle) return { ...f, [el]: { ...base, ...(f[el] ?? {}), ...style, same_on_all: true } };
           return f;
         }),
@@ -269,6 +274,44 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
 
   const setDuration = (i: number, seconds: number, key?: string) =>
     apply((d) => ({ ...d, frames: changeFrameLength(d.frames, i, seconds, sameLength) }), key ?? `duration-${i}`);
+
+  const playFrame = (i = idx) => {
+    const target = frames[i];
+    if (!target) return;
+    const start = frameStarts(frames)[i] ?? 0;
+    previewStop.current = start + target.duration_sec - 0.02;
+    setTime(start);
+    setFrameIndex(i);
+    setPlaying(true);
+  };
+
+  // While Custom movement is edited, park the preview on the chosen keyframe.
+  useEffect(() => {
+    if (!keyframe || !frame) return;
+    if (frame.photo?.movement !== "custom" || selected !== "photo") { setKeyframe(null); return; }
+    const start = frameStarts(frames)[idx] ?? 0;
+    const lead = idx > 0 ? Math.min(transitionDuration(frame.transition_in), frame.duration_sec / 2) : 0;
+    setPlaying(false);
+    setTime(keyframe === "start" ? start + lead + 0.01 : start + frame.duration_sec - 0.02);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [keyframe, idx, selected, frame?.photo?.movement]);
+
+  const onStageFocus = (patch: { focus?: { x: number; y: number }; zoom?: number }, key: string) => {
+    if (!keyframe || !frame) return updatePhoto(patch, key);
+    const p = frame.photo ?? {};
+    if (patch.zoom !== undefined) {
+      const cur = keyframe === "start" ? (p.zoom_start ?? 1) : (p.zoom_end ?? 1);
+      const delta = patch.zoom - (p.zoom ?? 1);
+      const z = Math.min(1.5, Math.max(1, cur + delta));
+      return updatePhoto(keyframe === "start" ? { zoom_start: z } : { zoom_end: z }, `kf-zoom-${keyframe}`);
+    }
+    if (patch.focus) {
+      if (keyDrag.current?.key !== key) keyDrag.current = { key, pan0: Number(p.pan_x ?? 0) };
+      const d = (p.focus?.x ?? 0.5) - patch.focus.x;
+      const px = keyDrag.current.pan0 + (keyframe === "start" ? -1 : 1) * d * 20;
+      updatePhoto({ pan_x: Math.max(-1, Math.min(1, px)) }, key);
+    }
+  };
 
   const playTransition = (i: number, patch: Partial<TransitionSettings>) => {
     const target = frames[i];
@@ -465,6 +508,9 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
       if (tr) apply((d) => ({ ...d, frames: d.frames.map((f, j) => (j === 0 ? f : { ...f, transition_in: { ...tr } })) }));
     },
     onReplacePhoto: () => replacePhoto(idx),
+    onPhotoAll: (patch, key) => apply((d) => ({ ...d, frames: d.frames.map((f) => ({ ...f, photo: { ...f.photo, ...patch } })) }), key),
+    onPlayFrame: () => playFrame(idx),
+    onUndo: () => undo(),
     onAdjust: () => {
       setSelected("photo");
       setAdjusting((a) => !a);
@@ -563,11 +609,12 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
                 onSelect={setSelected}
                 onMove={moveElement}
                 onText={setText}
-                adjusting={adjusting && selected === "photo"}
+                adjusting={(adjusting || Boolean(keyframe)) && selected === "photo"}
+                adjustHint={keyframe ? `Setting the ${keyframe} · drag to move · scroll to zoom` : undefined}
                 sizeOf={sizeOf}
                 onResize={resizeEl}
-                onFocus={(patch, key) => updatePhoto(patch, key)}
-                onAdjustDone={() => setAdjusting(false)}
+                onFocus={onStageFocus}
+                onAdjustDone={() => { setAdjusting(false); setKeyframe(null); }}
               />
             </div>
           }
@@ -666,9 +713,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
             if (f) void onReplaceFile(f);
           }}
         />
-        <div className="mt-5 mb-4 flex items-center gap-2">
-          <span className="mr-auto text-[15px] font-semibold nums">Frame {idx + 1} of {frames.length}</span>
-        </div>
+        <div className="mt-5" />
         <Inspector
           embedded
           hideKit
@@ -680,6 +725,9 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
           selected={selected}
           kit={kit} kits={kits ?? []} kitId={doc.project.brand_kit_id ?? null}
           adjusting={adjusting}
+          image={frame?.photo?.path ? images.get(frame.photo.path) : undefined}
+          keyframe={keyframe}
+          onKeyframe={setKeyframe}
           onSelect={(el) => {
             setSelected(el);
             if (el !== "photo") setAdjusting(false);
