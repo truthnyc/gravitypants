@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { ChevronLeft, ChevronRight, Play, Square, Undo2 } from "lucide-react";
+import { ChevronRight, MoreHorizontal, Undo2 } from "lucide-react";
+import { AppSegmented } from "@/components/app-ui";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Link } from "@tanstack/react-router";
 import { AppButton } from "@/components/app-ui";
 import { ReelCard, StepActions, StepShell, StepTitle } from "@/components/app-ui/StepShell";
@@ -194,6 +196,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
     });
   }, [time, total]);
 
+  const isMac = typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator.platform);
   const playVideo = () => {
     if (playing) {
       setPlaying(false);
@@ -543,11 +546,59 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
           formats={doc.project.formats}
           format={format}
           onFormat={(f) => setFormat(f as Format)}
-          onToggleFormat={(f, on) => toggleFormat(f as Format, on)}
+          sizesSlot={
+            <div className="mt-5 flex items-center gap-3">
+              <span className="shrink-0 text-[12px] font-semibold tracking-[0.08em] text-ap-muted uppercase">Preview as</span>
+              <AppSegmented
+                className="grid flex-1 grid-cols-3"
+                value={format as string}
+                onChange={(f) => setFormat(f as Format)}
+                options={(["9:16", "1:1", "16:9"] as const).map((f) => ({ value: f, label: <span className="nums">{f}</span> }))}
+              />
+            </div>
+          }
         />
       }
     >
-      <StepTitle title="Edit" lead="Tap a frame, then change its photo, words, logo, timing or transition." />
+      <StepTitle
+        title="Edit"
+        lead="Tap anything on the preview to change it."
+        actions={readOnly ? undefined : (
+          <>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <AppButton variant="ghost" size="sm" aria-label="Brand kit for the whole video">
+                  <span className="size-3 rounded-[3px] bg-ap-blue" style={kit?.colors?.[0] ? { background: kit.colors[0] } : undefined} aria-hidden />
+                  Brand
+                </AppButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-[240px]">
+                <DropdownMenuLabel>Brand kit for the whole video</DropdownMenuLabel>
+                {kits?.length ? (
+                  <DropdownMenuRadioGroup value={doc.project.brand_kit_id ?? ""} onValueChange={(v) => actions.onKit(v || null)}>
+                    <DropdownMenuRadioItem value="">None</DropdownMenuRadioItem>
+                    {kits.map((k) => <DropdownMenuRadioItem key={k.id} value={k.id}>{k.name}</DropdownMenuRadioItem>)}
+                  </DropdownMenuRadioGroup>
+                ) : (
+                  <DropdownMenuItem asChild><Link to="/app/brand">Create a brand kit</Link></DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <AppButton variant="ghost" size="sm" aria-label="More actions"><MoreHorizontal className="size-4" strokeWidth={1.7} /></AppButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-[220px]">
+                <DropdownMenuItem asChild><Link to="/app/ad/$id/photos" params={{ id: doc.project.id }}>Replace all photos…</Link></DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => duplicateFrame()}>Duplicate this frame</DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="text-destructive" onSelect={() => deleteFrame()}>Delete this frame</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <StaffMenu adId={doc.project.id} />
+          </>
+        )}
+      />
       <div className={cn(readOnly && "pointer-events-none select-none")} aria-readonly={readOnly || undefined}>
         <FrameRail
           horizontal
@@ -584,11 +635,10 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
         />
         <div className="mt-5 mb-4 flex items-center gap-2">
           <span className="mr-auto text-[15px] font-semibold nums">Frame {idx + 1} of {frames.length}</span>
-          <AppButton variant="ghost" size="sm" onClick={() => duplicateFrame()}>Duplicate</AppButton>
-          <AppButton variant="ghost" size="sm" className="bg-destructive/10 text-destructive hover:bg-destructive/15" onClick={() => deleteFrame()}>Delete</AppButton>
         </div>
         <Inspector
           embedded
+          hideKit
           doc={doc}
           endSeconds={endSeconds}
           frame={frame}
@@ -605,12 +655,9 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
         />
       </div>
       <StepActions>
-        <AppButton variant="ghost" size="sm" onClick={undo} disabled={!canUndo || readOnly} aria-label="Undo"><Undo2 className="size-4" strokeWidth={1.7} /> Undo</AppButton>
+        <AppButton variant="ghost" size="sm" onClick={undo} disabled={!canUndo || readOnly} aria-label="Undo"><Undo2 className="size-4" strokeWidth={1.7} /> Undo <kbd className="ml-1 font-ap text-[11px] text-ap-faint">{isMac ? "⌘Z" : "Ctrl+Z"}</kbd></AppButton>
         <KitAgainButton adId={doc.project.id} templateId={doc.project.template_id} />
-        <StaffMenu adId={doc.project.id} />
         <span className="flex-1" />
-        <AppButton asChild variant="ghost" size="lg"><Link to="/app/ad/$id/photos" params={{ id: doc.project.id }}><ChevronLeft className="size-4" strokeWidth={1.7} /> Photos</Link></AppButton>
-        <AppButton variant="ghost" size="lg" onClick={playVideo}>{playing ? <Square className="size-4" strokeWidth={1.7} /> : <Play className="size-4" strokeWidth={1.7} />} {playing ? "Stop" : "Play Video"}</AppButton>
         {exportDisabled ? (
           <AppButton size="lg" disabled>Next: Export <ChevronRight className="size-4" strokeWidth={1.7} /></AppButton>
         ) : (
