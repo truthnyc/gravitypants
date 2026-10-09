@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { siteHead } from "@/lib/site/seo";
 
 export const Route = createFileRoute("/features")({
-  head: () => siteHead({ path: "/features", title: "Product Video Maker Features — Gravity Pants", description: "Everything in the Gravity Pants product video maker: photo frames, text and fonts, brand kits, motion, four shapes plus custom sizes, MP4 and GIF export, templates and teams." }),
+  head: () => siteHead({ path: "/features", title: "Product Video Maker Features — Gravity Pants", description: "Make MP4 and GIF ads in Vertical 9:16, Portrait 4:5, Square 1:1 and Landscape 16:9, plus custom sizes. Portrait is recommended for Instagram, Facebook and LinkedIn feeds." }),
   component: FeaturesPage,
 });
 
@@ -76,9 +76,11 @@ const groups = [
     eyebrow: "Formats",
     title: "One design, every screen.",
     points: [
-      "9:16 for Reels, Stories and TikTok",
-      "1:1 for feeds",
-      "16:9 for banners and YouTube",
+      "Vertical 9:16 for Reels, Stories and TikTok",
+      "Portrait 4:5 — recommended for Instagram, Facebook and LinkedIn feeds",
+      "Square 1:1 for square feed posts",
+      "Landscape 16:9 for banners and YouTube",
+      "Custom sizes for other placements",
       "Switch format while editing and keep your words in place",
     ],
   },
@@ -126,7 +128,7 @@ const allFeatures = [
   ["Text", "Google Fonts picker", "Upload your own font", "Size, weight, color", "Nine-point position", "Same on all frames"],
   ["Brand", "Named brand kits", "Logo, colors, fonts", "Logo placement and size", "End card", "Shared kits on Team"],
   ["Motion", "Fade, slide, swipe, zoom, cut", "Rise up, fade in, typewriter", "Slow zoom and pan", "Per-frame timing"],
-  ["Formats", "9:16, 4:5, 1:1, 16:9, custom", "Switch while editing", "Layout adapts to the shape"],
+  ["Formats", "Vertical 9:16, Portrait 4:5, Square 1:1, Landscape 16:9 and custom", "Portrait recommended for Instagram, Facebook and LinkedIn feeds", "Switch while editing", "Layout adapts to the shape"],
   ["Export", "MP4 and GIF", "All sizes at once", "Made in your browser", "Kept for 30 days"],
   ["Templates", "Ready-made templates", "Save your own", "Make another from a kit", "Duplicate and rename"],
   ["Account", "Private workspace", "Team seats and roles", "Email invites", "Billing and invoices"],

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { siteHead } from "@/lib/site/seo";
 
 export const Route = createFileRoute("/help")({
-  head: () => siteHead({ path: "/help", title: "Help & FAQ – Making Video Ads from Photos | Gravity Pants", description: "Answers about making video ads from product photos with Gravity Pants: MP4 and GIF exports, 9:16, 4:5, 1:1 and 16:9 formats, brand kits, plans and billing." }),
+  head: () => siteHead({ path: "/help", title: "Help & FAQ – Making Video Ads from Photos | Gravity Pants", description: "Help with MP4 and GIF exports: Vertical 9:16, Portrait 4:5 for Instagram, Facebook and LinkedIn feeds, Square 1:1, Landscape 16:9 and custom sizes." }),
   component: HelpPage,
 });
 
@@ -20,7 +20,7 @@ const guides = [
 
 const videoAds = [
   { q: "Can I make a video ad from product photos?", a: "Yes. That is what Gravity Pants is for. Choose three to five product photos and it builds a short video ad with movement, transitions, your text and your logo. You can change any part before exporting." },
-  { q: "Which formats do I get for Instagram, TikTok and Facebook?", a: "Every reel exports in 9:16 for Reels, TikTok and Stories, 1:1 for feed posts and 16:9 for YouTube, websites and email, so one ad covers every placement." },
+  { q: "Which formats do I get for Instagram, TikTok and Facebook?", a: "Choose Vertical 9:16 for Reels, TikTok and Stories; Portrait 4:5, recommended for Instagram, Facebook and LinkedIn feeds; Square 1:1 for square feed posts; and Landscape 16:9 for YouTube, websites and email. You can also export a custom size. Each selected shape produces one file per chosen file type, MP4 or GIF." },
   { q: "Should I export an MP4 or a GIF?", a: "Use MP4 for social media ads and anywhere video plays. Use an animated GIF for email newsletters and places that do not play video. Gravity Pants makes both from the same ad, and they look the same." },
   { q: "Do I need video editing experience?", a: "No. Gravity Pants starts with a finished reel instead of an empty timeline. Tap the words, colors, photo framing or movement to change them." },
   { q: "Can my video ads match my brand?", a: "Yes. Save your logo, colors and fonts in a brand kit and every new ad starts with them. You can also add a light and a dark version of your logo and pick which one shows on each frame." },

@@ -51,7 +51,7 @@ export const PLANS: PlanConfig[] = [
     monthly: 35,
     yearly: 350,
     team: false,
-    features: ["1 seat", "10 exports a month", "9:16, 4:5, 1:1, 16:9 and custom", "MP4 and GIF", "Every Google Font", "Brand kit: logo, colors, fonts", "Duplicate with new photos", "Save as template", "No watermark", "Need more? Packs of 5, 10 or 20 extra exports"],
+    features: ["1 seat", "10 exports a month", "Vertical 9:16, Portrait 4:5, Square 1:1, Landscape 16:9 and custom", "MP4 and GIF", "Every Google Font", "Brand kit: logo, colors, fonts", "Duplicate with new photos", "Save as template", "No watermark", "Need more? Packs of 5, 10 or 20 extra exports"],
   },
   {
     id: "business",
@@ -134,7 +134,7 @@ export const FAQ = [
   { q: "Can I try it before paying?", a: `Yes. Every account starts with a free trial, no credit card and no time limit. Your first reel exports with no watermark, and you get ${TRIAL.exports - TRIAL.cleanExports} more watermarked exports. Your ads and brand kit stay saved when the trial exports run out.` },
   { q: "What if I need more than 10 exports on Simple?", a: "Buy a pack from Account → Billing whenever you need it: 5 exports for $15, 10 for $25 or 20 for $45. Extra exports never expire and work on any plan, so a busy month doesn’t mean jumping to Business." },
   { q: "What kind of photos work best?", a: "Clear product photos with some space around the product work best. Phone photos are fine: three to five of them make a good reel." },
-  { q: "Which formats can I export?", a: "Every reel exports as 9:16 for Reels, Stories and TikTok, 1:1 for feeds and 16:9 for banners and YouTube, as MP4 or GIF." },
+   { q: "Which formats can I export?", a: "Choose Vertical 9:16 for Reels, Stories and TikTok; Portrait 4:5, recommended for Instagram, Facebook and LinkedIn feeds; Square 1:1 for square posts; or Landscape 16:9 for banners and YouTube. Custom sizes are available too. Each selected shape exports as MP4, GIF or both." },
   { q: "Can I cancel anytime?", a: "Yes. Cancel from Account → Billing in the app whenever you like. You keep full access until the end of the period you've already paid for, and we don't charge you again." },
   { q: "Do I own the reels I make?", a: "Yes. Every reel you export is yours to use wherever you like, forever — including reels made during the free trial. We never claim any rights over your photos or your finished videos." },
   { q: "Do you offer discounts?", a: "Yearly billing already saves you 17% on every plan. If you're a nonprofit or a school, write to info@gravitypants.com and we'll see what we can do." },
