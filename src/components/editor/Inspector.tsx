@@ -998,8 +998,8 @@ export function TransitionPanel({ frames, frame, first, actions }: { frames: Fra
             className={cn("tr-tile h-auto min-w-0 flex flex-col items-center gap-1.5 rounded-sm p-1.5", tr.type === type ? "ring-2 ring-primary" : "ring-1 ring-border")}
             style={{ "--tr-anim": TR_ANIM[type] } as React.CSSProperties}
           >
-            <span className="relative block h-12 w-full overflow-hidden rounded-[3px] bg-secondary-text/40">
-              <span className="tr-b absolute inset-0 bg-el-photo/80" />
+            <span className="relative block h-12 w-full overflow-hidden rounded-[3px] bg-ap-panel">
+              <span className="tr-b absolute inset-0 bg-ap-blue" />
               {type === "dip_black" && <span className="tr-k absolute inset-0 bg-foreground" />}
             </span>
             <span className="text-[11px] font-medium">{TRANSITION_LABEL[type]}</span>

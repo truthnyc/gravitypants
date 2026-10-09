@@ -33,6 +33,7 @@ export function FrameRail({ doc, format, frameIndex, images, version, uploading,
   const [over, setOver] = useState<number | null>(null);
   const [popup, setPopup] = useState<string | null>(null);
   return <nav ref={navRef} aria-label="Frames" tabIndex={0} className="-mx-1 flex items-start gap-2 overflow-x-auto px-1 pt-1 pb-2 outline-none focus-visible:ring-2 focus-visible:ring-primary" onKeyDown={(e) => {
+    if (!e.currentTarget.contains(e.target as Node)) return;
     if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
     e.preventDefault(); e.stopPropagation();
     const next = Math.max(0, Math.min(doc.frames.length - 1, frameIndex + (e.key === "ArrowLeft" ? -1 : 1)));

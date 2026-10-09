@@ -481,7 +481,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
       if (on && target) apply((d) => ({ ...d, frames: changeFrameLength(d.frames, i, target.duration_sec, true) }));
     },
     onTransition: (patch) => {
-      apply((d) => ({ ...d, frames: d.frames.map((f, j) => (j > 0 && (sameTransition || j === i)) ? { ...f, transition_in: { type: "cut", speed: "smooth", ...f.transition_in, ...patch } } : f) }));
+      apply((d) => ({ ...d, frames: d.frames.map((f, j) => (j > 0 && (sameTransition || j === i)) ? { ...f, transition_in: { ...f.transition_in, ...patch } } : f) }));
       playTransition(i, patch);
     },
     onSameTransition: (on) => {
