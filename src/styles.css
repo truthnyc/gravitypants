@@ -1326,3 +1326,7 @@ p.concept-reel-notice { font-size: 10px !important; }
 .mv-chip:is(:hover, :focus-visible) .mv-thumb[data-mv="pan_right"] img { animation: mv-pan-right 1.4s ease-in-out infinite alternate; }
 .mv-chip:is(:hover, :focus-visible) .mv-thumb[data-mv="custom"] img { animation: mv-custom 1.4s ease-in-out infinite alternate; }
 @media (prefers-reduced-motion: reduce) { .mv-chip .mv-thumb img { animation: none !important; } }
+
+/* Checkerboard behind logo/badge previews, split dark/light behind Auto logo */
+.checker { background-color: var(--card); background-image: conic-gradient(var(--control-fill) 25%, transparent 0 50%, var(--control-fill) 0 75%, transparent 0); background-size: 12px 12px; }
+.logo-split { background: linear-gradient(90deg, var(--foreground) 50%, var(--background) 50%); }
