@@ -41,7 +41,7 @@ export function BlogVisual({ kind }: { kind: BlogVisualKind }) {
           <p className="text-[13px] text-site-muted">{f.use}</p>
         </div>)}
       </div>
-      <Caption>One reel, three sizes, exported at the same time.</Caption>
+      <Caption>One reel, every size you need, exported at the same time.</Caption>
     </figure>;
   }
   if (kind === "three-shots") {

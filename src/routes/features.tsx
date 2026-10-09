@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { siteHead } from "@/lib/site/seo";
 
 export const Route = createFileRoute("/features")({
-  head: () => siteHead({ path: "/features", title: "Product Video Maker Features — Gravity Pants", description: "Everything in the Gravity Pants product video maker: photo frames, text and fonts, brand kits, motion, three formats, MP4 and GIF export, templates and teams." }),
+  head: () => siteHead({ path: "/features", title: "Product Video Maker Features — Gravity Pants", description: "Everything in the Gravity Pants product video maker: photo frames, text and fonts, brand kits, motion, four shapes plus custom sizes, MP4 and GIF export, templates and teams." }),
   component: FeaturesPage,
 });
 
@@ -89,7 +89,7 @@ const groups = [
     points: [
       "MP4 for ads and social posts",
       "Animated GIF for email and websites",
-      "All three sizes in one go",
+      "Every size in one go",
       "Exports made in your browser, so nothing queues",
       "Finished files kept for 30 days to download again",
     ],
@@ -126,7 +126,7 @@ const allFeatures = [
   ["Text", "Google Fonts picker", "Upload your own font", "Size, weight, color", "Nine-point position", "Same on all frames"],
   ["Brand", "Named brand kits", "Logo, colors, fonts", "Logo placement and size", "End card", "Shared kits on Team"],
   ["Motion", "Fade, slide, swipe, zoom, cut", "Rise up, fade in, typewriter", "Slow zoom and pan", "Per-frame timing"],
-  ["Formats", "9:16, 1:1, 16:9", "Switch while editing", "Layout adapts to the shape"],
+  ["Formats", "9:16, 4:5, 1:1, 16:9, custom", "Switch while editing", "Layout adapts to the shape"],
   ["Export", "MP4 and GIF", "All sizes at once", "Made in your browser", "Kept for 30 days"],
   ["Templates", "Ready-made templates", "Save your own", "Make another from a kit", "Duplicate and rename"],
   ["Account", "Private workspace", "Team seats and roles", "Email invites", "Billing and invoices"],

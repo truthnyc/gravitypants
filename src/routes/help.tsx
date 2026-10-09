@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { siteHead } from "@/lib/site/seo";
 
 export const Route = createFileRoute("/help")({
-  head: () => siteHead({ path: "/help", title: "Help & FAQ – Making Video Ads from Photos | Gravity Pants", description: "Answers about making video ads from product photos with Gravity Pants: MP4 and GIF exports, 9:16, 1:1 and 16:9 formats, brand kits, plans and billing." }),
+  head: () => siteHead({ path: "/help", title: "Help & FAQ – Making Video Ads from Photos | Gravity Pants", description: "Answers about making video ads from product photos with Gravity Pants: MP4 and GIF exports, 9:16, 4:5, 1:1 and 16:9 formats, brand kits, plans and billing." }),
   component: HelpPage,
 });
 
