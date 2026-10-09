@@ -112,6 +112,7 @@ function SiteFooter() {
           <a href={STATUS_URL} target="_blank" rel="noreferrer" className="ml-auto inline-flex min-h-0 items-center gap-1.5 hover:text-ap-blue">
             <span className="size-2 rounded-full bg-ap-green" aria-hidden /> Status
           </a>
+          <p className="w-full pt-1 text-[12px] text-ap-muted">Gravity Pants and Aimanté are trademarks of Truth Nyc LLC.</p>
         </div>
       </div>
     </footer>
