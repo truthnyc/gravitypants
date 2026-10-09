@@ -19,7 +19,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { effectiveKit, useBrandKit, useBrandKits, useTemplateName } from "@/lib/stillframe/data";
 import { MEDIA_BUCKET } from "@/lib/stillframe/media";
 import { registerCustomFonts } from "@/lib/stillframe/fonts";
-import { CHANNELS, DEFAULT_CHANNEL, nearestFormat, slugify } from "@/lib/stillframe/channels";
+import { nearestFormat, slugify } from "@/lib/stillframe/channels";
+import { CUSTOM_MAX, CUSTOM_MIN, CUSTOM_PRESETS, DEFAULT_SIZES, EXPORT_SIZES, PLATFORMS, customError, exportFileName, migrateSizes, platformState, ratioLabel, sizeLabelForFile, togglePlatform, type PlatformId, type SizeId } from "@/lib/stillframe/export-sizes";
 import { formatSeconds, type Format, type Frame, type Project } from "@/lib/stillframe/types";
 import { FORMAT_SIZE } from "@/render/formats";
 import { loadImages } from "@/render/images";
@@ -30,8 +31,11 @@ import { fetchExportStatus, useExportStatus, useRefreshBilling } from "@/lib/sti
 import { PlanCards } from "@/components/billing/PlanCards";
 
 type GifSize = "full" | "half" | "small";
-type Target = { key: string; name: string; slug: string; format: Format; width: number; height: number };
-type FileRow = { name: string; kind: "mp4" | "gif"; job: string };
+type Target = { key: string; name: string; ratio: string; format: Format; width: number; height: number; custom?: boolean };
+type CustomRow = { id: string; w: string; h: string };
+type FileRow = { name: string; kind: "mp4" | "gif"; job: string; width: number; height: number };
+const num = (s: string) => (s.trim() === "" ? null : Number(s));
+const rid = () => Math.random().toString(36).slice(2, 9);
 type JobState = { progress: number; status: "waiting" | "working" | "done" | "error" | "cancelled"; blob?: Blob; note?: string };
 
 const even = (n: number) => Math.max(2, Math.round(n / 2) * 2);
