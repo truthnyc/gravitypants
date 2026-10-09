@@ -311,6 +311,8 @@ function drawPhoto(
   ctx.fillRect(0, 0, W, H);
   const img = photo.path ? images?.get(photo.path) : undefined;
   if (!img || !img.naturalWidth) return;
+  const bgMode = photo.background ?? (photo.background_color ? "solid" : "blur");
+  if ((photo.fit ?? "fill") === "fit" && bgMode === "blur") drawBlurred(ctx, img, W, H);
 
   const e = easeInOut(clamp(u));
   const mv = photo.movement ?? "none";

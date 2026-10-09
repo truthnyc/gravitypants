@@ -156,6 +156,8 @@ export function framePayloadFromPhoto(photo: UploadedPhoto, index: number) {
       brightness: 0,
       darken_for_text: false,
       background_color: null,
+      background: "blur",
+      name: photo.name ? photo.name.replace(/\.[a-z0-9]{2,5}$/i, "") : null,
     },
     transition_in: { type: index === 0 ? "cut" : "fade", speed: "smooth" },
     headline:
