@@ -64,6 +64,7 @@ export function Stage({
   const sessions = useRef(0);
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const surfaceRef = useRef<HTMLDivElement>(null);
   const [box, setBox] = useState({ w: 0, h: 0 });
   const [layout, setLayout] = useState<FrameLayout | null>(null);
   const [drag, setDrag] = useState<{ el: DragEl; x: number; y: number; moving: boolean; anchor: Anchor | null; was: boolean } | null>(null);
@@ -138,7 +139,25 @@ export function Stage({
   };
 
   const frame = doc.frames[frameIndex];
-  const showTags = interactive && !playing && !adjusting && layout;
+  const showTags = interactive && !playing && layout;
+  const photoMode = interactive && !playing && (selected === "photo" || adjusting);
+
+  // Wheel / trackpad pinch zoom (1x-2.5x); native non-passive listener so the page doesn't scroll.
+  const wheelRef = useRef<(e: WheelEvent) => void>(() => {});
+  wheelRef.current = (e: WheelEvent) => {
+    if (!photoMode || !frame) return;
+    e.preventDefault();
+    const dy = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? 100 : 1);
+    const z = frame.photo?.zoom ?? 1;
+    onFocus({ zoom: Math.min(2.5, Math.max(1, z * Math.exp(-dy * 0.0015))) }, "zoom-wheel");
+  };
+  useEffect(() => {
+    const el = surfaceRef.current;
+    if (!el) return;
+    const h = (e: WheelEvent) => wheelRef.current(e);
+    el.addEventListener("wheel", h, { passive: false });
+    return () => el.removeEventListener("wheel", h);
+  }, []);
 
   const placeholderBox = (el: "headline" | "subline"): Box | null => {
     if (!layout || !frame) return null;
@@ -256,9 +275,26 @@ export function Stage({
   return (
     <div ref={wrapRef} className="flex h-full min-h-0 w-full min-w-0 items-center justify-center">
       <div
-        className="relative rounded-lg shadow-ap-thumb"
-        style={{ width: box.w, height: box.h, outline: selected === "photo" && showTags ? `2px solid var(--accent-blue)` : undefined, outlineOffset: 3 }}
-        onPointerDown={() => onSelect("photo")}
+        ref={surfaceRef}
+        style={{ width: box.w, height: box.h, outline: selected === "photo" && showTags ? `2px solid var(--accent-blue)` : undefined, outlineOffset: 3, touchAction: photoMode ? "none" : undefined }}
+        className={cn("relative rounded-lg shadow-ap-thumb", photoMode && (pan ? "cursor-grabbing" : "cursor-grab"))}
+        onPointerDown={(e) => {
+          onSelect("photo");
+          if (!interactive || playing || !frame) return;
+          (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+          const f = frame.photo?.focus ?? { x: 0.5, y: 0.5 };
+          setPan({ x: e.clientX, y: e.clientY, fx: f.x, fy: f.y, id: ++sessions.current });
+        }}
+        onPointerMove={(e) => {
+          if (!pan || !frame) return;
+          if (Math.hypot(e.clientX - pan.x, e.clientY - pan.y) < 3) return;
+          const z = frame.photo?.zoom ?? 1;
+          const x = Math.min(1, Math.max(0, pan.fx - (e.clientX - pan.x) / (box.w * z * 1.4)));
+          const y = Math.min(1, Math.max(0, pan.fy - (e.clientY - pan.y) / (box.h * z * 1.4)));
+          onFocus({ focus: { x, y } }, `drag:focus:${pan.id}`);
+        }}
+        onPointerUp={() => setPan(null)}
+        onPointerCancel={() => setPan(null)}
       >
         <canvas ref={canvasRef} width={W || 1} height={H || 1} className="block h-full w-full rounded-lg" aria-label="Ad preview" role="img" />
         {showTags && frame && (
@@ -278,55 +314,10 @@ export function Stage({
             {tag("logo", layout.logo, true)}
           </>
         )}
-        {adjusting && frame && (
-          <div
-            className="absolute inset-0 cursor-move rounded-sm ring-2 ring-primary"
-            onPointerDown={(e) => {
-              e.stopPropagation();
-              (e.target as HTMLElement).setPointerCapture(e.pointerId);
-              const f = frame.photo?.focus ?? { x: 0.5, y: 0.5 };
-              setPan({ x: e.clientX, y: e.clientY, fx: f.x, fy: f.y, id: ++sessions.current });
-            }}
-            onPointerMove={(e) => {
-              if (!pan) return;
-              const z = frame.photo?.zoom ?? 1;
-              const x = Math.min(1, Math.max(0, pan.fx - (e.clientX - pan.x) / (box.w * z * 1.4)));
-              const y = Math.min(1, Math.max(0, pan.fy - (e.clientY - pan.y) / (box.h * z * 1.4)));
-              onFocus({ focus: { x, y } }, `drag:focus:${pan.id}`);
-            }}
-            onPointerUp={() => setPan(null)}
-            onWheel={(e) => {
-              const z = frame.photo?.zoom ?? 1;
-              onFocus({ zoom: Math.min(3, Math.max(1, z - e.deltaY * 0.002)) }, "zoom-wheel");
-            }}
-          >
-            <div className="pointer-events-none absolute inset-0 grid grid-cols-3 grid-rows-3">
-              {Array.from({ length: 9 }, (_, i) => (
-                <span key={i} className="border border-background/30" />
-              ))}
-            </div>
-            <div
-              className="absolute inset-x-4 bottom-4 flex items-center gap-3 rounded-lg bg-card/95 px-3 py-2 shadow-popover"
-              onPointerDown={(e) => e.stopPropagation()}
-            >
-              <span className="text-[12px] font-medium">Zoom</span>
-              <input
-                type="range"
-                min={100}
-                max={300}
-                value={Math.round((frame.photo?.zoom ?? 1) * 100)}
-                onChange={(e) => onFocus({ zoom: Number(e.target.value) / 100 }, "zoom-range")}
-                aria-label="Zoom"
-                className="flex-1 accent-[var(--el-photo)]"
-              />
-              <button type="button" onClick={onAdjustDone} className="text-[13px] font-semibold text-link">
-                Done
-              </button>
-            </div>
-            <span className="pointer-events-none absolute left-1/2 top-3 -translate-x-1/2 rounded-lg bg-foreground/70 px-2.5 py-1 text-[12px] text-background">
-              {adjustHint ?? "Drag to choose what stays in view"}
-            </span>
-          </div>
+        {photoMode && !drag && (
+          <span className="pointer-events-none absolute left-1/2 top-3 -translate-x-1/2 whitespace-nowrap rounded-lg bg-foreground/70 px-2.5 py-1 text-[12px] text-background">
+            {adjustHint ?? "Drag to reposition · scroll to zoom"}
+          </span>
         )}
         {drag?.moving && layout && (
           <div className="pointer-events-none absolute inset-0">
