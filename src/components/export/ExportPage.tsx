@@ -352,7 +352,11 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
       title={{ name: project.name, status: "saved" }}
       left={
         <ReelCard
-          preview={player.preview}
+          preview={previewT ? (
+            <ExportStage target={previewT} time={player.time} project={project} frames={frames} brand={brand} images={images} />
+          ) : (
+            <p className="text-center text-[14px] text-ap-muted">Pick a size on the right to preview it.</p>
+          )}
           playing={player.playing}
           onTogglePlay={player.toggle}
           segments={player.segments}
@@ -364,6 +368,25 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
           formats={project.formats}
           format={player.format}
           onFormat={(f) => player.setFormat(f as Format)}
+          sizesSlot={targets.length > 0 && (
+            <>
+              <AppSectionLabel className="mt-5 mb-2">Preview size</AppSectionLabel>
+              <div role="tablist" aria-label="Preview size" className="flex flex-wrap gap-2">
+                {targets.map((t) => {
+                  const on = t.key === previewT?.key;
+                  const r = t.width / t.height;
+                  return (
+                    <button key={t.key} type="button" role="tab" aria-selected={on} onClick={() => setPreviewKey(t.key)}
+                      className={cn("inline-flex min-h-0 items-center gap-2 rounded-lg border bg-ap-card px-3 py-2 text-[13px] font-medium", on ? "border-ap-blue shadow-[0_0_0_1px_var(--ap-blue)]" : "border-ap-hairline")}>
+                      <span aria-hidden className="rounded-[2px] border-[1.5px] border-current" style={{ width: r >= 1 ? 14 : 14 * r, height: r >= 1 ? 14 / r : 14 }} />
+                      {t.name}
+                      <span className="text-[11px] font-normal text-ap-muted nums">{t.ratio}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          )}
         />
       }
     >
