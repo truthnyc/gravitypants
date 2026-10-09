@@ -220,6 +220,7 @@ export function FontPicker({
           <div className="mt-2.5 flex flex-wrap gap-1.5">
             {CHIPS.map((c) => (
               <Button
+                variant="plain"
                 key={c.value}
                 type="button"
                 onClick={() => setCat(c.value)}
@@ -274,8 +275,8 @@ export function FontPicker({
             )}
           </div>
         </div>
-        <div className="flex items-center gap-1 border-t px-4 pt-2 text-[11px] text-secondary-text nums">
-          {(data?.fonts.length ?? 0).toLocaleString()} fonts · free for commercial use ·
+        <div className="flex flex-wrap items-center gap-x-1 gap-y-0.5 border-t px-4 pt-2 text-[11px] text-secondary-text nums">
+          <span>{(data?.fonts.length ?? 0).toLocaleString()} fonts · free for commercial use ·</span>
           <a href="https://fonts.google.com" target="_blank" rel="noreferrer" className="text-link">Google Fonts ↗</a>
         </div>
         <div className="flex items-center gap-2 px-4 py-3">
