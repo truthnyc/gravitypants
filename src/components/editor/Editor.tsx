@@ -31,6 +31,7 @@ import { useAutosave, useEditorDoc, useRenderAssets, type ElementKey } from "./u
 import { cn } from "@/lib/utils";
 import { changeFrameLength } from "./frame-timing";
 import { frameStarts, transitionDuration } from "@/render/renderFrame";
+import { checkFit, type FitIssue } from "./fit-check";
 
 const NEW_HEADLINE: TextSettings = {
   text: "",
@@ -151,6 +152,20 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
     const patch = { font_family: fontPreview.family, font_weight: fontPreview.weight };
     return { ...doc, frames: doc.frames.map((f, j) => (j === idx ? { ...f, [fontPreview.el]: { ...f[fontPreview.el], ...patch } } : f)) };
   }, [doc, fontPreview, idx, frame]);
+
+  // Fit warnings: lay every frame out at each size (debounced, and again when fonts finish loading).
+  const [fitIssues, setFitIssues] = useState<FitIssue[]>([]);
+  const [fontsTick, setFontsTick] = useState(0);
+  useEffect(() => {
+    if (typeof document === "undefined" || !document.fonts) return;
+    const bump = () => setFontsTick((n) => n + 1);
+    document.fonts.addEventListener("loadingdone", bump);
+    return () => document.fonts.removeEventListener("loadingdone", bump);
+  }, []);
+  useEffect(() => {
+    const t = setTimeout(() => setFitIssues(checkFit(doc, images)), 150);
+    return () => clearTimeout(t);
+  }, [doc, images, version, fontsTick]);
   const total = videoDuration(doc.project, frames, brand);
 
   const selectFrame = useCallback(
@@ -613,6 +628,10 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
 
   if (!frame) return null;
 
+  const formatIssues = (f: Format) => fitIssues.filter((x) => x.format === f);
+  const here = formatIssues(format)[0];
+  const elsewhere = (["9:16", "1:1", "16:9"] as Format[]).filter((f) => f !== format && formatIssues(f).length);
+
   const meta = [templateName, `${frames.length} ${frames.length === 1 ? "photo" : "photos"}`, `${total.toFixed(1)} sec`].filter(Boolean).join(" · ");
   const segments = [...frames.map((f) => f.duration_sec), ...(endSeconds ? [endSeconds] : [])];
 
@@ -661,16 +680,40 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
           formats={doc.project.formats}
           format={format}
           onFormat={(f) => setFormat(f as Format)}
+          onSegment={(i) => { if (i < frames.length) selectFrame(i); }}
           sizesSlot={
+            <>
             <div className="mt-5 flex items-center gap-3">
               <span className="shrink-0 text-[12px] font-semibold tracking-[0.08em] text-ap-muted uppercase">Preview as</span>
               <AppSegmented
                 className="grid flex-1 grid-cols-3"
                 value={format as string}
                 onChange={(f) => setFormat(f as Format)}
-                options={(["9:16", "1:1", "16:9"] as const).map((f) => ({ value: f, label: <span className="nums">{f}</span> }))}
+                options={(["9:16", "1:1", "16:9"] as const).map((f) => ({
+                  value: f,
+                  label: (
+                    <span className="inline-flex items-center gap-1.5 nums">
+                      {f}
+                      {formatIssues(f).length > 0 && <span className="size-1.5 rounded-full bg-ap-amber" aria-label="has a fit problem" />}
+                    </span>
+                  ),
+                }))}
               />
             </div>
+            {(here || elsewhere.length > 0) && (
+              <p className="mt-2 text-[12px] leading-snug text-ap-amber" role="status">
+                {here ? (
+                  <>
+                    In {format},{" "}
+                    <button type="button" className="font-semibold underline underline-offset-2" onClick={() => selectFrame(here.frame)}>frame {here.frame + 1}</button>
+                    : {here.text}. Try a smaller size or another position.
+                  </>
+                ) : (
+                  <>Check {elsewhere.join(" and ")} — tap it to see where.</>
+                )}
+              </p>
+            )}
+            </>
           }
         />
       }
