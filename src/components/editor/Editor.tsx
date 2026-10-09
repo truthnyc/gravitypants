@@ -97,6 +97,18 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
   const [styleClip, setStyleClip] = useState<FrameStyle | null>(null);
   const [sameLength, setSameLength] = useState(false);
   const [sameTransition, setSameTransition] = useState(false);
+  // "Same for all frames" switches are remembered per ad.
+  const sameKey = `sf-same:${initial.project.id}`;
+  useEffect(() => {
+    try {
+      const v = JSON.parse(localStorage.getItem(sameKey) ?? "{}");
+      if (v.length) setSameLength(true);
+      if (v.transition) setSameTransition(true);
+    } catch { /* ignore */ }
+  }, [sameKey]);
+  useEffect(() => {
+    try { localStorage.setItem(sameKey, JSON.stringify({ length: sameLength, transition: sameTransition })); } catch { /* ignore */ }
+  }, [sameKey, sameLength, sameTransition]);
   const replaceRef = useRef<HTMLInputElement>(null);
   const replaceAt = useRef(0);
   const { data: settings } = useBrandKit();
@@ -152,6 +164,29 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
     const patch = { font_family: fontPreview.family, font_weight: fontPreview.weight };
     return { ...doc, frames: doc.frames.map((f, j) => (j === idx ? { ...f, [fontPreview.el]: { ...f[fontPreview.el], ...patch } } : f)) };
   }, [doc, fontPreview, idx, frame]);
+
+  // Older ads with a single logo: file it as the light or dark version by its brightness.
+  const migratedLogo = useRef(false);
+  useEffect(() => {
+    const lg = doc.project.logo;
+    if (migratedLogo.current || !lg.path || lg.light_path || lg.dark_path) return;
+    const img = images.get(lg.path);
+    if (!img?.naturalWidth) return;
+    migratedLogo.current = true;
+    void import("@/lib/stillframe/logo-file").then(({ isLightArtwork }) => {
+      try {
+        const c = document.createElement("canvas");
+        c.width = Math.min(200, img.naturalWidth);
+        c.height = Math.max(1, Math.round((c.width * img.naturalHeight) / img.naturalWidth));
+        const ctx = c.getContext("2d");
+        if (!ctx) return;
+        ctx.drawImage(img, 0, 0, c.width, c.height);
+        const light = isLightArtwork(ctx.getImageData(0, 0, c.width, c.height).data);
+        const p = lg.path ?? null; updateLogo(light ? { light_path: p } : { dark_path: p });
+      } catch { /* cross-origin image: leave as is */ }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [images, version, doc.project.logo.path]);
 
   // Fit warnings: lay every frame out at each size (debounced, and again when fonts finish loading).
   const [fitIssues, setFitIssues] = useState<FitIssue[]>([]);

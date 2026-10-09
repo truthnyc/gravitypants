@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState, type PointerEvent as RPointerEvent } from "react";
 import type { EditorDoc } from "@/lib/stillframe/data";
-import type { Format, LogoPosition, TextSettings } from "@/lib/stillframe/types";
+import type { Format, Frame, LogoPosition, TextSettings } from "@/lib/stillframe/types";
 import { FORMAT_SIZE, type Rect } from "@/render/formats";
 import {
   ANCHORS,
@@ -70,6 +70,14 @@ export function Stage({
   const [drag, setDrag] = useState<{ el: DragEl; x: number; y: number; moving: boolean; anchor: Anchor | null; was: boolean } | null>(null);
   const [editing, setEditing] = useState<"headline" | "subline" | null>(null);
 
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const on = () => setReduced(mq.matches);
+    on();
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, []);
   const size = FORMAT_SIZE[format];
   const ratio = size.width / size.height;
   const dpr = typeof window === "undefined" ? 1 : Math.min(2, window.devicePixelRatio || 1);
@@ -93,9 +101,10 @@ export function Stage({
   useEffect(() => {
     const ctx = canvasRef.current?.getContext("2d");
     if (!ctx || !W || !H) return;
-    renderAt(ctx, doc.project, doc.frames, format, time, { width: W, height: H, images, brand, showGuides: !playing && Boolean(drag?.moving) });
+    const frames = reduced ? calmFrames(doc.frames) : doc.frames;
+    renderAt(ctx, doc.project, frames, format, time, { width: W, height: H, images, brand, showGuides: !playing && Boolean(drag?.moving) });
     if (!playing) setLayout(layoutFrame(ctx, doc.project, doc.frames, frameIndex, format, W, H, images));
-  }, [doc, brand, format, time, W, H, images, version, playing, frameIndex, drag?.moving]);
+  }, [doc, brand, format, time, W, H, images, version, playing, frameIndex, drag?.moving, reduced]);
 
   const toCss = (b: Box) => ({ left: b.x / dpr, top: b.y / dpr, width: b.w / dpr, height: b.h / dpr });
 
@@ -357,3 +366,19 @@ export function Tag({ el, active, className }: { el: ElementKey; active: boolean
 }
 
 export type { LogoPosition };
+
+/** Reduced motion: the editor preview drops photo movement, text animation and transitions (exports are unchanged). */
+const calmCache = new WeakMap<Frame[], Frame[]>();
+function calmFrames(frames: Frame[]): Frame[] {
+  const hit = calmCache.get(frames);
+  if (hit) return hit;
+  const out = frames.map((f) => ({
+    ...f,
+    photo: { ...f.photo, movement: "none" as const },
+    transition_in: { ...f.transition_in, type: "cut" as const },
+    headline: f.headline ? { ...f.headline, animation: "none" as const } : f.headline,
+    subline: f.subline ? { ...f.subline, animation: "none" as const } : f.subline,
+  }));
+  calmCache.set(frames, out);
+  return out;
+}
