@@ -90,6 +90,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
   const [playing, setPlaying] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [adjusting, setAdjusting] = useState(false);
+  const [fontPreview, setFontPreview] = useState<{ el: "headline" | "subline"; family: string; weight: number } | null>(null);
   const [keyframe, setKeyframe] = useState<"start" | "end" | null>(null);
   const keyDrag = useRef<{ key: string; pan0: number } | null>(null);
   const [styleClip, setStyleClip] = useState<FrameStyle | null>(null);
@@ -396,15 +397,36 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
     }
   };
 
-  const addLogo = async (file: File, variant: "light" | "dark") => {
+  const addLogo = async (raw: File, wanted: "light" | "dark" | "auto") => {
     try {
-      const up = await uploadMedia(file, "logo");
+      const { prepareLogo } = await import("@/lib/stillframe/logo-file");
+      const prep = await prepareLogo(raw);
+      const variant = wanted === "auto" ? (prep.light ? "light" : "dark") : wanted;
+      if (prep.warning) toast.warning(prep.warning);
+      const up = await uploadMedia(prep.file, "logo");
       updateLogo(variant === "light"
         ? { path: doc.project.logo.path ?? up.path, light_path: up.path }
         : { path: doc.project.logo.path ?? up.path, dark_path: up.path });
-      toast(`${variant === "light" ? "Light" : "Dark"} logo added`);
+      toast(wanted === "auto" ? `Added as your ${variant === "light" ? "Light logo (for dark photos)" : "Dark logo (for light photos)"}` : `${variant === "light" ? "Light" : "Dark"} logo added`);
     } catch {
       toast.error("That logo couldn't be uploaded. Try again.");
+    }
+  };
+
+  const makeLogo = async (variant: "light" | "dark") => {
+    const lg = doc.project.logo;
+    const srcPath = variant === "light" ? (lg.dark_path ?? lg.path) : (lg.light_path ?? lg.path);
+    if (!srcPath) return;
+    try {
+      const [{ monoLogo }, { getMediaUrl }] = await Promise.all([import("@/lib/stillframe/logo-file"), import("@/lib/stillframe/media")]);
+      const url = await getMediaUrl(srcPath);
+      if (!url) throw new Error("no url");
+      const file = await monoLogo(url, variant === "light" ? "white" : "black", "logo");
+      const up = await uploadMedia(file, "logo");
+      updateLogo(variant === "light" ? { light_path: up.path } : { dark_path: up.path });
+      toast(`${variant === "light" ? "Light" : "Dark"} logo made`, { action: { label: "Undo", onClick: () => undo() } });
+    } catch {
+      toast.error("That version couldn't be made. Try uploading one instead.");
     }
   };
 
@@ -510,6 +532,8 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
     onReplacePhoto: () => replacePhoto(idx),
     onPhotoAll: (patch, key) => apply((d) => ({ ...d, frames: d.frames.map((f) => ({ ...f, photo: { ...f.photo, ...patch } })) }), key),
     onPlayFrame: () => playFrame(idx),
+    onMakeLogo: (v) => void makeLogo(v),
+    onFontPreview: setFontPreview,
     onUndo: () => undo(),
     onAdjust: () => {
       setSelected("photo");
@@ -597,7 +621,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
           preview={
             <div className={cn("h-full w-full", readOnly && "pointer-events-none select-none")}>
               <Stage
-                doc={doc}
+                doc={stageDoc}
                 brand={brand}
                 frameIndex={idx}
                 format={format}
