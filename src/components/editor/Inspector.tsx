@@ -107,7 +107,7 @@ export function Inspector({
   keyframe = null,
   onKeyframe = () => {},
 }: {
-  image?: HTMLImageElement;
+  image?: HTMLImageElement | undefined;
   keyframe?: "start" | "end" | null;
   onKeyframe?: (k: "start" | "end" | null) => void;
   hideKit?: boolean;
@@ -441,7 +441,7 @@ function PhotoPanel({
   hasWords: boolean;
   brandName: string;
   brandColors: string[];
-  image?: HTMLImageElement;
+  image?: HTMLImageElement | undefined;
   keyframe: "start" | "end" | null;
   onKeyframe: (k: "start" | "end" | null) => void;
   actions: InspectorActions;
@@ -591,7 +591,7 @@ function PhotoPanel({
             checked={allMove}
             onChange={(v) => {
               setAllMove(v);
-              if (v) actions.onPhotoAll?.({ movement: move, movement_intensity: photo.movement_intensity, zoom_start: photo.zoom_start, zoom_end: photo.zoom_end, pan_x: photo.pan_x, pan_y: photo.pan_y });
+              if (v) actions.onPhotoAll?.({ movement: move, movement_intensity: photo.movement_intensity ?? "standard", zoom_start: photo.zoom_start ?? 1, zoom_end: photo.zoom_end ?? 1, pan_x: photo.pan_x ?? 0, pan_y: photo.pan_y ?? 0 });
             }}
           />
         </div>

@@ -56,7 +56,7 @@ export function Stage({
   onResize: (el: DragEl, value: number, key: string) => void;
   onFocus: (patch: { focus?: { x: number; y: number }; zoom?: number }, key: string) => void;
   onAdjustDone: () => void;
-  adjustHint?: string;
+  adjustHint?: string | undefined;
   interactive?: boolean;
 }) {
   const [resize, setResize] = useState<{ el: DragEl; x: number; w: number; v: number; id: number } | null>(null);
