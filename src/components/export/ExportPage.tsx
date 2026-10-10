@@ -105,9 +105,9 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
   const [gif, setGif] = useState(true);
   useEffect(() => { if (accessReady && !canUse("gif")) setGif(false); }, [accessReady]); // eslint-disable-line react-hooks/exhaustive-deps
   const [fps, setFps] = useState(30);
-  const [gSize, setGSize] = useState<GifSize>("full");
+  const [gSize, setGSize] = useState<GifSize>("half");
   const [gColors, setGColors] = useState<GifColors>("best");
-  const [gFps, setGFps] = useState(25);
+  const [gFps, setGFps] = useState(15);
   const [gLoop, setGLoop] = useState<"forever" | "once">("forever");
   const templateName = useTemplateName(project.template_id);
 
@@ -757,7 +757,7 @@ function Reveal({ show, children }: { show: boolean; children: React.ReactNode }
 /** Rough file size estimate for the file list. */
 function estimateMb(f: FileRow, seconds: number, fps: number, gFps: number, colors: GifColors) {
   const px = f.width * f.height * seconds;
-  const bytes = f.kind === "mp4" ? px * 0.24 * Math.sqrt(fps / 30) : px * gFps * 0.059 * (colors === "best" ? 1 : colors === "balanced" ? 0.75 : 0.5);
+  const bytes = f.kind === "mp4" ? px * 0.12 * Math.sqrt(fps / 30) : px * gFps * 0.059 * (colors === "best" ? 1 : colors === "balanced" ? 0.75 : 0.5);
   const mb = bytes / 1_000_000;
   return mb < 10 ? mb.toFixed(1) : Math.round(mb).toString();
 }

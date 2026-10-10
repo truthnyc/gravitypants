@@ -124,7 +124,7 @@ async function run(ff: FFmpeg, args: string[], signal: AbortSignal, onProgress: 
 export async function exportMp4(input: RenderInput, fps: number, signal: AbortSignal, onProgress: Progress): Promise<Blob> {
   const mb = await import("mediabunny");
   // Phones (iPhone Safari especially) can claim support yet fail at high bitrates, so step down before falling back.
-  const rates = fps >= 60 ? [20_000_000, 8_000_000, 4_000_000] : [12_000_000, 6_000_000, 3_000_000];
+  const rates = fps >= 60 ? [10_000_000, 6_000_000, 4_000_000] : [6_000_000, 4_000_000, 2_500_000];
   for (const bitrate of rates) {
     if (typeof VideoEncoder === "undefined") break;
     const ok = await mb.canEncodeVideo("avc", { width: input.width, height: input.height, bitrate }).catch(() => false);
@@ -162,7 +162,7 @@ export async function exportMp4(input: RenderInput, fps: number, signal: AbortSi
   try {
     await run(
       ff,
-      ["-framerate", String(fps), "-i", "f%05d.png", "-c:v", "libx264", "-crf", "20", "-preset", "veryfast", "-pix_fmt", "yuv420p", "-movflags", "+faststart", "out.mp4"],
+      ["-framerate", String(fps), "-i", "f%05d.png", "-c:v", "libx264", "-crf", "23", "-preset", "veryfast", "-pix_fmt", "yuv420p", "-movflags", "+faststart", "out.mp4"],
       signal,
       onProgress,
       0.5,
