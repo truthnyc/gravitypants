@@ -189,7 +189,7 @@ export function AimanteFooter() {
       <div className="mx-auto grid max-w-[1280px] gap-y-4 px-4 py-8 text-[14px] leading-[1.3] text-ap-muted md:px-10 md:grid-cols-[auto_minmax(0,1fr)] md:items-center md:gap-x-8 md:gap-y-6 md:py-12">
         <div className="flex min-w-0 items-center gap-4">
           <Link to="/directory" aria-label="Aimanté home"><AimanteLogo footer /></Link>
-          <span className="hidden whitespace-nowrap text-[14px] text-ap-muted tabular-nums md:block">© {new Date().getFullYear()} Gravity Pants</span>
+          <span className="hidden whitespace-nowrap text-[14px] text-ap-muted tabular-nums md:block">© {new Date().getFullYear()} Aimanté.co. All rights reserved.</span>
         </div>
         <nav aria-label="Footer" className="grid min-w-0 grid-cols-2 gap-x-6 gap-y-2.5 md:flex md:flex-wrap md:items-center md:justify-end md:gap-x-5 md:gap-y-3">
           <Link to="/aimante/join" className="hover:text-ap-ink">List your brand</Link>
@@ -198,7 +198,7 @@ export function AimanteFooter() {
           <Link to="/terms" className="hover:text-ap-ink">Terms</Link>
           <a href="https://gravitypants.com" className="col-span-2 mt-1 text-ap-blue hover:underline">Make reels with Gravity Pants</a>
         </nav>
-        <span className="-mt-1 text-[12px] text-ap-muted tabular-nums md:hidden">© {new Date().getFullYear()} Gravity Pants</span>
+        <span className="-mt-1 text-[12px] text-ap-muted tabular-nums md:hidden">© {new Date().getFullYear()} Aimanté.co. All rights reserved.</span>
         <p className="md:col-span-2 text-[12px] text-ap-muted">Gravity Pants and Aimanté are trademarks of Truth Nyc LLC.</p>
       </div>
     </footer>

@@ -8,7 +8,7 @@ function isAimanteHost(host: string | null | undefined): boolean {
 export function renderErrorPage({ host }: ErrorPageOptions = {}): string {
   const aimante = isAimanteHost(host);
   const brand = aimante ? "Aimanté" : "Gravity Pants";
-  const copyright = aimante ? "Aimanté — by Gravity Pants" : "Gravity Pants";
+  const copyright = aimante ? "Aimanté.co. All rights reserved." : "Gravity Pants";
   return `<!doctype html>
 <html lang="en">
   <head>

@@ -38,7 +38,7 @@ export function ServiceUnavailable({ onRetry }: { onRetry: () => void }) {
         </div>
       </section>
       <footer className="border-t border-ap-hairline px-5 py-5 text-[12px] text-ap-muted sm:px-8">
-        <div className="mx-auto max-w-[1280px]">© {new Date().getFullYear()} {isAimante ? "Aimanté — by Gravity Pants" : "Gravity Pants"}</div>
+        <div className="mx-auto max-w-[1280px]">© {new Date().getFullYear()} {isAimante ? "Aimanté.co. All rights reserved." : "Gravity Pants"}</div>
       </footer>
     </main>
   );
