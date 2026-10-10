@@ -5,6 +5,8 @@ export type GalleryExample = {
   photos: number; seconds: number; headline: string; sub: string; frames: string[];
   // "top" matches the Purl Soho ad: light centered headline at the top, logo text near the bottom.
   layout?: "top";
+  /** Featured client Directory reel: hearts hidden (their saves live in Directory favorites). */
+  client?: boolean;
   logo?: string;
   /** A real exported video plays instead of the drawn frames. */
   video?: string;

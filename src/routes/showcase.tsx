@@ -37,7 +37,7 @@ function BrandCard({ reel }: { reel: SiteReel }) {
   return (
     <article className="examples-card showcase-card">
       <div className="examples-card-media">
-        <SiteReelHeart reelId={reel.id} name={`${reel.brand} reel`} />
+        {reel.source !== "client" && <SiteReelHeart reelId={reel.id} name={`${reel.brand} reel`} />}
         {reel.href ? (
           <a
             className="site-reel-link"

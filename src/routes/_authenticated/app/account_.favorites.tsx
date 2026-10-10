@@ -34,7 +34,7 @@ function FavoritesPage() {
   const q = useQuery({ queryKey: ["my-favorites"], queryFn: () => load() });
   const d = q.data;
   const siteFavIds = useSiteReelFavorites().data ?? [];
-  const siteReels = useQuery({ queryKey: ["site-reels-all"], queryFn: () => listSiteReels() }).data ?? ([] as SiteReel[]);
+  const siteReels = useQuery({ queryKey: ["site-reels-all"], queryFn: () => listSiteReels() }).data?.filter((r) => r.source !== "client") ?? ([] as SiteReel[]);
   const siteFavs = siteFavIds.map((id) => siteReels.find((r) => r.id === id)).filter((r): r is NonNullable<typeof r> => !!r);
   const [slug, setSlug] = useState("");
   const [title, setTitle] = useState("");

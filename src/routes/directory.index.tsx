@@ -49,7 +49,7 @@ export const Route = createFileRoute("/directory/")({
     const [dir, cards, reels, brands] = await Promise.all([
       getDirectoryPublic().catch(() => ({ settings: DEFAULT_DIRECTORY_SETTINGS, featured: [] as FacetedReel[] })),
       searchDirectoryLegacy({ data: { q: "", size: null } }).catch(() => [] as DirectoryCard[]),
-      listSiteReels().then((rs) => rs.map((r) => ({ ...r, title: aimanteTitle(r) }))).catch(() => [] as SiteReel[]),
+      listSiteReels().then((rs) => rs.filter((r) => r.source !== "client").map((r) => ({ ...r, title: aimanteTitle(r) }))).catch(() => [] as SiteReel[]),
       listPublicBrands().catch(() => []),
     ]);
     return { q: deps.q, category: deps.category, mood: deps.mood, site: (context as { site?: string }).site, cards, reels, brands, settings: dir.settings, featuredReels: dir.featured };
