@@ -31,4 +31,4 @@ export const REEL_PREFIX = "site-reels:";
 export const FORMAT_LABEL: Record<ReelFormat, string> = { "916": "9:16", "11": "1:1", "169": "16:9" };
 
 /** Aimanté reel title: the set display title, otherwise the brand name — never the template name. */
-export const aimanteTitle = (r: { displayTitle?: string | null; brand: string }) => r.displayTitle?.trim() || r.brand;
+export const aimanteTitle = (r: { displayTitle?: string | null; title?: string | null; brand: string }) => r.displayTitle?.trim() || r.title?.trim() || r.brand;
