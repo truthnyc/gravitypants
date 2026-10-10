@@ -93,7 +93,7 @@ function SignIn() {
         </Button>
       </form>
       <p className="auth-switch">
-        {aim ? "New here?" : "New to Gravity Pants?"} <Link to="/signup" search={{ redirect: aim ? target : redirect }} className="auth-link">{aim ? "Create a free account" : "Start your free trial"}</Link>
+        {aim ? "New here?" : "New to Gravity Pants?"} <Link to="/signup" search={{ redirect: aim ? target : redirect }} className="auth-link">{aim ? "Create a free account" : "Make your first reel"}</Link>
       </p>
     </AuthShell>
   );

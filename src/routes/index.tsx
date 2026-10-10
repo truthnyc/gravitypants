@@ -213,17 +213,17 @@ const tabCopy: Record<Tab, { title: string; body: string }> = {
     body: "Export Vertical 9:16, Portrait 4:5, Square 1:1 and Landscape 16:9 together, plus custom sizes. Choose MP4 for ads and social posts, or GIF for email and websites.",
   },
 };
-function Primary({ children, to = "/signup" }: { children: React.ReactNode; to?: "/signup" | "/examples" }) {
+function Primary({ children, to = "/signup", cta }: { children: React.ReactNode; to?: "/signup" | "/examples"; cta?: string }) {
   return (
     <Button asChild variant="site" size="site" className="home-button">
-      <Link to={to}>{children}</Link>
+      <Link to={to} data-cta={cta}>{children}</Link>
     </Button>
   );
 }
-function Secondary({ children, to }: { children: React.ReactNode; to: "/pricing" | "/signup" | "/examples" }) {
+function Secondary({ children, to, cta }: { children: React.ReactNode; to: "/pricing" | "/signup" | "/examples"; cta?: string }) {
   return (
     <Button asChild variant="siteSecondary" size="site" className="home-button">
-      <Link to={to}>{children}</Link>
+      <Link to={to} data-cta={cta}>{children}</Link>
     </Button>
   );
 }
@@ -324,7 +324,7 @@ function BeforeAfter({
           <p>{detail}</p>
         </div>
         <Button asChild variant="siteSecondary" size="siteHeader" className="home-use">
-          <Link to="/signup">Use this style</Link>
+          <Link to="/signup" data-cta="begin-with-style">Begin with this style</Link>
         </Button>
       </div>
     </article>
@@ -593,10 +593,10 @@ function Home() {
             </h1>
             <p className="site-lede home-hero-lede">{hero.lede}</p>
             <div className="home-actions">
-              <Primary>
+              <Primary cta="make-first-reel">
                 {hero.primary} <ArrowRight size={18} strokeWidth={1.7} />
               </Primary>
-              <Secondary to="/examples">
+              <Secondary to="/examples" cta="see-examples">
                 <Play size={17} fill="currentColor" /> {hero.secondary}
               </Secondary>
             </div>
@@ -808,11 +808,11 @@ function Home() {
               <GravityPantsLogo size={64} />
             </div>
             <div className="home-closing-copy">
-              <h2 className="site-h2">Your next ad is three photos away.</h2>
-              <p className="site-lede">Start free and make your first reel in the next few minutes.</p>
+              <h2 className="site-h2">Your next reel is three photos away.</h2>
+              <p className="site-lede">Bring three photos. We'll take it from there.</p>
               <div className="home-actions">
-                <Primary>Start free</Primary>
-                <Secondary to="/pricing">See pricing</Secondary>
+                <Primary cta="make-first-reel">Make your first reel</Primary>
+                <Secondary to="/pricing" cta="view-plans">View plans</Secondary>
               </div>
             </div>
             <div className="home-closing-orbit" aria-hidden="true">

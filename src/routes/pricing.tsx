@@ -79,10 +79,10 @@ function Pricing() {
         <section className="pr-tiers">
           <div className="pr-grid pr-grid-4">
             <article className="pr-tier">
-              <div className="pr-tier-top"><h3>{TRIAL.name}</h3><p>Your first reel free, no watermark.</p></div>
+              <div className="pr-tier-top"><h3>{TRIAL.name}</h3><p>Your first reel on us, no watermark, no time limit.</p></div>
               <div className="pr-price"><b>$0</b><span>no card needed</span></div>
               <span className="pr-note">No time limit. Your ads stay saved.</span>
-              <Link to="/signup" className="pr-btn sec full">Start free trial</Link>
+              <Link to="/signup" data-cta="make-first-reel" className="pr-btn sec full">Make your first reel</Link>
               <ul>{["First export with no watermark", `${TRIAL.exports - TRIAL.cleanExports} more watermarked exports`, "Vertical 9:16, Portrait 4:5, Square 1:1, Landscape 16:9 and custom", "MP4 and GIF", "Brand kits", "Templates"].map((f) => <li key={f}><Tick /><span>{f}</span></li>)}</ul>
             </article>
             {PLANS.map((p) => {
@@ -93,7 +93,7 @@ function Pricing() {
                   <div className="pr-tier-top"><h3>{p.name}</h3><p>{p.tagline}</p></div>
                   <div className="pr-price"><b>{pr.price}</b><span>{pr.per}</span></div>
                   <span className="pr-note">{pr.note}</span>
-                  <button type="button" onClick={() => void choose(p)} className={`pr-btn ${pop ? "pri" : "sec"} full`}>Choose {p.name}</button>
+                  <button type="button" data-cta={`choose-${p.id.replace(/_yearly$/, "")}`} onClick={() => void choose(p)} className={`pr-btn ${pop ? "pri" : "sec"} full`}>Choose {p.name}</button>
                   <ul>{p.features.map((f) => <li key={f}><Tick /><span>{f}</span></li>)}</ul>
                 </article>
               );
@@ -146,9 +146,9 @@ function Pricing() {
 
         <section className="pr-cta">
           <div>
-            <h2 className="site-h2">Try Gravity Pants before you pay.</h2>
-            <p className="site-lede">Make your first reel free, with every feature and no watermark. No credit card needed.</p>
-            <div className="pr-cta-actions"><Link to="/signup" className="pr-btn pri big">Start free</Link><Link to="/examples" className="pr-btn sec big white">See examples</Link></div>
+            <h2 className="site-h2">See it with your own photos first.</h2>
+            <p className="site-lede">Every feature, no watermark on your first reel, no card, no clock.</p>
+            <div className="pr-cta-actions"><Link to="/signup" data-cta="make-first-reel" className="pr-btn pri big">Make your first reel</Link><Link to="/examples" data-cta="see-examples" className="pr-btn sec big white">See examples</Link></div>
           </div>
         </section>
       </div>

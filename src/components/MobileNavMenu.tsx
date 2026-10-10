@@ -203,7 +203,7 @@ export function MobileMenu({
         <div className="flex flex-col">
           <Group label="Explore">{exploreRows}</Group>
           <div className="mt-6 flex flex-col gap-2.5">
-            <Link to="/signup" onClick={close} className="flex h-12 items-center justify-center rounded-lg bg-ap-blue text-[16px] font-medium text-ap-card hover:bg-ap-blue-hover">Start free</Link>
+            <Link to="/signup" onClick={close} data-cta="make-first-reel" className="flex h-12 items-center justify-center rounded-lg bg-ap-blue text-[16px] font-medium text-ap-card hover:bg-ap-blue-hover">Make your first reel</Link>
             <Link to="/signin" onClick={close} className="flex h-12 items-center justify-center rounded-lg bg-ap-panel text-[16px] font-medium text-ap-ink hover:bg-ap-hairline">Sign in</Link>
           </div>
         </div>
