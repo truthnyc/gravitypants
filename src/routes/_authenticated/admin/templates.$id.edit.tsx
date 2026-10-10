@@ -35,7 +35,7 @@ export const Route = createFileRoute("/_authenticated/admin/templates/$id/edit")
 });
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-const FORMATS: Format[] = ["9:16", "1:1", "16:9"];
+const FORMATS: Format[] = ["9:16", "4:5", "1:1", "16:9"];
 const inp = "h-9 w-full min-w-0 rounded-sm bg-canvas px-2.5 text-[14px] shadow-[inset_0_0_0_0.5px_var(--color-border)] outline-none focus:bg-card focus:ring-2 focus:ring-primary/40";
 const readFile = (f: File) => new Promise<string>((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = rej; r.readAsDataURL(f); });
 const POS_LABEL = (a: string) => a.replace("middle-", "middle ").replace("-", " ").replace(/^\w/, (c) => c.toUpperCase());
