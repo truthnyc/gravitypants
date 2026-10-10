@@ -41,7 +41,7 @@ function About() {
           <p className="mx-auto mt-6 max-w-[620px] text-[18px] leading-[1.5] text-ap-body">Aimanté is a visual directory of brands, shown through short reels. Tell us how you want to feel today, and we'll show you something.</p>
           <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
             <Link to="/directory" className={primary}>Show me something →</Link>
-            <Link to="/directory" hash="directory-results" className={grey}>Browse all reels</Link>
+            <Link to="/directory" hash="directory-results" className={grey}>View the collection</Link>
           </div>
         </section>
 
@@ -97,7 +97,7 @@ function About() {
 
         <section className="mx-auto max-w-[1200px] px-6 py-24 text-center">
           <h2 className="text-[clamp(30px,4vw,48px)] font-semibold tracking-[-0.035em]">What will you fall for today?</h2>
-          <Link to="/directory" className={`${primary} mt-8`}>Start browsing →</Link>
+          <Link to="/directory" className={`${primary} mt-8`}>Begin browsing →</Link>
           <p className="mt-6 text-[13px] text-ap-muted">Aimanté is made by Gravity Pants. Every reel here was made with it.</p>
           <p className="mt-3 text-[13px]"><Link to="/aimante/join" className="font-medium text-ap-blue hover:underline">Have a brand? See how to join →</Link></p>
         </section>

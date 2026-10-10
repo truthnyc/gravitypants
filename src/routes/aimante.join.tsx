@@ -11,7 +11,7 @@ import { aimanteHead } from '@/lib/site/brand-site'
 import { cn } from '@/lib/utils'
 
 export const Route = createFileRoute('/aimante/join')({
-  head: () => aimanteHead({ path: '/join', title: 'List your brand on Aimanté', description: 'Get your brand discovered by mood. List your reels free on Aimanté with your Gravity Pants account.' }),
+  head: () => aimanteHead({ path: '/join', title: 'List your brand on Aimanté', description: 'Join a curated collection where people discover brands by mood. Your page is complimentary with any Gravity Pants account.' }),
   component: Join,
 })
 
@@ -120,7 +120,7 @@ const GETS = [
   [LayoutTemplate, 'A brand page that looks the part.', 'Your reels, your story, your link, in a clean, elegant layout.'],
   [Sparkles, 'Found by mood, not just by name.', "Shoppers looking for 'cozy' or 'elegant' find you, even if they've never heard of you."],
   [Users, 'Side by side with names people know.', 'Small makers and well-known houses share the same space and the same spotlight.'],
-  [BadgeCheck, 'Free to list.', 'Your brand page is free with any Gravity Pants account. No ad budget needed.'],
+  [BadgeCheck, 'Complimentary.', 'Your page comes with any Gravity Pants account.'],
 ] as const
 const STEPS = [
   ['Make your reels with Gravity Pants', 'Bring a few photos (three is enough). Choose a style, and Gravity Pants, our studio, makes the reel.'],
@@ -128,9 +128,9 @@ const STEPS = [
   ['Go live on Aimanté', 'Your reels appear in the directory, in your category and moods, linking straight to you.'],
 ]
 const PLANS = [
-  { eyebrow: 'Brand page', price: 'Free', note: 'With any Gravity Pants account', items: ['Your brand page with logo, description and website link', 'One category and up to three moods', 'Up to 3 reels'] },
-  { eyebrow: 'Full brand page', price: 'Included', note: 'With Simple, from $35/month', items: ['Everything in Brand page', 'Unlimited reels on your page', 'Every reel shown in mood and category search'], highlight: true },
-  { eyebrow: 'Brand stats', price: 'Included', note: 'With Business and Team', items: ['Everything in Full brand page', 'Views, saves and clicks to your website', 'See which reels and moods work best'] },
+  { eyebrow: 'Brand page', price: 'Complimentary', note: 'With any Gravity Pants account', items: ['Your brand page with logo, description and website link', 'One category and up to three moods', 'Up to 3 reels'] },
+  { eyebrow: 'Full brand page', price: 'With Simple', note: 'from $35 a month', items: ['Everything in Brand page', 'Unlimited reels on your page', 'Every reel shown in mood and category search'], highlight: true },
+  { eyebrow: 'Brand insights', price: 'Included', note: 'With Business and Team', items: ['Everything in Full brand page', 'Views, saves and clicks to your website', 'See which reels and moods work best'] },
 ]
 const WHO: [string, string][] = [['Fashion', 'Fashion & Apparel'], ['Beauty', 'Beauty & Fragrance'], ['Food & Drink', 'Food & Drink'], ['Home', 'Home & Living'], ['Travel', 'Travel & Hospitality'], ['Crafts', 'Crafts & Hobbies'], ['Photography', 'Photography & Visual Arts'], ['Nonprofits', 'Nonprofit & Causes']]
 const FAQ = [
@@ -204,13 +204,13 @@ function ForBrands() {
 
       <section className="mx-auto max-w-[1200px] px-6 py-20">
         <div className="text-center">
-          <h2 className={h2}>Free to list. Grow with Gravity Pants.</h2>
+          <h2 className={h2}>Your page is complimentary. Your plan shapes the rest.</h2>
           <p className="mx-auto mt-4 max-w-[640px] text-[17px] leading-[1.5] text-ap-body">Your brand page comes with your Gravity Pants account. Paid plans add more reels and show how your page performs.</p>
         </div>
         <div className="mt-10 grid gap-5 rounded-[12px] bg-ap-panel p-5 sm:p-8 md:grid-cols-3">
           {PLANS.map((p) => (
             <div key={p.eyebrow} className={cn('rounded-[12px] bg-ap-card p-6', p.highlight && 'ring-2 ring-ap-blue')}>
-              <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-ap-blue">{p.eyebrow}</p>
+              <p className="text-[12px] font-semibold text-ap-blue">{p.eyebrow}</p>
               <p className="mt-3 text-[34px] font-semibold tracking-[-0.03em]">{p.price}</p>
               <p className="text-[14px] text-ap-muted nums">{p.note}</p>
               <ul className="mt-5 space-y-2.5">

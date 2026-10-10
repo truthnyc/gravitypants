@@ -22,7 +22,7 @@ export function AimanteBrandPage({ brand, reels, siteReels, more, onOpen, onOpen
   return <main className="aimante-brand-page mx-auto max-w-[1040px] px-4 pt-4 pb-10 font-ap text-ap-ink md:px-6 md:pt-6">
     <header className="mx-auto max-w-[720px]">
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
-        <Link to="/directory" className="min-w-0 text-[15px] text-ap-blue">← Browse</Link>
+        <Link to="/directory" className="min-w-0 text-[15px] text-ap-blue">← Back to the collection</Link>
         <div className="aimante-brand-actions flex shrink-0 items-center gap-2"><BrandActions brandId={brand.id} name={brand.name} /></div>
       </div>
       <div className="mt-4 grid h-[80px] grid-cols-[80px_minmax(0,1fr)] gap-4 md:gap-5">

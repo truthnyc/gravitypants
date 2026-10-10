@@ -39,7 +39,8 @@ const POSTER =
 const ROTATING = ["soothing", "energizing", "hopeful", "inspiring", "cozy", "luxurious", "playful"];
 export const Route = createFileRoute("/directory/")({
   validateSearch: z.object({
-    q: z.string().optional(), mood: z.string().optional(), category: z.string().optional(), brand: z.string().optional(),
+    q: z.string().optional(), mood: z.string().optional().transform((v) => v?.split(",").map((m) => (m.trim().toLowerCase() === "urgent" ? "lively" : m)).join(",")), // old ?mood=urgent links still work
+    category: z.string().optional(), brand: z.string().optional(),
     page: z.union([z.number(), z.string()]).optional(),
   }),
   loaderDeps: ({ search }) => ({ q: (search.q ?? "").slice(0, 200), category: search.category, mood: search.mood }),
@@ -59,7 +60,7 @@ export const Route = createFileRoute("/directory/")({
       const mood = !cat && loaderData.mood && !loaderData.mood.includes(",") ? loaderData.mood : undefined;
       if (cat) return aimanteHead({ path: `/c/${loaderData.category}`, title: `${cat} video ads — Aimanté`, description: `Short video ads and Reels from ${cat} brands. Browse by mood and brand on Aimanté.` });
       if (mood) return aimanteHead({ path: `/mood/${encodeURIComponent(mood)}`, title: `${cap(mood)} video ads — Aimanté`, description: `Video ads and Reels that feel ${mood}, from independent brands on Aimanté.` });
-      return aimanteHead({ path: "/", title: "Aimanté — Video ads by mood, category and brand", description: "Tell us your mood and we'll show you something. Browse short video ads and Reels from independent brands, by mood, category or brand." });
+      return aimanteHead({ path: "/", title: "Aimanté — Discover brands by mood", description: "Tell us how you'd like to feel and we'll show you something. Short reels from independent makers and well-known houses, by mood, category or brand." });
     }
     const base = siteHead({
       path: "/directory",
@@ -322,7 +323,7 @@ function DirectoryPage() {
         <div className={cn("dir-filter-wrap sticky top-16 z-30 px-6 transition-[background,padding] motion-reduce:transition-none",
           stuck ? "border-b border-ap-hairline bg-ap-card/80 py-2 backdrop-blur-xl" : "border-b border-transparent pb-2")}>
           <FilterBar phoneStyle={isAim} comingSoon={settings.comingSoon} value={filters} onChange={setFilters} facets={facets} total={total} families={families} brands={brands} compact={stuck} />
-          {isAim && <p className="mt-2 text-center text-[13px]"><Link to="/aimante/about" className="text-ap-blue hover:underline">New here? See how Aimanté works →</Link></p>}
+          {isAim && <p className="mt-2 text-center text-[13px]"><Link to="/aimante/about" className="text-ap-blue hover:underline">New to Aimanté? How it works →</Link></p>}
           {tags.length > 0 && (
             <ul className="mx-auto mt-2 flex max-w-[680px] flex-wrap items-center gap-1.5" aria-label="Active filters">
               {tags.map((t) => (
@@ -380,7 +381,12 @@ function DirectoryPage() {
           {results.data && total === 0 && (
             filtered ? (
               <div role="status" className="rounded-[4px] bg-ap-panel px-6 py-10 text-center">
-                <p className="text-[17px] font-semibold">Nothing matches all of that — try loosening one filter</p>
+                <p className="text-[17px] font-semibold">Nothing quite matches yet. Try removing one filter, or start with a mood.</p>
+                <div className="mt-4 flex flex-wrap justify-center gap-2">
+                  {["soothing", "elegant", "cozy", "playful", "bold", "inspiring"].map((m) => (
+                    <Link key={m} to="/directory" search={{ mood: m }} className="inline-flex h-10 items-center rounded-lg bg-ap-card px-4 text-[14px] shadow-ap-soft hover:bg-ap-soft-blue">{m}</Link>
+                  ))}
+                </div>
                 <div className="mt-4 flex flex-wrap justify-center gap-2">
                   {suggestions.map(({ t, n }) => (
                     <button key={`${t.key}-${t.value}`} type="button" onClick={() => setFilters(without(t))}
