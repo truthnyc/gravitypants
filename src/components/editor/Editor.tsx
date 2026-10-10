@@ -80,8 +80,7 @@ function isTyping(target: EventTarget | null) {
   return Boolean(el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable || el.getAttribute("role") === "combobox"));
 }
 
-type PreviewShape = Format | "4:5";
-const PREVIEW_SHAPES: PreviewShape[] = ["9:16", "4:5", "1:1", "16:9"];
+const PREVIEW_SHAPES: Format[] = ["9:16", "4:5", "1:1", "16:9"];
 
 export function Editor({ initial, readOnly = false, banner, exportDisabled = false }: { initial: EditorDoc; readOnly?: boolean; banner?: import("react").ReactNode; exportDisabled?: boolean }) {
   const { doc, apply, undo, redo, canUndo } = useEditorDoc(initial);
@@ -89,10 +88,8 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
 
   const [frameIndex, setFrameIndex] = useState(0);
   const [selected, setSelected] = useState<ElementKey>("headline");
-  // Preview shape; Portrait 4:5 previews with the 1:1 layout rules, exactly as it exports.
-  const [shape, setShape] = useState<PreviewShape>(initial.project.primary_format);
-  const format: Format = shape === "4:5" ? "1:1" : shape;
-  const setFormat = (f: Format) => setShape(f);
+  // Preview shape; 4:5 is a real format with its own layout rules.
+  const [format, setFormat] = useState<Format>(initial.project.primary_format);
   const [time, setTime] = useState(() => restTime(initial.frames, 0));
   const [playing, setPlaying] = useState(false);
   const [uploading, setUploading] = useState(false);
