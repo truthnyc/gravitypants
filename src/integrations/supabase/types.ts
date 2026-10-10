@@ -705,12 +705,16 @@ export type Database = {
           hidden_at: string | null
           hidden_reason: string | null
           id: string
+          in_showcase: boolean
           moods: string[]
           poster_url: string | null
           preview_url: string | null
           published_at: string | null
           review_note: string | null
           search_text: unknown
+          showcase_at: string | null
+          showcase_by: string | null
+          showcase_order: number | null
           status: string
           tags: string[]
           template_id: string | null
@@ -728,12 +732,16 @@ export type Database = {
           hidden_at?: string | null
           hidden_reason?: string | null
           id?: string
+          in_showcase?: boolean
           moods?: string[]
           poster_url?: string | null
           preview_url?: string | null
           published_at?: string | null
           review_note?: string | null
           search_text?: unknown
+          showcase_at?: string | null
+          showcase_by?: string | null
+          showcase_order?: number | null
           status?: string
           tags?: string[]
           template_id?: string | null
@@ -751,12 +759,16 @@ export type Database = {
           hidden_at?: string | null
           hidden_reason?: string | null
           id?: string
+          in_showcase?: boolean
           moods?: string[]
           poster_url?: string | null
           preview_url?: string | null
           published_at?: string | null
           review_note?: string | null
           search_text?: unknown
+          showcase_at?: string | null
+          showcase_by?: string | null
+          showcase_order?: number | null
           status?: string
           tags?: string[]
           template_id?: string | null
