@@ -21,9 +21,45 @@ describe("size-specific editor settings", () => {
     for (const format of ["9:16", "1:1", "16:9"] as const) expect(frameForFormat(next, format).photo).toEqual(frame.photo);
   });
   for (const el of ["headline", "subline"] as const) it(`keeps ${el} words, font, size and position independent`, () => {
-    const next = patchTextForFormat(frame, "1:1", el, { text: "Square words", font_family: "Arial", size_px: 72, position: "top-left" });
-    expect(frameForFormat(next, "1:1")[el]).toMatchObject({ text: "Square words", font_family: "Arial", size_px: 72, position: "top-left" });
+    const next = patchTextForFormat(frame, "1:1", el, { text: "Square words", font_family: "Arial", size_px: 72, letter_spacing: 12, line_height: 1.4, position: "top-left" });
+    expect(frameForFormat(next, "1:1")[el]).toMatchObject({ text: "Square words", font_family: "Arial", size_px: 72, letter_spacing: 12, line_height: 1.4, position: "top-left" });
     expect(frameForFormat(next, "9:16")[el]).toEqual(frame[el]);
+  });
+  it("keeps headline and subline specifications independent across all four sizes", () => {
+    const adjusted = REEL_FORMATS.reduce((next, format, index) => {
+      const withHeadline = patchTextForFormat(next, format, "headline", {
+        size_px: 80 + index * 10,
+        letter_spacing: index,
+        line_height: 1 + index / 10,
+      });
+      return patchTextForFormat(withHeadline, format, "subline", {
+        size_px: 36 + index * 6,
+        letter_spacing: 10 + index,
+        line_height: 1.2 + index / 10,
+      });
+    }, frame);
+
+    REEL_FORMATS.forEach((format, index) => {
+      expect(frameForFormat(adjusted, format).headline).toMatchObject({
+        size_px: 80 + index * 10,
+        letter_spacing: index,
+        line_height: 1 + index / 10,
+      });
+      expect(frameForFormat(adjusted, format).subline).toMatchObject({
+        size_px: 36 + index * 6,
+        letter_spacing: 10 + index,
+        line_height: 1.2 + index / 10,
+      });
+    });
+  });
+  it("keeps logo size independent across all four sizes", () => {
+    const adjusted = REEL_FORMATS.reduce(
+      (next, format, index) => patchLogoForFormat(next, format, { size_pct: 10 + index * 5 }),
+      project,
+    );
+    REEL_FORMATS.forEach((format, index) => {
+      expect(projectForFormat(adjusted, format).logo.size_pct).toBe(10 + index * 5);
+    });
   });
   it("keeps logo artwork, size, opacity, scope and frame visibility independent", () => {
     const next = patchLogoForFormat(project, "16:9", { path: "wide.png", size_pct: 30, opacity: "soft", show_on: "first_last" });
