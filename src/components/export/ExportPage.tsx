@@ -187,6 +187,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
   const { data: exportStatus } = useExportStatus();
   const refreshBilling = useRefreshBilling();
   const [planSheet, setPlanSheet] = useState<string | null>(null);
+  const [lastTrial, setLastTrial] = useState(false);
   const [preferredPlan, setPreferredPlan] = useState<string | null>(null);
   useEffect(() => { void supabase.auth.getUser().then(({ data }) => {
     if (data.user) {
@@ -302,6 +303,10 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
             break;
           }
           counted = true;
+          if (exportStatus?.trial && !exportStatus.extras && (exportStatus.used ?? 0) + 1 >= (exportStatus.limit ?? 3)) {
+            const seenKey = `sf-last-trial-seen:${ws}`;
+            if (!localStorage.getItem(seenKey)) { localStorage.setItem(seenKey, "1"); setLastTrial(true); }
+          }
         }
         for (const f of files.filter((f) => f.job === key)) {
           void supabase.storage
@@ -503,7 +508,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
             )}
             <p className="mt-1 text-[13px] text-ap-muted nums">
               {[
-                exportStatus?.limit != null ? `${Math.max(0, exportStatus.limit - (exportStatus.used ?? 0))} of ${exportStatus.limit} left${exportStatus.trial ? " in your free trial" : " this month"}` : null,
+                exportStatus?.trial && exportStatus.limit != null ? `Trial · ${Math.max(0, exportStatus.limit - (exportStatus.used ?? 0))} of ${exportStatus.limit} exports left` : exportStatus?.limit != null ? `${Math.max(0, exportStatus.limit - (exportStatus.used ?? 0))} of ${exportStatus.limit} left${exportStatus.trial ? " in your free trial" : " this month"}` : null,
                 exportStatus?.extras ? `Plus ${exportStatus.extras} extra ${exportStatus.extras === 1 ? "export" : "exports"} that never expire` : null,
               ].filter(Boolean).join(" · ")}
             </p>
@@ -513,6 +518,12 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
                 This export will carry a small Gravity Pants mark.{" "}
                 <button type="button" className="font-medium text-ap-blue hover:underline" onClick={() => setPlanSheet("no_plan")}>Remove the watermark — Simple, $35/month</button>
               </p>
+            )}
+            {lastTrial && (
+              <div className="mt-3 flex flex-wrap items-center gap-3 rounded-[4px] border border-ap-line bg-ap-inner p-3" role="status">
+                <p className="text-[14px]">That was your last trial export. Your reels and brand kit stay saved.</p>
+                <Link to="/pricing" data-cta="trial-choose-plan" className="rounded-lg bg-ap-blue px-3 py-1.5 text-[14px] font-medium text-ap-card hover:bg-ap-blue-hover">Choose a plan</Link>
+              </div>
             )}
             {running && (
               <div className="mt-3">

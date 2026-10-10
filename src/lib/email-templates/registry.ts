@@ -10,8 +10,6 @@ export interface TemplateEntry {
 }
 
 import { template as welcome } from './welcome'
-import { template as trialEnding } from './trial-ending'
-import { template as trialEnded } from './trial-ended'
 import { template as planStarted } from './plan-started'
 import { template as paymentFailed } from './payment-failed'
 import { template as planCancelled } from './plan-cancelled'
@@ -30,8 +28,6 @@ import { template as trialSignup } from './trial-signup'
  */
 export const TEMPLATES: Record<string, TemplateEntry> = {
   welcome,
-  'trial-ending': trialEnding,
-  'trial-ended': trialEnded,
   'plan-started': planStarted,
   'payment-failed': paymentFailed,
   'plan-cancelled': planCancelled,
