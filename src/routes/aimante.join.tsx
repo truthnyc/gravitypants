@@ -123,7 +123,7 @@ const GETS = [
   [BadgeCheck, 'Free to list.', 'Your brand page is free with any Gravity Pants account. No ad budget needed.'],
 ] as const
 const STEPS = [
-  ['Make your reels with Gravity Pants', 'Add a few photos, pick a template, and get a polished reel in minutes. No editing skills needed.'],
+  ['Make your reels with Gravity Pants', 'Bring a few photos (three is enough). Choose a style, and Gravity Pants, our studio, makes the reel.'],
   ['Create your brand page', 'Pick your category and up to three moods that fit your brand. Add a short description and your website.'],
   ['Go live on Aimanté', 'Your reels appear in the directory, in your category and moods, linking straight to you.'],
 ]
@@ -220,7 +220,7 @@ function ForBrands() {
           ))}
         </div>
         <p className="mt-6 text-center text-[13px] text-ap-muted">
-          Listed reels must be watermark-free. Coming later: featured spots in Featured this week and Orbite Love.{' '}
+          Listed reels must be watermark-free. Featured places in <em>Featured this week</em> are coming later.{' '}
           <a href="https://gravitypants.com/pricing" className="font-medium text-ap-blue hover:underline">See Gravity Pants plans →</a>
         </p>
       </section>

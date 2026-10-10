@@ -29,7 +29,7 @@ const values = [
 
 const stats = [
   { n: "3", l: "photos to start an ad" },
-  { n: "5 min", l: "from upload to finished reel" },
+  { n: "Minutes", l: "from photos to a finished reel" },
   { n: "4", l: "export shapes: Vertical, Portrait, Square and Landscape — plus custom sizes" },
 ];
 
