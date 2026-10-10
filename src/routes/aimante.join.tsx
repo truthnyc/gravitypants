@@ -211,7 +211,7 @@ function ForBrands() {
           {PLANS.map((p) => (
             <div key={p.eyebrow} className={cn('rounded-[12px] bg-ap-card p-6', p.highlight && 'ring-2 ring-ap-blue')}>
               <p className="text-[12px] font-semibold text-ap-blue">{p.eyebrow}</p>
-              <p className="mt-3 text-[34px] font-semibold tracking-[-0.03em]">{p.price}</p>
+              <p className="mt-3 text-[34px] md:text-[24px] lg:text-[34px] font-semibold tracking-[-0.03em]">{p.price}</p>
               <p className="text-[14px] text-ap-muted nums">{p.note}</p>
               <ul className="mt-5 space-y-2.5">
                 {p.items.map((it) => <li key={it} className="flex gap-2 text-[14px] leading-[1.45] text-ap-body"><Check className="mt-0.5 size-4 shrink-0 text-ap-blue" strokeWidth={1.7} aria-hidden />{it}</li>)}
