@@ -158,7 +158,7 @@ function Builder({ row, refetch }: { row: any; refetch: () => void }) {
         <div className="min-w-0 space-y-4">
           <Panel n={1} title="Basics">
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Name"><input className={inp} value={doc.name} maxLength={60} onChange={(e) => set(slugTouched ? { name: e.target.value } : { name: e.target.value, slug: slugify(e.target.value) })} /></Field>
+              <Field label="Template name" hint="Shown in the template library"><input className={inp} value={doc.name} maxLength={60} onChange={(e) => set(slugTouched ? { name: e.target.value } : { name: e.target.value, slug: slugify(e.target.value) })} /></Field>
               <Field label="Slug">
                 <div className={cn(inp, "flex items-center gap-1")}>
                   <span className="text-secondary-text">/templates/</span>
@@ -167,6 +167,9 @@ function Builder({ row, refetch }: { row: any; refetch: () => void }) {
               </Field>
               <Field label="Description" className="sm:col-span-2" hint={`${doc.description.length} / 120`}>
                 <input className={inp} value={doc.description} maxLength={120} onChange={(e) => set({ description: e.target.value })} />
+              </Field>
+              <Field label="Default ad title" className="sm:col-span-2" hint="Customers can rename it">
+                <input className={inp} value={doc.ad_title ?? ""} maxLength={60} placeholder={doc.name || "Same as the template name"} onChange={(e) => set({ ad_title: e.target.value })} />
               </Field>
               <Field label="Format"><Seg value={doc.format} options={FORMATS} onChange={(f) => set({ format: f })} /></Field>
               <div className="flex flex-col justify-end gap-2">

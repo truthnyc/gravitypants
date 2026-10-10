@@ -43,6 +43,7 @@ const docSchema = z.object({
   name: z.string().trim().min(1, "Give the template a name.").max(60),
   slug: z.string().trim().max(60),
   description: z.string().max(120),
+  ad_title: z.string().trim().max(60).optional(),
   format: z.enum(["9:16", "4:5", "1:1", "16:9"]),
   is_reusable: z.boolean(),
   featured: z.boolean(),

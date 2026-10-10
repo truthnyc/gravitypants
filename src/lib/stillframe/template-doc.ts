@@ -32,6 +32,8 @@ export type TemplateDoc = {
   name: string;
   slug: string;
   description: string;
+  /** Starting title of ads made from this template. Empty = use the template name. */
+  ad_title?: string;
   format: Format;
   is_reusable: boolean;
   featured: boolean;
@@ -96,6 +98,7 @@ export function docFromRow(t: Row): TemplateDoc {
     name: t.name,
     slug: t.slug ?? "",
     description: t.description ?? "",
+    ad_title: t.settings?.ad_title ?? "",
     format: (t.format ?? "9:16") as Format,
     is_reusable: Boolean(t.is_reusable),
     featured: Boolean(t.featured),
@@ -170,6 +173,7 @@ export function framesFromDoc(doc: TemplateDoc, { samples = false } = {}): Frame
 
 export function settingsFromDoc(doc: TemplateDoc): TemplateSettings {
   return {
+    ad_title: doc.ad_title?.trim() || null,
     formats: [doc.format],
     primary_format: doc.format,
     pace: "standard",
