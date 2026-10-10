@@ -726,8 +726,8 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
               <span className="shrink-0 text-[12px] font-semibold tracking-[0.08em] text-ap-muted uppercase">Preview as</span>
               <AppSegmented
                 className="grid flex-1 grid-cols-4"
-                value={shape}
-                onChange={(f) => setShape(f as PreviewShape)}
+                value={format}
+                onChange={(f) => setFormat(f as Format)}
                 options={PREVIEW_SHAPES.map((f) => ({
                   value: f,
                   label: (
@@ -743,7 +743,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
               <p className="mt-2 text-[12px] leading-snug text-ap-amber" role="status">
                 {here ? (
                   <>
-                    In {shape},{" "}
+                    In {format},{" "}
                     <button type="button" className="font-semibold underline underline-offset-2" onClick={() => selectFrame(here.frame)}>frame {here.frame + 1}</button>
                     : {here.text}. Try a smaller size or another position.
                   </>
