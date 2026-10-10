@@ -12,3 +12,4 @@
 - Greeting events go through a validated public server function; direct browser inserts are revoked so clients cannot supply record ids or timestamps.
 - Aimanté applications extend `brand_requests`; staff approval creates one draft editorial brand before publication.
 - Shared reel videos are copied to `<ws>/directory/<ad_id>.mp4` (`pinReelVideo`) so the 30-day exports/ cleanup never removes them; never store an exports/ path in `directory_reels.video_url`.
+- Showcase featuring: staff-only `setReelFeatured`; `listSiteReels` merges featured live Directory reels (`source: "client"`, pure helpers in `src/lib/site/featured-reels.ts`); Aimanté/favorites callers filter them out, and client reels show no site-reel heart so saved favorites keep their ids.
