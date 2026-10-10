@@ -4,7 +4,7 @@ import { FORMAT_SIZE } from "@/render/formats";
 import { layoutFrame } from "@/render/renderFrame";
 
 export type FitBox = { x: number; y: number; w: number; h: number };
-/** `format` is the preview shape label (includes "4:5", which lays out with the 1:1 rules). */
+/** `format` is the preview shape label. */
 export type FitIssue = { format: string; frame: number; text: string };
 type El = "headline" | "subline" | "logo";
 
@@ -29,7 +29,7 @@ export function findProblems(boxes: Partial<Record<El, FitBox | null>>, W: numbe
 
 const SHAPES: { shape: string; layout: Format; width: number; height: number }[] = [
   { shape: "9:16", layout: "9:16", ...FORMAT_SIZE["9:16"] },
-  { shape: "4:5", layout: "1:1", width: 1080, height: 1350 },
+  { shape: "4:5", layout: "4:5", ...FORMAT_SIZE["4:5"] },
   { shape: "1:1", layout: "1:1", ...FORMAT_SIZE["1:1"] },
   { shape: "16:9", layout: "16:9", ...FORMAT_SIZE["16:9"] },
 ];
