@@ -64,6 +64,13 @@
       "when": 1791648105191,
       "tag": "0008_frame_format_visual_settings",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1791670881105,
+      "tag": "0009_directory_reels_showcase",
+      "breakpoints": true
     }
   ]
 }
