@@ -283,7 +283,7 @@ export const adminTemplateFromAd = createServerFn({ method: "POST" })
     if (!frames.length) throw new Error("That ad has no slides yet.");
     const TR: Record<string, string> = { cut: "cut", fade: "fade", slide: "slide", wipe: "swipe-left", zoom: "zoom", dip_black: "dip-black" };
     const TA: Record<string, string> = { none: "none", rise: "rise-up", fade: "fade-in", typewriter: "typewriter", pop: "zoom" };
-    const PM: Record<string, string> = { slow_zoom_in: "slow-zoom-in", pan_left: "pan", pan_right: "pan" };
+    const PM: Record<string, string> = { slow_zoom_in: "slow-zoom-in", pan_left: "pan", pan_right: "pan", pan_up: "pan", pan_down: "pan" };
     const hex = (c: any, d: string) => (typeof c === "string" && /^#[0-9a-fA-F]{6}$/.test(c) ? c.toUpperCase() : d);
     const h0 = frames.find((f) => f.headline)?.headline ?? {};
     const s0 = frames.find((f) => f.subline)?.subline ?? {};

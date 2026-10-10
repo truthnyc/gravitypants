@@ -39,7 +39,7 @@ export type PhotoSettings = {
   focus?: { x: number; y: number };
   /** extra crop zoom for Fill, 1..3 */
   zoom?: number;
-  movement?: "none" | "slow_zoom_in" | "slow_zoom_out" | "pan_left" | "pan_right" | "custom";
+  movement?: "none" | "slow_zoom_in" | "slow_zoom_out" | "pan_left" | "pan_right" | "pan_up" | "pan_down" | "custom";
   /** how much the preset movement travels */
   movement_intensity?: "subtle" | "standard" | "dramatic";
   /** custom movement: zoom at the start / end of the frame, 1..1.5 */

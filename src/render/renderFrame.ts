@@ -342,8 +342,8 @@ function drawPhoto(
   const e = easeInOut(clamp(u));
   const mv = photo.movement ?? "none";
   const intensity = photo.movement_intensity ?? "standard";
-  const zoomTravel = intensity === "subtle" ? 0.04 : intensity === "dramatic" ? 0.14 : 0.08;
-  const panTravel = intensity === "subtle" ? 0.03 : intensity === "dramatic" ? 0.1 : 0.06;
+  const zoomTravel = intensity === "subtle" ? 0.04 : intensity === "dramatic" ? 0.26 : 0.08;
+  const panTravel = intensity === "subtle" ? 0.03 : intensity === "dramatic" ? 0.2 : 0.06;
   let zoom = 1;
   let pan = 0;
   let panV = 0;
@@ -352,6 +352,10 @@ function drawPhoto(
   if (mv === "pan_left" || mv === "pan_right") {
     zoom = 1 + panTravel + 0.01;
     pan = (mv === "pan_left" ? -1 : 1) * panTravel * W * (e - 0.5);
+  }
+  if (mv === "pan_up" || mv === "pan_down") {
+    zoom = 1 + panTravel + 0.01;
+    panV = (mv === "pan_up" ? -1 : 1) * panTravel * H * (e - 0.5);
   }
   if (mv === "custom") {
     const zs = Math.max(1, Math.min(1.5, Number(photo.zoom_start ?? 1)));
