@@ -67,7 +67,7 @@ export function AimanteBrandPage({ brand, reels, siteReels, more, onOpen, onOpen
     </section>}
     <div className="mx-auto mt-8 max-w-[720px] rounded-[12px] bg-ap-soft-blue px-5 py-5 text-center leading-[1.4] text-[15px] text-ap-body">
       <p>Reels made with Gravity Pants.</p>
-      <Link to="/aimante/join" className="mt-1 inline-block !min-h-0 text-[16px] font-semibold text-ap-blue">List your brand free →</Link>
+      <Link to="/aimante/join" hash="apply" data-cta="apply-to-join" className="mt-1 inline-block !min-h-0 text-[16px] font-semibold text-ap-blue">Have a brand? Apply to join →</Link>
     </div>
   </main>;
 }

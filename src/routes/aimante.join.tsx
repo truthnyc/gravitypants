@@ -62,9 +62,9 @@ function Join() {
       <ForBrands />
       <div id="apply" className="mx-auto max-w-[980px] scroll-mt-20 px-5 py-14 font-ap text-ap-ink sm:px-8 sm:py-20">
         <header className="max-w-[700px]">
-          <p className="text-[13px] font-semibold uppercase text-ap-blue">List your brand</p>
+          <p className="text-[13px] font-semibold text-ap-blue">Apply to join</p>
           <h2 className="mt-3 text-[clamp(30px,4vw,44px)] font-semibold leading-[1.08] tracking-[-0.03em]">Bring your brand to Aimanté.</h2>
-          <p className="mt-5 max-w-[620px] text-[18px] leading-[1.5] text-ap-body">Share your profile with our team. We review every application before creating a public brand page.</p>
+          <p className="mt-5 max-w-[620px] text-[18px] leading-[1.5] text-ap-body">Tell us about your brand. We review every application personally and write to you before anything goes live.</p>
         </header>
 
         <section className="mt-12 border-t border-ap-hairline pt-10">
@@ -98,7 +98,7 @@ function Join() {
               <input className="hidden" tabIndex={-1} autoComplete="off" aria-hidden="true" value={form.company} onChange={(event) => set('company', event.target.value)} />
               {error && <p className="text-[14px] text-destructive sm:col-span-2" role="alert">{error}</p>}
               <div className="flex flex-wrap items-center gap-4 sm:col-span-2">
-                <Button type="submit" size="large" disabled={state === 'sending' || form.moods.length < 1 || !form.logo}>{state === 'sending' ? 'Sending…' : 'Submit application'}</Button>
+                <Button type="submit" size="large" data-cta="send-application" disabled={state === 'sending' || form.moods.length < 1 || !form.logo}>{state === 'sending' ? 'Sending…' : 'Send application'}</Button>
                 <p className="max-w-[460px] text-[13px] leading-[1.45] text-ap-muted">Submitting does not publish your page. We review the details and contact you before it goes live.</p>
               </div>
             </form>
@@ -146,11 +146,11 @@ function ForBrands() {
       <section className="mx-auto grid max-w-[1200px] items-center gap-12 px-6 py-16 md:grid-cols-2 md:py-24">
         <div>
           <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-ap-blue">For brands</p>
-          <h1 className="mt-3 text-[clamp(38px,5vw,60px)] font-semibold leading-[1.05] tracking-[-0.035em]">Get seen by people who'll love you.</h1>
-          <p className="mt-5 max-w-[520px] text-[18px] leading-[1.5] text-ap-body">Aimanté is where shoppers browse brands by feeling. Put yours in front of them.</p>
+          <h1 className="mt-3 text-[clamp(38px,5vw,60px)] font-semibold leading-[1.05] tracking-[-0.035em]">Found by the people who'll love your work.</h1>
+          <p className="mt-5 max-w-[520px] text-[18px] leading-[1.5] text-ap-body">Aimanté is a curated collection where people discover brands by feeling. Yours belongs here.</p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <a href="#apply" className={primary}>List your brand →</a>
-            <Link to="/aimante/about" className={grey}>See how it looks</Link>
+            <a href="#apply" data-cta="apply-to-join" className={primary}>Apply to join →</a>
+            <Link to="/aimante/about" className={grey}>See a brand page</Link>
           </div>
         </div>
         <div className="rounded-[12px] bg-ap-panel p-6 sm:p-8">
@@ -249,7 +249,7 @@ function Closing() {
   return (
     <section className="bg-ap-panel px-6 py-20 text-center font-ap text-ap-ink">
       <h2 className="text-[clamp(30px,4vw,48px)] font-semibold tracking-[-0.035em]">Let people fall for your brand.</h2>
-      <a href="#apply" className={`${primary} mt-8`}>List your brand →</a>
+      <a href="#apply" data-cta="apply-to-join" className={`${primary} mt-8`}>Apply to join →</a>
       <p className="mt-6 text-[13px] text-ap-muted">Already have reels? <Link to="/signin" className="text-ap-blue hover:underline">Sign in with your Gravity Pants account.</Link></p>
     </section>
   )

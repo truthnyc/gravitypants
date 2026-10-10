@@ -99,7 +99,7 @@ function About() {
           <h2 className="text-[clamp(30px,4vw,48px)] font-semibold tracking-[-0.035em]">What will you fall for today?</h2>
           <Link to="/directory" className={`${primary} mt-8`}>Start browsing →</Link>
           <p className="mt-6 text-[13px] text-ap-muted">Aimanté is made by Gravity Pants. Every reel here was made with it.</p>
-          <p className="mt-3 text-[13px]"><Link to="/aimante/join" className="font-medium text-ap-blue hover:underline">Have a brand? See how to list it →</Link></p>
+          <p className="mt-3 text-[13px]"><Link to="/aimante/join" className="font-medium text-ap-blue hover:underline">Have a brand? See how to join →</Link></p>
         </section>
       </div>
     </AimanteShell>
