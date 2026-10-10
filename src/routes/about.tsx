@@ -80,8 +80,8 @@ function AboutPage() {
           <h2 className="mx-auto max-w-[640px] text-[32px] font-semibold leading-[1.1] tracking-[-0.03em] text-site-ink md:text-[48px] md:tracking-[-0.035em]">Try it with photos you already have.</h2>
           <p className="mx-auto mt-4 max-w-[480px] text-[17px] leading-[1.45] text-site-secondary">The free trial includes every feature, and your first reel has no watermark.</p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Button asChild variant="site" size="site"><Link to="/signup">Start free trial</Link></Button>
-            <Button asChild variant="siteSecondary" size="site"><Link to="/examples">Browse the gallery</Link></Button>
+            <Button asChild variant="site" size="site"><Link to="/signup" data-cta="make-first-reel">Make your first reel</Link></Button>
+            <Button asChild variant="siteSecondary" size="site"><Link to="/examples" data-cta="see-examples">See examples</Link></Button>
           </div>
         </div>
       </section>

@@ -106,12 +106,12 @@ function Showcase() {
               <p>Tell us about your products and we'll get back to you about a reel.</p>
               <div>
                 <Button asChild variant="site" size="site">
-                  <Link to="/contact">
-                    Get in touch <ArrowRight size={18} strokeWidth={1.7} />
+                  <Link to="/contact" search={{ topic: "brand-reel" }} data-cta="commission-reel">
+                    Commission a reel <ArrowRight size={18} strokeWidth={1.7} />
                   </Link>
                 </Button>
                 <Button asChild variant="siteSecondary" size="site">
-                  <Link to="/signup">Make your own</Link>
+                  <Link to="/signup" data-cta="make-first-reel">Make your first reel</Link>
                 </Button>
               </div>
             </div>
