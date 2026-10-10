@@ -81,7 +81,7 @@ export const Route = createFileRoute("/")({
   },
   loader: async () => {
     const [reels, content] = await Promise.all([
-      listSiteReels().catch(() => [] as SiteReel[]),
+      listSiteReels().then((rs) => rs.filter((r) => r.source !== "client")).catch(() => [] as SiteReel[]),
       getHomepageContent().catch(() => DEFAULT_CONTENT),
     ]);
     return { reels, content };

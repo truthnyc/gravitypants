@@ -389,7 +389,7 @@ export const getBrandPage = createServerFn({ method: "GET" })
     }
     const { data: reels } = await pc.from("directory_reels").select("id, tags, moods, formats, published_at, templates(name)").eq("brand_id", b.id).eq("status", "live").order("published_at", { ascending: false });
     const { listSiteReels } = await import("@/lib/site/reels.functions");
-    const allSiteReels = await listSiteReels();
+    const allSiteReels = (await listSiteReels()).filter((r) => r.source !== "client");
     const siteReels = allSiteReels.filter((r) => r.brandSlug === b.slug).map((r) => ({ ...r, title: aimanteTitle(r) }));
     const { data: featured } = await pc.rpc("is_featured_brand", { _brand: b.id });
     const cards = await toCards((reels ?? []).map((r: any) => ({ id: r.id, brand_name: b.name, brand_slug: b.slug, category: b.category, tags: r.tags, moods: r.moods, formats: r.formats, template_name: r.templates?.name ?? null, featured })));

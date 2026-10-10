@@ -20,7 +20,7 @@ function useWorkspaces(enabled: boolean) {
 }
 
 function useAllSiteReels() {
-  return useQuery({ queryKey: ["site-reels-all"], queryFn: () => listSiteReels() });
+  return useQuery({ queryKey: ["site-reels-all"], queryFn: async () => (await listSiteReels()).filter((r) => r.source !== "client") });
 }
 
 function WorkspacePicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {

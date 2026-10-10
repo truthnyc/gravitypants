@@ -41,7 +41,7 @@ export const Route = createFileRoute("/favorites/$slug")({
 
 function FavoritesPublic() {
   const { title, reels, brands, siteReelIds } = Route.useLoaderData();
-  const all = useQuery({ queryKey: ["site-reels-all"], queryFn: () => listSiteReels() }).data?.map((r) => ({ ...r, title: aimanteTitle(r) })) ?? ([] as SiteReel[]);
+  const all = useQuery({ queryKey: ["site-reels-all"], queryFn: () => listSiteReels() }).data?.filter((r) => r.source !== "client").map((r) => ({ ...r, title: aimanteTitle(r) })) ?? ([] as SiteReel[]);
   const siteReels = siteReelIds.map((id) => all.find((r) => r.id === id)).filter((r): r is SiteReel => !!r);
   const reelCount = reels.length + siteReels.length;
   const [open, setOpen] = useState<DirectoryCard | null>(null);
