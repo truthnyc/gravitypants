@@ -262,7 +262,7 @@ function Reels() {
   return (
     <>
       <PageTitle title="Website Reels" sub="These reels show on the home page, Examples and Showcase, in this order." />
-      <Card className="mb-6"><h2 className="mb-3 text-[17px] font-semibold">Add a reel</h2><ReelForm initial={empty} onDone={() => void refetch()} /></Card>
+      <AddReelCard onDone={() => void refetch()} />
       <Card className="p-0">
         <ul className="divide-y divide-border">
           {reels.map((r, i) => (
