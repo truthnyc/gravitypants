@@ -16,7 +16,7 @@ function BlogIndexPage() {
     <SiteShell>
       <section className="mx-auto max-w-[1248px] px-5 pb-14 pt-16 md:px-8 md:pt-24 lg:px-16 xl:px-24">
         <p className="text-[15px] font-semibold text-site-eyebrow">Blog</p>
-        <h1 className="mt-3 max-w-[720px] text-[40px] font-semibold leading-[1.05] tracking-[-0.03em] text-site-ink md:text-[64px] md:tracking-[-0.035em]">Practical notes on making better ads.</h1>
+        <h1 className="mt-3 max-w-[720px] text-[40px] font-semibold leading-[1.05] tracking-[-0.03em] text-site-ink md:text-[64px] md:tracking-[-0.035em]">Notes from the studio.</h1>
         <p className="mt-5 max-w-[620px] text-[17px] leading-[1.45] text-site-secondary md:text-[21px]">Simple advice about choosing photos, adding movement and making ads people understand quickly.</p>
       </section>
 

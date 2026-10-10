@@ -59,6 +59,7 @@ function AboutPage() {
           <p>Gravity Pants is an online video ad maker for small brands and shops. You upload a few product photos, and it turns them into a short video ad with movement, transitions, text and your logo. There is no timeline to learn and nothing to install.</p>
           <p>Every ad exports as an MP4 video and, when you need one, an animated GIF. Pick the shapes you need: Vertical 9:16 for Instagram Reels, TikTok and Stories; Portrait 4:5, recommended for Instagram, Facebook and LinkedIn feeds; Square 1:1 for square posts; Landscape 16:9 for YouTube, websites and email; or a custom size. One file per shape works everywhere listed for it.</p>
           <p>Brand kits keep your logo, colors and fonts in one place, so every new ad already looks like yours. Templates give you a ready-made style to start from, and you can save your own to reuse for the next product launch, sale or seasonal collection.</p>
+          <p>Reels you make can also live on <a href="https://aimante.co">Aimanté</a>, our collection where people discover brands by mood.</p>
           <p>Gravity Pants works well for product launches, restocks, new collections, gift guides and sale announcements, anywhere a still photo would do better as a few seconds of motion.</p>
         </div>
       </section>

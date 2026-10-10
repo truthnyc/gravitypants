@@ -79,9 +79,9 @@ function Showcase() {
           <span className="site-eyebrow">Showcase</span>
           <div>
             <h1>
-              Making reels
+              Brands that make
               <br />
-              for your brand.
+              their reels here.
             </h1>
             <p className="site-lede">Each reel starts as a few product photos. Tap a reel to visit the brand.</p>
           </div>

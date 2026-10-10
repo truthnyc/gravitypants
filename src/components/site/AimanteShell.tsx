@@ -198,7 +198,7 @@ export function AimanteFooter() {
           <a href="https://gravitypants.com" className="col-span-2 mt-1 text-ap-blue hover:underline">Reels made with Gravity Pants, our studio</a>
         </nav>
         <span className="-mt-1 text-[12px] text-ap-muted tabular-nums md:hidden">© {new Date().getFullYear()} Aimanté.co. All rights reserved.</span>
-        <p className="md:col-span-2 text-[12px] text-ap-muted">Gravity Pants and Aimanté are trademarks of Truth Nyc LLC.</p>
+        <p className="md:col-span-2 text-[12px] text-ap-muted">Gravity Pants and Aimanté are trademarks of Truth NYC LLC.</p>
       </div>
     </footer>
   );

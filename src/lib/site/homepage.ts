@@ -26,7 +26,7 @@ const purl: SitePhoto[] = [
 ];
 
 export const DEFAULT_HERO: HomeHero = {
-  announcement: "Export MP4 and GIF together", announcementLink: "See how it works",
+  announcement: "New · MP4 and GIF in one export", announcementLink: "",
   line1: "Photos in.", line2: "Reels out.",
   lede: "Turn your photos into video ads, Reels and GIFs. Add a few images and Gravity Pants makes a short video with your words, logo and colors, sized for Instagram, TikTok and Facebook.",
   primary: "Make your first reel", secondary: "Watch examples",

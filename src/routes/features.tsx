@@ -117,7 +117,7 @@ const groups = [
       "Team plan: 5 seats with shared templates and brand kits",
       "Invite people by email, with owner, admin and editor roles",
       "Plan, exports and invoices on one billing page",
-      "Priority support on paid plans",
+      "Faster replies on paid plans",
     ],
   },
 ] as const;

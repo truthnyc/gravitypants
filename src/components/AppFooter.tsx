@@ -17,7 +17,7 @@ export function AppFooter() {
           <Link to="/privacy" className={linkCls}>Privacy</Link>
           <Link to="/terms" className={linkCls}>Terms</Link>
         </nav>
-        <p className="w-full pb-1 text-[12px] text-ap-muted">Gravity Pants and Aimanté are trademarks of Truth Nyc LLC.</p>
+        <p className="w-full pb-1 text-[12px] text-ap-muted">Gravity Pants and Aimanté are trademarks of Truth NYC LLC.</p>
       </div>
     </footer>
   );

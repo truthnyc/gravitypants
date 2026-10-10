@@ -699,9 +699,9 @@ function Home() {
             }))}
           />
           <p className="site-gallery-cta home-section">
-            Want a reel like these for your brand?{" "}
-            <Link to="/contact">
-              Tell us about it <ArrowRight size={16} strokeWidth={1.7} />
+            Prefer we make it for you?{" "}
+            <Link to="/contact" search={{ topic: "brand-reel" }} data-cta="commission-reel">
+              Commission a reel <ArrowRight size={16} strokeWidth={1.7} />
             </Link>
           </p>
           <div className="home-gallery-mobile home-section">
@@ -746,7 +746,7 @@ function Home() {
         </section>
         <Spotlight />
         <section id="features" className="home-section home-features">
-          <Heading eyebrow="Features">The tools you need to make and reuse ads.</Heading>
+          <Heading eyebrow="Features">Everything a reel needs, and nothing it doesn't.</Heading>
           <div className="home-features-grid">
             <article className="site-card home-feature home-feature-wide">
               <div>

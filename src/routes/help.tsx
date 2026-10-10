@@ -10,7 +10,7 @@ export const Route = createFileRoute("/help")({
 });
 
 const guides = [
-  { q: "How do I make my first reel?", a: "Sign up, start a new ad and choose three to five photos. Gravity Pants puts them into a reel. Tap the words, colors or movement to make changes, then export your files." },
+  { q: "How do I make my first reel?", a: "Create your account, begin a new reel and choose three to five photos. Gravity Pants puts them into a reel. Tap the words, colors or movement to make changes, then export your files." },
   { q: "Where do my exports go?", a: "Every finished export appears on the Export page under Previous exports and stays available to download for 30 days." },
   { q: "What counts as one export?", a: "One export is one reel, however many formats and files it produces. Export counts reset on each billing date." },
   { q: "Can I use my own fonts and logo?", a: "Yes. Add your logo, colors and fonts to a brand kit, then use it when you make a new ad. Every Google Font is included on all plans." },
