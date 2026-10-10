@@ -389,6 +389,8 @@ const MOVEMENTS: { value: NonNullable<PhotoSettings["movement"]>; label: string 
   { value: "slow_zoom_out", label: "Zoom out" },
   { value: "pan_left", label: "Pan left" },
   { value: "pan_right", label: "Pan right" },
+  { value: "pan_up", label: "Pan up" },
+  { value: "pan_down", label: "Pan down" },
   { value: "custom", label: "Custom" },
 ];
 const INTENSITIES: { value: NonNullable<PhotoSettings["movement_intensity"]>; label: string }[] = [
@@ -643,7 +645,7 @@ function PhotoPanel({
 
       <div>
         <button type="button" aria-expanded={look} onClick={() => setLook((v) => !v)} className="flex w-full items-center gap-1 text-[12px] font-medium text-secondary-text">
-          <ChevronRight className={cn("size-3.5 transition-transform motion-reduce:transition-none", look && "rotate-90")} strokeWidth={1.7} /> Look
+          <ChevronRight className={cn("size-3.5 transition-transform motion-reduce:transition-none", look && "rotate-90")} strokeWidth={1.7} /> Adjust
         </button>
         <Reveal open={look}>
           <div className="space-y-4 pt-3">

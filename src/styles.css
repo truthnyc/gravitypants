@@ -1319,11 +1319,15 @@ p.concept-reel-notice { font-size: 10px !important; }
 @keyframes mv-zoom-out { from { transform: scale(1.35); } to { transform: scale(1); } }
 @keyframes mv-pan-left { from { transform: scale(1.4) translateX(12%); } to { transform: scale(1.4) translateX(-12%); } }
 @keyframes mv-pan-right { from { transform: scale(1.4) translateX(-12%); } to { transform: scale(1.4) translateX(12%); } }
+@keyframes mv-pan-up { from { transform: scale(1.4) translateY(12%); } to { transform: scale(1.4) translateY(-12%); } }
+@keyframes mv-pan-down { from { transform: scale(1.4) translateY(-12%); } to { transform: scale(1.4) translateY(12%); } }
 @keyframes mv-custom { 0% { transform: scale(1) translateX(-8%); } 100% { transform: scale(1.3) translateX(8%); } }
 .mv-chip:is(:hover, :focus-visible) .mv-thumb[data-mv="slow_zoom_in"] img { animation: mv-zoom-in 1.4s ease-in-out infinite alternate; }
 .mv-chip:is(:hover, :focus-visible) .mv-thumb[data-mv="slow_zoom_out"] img { animation: mv-zoom-out 1.4s ease-in-out infinite alternate; }
 .mv-chip:is(:hover, :focus-visible) .mv-thumb[data-mv="pan_left"] img { animation: mv-pan-left 1.4s ease-in-out infinite alternate; }
 .mv-chip:is(:hover, :focus-visible) .mv-thumb[data-mv="pan_right"] img { animation: mv-pan-right 1.4s ease-in-out infinite alternate; }
+.mv-chip:is(:hover, :focus-visible) .mv-thumb[data-mv="pan_up"] img { animation: mv-pan-up 1.4s ease-in-out infinite alternate; }
+.mv-chip:is(:hover, :focus-visible) .mv-thumb[data-mv="pan_down"] img { animation: mv-pan-down 1.4s ease-in-out infinite alternate; }
 .mv-chip:is(:hover, :focus-visible) .mv-thumb[data-mv="custom"] img { animation: mv-custom 1.4s ease-in-out infinite alternate; }
 @media (prefers-reduced-motion: reduce) { .mv-chip .mv-thumb img { animation: none !important; } }
 
