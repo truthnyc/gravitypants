@@ -61,7 +61,7 @@ export const Route = createFileRoute("/")({
           url: `${SITE_ORIGIN}/`,
           description: "Turns still product photos into short MP4 video ads and animated GIFs for social media.",
           publisher: { "@id": `${SITE_ORIGIN}/#org` },
-          offers: { "@type": "Offer", name: "7-day free trial", price: "0", priceCurrency: "USD" },
+          offers: { "@type": "Offer", name: "Free trial", price: "0", priceCurrency: "USD" },
         },
       ],
     };
