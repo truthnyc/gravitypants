@@ -152,7 +152,7 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
           time={player.time}
           total={player.total}
           name={doc.project.name}
-          meta={[templateName, `${doc.frames.length} photos`, `${player.total.toFixed(1)} sec`].filter(Boolean).join(" · ")}
+          meta={[templateName, `${doc.frames.length} ${doc.frames.length === 1 ? "photo" : "photos"}`, `${player.total.toFixed(1)} sec`].filter(Boolean).join(" · ")}
           formats={doc.project.formats}
           format={player.format}
           onFormat={(f) => player.setFormat(f as Format)}

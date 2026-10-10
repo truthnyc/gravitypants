@@ -27,7 +27,7 @@ const WHY = [
   ["Discover, don't scroll.", "A calm, curated place to find brands, not an endless feed."],
   ["Small and large, side by side.", "Independent makers next to well-known houses."],
   ["Seen in motion.", "Products, places and work shown as they really look."],
-  ["Something new each day.", "Fresh picks in Featured this week."],
+  ["Something new each week.", "A fresh selection, chosen by hand."],
 ];
 
 function About() {

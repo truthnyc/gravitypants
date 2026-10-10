@@ -30,7 +30,7 @@ export const DEFAULT_HERO: HomeHero = {
   line1: "Photos in.", line2: "Reels out.",
   lede: "Turn your photos into video ads, Reels and GIFs. Add a few images and Gravity Pants makes a short video with your words, logo and colors, sized for Instagram, TikTok and Facebook.",
   primary: "Make your first reel", secondary: "Watch examples",
-  note: "No editing skills needed. Your first reel is free, with no watermark, and takes just a few minutes.",
+  note: "No editing experience needed. Your first reel is on us, without a watermark.",
   reelId: null, photos: purl,
 };
 export const DEFAULT_EXAMPLE: ExampleOfWeek = {
@@ -56,6 +56,6 @@ export function featuredVideo(reelId: string | null, reels: SiteReel[], photoCou
   return {
     video: r.video, ...(r.videoWebm ? { videoWebm: r.videoWebm } : {}), poster: r.poster ?? posterAsset.url,
     format: r.format === "169" ? "169" : "916", label: `${r.brand} ${r.title} video ad`,
-    chips: [`${r.photos} photos`, `${r.seconds} sec`, FORMAT_LABEL[r.format], r.brand],
+    chips: [`${r.photos} ${r.photos === 1 ? "photo" : "photos"}`, `${r.seconds} sec`, FORMAT_LABEL[r.format], r.brand],
   };
 }

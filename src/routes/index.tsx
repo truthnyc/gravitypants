@@ -736,7 +736,7 @@ function Home() {
               stills={[jewelryFrame1.url, jewelryFrame2.url, jewelryFrame3.url]}
               imageLabel="Video frames"
               title="Gift Guide"
-              detail="8 sec reel · Katherine Grover Fine Jewelry"
+              detail="8 sec reel · Katherine Grover Fine Jewellery"
               video={jewelryVideo.url}
               videoWebm={jewelryWebm.url}
               poster={jewelryPoster.url}
