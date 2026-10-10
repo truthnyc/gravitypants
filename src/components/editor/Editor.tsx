@@ -56,7 +56,20 @@ const NEW_SUBLINE: TextSettings = {
   same_on_all: false,
   keep_under_headline: true,
 };
-const STYLE_KEYS = ["font_family", "font_weight", "size_px", "color", "animation", "position", "keep_under_headline"] as const;
+const STYLE_KEYS = [
+  "font_family",
+  "font_weight",
+  "size_px",
+  "color",
+  "animation",
+  "position",
+  "keep_under_headline",
+  "letter_spacing",
+  "line_height",
+  "mode",
+  "image_path",
+  "image_size_pct",
+] as const;
 type FrameStyle = Pick<Frame, "transition_in"> & {
   photo: Pick<
     PhotoSettings,
