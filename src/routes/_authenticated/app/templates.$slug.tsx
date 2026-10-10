@@ -41,8 +41,8 @@ export const Route = createFileRoute("/_authenticated/app/templates/$slug")({
 
 const MAX_MB = 20;
 const HEADLINE_HINT = 40;
-const RATIO: Record<Aspect, string> = { "9:16": "9 / 16", "1:1": "1 / 1", "16:9": "16 / 9" };
-const TILE: Record<Aspect, string> = { "9:16": "w-[58px] h-[103px]", "1:1": "w-20 h-20", "16:9": "w-[120px] h-[68px]" };
+const RATIO: Record<Aspect, string> = { "9:16": "9 / 16", "4:5": "4 / 5", "1:1": "1 / 1", "16:9": "16 / 9" };
+const TILE: Record<Aspect, string> = { "9:16": "w-[58px] h-[103px]", "4:5": "w-[72px] h-[90px]", "1:1": "w-20 h-20", "16:9": "w-[120px] h-[68px]" };
 const TRANSITION_LABEL: Partial<Record<TemplateSlide["transition_in"], string>> = { fade: "Fade in", "swipe-left": "Swipe left", slide: "Slide in", zoom: "Zoom", cut: "Cut" };
 
 const clock = (s: number) => `${Math.floor(s / 60)}:${(s % 60).toFixed(1).padStart(4, "0")}`;
@@ -508,7 +508,7 @@ function ManageTemplate({ template: t }: { template: Template }) {
 function FormatSwitch({ value, onChange }: { value: Aspect; onChange: (f: Aspect) => void }) {
   return (
     <div className="flex rounded-lg bg-control-fill p-0.5" role="radiogroup" aria-label="Format">
-      {(["1:1", "9:16", "16:9"] as Aspect[]).map((f) => (
+      {(["1:1", "9:16", "4:5", "16:9"] as Aspect[]).map((f) => (
         <button key={f} type="button" role="radio" aria-checked={value === f} onClick={() => onChange(f)}
           className={cn("nums h-11 flex-1 rounded-lg text-[14px] font-medium lg:h-9", value === f && "bg-card shadow-segment")}>
           {f}
