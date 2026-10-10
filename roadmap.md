@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Separate visual editor settings by size; retain shared timing/motion and verify saved reload and export rendering.
 - [x] Make "Add a reel" collapsible on admin/reels; verified collapsed default, open/close, draft kept when hidden, choice remembered after reload, clean build.
 - [x] Replace phone font popover with a bottom sheet; verified phone search/close and desktop popover, saved SVG readback without active content, export font outage/retry and nine passing tests.
 - [x] Move timing and transitions to frame-strip popovers; verified menus, delete/toast undo, keyboard navigation and shared timing saved across reload; nine timing/transition tests pass.
