@@ -193,7 +193,7 @@ export function previewProject(doc: TemplateDoc, { allSlides = false, samples = 
     primary_format: doc.format,
     formats: [doc.format],
     pace: "standard",
-    logo: { ...DEFAULT_LOGO, path: doc.style.logo_path ?? null, size_pct: doc.style.logo_size_pct ?? 16, opacity: doc.style.logo_opacity ?? "solid", show_on: doc.style.logo_show_on ?? "all", version: doc.style.logo_version ?? "auto", positions: { "9:16": doc.style.logo_position, "1:1": doc.style.logo_position, "16:9": doc.style.logo_position } },
+    logo: { ...DEFAULT_LOGO, path: doc.style.logo_path ?? null, size_pct: doc.style.logo_size_pct ?? 16, opacity: doc.style.logo_opacity ?? "solid", show_on: doc.style.logo_show_on ?? "all", version: doc.style.logo_version ?? "auto", positions: { "9:16": doc.style.logo_position, "4:5": doc.style.logo_position, "1:1": doc.style.logo_position, "16:9": doc.style.logo_position } },
     end_card: {},
     is_template: false,
     deleted_at: null,

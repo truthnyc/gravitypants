@@ -1,6 +1,6 @@
 export const WORKSPACE_ID = "00000000-0000-4000-8000-000000000001";
 
-export type Format = "9:16" | "1:1" | "16:9";
+export type Format = "9:16" | "4:5" | "1:1" | "16:9";
 export type Pace = "relaxed" | "standard" | "fast";
 export type LogoPosition =
   | "top-left"
@@ -126,11 +126,12 @@ export const DEFAULT_LOGO: LogoSettings = {
   size_pct: 16,
   opacity: "solid",
   show_on: "all",
-  positions: { "9:16": "top-right", "1:1": "top-right", "16:9": "bottom-right" },
+  positions: { "9:16": "top-right", "4:5": "top-right", "1:1": "top-right", "16:9": "bottom-right" },
 };
 
 export const FORMAT_RATIO: Record<Format, number> = {
   "9:16": 9 / 16,
+  "4:5": 4 / 5,
   "1:1": 1,
   "16:9": 16 / 9,
 };

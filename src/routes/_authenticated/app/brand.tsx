@@ -38,6 +38,7 @@ const ROLE_LABEL: Record<BrandLogoRole, string> = {
 const SLOTS: BrandLogoRole[] = ["primary", "reversed", "icon"];
 const FORMATS: { f: Format; w: number; h: number }[] = [
   { f: "9:16", w: 54, h: 96 },
+  { f: "4:5", w: 68, h: 85 },
   { f: "1:1", w: 84, h: 84 },
   { f: "16:9", w: 128, h: 72 },
 ];
@@ -95,7 +96,7 @@ function PlacementCard({ kit, save }: SaveProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [size]);
   const positions = kit.default_logo_positions;
-  const def: Record<Format, string> = { "9:16": "top-right", "1:1": "top-right", "16:9": "bottom-right" };
+  const def: Record<Format, string> = { "9:16": "top-right", "4:5": "top-right", "1:1": "top-right", "16:9": "bottom-right" };
   return (
     <Card title="Default logo placement" hint="Where the logo sits in each format when you start a new ad.">
       <div className="flex flex-wrap items-end gap-10">

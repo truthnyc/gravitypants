@@ -3,7 +3,7 @@ import type { Template, TemplateSlide } from "@/lib/stillframe/data";
 import { cn } from "@/lib/utils";
 import { RenderCanvas, templateProject, useLoopTime } from "./TemplateRender";
 
-export type Aspect = "9:16" | "1:1" | "16:9";
+export type Aspect = "9:16" | "4:5" | "1:1" | "16:9";
 
 export function templateFormat(t: Template): Aspect {
   return (t.format ?? t.settings?.primary_format ?? "9:16") as Aspect;
@@ -42,7 +42,7 @@ export function usePrefersReducedMotion() {
   return reduced;
 }
 
-const RATIO: Record<Aspect, string> = { "9:16": "9 / 16", "1:1": "1 / 1", "16:9": "16 / 9" };
+const RATIO: Record<Aspect, string> = { "9:16": "9 / 16", "4:5": "4 / 5", "1:1": "1 / 1", "16:9": "16 / 9" };
 
 /** Template preview at its real aspect ratio, drawn by renderAt (real fonts, layout, logo); loops while `playing`. */
 export function TemplatePreview({ template, playing, className }: { template: Template; playing: boolean; className?: string; quiet?: boolean }) {
