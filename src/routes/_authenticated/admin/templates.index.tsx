@@ -147,6 +147,7 @@ function AdminTemplates() {
           <select value={format} onChange={(e) => setFormat(e.target.value)} aria-label="Format" className="h-9 rounded-sm bg-card px-3 text-[13px] shadow-card">
             <option value="all">All formats</option>
             <option value="9:16">9:16</option>
+            <option value="4:5">4:5</option>
             <option value="1:1">1:1</option>
             <option value="16:9">16:9</option>
           </select>
