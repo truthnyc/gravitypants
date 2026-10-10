@@ -23,7 +23,7 @@ export const EXPORT_SIZES: SizeDef[] = [
     { label: "YouTube Shorts", platforms: ["youtube"] },
     { label: "Facebook Stories & Reels", platforms: ["facebook"] },
   ] },
-  { id: "4x5", name: "Portrait", ratio: "4:5", width: 1080, height: 1350, layout: "1:1", badge: "Recommended for feeds", uses: [
+  { id: "4x5", name: "Portrait", ratio: "4:5", width: 1080, height: 1350, layout: "4:5", badge: "Recommended for feeds", uses: [
     { label: "Instagram feed", platforms: ["instagram"] },
     { label: "Facebook feed", platforms: ["facebook"] },
     { label: "LinkedIn feed", platforms: ["linkedin"] },
