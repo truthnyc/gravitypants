@@ -1,0 +1,2 @@
+ALTER TABLE public.frames ADD COLUMN IF NOT EXISTS format_overrides jsonb NOT NULL DEFAULT '{}'::jsonb;
+COMMENT ON COLUMN public.frames.format_overrides IS 'Per-format photo, headline, subline and logo visual overrides. Timing, transitions, text animations and photo movement remain on shared frame fields.';
