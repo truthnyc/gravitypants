@@ -520,7 +520,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
               </p>
             )}
             {lastTrial && (
-              <div className="mt-3 flex flex-wrap items-center gap-3 rounded-[4px] border border-ap-line bg-ap-inner p-3" role="status">
+              <div className="mt-3 flex flex-wrap items-center gap-3 rounded-[4px] border border-ap-hairline bg-ap-inner p-3" role="status">
                 <p className="text-[14px]">That was your last trial export. Your reels and brand kit stay saved.</p>
                 <Link to="/pricing" data-cta="trial-choose-plan" className="rounded-lg bg-ap-blue px-3 py-1.5 text-[14px] font-medium text-ap-card hover:bg-ap-blue-hover">Choose a plan</Link>
               </div>
