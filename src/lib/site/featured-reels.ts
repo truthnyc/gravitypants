@@ -19,7 +19,7 @@ export function directoryToSiteReel(r: FeaturedDirRow): SiteReel | null {
     brandSlug: r.brand.slug,
     title: r.display_title?.trim() || r.title?.trim() || r.brand.name,
     displayTitle: r.display_title ?? null,
-    description: r.description ?? undefined,
+    ...(r.description ? { description: r.description } : {}),
     href: r.brand.website_url,
     category: r.brand.category as SiteReel["category"],
     format: DIR_FORMAT[r.formats?.[0] ?? ""] ?? "916",
