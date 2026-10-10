@@ -597,7 +597,7 @@ export type Template = {
   id: string;
   slug?: string | null;
   description?: string | null;
-  format?: "9:16" | "1:1" | "16:9" | null;
+  format?: "9:16" | "4:5" | "1:1" | "16:9" | null;
   is_reusable?: boolean;
   source?: "system" | "user" | "team";
   sort_order?: number;

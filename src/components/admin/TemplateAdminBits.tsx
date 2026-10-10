@@ -4,7 +4,7 @@ import { PLAN_AUDIENCE } from "@/lib/stillframe/template-doc";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type Row = any;
 export const adminTemplatesKey = ["admin", "templates"] as const;
-const RATIO: Record<string, [number, number]> = { "9:16": [20, 36], "1:1": [34, 34], "16:9": [40, 23] };
+const RATIO: Record<string, [number, number]> = { "9:16": [20, 36], "4:5": [28, 35], "1:1": [34, 34], "16:9": [40, 23] };
 
 export function audienceLabel(a: string[] | null | undefined) {
   if (!a?.length) return "All users";
