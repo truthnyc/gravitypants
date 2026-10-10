@@ -581,6 +581,8 @@ export type TemplateFrame = Pick<Frame, "duration_sec" | "transition_in" | "head
 };
 export type TemplateSettings = Pick<Project, "formats" | "primary_format" | "pace" | "logo" | "end_card"> & {
   brand_kit_id?: string | null;
+  /** Starting title for ads made from this template; falls back to the template name. */
+  ad_title?: string | null;
   frame_count: number;
   frames: TemplateFrame[];
 };
@@ -729,7 +731,7 @@ function sourceFromTemplate(t: Template, count: number): ProjectWithFrames {
   return {
     id: "",
     workspace_id: getWorkspaceId(),
-    name: t.name,
+    name: s.ad_title?.trim() || t.name,
     primary_format: s.primary_format,
     formats: s.formats,
     pace: s.pace,
@@ -816,7 +818,7 @@ export function useCreateAdFromCustomization() {
         };
       });
       const photos = slides.map((s) => s.photo) as UploadedPhoto[];
-      return insertCopy(source, template.name, photos);
+      return insertCopy(source, source.name, photos);
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: projectKeys.all }),
   });
