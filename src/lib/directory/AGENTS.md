@@ -11,3 +11,4 @@
 - Category hints are read from `categories` through `categories.functions.ts`, with staff-only edits and audit records; public filters share its catalog query so edits reach visitors without duplicating copy.
 - Greeting events go through a validated public server function; direct browser inserts are revoked so clients cannot supply record ids or timestamps.
 - Aimanté applications extend `brand_requests`; staff approval creates one draft editorial brand before publication.
+- Shared reel videos are copied to `<ws>/directory/<ad_id>.mp4` (`pinReelVideo`) so the 30-day exports/ cleanup never removes them; never store an exports/ path in `directory_reels.video_url`.
