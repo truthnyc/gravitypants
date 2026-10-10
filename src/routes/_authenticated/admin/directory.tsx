@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Fragment, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { adminSetAimanteTitle, adminDeleteReel, adminMoveReel, adminBrandDetail, adminRenameReel, adminSaveBrand, adminSaveBrandSlug, setBrandLogo, listDirectoryBrands, listDirectoryReview, resolveReport, reviewDirectoryReel } from "@/lib/directory/directory.functions";
+import { adminSetAimanteTitle, pinAllDirectoryVideos, adminDeleteReel, adminMoveReel, adminBrandDetail, adminRenameReel, adminSaveBrand, adminSaveBrandSlug, setBrandLogo, listDirectoryBrands, listDirectoryReview, resolveReport, reviewDirectoryReel } from "@/lib/directory/directory.functions";
 import { BRAND_DESCRIPTION_MAX, BRAND_NAME_MAX, CATEGORIES, SLUG_MAX, BRAND_MOODS_MAX, moodLabel, STATUS_LABEL, nearLimit, type Category } from "@/lib/directory/directory";
 import { useMoodCatalog } from "@/lib/directory/moods";
 import { cn } from "@/lib/utils";
@@ -23,6 +23,14 @@ function AdminDirectory() {
   const list = useServerFn(listDirectoryReview);
   const review = useServerFn(reviewDirectoryReel);
   const resolve = useServerFn(resolveReport);
+  const pinAll = useServerFn(pinAllDirectoryVideos);
+  const [pinning, setPinning] = useState(false);
+  const pin = async () => {
+    setPinning(true);
+    try { const r = await pinAll(); toast.success(`Pinned ${r.pinned} · no export ${r.missing} · failed ${r.failed}`); refresh(); }
+    catch (e) { toast.error(e instanceof Error ? e.message : "That didn't work"); }
+    finally { setPinning(false); }
+  };
   const qc = useQueryClient();
   const q = useQuery({ queryKey: ["admin", "directory"], queryFn: () => list() });
   const refresh = () => void qc.invalidateQueries({ queryKey: ["admin", "directory"] });
@@ -37,7 +45,10 @@ function AdminDirectory() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-[24px] font-bold tracking-[-0.02em]">Directory review</h1>
+        <div className="flex items-center justify-between gap-3">
+          <h1 className="text-[24px] font-bold tracking-[-0.02em]">Directory review</h1>
+          <Button variant="outline" size="sm" onClick={pin} disabled={pinning}>{pinning ? "Pinning…" : "Pin reel videos"}</Button>
+        </div>
         <p className="text-[14px] text-secondary-text">A brand's first reel waits here. After you approve it, that brand's new reels go live straight away.</p>
       </div>
 

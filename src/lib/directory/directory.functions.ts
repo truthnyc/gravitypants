@@ -186,8 +186,8 @@ export const shareReel = createServerFn({ method: "POST" })
     const { data: prev } = await sb.from("directory_reels").select("id, status, title").eq("ad_id", ad.id).maybeSingle();
     const status: DirStatus = data.show ? (brand.first_approved_at ? "live" : "in_review") : prev?.status === "hidden" ? "hidden" : "private";
     const tags = [...new Set(data.tags.map((t) => t.toLowerCase()))];
-    const { findLatestVideo } = await import("./directory.server");
-    const videoUrl = await findLatestVideo(sb, ad.workspace_id, ad.id).catch(() => null);
+    const { pinReelVideo } = await import("./directory.server");
+    const videoUrl = data.show ? await pinReelVideo(sb, ad.workspace_id, ad.id).catch(() => null) : null;
     const row = {
       ad_id: ad.id, brand_id: brand.id, status, tags, moods: await cleanMoods(sb, data.moods), template_id: ad.template_id, formats: (ad.formats as string[]).map((f) => f.replace(":", "x")),
       description: data.description || null,
@@ -611,6 +611,29 @@ export const adminSetAimanteTitle = createServerFn({ method: "POST" })
     const { error } = await (supabaseAdmin as any).from(data.kind === "site" ? "site_reels" : "directory_reels").update({ display_title: data.displayTitle || null }).eq("id", data.reelId);
     if (error) throw new Error(error.message);
     return { ok: true };
+  });
+
+/** Admin, one-off: move every reel video still pointing into exports/ to its pinned <ws>/directory/ copy. */
+export const pinAllDirectoryVideos = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.supabase);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { pinReelVideo } = await import("./directory.server");
+    const sb = supabaseAdmin as any;
+    const { data: rows } = await sb.from("directory_reels").select("id, ad_id, directory_brands(workspace_id)").like("video_url", "%/exports/%");
+    let pinned = 0, missing = 0, failed = 0;
+    for (const r of rows ?? []) {
+      try {
+        const v = await pinReelVideo(sb, r.directory_brands?.workspace_id, r.ad_id);
+        if (!v) { missing++; continue; }
+        const { error } = await sb.from("directory_reels").update({ video_url: v }).eq("id", r.id);
+        if (error) throw error;
+        pinned++;
+      } catch (e) { console.error("pin reel video failed", r.id, e); failed++; }
+    }
+    await sb.from("admin_audit_log").insert({ admin_user_id: context.userId, action: "directory_videos_pin", target: `pinned ${pinned}, missing ${missing}, failed ${failed}` });
+    return { pinned, missing, failed };
   });
 
 /** Admin: delete a Directory reel for good (the client's ad itself is untouched). */

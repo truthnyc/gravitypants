@@ -22,6 +22,18 @@ export async function findLatestVideo(sb: any, wsId: string, adId: string): Prom
   return null;
 }
 
+/** Copies the newest export MP4 to <ws>/directory/<ad>.mp4 (outside exports/, so cleanup never deletes it). Returns the media: path, or null without an export. */
+export async function pinReelVideo(_sb: any, wsId: string, adId: string): Promise<string | null> {
+  const src = await findLatestVideo(await admin(), wsId, adId);
+  if (!src) return null;
+  const store = (await admin()).storage.from("media");
+  const dest = `${wsId}/directory/${adId}.mp4`;
+  await store.remove([dest]);
+  const { error } = await store.copy(src.slice(POSTER_PREFIX.length), dest);
+  if (error) throw new Error(error.message);
+  return `${POSTER_PREFIX}${dest}`;
+}
+
 /** Turns live reel rows into public cards: signed posters and videos, seconds and photo counts (never other ad content). */
 export async function toCards(rows: any[]): Promise<DirectoryCard[]> {
   if (!rows.length) return [];
@@ -33,7 +45,7 @@ export async function toCards(rows: any[]): Promise<DirectoryCard[]> {
   // Reels shared before videos were stored get theirs found now, once.
   for (const e of extra ?? []) {
     if (!e.video_url && e.ad_id && e.directory_brands?.workspace_id) {
-      const v = await findLatestVideo(sb, e.directory_brands.workspace_id, e.ad_id);
+      const v = await pinReelVideo(sb, e.directory_brands.workspace_id, e.ad_id).catch(() => null);
       if (v) {
         await sb.from("directory_reels").update({ video_url: v }).eq("id", e.id);
         e.video_url = v;
