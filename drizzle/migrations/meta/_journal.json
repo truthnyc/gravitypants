@@ -50,6 +50,13 @@
       "when": 1791643833540,
       "tag": "0006_reel_display_title",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1791646667518,
+      "tag": "0007_reel_title_first_line",
+      "breakpoints": true
     }
   ]
 }
