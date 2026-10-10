@@ -4,7 +4,8 @@ import { FORMAT_SIZE } from "@/render/formats";
 import { layoutFrame } from "@/render/renderFrame";
 
 export type FitBox = { x: number; y: number; w: number; h: number };
-export type FitIssue = { format: Format; frame: number; text: string };
+/** `format` is the preview shape label (includes "4:5", which lays out with the 1:1 rules). */
+export type FitIssue = { format: string; frame: number; text: string };
 type El = "headline" | "subline" | "logo";
 
 /** Pure check: elements outside the frame or overlapping (with breathing room as a fraction of the shorter side). */
@@ -26,7 +27,12 @@ export function findProblems(boxes: Partial<Record<El, FitBox | null>>, W: numbe
   return out;
 }
 
-const FORMATS: Format[] = ["9:16", "1:1", "16:9"];
+const SHAPES: { shape: string; layout: Format; width: number; height: number }[] = [
+  { shape: "9:16", layout: "9:16", ...FORMAT_SIZE["9:16"] },
+  { shape: "4:5", layout: "1:1", width: 1080, height: 1350 },
+  { shape: "1:1", layout: "1:1", ...FORMAT_SIZE["1:1"] },
+  { shape: "16:9", layout: "16:9", ...FORMAT_SIZE["16:9"] },
+];
 
 /** Lays every frame out off-screen at each size with the same layout code the preview uses. */
 export function checkFit(doc: EditorDoc, images: Map<string, HTMLImageElement>): FitIssue[] {
@@ -35,8 +41,7 @@ export function checkFit(doc: EditorDoc, images: Map<string, HTMLImageElement>):
   const ctx = canvas.getContext("2d");
   if (!ctx) return [];
   const issues: FitIssue[] = [];
-  for (const format of FORMATS) {
-    const { width, height } = FORMAT_SIZE[format];
+  for (const { shape, layout: format, width, height } of SHAPES) {
     const W = width / 2;
     const H = height / 2;
     canvas.width = W;
@@ -48,7 +53,7 @@ export function checkFit(doc: EditorDoc, images: Map<string, HTMLImageElement>):
       const boxes = { headline: l.headline, subline: l.subline, logo: l.logo };
       for (const text of findProblems(boxes, W, H)) {
         if (under && text === "the headline overlaps the subline") continue;
-        issues.push({ format, frame: i, text });
+        issues.push({ format: shape, frame: i, text });
       }
     });
   }

@@ -80,13 +80,19 @@ function isTyping(target: EventTarget | null) {
   return Boolean(el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable || el.getAttribute("role") === "combobox"));
 }
 
+type PreviewShape = Format | "4:5";
+const PREVIEW_SHAPES: PreviewShape[] = ["9:16", "4:5", "1:1", "16:9"];
+
 export function Editor({ initial, readOnly = false, banner, exportDisabled = false }: { initial: EditorDoc; readOnly?: boolean; banner?: import("react").ReactNode; exportDisabled?: boolean }) {
   const { doc, apply, undo, redo, canUndo } = useEditorDoc(initial);
   const status = useAutosave(doc, !readOnly);
 
   const [frameIndex, setFrameIndex] = useState(0);
   const [selected, setSelected] = useState<ElementKey>("headline");
-  const [format, setFormat] = useState<Format>(initial.project.primary_format);
+  // Preview shape; Portrait 4:5 previews with the 1:1 layout rules, exactly as it exports.
+  const [shape, setShape] = useState<PreviewShape>(initial.project.primary_format);
+  const format: Format = shape === "4:5" ? "1:1" : shape;
+  const setFormat = (f: Format) => setShape(f);
   const [time, setTime] = useState(() => restTime(initial.frames, 0));
   const [playing, setPlaying] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -663,9 +669,9 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
 
   if (!frame) return null;
 
-  const formatIssues = (f: Format) => fitIssues.filter((x) => x.format === f);
-  const here = formatIssues(format)[0];
-  const elsewhere = (["9:16", "1:1", "16:9"] as Format[]).filter((f) => f !== format && formatIssues(f).length);
+  const formatIssues = (f: string) => fitIssues.filter((x) => x.format === f);
+  const here = formatIssues(shape)[0];
+  const elsewhere = PREVIEW_SHAPES.filter((f) => f !== shape && formatIssues(f).length);
 
   const meta = [templateName, `${frames.length} ${frames.length === 1 ? "photo" : "photos"}`, `${total.toFixed(1)} sec`].filter(Boolean).join(" · ");
   const segments = [...frames.map((f) => f.duration_sec), ...(endSeconds ? [endSeconds] : [])];
@@ -685,6 +691,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
                 brand={brand}
                 frameIndex={idx}
                 format={format}
+                aspect={shape === "4:5" ? 4 / 5 : undefined}
                 time={time}
                 playing={playing}
                 selected={selected}
@@ -721,10 +728,10 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
             <div className="mt-5 flex items-center gap-3">
               <span className="shrink-0 text-[12px] font-semibold tracking-[0.08em] text-ap-muted uppercase">Preview as</span>
               <AppSegmented
-                className="grid flex-1 grid-cols-3"
-                value={format as string}
-                onChange={(f) => setFormat(f as Format)}
-                options={(["9:16", "1:1", "16:9"] as const).map((f) => ({
+                className="grid flex-1 grid-cols-4"
+                value={shape}
+                onChange={(f) => setShape(f as PreviewShape)}
+                options={PREVIEW_SHAPES.map((f) => ({
                   value: f,
                   label: (
                     <span className="inline-flex items-center gap-1.5 nums">
@@ -739,7 +746,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
               <p className="mt-2 text-[12px] leading-snug text-ap-amber" role="status">
                 {here ? (
                   <>
-                    In {format},{" "}
+                    In {shape},{" "}
                     <button type="button" className="font-semibold underline underline-offset-2" onClick={() => selectFrame(here.frame)}>frame {here.frame + 1}</button>
                     : {here.text}. Try a smaller size or another position.
                   </>
