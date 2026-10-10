@@ -14,7 +14,7 @@ export const CHANNELS: Channel[] = [
 ];
 
 /** First channel for each format, used to preselect the ad's own formats. */
-export const DEFAULT_CHANNEL: Record<Format, string> = { "9:16": "ig-reels", "1:1": "ig-feed", "16:9": "youtube" };
+export const DEFAULT_CHANNEL: Record<Format, string> = { "9:16": "ig-reels", "4:5": "ig-feed", "1:1": "ig-feed", "16:9": "youtube" };
 
 /** Nearest built-in ratio (compared on a log scale) so custom sizes reuse its positions. */
 export function nearestFormat(w: number, h: number): Format {
