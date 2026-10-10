@@ -12,6 +12,7 @@ import type { NamedBrandKit } from "@/lib/stillframe/types";
 import { ACCEPTED_IMAGE_TYPES, uploadMedia } from "@/lib/stillframe/media";
 import { registerCustomFonts } from "@/lib/stillframe/fonts";
 import {
+  FORMAT_RATIO,
   PACE_SECONDS,
   type Format,
   type Frame,
