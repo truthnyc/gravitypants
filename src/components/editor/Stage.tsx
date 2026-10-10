@@ -38,7 +38,10 @@ export function Stage({
   adjustHint,
   interactive = true,
   brand,
+  aspect,
 }: {
+  /** Override the canvas shape (e.g. 4:5) while laying out with `format`'s rules. */
+  aspect?: number | undefined;
   brand?: BrandStyle;
   doc: EditorDoc;
   frameIndex: number;
@@ -79,7 +82,7 @@ export function Stage({
     return () => mq.removeEventListener("change", on);
   }, []);
   const size = FORMAT_SIZE[format];
-  const ratio = size.width / size.height;
+  const ratio = aspect ?? size.width / size.height;
   const dpr = typeof window === "undefined" ? 1 : Math.min(2, window.devicePixelRatio || 1);
 
   useLayoutEffect(() => {
