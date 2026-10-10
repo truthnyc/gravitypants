@@ -111,7 +111,6 @@ export function AimanteHeader() {
   const signOut = useAimanteSignOut();
   const here = useRouterState({ select: (s) => s.location.pathname + s.location.searchStr });
   const signInSearch = { redirect: here };
-  const listSearch = { redirect: "/aimante/join#apply" };
   useEffect(() => { setOpen(false); }, [pathname]);
   useEffect(() => {
     if (!open) return;
@@ -148,7 +147,7 @@ export function AimanteHeader() {
           {!me && <Link to="/signin" search={signInSearch} className={navLink} activeProps={navActive}>Sign in</Link>}
           {!me && (
             <Button asChild variant="site" className="h-9 min-h-0 rounded-lg bg-ap-blue px-4 text-[14px] text-ap-card hover:bg-ap-blue-hover">
-              <Link to="/signin" search={listSearch}>List your brand</Link>
+              <Link to="/aimante/join" hash="apply" data-cta="apply-to-join">Apply to join</Link>
             </Button>
           )}
           {me && <AccountMenu me={me} />}
@@ -166,7 +165,7 @@ export function AimanteHeader() {
           <Link to="/directory" onClick={close} className={row}>Browse{chevron}</Link>
           <Link to="/aimante/about" onClick={close} className={row}>About{chevron}</Link>
           <Link to="/aimante/join" onClick={close} className={row}>For brands{chevron}</Link>
-          {!me && <Link to="/signin" search={listSearch} onClick={close} className={cn(row, "text-ap-blue")}>List your brand{chevron}</Link>}
+          {!me && <Link to="/aimante/join" hash="apply" data-cta="apply-to-join" onClick={close} className={cn(row, "text-ap-blue")}>Apply to join{chevron}</Link>}
           {me ? <>
             <div className="mt-5 flex items-center gap-3 rounded-[12px] bg-ap-panel p-3"><Avatar me={me} /><div className="min-w-0"><p className="truncate text-[15px] font-semibold text-ap-ink">{me.displayName || me.email}</p>{me.displayName && <p className="truncate text-[13px] text-ap-muted">{me.email}</p>}</div></div>
             {ACCOUNT_LINKS(saved, statsOk).map((l) => "href" in l
@@ -175,7 +174,7 @@ export function AimanteHeader() {
             <a href="#" onClick={(e) => { e.preventDefault(); close(); void signOut(); }} className="flex h-12 items-center text-[16px] text-site-nav hover:text-ap-ink">Sign out</a>
           </> : <>
             <Link to="/signin" search={signInSearch} onClick={close} className="flex h-14 items-center text-[16px] text-site-nav hover:text-ap-ink">Sign in</Link>
-            <a href="https://gravitypants.com" onClick={close} className="inline-flex min-h-10 items-center text-[13px] text-ap-muted hover:text-ap-blue">Make reels with Gravity Pants →</a>
+            <a href="https://gravitypants.com" onClick={close} className="inline-flex min-h-10 items-center text-[13px] text-ap-muted hover:text-ap-blue">Reels made with Gravity Pants, our studio →</a>
           </>}
         </nav>
       </>}
@@ -192,11 +191,11 @@ export function AimanteFooter() {
           <span className="hidden whitespace-nowrap text-[14px] text-ap-muted tabular-nums md:block">© {new Date().getFullYear()} Aimanté.co. All rights reserved.</span>
         </div>
         <nav aria-label="Footer" className="grid min-w-0 grid-cols-2 gap-x-6 gap-y-2.5 md:flex md:flex-wrap md:items-center md:justify-end md:gap-x-5 md:gap-y-3">
-          <Link to="/aimante/join" className="hover:text-ap-ink">List your brand</Link>
+          <Link to="/aimante/join" hash="apply" data-cta="apply-to-join" className="hover:text-ap-ink">Apply to join</Link>
           <Link to="/aimante/about" className="hover:text-ap-ink">About</Link>
           <Link to="/privacy" className="hover:text-ap-ink">Privacy</Link>
           <Link to="/terms" className="hover:text-ap-ink">Terms</Link>
-          <a href="https://gravitypants.com" className="col-span-2 mt-1 text-ap-blue hover:underline">Make reels with Gravity Pants</a>
+          <a href="https://gravitypants.com" className="col-span-2 mt-1 text-ap-blue hover:underline">Reels made with Gravity Pants, our studio</a>
         </nav>
         <span className="-mt-1 text-[12px] text-ap-muted tabular-nums md:hidden">© {new Date().getFullYear()} Aimanté.co. All rights reserved.</span>
         <p className="md:col-span-2 text-[12px] text-ap-muted">Gravity Pants and Aimanté are trademarks of Truth Nyc LLC.</p>
@@ -220,7 +219,7 @@ export function MadeWithGravityPants() {
   return (
     <p className="mx-auto max-w-[1440px] px-6 pb-16 text-center text-[15px] text-ap-body sm:px-8 lg:px-10">
       Reels made with Gravity Pants.{" "}
-      <Link to="/aimante/join" className="font-medium text-ap-blue hover:underline">List your brand free →</Link>
+      <Link to="/aimante/join" hash="apply" data-cta="apply-to-join" className="font-medium text-ap-blue hover:underline">Have a brand? Apply to join →</Link>
     </p>
   );
 }
