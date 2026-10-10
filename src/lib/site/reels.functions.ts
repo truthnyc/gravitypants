@@ -8,7 +8,7 @@ export const listSiteReels = createServerFn({ method: "GET" }).handler(async ():
   const db = publicClient();
   const { data, error } = await db
     .from("site_reels")
-    .select("id, brand, brand_id, title, description, href, category, format, seconds, photos, video_url, video_webm_url, poster_url")
+    .select("id, brand, brand_id, title, display_title, description, href, category, format, seconds, photos, video_url, video_webm_url, poster_url")
     .eq("published", true)
     .order("sort_order")
     .order("created_at");
@@ -39,6 +39,7 @@ export const listSiteReels = createServerFn({ method: "GET" }).handler(async ():
       brand: r.brand,
       brandSlug: (r.brand_id ? byId.get(r.brand_id) : undefined) ?? slugs.get(r.brand.toLowerCase()) ?? null,
       title: r.title,
+      displayTitle: (r as { display_title?: string | null }).display_title ?? null,
       description: r.description,
       href: r.href,
       category: r.category as SiteReel["category"],

@@ -43,6 +43,13 @@
       "when": 1791549326253,
       "tag": "0005_grant_workspace_seat_activity",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791643833540,
+      "tag": "0006_reel_display_title",
+      "breakpoints": true
     }
   ]
 }

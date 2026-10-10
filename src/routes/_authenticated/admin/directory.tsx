@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Fragment, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { adminDeleteReel, adminMoveReel, adminBrandDetail, adminRenameReel, adminSaveBrand, adminSaveBrandSlug, setBrandLogo, listDirectoryBrands, listDirectoryReview, resolveReport, reviewDirectoryReel } from "@/lib/directory/directory.functions";
+import { adminSetAimanteTitle, adminDeleteReel, adminMoveReel, adminBrandDetail, adminRenameReel, adminSaveBrand, adminSaveBrandSlug, setBrandLogo, listDirectoryBrands, listDirectoryReview, resolveReport, reviewDirectoryReel } from "@/lib/directory/directory.functions";
 import { BRAND_DESCRIPTION_MAX, BRAND_NAME_MAX, CATEGORIES, SLUG_MAX, BRAND_MOODS_MAX, moodLabel, STATUS_LABEL, nearLimit, type Category } from "@/lib/directory/directory";
 import { useMoodCatalog } from "@/lib/directory/moods";
 import { cn } from "@/lib/utils";
@@ -226,6 +226,19 @@ function BrandPanel({ brandId, onChanged }: { brandId: string; onChanged: () => 
           {!d.reels.length && <p className="text-secondary-text">No reels shared yet.</p>}
         </div>
       </div>
+      {d.siteReels.length > 0 && (
+        <div>
+          <div className="mb-2 font-semibold nums">Website reels · {d.siteReels.length}</div>
+          <div className="space-y-2">
+            {d.siteReels.map((r) => (
+              <div key={r.id} className="space-y-1 rounded-sm border border-border p-3">
+                <div className="text-[13px] text-secondary-text">Gravity Pants title: {r.title}{r.published ? "" : " · Not published"}</div>
+                <AimanteTitleField reelId={r.id} kind="site" initial={r.displayTitle} onSaved={refresh} />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -316,6 +329,7 @@ function AdminReel({ r, brandId, onChanged }: { r: Detail["reels"][number]; bran
           <span className="text-secondary-text">{STATUS_LABEL[r.status]}{r.note ? ` · ${r.note}` : ""}</span>
           <span className="text-secondary-text">Ad: {r.ad}{r.formats.length ? ` · ${r.formats.join(", ")}` : ""}</span>
         </div>
+        <AimanteTitleField reelId={r.id} kind="directory" initial={r.displayTitle} onSaved={onChanged} />
         <input value={tags} onChange={(e) => setTags(e.target.value)} aria-label="Tags" placeholder="Tags, comma separated" className={field} />
         <div className="flex flex-wrap gap-1">
           {moodCatalog.all.map((m) => {
@@ -363,5 +377,30 @@ function ReelMoveDelete({ reelId, brandId, onChanged }: { reelId: string; brandI
       <Button size="sm" variant="plain" disabled={busy} onClick={() => setMoving(true)}>Move</Button>
       <Button size="sm" variant="plain" disabled={busy} className="text-destructive" onClick={() => { if (confirm("Delete this reel from the Directory? The client's ad isn't affected. This can't be undone.")) void run(() => del({ data: { reelId } }), "Reel deleted"); }}>Delete</Button>
     </>
+  );
+}
+
+const AIMANTE_TITLE_HINT = "Shown on Aimanté instead of the template name. Leave empty to show the brand name.";
+
+function AimanteTitleField({ reelId, kind, initial, onSaved }: { reelId: string; kind: "directory" | "site"; initial: string; onSaved: () => void }) {
+  const set = useServerFn(adminSetAimanteTitle);
+  const [v, setV] = useState(initial);
+  const [busy, setBusy] = useState(false);
+  const id = `aim-title-${reelId}`;
+  const save = async () => {
+    setBusy(true);
+    try { await set({ data: { reelId, kind, displayTitle: v.trim() } }); toast.success("Title on Aimanté saved"); onSaved(); }
+    catch (e) { toast.error(e instanceof Error ? e.message : "That didn't work"); }
+    finally { setBusy(false); }
+  };
+  return (
+    <div className="space-y-1">
+      <label htmlFor={id} className="flex justify-between text-[12px] text-secondary-text"><span>Title on Aimanté</span><span className="nums">{v.length} / 60</span></label>
+      <div className="flex gap-2">
+        <input id={id} value={v} maxLength={60} onChange={(e) => setV(e.target.value)} aria-describedby={`${id}-hint`} className={cn(field, "max-w-[320px]")} />
+        <Button size="sm" variant="plain" disabled={busy || v.trim() === initial.trim()} onClick={() => void save()}>Save title</Button>
+      </div>
+      <p id={`${id}-hint`} className="text-[12px] text-secondary-text">{AIMANTE_TITLE_HINT}</p>
+    </div>
   );
 }

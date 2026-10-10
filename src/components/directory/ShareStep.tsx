@@ -69,6 +69,7 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
   const [site, setSite] = useState(ctx.brand.website_url);
   const [category, setCategory] = useState<Category>(ctx.brand.category);
   const [desc, setDesc] = useState(ctx.reel?.description ?? "");
+  const [aimTitle, setAimTitle] = useState(ctx.reel?.displayTitle ?? "");
   const [tags, setTags] = useState<string[]>(ctx.prefill.tags);
   const [draft, setDraft] = useState("");
   const [moods, setMoods] = useState<string[]>(ctx.prefill.moods);
@@ -111,7 +112,7 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
         }
       }
       const res = await save({ data: {
-        adId: doc.project.id, brand: { name: name.trim(), website_url: site.trim(), category }, description: desc.trim(),
+        adId: doc.project.id, brand: { name: name.trim(), website_url: site.trim(), category }, description: desc.trim(), displayTitle: aimTitle.trim(),
         tags, moods: moods as string[], show, fullName, jobTitle: title, agreed, posterPath,
       } });
       if (alreadyShared && show && !agreed) toast.success("Changes saved.");
@@ -194,6 +195,10 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
             <AppSelect id="d-cat" value={category} onChange={(e) => setCategory(e.target.value as Category)}>
               {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
             </AppSelect>
+          </AppField>
+          <AppField label="Title on Aimanté (optional)" htmlFor="d-aim-title" className="mb-[18px]">
+            <AppInput id="d-aim-title" value={aimTitle} placeholder="e.g. Autumn cashmere" maxLength={60} onChange={(e) => setAimTitle(e.target.value)} />
+            <FieldCount value={aimTitle} max={60} />
           </AppField>
           <AppField label="Reel description" htmlFor="d-desc" className="mb-[18px]">
             <AppInput id="d-desc" value={desc} maxLength={REEL_DESCRIPTION_MAX} onChange={(e) => setDesc(e.target.value)} />

@@ -5,6 +5,7 @@ import { DirectoryGrid, ReelDetail } from "@/components/directory/DirectoryGrid"
 import { listPublicBrands, searchDirectoryLegacy } from "@/lib/directory/directory.functions";
 import { CATEGORIES, CATEGORY_COVERS, categoryFromSlug, categorySlug, type DirectoryCard } from "@/lib/directory/directory";
 import { listSiteReels } from "@/lib/site/reels.functions";
+import { aimanteTitle } from "@/lib/site/reels";
 import type { SiteReel } from "@/lib/site/reels";
 import { siteHead } from "@/lib/site/seo";
 import { SiteReelHeart } from "@/components/site/SiteReelHeart";
@@ -23,7 +24,7 @@ export const Route = createFileRoute("/directory/category/$slug")({
     if (!category) throw notFound();
     const [cards, reels, brands] = await Promise.all([
       searchDirectoryLegacy({ data: { q: "", size: null } }).catch(() => [] as DirectoryCard[]),
-      listSiteReels().catch(() => [] as SiteReel[]),
+      listSiteReels().then((rs) => rs.map((r) => ({ ...r, title: aimanteTitle(r) }))).catch(() => [] as SiteReel[]),
       listPublicBrands().catch(() => []),
     ]);
     const inCat = brands.filter((b) => b.category === category);

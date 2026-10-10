@@ -700,6 +700,7 @@ export type Database = {
           brand_id: string
           created_at: string
           description: string | null
+          display_title: string | null
           formats: string[]
           hidden_at: string | null
           hidden_reason: string | null
@@ -722,6 +723,7 @@ export type Database = {
           brand_id: string
           created_at?: string
           description?: string | null
+          display_title?: string | null
           formats?: string[]
           hidden_at?: string | null
           hidden_reason?: string | null
@@ -744,6 +746,7 @@ export type Database = {
           brand_id?: string
           created_at?: string
           description?: string | null
+          display_title?: string | null
           formats?: string[]
           hidden_at?: string | null
           hidden_reason?: string | null
@@ -1327,6 +1330,7 @@ export type Database = {
           category: string
           created_at: string
           description: string
+          display_title: string | null
           format: string
           href: string | null
           id: string
@@ -1347,6 +1351,7 @@ export type Database = {
           category?: string
           created_at?: string
           description?: string
+          display_title?: string | null
           format?: string
           href?: string | null
           id?: string
@@ -1367,6 +1372,7 @@ export type Database = {
           category?: string
           created_at?: string
           description?: string
+          display_title?: string | null
           format?: string
           href?: string | null
           id?: string

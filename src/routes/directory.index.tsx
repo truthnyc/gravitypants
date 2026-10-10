@@ -18,6 +18,7 @@ import { CATEGORIES, categorySlug, type DirectoryCard } from "@/lib/directory/di
 import { MOOD_FAMILY_COLORS, type MoodFamily } from "@/lib/directory/mood-admin";
 import { cn } from "@/lib/utils";
 import { listSiteReels } from "@/lib/site/reels.functions";
+import { aimanteTitle } from "@/lib/site/reels";
 import { type SiteReel } from "@/lib/site/reels";
 import { siteHead } from "@/lib/site/seo";
 import { aimanteHead } from "@/lib/site/brand-site";
@@ -47,7 +48,7 @@ export const Route = createFileRoute("/directory/")({
     const [dir, cards, reels, brands] = await Promise.all([
       getDirectoryPublic().catch(() => ({ settings: DEFAULT_DIRECTORY_SETTINGS, featured: [] as FacetedReel[] })),
       searchDirectoryLegacy({ data: { q: "", size: null } }).catch(() => [] as DirectoryCard[]),
-      listSiteReels().catch(() => [] as SiteReel[]),
+      listSiteReels().then((rs) => rs.map((r) => ({ ...r, title: aimanteTitle(r) }))).catch(() => [] as SiteReel[]),
       listPublicBrands().catch(() => []),
     ]);
     return { q: deps.q, category: deps.category, mood: deps.mood, site: (context as { site?: string }).site, cards, reels, brands, settings: dir.settings, featuredReels: dir.featured };

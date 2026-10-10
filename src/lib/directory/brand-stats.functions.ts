@@ -54,12 +54,13 @@ export const getBrandStats = createServerFn({ method: "POST" })
     if (!ids.length) return empty;
 
     const [{ data: dReels }, { data: sReels }] = await Promise.all([
-      db.from("directory_reels").select("id, title, moods, formats, poster_url").in("brand_id", ids),
-      db.from("site_reels").select("id, title, moods, format, poster_url").in("brand_id", ids),
+      db.from("directory_reels").select("id, brand_id, display_title, moods, formats, poster_url").in("brand_id", ids),
+      db.from("site_reels").select("id, brand_id, display_title, moods, format, poster_url").in("brand_id", ids),
     ]);
+    const bName = (id: string) => all.find((x) => x.id === id)?.name ?? "Reel";
     const reels = new Map<string, { name: string; moods: string[]; formats: string[]; poster: string | null }>();
-    for (const r of dReels ?? []) reels.set(r.id, { name: r.title ?? "Untitled reel", moods: r.moods ?? [], formats: r.formats ?? [], poster: r.poster_url });
-    for (const r of sReels ?? []) reels.set(r.id, { name: r.title, moods: r.moods ?? [], formats: r.format ? [r.format] : [], poster: null });
+    for (const r of dReels ?? []) reels.set(r.id, { name: r.display_title?.trim() || bName(r.brand_id), moods: r.moods ?? [], formats: r.formats ?? [], poster: r.poster_url });
+    for (const r of sReels ?? []) reels.set(r.id, { name: r.display_title?.trim() || bName(r.brand_id), moods: r.moods ?? [], formats: r.format ? [r.format] : [], poster: null });
     const reelIds = [...reels.keys()];
 
     const fetchAll = async (q: () => any) => {
