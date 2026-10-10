@@ -24,7 +24,7 @@ export const EXPORT_PACKS = [
 export type ExportPackId = (typeof EXPORT_PACKS)[number]["id"];
 export const PACKS_LINE = "Extra exports: 5 for $15, 10 for $25, 20 for $45";
 
-export const YEARLY_LABEL = "Save 17%";
+export const YEARLY_LABEL = "two months included";
 
 export type PlanConfig = {
   id: PlanId;
@@ -100,7 +100,7 @@ export function signupHref(p: PlanConfig, billing: Billing) {
 }
 
 type Cell = string | boolean;
-export type CompareRow = { label: string; cells: [Cell, Cell, Cell, Cell] }; // trial, simple, business, team
+export type CompareRow = { label: string; href?: string; cells: [Cell, Cell, Cell, Cell] }; // trial, simple, business, team
 export type CompareGroup = { group: string; rows: CompareRow[] };
 
 const S = planById("simple"), B = planById("business"), T = planById("team");
@@ -114,6 +114,7 @@ export const COMPARE: CompareGroup[] = [
       { label: "Seats", cells: ["1", String(S.seats), String(B.seats), String(T.seats)] },
       { label: "Exports a month", cells: [`${TRIAL.exports} in total`, String(S.monthlyExports), String(B.monthlyExports), `${T.monthlyExports}, shared`] },
       { label: "Watermark", cells: ["After first export", "No", "No", "No"] },
+      { label: "Aimanté brand page", href: "https://aimante.co/join", cells: ["Your page, reels without a watermark", "Full page, unlimited reels", "Full page + insights", "Full page + insights"] },
     ],
   },
   {

@@ -22,7 +22,7 @@ const columns: { label: string; links: FooterLink[] }[] = [
       { label: "Blog", to: "/blog" },
     ],
   },
-  { label: "Company", links: [{ label: "About", to: "/about" }, { label: "Get a brand reel", to: "/contact", search: { topic: "brand-reel" } }, { label: "Contact", to: "/contact" }] },
+  { label: "Company", links: [{ label: "About", to: "/about" }, { label: "Commission a reel", to: "/contact", search: { topic: "brand-reel" } }, { label: "Contact", to: "/contact" }] },
   { label: "Help", links: [{ label: "Help center", to: "/help" }, { label: "Status", to: STATUS_URL, external: true }] },
 ];
 
@@ -46,7 +46,7 @@ function Brand() {
   return (
     <div>
       <GravityPantsLogo size={28} showWordmark wordmarkSize={17} />
-      <p className="mt-3 max-w-[300px] text-[14px] leading-normal text-ap-body">Turn the product photos you already have into short video ads.</p>
+      <p className="mt-3 max-w-[300px] text-[14px] leading-normal text-ap-body">Turn the photos you already have into short films for your brand.</p>
       {SOCIAL_LINKS.some((s) => s.url) && (
         <div className="mt-4 flex gap-2">
           {SOCIAL_LINKS.filter((s) => s.url).map((s) => (
@@ -112,7 +112,7 @@ function SiteFooter() {
           <a href={STATUS_URL} target="_blank" rel="noreferrer" className="ml-auto inline-flex min-h-0 items-center gap-1.5 hover:text-ap-blue">
             <span className="size-2 rounded-full bg-ap-green" aria-hidden /> Status
           </a>
-          <p className="w-full pt-1 text-[12px] text-ap-muted">Gravity Pants and Aimanté are trademarks of Truth Nyc LLC.</p>
+          <p className="w-full pt-1 text-[12px] text-ap-muted">Gravity Pants and Aimanté are trademarks of Truth NYC LLC.</p>
         </div>
       </div>
     </footer>

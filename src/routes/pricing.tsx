@@ -65,12 +65,12 @@ function Pricing() {
       <div className="pricing-page">
         <section className="pr-hero">
           <span className="site-eyebrow">Pricing</span>
-          <h1>Start with a free trial.<br /><span>Choose a plan later.</span></h1>
-          <p className="site-lede">Your first reel is free, with no watermark and no credit card. Paid plans add more exports and never add a watermark.</p>
+          <h1>Make your first reel.<br /><span>Choose a plan when you're ready.</span></h1>
+          <p className="site-lede">The first one is on us, with no watermark and no card, and no time limit. Paid plans add more exports and never add a watermark.</p>
           <div role="group" aria-label="Billing period" className="pr-switch">
             {(["monthly", "yearly"] as const).map((b) => (
               <button key={b} className={billing === b ? "on" : ""} aria-pressed={billing === b} onClick={() => setBilling(b)}>
-                {b === "monthly" ? "Monthly" : <>Yearly <em>{YEARLY_LABEL}</em></>}
+                {b === "monthly" ? "Monthly" : <>Yearly · <em>{YEARLY_LABEL}</em></>}
               </button>
             ))}
           </div>
@@ -99,7 +99,7 @@ function Pricing() {
               );
             })}
           </div>
-          <p className="pr-fine">Prices in [USD]. [Taxes may apply.] One export is one reel, whatever the number of formats and files. Export counts reset on each billing date. Run out early? Add a pack: 5 exports for $15, 10 for $25 or 20 for $45. Packs work on any plan and never expire. Need more seats? <Link to="/app/help">Talk to us</Link>.</p>
+          <p className="pr-fine">Prices in [USD]. [Taxes may apply.] One export is one reel, whatever the number of formats and files. Export counts reset on each billing date. Run out early? Add a pack: 5 exports for $15, 10 for $25 or 20 for $45. Packs work on any plan and never expire. Need more seats? <Link to="/app/help">Write to us</Link>.</p>
         </section>
 
         <section className="pr-compare">
@@ -110,7 +110,7 @@ function Pricing() {
               {COMPARE.flatMap((g) => [
                 <tr key={g.group} className="grp"><th colSpan={5} scope="colgroup">{g.group}</th></tr>,
                 ...g.rows.map((r) => (
-                  <tr key={g.group + r.label}><th scope="row">{r.label}</th>{r.cells.map((c, i) => <td key={i} className={i === 1 ? "simple" : undefined}><CellView v={c} /></td>)}</tr>
+                  <tr key={g.group + r.label}><th scope="row">{r.href ? <a href={r.href}>{r.label}</a> : r.label}</th>{r.cells.map((c, i) => <td key={i} className={i === 1 ? "simple" : undefined}><CellView v={c} /></td>)}</tr>
                 )),
               ])}
             </tbody>
@@ -122,7 +122,7 @@ function Pricing() {
                 {COMPARE.map((g) => (
                   <div key={g.group}>
                     <small>{g.group}</small>
-                    <ul>{g.rows.map((r) => <li key={r.label}><span>{r.label}</span><span><CellView v={r.cells[i] ?? ""} /></span></li>)}</ul>
+                    <ul>{g.rows.map((r) => <li key={r.label}><span>{r.href ? <a href={r.href}>{r.label}</a> : r.label}</span><span><CellView v={r.cells[i] ?? ""} /></span></li>)}</ul>
                   </div>
                 ))}
               </div>

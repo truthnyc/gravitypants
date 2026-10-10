@@ -9,7 +9,7 @@ import { submitBrandRequest } from "@/lib/site/reels.functions";
 
 export const Route = createFileRoute("/contact")({
   validateSearch: (s: Record<string, unknown>): { topic?: string } => (typeof s["topic"] === "string" ? { topic: s["topic"] } : {}),
-  head: () => siteHead({ path: "/contact", title: "Contact — Get a reel for your brand | Gravity Pants", description: "Tell Gravity Pants about your brand and products, and we'll get back to you about a short video ad." }),
+  head: () => siteHead({ path: "/contact", title: "Commission a reel | Gravity Pants", description: "Tell Gravity Pants about your brand and products, and we'll get back to you about a short video ad." }),
   component: Contact,
 });
 
@@ -40,7 +40,7 @@ function Contact() {
       <div className="examples-page">
         <section className="examples-hero examples-container">
           <span className="site-eyebrow">Contact</span>
-          <div><h1>Want a reel<br />for your brand?</h1><p className="site-lede">Tell us a little about your brand. We reply within one business day.</p></div>
+          <div><h1>Commission a reel.</h1><p className="site-lede">Tell us a little about your brand. We reply within one business day.</p></div>
         </section>
         <section className="examples-container contact-section">
           <div className="site-card contact-card">
@@ -60,7 +60,7 @@ function Contact() {
                 <label className="contact-wide">What would you like to promote? <span>(optional)</span><textarea className={field} rows={5} maxLength={5000} value={f.message} onChange={set("message")} /></label>
                 <input className="contact-trap" tabIndex={-1} autoComplete="off" aria-hidden="true" value={f.company} onChange={set("company")} />
                 {error && <p className="contact-error contact-wide" role="alert">{error}</p>}
-                <div className="contact-wide"><Button type="submit" variant="site" size="site" disabled={state === "sending"}>{state === "sending" ? "Sending…" : "Send"}</Button></div>
+                <div className="contact-wide"><Button type="submit" variant="site" size="site" data-cta="send-contact" disabled={state === "sending"}>{state === "sending" ? "Sending…" : "Send to the studio"}</Button></div>
               </form>
             )}
           </div>

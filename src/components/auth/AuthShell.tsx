@@ -41,7 +41,7 @@ export function AuthShell({ eyebrow, title, subtitle, children, beforeForm }: { 
           {beforeForm}
           <div className="mt-6">{children}</div>
         </div>
-        <p className="mt-6 text-center text-[13px] text-ap-muted">{aim ? "One account for Aimanté and Gravity Pants." : "One account for Gravity Pants and Aimanté."} <Link to="/privacy" className="hover:text-ap-ink">Privacy</Link> · <Link to="/terms" className="hover:text-ap-ink">Terms</Link></p>
+        <p className="mt-6 text-center text-[13px] text-ap-muted">{aim ? "One account for Aimanté and Gravity Pants." : "One account for the studio and the collection: Gravity Pants and Aimanté."} <Link to="/privacy" className="hover:text-ap-ink">Privacy</Link> · <Link to="/terms" className="hover:text-ap-ink">Terms</Link></p>
       </main>
     </div>
   );
