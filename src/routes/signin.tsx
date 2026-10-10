@@ -77,13 +77,13 @@ function SignIn() {
   }
 
   return (
-    <AuthShell mode="signin" title={aim ? "Sign in to Aimanté" : "Sign in to Gravity Pants"} subtitle={aim ? "Use your Gravity Pants account. It works on both sites." : "Welcome back. Your account also works on Aimanté."}>
+    <AuthShell mode="signin" title={aim ? "Sign in to Aimanté" : "Sign in to Gravity Pants"} subtitle={aim ? "One account for Aimanté and Gravity Pants, our studio." : "Welcome back. Your account also works on Aimanté."}>
       <GoogleButton redirectTo={target} />
       <form onSubmit={submit} noValidate>
         <FieldGroup
           error={error}
           fields={[
-            { id: "email", label: "Email", type: "email", autoComplete: "email", value: email, placeholder: "you@yourbrand.com", onChange: (value) => { setEmail(value); setEmailError(null); }, error: emailError },
+            { id: "email", label: "Email", type: "email", autoComplete: "email", value: email, placeholder: aim ? "you@example.com" : "you@yourbrand.com", onChange: (value) => { setEmail(value); setEmailError(null); }, error: emailError },
             { id: "password", label: "Password", labelAction: <Link to="/reset" className="auth-link text-[13px] font-medium">Forgot password?</Link>, type: "password", autoComplete: "current-password", value: password, placeholder: "Your password", onChange: (value) => { setPassword(value); setPasswordError(null); }, error: passwordError },
           ]}
         />
@@ -93,7 +93,7 @@ function SignIn() {
         </Button>
       </form>
       <p className="auth-switch">
-        {aim ? "New here?" : "New to Gravity Pants?"} <Link to="/signup" search={{ redirect: aim ? target : redirect }} className="auth-link">{aim ? "Create a free account" : "Make your first reel"}</Link>
+        {aim ? "New here?" : "New to Gravity Pants?"} <Link to="/signup" search={{ redirect: aim ? target : redirect }} className="auth-link">{aim ? "Create an account" : "Make your first reel"}</Link>
       </p>
     </AuthShell>
   );

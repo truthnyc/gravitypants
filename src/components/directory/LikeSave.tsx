@@ -64,8 +64,8 @@ export function LikeSave({ kind, id, name, showSave = true, brand = false }: { k
     const { error } = next
       ? await (supabase.from(favTable) as any).insert({ user_id: userId, [favCol]: id })
       : await (supabase.from(favTable) as any).delete().eq(favCol, id);
-    if (error) { setSaved(!next); toast.error("Couldn't update your favorites. Try again."); return; }
-    toast.success(next ? "Saved to your favorites" : "Removed from your favorites");
+    if (error) { setSaved(!next); toast.error("Couldn't update your favourites. Try again."); return; }
+    toast.success(next ? "Saved to your favourites" : "Removed from your favourites");
     void qc.invalidateQueries({ queryKey: ["my-favorites"] });
     void qc.invalidateQueries({ queryKey: ["directory-reel-favs"] });
   };
@@ -77,7 +77,7 @@ export function LikeSave({ kind, id, name, showSave = true, brand = false }: { k
         <span className="text-[14px] font-semibold text-ap-ink nums">{count}</span>
       </button>
       {showSave && (
-        <button type="button" onClick={() => void save()} aria-pressed={saved} aria-label={saved ? "Remove from my favorites" : "Save to my favorites"} title={saved ? "Saved to my favorites" : "Save to my favorites"} className={cn("grid size-11 place-items-center rounded-lg bg-ap-panel transition-colors", saved ? "text-destructive" : "text-ap-body hover:text-ap-ink")}>
+        <button type="button" onClick={() => void save()} aria-pressed={saved} aria-label={saved ? "Remove from my favourites" : "Save to my favourites"} title={saved ? "Saved to my favourites" : "Save to my favourites"} className={cn("grid size-11 place-items-center rounded-lg bg-ap-panel transition-colors", saved ? "text-destructive" : "text-ap-body hover:text-ap-ink")}>
           <Heart className={cn("size-4", saved && "fill-current")} strokeWidth={1.7} />
         </button>
       )}
@@ -112,12 +112,12 @@ export function DirectoryReelHeart({ reelId, name, inline = false }: { reelId: s
     const { error } = next
       ? await supabase.from("directory_reel_favorites").insert({ user_id: u.user.id, reel_id: reelId })
       : await supabase.from("directory_reel_favorites").delete().eq("reel_id", reelId);
-    if (error) toast.error("Couldn't update your favorites. Try again.");
+    if (error) toast.error("Couldn't update your favourites. Try again.");
     void qc.invalidateQueries({ queryKey: DIR_FAVS_KEY });
     void qc.invalidateQueries({ queryKey: ["my-favorites"] });
   };
   return (
-    <button type="button" onClick={(e) => void toggle(e)} aria-pressed={saved} aria-label={saved ? `Remove ${name} from favorites` : `Save ${name} to favorites`}
+    <button type="button" onClick={(e) => void toggle(e)} aria-pressed={saved} aria-label={saved ? `Remove ${name} from your favourites` : `Save ${name} to your favourites`}
       className={cn(inline ? "grid size-11 place-items-center rounded-lg bg-ap-panel" : "absolute top-1.5 right-1.5 z-10 grid size-[30px] min-h-0 place-items-center rounded-[8px] bg-ap-card/95", saved ? "text-destructive" : "text-ap-body hover:text-ap-ink")}>
       <Heart className={cn("size-4", saved && "fill-current")} strokeWidth={1.7} />
     </button>

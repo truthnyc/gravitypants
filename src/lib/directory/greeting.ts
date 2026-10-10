@@ -68,7 +68,7 @@ export const SEED_EVENTS: GEvent[] = [
   ev("halloween", "marketing", "Halloween", CD, "mysterious", fixed(10, 31)),
   ev("singles-day", "marketing", "Singles' Day", CD, "bold", fixed(11, 11)),
   ev("thanksgiving", "marketing", "Thanksgiving", CD, "warm", { kind: "nth", month: 11, weekday: 4, n: 4 }, { regions: ["US"], active: false }),
-  ev("black-friday", "marketing", "Black Friday", CD, "urgent", { kind: "offset", eventId: "thanksgiving", days: 1 }),
+  ev("black-friday", "marketing", "Black Friday", CD, "lively", { kind: "offset", eventId: "thanksgiving", days: 1 }),
   ev("small-biz-sat", "marketing", "Shop Small", CD, "human", { kind: "offset", eventId: "thanksgiving", days: 2 }, { regions: ["US"] }),
   ev("cyber-monday", "marketing", "Cyber Monday", CD, "punchy", { kind: "offset", eventId: "thanksgiving", days: 4 }),
   ev("giving-tuesday", "marketing", "Giving Tuesday", CD, "hopeful", { kind: "offset", eventId: "thanksgiving", days: 5 }, { category: "Nonprofit & Causes" }),

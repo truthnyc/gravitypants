@@ -37,7 +37,7 @@ export const Route = createFileRoute("/directory/$slug")({
     // Every gravitypants.com page shares the home page card (og-cover.jpg), so no per-brand image.
     const head = aim ? aimanteHead({
       path: `/b/${params.slug}`,
-      title: `${b.name} video ads — Aimanté`,
+      title: `${b.name} on Aimanté${b.moods?.length ? ` — ${b.moods.slice(0, 3).map((m) => m.toLowerCase()).join(", ")}` : ""}`,
       description: b.description || `Reels and video ads by ${b.name} on Aimanté.`,
       // Every aimante.co page shares the home page card (og-aimante.jpg).
     }) : siteHead({
