@@ -757,7 +757,10 @@ function Reveal({ show, children }: { show: boolean; children: React.ReactNode }
 /** Rough file size estimate for the file list. */
 function estimateMb(f: FileRow, seconds: number, fps: number, gFps: number, colors: GifColors) {
   const px = f.width * f.height * seconds;
-  const bytes = f.kind === "mp4" ? px * 0.12 * Math.sqrt(fps / 30) : px * gFps * 0.059 * (colors === "best" ? 1 : colors === "balanced" ? 0.75 : 0.5);
+  // MP4 size follows the encoder's bitrate (same for every shape); GIF factor calibrated against real downloads.
+  const bytes = f.kind === "mp4"
+    ? ((fps >= 60 ? 10_000_000 : 6_000_000) / 8) * seconds * 1.05
+    : px * gFps * 0.1 * (colors === "best" ? 1 : colors === "balanced" ? 0.75 : 0.5);
   const mb = bytes / 1_000_000;
   return mb < 10 ? mb.toFixed(1) : Math.round(mb).toString();
 }
