@@ -238,7 +238,7 @@ export const hideReel = createServerFn({ method: "POST" })
       ip_address: req?.headers.get("cf-connecting-ip") ?? null, user_agent: req?.headers.get("user-agent")?.slice(0, 400) ?? null,
     });
     if (logErr) throw new Error(logErr.message);
-    const { error } = await sb.from("directory_reels").update({ status: "hidden", hidden_reason: "brand" }).eq("id", reel.id);
+    const { error } = await sb.from("directory_reels").update({ status: "hidden", hidden_reason: "brand", in_showcase: false, showcase_order: null, showcase_at: null, showcase_by: null }).eq("id", reel.id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
@@ -487,7 +487,7 @@ export const reviewDirectoryReel = createServerFn({ method: "POST" })
       data.action === "approve" ? { status: "live", review_note: null, hidden_reason: null }
       : data.action === "reject" ? { status: "private", review_note: data.reason || null }
       : data.action === "review" ? { status: "in_review" }
-      : { status: "hidden", hidden_reason: "admin" };
+      : { status: "hidden", hidden_reason: "admin", in_showcase: false, showcase_order: null, showcase_at: null, showcase_by: null };
     if (data.action === "reject" && !data.reason) throw new Error("Add a short reason.");
     if (data.action === "approve") await sb.from("directory_brands").update({ first_approved_at: new Date().toISOString() }).eq("id", reel.brand_id).is("first_approved_at", null);
     const { error } = await sb.from("directory_reels").update(patch).eq("id", data.id);
@@ -634,6 +634,32 @@ export const pinAllDirectoryVideos = createServerFn({ method: "POST" })
     }
     await sb.from("admin_audit_log").insert({ admin_user_id: context.userId, action: "directory_videos_pin", target: `pinned ${pinned}, missing ${missing}, failed ${failed}` });
     return { pinned, missing, failed };
+  });
+
+/** Admin: feature (or unfeature) a live Directory reel on the Gravity Pants Showcase and Examples pages. */
+export const setReelFeatured = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ reelId: z.string().uuid(), featured: z.boolean() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const { featurePatch } = await import("@/lib/site/featured-reels");
+    const { data: isAdmin } = await (context.supabase as any).rpc("is_platform_admin");
+    if (!isAdmin) { const { notFound } = await import("@tanstack/react-router"); throw notFound(); }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const sb = supabaseAdmin as any;
+    const { data: reel } = await sb.from("directory_reels").select("id, status").eq("id", data.reelId).maybeSingle();
+    let maxOrder = 0;
+    if (data.featured) {
+      const [{ data: s }, { data: d }] = await Promise.all([
+        sb.from("site_reels").select("sort_order").order("sort_order", { ascending: false }).limit(1).maybeSingle(),
+        sb.from("directory_reels").select("showcase_order").not("showcase_order", "is", null).order("showcase_order", { ascending: false }).limit(1).maybeSingle(),
+      ]);
+      maxOrder = Math.max(Number(s?.sort_order ?? 0), Number(d?.showcase_order ?? 0));
+    }
+    const patch = featurePatch({ isAdmin: true, featured: data.featured, status: reel?.status ?? null, maxOrder, adminId: context.userId, now: new Date().toISOString() });
+    const { error } = await sb.from("directory_reels").update(patch).eq("id", data.reelId);
+    if (error) throw new Error(error.message);
+    await sb.from("admin_audit_log").insert({ admin_user_id: context.userId, action: data.featured ? "directory_reel.feature" : "directory_reel.unfeature", target: data.reelId });
+    return { ok: true };
   });
 
 /** Admin: delete a Directory reel for good (the client's ad itself is untouched). */

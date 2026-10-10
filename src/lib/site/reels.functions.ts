@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { REEL_PREFIX, type SiteReel } from "./reels";
+import { directoryToSiteReel, mergeShowcase } from "./featured-reels";
 
 /** Public: published brand reels in order, with uploaded files turned into viewable links. */
 export const listSiteReels = createServerFn({ method: "GET" }).handler(async (): Promise<SiteReel[]> => {
@@ -8,7 +9,7 @@ export const listSiteReels = createServerFn({ method: "GET" }).handler(async ():
   const db = publicClient();
   const { data, error } = await db
     .from("site_reels")
-    .select("id, brand, brand_id, title, display_title, description, href, category, format, seconds, photos, video_url, video_webm_url, poster_url")
+    .select("id, brand, brand_id, sort_order, created_at, title, display_title, description, href, category, format, seconds, photos, video_url, video_webm_url, poster_url")
     .eq("published", true)
     .order("sort_order")
     .order("created_at");
@@ -33,8 +34,8 @@ export const listSiteReels = createServerFn({ method: "GET" }).handler(async ():
   } catch {
     // Directory is optional; fall back to the slugified brand name.
   }
-  return data
-    .map((r) => ({
+  const studio = data
+    .map((r) => ({ order: Number(r.sort_order), created: r.created_at as string, reel: {
       id: r.id,
       brand: r.brand,
       brandSlug: (r.brand_id ? byId.get(r.brand_id) : undefined) ?? slugs.get(r.brand.toLowerCase()) ?? null,
@@ -49,9 +50,46 @@ export const listSiteReels = createServerFn({ method: "GET" }).handler(async ():
       video: resolve(r.video_url) ?? "",
       videoWebm: resolve(r.video_webm_url),
       poster: resolve(r.poster_url),
-    }))
-    .filter((r) => r.video);
+      source: "studio" as const,
+    } as SiteReel }))
+    .filter((x) => x.reel.video);
+  const client = await featuredDirectoryReels().catch((e) => { console.error("featured directory reels failed", e); return []; });
+  return mergeShowcase(studio, client);
 });
+
+/** Live Directory reels staff featured on Showcase/Examples, limited to brands still visible (plan or grace). */
+async function featuredDirectoryReels() {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const sb = supabaseAdmin as any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  const { data: rows } = await sb.from("directory_reels")
+    .select("id, ad_id, brand_id, title, display_title, description, formats, video_url, poster_url, showcase_order, created_at, directory_brands(id, name, slug, category, website_url)")
+    .eq("in_showcase", true).eq("status", "live");
+  if (!rows?.length) return [];
+  const visible = new Set<string>();
+  for (const id of [...new Set<string>(rows.map((r: any) => r.brand_id))]) { // eslint-disable-line @typescript-eslint/no-explicit-any
+    const { data: ok } = await sb.rpc("brand_visible", { _brand: id });
+    if (ok) visible.add(id);
+  }
+  const keep = rows.filter((r: any) => visible.has(r.brand_id) && r.video_url && r.directory_brands); // eslint-disable-line @typescript-eslint/no-explicit-any
+  if (!keep.length) return [];
+  const adIds = keep.map((r: any) => r.ad_id); // eslint-disable-line @typescript-eslint/no-explicit-any
+  const { data: frames } = await sb.from("frames").select("project_id, duration_sec").in("project_id", adIds);
+  const len = new Map<string, { sec: number; n: number }>();
+  for (const f of frames ?? []) { const v = len.get(f.project_id) ?? { sec: 0, n: 0 }; v.sec += Number(f.duration_sec); v.n += 1; len.set(f.project_id, v); }
+  const P = "media:";
+  const paths = keep.flatMap((r: any) => [r.video_url, r.poster_url]).filter((p: string | null) => p?.startsWith(P)).map((p: string) => p.slice(P.length)); // eslint-disable-line @typescript-eslint/no-explicit-any
+  const signed = new Map<string, string>();
+  if (paths.length) {
+    const { data: s } = await sb.storage.from("media").createSignedUrls(paths, 60 * 60 * 24);
+    for (const x of s ?? []) if (x.path && x.signedUrl) signed.set(x.path, x.signedUrl);
+  }
+  const res = (u: string | null) => (u?.startsWith(P) ? signed.get(u.slice(P.length)) ?? null : u);
+  return keep.flatMap((r: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+    const l = len.get(r.ad_id) ?? { sec: 0, n: 0 };
+    const reel = directoryToSiteReel({ ...r, brand: r.directory_brands, video: res(r.video_url), poster: res(r.poster_url), seconds: Math.round(l.sec * 10) / 10, photos: l.n });
+    return reel ? [{ reel, order: Number(r.showcase_order ?? 0), created: r.created_at as string }] : [];
+  });
+}
 
 const requestSchema = z.object({
   name: z.string().trim().min(1, "Please add your name.").max(200),
