@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { ArrowDown, ArrowUp, Upload } from "lucide-react";
+import { ArrowDown, ArrowUp, ChevronDown, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { deleteSiteReel, listAdminReels, moveSiteReel, saveSiteReel, type AdminReel } from "@/lib/stillframe/admin-reels.functions";
 import { listDirectoryBrands } from "@/lib/directory/directory.functions";
 import { FORMAT_LABEL, type ReelFormat } from "@/lib/site/reels";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/admin/reels")({
   head: () => ({ meta: [
@@ -233,6 +234,40 @@ function ReelForm({ initial, onDone, onCancel, videoSrc }: { videoSrc?: string |
   );
 }
 
+const ADD_OPEN_KEY = "gravity-pants:admin-reels-add-open";
+
+/** The add-reel form tucked behind its heading, so the reel list stays near the top. */
+function AddReelCard({ onDone }: { onDone: () => void }) {
+  const [open, setOpen] = useState(false);
+  const [seen, setSeen] = useState(false);
+  useEffect(() => {
+    let was = false;
+    try { was = localStorage.getItem(ADD_OPEN_KEY) === "1"; } catch { /* ignore */ }
+    setOpen(was); setSeen(true);
+  }, []);
+  useEffect(() => {
+    if (!seen) return;
+    try { localStorage.setItem(ADD_OPEN_KEY, open ? "1" : "0"); } catch { /* ignore */ }
+  }, [open, seen]);
+  return (
+    <section className="mb-6 rounded-sm bg-card shadow-card">
+      <h2>
+        <button type="button" aria-expanded={open} aria-controls="add-reel-panel" onClick={() => setOpen((v) => !v)}
+          className="flex w-full items-center gap-3 px-4 py-3.5 text-left sm:px-5">
+          <span className="min-w-0 flex-1">
+            <span className="block text-[17px] font-semibold">Add a reel</span>
+            <span className="block text-[13px] text-secondary-text">{open ? "Upload a reel file and fill in its details." : "Tap to open the form."}</span>
+          </span>
+          <ChevronDown className={cn("size-4 shrink-0 text-secondary-text transition-transform duration-200", open && "rotate-180")} strokeWidth={1.7} />
+        </button>
+      </h2>
+      <div id="add-reel-panel" hidden={!open} className="hairline-t px-4 pb-4 pt-4 sm:px-5">
+        <ReelForm initial={empty} onDone={onDone} />
+      </div>
+    </section>
+  );
+}
+
 function Reels() {
   const list = useServerFn(listAdminReels);
   const del = useServerFn(deleteSiteReel);
@@ -261,7 +296,7 @@ function Reels() {
   return (
     <>
       <PageTitle title="Website Reels" sub="These reels show on the home page, Examples and Showcase, in this order." />
-      <Card className="mb-6"><h2 className="mb-3 text-[17px] font-semibold">Add a reel</h2><ReelForm initial={empty} onDone={() => void refetch()} /></Card>
+      <AddReelCard onDone={() => void refetch()} />
       <Card className="p-0">
         <ul className="divide-y divide-border">
           {reels.map((r, i) => (
