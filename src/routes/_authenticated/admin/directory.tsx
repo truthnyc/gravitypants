@@ -180,8 +180,7 @@ function ReviewCard({ r, act }: { r: Row; act: (a: Act, msg: string) => Promise<
         <div className="text-secondary-text">{r.website ? <a href={r.website} target="_blank" rel="noreferrer" className="text-link">{r.website}</a> : "No website"}{r.description ? ` · ${r.description}` : ""}</div>
         <div className="flex flex-wrap gap-2">
           <select value={category} onChange={(e) => setCategory(e.target.value as Category)} className="h-8 rounded-sm bg-control-fill px-2 text-[13px]">{CATEGORIES.map((c) => <option key={c}>{c}</option>)}</select>
-          <AimanteTitleField reelId={r.id} kind="directory" initial={r.displayTitle} onSaved={onChanged} />
-        <input value={tags} onChange={(e) => setTags(e.target.value)} aria-label="Tags" placeholder="Tags, comma separated" className="h-8 min-w-[220px] flex-1 rounded-sm bg-control-fill px-2 text-[13px]" />
+          <input value={tags} onChange={(e) => setTags(e.target.value)} aria-label="Tags" placeholder="Tags, comma separated" className="h-8 min-w-[220px] flex-1 rounded-sm bg-control-fill px-2 text-[13px]" />
         </div>
         <div className="flex flex-wrap gap-1">
           {[...new Set([...forCategory(category), ...moods])].map((m) => {
@@ -330,6 +329,7 @@ function AdminReel({ r, brandId, onChanged }: { r: Detail["reels"][number]; bran
           <span className="text-secondary-text">{STATUS_LABEL[r.status]}{r.note ? ` · ${r.note}` : ""}</span>
           <span className="text-secondary-text">Ad: {r.ad}{r.formats.length ? ` · ${r.formats.join(", ")}` : ""}</span>
         </div>
+        <AimanteTitleField reelId={r.id} kind="directory" initial={r.displayTitle} onSaved={onChanged} />
         <input value={tags} onChange={(e) => setTags(e.target.value)} aria-label="Tags" placeholder="Tags, comma separated" className={field} />
         <div className="flex flex-wrap gap-1">
           {moodCatalog.all.map((m) => {
