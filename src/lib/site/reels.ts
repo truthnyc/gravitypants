@@ -24,6 +24,8 @@ export type SiteReel = {
   video: string;
   videoWebm: string | null;
   poster: string | null;
+  /** "studio" = admin-uploaded site reel; "client" = featured Directory reel. Missing means studio. */
+  source?: "studio" | "client";
 };
 
 /** Files uploaded from the admin form are stored as `site-reels:<path>`. */
