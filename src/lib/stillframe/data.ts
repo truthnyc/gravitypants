@@ -578,7 +578,7 @@ export function effectiveKit(settings: BrandKit, named: NamedBrandKit | null | u
 
 /* ---------------- Templates (no photos; private or shared with the team) */
 
-export type TemplateFrame = Pick<Frame, "duration_sec" | "transition_in" | "headline" | "subline" | "logo_visible" | "logo_variant"> & {
+export type TemplateFrame = Pick<Frame, "duration_sec" | "transition_in" | "headline" | "subline" | "logo_visible" | "logo_variant" | "format_overrides"> & {
   photo: Frame["photo"];
 };
 export type TemplateSettings = Pick<Project, "formats" | "primary_format" | "pace" | "logo" | "end_card"> & {

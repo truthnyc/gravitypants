@@ -14,7 +14,7 @@ export function frameForFormat(frame: Frame, format: Format): Frame {
   };
   const visualPhoto = Object.fromEntries(Object.entries(own.photo ?? {}).filter(([k]) => !MOTION_KEYS.has(k)));
   return { ...base, photo: { ...base.photo, ...visualPhoto }, headline: text("headline"), subline: text("subline"),
-    logo_visible: own.logo_visible ?? base.logo_visible, logo_variant: own.logo_variant ?? base.logo_variant };
+    logo_visible: own.logo_visible ?? base.logo_visible, logo_variant: own.logo_variant ?? base.logo_variant ?? null };
 }
 
 export function projectForFormat(project: Project, format: Format): Project {

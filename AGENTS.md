@@ -12,8 +12,8 @@
 ## Stillframe architecture rules
 
 - Project/frame data uses `data.ts` autosave; strip popovers reuse Inspector panels and editor undo actions to avoid parallel logic.
-- Domain types and shared constants (workspace id, formats, defaults) live in `src/lib/stillframe/types.ts`.
-- Private media URLs use `getMediaUrl()` in `src/lib/stillframe/media.ts`.
+- Types/constants live in `types.ts`; `format-settings.ts` resolves size visuals and shared motion for preview/export parity.
+- Private media URLs use `getMediaUrl()` in `media.ts`.
 - Colors use semantic tokens in `src/styles.css`, never raw component colors.
 - Share `ReelPopup`, `HoverReelPreview` and `ConceptReelNotice` for consistent reel UI.
 - Preview/export share `renderAt()` in `src/render/renderFrame.ts` to match.

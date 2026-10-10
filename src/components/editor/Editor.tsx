@@ -116,6 +116,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
   }, [sameKey, sameLength, sameTransition]);
   const replaceRef = useRef<HTMLInputElement>(null);
   const replaceAt = useRef(0);
+  const replaceFormat = useRef<Format>(format);
   const { data: settings } = useBrandKit();
   const { data: kits } = useBrandKits();
   const templateName = useTemplateName(initial.project.template_id);
@@ -302,7 +303,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
         ...d,
         frames: d.frames.map((f, j) => {
           if (j === idx) {
-            const next = patchTextForFormat(f, format, el, { ...current, animation: patch.animation ?? f[el]?.animation ?? base.animation });
+            const next = patchTextForFormat(f, format, el, { ...current, animation: patch.animation ?? f[el]?.animation ?? base.animation ?? "none" });
             return autoDarken ? patchPhotoForFormat(next, format, { darken_for_text: true }) : next;
           }
           if (shareStyle) {
