@@ -443,7 +443,7 @@ export const listDirectoryReview = createServerFn({ method: "POST" })
   .handler(async ({ context }) => {
     const sb = context.supabase as any;
     await assertAdmin(sb);
-    const { data } = await sb.from("directory_reels").select("id, ad_id, brand_id, status, tags, moods, poster_url, updated_at, review_note, hidden_reason, title, description, directory_brands(name, slug, website_url, category, description, first_approved_at), projects(name)").order("updated_at", { ascending: false }).limit(300);
+    const { data } = await sb.from("directory_reels").select("id, ad_id, brand_id, status, tags, moods, poster_url, updated_at, in_showcase, showcase_order, review_note, hidden_reason, title, description, directory_brands(name, slug, website_url, category, description, first_approved_at), projects(name)").order("updated_at", { ascending: false }).limit(300);
     const rows = await signPosters(data ?? []);
     const ids = rows.map((r: any) => r.id);
     const { data: logs } = ids.length ? await sb.from("permission_log").select("directory_reel_id, full_name, job_title, email, created_at, wording_version, action").in("directory_reel_id", ids).order("created_at", { ascending: false }) : { data: [] };
@@ -455,7 +455,7 @@ export const listDirectoryReview = createServerFn({ method: "POST" })
         id: r.id as string, adId: r.ad_id as string, brand_id: r.brand_id as string, status: r.status as DirStatus, tags: r.tags as string[], moods: r.moods as string[], poster: r.poster as string | null,
         updated: r.updated_at as string, note: r.review_note as string | null, brand: r.directory_brands?.name as string, slug: r.directory_brands?.slug as string,
         website: r.directory_brands?.website_url as string | null, category: r.directory_brands?.category as string, description: r.directory_brands?.description as string | null,
-        approved: !!r.directory_brands?.first_approved_at, ad: (r.title as string | null) ?? (r.projects?.name as string) ?? "Untitled",
+        approved: !!r.directory_brands?.first_approved_at, inShowcase: !!r.in_showcase, showcaseOrder: (r.showcase_order ?? null) as number | null, ad: (r.title as string | null) ?? (r.projects?.name as string) ?? "Untitled",
         permission: (last.get(r.id) ?? null) as null | { full_name: string; job_title: string | null; email: string; created_at: string; wording_version: string; action: string },
       })),
       reports: ((reports ?? []) as any[]).map((x) => ({ id: x.id as string, reelId: x.directory_reel_id as string, reason: x.reason as string, email: x.reporter_email as string | null, created: x.created_at as string })),
@@ -555,13 +555,13 @@ export const adminBrandDetail = createServerFn({ method: "POST" })
     await assertAdmin(sb);
     const { data: b, error } = await sb.from("directory_brands").select("id, name, slug, website_url, category, description, logo_url, moods, first_approved_at, plan_ended_at, created_at, affiliated, status").eq("id", data.brandId).single();
     if (error) throw new Error(error.message);
-    const { data: reels } = await sb.from("directory_reels").select("id, ad_id, title, display_title, description, status, tags, moods, formats, poster_url, published_at, review_note, hidden_reason, projects(name)").eq("brand_id", b.id).order("created_at", { ascending: false });
+    const { data: reels } = await sb.from("directory_reels").select("id, ad_id, title, display_title, description, status, tags, moods, formats, poster_url, published_at, review_note, hidden_reason, in_showcase, showcase_order, projects(name)").eq("brand_id", b.id).order("created_at", { ascending: false });
     const { data: siteRows } = await sb.from("site_reels").select("id, title, display_title, published").eq("brand_id", b.id).order("sort_order");
     const signed = await signPosters((reels ?? []) as any[]);
     return {
       brand: { id: b.id as string, name: b.name as string, slug: b.slug as string, website: (b.website_url ?? "") as string, category: b.category as string, description: (b.description ?? "") as string, moods: (b.moods ?? []) as string[], logo: await signLogo(b.logo_url), approved: b.first_approved_at as string | null, planEnded: b.plan_ended_at as string | null, affiliated: !!b.affiliated, status: b.status as "draft" | "live" },
       siteReels: ((siteRows ?? []) as any[]).map((r) => ({ id: r.id as string, title: r.title as string, displayTitle: (r.display_title ?? "") as string, published: !!r.published })),
-      reels: signed.map((r: any) => ({ id: r.id as string, title: (r.title ?? r.projects?.name ?? "Untitled") as string, displayTitle: (r.display_title ?? "") as string, description: (r.description ?? "") as string, ad: (r.projects?.name ?? "Removed ad") as string, status: r.status as DirStatus, tags: (r.tags ?? []) as string[], moods: (r.moods ?? []) as string[], formats: (r.formats ?? []) as string[], poster: r.poster as string | null, published: r.published_at as string | null, note: (r.review_note ?? r.hidden_reason ?? null) as string | null })),
+      reels: signed.map((r: any) => ({ id: r.id as string, title: (r.title ?? r.projects?.name ?? "Untitled") as string, displayTitle: (r.display_title ?? "") as string, description: (r.description ?? "") as string, ad: (r.projects?.name ?? "Removed ad") as string, status: r.status as DirStatus, tags: (r.tags ?? []) as string[], moods: (r.moods ?? []) as string[], formats: (r.formats ?? []) as string[], poster: r.poster as string | null, published: r.published_at as string | null, note: (r.review_note ?? r.hidden_reason ?? null) as string | null, inShowcase: !!r.in_showcase, showcaseOrder: (r.showcase_order ?? null) as number | null })),
     };
   });
 

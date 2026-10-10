@@ -110,3 +110,52 @@ export const moveSiteReel = createServerFn({ method: "POST" })
     await log(db, context.userId, "site_reel.reorder", `${data.ids.length} reels`);
     return { ok: true };
   });
+
+export type FeaturedClientReel = { id: string; brand: string; title: string; order: number; created: string; posterView: string | null; formats: string[] };
+
+/** Admin: Directory reels currently featured on Showcase/Examples, in public order. */
+export const listFeaturedClientReels = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<FeaturedClientReel[]> => {
+    const db = await adminDb(context);
+    const { data } = await db.from("directory_reels")
+      .select("id, title, display_title, poster_url, formats, showcase_order, created_at, directory_brands(name)")
+      .eq("in_showcase", true).eq("status", "live").order("showcase_order").order("created_at");
+    const rows = (data ?? []) as any[];
+    const paths = rows.map((r) => r.poster_url).filter((u: string | null) => u?.startsWith("media:")).map((u: string) => u.slice(6));
+    const signed = new Map<string, string>();
+    if (paths.length) {
+      const { data: s } = await db.storage.from("media").createSignedUrls(paths, 3600);
+      for (const x of s ?? []) if (x.path && x.signedUrl) signed.set(x.path, x.signedUrl);
+    }
+    return rows.map((r) => ({
+      id: r.id, brand: r.directory_brands?.name ?? "", title: (r.display_title || r.title || r.directory_brands?.name || "Untitled") as string,
+      order: Number(r.showcase_order ?? 0), created: r.created_at, formats: r.formats ?? [],
+      posterView: r.poster_url?.startsWith("media:") ? signed.get(r.poster_url.slice(6)) ?? null : r.poster_url,
+    }));
+  });
+
+/** Admin: save one merged Showcase order; studio reels get sort_order, Directory reels showcase_order, both in 10-steps. */
+export const saveShowcaseOrder = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ items: z.array(z.object({ kind: z.enum(["site", "directory"]), id: z.string().uuid() })).max(300) }).parse(d))
+  .handler(async ({ data, context }) => {
+    const db = await adminDb(context);
+    await Promise.all(data.items.map((it, i) => it.kind === "site"
+      ? db.from("site_reels").update({ sort_order: (i + 1) * 10 }).eq("id", it.id)
+      : db.from("directory_reels").update({ showcase_order: (i + 1) * 10 }).eq("id", it.id).eq("in_showcase", true)));
+    await log(db, context.userId, "site_reel.reorder", `${data.items.length} reels (with Directory)`);
+    return { ok: true };
+  });
+
+/** Admin: publish or unpublish one website reel. */
+export const setSiteReelPublished = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid(), published: z.boolean() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const db = await adminDb(context);
+    const { error } = await db.from("site_reels").update({ published: data.published }).eq("id", data.id);
+    if (error) throw new Error(error.message);
+    await log(db, context.userId, data.published ? "site_reel.publish" : "site_reel.unpublish", data.id);
+    return { ok: true };
+  });
