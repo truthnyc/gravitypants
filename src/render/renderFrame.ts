@@ -544,6 +544,7 @@ export function renderAt(
   timeSec: number,
   { width: W, height: H, showGuides, images, brand, watermark }: RenderOptions,
 ) {
+  project = projectForFormat(project, format);
   ctx.save();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.globalAlpha = 1;

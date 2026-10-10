@@ -269,7 +269,12 @@ async function insertCopy(source: ProjectWithFrames, name: string, photos?: Uplo
       subline: frame.subline,
       logo_visible: frame.logo_visible,
       logo_variant: frame.logo_variant ?? null,
-      format_overrides: frame.format_overrides ?? {},
+      format_overrides: replacement
+        ? Object.fromEntries(Object.entries(frame.format_overrides ?? {}).map(([format, own]) => {
+            const { asset_id: _id, path: _path, url: _url, name: _name, ...photo } = own.photo ?? {};
+            return [format, { ...own, photo }];
+          }))
+        : frame.format_overrides ?? {},
     };
   });
 
