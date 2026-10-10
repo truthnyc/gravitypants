@@ -33,6 +33,7 @@ import { cn } from "@/lib/utils";
 import { changeFrameLength } from "./frame-timing";
 import { frameStarts, transitionDuration } from "@/render/renderFrame";
 import { checkFit, type FitIssue } from "./fit-check";
+import { frameForFormat, projectForFormat, patchPhotoForFormat, patchTextForFormat, patchLogoForFormat, patchFrameVisual } from "@/lib/stillframe/format-settings";
 
 const NEW_HEADLINE: TextSettings = {
   text: "",
@@ -161,13 +162,15 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
 
   const frames = doc.frames;
   const idx = Math.min(frameIndex, Math.max(0, frames.length - 1));
-  const frame = frames[idx];
+  const sourceFrame = frames[idx];
+  const frame = sourceFrame ? frameForFormat(sourceFrame, format) : undefined;
+  const displayDoc = useMemo(() => ({ project: projectForFormat(doc.project, format), frames: doc.frames.map((f) => frameForFormat(f, format)) }), [doc, format]);
   // Font picker hover shows the font on the preview without touching the saved ad.
   const stageDoc = useMemo(() => {
     if (!fontPreview || !frame?.[fontPreview.el]) return doc;
     const patch = { font_family: fontPreview.family, font_weight: fontPreview.weight };
-    return { ...doc, frames: doc.frames.map((f, j) => (j === idx ? { ...f, [fontPreview.el]: { ...f[fontPreview.el], ...patch } } : f)) };
-  }, [doc, fontPreview, idx, frame]);
+    return { ...doc, frames: doc.frames.map((f, j) => (j === idx ? patchTextForFormat(f, format, fontPreview.el, patch) : f)) };
+  }, [doc, fontPreview, idx, frame, format]);
 
   // Older ads with a single logo: file it as the light or dark version by its brightness.
   const migratedLogo = useRef(false);
@@ -286,30 +289,40 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
   const updateText = (el: "headline" | "subline", patch: Partial<TextSettings>, key?: string) => {
     const base = el === "headline" ? NEW_HEADLINE : NEW_SUBLINE;
     apply((d) => {
-      const current = { ...base, ...(d.frames[idx]?.[el] ?? {}), ...patch };
+      const target = d.frames[idx];
+      if (!target) return d;
+      const effective = frameForFormat(target, format);
+      const current = { ...base, ...(effective[el] ?? {}), ...patch };
       const shareStyle = current.same_on_all;
       const style = Object.fromEntries(STYLE_KEYS.map((k) => [k, current[k]]));
-      const was = d.frames[idx];
+      const was = effective;
       const hadWords = Boolean(was?.headline?.text?.trim() || was?.subline?.text?.trim());
       const autoDarken = !hadWords && Boolean(patch.text?.trim()) && !was?.photo?.darken_set;
       return {
         ...d,
         frames: d.frames.map((f, j) => {
-          if (j === idx) return { ...f, [el]: current, ...(autoDarken ? { photo: { ...f.photo, darken_for_text: true } } : {}) };
-          if (shareStyle) return { ...f, [el]: { ...base, ...(f[el] ?? {}), ...style, same_on_all: true } };
+          if (j === idx) {
+            const next = patchTextForFormat(f, format, el, { ...current, animation: patch.animation ?? f[el]?.animation ?? base.animation });
+            return autoDarken ? patchPhotoForFormat(next, format, { darken_for_text: true }) : next;
+          }
+          if (shareStyle) {
+            // Visual style shares within this size; only an explicit animation edit crosses sizes.
+            const { animation: _animation, ...visualStyle } = style;
+            return patchTextForFormat(f, format, el, { ...visualStyle, same_on_all: true, ...(patch.animation !== undefined ? { animation: patch.animation } : {}) });
+          }
           return f;
         }),
       };
-    }, key);
+    }, key ? `${key}:${format}` : undefined);
   };
   const updateHeadline = (patch: Partial<TextSettings>, key?: string) => updateText("headline", patch, key);
   const updateLogo = (patch: Partial<LogoSettings>, key?: string) =>
-    apply((d) => ({ ...d, project: { ...d.project, logo: { ...d.project.logo, ...patch } } }), key);
+    apply((d) => ({ ...d, project: patchLogoForFormat(d.project, format, patch) }), key ? `${key}:${format}` : undefined);
   const updatePhoto = (patch: Partial<PhotoSettings>, key?: string) =>
-    updateFrame(idx, (f) => ({ ...f, photo: { ...f.photo, ...patch } }), key);
+    updateFrame(idx, (f) => patchPhotoForFormat(f, format, patch), key ? `${key}:${format}` : undefined);
 
   const sizeOf = (el: "headline" | "subline" | "logo") =>
-    el === "logo" ? (doc.project.logo.size_pct ?? 16) : (frame?.[el]?.size_px ?? (el === "headline" ? 108 : 48));
+    el === "logo" ? (displayDoc.project.logo.size_pct ?? 16) : (frame?.[el]?.size_px ?? (el === "headline" ? 108 : 48));
   const resizeEl = (el: "headline" | "subline" | "logo", v: number, key?: string) => {
     if (el === "logo") return updateLogo({ size_pct: Math.round(Math.min(100, Math.max(5, v))) }, key);
     updateText(el, { size_px: Math.round(Math.min(240, Math.max(24, v))) }, key);
@@ -323,7 +336,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
   const moveElement = (el: "headline" | "subline" | "logo", anchor: Anchor) => {
     if (el === "headline") return updateHeadline({ position: anchor });
     if (el === "subline")
-      return updateFrame(idx, (f) => ({ ...f, subline: { ...(f.subline ?? {}), position: anchor, keep_under_headline: false } }));
+      return updateText("subline", { position: anchor, keep_under_headline: false });
     apply((d) => ({
       ...d,
       project: {
@@ -399,7 +412,8 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
   };
 
   const copyStyle = (at: number) => {
-    const f = frames[at];
+    const source = frames[at];
+    const f = source ? frameForFormat(source, format) : undefined;
     if (!f) return;
     const p = f.photo ?? {};
     const photo = Object.fromEntries(
@@ -430,26 +444,24 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
   };
   const pasteStyle = (at: number) => {
     if (!styleClip) return;
-    updateFrame(at, (f) => ({
-      ...f,
-      transition_in: at === 0 ? f.transition_in : styleClip.transition_in,
-      photo: { ...f.photo, ...styleClip.photo },
-      headline: styleClip.headline && f.headline ? { ...f.headline, ...styleClip.headline } : f.headline,
-      subline: styleClip.subline && f.subline ? { ...f.subline, ...styleClip.subline } : f.subline,
-    }));
+    updateFrame(at, (f) => {
+      let next = patchPhotoForFormat({ ...f, transition_in: at === 0 ? f.transition_in : styleClip.transition_in }, format, styleClip.photo);
+      const effective = frameForFormat(f, format);
+      if (styleClip.headline && effective.headline) next = patchTextForFormat(next, format, "headline", styleClip.headline);
+      if (styleClip.subline && effective.subline) next = patchTextForFormat(next, format, "subline", styleClip.subline);
+      return next;
+    });
   };
   const replacePhoto = (at: number) => {
     replaceAt.current = at;
+    replaceFormat.current = format;
     replaceRef.current?.click();
   };
   const onReplaceFile = async (file: File) => {
     setUploading(true);
     try {
       const up = await uploadMedia(file, "photo");
-      updateFrame(replaceAt.current, (f) => ({
-        ...f,
-        photo: { ...f.photo, asset_id: up.assetId, path: up.path, url: up.path, focus: { x: 0.5, y: 0.5 }, zoom: 1 },
-      }));
+      updateFrame(replaceAt.current, (f) => patchPhotoForFormat(f, replaceFormat.current, { asset_id: up.assetId, path: up.path, url: up.path, name: file.name, focus: { x: 0.5, y: 0.5 }, zoom: 1 }));
     } catch {
       toast.error("That photo couldn't be added. Try again.");
     } finally {
@@ -465,8 +477,8 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
       if (prep.warning) toast.warning(prep.warning);
       const up = await uploadMedia(prep.file, "logo");
       updateLogo(variant === "light"
-        ? { path: doc.project.logo.path ?? up.path, light_path: up.path }
-        : { path: doc.project.logo.path ?? up.path, dark_path: up.path });
+        ? { path: displayDoc.project.logo.path ?? up.path, light_path: up.path }
+        : { path: displayDoc.project.logo.path ?? up.path, dark_path: up.path });
       toast(wanted === "auto" ? `Added as your ${variant === "light" ? "Light logo (for dark photos)" : "Dark logo (for light photos)"}` : `${variant === "light" ? "Light" : "Dark"} logo added`);
     } catch {
       toast.error("That logo couldn't be uploaded. Try again.");
@@ -474,7 +486,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
   };
 
   const makeLogo = async (variant: "light" | "dark") => {
-    const lg = doc.project.logo;
+    const lg = displayDoc.project.logo;
     const srcPath = variant === "light" ? (lg.dark_path ?? lg.path) : (lg.light_path ?? lg.path);
     if (!srcPath) return;
     try {
@@ -553,13 +565,13 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
     onPhoto: updatePhoto,
     onText: updateText,
     onLogo: updateLogo,
-    onLogoVisible: (v) => updateFrame(idx, (f) => ({ ...f, logo_visible: v })),
-    onLogoVariant: (v) => updateFrame(idx, (f) => ({ ...f, logo_variant: v })),
+    onLogoVisible: (v) => updateFrame(idx, (f) => patchFrameVisual(f, format, { logo_visible: v })),
+    onLogoVariant: (v) => updateFrame(idx, (f) => patchFrameVisual(f, format, { logo_variant: v })),
     onLogoScope: (scope) => apply((d) => ({
       ...d,
-      project: { ...d.project, logo: { ...d.project.logo, show_on: scope } },
+      project: patchLogoForFormat(d.project, format, { show_on: scope }),
       frames: scope === "selected"
-        ? d.frames.map((f, i) => ({ ...f, logo_visible: i === idx }))
+        ? d.frames.map((f, i) => patchFrameVisual(f, format, { logo_visible: i === idx }))
         : d.frames,
     })),
     onDuration: (sec, key) => {
@@ -590,7 +602,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
       if (tr) apply((d) => ({ ...d, frames: d.frames.map((f, j) => (j === 0 ? f : { ...f, transition_in: { ...tr } })) }));
     },
     onReplacePhoto: () => replacePhoto(idx),
-    onPhotoAll: (patch, key) => apply((d) => ({ ...d, frames: d.frames.map((f) => ({ ...f, photo: { ...f.photo, ...patch } })) }), key),
+    onPhotoAll: (patch, key) => apply((d) => ({ ...d, frames: d.frames.map((f) => patchPhotoForFormat(f, format, patch)) }), key ? `${key}:${format}` : undefined),
     onPlayFrame: () => playFrame(idx),
     onMakeLogo: (v) => void makeLogo(v),
     onFontPreview: setFontPreview,
@@ -637,7 +649,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
       if (e.altKey && (e.key === "ArrowUp" || e.key === "ArrowDown")) {
         if (selected === "headline" || selected === "subline") {
           e.preventDefault();
-          const cur = frames[idx]?.[selected]?.size_px ?? (selected === "headline" ? 108 : 48);
+          const cur = frame?.[selected]?.size_px ?? (selected === "headline" ? 108 : 48);
           const v = Math.min(240, Math.max(24, cur + (e.key === "ArrowUp" ? 4 : -4)));
           updateTextRef.current(selected, { size_px: v }, `${selected}-nudge`);
         }
@@ -830,7 +842,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
         <Inspector
           embedded
           hideKit
-          doc={doc}
+          doc={displayDoc}
           endSeconds={endSeconds}
           frame={frame}
           frameIndex={idx}
