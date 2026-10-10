@@ -8,6 +8,7 @@ import type { DirectoryCard } from "@/lib/directory/directory";
 import { siteHead } from "@/lib/site/seo";
 import { useQuery } from "@tanstack/react-query";
 import { listSiteReels } from "@/lib/site/reels.functions";
+import { aimanteTitle } from "@/lib/site/reels";
 import type { SiteReel } from "@/lib/site/reels";
 import { SiteReelHeart } from "@/components/site/SiteReelHeart";
 import { SiteReelModal } from "@/components/site/SiteReelModal";
@@ -40,7 +41,7 @@ export const Route = createFileRoute("/favorites/$slug")({
 
 function FavoritesPublic() {
   const { title, reels, brands, siteReelIds } = Route.useLoaderData();
-  const all = useQuery({ queryKey: ["site-reels-all"], queryFn: () => listSiteReels() }).data ?? ([] as SiteReel[]);
+  const all = useQuery({ queryKey: ["site-reels-all"], queryFn: () => listSiteReels() }).data?.map((r) => ({ ...r, title: aimanteTitle(r) })) ?? ([] as SiteReel[]);
   const siteReels = siteReelIds.map((id) => all.find((r) => r.id === id)).filter((r): r is SiteReel => !!r);
   const reelCount = reels.length + siteReels.length;
   const [open, setOpen] = useState<DirectoryCard | null>(null);

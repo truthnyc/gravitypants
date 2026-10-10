@@ -56,7 +56,7 @@ export function DirectoryGrid({ cards, q = "", onOpen }: { cards: DirectoryCard[
             <Link to="/directory/$slug" params={{ slug: c.brand_slug }} className="hover:text-ap-blue">{c.brand_name}</Link>
           </div>
           <div className="truncate text-[13px] text-ap-muted nums">
-            {c.title ?? c.template_name ?? "Custom reel"} · {c.seconds} sec
+            {c.title ?? c.brand_name} · {c.seconds} sec
           </div>
           <div className="mt-0.5 text-[12px] text-ap-badge">{matched(c, q).join(" · ")}</div><ConceptReelNotice brandName={c.brand_name} brandSlug={c.brand_slug} />
         </article>
@@ -80,7 +80,7 @@ export function CardCarousel({ cards, label, onOpen }: { cards: DirectoryCard[];
           </div>
         ),
         title: c.brand_name,
-        detail: `${c.title ?? c.template_name ?? "Custom reel"} · ${c.seconds} sec`,
+        detail: `${c.title ?? c.brand_name} · ${c.seconds} sec`,
         visit: c.website_url ? { href: c.website_url, label: `Visit ${c.brand_name}` } : undefined,
       }))}
     />
@@ -90,7 +90,7 @@ export function CardCarousel({ cards, label, onOpen }: { cards: DirectoryCard[];
 /** Shared reel detail presentation. */
 export function ReelDetail({ card, onClose }: { card: DirectoryCard | null; onClose: () => void }) {
   if (!card) return null;
-  const title = card.title ?? card.template_name ?? "Custom reel";
+  const title = card.title ?? card.brand_name;
   return <ReelPopup title={title} onClose={onClose}><ReelPopupBody
     category={card.category} title={title} brandName={card.brand_name} href={card.website_url} onVisit={() => void recordBrandClick({ data: { kind: "directory", id: card.reel_id } }).catch(() => {})}
     description={card.description} tags={[...card.moods, ...card.tags]}

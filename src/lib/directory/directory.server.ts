@@ -28,7 +28,7 @@ export async function toCards(rows: any[]): Promise<DirectoryCard[]> {
   const sb = await admin();
   const ids = rows.map((r) => r.reel_id ?? r.id);
   const { data: extra } = await sb.from("directory_reels")
-    .select("id, ad_id, template_id, poster_url, video_url, title, description, directory_brands(website_url, workspace_id)")
+    .select("id, ad_id, template_id, poster_url, video_url, title, display_title, description, directory_brands(website_url, workspace_id)")
     .in("id", ids);
   // Reels shared before videos were stored get theirs found now, once.
   for (const e of extra ?? []) {
@@ -72,8 +72,9 @@ export async function toCards(rows: any[]): Promise<DirectoryCard[]> {
       formats: r.formats ?? [],
       poster: p?.startsWith(POSTER_PREFIX) ? signed.get(p.slice(POSTER_PREFIX.length)) ?? null : p,
       video: v?.startsWith(POSTER_PREFIX) ? signed.get(v.slice(POSTER_PREFIX.length)) ?? null : v,
-      title: e?.title ?? null,
-      template_name: r.template_name ?? null,
+      // Aimanté never shows a template name: the set title, else the brand name.
+      title: (e?.display_title as string | null)?.trim() || r.brand_name,
+      template_name: null,
       template_id: e?.template_id ?? null,
       featured: !!r.featured,
       seconds: Math.round(l.sec * 10) / 10,

@@ -1,3 +1,4 @@
+import { aimanteTitle } from "@/lib/site/reels";
 import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
@@ -96,7 +97,7 @@ export const getShareContext = createServerFn({ method: "POST" })
     const { data: ad } = await sb.from("projects").select("id, workspace_id, name, template_id, formats").eq("id", data.adId).maybeSingle();
     if (!ad) throw new Error("This ad isn't available");
     const { data: b } = await sb.from("directory_brands").select("*").eq("workspace_id", ad.workspace_id).maybeSingle();
-    const { data: reel } = b ? await sb.from("directory_reels").select("id, status, tags, moods, title, description").eq("ad_id", ad.id).maybeSingle() : { data: null };
+    const { data: reel } = b ? await sb.from("directory_reels").select("id, status, tags, moods, title, display_title, description").eq("ad_id", ad.id).maybeSingle() : { data: null };
     const { data: last } = b && !reel ? await sb.from("directory_reels").select("tags, moods").eq("brand_id", b.id).order("updated_at", { ascending: false }).limit(1).maybeSingle() : { data: null };
     const { data: kit } = await sb.from("brand_kits").select("name").eq("workspace_id", ad.workspace_id).order("is_default", { ascending: false }).limit(1).maybeSingle();
     const { data: ws } = await sb.from("workspaces").select("name").eq("id", ad.workspace_id).maybeSingle();
@@ -109,7 +110,7 @@ export const getShareContext = createServerFn({ method: "POST" })
       : { id: null, name: fallbackName, website_url: "", category: "Other", description: "", slug: toSlug(fallbackName || "brand"), first_approved_at: null };
     return {
       brand,
-      reel: reel ? { id: reel.id as string, status: reel.status as DirStatus, tags: reel.tags as string[], moods: reel.moods as string[], title: (reel.title as string | null) ?? null, description: (reel.description as string | null) ?? "" } : null,
+      reel: reel ? { id: reel.id as string, status: reel.status as DirStatus, tags: reel.tags as string[], moods: reel.moods as string[], title: (reel.title as string | null) ?? null, displayTitle: (reel.display_title as string | null) ?? "", description: (reel.description as string | null) ?? "" } : null,
       prefill: { tags: (reel?.tags ?? last?.tags ?? []) as string[], moods: (reel?.moods ?? last?.moods ?? []) as string[] },
       plan,
       email: (context.claims as any)?.email ?? "",
@@ -143,6 +144,7 @@ const shareSchema = z.object({
   jobTitle: z.string().trim().max(120),
   agreed: z.boolean(),
   posterPath: z.string().max(400).nullable(),
+  displayTitle: z.string().trim().max(60).optional(),
 });
 
 /** Saves the brand and the reel's listing; when shown, records the permission in the same request. */
@@ -189,6 +191,7 @@ export const shareReel = createServerFn({ method: "POST" })
     const row = {
       ad_id: ad.id, brand_id: brand.id, status, tags, moods: await cleanMoods(sb, data.moods), template_id: ad.template_id, formats: (ad.formats as string[]).map((f) => f.replace(":", "x")),
       description: data.description || null,
+      ...(data.displayTitle !== undefined ? { display_title: data.displayTitle || null } : {}),
       ...(prev?.title ? {} : { title: ad.name as string }),
       ...(data.posterPath ? { poster_url: `${POSTER_PREFIX}${data.posterPath}` } : {}),
       ...(videoUrl ? { video_url: videoUrl } : {}),
@@ -387,7 +390,7 @@ export const getBrandPage = createServerFn({ method: "GET" })
     const { data: reels } = await pc.from("directory_reels").select("id, tags, moods, formats, published_at, templates(name)").eq("brand_id", b.id).eq("status", "live").order("published_at", { ascending: false });
     const { listSiteReels } = await import("@/lib/site/reels.functions");
     const allSiteReels = await listSiteReels();
-    const siteReels = allSiteReels.filter((r) => r.brandSlug === b.slug);
+    const siteReels = allSiteReels.filter((r) => r.brandSlug === b.slug).map((r) => ({ ...r, title: aimanteTitle(r) }));
     const { data: featured } = await pc.rpc("is_featured_brand", { _brand: b.id });
     const cards = await toCards((reels ?? []).map((r: any) => ({ id: r.id, brand_name: b.name, brand_slug: b.slug, category: b.category, tags: r.tags, moods: r.moods, formats: r.formats, template_name: r.templates?.name ?? null, featured })));
     const { data: similar } = await pc.rpc("search_directory", { q: "", size: null });
@@ -552,11 +555,13 @@ export const adminBrandDetail = createServerFn({ method: "POST" })
     await assertAdmin(sb);
     const { data: b, error } = await sb.from("directory_brands").select("id, name, slug, website_url, category, description, logo_url, moods, first_approved_at, plan_ended_at, created_at, affiliated, status").eq("id", data.brandId).single();
     if (error) throw new Error(error.message);
-    const { data: reels } = await sb.from("directory_reels").select("id, ad_id, title, description, status, tags, moods, formats, poster_url, published_at, review_note, hidden_reason, projects(name)").eq("brand_id", b.id).order("created_at", { ascending: false });
+    const { data: reels } = await sb.from("directory_reels").select("id, ad_id, title, display_title, description, status, tags, moods, formats, poster_url, published_at, review_note, hidden_reason, projects(name)").eq("brand_id", b.id).order("created_at", { ascending: false });
+    const { data: siteRows } = await sb.from("site_reels").select("id, title, display_title, published").eq("brand_id", b.id).order("sort_order");
     const signed = await signPosters((reels ?? []) as any[]);
     return {
       brand: { id: b.id as string, name: b.name as string, slug: b.slug as string, website: (b.website_url ?? "") as string, category: b.category as string, description: (b.description ?? "") as string, moods: (b.moods ?? []) as string[], logo: await signLogo(b.logo_url), approved: b.first_approved_at as string | null, planEnded: b.plan_ended_at as string | null, affiliated: !!b.affiliated, status: b.status as "draft" | "live" },
-      reels: signed.map((r: any) => ({ id: r.id as string, title: (r.title ?? r.projects?.name ?? "Untitled") as string, description: (r.description ?? "") as string, ad: (r.projects?.name ?? "Removed ad") as string, status: r.status as DirStatus, tags: (r.tags ?? []) as string[], moods: (r.moods ?? []) as string[], formats: (r.formats ?? []) as string[], poster: r.poster as string | null, published: r.published_at as string | null, note: (r.review_note ?? r.hidden_reason ?? null) as string | null })),
+      siteReels: ((siteRows ?? []) as any[]).map((r) => ({ id: r.id as string, title: r.title as string, displayTitle: (r.display_title ?? "") as string, published: !!r.published })),
+      reels: signed.map((r: any) => ({ id: r.id as string, title: (r.title ?? r.projects?.name ?? "Untitled") as string, displayTitle: (r.display_title ?? "") as string, description: (r.description ?? "") as string, ad: (r.projects?.name ?? "Removed ad") as string, status: r.status as DirStatus, tags: (r.tags ?? []) as string[], moods: (r.moods ?? []) as string[], formats: (r.formats ?? []) as string[], poster: r.poster as string | null, published: r.published_at as string | null, note: (r.review_note ?? r.hidden_reason ?? null) as string | null })),
     };
   });
 
@@ -591,6 +596,19 @@ export const adminRenameReel = createServerFn({ method: "POST" })
     const sb = context.supabase as any;
     await assertAdmin(sb);
     const { error } = await sb.from("directory_reels").update({ title: data.title }).eq("id", data.reelId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+/** Admin: set the title Aimanté shows for a Directory or website reel (empty = brand name). */
+export const adminSetAimanteTitle = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ reelId: z.string().uuid(), kind: z.enum(["directory", "site"]), displayTitle: z.string().trim().max(60) }).parse(d))
+  .handler(async ({ data, context }) => {
+    const sb = context.supabase as any;
+    await assertAdmin(sb);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await (supabaseAdmin as any).from(data.kind === "site" ? "site_reels" : "directory_reels").update({ display_title: data.displayTitle || null }).eq("id", data.reelId);
     if (error) throw new Error(error.message);
     return { ok: true };
   });

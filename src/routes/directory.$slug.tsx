@@ -52,7 +52,7 @@ export const Route = createFileRoute("/directory/$slug")({
         { "@type": "Organization", name: b.name, url: b.website_url ?? (aim ? `${AIMANTE_ORIGIN}/b/${b.slug}` : `${ORIGIN}/directory/${b.slug}`), ...(b.description ? { description: b.description } : {}) },
         ...loaderData.reels.map((r) => ({
           "@type": "VideoObject",
-          name: `${b.name} — ${r.template_name ?? "reel"}`,
+          name: r.title ?? b.name,
           description: [b.description, ...r.moods, ...r.tags].filter(Boolean).join(", ") || `${b.name} reel`,
           ...(r.poster ? { thumbnailUrl: r.poster } : {}),
           duration: `PT${Math.max(1, Math.round(r.seconds))}S`,

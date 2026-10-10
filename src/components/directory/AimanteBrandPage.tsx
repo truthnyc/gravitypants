@@ -16,7 +16,7 @@ export function AimanteBrandPage({ brand, reels, siteReels, more, onOpen, onOpen
   const total = reels.length + siteReels.length;
   const sizes = new Set([...reels.flatMap((r) => r.formats.map(ratio)), ...siteReels.map((r) => FORMAT_LABEL[r.format])]);
   const cards = [
-    ...reels.map((r) => ({ id: r.reel_id, title: r.template_name ?? r.title ?? "Custom reel", poster: r.poster, video: r.video, seconds: r.seconds, format: ratio(r.formats[0] ?? "9x16"), open: () => onOpen(r) })),
+    ...reels.map((r) => ({ id: r.reel_id, title: r.title ?? r.brand_name, poster: r.poster, video: r.video, seconds: r.seconds, format: ratio(r.formats[0] ?? "9x16"), open: () => onOpen(r) })),
     ...siteReels.map((r) => ({ id: r.id, title: r.title, poster: r.poster, video: r.video, seconds: r.seconds, format: FORMAT_LABEL[r.format], open: () => onOpenSite(r) })),
   ];
   return <main className="aimante-brand-page mx-auto max-w-[1040px] px-4 pt-4 pb-10 font-ap text-ap-ink md:px-6 md:pt-6">
