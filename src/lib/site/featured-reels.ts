@@ -50,3 +50,8 @@ export function featurePatch(o: { isAdmin: boolean; featured: boolean; status: s
   if (o.status !== "live") throw new Error("Only live reels can be featured.");
   return { in_showcase: true, showcase_order: o.maxOrder + 10, showcase_at: o.now, showcase_by: o.adminId };
 }
+
+/** A featured row stays listed only while live, featured, with a video and a brand still visible (plan or grace). */
+export function showcaseEligible(r: { in_showcase: boolean; status: string; video_url: string | null; brand_id: string }, visibleBrands: Set<string>): boolean {
+  return r.in_showcase && r.status === "live" && !!r.video_url && visibleBrands.has(r.brand_id);
+}

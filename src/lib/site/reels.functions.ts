@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { REEL_PREFIX, type SiteReel } from "./reels";
-import { directoryToSiteReel, mergeShowcase } from "./featured-reels";
+import { directoryToSiteReel, mergeShowcase, showcaseEligible } from "./featured-reels";
 
 /** Public: published brand reels in order, with uploaded files turned into viewable links. */
 export const listSiteReels = createServerFn({ method: "GET" }).handler(async (): Promise<SiteReel[]> => {
@@ -62,7 +62,7 @@ async function featuredDirectoryReels() {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const sb = supabaseAdmin as any; // eslint-disable-line @typescript-eslint/no-explicit-any
   const { data: rows } = await sb.from("directory_reels")
-    .select("id, ad_id, brand_id, title, display_title, description, formats, video_url, poster_url, showcase_order, created_at, directory_brands(id, name, slug, category, website_url)")
+    .select("id, ad_id, brand_id, status, in_showcase, title, display_title, description, formats, video_url, poster_url, showcase_order, created_at, directory_brands(id, name, slug, category, website_url)")
     .eq("in_showcase", true).eq("status", "live");
   if (!rows?.length) return [];
   const visible = new Set<string>();
@@ -70,7 +70,7 @@ async function featuredDirectoryReels() {
     const { data: ok } = await sb.rpc("brand_visible", { _brand: id });
     if (ok) visible.add(id);
   }
-  const keep = rows.filter((r: any) => visible.has(r.brand_id) && r.video_url && r.directory_brands); // eslint-disable-line @typescript-eslint/no-explicit-any
+  const keep = rows.filter((r: any) => showcaseEligible(r, visible) && r.directory_brands); // eslint-disable-line @typescript-eslint/no-explicit-any
   if (!keep.length) return [];
   const adIds = keep.map((r: any) => r.ad_id); // eslint-disable-line @typescript-eslint/no-explicit-any
   const { data: frames } = await sb.from("frames").select("project_id, duration_sec").in("project_id", adIds);
