@@ -11,6 +11,7 @@ export type LogoPosition =
   | "bottom-right";
 
 export type LogoSettings = {
+  format_overrides?: Partial<Record<Format, Omit<LogoSettings, "format_overrides" | "positions" | "frame_positions" | "kit_stamp">>>;
   asset_id?: string | null;
   path?: string | null;
   light_path?: string | null;
@@ -86,6 +87,7 @@ export type TextSettings = {
 };
 
 export type Frame = {
+  format_overrides?: Partial<Record<Format, FrameVisualSettings>>;
   id: string;
   project_id: string;
   sort_order: number;
@@ -119,6 +121,15 @@ export type Project = {
 };
 
 export type ProjectWithFrames = Project & { frames: Frame[] };
+
+export type PhotoMotionKey = "movement" | "movement_intensity" | "zoom_start" | "zoom_end" | "pan_x" | "pan_y";
+export type FrameVisualSettings = {
+  photo?: Omit<PhotoSettings, PhotoMotionKey>;
+  headline?: Omit<TextSettings, "animation"> | null;
+  subline?: Omit<TextSettings, "animation"> | null;
+  logo_visible?: boolean;
+  logo_variant?: Frame["logo_variant"];
+};
 
 export const DEFAULT_LOGO: LogoSettings = {
   asset_id: null,

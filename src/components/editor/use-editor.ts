@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { projectKeys, saveEditorDoc, type EditorDoc } from "@/lib/stillframe/data";
 import { ensureFonts, mediaPaths } from "@/render/renderFrame";
 import { loadImages } from "@/render/images";
+import { allFormatFrames } from "@/lib/stillframe/format-settings";
 
 export type ElementKey = "photo" | "headline" | "subline" | "logo" | "timing" | "transition";
 
@@ -106,7 +107,7 @@ export function useRenderAssets(doc: EditorDoc, brand?: BrandStyle) {
   const [version, setVersion] = useState(0);
   const paths = mediaPaths(doc.project, doc.frames);
   const pathKey = paths.join("|");
-  const fontKey = doc.frames
+  const fontKey = allFormatFrames(doc.frames)
     .map((f) => `${f.headline?.font_family}${f.headline?.font_weight}${f.subline?.font_family}${f.subline?.font_weight}`)
     .join("|");
 

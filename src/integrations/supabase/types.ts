@@ -968,6 +968,7 @@ export type Database = {
         Row: {
           created_at: string
           duration_sec: number
+          format_overrides: Json
           headline: Json | null
           id: string
           logo_variant: string | null
@@ -982,6 +983,7 @@ export type Database = {
         Insert: {
           created_at?: string
           duration_sec?: number
+          format_overrides?: Json
           headline?: Json | null
           id?: string
           logo_variant?: string | null
@@ -996,6 +998,7 @@ export type Database = {
         Update: {
           created_at?: string
           duration_sec?: number
+          format_overrides?: Json
           headline?: Json | null
           id?: string
           logo_variant?: string | null

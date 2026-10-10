@@ -15,6 +15,7 @@ import {
 } from "@/render/renderFrame";
 import { ELEMENT_META, type ElementKey } from "./use-editor";
 import { cn } from "@/lib/utils";
+import { frameForFormat } from "@/lib/stillframe/format-settings";
 
 type DragEl = "headline" | "subline" | "logo";
 
@@ -150,7 +151,8 @@ export function Stage({
     setDrag(null);
   };
 
-  const frame = doc.frames[frameIndex];
+  const sourceFrame = doc.frames[frameIndex];
+  const frame = sourceFrame ? frameForFormat(sourceFrame, format) : undefined;
   const showTags = interactive && !playing && layout;
   const photoMode = interactive && !playing && (selected === "photo" || adjusting);
 

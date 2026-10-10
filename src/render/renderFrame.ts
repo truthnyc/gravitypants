@@ -7,6 +7,7 @@ import type {
   TransitionSettings,
 } from "@/lib/stillframe/types";
 import { safeRect, type Rect } from "./formats";
+import { allFormatFrames, frameForFormat, projectForFormat, REEL_FORMATS } from "@/lib/stillframe/format-settings";
 
 export const DEFAULT_FONT = "DM Sans";
 
@@ -226,7 +227,9 @@ export function layoutFrame(
   H: number,
   images?: Map<string, HTMLImageElement>,
 ): FrameLayout {
-  const frame = frames[index];
+  const source = frames[index];
+  const frame = source ? frameForFormat(source, format) : undefined;
+  project = projectForFormat(project, format);
   const safe = safeRect(format, W, H);
   const result: FrameLayout = { safe, headline: null, subline: null, logo: null };
   if (!frame) return result;
@@ -490,7 +493,9 @@ function drawFrame(
   H: number,
   images?: Map<string, HTMLImageElement>,
 ) {
-  const frame = frames[j];
+  const source = frames[j];
+  const frame = source ? frameForFormat(source, format) : undefined;
+  project = projectForFormat(project, format);
   if (!frame) return;
   const span = dur(frame) + incoming(frames, j);
   drawPhoto(ctx, frame, W, H, localT / span, images);
@@ -539,6 +544,7 @@ export function renderAt(
   timeSec: number,
   { width: W, height: H, showGuides, images, brand, watermark }: RenderOptions,
 ) {
+  project = projectForFormat(project, format);
   ctx.save();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.globalAlpha = 1;
@@ -705,6 +711,7 @@ function drawEndCard(
 
 /** Awaits every font the frames use so canvas text never falls back. */
 export async function ensureFonts(frames: Frame[], brand?: BrandStyle, strict = false) {
+  frames = allFormatFrames(frames);
   if (typeof document === "undefined" || !document.fonts) return;
   const specs = new Set<string>();
   for (const f of frames) {
@@ -723,10 +730,15 @@ export async function ensureFonts(frames: Frame[], brand?: BrandStyle, strict = 
 }
 
 export function mediaPaths(project: Project, frames: Frame[]) {
+  frames = allFormatFrames(frames);
   const paths = new Set<string>();
   for (const f of frames) if (f.photo?.path) paths.add(f.photo.path);
   for (const f of frames) if (f.subline?.mode === "image" && f.subline.image_path) paths.add(f.subline.image_path);
   for (const p of [project.logo.path, project.logo.light_path, project.logo.dark_path])
     if (p) paths.add(p);
+  for (const format of REEL_FORMATS) {
+    const l = projectForFormat(project, format).logo;
+    for (const p of [l.path, l.light_path, l.dark_path]) if (p) paths.add(p);
+  }
   return [...paths];
 }
