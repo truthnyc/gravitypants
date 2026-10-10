@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { ArrowDown, ArrowUp, Upload } from "lucide-react";
+import { ArrowDown, ArrowUp, ChevronDown, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { deleteSiteReel, listAdminReels, moveSiteReel, saveSiteReel, type AdminReel } from "@/lib/stillframe/admin-reels.functions";
 import { listDirectoryBrands } from "@/lib/directory/directory.functions";
 import { FORMAT_LABEL, type ReelFormat } from "@/lib/site/reels";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/admin/reels")({
   head: () => ({ meta: [
