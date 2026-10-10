@@ -10,7 +10,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Card, PageTitle, Pill } from "@/components/admin/AdminShell";
 import { supabase } from "@/integrations/supabase/client";
-import { deleteSiteReel, listAdminReels, moveSiteReel, saveSiteReel, type AdminReel } from "@/lib/stillframe/admin-reels.functions";
+import { deleteSiteReel, listAdminReels, listFeaturedClientReels, saveShowcaseOrder, saveSiteReel, type AdminReel, type FeaturedClientReel } from "@/lib/stillframe/admin-reels.functions";
+import { setReelFeatured } from "@/lib/directory/directory.functions";
 import { listDirectoryBrands } from "@/lib/directory/directory.functions";
 import { FORMAT_LABEL, type ReelFormat } from "@/lib/site/reels";
 import { cn } from "@/lib/utils";
@@ -271,35 +272,65 @@ function AddReelCard({ onDone }: { onDone: () => void }) {
 function Reels() {
   const list = useServerFn(listAdminReels);
   const del = useServerFn(deleteSiteReel);
-  const move = useServerFn(moveSiteReel);
-  const { data, refetch } = useQuery({ queryKey: ["admin", "reels"], queryFn: () => list() });
+  const saveOrder = useServerFn(saveShowcaseOrder);
+  const unfeatureFn = useServerFn(setReelFeatured);
+  const { data, refetch: refetchSite } = useQuery({ queryKey: ["admin", "reels"], queryFn: () => list() });
+  const featuredFn = useServerFn(listFeaturedClientReels);
+  const { data: featured, refetch: refetchFeatured } = useQuery({ queryKey: ["admin", "reels", "featured"], queryFn: () => featuredFn() });
+  const refetch = () => { void refetchSite(); void refetchFeatured(); };
   const [editing, setEditing] = useState<string | null>(null);
   const reels = data ?? [];
+  const clients = featured ?? [];
+  // Same order as the public pages: sort_order / showcase_order, then created date.
+  type Item = { kind: "site"; r: AdminReel; order: number; created: string } | { kind: "directory"; r: FeaturedClientReel; order: number; created: string };
+  const items: Item[] = [
+    ...reels.map((r) => ({ kind: "site" as const, r, order: r.sort_order, created: (r as unknown as { created_at: string }).created_at ?? "" })),
+    ...clients.map((r) => ({ kind: "directory" as const, r, order: r.order, created: r.created })),
+  ].sort((a, b) => a.order - b.order || a.created.localeCompare(b.created));
 
   const reorder = async (i: number, dir: -1 | 1) => {
-    const ids = reels.map((r) => r.id);
+    const list = items.map((x) => ({ kind: x.kind, id: x.r.id }));
     const j = i + dir;
-    if (j < 0 || j >= ids.length) return;
-    const current = ids[i]; const next = ids[j];
-    if (!current || !next) return;
-    [ids[i], ids[j]] = [next, current];
-    await move({ data: { ids } });
-    void refetch();
+    const a = list[i]; const b = list[j];
+    if (!a || !b) return;
+    [list[i], list[j]] = [b, a];
+    await saveOrder({ data: { items: list } });
+    refetch();
+  };
+  const unfeature = async (r: FeaturedClientReel) => {
+    try { await unfeatureFn({ data: { reelId: r.id, featured: false } }); toast.success("Removed from Showcase and Examples"); refetch(); }
+    catch (e) { toast.error(e instanceof Error ? e.message : "That didn't work"); }
   };
   const remove = async (r: AdminReel) => {
     if (!window.confirm(`Remove "${r.title}" from the website?`)) return;
     await del({ data: { id: r.id } });
     toast("Reel removed");
-    void refetch();
+    refetch();
   };
 
   return (
     <>
       <PageTitle title="Website Reels" sub="These reels show on the home page, Examples and Showcase, in this order." />
-      <AddReelCard onDone={() => void refetch()} />
+      <AddReelCard onDone={refetch} />
       <Card className="p-0">
         <ul className="divide-y divide-border">
-          {reels.map((r, i) => (
+          {items.map((it, i) => it.kind === "directory" ? (
+            <li key={it.r.id} className="px-5 py-4">
+              <div className="flex flex-wrap items-center gap-4">
+                <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-sm bg-control-fill">
+                  {it.r.posterView && <img src={it.r.posterView} alt="" className="max-h-full max-w-full object-contain" />}
+                </div>
+                <div className="min-w-0 flex-1 text-[14px]">
+                  <div className="font-medium">{it.r.brand} · {it.r.title} <Pill>From the Directory</Pill></div>
+                  <div className="text-[13px] text-secondary-text">Client reel. Edit it in Admin → Directory.</div>
+                </div>
+                <div className="flex gap-1">
+                  <Button variant="plain" size="icon" aria-label="Move up" disabled={i === 0} onClick={() => void reorder(i, -1)}><ArrowUp className="size-4" strokeWidth={1.7} /></Button>
+                  <Button variant="plain" size="icon" aria-label="Move down" disabled={i === items.length - 1} onClick={() => void reorder(i, 1)}><ArrowDown className="size-4" strokeWidth={1.7} /></Button>
+                </div>
+              </div>
+            </li>
+          ) : ((r) => (
             <li key={r.id} className="px-5 py-4">
               <div className="flex flex-wrap items-center gap-4">
                 <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-sm bg-control-fill">
@@ -312,7 +343,7 @@ function Reels() {
                 </div>
                 <div className="flex gap-1">
                   <Button variant="plain" size="icon" aria-label="Move up" disabled={i === 0} onClick={() => void reorder(i, -1)}><ArrowUp className="size-4" strokeWidth={1.7} /></Button>
-                  <Button variant="plain" size="icon" aria-label="Move down" disabled={i === reels.length - 1} onClick={() => void reorder(i, 1)}><ArrowDown className="size-4" strokeWidth={1.7} /></Button>
+                  <Button variant="plain" size="icon" aria-label="Move down" disabled={i === items.length - 1} onClick={() => void reorder(i, 1)}><ArrowDown className="size-4" strokeWidth={1.7} /></Button>
                   <Button variant="plain" size="sm" onClick={() => setEditing(editing === r.id ? null : r.id)}>Edit</Button>
                   <Button variant="destructive-plain" size="sm" onClick={() => void remove(r)}>Remove</Button>
                 </div>
@@ -323,16 +354,34 @@ function Reels() {
                    
                     videoSrc={r.videoView}
                     initial={{ id: r.id, brand: r.brand, title: r.title, description: r.description ?? "", href: r.href ?? "", category: r.category, published: r.published, photos: r.photos, brand_id: r.brand_id, moods: r.moods ?? [], ...({ format: r.format, seconds: r.seconds } as object) }}
-                    onDone={() => { setEditing(null); void refetch(); }}
+                    onDone={() => { setEditing(null); refetch(); }}
                     onCancel={() => setEditing(null)}
                   />
                 </div>
               )}
             </li>
-          ))}
-          {reels.length === 0 && <li className="px-5 py-6 text-[14px] text-secondary-text">No reels yet.</li>}
+          ))(it.r))}
+          {items.length === 0 && <li className="px-5 py-6 text-[14px] text-secondary-text">No reels yet.</li>}
         </ul>
       </Card>
+      <section className="mt-8">
+        <h2 className="mb-3 text-[15px] font-semibold nums">Featured from the Directory · {clients.length}</h2>
+        <Card className="p-0">
+          <ul className="divide-y divide-border">
+            {items.map((it, i) => it.kind !== "directory" ? null : (
+              <li key={it.r.id} className="flex flex-wrap items-center gap-4 px-5 py-3 text-[14px]">
+                <span className="w-8 text-secondary-text nums">{i + 1}</span>
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-sm bg-control-fill">
+                  {it.r.posterView && <img src={it.r.posterView} alt="" className="max-h-full max-w-full object-contain" />}
+                </div>
+                <div className="min-w-0 flex-1 font-medium">{it.r.brand} · {it.r.title}</div>
+                <Button variant="plain" size="sm" onClick={() => void unfeature(it.r)}>Unfeature</Button>
+              </li>
+            ))}
+            {clients.length === 0 && <li className="px-5 py-6 text-[14px] text-secondary-text">No Directory reels featured yet. Feature one from Admin → Directory.</li>}
+          </ul>
+        </Card>
+      </section>
     </>
   );
 }
