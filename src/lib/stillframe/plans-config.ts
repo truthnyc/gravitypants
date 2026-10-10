@@ -131,7 +131,7 @@ export const COMPARE: CompareGroup[] = [
 ];
 
 export const FAQ = [
-  { q: "Can I try it before paying?", a: `Yes. Every account starts with a free trial, no credit card and no time limit. Your first reel exports with no watermark, and you get ${TRIAL.exports - TRIAL.cleanExports} more watermarked exports. Your ads and brand kit stay saved when the trial exports run out.` },
+  { q: "Can I try it before paying?", a: "Yes. Every account begins with a free trial, with no time limit and no card. Your first reel exports without a watermark, and you get 2 more exports with a small Gravity Pants mark. Your reels and brand kit stay saved, and a reel on Aimanté stays live." },
   { q: "What if I need more than 10 exports on Simple?", a: "Buy a pack from Account → Billing whenever you need it: 5 exports for $15, 10 for $25 or 20 for $45. Extra exports never expire and work on any plan, so a busy month doesn’t mean jumping to Business." },
   { q: "What kind of photos work best?", a: "Clear product photos with some space around the product work best. Phone photos are fine: three to five of them make a good reel." },
    { q: "Which formats can I export?", a: "Choose Vertical 9:16 for Reels, Stories and TikTok; Portrait 4:5, recommended for Instagram, Facebook and LinkedIn feeds; Square 1:1 for square posts; or Landscape 16:9 for banners and YouTube. Custom sizes are available too. Each selected shape exports as MP4, GIF or both." },
