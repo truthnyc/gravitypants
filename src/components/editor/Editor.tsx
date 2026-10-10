@@ -688,7 +688,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
                 brand={brand}
                 frameIndex={idx}
                 format={format}
-                aspect={shape === "4:5" ? 4 / 5 : undefined}
+                aspect={FORMAT_RATIO[format]}
                 time={time}
                 playing={playing}
                 selected={selected}
