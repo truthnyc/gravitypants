@@ -4,10 +4,13 @@ import { useServerFn } from "@tanstack/react-start";
 import { Fragment, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { adminSetAimanteTitle, pinAllDirectoryVideos, adminDeleteReel, adminMoveReel, adminBrandDetail, adminRenameReel, adminSaveBrand, adminSaveBrandSlug, setBrandLogo, listDirectoryBrands, listDirectoryReview, resolveReport, reviewDirectoryReel } from "@/lib/directory/directory.functions";
+import { setReelFeatured, adminSetAimanteTitle, pinAllDirectoryVideos, adminDeleteReel, adminMoveReel, adminBrandDetail, adminRenameReel, adminSaveBrand, adminSaveBrandSlug, setBrandLogo, listDirectoryBrands, listDirectoryReview, resolveReport, reviewDirectoryReel } from "@/lib/directory/directory.functions";
 import { BRAND_DESCRIPTION_MAX, BRAND_NAME_MAX, CATEGORIES, SLUG_MAX, BRAND_MOODS_MAX, moodLabel, STATUS_LABEL, nearLimit, type Category } from "@/lib/directory/directory";
 import { useMoodCatalog } from "@/lib/directory/moods";
 import { cn } from "@/lib/utils";
+import { Switch } from "@/components/ui/switch";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { setSiteReelPublished } from "@/lib/stillframe/admin-reels.functions";
 import { BrandOwnership, NewBrandPage } from "@/components/admin/BrandPageAdmin";
 
 export const Route = createFileRoute("/_authenticated/admin/directory")({
@@ -93,6 +96,7 @@ function AdminDirectory() {
                 <td>{r.ad}</td>
                 <td>{STATUS_LABEL[r.status]}{r.note && r.status === "private" ? ` · Not approved: ${r.note}` : ""}</td>
                 <td className="space-x-2 py-1.5 text-right">
+                  <FeatureToggle reelId={r.id} status={r.status} featured={r.inShowcase} order={r.showcaseOrder} onChanged={refresh} />
                   {r.status === "live" && <Button size="sm" variant="plain" onClick={() => void act({ id: r.id, action: "review" }, "Pulled back into review")}>Pull back into review</Button>}
                   {r.status === "live" && <Button size="sm" variant="plain" onClick={() => void act({ id: r.id, action: "hide" }, "Hidden")}>Hide</Button>}
                   {r.status === "hidden" && <Button size="sm" variant="plain" onClick={() => void act({ id: r.id, action: "approve" }, "Visible again")}>Unhide</Button>}
@@ -233,7 +237,7 @@ function BrandPanel({ brandId, onChanged }: { brandId: string; onChanged: () => 
       <div>
         <div className="mb-2 font-semibold nums">Reels · {d.reels.length}</div>
         <div className="space-y-2">
-          {d.reels.map((r) => <AdminReel key={r.id} r={r} brandId={brandId} onChanged={refresh} />)}
+          {d.reels.map((r) => <AdminReel key={r.id} r={r} brandId={brandId} onChanged={refresh} siteReels={d.siteReels} />)}
           {!d.reels.length && <p className="text-secondary-text">No reels shared yet.</p>}
         </div>
       </div>
@@ -315,7 +319,7 @@ function BrandForm({ b, onSaved }: { b: Detail["brand"]; onSaved: () => void }) 
   );
 }
 
-function AdminReel({ r, brandId, onChanged }: { r: Detail["reels"][number]; brandId: string; onChanged: () => void }) {
+function AdminReel({ r, brandId, onChanged, siteReels }: { r: Detail["reels"][number]; brandId: string; onChanged: () => void; siteReels: Detail["siteReels"] }) {
   const rename = useServerFn(adminRenameReel);
   const review = useServerFn(reviewDirectoryReel);
   const moodCatalog = useMoodCatalog();
@@ -341,6 +345,8 @@ function AdminReel({ r, brandId, onChanged }: { r: Detail["reels"][number]; bran
           <span className="text-secondary-text">Ad: {r.ad}{r.formats.length ? ` · ${r.formats.join(", ")}` : ""}</span>
         </div>
         <AimanteTitleField reelId={r.id} kind="directory" initial={r.displayTitle} onSaved={onChanged} />
+        <FeatureToggle reelId={r.id} status={r.status} featured={r.inShowcase} order={r.showcaseOrder} onChanged={onChanged} />
+        {r.inShowcase && siteReels.filter((s) => s.published).map((s) => <DuplicateSiteReel key={s.id} id={s.id} title={s.title} onChanged={onChanged} />)}
         <input value={tags} onChange={(e) => setTags(e.target.value)} aria-label="Tags" placeholder="Tags, comma separated" className={field} />
         <div className="flex flex-wrap gap-1">
           {moodCatalog.all.map((m) => {
@@ -412,6 +418,50 @@ function AimanteTitleField({ reelId, kind, initial, onSaved }: { reelId: string;
         <Button size="sm" variant="plain" disabled={busy || v.trim() === initial.trim()} onClick={() => void save()}>Save title</Button>
       </div>
       <p id={`${id}-hint`} className="text-[12px] text-secondary-text">{AIMANTE_TITLE_HINT}</p>
+    </div>
+  );
+}
+
+/** Staff switch: show a live Directory reel on the Gravity Pants Showcase and Examples pages. */
+function FeatureToggle({ reelId, status, featured, order, onChanged }: { reelId: string; status: string; featured: boolean; order: number | null; onChanged: () => void }) {
+  const set = useServerFn(setReelFeatured);
+  const [busy, setBusy] = useState(false);
+  const live = status === "live";
+  const toggle = async (on: boolean) => {
+    setBusy(true);
+    try { await set({ data: { reelId, featured: on } }); toast.success(on ? "Featured on Showcase and Examples" : "Removed from Showcase and Examples"); onChanged(); }
+    catch (e) { toast.error(e instanceof Error ? e.message : "That didn't work"); }
+    finally { setBusy(false); }
+  };
+  const control = (
+    <label className="inline-flex items-center gap-2 text-[13px]">
+      <Switch checked={featured} disabled={!live || busy} onCheckedChange={(v) => void toggle(v)} aria-label="Feature on Showcase and Examples" />
+      <span className={cn(!live && "text-secondary-text")}>Feature on Showcase and Examples</span>
+    </label>
+  );
+  return (
+    <span className="inline-flex flex-wrap items-center gap-2">
+      {live ? control : (
+        <TooltipProvider><Tooltip><TooltipTrigger asChild><span tabIndex={0}>{control}</span></TooltipTrigger><TooltipContent>Only live reels can be featured.</TooltipContent></Tooltip></TooltipProvider>
+      )}
+      {featured && <span className="rounded-lg border border-primary px-2 py-0.5 text-[12px] text-primary nums">Featured{order != null ? ` · position ${Math.round(order / 10)}` : ""}</span>}
+    </span>
+  );
+}
+
+/** Warns when the brand still has a published website reel, so Showcase doesn't show two versions. */
+function DuplicateSiteReel({ id, title, onChanged }: { id: string; title: string; onChanged: () => void }) {
+  const unpublish = useServerFn(setSiteReelPublished);
+  const [busy, setBusy] = useState(false);
+  return (
+    <div className="flex flex-wrap items-center gap-2 rounded-sm bg-control-fill px-3 py-2 text-[13px]">
+      <span className="min-w-0 flex-1">This brand also has a website reel: {title}. Unpublish it to avoid showing two versions.</span>
+      <Button size="sm" variant="plain" disabled={busy} onClick={async () => {
+        setBusy(true);
+        try { await unpublish({ data: { id, published: false } }); toast.success("Website reel unpublished"); onChanged(); }
+        catch (e) { toast.error(e instanceof Error ? e.message : "That didn't work"); }
+        finally { setBusy(false); }
+      }}>Unpublish website reel</Button>
     </div>
   );
 }
