@@ -269,6 +269,7 @@ async function insertCopy(source: ProjectWithFrames, name: string, photos?: Uplo
       subline: frame.subline,
       logo_visible: frame.logo_visible,
       logo_variant: frame.logo_variant ?? null,
+      format_overrides: frame.format_overrides ?? {},
     };
   });
 
@@ -352,6 +353,7 @@ export async function saveEditorDoc(prev: EditorDoc, next: EditorDoc) {
     subline: f.subline,
     logo_visible: f.logo_visible,
     logo_variant: f.logo_variant ?? null,
+    format_overrides: f.format_overrides ?? {},
   });
   const before = new Map(prev.frames.map((f, i) => [f.id, JSON.stringify(frameRow(f, i))]));
   const rows = next.frames.map(frameRow).filter((f) => before.get(f.id) !== JSON.stringify(f));
@@ -637,6 +639,10 @@ export function templateFromProject(p: ProjectWithFrames): TemplateSettings {
       subline: f.subline,
       logo_visible: f.logo_visible,
       logo_variant: f.logo_variant ?? null,
+      format_overrides: Object.fromEntries(Object.entries(f.format_overrides ?? {}).map(([format, own]) => {
+        const { asset_id: _id, path: _path, url: _url, name: _name, ...photo } = own.photo ?? {};
+        return [format, { ...own, photo }];
+      })),
       // Photo style only — the picture itself is never saved.
       photo: Object.fromEntries(
         ([

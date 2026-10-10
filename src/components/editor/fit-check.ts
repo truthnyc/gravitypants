@@ -2,6 +2,7 @@ import type { EditorDoc } from "@/lib/stillframe/data";
 import type { Format } from "@/lib/stillframe/types";
 import { FORMAT_SIZE } from "@/render/formats";
 import { layoutFrame } from "@/render/renderFrame";
+import { frameForFormat } from "@/lib/stillframe/format-settings";
 
 export type FitBox = { x: number; y: number; w: number; h: number };
 /** `format` is the preview shape label. */
@@ -49,7 +50,7 @@ export function checkFit(doc: EditorDoc, images: Map<string, HTMLImageElement>):
     doc.frames.forEach((f, i) => {
       const l = layoutFrame(ctx, doc.project, doc.frames, i, format, W, H, images);
       // A subline kept under the headline lives in the same block, so it never "overlaps" it.
-      const under = f.subline?.keep_under_headline ?? true;
+      const under = frameForFormat(f, format).subline?.keep_under_headline ?? true;
       const boxes = { headline: l.headline, subline: l.subline, logo: l.logo };
       for (const text of findProblems(boxes, W, H)) {
         if (under && text === "the headline overlaps the subline") continue;
