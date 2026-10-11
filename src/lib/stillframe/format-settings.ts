@@ -43,11 +43,12 @@ export function patchFrameVisual(frame: Frame, format: Format, patch: FrameVisua
 }
 
 export function patchLogoForFormat(project: Project, format: Format, patch: Partial<LogoSettings>): Project {
-  const { positions, frame_positions, kit_stamp, format_overrides: _ignored, ...visual } = patch;
+  const { positions, frame_positions, kit_stamp, enabled, format_overrides: _ignored, ...visual } = patch;
   const logo = project.logo;
   return { ...project, logo: { ...logo,
     ...(positions ? { positions } : {}), ...(frame_positions ? { frame_positions } : {}),
     ...(kit_stamp !== undefined ? { kit_stamp } : {}),
+    ...(enabled !== undefined ? { enabled } : {}),
     format_overrides: { ...logo.format_overrides, [format]: { ...logo.format_overrides?.[format], ...visual } },
   } };
 }
