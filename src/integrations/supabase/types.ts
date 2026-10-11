@@ -707,6 +707,10 @@ export type Database = {
           id: string
           in_showcase: boolean
           moods: string[]
+          pending_note: string | null
+          pending_status: string
+          pending_submitted_at: string | null
+          pending_video_url: string | null
           poster_url: string | null
           preview_url: string | null
           published_at: string | null
@@ -734,6 +738,10 @@ export type Database = {
           id?: string
           in_showcase?: boolean
           moods?: string[]
+          pending_note?: string | null
+          pending_status?: string
+          pending_submitted_at?: string | null
+          pending_video_url?: string | null
           poster_url?: string | null
           preview_url?: string | null
           published_at?: string | null
@@ -761,6 +769,10 @@ export type Database = {
           id?: string
           in_showcase?: boolean
           moods?: string[]
+          pending_note?: string | null
+          pending_status?: string
+          pending_submitted_at?: string | null
+          pending_video_url?: string | null
           poster_url?: string | null
           preview_url?: string | null
           published_at?: string | null

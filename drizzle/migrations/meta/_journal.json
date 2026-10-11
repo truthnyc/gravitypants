@@ -71,6 +71,13 @@
       "when": 1791670881105,
       "tag": "0009_directory_reels_showcase",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1791734921602,
+      "tag": "0010_directory_reel_pending_updates",
+      "breakpoints": true
     }
   ]
 }
