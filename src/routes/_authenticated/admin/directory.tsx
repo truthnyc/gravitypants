@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Fragment, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { setReelFeatured, adminSetAimanteTitle, pinAllDirectoryVideos, adminDeleteReel, adminMoveReel, adminBrandDetail, adminRenameReel, adminSaveBrand, adminSaveBrandSlug, setBrandLogo, listDirectoryBrands, listDirectoryReview, resolveReport, reviewDirectoryReel } from "@/lib/directory/directory.functions";
+import { decideReelUpdate, listReelUpdates, setReelFeatured, adminSetAimanteTitle, pinAllDirectoryVideos, adminDeleteReel, adminMoveReel, adminBrandDetail, adminRenameReel, adminSaveBrand, adminSaveBrandSlug, setBrandLogo, listDirectoryBrands, listDirectoryReview, resolveReport, reviewDirectoryReel } from "@/lib/directory/directory.functions";
 import { BRAND_DESCRIPTION_MAX, BRAND_NAME_MAX, CATEGORIES, SLUG_MAX, BRAND_MOODS_MAX, moodLabel, STATUS_LABEL, nearLimit, type Category } from "@/lib/directory/directory";
 import { useMoodCatalog } from "@/lib/directory/moods";
 import { cn } from "@/lib/utils";
@@ -21,6 +21,53 @@ export const Route = createFileRoute("/_authenticated/admin/directory")({
 type Data = Awaited<ReturnType<typeof listDirectoryReview>>;
 type Row = Data["reels"][number];
 type Act = { id: string; action: "approve" | "reject" | "hide" | "review" | "edit"; reason?: string; tags?: string[]; moods?: string[]; category?: Category };
+
+/** Staff review of replacement versions for live reels: current and proposed side by side. */
+function ReelUpdates({ onChanged }: { onChanged: () => void }) {
+  const list = useServerFn(listReelUpdates);
+  const decide = useServerFn(decideReelUpdate);
+  const qc = useQueryClient();
+  const q = useQuery({ queryKey: ["admin", "reel-updates"], queryFn: () => list() });
+  const [notes, setNotes] = useState<Record<string, string>>({});
+  const [busy, setBusy] = useState<string | null>(null);
+  const run = async (id: string, action: "approve" | "decline") => {
+    setBusy(id);
+    try {
+      await decide({ data: { id, action, note: notes[id] || undefined } });
+      toast(action === "approve" ? "Approved. The new version is live." : "Declined. The live version is unchanged.");
+      void qc.invalidateQueries({ queryKey: ["admin", "reel-updates"] });
+      onChanged();
+    } catch (e) { toast.error(e instanceof Error ? e.message : "That didn't work"); }
+    finally { setBusy(null); }
+  };
+  const rows = q.data ?? [];
+  return (
+    <section>
+      <h2 className="mb-3 text-[15px] font-semibold nums">Reel updates · {rows.length}</h2>
+      {!rows.length && <p className="text-[14px] text-secondary-text">No updates waiting.</p>}
+      <div className="space-y-3">
+        {rows.map((r) => (
+          <div key={r.id} className="rounded-[4px] border border-border bg-card p-4">
+            <div className="mb-3 text-[14px]"><b>{r.title}</b> · {r.brand} <span className="text-secondary-text nums">· sent {new Date(r.submitted).toLocaleString()}</span></div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {([["Live now", r.live], ["Proposed", r.proposed]] as const).map(([label, src]) => (
+                <div key={label}>
+                  <div className="mb-1 text-[12px] font-semibold text-secondary-text">{label}</div>
+                  {src ? <video src={src} controls muted playsInline className="max-h-[320px] w-full rounded-[4px] bg-muted" /> : <div className="grid h-40 place-items-center rounded-[4px] bg-muted text-[13px] text-secondary-text">No video</div>}
+                </div>
+              ))}
+            </div>
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <input value={notes[r.id] ?? ""} onChange={(e) => setNotes((n) => ({ ...n, [r.id]: e.target.value }))} placeholder="Note for the brand (optional)" aria-label="Note for the brand" className="h-9 min-w-[220px] flex-1 rounded-[4px] border border-border px-3 text-[14px]" maxLength={500} />
+              <Button size="sm" disabled={busy === r.id} onClick={() => void run(r.id, "approve")}>Approve</Button>
+              <Button size="sm" variant="outline" disabled={busy === r.id} onClick={() => void run(r.id, "decline")}>Decline</Button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
 
 function AdminDirectory() {
   const list = useServerFn(listDirectoryReview);
@@ -54,6 +101,8 @@ function AdminDirectory() {
         </div>
         <p className="text-[14px] text-secondary-text">A brand's first reel waits here. After you approve it, that brand's new reels go live straight away.</p>
       </div>
+
+      <ReelUpdates onChanged={refresh} />
 
       <section>
         <h2 className="mb-3 text-[15px] font-semibold nums">Waiting for review · {waiting.length}</h2>
