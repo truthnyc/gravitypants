@@ -124,8 +124,8 @@ export function buildReel(template: Template, items: ReelItem[], o: BuildOptions
       ...f,
       duration_sec: Math.max(Number(f.duration_sec) || 0, normal) + (first ? FIRST_PHOTO_LEAD : 0),
       photo: { ...f.photo, path: item?.path ?? null, url: item?.path ?? null, asset_id: null, ...(item?.productId ? { shopify_product_id: item.productId } : {}) },
-      headline: { ...h, text: item?.headline ?? "", same_on_all: false, ...(first ? { delay_sec: FIRST_PHOTO_LEAD } : {}) },
-      subline: sub ? { ...sub, ...(first ? { delay_sec: FIRST_PHOTO_LEAD } : {}) } : null,
+      headline: { ...h, text: item?.headline ?? "", same_on_all: true, ...(first ? { delay_sec: FIRST_PHOTO_LEAD } : {}) },
+      subline: sub ? { ...sub, same_on_all: true, ...(first ? { delay_sec: FIRST_PHOTO_LEAD } : {}) } : null,
       format_overrides: {},
     };
   });
@@ -207,7 +207,7 @@ export function applyReelStyle(reel: ProjectWithFrames, change: StyleChange): Pr
     if (scope !== "all" && i !== index) return f;
     // Keep each slide's words and visibility; style-only changes never create price text.
     const updated = patchTextForFormat(f, format, element, Object.fromEntries(Object.entries(patch).filter(([, v]) => v !== undefined)) as Partial<TextSettings>);
-    return { ...updated, [element]: f[element] ? { ...updated[element], text: f[element]?.text } : updated[element] };
+    return { ...updated, [element]: { ...updated[element], text: f[element]?.text ?? "", same_on_all: scope === "all" } };
   }) };
 }
 
@@ -217,16 +217,20 @@ export function appendReelSlides(reel: ProjectWithFrames, more: ReelItem[]): { r
   const source = reel.frames[0];
   if (!source) return { reel, error: "A reel needs at least one photo." };
   const visible = frameForFormat(source, reel.primary_format);
+  const sharedHeadline = reel.frames.find((f) => f.headline?.same_on_all === true) ?? source;
+  const sharedSubline = reel.frames.find((f) => f.subline?.same_on_all === true) ?? source;
+  const headlineStyle = frameForFormat(sharedHeadline, reel.primary_format).headline ?? visible.headline;
+  const sublineStyle = frameForFormat(sharedSubline, reel.primary_format).subline ?? visible.subline;
   const frames = more.map((item, i): Frame => ({
     ...structuredClone(source), id: crypto.randomUUID(), sort_order: reel.frames.length + i,
     photo: { ...source.photo, path: item.path, url: item.path, asset_id: null, shopify_product_id: item.productId ?? null } as Frame["photo"],
     duration_sec: Math.max(2, source.duration_sec - (source.headline?.delay_sec ?? 0)),
-    headline: { ...visible.headline, text: item.headline, delay_sec: 0 },
-    subline: item.subline ? { ...(visible.subline ?? visible.headline), text: item.subline, keep_under_headline: visible.subline?.keep_under_headline ?? true, delay_sec: 0 } : null,
+    headline: { ...headlineStyle, text: item.headline, same_on_all: true, delay_sec: 0 },
+    subline: item.subline ? { ...(sublineStyle ?? headlineStyle), text: item.subline, same_on_all: true, keep_under_headline: sublineStyle?.keep_under_headline ?? true, delay_sec: 0 } : null,
     format_overrides: Object.fromEntries(Object.entries(source.format_overrides ?? {}).map(([size, own]) => [size, {
       ...own, photo: own.photo ? { ...own.photo, path: item.path, url: item.path, asset_id: null } : undefined,
-      headline: own.headline ? { ...own.headline, text: item.headline, delay_sec: 0 } : undefined,
-      subline: item.subline ? { ...own.subline, text: item.subline, delay_sec: 0 } : null,
+      headline: { ...frameForFormat(sharedHeadline, size as Format).headline, text: item.headline, same_on_all: true, delay_sec: 0 },
+      subline: item.subline ? { ...(frameForFormat(sharedSubline, size as Format).subline ?? sublineStyle), text: item.subline, same_on_all: true, delay_sec: 0 } : null,
     }])),
   }));
   return { reel: { ...reel, frames: [...reel.frames, ...frames] }, error: null };
