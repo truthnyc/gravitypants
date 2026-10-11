@@ -806,7 +806,7 @@ function TextPanel({
             <ElementSlider
               name={`${isHead ? "Headline" : "Subline"} size`}
               color={color}
-              min={24}
+              min={isHead ? 24 : 11}
               max={240}
               value={size}
               onChange={(v, k) => onChange({ size_px: v }, k)}
