@@ -120,7 +120,7 @@ function StepHeader({ adId, current, title, back, pills }: { adId: string; curre
           </Link>
           <AdName title={title} />
           <div className="flex-1" />
-          <StepBar adId={adId} current={current} className="absolute left-1/2 hidden -translate-x-1/2 lg:inline-flex" />
+          <StepBar adId={adId} current={current} className={pills ? "hidden xl:inline-flex" : "absolute left-1/2 hidden -translate-x-1/2 lg:inline-flex"} />
           {pills && <div className="hidden shrink-0 sm:flex">{pills}</div>}
           <div className="hidden items-center gap-3 lg:flex"><HelpMenu /><UserMenu /></div>
           <button ref={btn} type="button" className="grid size-9 min-h-0 min-w-0 shrink-0 place-items-center rounded-lg text-ap-ink hover:bg-ap-panel lg:hidden" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} aria-controls="mobile-menu" onClick={() => setOpen((v) => !v)}>
@@ -129,7 +129,7 @@ function StepHeader({ adId, current, title, back, pills }: { adId: string; curre
         </div>
         <MobileMenu open={open} signedIn pathname={pathname} close={close} />
       </header>
-      <div className="overflow-x-auto border-b border-ap-hairline bg-ap-card px-4 py-2 md:px-6 lg:hidden">
+      <div className={cn("overflow-x-auto border-b border-ap-hairline bg-ap-card px-4 py-2 md:px-6", pills ? "xl:hidden" : "lg:hidden")}>
         <StepBar adId={adId} current={current} className="flex w-max min-w-full" />
         {pills && <div className="mt-2 flex sm:hidden">{pills}</div>}
       </div>
