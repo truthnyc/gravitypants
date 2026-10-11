@@ -155,7 +155,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
 
   /* ---------------- safeguards */
   const issues = useMemo(() => {
-    const out: { frame: number; text: string; blocking: boolean }[] = [];
+    const out: { frame: number; text: string; blocking: boolean; format?: Format; text_off?: boolean }[] = [];
     frames.forEach((f, i) => {
       if (!f.photo?.path) out.push({ frame: i, text: "This frame has no photo yet.", blocking: true });
     });
@@ -170,12 +170,13 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
         const outside = (b: { x: number; y: number; w: number; h: number } | null) =>
           b && (b.x < s.x - 2 || b.y < s.y - 2 || b.x + b.w > s.x + s.w + 2 || b.y + b.h > s.y + s.h + 2);
         const bad = [outside(l.headline) && "headline", outside(l.subline) && "subline", outside(l.logo) && "logo"].filter(Boolean);
-        if (bad.length) out.push({ frame: i, text: `The ${bad.join(" and ")} runs past the safe edge in ${format}. Try a smaller size.`, blocking: false });
+        if (bad.length) out.push({ frame: i, text: `The ${bad.join(" and ")} runs past the safe edge in ${format}. Try a smaller size.`, blocking: false, format, text_off: !!(outside(l.headline) || outside(l.subline)) });
       });
     }
     return out;
   }, [frames, images, targets, project]);
   const blocked = issues.some((i) => i.blocking);
+  const cropWarn = useMemo(() => new Set(issues.filter((i) => i.text_off).map((i) => i.format)), [issues]);
 
   /* ---------------- export run */
   const [open, setOpen] = useState(false);
@@ -434,11 +435,16 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
         </>
       ) : (
         <>
-          <h1 className="mb-5 text-[30px] font-bold leading-tight">Where will this ad play?</h1>
+          <h1 className="mb-1.5 text-[30px] font-bold leading-tight">Where will this ad play?</h1>
+          <p className="mb-5 text-[15px] text-ap-body">Your main size is ready. Add other sizes if you need them.</p>
           <PlatformPills selected={selected} onChange={changeSizes} />
           <div className="flex flex-col gap-2">
-            {[...EXPORT_SIZES.filter((s) => s.id !== "5x4"), ...EXPORT_SIZES.filter((s) => s.id === "5x4")].map((s) => (
-              <SizeCard key={s.id} size={s} selected={selected.has(s.id)} pulse={pulse.has(s.id)} onClick={() => toggleSize(s.id)} project={project} frames={frames} brand={brand} images={images} />
+            {EXPORT_SIZES.filter((s) => s.id === mainId).map((s) => (
+              <SizeCard key={s.id} size={s} selected main pulse={false} onClick={() => undefined} project={project} frames={frames} brand={brand} images={images} />
+            ))}
+            <p className="mt-3 mb-0.5 text-[12px] font-semibold tracking-[0.06em] text-ap-body"><span className="uppercase">Also export</span> · auto-adapted from {sizeLabel(project.primary_format)}</p>
+            {[...EXPORT_SIZES.filter((s) => s.id !== "5x4"), ...EXPORT_SIZES.filter((s) => s.id === "5x4")].filter((s) => s.id !== mainId).map((s) => (
+              <SizeCard key={s.id} size={s} selected={selected.has(s.id)} warn={selected.has(s.id) && cropWarn.has(s.layout)} pulse={pulse.has(s.id)} onClick={() => toggleSize(s.id)} project={project} frames={frames} brand={brand} images={images} />
             ))}
           </div>
           <Collapsible open={moreSizes} onOpenChange={setMoreSizes} className="mt-2">
@@ -573,8 +579,8 @@ function ExportStage({ target, time, project, frames, brand, images }: { target:
   );
 }
 
-function SizeCard({ size, selected, pulse, onClick, ...r }: {
-  size: (typeof EXPORT_SIZES)[number]; selected: boolean; pulse: boolean; onClick: () => void;
+function SizeCard({ size, selected, pulse, onClick, main, warn, ...r }: {
+  size: (typeof EXPORT_SIZES)[number]; selected: boolean; pulse: boolean; onClick: () => void; main?: boolean; warn?: boolean;
   project: Project; frames: Frame[]; brand: BrandStyle; images: Map<string, HTMLImageElement> | null;
 }) {
   const ratio = size.width / size.height;
@@ -585,7 +591,7 @@ function SizeCard({ size, selected, pulse, onClick, ...r }: {
   return (
     <label
       className={cn("relative flex cursor-pointer h-auto min-h-16 w-full items-center justify-start gap-3 whitespace-normal rounded-lg border p-2.5 text-left", selected ? "border-ap-blue bg-ap-soft-blue hover:bg-ap-soft-blue" : "border-ap-hairline bg-ap-card hover:bg-ap-panel", pulse && "ap-pulse")}>
-      <input type="checkbox" checked={selected} onChange={onClick} aria-label={`${size.name} ${size.ratio}`} className="ap-export-card-input" />
+      <input type="checkbox" checked={selected} disabled={main} onChange={onClick} aria-label={`${size.name} ${size.ratio}${main ? ", main size" : ""}`} className="ap-export-card-input" />
       <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-ap-panel">
         <MiniRender {...r} format={size.layout} width={thumbW} w={size.width} h={size.height} />
       </span>
@@ -593,7 +599,8 @@ function SizeCard({ size, selected, pulse, onClick, ...r }: {
         <span className="flex flex-wrap items-baseline gap-x-1.5">
           <span className="text-[14px] font-semibold">{size.name}</span>
           <span className="text-[14px] font-normal text-ap-muted nums">{size.ratio}</span>
-          {size.badge && <span className="text-[11px] font-medium text-ap-blue">★ Recommended</span>}
+          {main && <span className="text-[11px] font-medium text-ap-blue">● Main size</span>}
+          {warn && <span className="rounded-md bg-ap-amber-soft px-1.5 text-[11px] font-medium text-ap-amber">Check crop</span>}
         </span>
         <span className="mt-0.5 block truncate text-[12px] font-normal text-ap-muted" title={useText}>
           <span className="mr-2 text-ap-subhead nums">{size.width}×{size.height}</span>{useText}
