@@ -20,7 +20,7 @@ export function remainingText(s: ExportStatus | null) {
 }
 
 /** Opens Shopify's hosted plan page at the top level, outside the app iframe. */
-export function UpgradeButton({ returnTo, label = "Upgrade", cta = "shopify-upgrade", variant = "default" }: { returnTo?: string; label?: string; cta?: string; variant?: "default" | "outline" | "link" }) {
+export function UpgradeButton({ returnTo, label = "Upgrade", cta = "shopify-upgrade", variant = "default" }: { returnTo?: string | undefined; label?: string; cta?: string; variant?: "default" | "outline" | "link" }) {
   const [msg, setMsg] = useState<string | null>(null);
   async function go() {
     setMsg(null);
@@ -39,7 +39,7 @@ export function UpgradeButton({ returnTo, label = "Upgrade", cta = "shopify-upgr
   );
 }
 
-export function PlanBar({ info, returnTo }: { info: PlanInfo | null; returnTo?: string }) {
+export function PlanBar({ info, returnTo }: { info: PlanInfo | null; returnTo?: string | undefined }) {
   if (!info) return null;
   const paidShopify = info.plan.source === "shopify" && info.plan.handle !== "free";
   return (
