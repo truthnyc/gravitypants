@@ -141,7 +141,6 @@ export function framesFromDoc(doc: TemplateDoc, { samples = false } = {}): Frame
       zoom: s.photo_zoom ?? 1,
       movement: PM[s.photo_motion],
       brightness: 0,
-      darken_for_text: false,
       background_color: s.photo_background_color ?? st.background_color,
       ...(samples && s.sample_photo ? { path: s.sample_photo } : {}),
     },

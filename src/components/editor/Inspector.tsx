@@ -215,7 +215,6 @@ export function Inspector({
           <PhotoPanel
             photo={frame.photo ?? {}}
             frameIndex={frameIndex}
-            hasWords={Boolean(frame.headline?.text?.trim() || frame.subline?.text?.trim())}
             brandName={brandName}
             brandColors={(kit?.colors ?? []).map((c) => c.toUpperCase())}
             image={image}
@@ -435,7 +434,6 @@ function Swatch({ c, active, onPick }: { c: string; active: boolean; onPick: (c:
 function PhotoPanel({
   photo,
   frameIndex,
-  hasWords,
   brandName,
   brandColors,
   image,
@@ -445,7 +443,6 @@ function PhotoPanel({
 }: {
   photo: PhotoSettings;
   frameIndex: number;
-  hasWords: boolean;
   brandName: string;
   brandColors: string[];
   image?: HTMLImageElement | undefined;
@@ -660,15 +657,6 @@ function PhotoPanel({
                 onChange={(v, k) => actions.onPhoto({ brightness: v / 200 }, k)}
               />
             </Field>
-            {hasWords && (
-              <label className="flex items-center justify-between gap-3">
-                <span>
-                  <span className="block text-[13px]">Darken for text</span>
-                  <span className="block text-[12px] text-secondary-text">Keeps words readable on bright photos</span>
-                </span>
-                <Switch checked={Boolean(photo.darken_for_text)} onCheckedChange={(v) => actions.onPhoto({ darken_for_text: v, darken_set: true })} className="data-[state=checked]:bg-toggle-on" />
-              </label>
-            )}
           </div>
         </Reveal>
       </div>
