@@ -14,3 +14,6 @@ export const DEFAULT_GIF_QUALITY: GifQuality = { size: "half", colors: "balanced
 export function matchingGifPreset(quality: GifQuality): GifPresetId | null {
   return GIF_PRESETS.find((p) => p.size === quality.size && p.colors === quality.colors && p.fps === quality.fps)?.id ?? null;
 }
+export function exportSelectionCount(sizeCount: number, formatCount: number) {
+  return sizeCount * formatCount;
+}

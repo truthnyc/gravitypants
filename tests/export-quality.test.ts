@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { DEFAULT_EXPORT_FORMATS, DEFAULT_VIDEO_FPS, DEFAULT_GIF_LOOP, DEFAULT_GIF_QUALITY, GIF_PRESETS, matchingGifPreset } from "@/lib/stillframe/export-quality";
+import { DEFAULT_EXPORT_FORMATS, DEFAULT_VIDEO_FPS, DEFAULT_GIF_LOOP, DEFAULT_GIF_QUALITY, GIF_PRESETS, matchingGifPreset, exportSelectionCount } from "@/lib/stillframe/export-quality";
 describe("export quality rules", () => {
+  it("counts selected sizes times formats, with either empty selection producing zero", () => {
+    expect(exportSelectionCount(1, 1)).toBe(1);
+    expect(exportSelectionCount(1, 2)).toBe(2);
+    expect(exportSelectionCount(2, 2)).toBe(4);
+    expect(exportSelectionCount(0, 2)).toBe(0);
+    expect(exportSelectionCount(2, 0)).toBe(0);
+  });
   it("starts with MP4 only at 30 fps", () => {
     expect(DEFAULT_EXPORT_FORMATS).toEqual({ mp4: true, gif: false });
     expect(DEFAULT_VIDEO_FPS).toBe(30);
