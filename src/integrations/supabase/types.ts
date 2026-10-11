@@ -1329,11 +1329,13 @@ export type Database = {
           access_token: string
           aimante_opt_in: boolean
           billing_source: string
+          branding_synced_at: string | null
           id: string
           installed_at: string
           linked_user_id: string | null
           scopes: string | null
           shop_domain: string
+          storefront_token: string | null
           uninstalled_at: string | null
           updated_at: string
           workspace_id: string | null
@@ -1342,11 +1344,13 @@ export type Database = {
           access_token: string
           aimante_opt_in?: boolean
           billing_source?: string
+          branding_synced_at?: string | null
           id?: string
           installed_at?: string
           linked_user_id?: string | null
           scopes?: string | null
           shop_domain: string
+          storefront_token?: string | null
           uninstalled_at?: string | null
           updated_at?: string
           workspace_id?: string | null
@@ -1355,11 +1359,13 @@ export type Database = {
           access_token?: string
           aimante_opt_in?: boolean
           billing_source?: string
+          branding_synced_at?: string | null
           id?: string
           installed_at?: string
           linked_user_id?: string | null
           scopes?: string | null
           shop_domain?: string
+          storefront_token?: string | null
           uninstalled_at?: string | null
           updated_at?: string
           workspace_id?: string | null

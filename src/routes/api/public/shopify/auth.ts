@@ -75,6 +75,20 @@ export const Route = createFileRoute("/api/public/shopify/auth")({
           console.error("shopify-auth basics", e);
         }
 
+        // Optional: shop logo/colours via the Storefront API. Logged and ignored on failure.
+        try {
+          const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+          const { data: row } = await supabaseAdmin.from("shopify_shops").select("workspace_id").eq("shop_domain", shop).maybeSingle();
+          let ws = row?.workspace_id as string | null;
+          if (!ws) ws = ((await supabaseAdmin.rpc("ensure_shop_workspace" as never, { _shop: shop } as never)).data as unknown as string) ?? null;
+          if (ws) {
+            const { syncShopBranding } = await import("@/lib/shopify/branding.server");
+            await syncShopBranding(supabaseAdmin, shop, ws, access_token, tokenKey);
+          }
+        } catch (e) {
+          console.error("shopify-auth branding", e);
+        }
+
         return json({ shop, name, logo: null, colors: null });
       },
     },

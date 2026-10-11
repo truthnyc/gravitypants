@@ -32,6 +32,8 @@ export type LogoSettings = {
 export type EndCard = {
   enabled?: boolean;
   cta_text?: string;
+  /** "last_photo" draws a softly blurred last photo behind the card instead of a flat colour. */
+  background?: "color" | "last_photo";
 };
 
 export type PhotoSettings = {
@@ -83,6 +85,8 @@ export type TextSettings = {
   image_path?: string | null;
   /** Image width as % of frame width. */
   image_size_pct?: number;
+  /** Seconds to wait before the words appear, so the photo is seen first. */
+  delay_sec?: number;
 };
 
 export type Frame = {

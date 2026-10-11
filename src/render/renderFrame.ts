@@ -520,9 +520,11 @@ function drawFrame(
     }
   }
 
-  // Headline starts ~0.15s into the frame, subline ~0.45s.
-  if (layout.headline) drawText(ctx, layout.headline, layout.headline.animation === "none" ? localT : localT - 0.15, H, images);
-  if (layout.subline) drawText(ctx, layout.subline, layout.subline.animation === "none" ? localT : localT - 0.45, H, images);
+  // Headline starts ~0.15s into the frame, subline ~0.45s; an optional delay lets the photo show first.
+  const hd = frame.headline?.delay_sec ?? 0;
+  const sd = frame.subline?.delay_sec ?? hd;
+  if (layout.headline && localT >= hd) drawText(ctx, layout.headline, layout.headline.animation === "none" ? localT : localT - 0.15 - hd, H, images);
+  if (layout.subline && localT >= sd) drawText(ctx, layout.subline, layout.subline.animation === "none" ? localT : localT - 0.45 - sd, H, images);
 }
 
 /** Draws exactly what the viewer sees at timeSec. Pure: the same call serves preview and export. */
@@ -591,7 +593,7 @@ export function renderAt(
   if (endT >= 0) {
     ctx.save();
     ctx.globalAlpha = easeInOut(clamp(endT / END_CARD_FADE));
-    drawEndCard(ctx, project, endCard.cta, brand, W, H, images);
+    drawEndCard(ctx, project, endCard.cta, brand, W, H, images, frames);
     ctx.restore();
   }
 
@@ -666,11 +668,20 @@ function drawEndCard(
   W: number,
   H: number,
   images?: Map<string, HTMLImageElement>,
+  frames?: Frame[],
 ) {
   const bg = brand?.color || END_CARD_FALLBACK;
-  const light = hexLuma(bg) > 0.55;
+  const lastPath = project.end_card?.background === "last_photo" ? frames?.[frames.length - 1]?.photo?.path : null;
+  const lastImg = lastPath ? images?.get(lastPath) : undefined;
+  const light = lastImg?.naturalWidth ? false : hexLuma(bg) > 0.55;
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, W, H);
+  if (lastImg?.naturalWidth) {
+    // Softly blurred last photo with a gentle shade so the name stays readable.
+    drawBlurred(ctx, lastImg, W, H);
+    ctx.fillStyle = "rgba(0,0,0,0.35)";
+    ctx.fillRect(0, 0, W, H);
+  }
 
   const l = project.logo;
   const path = (light ? l.dark_path || l.path || l.light_path : l.light_path || l.path || l.dark_path) ?? null;

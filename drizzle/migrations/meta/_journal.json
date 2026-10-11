@@ -99,6 +99,13 @@
       "when": 1791755580522,
       "tag": "0013_shopify_shop_workspace",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1791758357321,
+      "tag": "0014_shopify_storefront_token",
+      "breakpoints": true
     }
   ]
 }
