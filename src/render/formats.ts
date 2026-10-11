@@ -5,6 +5,7 @@ export const FORMAT_SIZE: Record<Format, { width: number; height: number }> = {
   "4:5": { width: 1080, height: 1350 },
   "1:1": { width: 1080, height: 1080 },
   "16:9": { width: 1920, height: 1080 },
+  "5:4": { width: 1350, height: 1080 },
 };
 
 export const ALL_FORMATS: Format[] = ["9:16", "1:1", "16:9"];
@@ -15,6 +16,7 @@ export const SAFE_AREA: Record<Format, { top: number; bottom: number; side: numb
   "4:5": { top: 0.06, bottom: 0.06, side: 0.06 },
   "1:1": { top: 0.06, bottom: 0.06, side: 0.06 },
   "16:9": { top: 0.05, bottom: 0.05, side: 0.05 },
+  "5:4": { top: 0.06, bottom: 0.06, side: 0.06 },
 };
 
 export type Rect = { x: number; y: number; w: number; h: number };

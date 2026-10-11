@@ -1,6 +1,6 @@
 import type { Format, Frame, FrameVisualSettings, LogoSettings, PhotoSettings, Project, TextSettings } from "./types";
 
-export const REEL_FORMATS: Format[] = ["9:16", "4:5", "1:1", "16:9"];
+export const REEL_FORMATS: Format[] = ["9:16", "4:5", "1:1", "5:4", "16:9"];
 const MOTION_KEYS = new Set(["movement", "movement_intensity", "zoom_start", "zoom_end", "pan_x", "pan_y"]);
 
 export function frameForFormat(frame: Frame, format: Format): Frame {

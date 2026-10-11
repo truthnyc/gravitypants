@@ -95,7 +95,7 @@ function isTyping(target: EventTarget | null) {
   return Boolean(el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable || el.getAttribute("role") === "combobox"));
 }
 
-const PREVIEW_SHAPES: Format[] = ["9:16", "4:5", "1:1", "16:9"];
+const PREVIEW_SHAPES: Format[] = ["9:16", "4:5", "1:1", "5:4", "16:9"];
 
 export function Editor({ initial, readOnly = false, banner, exportDisabled = false }: { initial: EditorDoc; readOnly?: boolean; banner?: import("react").ReactNode; exportDisabled?: boolean }) {
   const { doc, apply, undo, redo, canUndo } = useEditorDoc(initial);
@@ -752,7 +752,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
             <div className="mt-5 flex items-center gap-3">
               <span className="shrink-0 text-[12px] font-semibold tracking-[0.08em] text-ap-muted uppercase">Preview as</span>
               <AppSegmented
-                className="grid flex-1 grid-cols-4"
+                className="grid flex-1 grid-cols-5"
                 value={format}
                 onChange={(f) => setFormat(f as Format)}
                 options={PREVIEW_SHAPES.map((f) => ({
