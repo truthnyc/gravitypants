@@ -5,7 +5,7 @@ import { Pause, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { FacetedReel } from "@/lib/directory/directory.functions";
 
-const SIZE: Record<string, { w: number; h: number }> = { "9x16": { w: 165, h: 293 }, "1x1": { w: 200, h: 200 }, "16x9": { w: 256, h: 144 } };
+const SIZE: Record<string, { w: number; h: number }> = { "9x16": { w: 165, h: 293 }, "1x1": { w: 200, h: 200 }, "16x9": { w: 256, h: 144 }, "5x4": { w: 240, h: 192 } };
 
 function useReducedMotion() {
   const [r, setR] = useState(false);
