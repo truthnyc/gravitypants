@@ -1165,6 +1165,37 @@ html:has(.acct), body:has(.acct), body:has(.acct) .bg-canvas { background: var(-
 .ap-steps-main.ap-large .ap-tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .ap-steps-main.ap-large .ap-gif-grid { grid-template-columns: minmax(0, 1fr); }
 
+/* Export-only palette and layout. */
+.ap-export {
+  --ap-panel: oklch(from #f4f5f7 l c h);
+  --ap-blue: oklch(from #0b6bde l c h);
+  --ap-blue-hover: oklch(from #095dc4 l c h);
+  --ap-soft-blue: oklch(from #f0f6fe l c h);
+  background: var(--ap-panel);
+}
+.ap-export .ap-steps-main { --ap-left: 340px; max-width: 1120px; gap: 24px; }
+.ap-export .ap-steps-main > div:first-child > div,
+.ap-export .ap-step-card { border-radius: 24px; padding: 24px; }
+.ap-export .ap-preview-box { height: 320px; border-radius: 18px; padding: 42px 22px 22px; }
+.ap-export .ap-step-inner { min-width: 0; }
+.ap-export .ap-step-inner h1 { letter-spacing: 0; }
+.ap-export .ap-step-inner button { max-width: 100%; }
+@media (min-width: 821px) {
+  .ap-export .ap-steps-main { grid-template-columns: 340px minmax(0, 1fr); }
+}
+@media (min-width: 1024px) {
+  .ap-export .ap-steps-main.ap-large { grid-template-columns: minmax(0, 1fr); }
+  .ap-export .ap-steps-main.ap-large .ap-preview-box { height: min(78vh, 860px); }
+}
+@media (max-width: 820px) {
+  .ap-export .ap-steps-main { grid-template-columns: minmax(0, 1fr); }
+  .ap-export .ap-steps-main > div:first-child > div,
+  .ap-export .ap-step-card { padding: 20px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ap-export *, .ap-export .ap-steps-main { transition: none !important; animation: none !important; }
+}
+
 @keyframes dir-mood { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 
 @media (prefers-reduced-motion: reduce) {
