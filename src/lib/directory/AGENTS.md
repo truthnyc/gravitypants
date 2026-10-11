@@ -13,3 +13,4 @@
 - Aimanté applications extend `brand_requests`; staff approval creates one draft editorial brand before publication.
 - Shared reel videos are copied to `<ws>/directory/<ad_id>.mp4` (`pinReelVideo`) so the 30-day exports/ cleanup never removes them; never store an exports/ path in `directory_reels.video_url`.
 - Showcase featuring: staff-only `setReelFeatured`; `listSiteReels` merges featured live Directory reels (`source: "client"`, pure helpers in `src/lib/site/featured-reels.ts`); Aimanté/favorites callers filter them out, and client reels show no site-reel heart so saved favorites keep their ids.
+- Live reel replacements: owners submit via `submitReelUpdate` into `pending_*` columns (`<ws>/directory/<ad>-pending.mp4`); only staff `decideReelUpdate` swaps `video_url`, enforced by trigger `guard_reel_video_update`, so the live version never changes without review.
