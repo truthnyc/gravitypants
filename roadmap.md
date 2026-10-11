@@ -1,43 +1,5 @@
-# Roadmap
-- [x] Finish Export footer/list/empty states and small components; signed-in 1/2/4 file counts, actual pixel list, empty states, native checkboxes, keyboard arrows/space and 44px controls verified at 375/768/1440px; clean preview.
-- [x] Add Export format defaults, quality summary, GIF presets/advanced/loop controls; exact presets, custom detection, looping and format visibility verified signed-in at 375/768/1440px; 18 tests passed, clean preview.
-- [x] Redesign Export with compact size cards, platform shortcuts, portrait default, true-ratio previews and top history; signed-in selection/custom/history/larger-preview/reload verified at 375/768/1440px with no overflow or runtime errors; 23 tests passed.
-- [x] Separate photo/logo/headline/subline settings by size; signed-in edits and reload verified, shared animation/movement confirmed, originals restored; 28 regression tests passed and preview/export share size-aware rendering.
-- [x] Make "Add a reel" collapsible on admin/reels; verified collapsed default, open/close, draft kept when hidden, choice remembered after reload, clean build.
-- [x] Replace phone font popover with a bottom sheet; verified phone search/close and desktop popover, saved SVG readback without active content, export font outage/retry and nine passing tests.
-- [x] Move timing and transitions to frame-strip popovers; verified menus, delete/toast undo, keyboard navigation and shared timing saved across reload; nine timing/transition tests pass.
-- [x] Update and verify four-shape descriptions and illustrations on Home, Features, Pricing, About, Help, How it Works and Aimanté About; seven pages load with metadata, four-shape artwork checked, five export-size tests pass.
-- [x] Redesign Aimanté brand pages; verified desktop/phone layouts, reel dialog, related links and affiliation notice; browser-test playback unavailable (no supported media source).
-- [x] Update Aimanté phone home; verified 320/390/767 widths, all bottom sheets, pause and Purl Soho search; desktop preserved except requested About link visibility.
-- [x] Update Aimanté lockup, always-branded navigation, mobile panel and footer; verify signed-in and signed-out pages.
-- [x] Add a branded, domain-aware service-unavailable page for application and SSR failures.
-- [x] Complete brand-request spam protection, website deduplication, private admin details/actions/nav count and emails; verified upload, confirmation/alert sends, duplicate rejection, Needs info, approval into linked draft, optional-reason decline, and rate-limit rejection.
-- [x] Set the shared concept disclaimer to 10px.
-- [x] Add the concept-reel notice for Agnona and Maison Francis Kurkdjian across brand/reel displays; both brand pages and popups, Showcase/Examples, and unaffected Purl Soho verified.
-- [x] Add editable website reel descriptions; all 12 published reels have starter copy, with authenticated save/reload and public popup readback verified.
-- [x] Match Directory reel popups to the reference; verified playback, closing, brand links and mobile layout.
-- [x] Resolve 32 exposed-definer warnings; verify public browsing, account/staff reads and access-denial regressions (20 tests passed).
-- [ ] Remaining managed pg_net extension registration warning — safe relocation requires provider-supported maintenance; drop/recreate could disrupt scheduled jobs, so retain it rather than suppress the warning.
-- [x] Complete Aimanté brand pages and verify all 12 live brands.
-- [x] Build `/join` submission, confirmation email, and staff approval into a draft brand.
-- [ ] Submit Aimanté's sitemap to Google — blocked until aimante.co is verified in Google Search Console. Publishing requested; recheck production redirects after deployment completes.
-- [x] Add admin brand affiliation/draft controls and category-line editing; verify saved values.
-- [x] Review current security findings; revoke unchecked greeting inserts, protect staff brand fields, patch vulnerable dependencies; retain intentional public catalog reads and reviewed helper/extension advisories.
-- [x] Replace invented Aimanté share art with real reel imagery, review Join/About copy, and correct Purl Soho's address with an old-address redirect.
-- [x] Count intentional Directory reel opens and rank “Most viewed this week” using real weekly totals; verify recording and selection.
-- [x] Verify the staff carousel preview visually — current staff session opens settings and renders real reel previews.
-- [x] Connect real visitor country and weather to Directory greetings and verify lookup/fallback behavior.
-- [x] Add brand-page links and expanding logo tiles to Browse reels and carousel captions; verify navigation, keyboard and touch behavior.
-- [x] Adjust filter-to-carousel spacing and add saved label size/spacing controls.
-- [x] Stabilize changing Directory headlines and verify the page and admin controls.
-- [x] Add shared-list Moods filter to Directory and verify filtering/reset.
-- [x] Add staff-only Moods page and family-grouped add/rename/delete controls.
-- [x] Preserve category and brand/reel mood references on rename; remove deleted moods safely.
-- [x] Verify mood management end to end.
-- [x] Update shared categories and preserve existing brand/mood assignments.
-- [x] Update reel category dropdowns and verify selection/save.
-- [x] Account Directory tab: name/website/category fields, featured note, split cards, reel thumbnails
-- [x] Favorites: square tiles, live Shared/Private text
-- [x] Team: seats bar, role picker, Resend invite
-- [x] Billing: Featured brand row
-- [x] Your Ads: verify Directory status + menu
+# Shopify reel styling
+- [ ] Preserve template logo settings across creation, uploads and size changes; repair existing Shopify reels.
+- [ ] Add shared editor Style controls with immediate preview and saved changes.
+- [ ] Preserve slide styling during add/remove/reorder; reset styling without changing photos or words.
+- [ ] Run regression tests and verify the screen; note any Shopify-session testing limitation.
