@@ -22,7 +22,8 @@ export function useAdBrand(doc: EditorDoc) {
 export function useReelPlayer(doc: EditorDoc) {
   const brand = useAdBrand(doc);
   const { images, version } = useRenderAssets(doc, brand);
-  const [format, setFormat] = useState<Format>(doc.project.primary_format);
+  const [previewSize, setFormat] = useState<Format | null>(null);
+  const format = previewSize ?? doc.project.primary_format;
   const [playing, setPlaying] = useState(false);
   const [time, setTime] = useState(() => restTime(doc.frames, 0));
   const total = videoDuration(doc.project, doc.frames, brand);

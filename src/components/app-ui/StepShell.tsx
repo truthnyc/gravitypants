@@ -33,14 +33,16 @@ function useLargePreviewState() {
 }
 import { GravityPantsLogo } from "@/components/GravityPantsLogo";
 import { cn } from "@/lib/utils";
+import { MAIN_SIZES } from "@/lib/stillframe/main-size";
 import { AppCard, AppSectionLabel, AppSwitch } from "./index";
 
-export type StepKey = "photos" | "edit" | "export" | "share";
-const STEPS_ALL: { key: StepKey; label: string; to: "/app/ad/$id/photos" | "/app/ad/$id/edit" | "/app/ad/$id/export" | "/app/ad/$id/share" }[] = [
+export type StepKey = "format" | "photos" | "edit" | "export" | "share";
+const STEPS_ALL: { key: StepKey; label: string; to: "/app/ad/$id/format" | "/app/ad/$id/photos" | "/app/ad/$id/edit" | "/app/ad/$id/export" | "/app/ad/$id/share" }[] = [
+  { key: "format", label: "Format", to: "/app/ad/$id/format" },
   { key: "photos", label: "Photos", to: "/app/ad/$id/photos" },
   { key: "edit", label: "Edit", to: "/app/ad/$id/edit" },
   { key: "export", label: "Export", to: "/app/ad/$id/export" },
-  { key: "share", label: "Share", to: "/app/ad/$id/share" },
+  { key: "share", label: "Share (optional)", to: "/app/ad/$id/share" },
 ];
 const STEPS = STEPS_ALL.filter((s) => SHOW_SHARE || s.key !== "share");
 
@@ -100,7 +102,7 @@ function StepBar({ adId, current, className }: { adId: string; current: number; 
 }
 
 /** Ad-step header: same shell as the shared site header, with ad name and step bar. */
-function StepHeader({ adId, current, title, back }: { adId: string; current: number; title: StepTitleInfo; back?: { label: string; to: "/app/ads" | "/app/ad/$id/edit" } | undefined }) {
+function StepHeader({ adId, current, title, back, pills }: { adId: string; current: number; title: StepTitleInfo; back?: { label: string; to: "/app/ads" | "/app/ad/$id/edit" } | undefined; pills?: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [open, setOpen] = useState(false);
   const close = useCallback(() => setOpen(false), []);
@@ -118,7 +120,8 @@ function StepHeader({ adId, current, title, back }: { adId: string; current: num
           </Link>
           <AdName title={title} />
           <div className="flex-1" />
-          <StepBar adId={adId} current={current} className="absolute left-1/2 hidden -translate-x-1/2 lg:inline-flex" />
+          <StepBar adId={adId} current={current} className={pills ? "hidden xl:inline-flex" : "absolute left-1/2 hidden -translate-x-1/2 lg:inline-flex"} />
+          {pills && <div className="hidden shrink-0 sm:flex">{pills}</div>}
           <div className="hidden items-center gap-3 lg:flex"><HelpMenu /><UserMenu /></div>
           <button ref={btn} type="button" className="grid size-9 min-h-0 min-w-0 shrink-0 place-items-center rounded-lg text-ap-ink hover:bg-ap-panel lg:hidden" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} aria-controls="mobile-menu" onClick={() => setOpen((v) => !v)}>
             {open ? <X size={22} strokeWidth={1.7} /> : <Menu size={22} strokeWidth={1.7} />}
@@ -126,15 +129,18 @@ function StepHeader({ adId, current, title, back }: { adId: string; current: num
         </div>
         <MobileMenu open={open} signedIn pathname={pathname} close={close} />
       </header>
-      <div className="overflow-x-auto border-b border-ap-hairline bg-ap-card px-4 py-2 md:px-6 lg:hidden">
+      <div className={cn("overflow-x-auto border-b border-ap-hairline bg-ap-card px-4 py-2 md:px-6", pills ? "xl:hidden" : "lg:hidden")}>
         <StepBar adId={adId} current={current} className="flex w-max min-w-full" />
+        {pills && <div className="mt-2 flex sm:hidden">{pills}</div>}
       </div>
     </>
   );
 }
 
 /** Shared frame for the four ad steps: header with steps, sticky reel card on the left, step card on the right. */
-export function StepShell({ adId, step, left, children, banner, back, title, className }: {
+export function StepShell({ adId, step, left, children, banner, back, title, className, pills }: {
+  /** Header right side: brand kit and main size pills. */
+  pills?: ReactNode;
   adId: string;
   step: StepKey;
   left: ReactNode;
@@ -148,7 +154,7 @@ export function StepShell({ adId, step, left, children, banner, back, title, cla
   const { large, toggle } = useLargePreviewState();
   return (
     <div className={cn("ap-flow min-h-dvh", className)}>
-      <StepHeader adId={adId} current={current} title={title} back={back} />
+      <StepHeader adId={adId} current={current} title={title} back={back} pills={pills} />
       {banner}
       <LargeCtx.Provider value={{ large, toggle }}>
         <main className={cn("ap-steps-main mx-auto grid max-w-[1180px] items-start gap-7 px-4 pt-6 pb-20 sm:px-6 sm:pt-8", large && "ap-large")}>
@@ -180,6 +186,7 @@ export function StepActions({ children, note }: { children: ReactNode; note?: Re
 }
 
 const FORMATS = ["9:16", "1:1", "16:9"] as const;
+const FORMAT_PX = Object.fromEntries(MAIN_SIZES.map((s) => [s.format, `${s.width} × ${s.height}`]));
 
 /** Left card: reel preview, play + progress, name and meta, sizes. Same on every step. */
 export function ReelCard({
@@ -213,6 +220,9 @@ export function ReelCard({
     <AppCard>
       <div className="ap-preview-box relative grid h-[340px] grid-cols-[minmax(0,1fr)] grid-rows-[minmax(0,1fr)] place-items-center overflow-hidden rounded-[18px] bg-ap-panel p-[22px] sm:h-[380px]">
         {preview}
+        {(FORMAT_PX as Record<string, string>)[format] && (
+          <span className="pointer-events-none absolute bottom-2.5 left-2.5 rounded-full bg-ap-card px-2.5 py-0.5 text-[12px] text-ap-muted shadow-ap-soft nums">{(FORMAT_PX as Record<string, string>)[format]}</span>
+        )}
         {lp && (
           <button
             type="button"

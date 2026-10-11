@@ -25,9 +25,7 @@
 - Billing: per-workspace in `workspace_billing` (synced only by /api/public/payments/webhook), plans in `plans`; export gating via SQL `export_status`/`record_export` plus a restrictive storage policy on `<ws>/exports/` — the browser is never trusted for plan status.
 - AI calls go through `src/lib/ai/gateway.server.ts`; the billing helper is `diagnoseBilling` in `billing-help.functions.ts`, owners/admins only.
 - Brand kits: `brand_kits` (logos in private `brand-assets` bucket, `brand-assets:` path prefix for `getMediaUrl`); ads link via `projects.brand_kit_id`; `effectiveKit()` merges over the legacy `brand_kit` row (workspace ad settings only). Gated by SQL `brand_kits_enabled()` in RLS.
-- Templates are photo-less styles; examples reuse `insertCopy`; imported system templates preserve per-slide overrides and logo visibility.
 
-- Plan gates: every feature check goes through `usePlanAccess().canUse(feature)` in `src/lib/stillframe/plan.ts`; blocked features call `openUpgrade()` (one shared dialog) instead of hiding — one place for plan rules.
 - Support: tickets in `support_tickets` via `submitTicket` server fn; priority set by SQL trigger from the plan (never the browser); each ticket emails help@gravitypants.com.
 
 - Public art uses `public/site-art`; site video uses shared `FeaturedAdVideo` and CDN pointers.

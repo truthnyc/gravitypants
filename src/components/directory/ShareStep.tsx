@@ -5,6 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { ChevronLeft, X } from "lucide-react";
 import { AppButton, AppField, AppInput, AppSelect, AppSwitch, AppTag } from "@/components/app-ui";
+import { AdPills, useSaveDoc } from "@/components/app-ui/AdPills";
 import { ReelCard, StepActions, StepShell, StepTitle } from "@/components/app-ui/StepShell";
 import { useReelPlayer } from "@/components/editor/ReelPreview";
 import { supabase } from "@/integrations/supabase/client";
@@ -136,12 +137,14 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
     void makePoster(doc, player.brand, thumbFrame).then((b) => { if (b) { url = URL.createObjectURL(b); setThumb(url); } }).catch(() => undefined);
     return () => { if (url) URL.revokeObjectURL(url); };
   }, [doc, player.brand, thumbFrame]);
+  const saveDoc = useSaveDoc(doc);
   const graceEnd = ctx.plan.endedAt ? new Date(new Date(ctx.plan.endedAt).getTime() + GRACE_DAYS * 86_400_000) : null;
 
   return (
     <StepShell
       adId={doc.project.id}
       step="share"
+      pills={<AdPills doc={doc} set={saveDoc} />}
       title={{ name: doc.project.name }}
       back={{ label: "Back to Edit", to: "/app/ad/$id/edit" }}
       left={

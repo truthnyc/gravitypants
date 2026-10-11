@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { ChevronRight, X } from "lucide-react";
 import { AppButton, AppSectionLabel } from "@/components/app-ui";
+import { AdPills } from "@/components/app-ui/AdPills";
 import { ReelCard, StepActions, StepShell, StepTitle } from "@/components/app-ui/StepShell";
 import { framePayloadFromPhoto, useTemplateName, type EditorDoc } from "@/lib/stillframe/data";
 import { ACCEPTED_IMAGE_TYPES, uploadMedia } from "@/lib/stillframe/media";
@@ -85,6 +86,7 @@ export function PhotosStep({ initial, readOnly = false }: { initial: EditorDoc; 
     <StepShell
       adId={doc.project.id}
       step="photos"
+      pills={<AdPills doc={doc} set={(next) => apply(() => next)} readOnly={readOnly} />}
       title={{ name: doc.project.name, onRename: (name) => apply((d) => ({ ...d, project: { ...d.project, name } })), status: readOnly ? undefined : status, readOnly }}
       left={
         <ReelCard
