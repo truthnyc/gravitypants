@@ -1,4 +1,5 @@
 # Roadmap
+- [x] Finish Export footer/list/empty states and small components; signed-in 1/2/4 file counts, actual pixel list, empty states, native checkboxes, keyboard arrows/space and 44px controls verified at 375/768/1440px; clean preview.
 - [x] Add Export format defaults, quality summary, GIF presets/advanced/loop controls; exact presets, custom detection, looping and format visibility verified signed-in at 375/768/1440px; 18 tests passed, clean preview.
 - [x] Redesign Export with compact size cards, platform shortcuts, portrait default, true-ratio previews and top history; signed-in selection/custom/history/larger-preview/reload verified at 375/768/1440px with no overflow or runtime errors; 23 tests passed.
 - [x] Separate photo/logo/headline/subline settings by size; signed-in edits and reload verified, shared animation/movement confirmed, originals restored; 28 regression tests passed and preview/export share size-aware rendering.
