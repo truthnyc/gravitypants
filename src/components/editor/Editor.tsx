@@ -5,7 +5,7 @@ import { AppSegmented } from "@/components/app-ui";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Link } from "@tanstack/react-router";
 import { AppButton } from "@/components/app-ui";
-import { AdPills } from "@/components/app-ui/AdPills";
+import { AdPills, useMainSizeChange } from "@/components/app-ui/AdPills";
 import { ReelCard, StepActions, StepShell, StepTitle } from "@/components/app-ui/StepShell";
 import { KitAgainButton } from "@/components/templates/KitAgain";
 import { effectiveKit, framePayloadFromPhoto, useBrandKit, useBrandKits, useTemplateName, type EditorDoc } from "@/lib/stillframe/data";
@@ -44,7 +44,7 @@ const NEW_HEADLINE: TextSettings = {
   color: "#FFFFFF",
   animation: "rise",
   position: "center",
-  same_on_all: false,
+  same_on_all: true,
 };
 const NEW_SUBLINE: TextSettings = {
   text: "",
@@ -54,7 +54,7 @@ const NEW_SUBLINE: TextSettings = {
   color: "#FFFFFF",
   animation: "fade",
   position: "bottom-center",
-  same_on_all: false,
+  same_on_all: true,
   keep_under_headline: true,
 };
 const STYLE_KEYS = [
@@ -106,6 +106,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
   // Preview shape; 4:5 is a real format with its own layout rules.
   // previewSize is temporary; the main size lives on the ad.
   const [previewSize, setFormat] = useState<Format | null>(null);
+  const [safeZones, setSafeZones] = useState(true);
   const format = previewSize ?? doc.project.primary_format;
   const [time, setTime] = useState(() => restTime(initial.frames, 0));
   const [playing, setPlaying] = useState(false);
@@ -129,6 +130,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
   useEffect(() => {
     try { localStorage.setItem(sameKey, JSON.stringify({ length: sameLength, transition: sameTransition })); } catch { /* ignore */ }
   }, [sameKey, sameLength, sameTransition]);
+  const changeMain = useMainSizeChange(doc, (next) => { setFormat(null); apply(() => next); });
   const replaceRef = useRef<HTMLInputElement>(null);
   const replaceAt = useRef(0);
   const replaceFormat = useRef<Format>(format);
@@ -691,6 +693,20 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
 
   if (!frame) return null;
 
+  /** Freezes the current layout for the previewed size, so later main-size edits don't move it. */
+  const fixForSize = () => {
+    apply((d) => ({
+      ...d,
+      frames: d.frames.map((f) => {
+        const r = frameForFormat(f, format);
+        const { movement: _m, movement_intensity: _i, zoom_start: _a, zoom_end: _b, pan_x: _x, pan_y: _y, ...photo } = r.photo ?? {};
+        const text = (t: TextSettings | null) => { if (!t) return t; const { animation: _an, ...rest } = t; return rest; };
+        return patchFrameVisual(f, format, { photo, headline: text(r.headline), subline: text(r.subline), logo_visible: r.logo_visible });
+      }),
+    }));
+    toast(`Layout saved for ${format}. Changes you make now apply to ${format} only.`);
+  };
+
   const formatIssues = (f: string) => fitIssues.filter((x) => x.format === f);
   const here = formatIssues(format)[0];
   const elsewhere = PREVIEW_SHAPES.filter((f) => f !== format && formatIssues(f).length);
@@ -729,6 +745,12 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
                 onResize={resizeEl}
                 onFocus={onStageFocus}
                 onAdjustDone={() => { setAdjusting(false); setKeyframe(null); }}
+                overlay={format === "9:16" && safeZones ? (
+                  <>
+                    <div className="absolute inset-x-0 top-0 h-[14%] bg-ap-red/25" />
+                    <div className="absolute inset-x-0 bottom-0 h-[22%] bg-ap-red/25" />
+                  </>
+                ) : undefined}
               />
             </div>
           }
@@ -759,12 +781,30 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
                   label: (
                     <span className="inline-flex items-center gap-1.5 nums">
                       {f}
+                      {f === doc.project.primary_format && <span className="size-1.5 rounded-full bg-ap-blue" aria-label="main size" />}
                       {formatIssues(f).length > 0 && <span className="size-1.5 rounded-full bg-ap-amber" aria-label="has a fit problem" />}
                     </span>
                   ),
                 }))}
               />
             </div>
+            {format !== doc.project.primary_format && (
+              <div role="status" className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-[12px] bg-ap-amber-soft px-3.5 py-2.5 text-[13px] text-ap-amber">
+                <span className="nums">Previewing {format}. Your main size is {doc.project.primary_format}.</span>
+                {!readOnly && (
+                  <span className="flex gap-3">
+                    <button type="button" className="font-semibold text-ap-blue" onClick={() => changeMain(format)}>Make main size</button>
+                    <button type="button" className="font-semibold text-ap-blue" onClick={fixForSize}>Fix for this size</button>
+                  </span>
+                )}
+              </div>
+            )}
+            {format === "9:16" && (
+              <label className="mt-3 flex items-center gap-2 text-[13px]">
+                <input type="checkbox" checked={safeZones} onChange={(e) => setSafeZones(e.target.checked)} className="size-4 accent-ap-blue" />
+                Show Reels / TikTok safe zones
+              </label>
+            )}
             {(here || elsewhere.length > 0) && (
               <p className="mt-2 text-[12px] leading-snug text-ap-amber" role="status">
                 {here ? (
