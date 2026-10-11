@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { getShopifyConfig } from "@/lib/shopify/config.functions";
 import { shopifyFetch, waitForAppBridge } from "@/lib/shopify/bridge";
+import { PlanBar, useShopPlan } from "@/components/shopify/ShopPlan";
 
 type Result =
   | { state: "loading" }
@@ -95,6 +96,7 @@ function ShopifyHome() {
             >
               {making ? "Making your reel…" : "Make a reel"}
             </button>
+            <div className="mt-6 flex justify-center"><ShopPlanSummary /></div>
             {note && <p className="mt-3 text-sm text-muted-foreground">{note}</p>}
             {error && <p role="alert" className="mt-3 text-sm text-destructive">{error}</p>}
           </>
@@ -108,4 +110,9 @@ function ShopifyHome() {
       </div>
     </main>
   );
+}
+
+function ShopPlanSummary() {
+  const { info } = useShopPlan();
+  return <PlanBar info={info} />;
 }

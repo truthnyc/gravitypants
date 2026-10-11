@@ -44,6 +44,7 @@ import { Route as GalleryPatternsSplatRouteImport } from './routes/gallery-patte
 import { Route as InviteTokenRouteImport } from './routes/invite.$token'
 import { Route as ProductCategorySplatRouteImport } from './routes/product-category.$'
 import { Route as ProductSplatRouteImport } from './routes/product.$'
+import { Route as ShopifyWelcomeRouteImport } from './routes/shopify_.welcome'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedAdminAdminsRouteImport } from './routes/_authenticated/admin/admins'
 import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin/analytics'
@@ -273,6 +274,11 @@ const ProductSplatRoute = ProductSplatRouteImport.update({
   id: '/$',
   path: '/$',
   getParentRoute: () => ProductRoute,
+} as any)
+const ShopifyWelcomeRoute = ShopifyWelcomeRouteImport.update({
+  id: '/shopify_/welcome',
+  path: '/shopify/welcome',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
@@ -614,6 +620,7 @@ export interface FileRoutesByFullPath {
   '/invite/$token': typeof InviteTokenRoute
   '/product-category/$': typeof ProductCategorySplatRoute
   '/product/$': typeof ProductSplatRoute
+  '/shopify/welcome': typeof ShopifyWelcomeRoute
   '/blog/': typeof BlogIndexRoute
   '/directory/': typeof DirectoryIndexRoute
   '/admin/admins': typeof AuthenticatedAdminAdminsRoute
@@ -702,6 +709,7 @@ export interface FileRoutesByTo {
   '/invite/$token': typeof InviteTokenRoute
   '/product-category/$': typeof ProductCategorySplatRoute
   '/product/$': typeof ProductSplatRoute
+  '/shopify/welcome': typeof ShopifyWelcomeRoute
   '/blog': typeof BlogIndexRoute
   '/directory': typeof DirectoryIndexRoute
   '/admin/admins': typeof AuthenticatedAdminAdminsRoute
@@ -795,6 +803,7 @@ export interface FileRoutesById {
   '/invite/$token': typeof InviteTokenRoute
   '/product-category/$': typeof ProductCategorySplatRoute
   '/product/$': typeof ProductSplatRoute
+  '/shopify_/welcome': typeof ShopifyWelcomeRoute
   '/blog/': typeof BlogIndexRoute
   '/directory/': typeof DirectoryIndexRoute
   '/_authenticated/admin/admins': typeof AuthenticatedAdminAdminsRoute
@@ -888,6 +897,7 @@ export interface FileRouteTypes {
     | '/invite/$token'
     | '/product-category/$'
     | '/product/$'
+    | '/shopify/welcome'
     | '/blog/'
     | '/directory/'
     | '/admin/admins'
@@ -976,6 +986,7 @@ export interface FileRouteTypes {
     | '/invite/$token'
     | '/product-category/$'
     | '/product/$'
+    | '/shopify/welcome'
     | '/blog'
     | '/directory'
     | '/admin/admins'
@@ -1068,6 +1079,7 @@ export interface FileRouteTypes {
     | '/invite/$token'
     | '/product-category/$'
     | '/product/$'
+    | '/shopify_/welcome'
     | '/blog/'
     | '/directory/'
     | '/_authenticated/admin/admins'
@@ -1155,6 +1167,7 @@ export interface RootRouteChildren {
   DirectorySlugRoute: typeof DirectorySlugRoute
   FavoritesSlugRoute: typeof FavoritesSlugRoute
   InviteTokenRoute: typeof InviteTokenRoute
+  ShopifyWelcomeRoute: typeof ShopifyWelcomeRoute
   DirectoryIndexRoute: typeof DirectoryIndexRoute
   ApiPublicCleanupExportsRoute: typeof ApiPublicCleanupExportsRoute
   ApiPublicDirectoryDailyRoute: typeof ApiPublicDirectoryDailyRoute
@@ -1419,6 +1432,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/product/$'
       preLoaderRoute: typeof ProductSplatRouteImport
       parentRoute: typeof ProductRoute
+    }
+    '/shopify_/welcome': {
+      id: '/shopify_/welcome'
+      path: '/shopify/welcome'
+      fullPath: '/shopify/welcome'
+      preLoaderRoute: typeof ShopifyWelcomeRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
@@ -2016,6 +2036,7 @@ const rootRouteChildren: RootRouteChildren = {
   DirectorySlugRoute: DirectorySlugRoute,
   FavoritesSlugRoute: FavoritesSlugRoute,
   InviteTokenRoute: InviteTokenRoute,
+  ShopifyWelcomeRoute: ShopifyWelcomeRoute,
   DirectoryIndexRoute: DirectoryIndexRoute,
   ApiPublicCleanupExportsRoute: ApiPublicCleanupExportsRoute,
   ApiPublicDirectoryDailyRoute: ApiPublicDirectoryDailyRoute,
