@@ -5,3 +5,6 @@
 - `billing_source` is set by a SQL trigger from the linked user's paid web plan, never by app code.
 - src/server.ts sets the per-shop `frame-ancestors` CSP for /shopify, because Shopify rejects meta-tag CSP.
 - Admin API is GraphQL only, version pinned in SHOPIFY_API_VERSION.
+- Each shop owns one member-less workspace (`shopify_shops.workspace_id`, created by SQL `ensure_shop_workspace`); routes resolve it via `shopFromRequest()` in session.server.ts so the browser never sends a workspace id.
+- Shopify reels reuse `template-source.ts`, `renderAt` and `exportMedia.ts`; `reel-build.ts` holds the pure product→reel rules. No second renderer.
+- `export_status` allows `service_role` so shop routes can enforce the same export rules for member-less workspaces.
