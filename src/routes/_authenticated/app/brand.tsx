@@ -41,6 +41,7 @@ const FORMATS: { f: Format; w: number; h: number }[] = [
   { f: "4:5", w: 68, h: 85 },
   { f: "1:1", w: 84, h: 84 },
   { f: "16:9", w: 128, h: 72 },
+  { f: "5:4", w: 105, h: 84 },
 ];
 
 function Card({ title, hint, children }: { title: string; hint?: string; children: React.ReactNode }) {

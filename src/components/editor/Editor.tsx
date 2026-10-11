@@ -103,7 +103,9 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
   const [frameIndex, setFrameIndex] = useState(0);
   const [selected, setSelected] = useState<ElementKey>("headline");
   // Preview shape; 4:5 is a real format with its own layout rules.
-  const [format, setFormat] = useState<Format>(initial.project.primary_format);
+  // previewSize is temporary; the main size lives on the ad.
+  const [previewSize, setFormat] = useState<Format | null>(null);
+  const format = previewSize ?? doc.project.primary_format;
   const [time, setTime] = useState(() => restTime(initial.frames, 0));
   const [playing, setPlaying] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -784,25 +786,6 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
         lead="Tap anything on the preview to change it."
         actions={readOnly ? undefined : (
           <>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <AppButton variant="ghost" size="sm" aria-label="Brand kit for the whole video">
-                  <span className="size-3 rounded-[3px] bg-ap-blue" style={kit?.colors?.[0] ? { background: kit.colors[0] } : undefined} aria-hidden />
-                  Brand
-                </AppButton>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-[240px]">
-                <DropdownMenuLabel>Brand kit for the whole video</DropdownMenuLabel>
-                {kits?.length ? (
-                  <DropdownMenuRadioGroup value={doc.project.brand_kit_id ?? ""} onValueChange={(v) => actions.onKit(v || null)}>
-                    <DropdownMenuRadioItem value="">None</DropdownMenuRadioItem>
-                    {kits.map((k) => <DropdownMenuRadioItem key={k.id} value={k.id}>{k.name}</DropdownMenuRadioItem>)}
-                  </DropdownMenuRadioGroup>
-                ) : (
-                  <DropdownMenuItem asChild><Link to="/app/brand">Create a brand kit</Link></DropdownMenuItem>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <AppButton variant="ghost" size="sm" aria-label="More actions"><MoreHorizontal className="size-4" strokeWidth={1.7} /></AppButton>
