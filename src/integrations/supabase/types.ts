@@ -1336,6 +1336,7 @@ export type Database = {
           shop_domain: string
           uninstalled_at: string | null
           updated_at: string
+          workspace_id: string | null
         }
         Insert: {
           access_token: string
@@ -1348,6 +1349,7 @@ export type Database = {
           shop_domain: string
           uninstalled_at?: string | null
           updated_at?: string
+          workspace_id?: string | null
         }
         Update: {
           access_token?: string
@@ -1360,6 +1362,7 @@ export type Database = {
           shop_domain?: string
           uninstalled_at?: string | null
           updated_at?: string
+          workspace_id?: string | null
         }
         Relationships: [
           {
@@ -1368,6 +1371,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "shopify_shops_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -1959,6 +1969,7 @@ export type Database = {
         }[]
       }
       effective_billing: { Args: { _ws: string }; Returns: Json }
+      ensure_shop_workspace: { Args: { _shop: string }; Returns: string }
       ensure_workspace: { Args: never; Returns: string }
       export_status: { Args: { _ws: string }; Returns: Json }
       featured_plans: { Args: never; Returns: string[] }
