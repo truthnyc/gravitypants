@@ -32,8 +32,14 @@ import { useGreeting, logGreeting } from "@/components/directory/useGreeting";
 import { rememberVisit } from "@/lib/directory/greeting";
 import { recordDirectoryReelOpen } from "@/lib/directory/views.functions";
 
-const POSTER =
-  "absolute top-1/2 left-1/2 h-[72%] w-auto max-w-[72%] object-contain -translate-x-1/2 -translate-y-1/2 rounded-[6px] shadow-[0_0_0_1px_var(--ap-inner),0_18px_34px_-16px_rgba(29,29,31,.28)]";
+const POSTER_RING = "rounded-[6px] shadow-[0_0_0_1px_var(--ap-inner),0_18px_34px_-16px_rgba(29,29,31,.28)]";
+/** The poster box takes the reel's own shape, so the ring fits the image on every size. */
+const posterFor = (format: string | undefined) =>
+  format === "16x9"
+    ? `absolute top-1/2 left-1/2 w-[88%] aspect-[16/9] object-contain -translate-x-1/2 -translate-y-1/2 ${POSTER_RING}`
+    : format === "5x4"
+      ? `absolute top-1/2 left-1/2 w-[84%] aspect-[5/4] object-contain -translate-x-1/2 -translate-y-1/2 ${POSTER_RING}`
+      : `absolute top-1/2 left-1/2 h-auto w-auto max-h-[72%] max-w-[72%] object-contain -translate-x-1/2 -translate-y-1/2 ${POSTER_RING}`;
 
 // Moods the headline cycles through when none are picked.
 const ROTATING = ["soothing", "energizing", "hopeful", "inspiring", "cozy", "luxurious", "playful"];
@@ -360,7 +366,7 @@ function DirectoryPage() {
                 <li key={`${r.kind}-${r.id}`} data-reel-idx={i} className="dir-card-in relative" style={{ animationDelay: `${(i % PAGE) * 40}ms` }}>
                   <button type="button" onClick={() => openReel(r)} aria-label={`Open ${r.title}`}
                     className="dir-result-tile relative block aspect-square w-full overflow-hidden rounded-[8px] bg-ap-panel">
-                    <HoverReelPreview video={r.video_url ?? r.preview_url} poster={r.poster} className={POSTER} />
+                    <HoverReelPreview video={r.video_url ?? r.preview_url} poster={r.poster} className={posterFor(r.formats[0])} />
                   </button>
                   {r.kind === "site" ? <SiteReelHeart reelId={r.id} name={r.title} /> : <DirectoryReelHeart reelId={r.id} name={`${r.brand_name} reel`} />}
                   <p className="dir-result-title mt-2.5 truncate text-[14px] font-semibold">{r.title}</p>

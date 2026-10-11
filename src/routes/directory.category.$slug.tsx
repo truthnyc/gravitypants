@@ -11,8 +11,12 @@ import { siteHead } from "@/lib/site/seo";
 import { SiteReelHeart } from "@/components/site/SiteReelHeart";
 import { SiteReelModal } from "@/components/site/SiteReelModal";
 
-const POSTER =
-  "absolute top-1/2 left-1/2 h-[72%] w-auto max-w-[72%] object-contain -translate-x-1/2 -translate-y-1/2 rounded-[6px] shadow-[0_0_0_1px_var(--ap-inner),0_18px_34px_-16px_rgba(29,29,31,.28)]";
+const POSTER_RING = "rounded-[6px] shadow-[0_0_0_1px_var(--ap-inner),0_18px_34px_-16px_rgba(29,29,31,.28)]";
+/** The poster box takes the reel's own shape, so the ring fits the image on every size. */
+const posterFor = (format: string | undefined) =>
+  format === "169"
+    ? `absolute top-1/2 left-1/2 w-[88%] aspect-[16/9] object-contain -translate-x-1/2 -translate-y-1/2 ${POSTER_RING}`
+    : `absolute top-1/2 left-1/2 h-auto w-auto max-h-[72%] max-w-[72%] object-contain -translate-x-1/2 -translate-y-1/2 ${POSTER_RING}`;
 
 export const Route = createFileRoute("/directory/category/$slug")({
   // Category pages now open the Directory with that category already filtered.
@@ -97,7 +101,7 @@ function CategoryPage() {
               {reels.map((r) => (
                 <li key={r.id} className="relative">
                   <button type="button" onClick={() => setOpenSite(r)} aria-label={`Open ${r.title}`} className="relative block aspect-square w-full overflow-hidden rounded-[8px] bg-ap-panel">
-                    {r.poster && <img src={r.poster} alt="" loading="lazy" className={POSTER} />}
+                    {r.poster && <img src={r.poster} alt="" loading="lazy" className={posterFor(r.format)} />}
                   </button>
                   <SiteReelHeart reelId={r.id} name={r.title} />
                   <p className="mt-2.5 truncate text-[14px] font-semibold">{r.title}</p>
