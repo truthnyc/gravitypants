@@ -78,6 +78,7 @@
   --ap-inner: #e8e8ed;
   --ap-green: #248a3d;
   --ap-amber: #b25000;
+  --ap-amber-soft: #fff7e0;
   --ap-gold: #d4a017;
   --ap-switch-off: #d1d1d6;
   --ap-card: #ffffff;
@@ -106,6 +107,7 @@
   --color-ap-blue: var(--ap-blue);
   --color-ap-blue-strong: var(--ap-blue-strong);
   --color-ap-red: var(--ap-red);
+  --color-ap-amber-soft: var(--ap-amber-soft);
   --color-ap-blue-hover: var(--ap-blue-hover);
   --color-ap-badge: var(--ap-badge);
   --color-ap-soft-blue: var(--ap-soft-blue);
