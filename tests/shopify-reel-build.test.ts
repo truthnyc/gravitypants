@@ -28,7 +28,8 @@ describe("shopify reel rules", () => {
   });
 });
 
-import { addSlides, buildReel, changeSize, moveSlide, removeSlide, LIMIT_MESSAGE, type ReelItem } from "@/lib/shopify/reel-build";
+import { addSlides, appendReelSlides, applyReelStyle, buildReel, changeSize, moveSlide, removeSlide, resetReelStyle, withLogoImage, LIMIT_MESSAGE, type ReelItem } from "@/lib/shopify/reel-build";
+import { frameForFormat } from "@/lib/stillframe/format-settings";
 import type { Template } from "@/lib/stillframe/data";
 
 const tpl = { id: "t1", name: "Product Launch", source: "system", is_reusable: true, settings: { frames: [], formats: ["9:16"], primary_format: "9:16", pace: "standard", logo: {}, end_card: {} } } as unknown as Template;
@@ -43,7 +44,7 @@ describe("shopify reel screen rules", () => {
     expect(formatPrice({ amount: "0.0", currencyCode: "USD" })).toBeNull();
     expect(formatPrice(null)).toBeNull();
     const r = buildReel(tpl, [{ path: "ws/a.jpg", headline: "A", subline: formatPrice({ amount: "0", currencyCode: "USD" }) }], opts);
-    expect(r.frames[0]!.subline).toBeNull();
+    expect(r.frames[0]?.subline).toBeNull();
   });
   it("add respects MAX_SLIDES", () => {
     expect(addSlides(items(MAX_FRAMES), items(1)).error).toBe(LIMIT_MESSAGE);
@@ -58,5 +59,60 @@ describe("shopify reel screen rules", () => {
     const r = changeSize(buildReel(tpl, items(4), opts), "4:5");
     expect(r.primary_format).toBe("4:5");
     expect(r.frames.map((f) => f.headline?.text)).toEqual(["H0", "H1", "H2", "H3"]);
+  });
+});
+
+const launch = { ...tpl, settings: { ...tpl.settings, logo: { positions: { "9:16": "bottom-center" }, size_pct: 64, show_on: "all", opacity: "solid" } }, style: { logo_position: "bottom-center" } } as Template;
+describe("Shopify styling persistence", () => {
+  it("keeps Product Launch logo settings through build, upload and size changes", () => {
+    const built = buildReel(launch, items(3), { ...opts, logoPath: "brand-assets:ws/auto.svg" });
+    const uploaded = withLogoImage(built, "brand-assets:ws/manual.svg");
+    const resized = changeSize(uploaded, "16:9");
+    for (const reel of [built, uploaded, resized]) {
+      expect(reel.logo.positions).toEqual({ "9:16": "bottom-center", "4:5": "bottom-center", "1:1": "bottom-center", "16:9": "bottom-center", "5:4": "bottom-center" });
+      expect(reel.logo.size_pct).toBe(64);
+      expect(reel.logo.show_on).toBe("all");
+      expect(reel.logo.opacity).toBe("solid");
+    }
+    expect(resized.logo.path).toBe("brand-assets:ws/manual.svg");
+  });
+  it("applies text style to all slides without changing their words", () => {
+    const r = applyReelStyle(buildReel(launch, items(3), opts), { element: "headline", scope: "all", index: 1, patch: { size_px: 132 } });
+    expect(r.frames.map((f) => frameForFormat(f, "9:16").headline?.size_px)).toEqual([132, 132, 132]);
+    expect(r.frames.map((f) => f.headline?.text)).toEqual(["H0", "H1", "H2"]);
+  });
+  it("applies text style only to the selected slide", () => {
+    const base = buildReel(launch, items(3), opts);
+    const r = applyReelStyle(base, { element: "headline", scope: "slide", index: 1, patch: { size_px: 132 } });
+    expect(frameForFormat(r.frames[1] ?? base.frames[0], "9:16").headline?.size_px).toBe(132);
+    expect(r.frames[0]).toEqual(base.frames[0]);
+    expect(r.frames[2]).toEqual(base.frames[2]);
+  });
+  it("reordering and removing retain each photo's per-slide styling", () => {
+    const base = applyReelStyle(buildReel(launch, items(3), opts), { element: "headline", scope: "slide", index: 0, patch: { size_px: 155, color: "#0071E3" } });
+    const moved = moveSlide(base.frames, 0, 2).items;
+    expect(moved[2]).toEqual(base.frames[0]);
+    expect(moved.map((f) => f.photo.path)).toEqual(["ws/p1.jpg", "ws/p2.jpg", "ws/p0.jpg"]);
+    expect(removeSlide(moved, 1).items[1]).toEqual(base.frames[0]);
+  });
+  it("new slides inherit current reel-wide style and enforce the limit", () => {
+    const base = applyReelStyle(buildReel(launch, items(3), opts), { element: "headline", scope: "all", index: 0, patch: { size_px: 155 } });
+    const added = appendReelSlides(base, [{ path: "ws/new.jpg", headline: "New", subline: "$9" }]);
+    expect(frameForFormat(added.reel.frames[3] ?? base.frames[0], "9:16").headline?.size_px).toBe(155);
+    expect(added.reel.frames.slice(0, 3)).toEqual(base.frames);
+    expect(appendReelSlides(base, items(8)).error).toBe(LIMIT_MESSAGE);
+    const customFirst = applyReelStyle(base, { element: "headline", scope: "slide", index: 0, patch: { size_px: 200 } });
+    const next = appendReelSlides(customFirst, [{ path: "ws/new.jpg", headline: "New", subline: "$9" }]).reel;
+    expect(frameForFormat(next.frames[3] ?? base.frames[0], "9:16").headline?.size_px).toBe(155);
+    expect(frameForFormat(changeSize(next, "4:5").frames[0] ?? base.frames[0], "9:16").headline?.size_px).toBe(200);
+  });
+  it("reset restores template styling and keeps words and photos", () => {
+    const base = buildReel(launch, items(3), opts);
+    const edited = applyReelStyle(applyReelStyle(base, { element: "headline", scope: "slide", index: 0, patch: { size_px: 155 } }), { element: "logo", patch: { size_pct: 20, positions: { "9:16": "top-right" } } });
+    const reset = resetReelStyle(edited, launch);
+    expect(reset.logo.size_pct).toBe(64);
+    expect(reset.logo.positions?.["9:16"]).toBe("bottom-center");
+    expect(reset.frames.map((f) => f.photo.path)).toEqual(base.frames.map((f) => f.photo.path));
+    expect(reset.frames.map((f) => f.headline)).toEqual(base.frames.map((f) => f.headline));
   });
 });

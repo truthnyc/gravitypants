@@ -36,6 +36,7 @@ export async function copyImage(admin: Admin, ws: string, stamp: string, n: numb
 
 function frameRows(projectId: string, reel: ProjectWithFrames) {
   return reel.frames.map((f, i) => ({
+    id: f.id || crypto.randomUUID(),
     project_id: projectId,
     sort_order: i,
     duration_sec: f.duration_sec,
@@ -78,9 +79,13 @@ export async function replaceReel(admin: Admin, ws: string, id: string, reel: Pr
     .eq("id", id)
     .eq("workspace_id", ws);
   if (error) throw new Error(error.message);
-  await admin.from("frames").delete().eq("project_id", id);
-  const { error: fe } = await admin.from("frames").insert(frameRows(id, reel));
+  const rows = frameRows(id, reel) as unknown as { id: string }[];
+  const { error: fe } = await admin.from("frames").upsert(rows as never);
   if (fe) throw new Error(fe.message);
+  if (rows.length) {
+    const { error: de } = await admin.from("frames").delete().eq("project_id", id).not("id", "in", `(${rows.map((f) => f.id).join(",")})`);
+    if (de) throw new Error(de.message);
+  }
 }
 
 /** Loads a reel only if it belongs to this shop's workspace, with short-lived photo links. */

@@ -326,7 +326,7 @@ export function ElementSlider({
   );
 }
 
-function PositionGrid({ value, color, onChange }: { value: string; color: string; onChange: (a: string) => void }) {
+export function PositionGrid({ value, color, onChange }: { value: string; color: string; onChange: (a: string) => void }) {
   return (
     <div className="grid w-[96px] grid-cols-3 gap-1 rounded-sm bg-control-fill p-1">
       {ANCHORS.map((a) => (
@@ -668,7 +668,7 @@ function FontField({ el, t, brandName, actions, onChange }: { el: "headline" | "
   );
 }
 
-function SizeField({ el, t, onChange }: { el: "headline" | "subline"; t: TextSettings; onChange: (p: Partial<TextSettings>, k?: string) => void }) {
+export function SizeField({ el, t, onChange }: { el: "headline" | "subline"; t: TextSettings; onChange: (p: Partial<TextSettings>, k?: string) => void }) {
   const isHead = el === "headline";
   const size = t.size_px ?? (isHead ? 108 : 48);
   return (
@@ -687,12 +687,12 @@ function SizeField({ el, t, onChange }: { el: "headline" | "subline"; t: TextSet
   );
 }
 
-function ColorField({ el, t, brandColors, onChange }: { el: "headline" | "subline"; t: TextSettings; brandColors: string[]; onChange: (p: Partial<TextSettings>, k?: string) => void }) {
+export function ColorField({ el, t, brandColors, onChange, remember = true }: { el: "headline" | "subline"; t: TextSettings; brandColors: string[]; onChange: (p: Partial<TextSettings>, k?: string) => void; remember?: boolean }) {
   const current = (t.color ?? "#FFFFFF").toUpperCase();
   const [recent, setRecent] = useState<string[]>([]);
   useEffect(() => {
-    try { setRecent(JSON.parse(localStorage.getItem(RECENT_TEXT) ?? "[]").slice(0, 4)); } catch { /* ignore */ }
-  }, []);
+    if (remember) { try { setRecent(JSON.parse(localStorage.getItem(RECENT_TEXT) ?? "[]").slice(0, 4)); } catch { /* ignore */ } }
+  }, [remember]);
   const base = [...brandColors, ...TEXT_SWATCHES];
   const swatches = [...new Set([...base, ...recent, ...(base.includes(current) || recent.includes(current) ? [] : [current])])];
   return (
@@ -714,7 +714,7 @@ function ColorField({ el, t, brandColors, onChange }: { el: "headline" | "sublin
             if (!base.includes(c)) {
               const next = [c, ...recent.filter((x) => x !== c)].slice(0, 4);
               setRecent(next);
-              try { localStorage.setItem(RECENT_TEXT, JSON.stringify(next)); } catch { /* ignore */ }
+              if (remember) { try { localStorage.setItem(RECENT_TEXT, JSON.stringify(next)); } catch { /* ignore */ } }
             }
             onChange({ color: c }, `drag:${el}-color`);
           }}
@@ -724,7 +724,7 @@ function ColorField({ el, t, brandColors, onChange }: { el: "headline" | "sublin
   );
 }
 
-function AnimationField({ value, onPick }: { value: NonNullable<TextSettings["animation"]>; onPick: (a: NonNullable<TextSettings["animation"]>) => void }) {
+export function AnimationField({ value, onPick }: { value: NonNullable<TextSettings["animation"]>; onPick: (a: NonNullable<TextSettings["animation"]>) => void }) {
   return (
     <Field label="Animation">
       <div className="flex flex-wrap gap-1.5" role="radiogroup" aria-label="Animation">

@@ -1,9 +1,10 @@
 /* Pure rules for turning picked Shopify products into a reel. Used by the server routes and tests. */
-import type { Format, Frame, ProjectWithFrames, TextSettings } from "@/lib/stillframe/types";
+import { DEFAULT_LOGO, type Format, type Frame, type LogoSettings, type ProjectWithFrames, type TextSettings } from "@/lib/stillframe/types";
 import type { Template, TemplateFrame } from "@/lib/stillframe/data";
 import { sourceFromTemplate } from "@/lib/stillframe/template-source";
 import { MAX_SLIDES } from "@/lib/stillframe/template-doc";
 import { refitForMainSize } from "@/lib/stillframe/main-size";
+import { frameForFormat, patchTextForFormat, REEL_FORMATS } from "@/lib/stillframe/format-settings";
 
 export const MAX_PRODUCTS = 10;
 export const MAX_FRAMES = MAX_SLIDES;
@@ -78,7 +79,7 @@ const FALLBACK_FRAME: TemplateFrame = {
 /** The template's usual slide length (median of its slides, at least 2s). */
 export function normalDuration(template: Template) {
   const d = (template.settings.frames ?? []).map((f) => Number(f.duration_sec) || 0).filter((x) => x > 0).sort((a, b) => a - b);
-  const mid = d.length ? d[Math.floor((d.length - 1) / 2)]! : 2;
+  const mid = d[Math.floor((d.length - 1) / 2)] ?? 2;
   return Math.max(2, mid);
 }
 
@@ -92,6 +93,21 @@ export type BuildOptions = {
   /** Sign-off slide; off unless the merchant turns it on. */
   signoff?: boolean;
 };
+
+/** Artwork is shop-owned; layout is template-owned, including unspecified sizes. */
+export function templateLogo(template: Template, path: string | null): LogoSettings {
+  const own = template.settings.logo ?? {};
+  const fallback = own.positions?.[template.settings.primary_format]
+    ?? Object.values(own.positions ?? {}).find(Boolean)
+    ?? template.style?.["logo_position"] ?? "top-right";
+  return { ...DEFAULT_LOGO, ...own, path, light_path: null, dark_path: null,
+    positions: Object.fromEntries(REEL_FORMATS.map((f) => [f, own.positions?.[f] ?? fallback])),
+  };
+}
+
+export function withLogoImage(reel: ProjectWithFrames, path: string): ProjectWithFrames {
+  return { ...reel, logo: { ...reel.logo, path, light_path: null, dark_path: null } };
+}
 
 /** Applies a template's look to the items. The sign-off slide is off by default. */
 export function buildReel(template: Template, items: ReelItem[], o: BuildOptions): ProjectWithFrames {
@@ -108,8 +124,8 @@ export function buildReel(template: Template, items: ReelItem[], o: BuildOptions
       ...f,
       duration_sec: Math.max(Number(f.duration_sec) || 0, normal) + (first ? FIRST_PHOTO_LEAD : 0),
       photo: { ...f.photo, path: item?.path ?? null, url: item?.path ?? null, asset_id: null, ...(item?.productId ? { shopify_product_id: item.productId } : {}) },
-      headline: { ...h, text: item?.headline ?? "", same_on_all: false, ...(first ? { delay_sec: FIRST_PHOTO_LEAD } : {}) },
-      subline: sub ? { ...sub, ...(first ? { delay_sec: FIRST_PHOTO_LEAD } : {}) } : null,
+      headline: { ...h, text: item?.headline ?? "", same_on_all: true, ...(first ? { delay_sec: FIRST_PHOTO_LEAD } : {}) },
+      subline: sub ? { ...sub, same_on_all: true, ...(first ? { delay_sec: FIRST_PHOTO_LEAD } : {}) } : null,
       format_overrides: {},
     };
   });
@@ -119,7 +135,7 @@ export function buildReel(template: Template, items: ReelItem[], o: BuildOptions
     name: o.name.slice(0, 80) || base.name,
     primary_format: "9:16",
     formats: ["9:16"],
-    logo: { ...base.logo, path: o.logoPath ?? null, light_path: null, dark_path: null },
+    logo: templateLogo(template, o.logoPath ?? null),
     end_card: { enabled: Boolean(o.signoff) && Boolean(shop), cta_text: shop, background: "last_photo" },
     frames,
   };
@@ -136,28 +152,102 @@ export function itemsFromFrames(frames: Pick<Frame, "photo" | "headline" | "subl
   }));
 }
 
-export type SlideResult = { items: ReelItem[]; error: string | null };
+export type SlideResult<T = ReelItem> = { items: T[]; error: string | null };
 
 export function addSlides(items: ReelItem[], more: ReelItem[]): SlideResult {
   if (items.length + more.length > MAX_SLIDES) return { items, error: LIMIT_MESSAGE };
   return { items: [...items, ...more], error: null };
 }
-export function removeSlide(items: ReelItem[], index: number): SlideResult {
+export function removeSlide<T>(items: T[], index: number): SlideResult<T> {
   if (items.length <= 1) return { items, error: "A reel needs at least one photo." };
   if (index < 0 || index >= items.length) return { items, error: null };
   return { items: items.filter((_, i) => i !== index), error: null };
 }
-export function moveSlide(items: ReelItem[], from: number, to: number): SlideResult {
+export function moveSlide<T>(items: T[], from: number, to: number): SlideResult<T> {
   if (from === to || from < 0 || to < 0 || from >= items.length || to >= items.length) return { items, error: null };
   const next = [...items];
   const [x] = next.splice(from, 1);
-  next.splice(to, 0, x!);
+  if (x === undefined) return { items, error: null };
+  next.splice(to, 0, x);
   return { items: next, error: null };
 }
 
 /** Makes `format` the reel's size using the editor's own re-fit rules; slides and words are kept. */
 export function changeSize(reel: ProjectWithFrames, format: Format): ProjectWithFrames {
   const { frames, ...project } = reel;
-  const doc = refitForMainSize({ project, frames } as never, format) as unknown as { project: Omit<ProjectWithFrames, "frames">; frames: Frame[] };
+  const positions = { ...reel.logo.positions, [format]: reel.logo.positions?.[format] ?? reel.logo.positions?.[reel.primary_format] ?? Object.values(reel.logo.positions ?? {}).find(Boolean) ?? "top-right" };
+  const doc = refitForMainSize({ project, frames } as never, format, positions) as unknown as { project: Omit<ProjectWithFrames, "frames">; frames: Frame[] };
   return { ...doc.project, formats: [format], frames: doc.frames };
+}
+
+type OptionalPatch<T> = { [K in keyof T]?: T[K] | undefined };
+export type TextStylePatch = OptionalPatch<Pick<TextSettings, "font_family" | "font_weight" | "size_px" | "color" | "position" | "animation" | "keep_under_headline">>;
+export type StyleChange =
+  | { element: "headline" | "subline"; scope: "all" | "slide"; index: number; patch: TextStylePatch }
+  | { element: "logo"; patch: OptionalPatch<Pick<LogoSettings, "positions" | "size_pct" | "show_on" | "enabled" | "opacity">> };
+
+export function applyReelStyle(reel: ProjectWithFrames, change: StyleChange): ProjectWithFrames {
+  const format = reel.primary_format;
+  if (change.element === "logo") {
+    const clean = Object.fromEntries(Object.entries(change.patch).filter(([, v]) => v !== undefined)) as Partial<LogoSettings>;
+    const logo = { ...reel.logo, ...clean };
+    // Existing per-size overrides must not conceal the newly selected reel-wide settings.
+    const overrides = { ...logo.format_overrides };
+    if (overrides[format]) {
+      const own = { ...overrides[format] };
+      if (change.patch.size_pct !== undefined) delete own.size_pct;
+      if (change.patch.show_on !== undefined) delete own.show_on;
+      if (change.patch.opacity !== undefined) delete own.opacity;
+      overrides[format] = own;
+    }
+    return { ...reel, logo: { ...logo, format_overrides: overrides } };
+  }
+  const { element, scope, index, patch } = change;
+  return { ...reel, frames: reel.frames.map((f, i) => {
+    if (scope !== "all" && i !== index) return f;
+    // Keep each slide's words and visibility; style-only changes never create price text.
+    const updated = patchTextForFormat(f, format, element, Object.fromEntries(Object.entries(patch).filter(([, v]) => v !== undefined)) as Partial<TextSettings>);
+    return { ...updated, [element]: { ...updated[element], text: f[element]?.text ?? "", same_on_all: scope === "all" } };
+  }) };
+}
+
+/** The first slide represents the current reel-wide look; no new styling fields are stored. */
+export function appendReelSlides(reel: ProjectWithFrames, more: ReelItem[]): { reel: ProjectWithFrames; error: string | null } {
+  if (reel.frames.length + more.length > MAX_SLIDES) return { reel, error: LIMIT_MESSAGE };
+  const source = reel.frames[0];
+  if (!source) return { reel, error: "A reel needs at least one photo." };
+  const visible = frameForFormat(source, reel.primary_format);
+  const sharedHeadline = reel.frames.find((f) => f.headline?.same_on_all === true) ?? source;
+  const sharedSubline = reel.frames.find((f) => f.subline?.same_on_all === true) ?? source;
+  const headlineStyle = frameForFormat(sharedHeadline, reel.primary_format).headline ?? visible.headline;
+  const sublineStyle = frameForFormat(sharedSubline, reel.primary_format).subline ?? visible.subline
+    ?? { ...headlineStyle, size_px: Math.round((headlineStyle?.size_px ?? 96) * 0.55), keep_under_headline: true };
+  const frames = more.map((item, i): Frame => ({
+    ...structuredClone(source), id: crypto.randomUUID(), sort_order: reel.frames.length + i,
+    photo: { ...source.photo, path: item.path, url: item.path, asset_id: null, shopify_product_id: item.productId ?? null } as Frame["photo"],
+    duration_sec: Math.max(2, source.duration_sec - (source.headline?.delay_sec ?? 0)),
+    headline: { ...headlineStyle, text: item.headline, same_on_all: true, delay_sec: 0 },
+    subline: item.subline ? { ...(sublineStyle ?? headlineStyle), text: item.subline, same_on_all: true, keep_under_headline: sublineStyle?.keep_under_headline ?? true, delay_sec: 0 } : null,
+    format_overrides: Object.fromEntries(Object.entries(source.format_overrides ?? {}).map(([size, own]) => [size, {
+      ...own, photo: own.photo ? { ...own.photo, path: item.path, url: item.path, asset_id: null } : undefined,
+      headline: { ...frameForFormat(sharedHeadline, size as Format).headline, text: item.headline, same_on_all: true, delay_sec: 0 },
+      subline: item.subline ? { ...(frameForFormat(sharedSubline, size as Format).subline ?? sublineStyle), text: item.subline, same_on_all: true, delay_sec: 0 } : null,
+    }])),
+  }));
+  return { reel: { ...reel, frames: [...reel.frames, ...frames] }, error: null };
+}
+
+export function resetReelStyle(reel: ProjectWithFrames, template: Template): ProjectWithFrames {
+  const next = buildReel(template, itemsFromFrames(reel.frames), {
+    workspaceId: reel.workspace_id, shopName: reel.end_card.cta_text ?? "", name: reel.name,
+    format: reel.primary_format, logoPath: reel.logo.path ?? null, signoff: Boolean(reel.end_card.enabled),
+  });
+  return { ...reel, logo: next.logo, pace: next.pace, template_id: next.template_id ?? null,
+    frames: next.frames.map((f, i) => {
+      const photo = reel.frames[i]?.photo;
+      return { ...f, id: reel.frames[i]?.id ?? f.id, project_id: reel.id,
+        photo: { ...f.photo, path: photo?.path ?? null, url: photo?.url ?? null, asset_id: photo?.asset_id ?? null, name: photo?.name ?? null },
+      };
+    }),
+  };
 }

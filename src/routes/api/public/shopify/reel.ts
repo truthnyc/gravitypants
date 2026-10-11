@@ -2,15 +2,31 @@ import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { handle, json, listTemplates, shopFromRequest } from "@/lib/shopify/session.server";
 import { copyImage, fetchProducts, loadReel, replaceReel } from "@/lib/shopify/reel.server";
-import { addSlides, buildReel, changeSize, formatPrice, itemsFromFrames, moveSlide, removeSlide, SHOPIFY_SIZES, type ReelItem } from "@/lib/shopify/reel-build";
+import { addSlides, appendReelSlides, applyReelStyle, buildReel, changeSize, formatPrice, itemsFromFrames, moveSlide, removeSlide, resetReelStyle, withLogoImage, SHOPIFY_SIZES, type ReelItem } from "@/lib/shopify/reel-build";
 import { setKitLogo, storeLogo } from "@/lib/shopify/branding.server";
 import { MAX_SLIDES } from "@/lib/stillframe/template-doc";
 import type { Template } from "@/lib/stillframe/data";
 import type { Format, ProjectWithFrames } from "@/lib/stillframe/types";
+import { fetchGoogleFonts } from "@/lib/stillframe/font-list.server";
 
 const id = z.string().uuid();
+const textPatch = z.object({
+  font_family: z.string().min(1).max(100).optional(), font_weight: z.number().int().min(100).max(900).optional(),
+  size_px: z.number().min(11).max(240).optional(), color: z.string().regex(/^#[0-9a-f]{6}$/i).optional(),
+  position: z.enum(["top-left", "top-center", "top-right", "middle-left", "center", "middle-right", "bottom-left", "bottom-center", "bottom-right"]).optional(),
+  animation: z.enum(["none", "rise", "fade", "pop", "typewriter"]).optional(), keep_under_headline: z.boolean().optional(),
+}).strict();
+const styleChange = z.union([
+  z.object({ element: z.enum(["headline", "subline"]), scope: z.enum(["all", "slide"]), index: z.number().int().min(0).max(MAX_SLIDES - 1), patch: textPatch }),
+  z.object({ element: z.literal("logo"), patch: z.object({
+    positions: z.record(z.enum(["9:16", "4:5", "1:1", "16:9", "5:4"]), textPatch.shape.position.unwrap()).optional(),
+    size_pct: z.number().min(5).max(100).optional(), show_on: z.enum(["all", "first_last", "selected"]).optional(),
+    enabled: z.boolean().optional(), opacity: z.enum(["solid", "soft"]).optional(),
+  }).strict() }),
+]);
 const Body = z.discriminatedUnion("action", [
   z.object({ action: z.literal("get"), id }),
+  z.object({ action: z.literal("fonts"), id }),
   z.object({
     action: z.literal("words"),
     id,
@@ -26,6 +42,9 @@ const Body = z.discriminatedUnion("action", [
   z.object({ action: z.literal("add"), id, productId: z.string().regex(/^gid:\/\/shopify\/Product\/\d+$/).optional(), url: z.string().url().max(1000).optional(), path: z.string().max(300).optional() }),
   z.object({ action: z.literal("upload-url"), id, kind: z.enum(["photo", "logo"]), type: z.enum(["image/jpeg", "image/png", "image/webp", "image/svg+xml"]) }),
   z.object({ action: z.literal("logo"), id, path: z.string().max(300) }),
+  z.object({ action: z.literal("style"), id, change: styleChange }),
+  z.object({ action: z.literal("logo-visible"), id, index: z.number().int().min(0).max(MAX_SLIDES - 1), visible: z.boolean() }),
+  z.object({ action: z.literal("reset-style"), id }),
 ]);
 const EXT: Record<string, string> = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/svg+xml": "svg" };
 
@@ -41,6 +60,7 @@ export const Route = createFileRoute("/api/public/shopify/reel")({
           const b = parsed.data;
           const current = await loadReel(ctx.admin, ctx.ws, b.id);
           if (!current) return json({ error: "Reel not found." }, 404);
+          if (b.action === "fonts") return json(await fetchGoogleFonts());
           const p = current.project;
           const templates = await listTemplates(ctx.admin);
           const uploads = `${ctx.ws}/shopify/uploads/`;
@@ -83,10 +103,21 @@ export const Route = createFileRoute("/api/public/shopify/reel")({
             await rebuild(items, b.templateId);
           }
           if (b.action === "size") await replaceReel(ctx.admin, ctx.ws, b.id, changeSize(p, b.format));
+          if (b.action === "style") await replaceReel(ctx.admin, ctx.ws, b.id, applyReelStyle(p, b.change));
+          if (b.action === "logo-visible") {
+            const frame = p.frames[b.index];
+            if (!frame) return json({ error: "Slide not found." }, 404);
+            await replaceReel(ctx.admin, ctx.ws, b.id, { ...p, frames: p.frames.map((f, i) => i === b.index ? { ...f, logo_visible: b.visible, format_overrides: { ...f.format_overrides, [p.primary_format]: { ...f.format_overrides?.[p.primary_format], logo_visible: b.visible } } } : f) });
+          }
+          if (b.action === "reset-style") {
+            const t = templates.find((t) => t.id === p.template_id) as unknown as Template | undefined;
+            if (!t) return json({ error: "That template isn't available." }, 404);
+            await replaceReel(ctx.admin, ctx.ws, b.id, resetReelStyle(p, t));
+          }
           if (b.action === "remove" || b.action === "move") {
-            const r = b.action === "remove" ? removeSlide(items, b.index) : moveSlide(items, b.from, b.to);
+            const r = b.action === "remove" ? removeSlide(p.frames, b.index) : moveSlide(p.frames, b.from, b.to);
             if (r.error) return json({ error: r.error }, 422);
-            await rebuild(r.items);
+            await replaceReel(ctx.admin, ctx.ws, b.id, { ...p, frames: r.items });
           }
           if (b.action === "photos") {
             const ids = [...new Set(items.map((i) => i.productId).filter((x): x is string => !!x))];
@@ -107,9 +138,9 @@ export const Route = createFileRoute("/api/public/shopify/reel")({
               item = { path, headline: prod.title, subline: formatPrice(prod.price), productId: prod.id };
             }
             if (!item) return json({ error: "Choose a photo." }, 400);
-            const r = addSlides(items, [item]);
+            const r = appendReelSlides(p, [item]);
             if (r.error) return json({ error: r.error }, 422);
-            await rebuild(r.items);
+            await replaceReel(ctx.admin, ctx.ws, b.id, r.reel);
           }
           if (b.action === "upload-url") {
             if (b.kind === "photo" && b.type === "image/svg+xml") return json({ error: "Use a JPG, PNG or WebP photo." }, 400);
@@ -131,7 +162,7 @@ export const Route = createFileRoute("/api/public/shopify/reel")({
               await ctx.admin.storage.from("media").remove([b.path]);
             }
             await setKitLogo(ctx.admin, ctx.ws, key);
-            await ctx.admin.from("projects").update({ logo: { ...p.logo, path: key, light_path: null, dark_path: null } } as never).eq("id", b.id).eq("workspace_id", ctx.ws);
+            await ctx.admin.from("projects").update({ logo: withLogoImage(p, key).logo } as never).eq("id", b.id).eq("workspace_id", ctx.ws);
             notice = "Logo saved. Your next reels will use it too.";
           }
 
