@@ -11,6 +11,8 @@ import { Card, PageTitle } from "@/components/admin/AdminShell";
 import { supabase } from "@/integrations/supabase/client";
 import { getHomepageAdmin, saveHomepageSection } from "@/lib/site/homepage.functions";
 import { listAdminReels, type AdminReel } from "@/lib/stillframe/admin-reels.functions";
+import { listSiteReels } from "@/lib/site/reels.functions";
+import type { SiteReel } from "@/lib/site/reels";
 import { DEFAULT_EXAMPLE, DEFAULT_HERO, DEFAULT_QUOTE, photoSrc, type ExampleOfWeek, type HomeHero, type HomeQuote, type SitePhoto } from "@/lib/site/homepage";
 
 export const Route = createFileRoute("/_authenticated/admin/homepage")({
@@ -37,11 +39,18 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   return <label className="block space-y-1.5"><span className="text-[13px] font-medium text-secondary-text">{label}</span>{children}</label>;
 }
 
-function ReelPick({ value, reels, onChange }: { value: string | null; reels: AdminReel[]; onChange: (v: string | null) => void }) {
+function ReelPick({ value, reels, client, onChange }: { value: string | null; reels: AdminReel[]; client: SiteReel[]; onChange: (v: string | null) => void }) {
   return (
     <select className="h-11 w-full rounded-sm border border-border bg-card px-3 text-[14px]" value={value ?? ""} onChange={(e) => onChange(e.target.value || null)}>
       <option value="">Purl Soho — Japanese Denim Cotton (default)</option>
-      {reels.map((r) => <option key={r.id} value={r.id} disabled={!r.published}>{r.brand} — {r.title}{r.published ? "" : " (not published)"}</option>)}
+      <optgroup label="Website reels">
+        {reels.map((r) => <option key={r.id} value={r.id} disabled={!r.published}>{r.brand} — {r.title}{r.published ? "" : " (not published)"}</option>)}
+      </optgroup>
+      {client.length > 0 && (
+        <optgroup label="Featured from the Directory">
+          {client.map((r) => <option key={r.id} value={r.id}>{r.brand} — {r.title}</option>)}
+        </optgroup>
+      )}
     </select>
   );
 }
@@ -82,6 +91,8 @@ function HomepageAdmin() {
   const save = useServerFn(saveHomepageSection);
   const content = useQuery({ queryKey: ["admin", "homepage"], queryFn: () => load() });
   const reels = useQuery({ queryKey: ["admin", "reels"], queryFn: () => loadReels() });
+  const featured = useQuery({ queryKey: ["site-reels-all"], queryFn: () => listSiteReels() });
+  const client = (featured.data ?? []).filter((r) => r.source === "client");
   const [hero, setHero] = useState<HomeHero>(DEFAULT_HERO);
   const [ex, setEx] = useState<ExampleOfWeek>(DEFAULT_EXAMPLE);
   const [quote, setQuote] = useState<HomeQuote>(DEFAULT_QUOTE);
@@ -118,7 +129,7 @@ function HomepageAdmin() {
           <Field label="Second button"><Input value={hero.secondary} maxLength={40} onChange={h("secondary")} /></Field>
         </div>
         <Field label="Line under the buttons"><Input value={hero.note} maxLength={200} onChange={h("note")} /></Field>
-        <Field label="Reel in the phone"><ReelPick value={hero.reelId} reels={list} onChange={(reelId) => setHero({ ...hero, reelId })} /></Field>
+        <Field label="Reel in the phone"><ReelPick value={hero.reelId} reels={list} client={client} onChange={(reelId) => setHero({ ...hero, reelId })} /></Field>
         <Field label="The three tilted photos"><Photos photos={hero.photos} max={3} onChange={(photos) => setHero({ ...hero, photos })} /></Field>
         <div className="flex flex-wrap gap-2">
           <Button disabled={saving !== null || hero.photos.length !== 3} onClick={() => run("home_hero", { ...hero, photos: strip(hero.photos) }, "Home banner saved")}>{saving === "home_hero" ? "Saving…" : "Save"}</Button>
@@ -127,7 +138,7 @@ function HomepageAdmin() {
       </Card>
       <Card className="space-y-4">
         <h2 className="text-[17px] font-semibold">Example of the week</h2>
-        <Field label="Reel"><ReelPick value={ex.reelId} reels={list} onChange={(reelId) => setEx({ ...ex, reelId })} /></Field>
+        <Field label="Reel"><ReelPick value={ex.reelId} reels={list} client={client} onChange={(reelId) => setEx({ ...ex, reelId })} /></Field>
         <Field label="Title"><Input value={ex.title} maxLength={120} onChange={(e) => setEx({ ...ex, title: e.target.value })} /></Field>
         <Field label="Description"><Textarea value={ex.description} maxLength={400} rows={3} onChange={(e) => setEx({ ...ex, description: e.target.value })} /></Field>
         <Field label="Original photos (up to 3)"><Photos photos={ex.photos} max={3} onChange={(photos) => setEx({ ...ex, photos })} /></Field>
