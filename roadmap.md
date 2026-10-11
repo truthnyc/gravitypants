@@ -1,5 +1,5 @@
 # Shopify reel styling
-- [ ] Preserve template logo settings across creation, uploads and size changes; repair existing Shopify reels.
-- [ ] Add shared editor Style controls with immediate preview and saved changes.
-- [ ] Preserve slide styling during add/remove/reorder; reset styling without changing photos or words.
-- [ ] Run regression tests and verify the screen; note any Shopify-session testing limitation.
+- [x] Preserve template logo settings across creation, uploads and size changes; repaired six existing Shopify reels.
+- [x] Add shared editor Style controls with immediate preview and saved changes.
+- [x] Preserve slide styling during add/remove/reorder; reset styling without changing photos or words.
+- [x] Run regression tests and verify real shop-scoped saving/reload at desktop and phone sizes. Actual Shopify-admin incognito embedding remains a merchant-side check.

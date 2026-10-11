@@ -101,6 +101,10 @@ describe("Shopify styling persistence", () => {
     expect(frameForFormat(added.reel.frames[3] ?? base.frames[0], "9:16").headline?.size_px).toBe(155);
     expect(added.reel.frames.slice(0, 3)).toEqual(base.frames);
     expect(appendReelSlides(base, items(8)).error).toBe(LIMIT_MESSAGE);
+    const customFirst = applyReelStyle(base, { element: "headline", scope: "slide", index: 0, patch: { size_px: 200 } });
+    const next = appendReelSlides(customFirst, [{ path: "ws/new.jpg", headline: "New", subline: "$9" }]).reel;
+    expect(frameForFormat(next.frames[3] ?? base.frames[0], "9:16").headline?.size_px).toBe(155);
+    expect(frameForFormat(changeSize(next, "4:5").frames[0] ?? base.frames[0], "9:16").headline?.size_px).toBe(200);
   });
   it("reset restores template styling and keeps words and photos", () => {
     const base = buildReel(launch, items(3), opts);

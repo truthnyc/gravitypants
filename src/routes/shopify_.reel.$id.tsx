@@ -99,6 +99,7 @@ function ShopifyReel() {
     const next = { ...current, project: applyReelStyle(current.project, change) };
     currentReel.current = next;
     setReel(next);
+    void ensureFonts(next.project.frames, BRAND).catch((e) => setError((e as Error).message));
     styleRevision.current += 1;
     // Coalesce slider changes to one save while retaining distinct field edits.
     const last = pendingStyles.current[pendingStyles.current.length - 1];
