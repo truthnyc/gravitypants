@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Add Export format defaults, quality summary, GIF presets/advanced/loop controls; verify settings and responsive signed-in flow.
 - [x] Redesign Export with compact size cards, platform shortcuts, portrait default, true-ratio previews and top history; signed-in selection/custom/history/larger-preview/reload verified at 375/768/1440px with no overflow or runtime errors; 23 tests passed.
 - [x] Separate photo/logo/headline/subline settings by size; signed-in edits and reload verified, shared animation/movement confirmed, originals restored; 28 regression tests passed and preview/export share size-aware rendering.
 - [x] Make "Add a reel" collapsible on admin/reels; verified collapsed default, open/close, draft kept when hidden, choice remembered after reload, clean build.
