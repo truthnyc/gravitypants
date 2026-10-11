@@ -6,7 +6,9 @@ import { ensureFonts, renderAt, videoDuration, type BrandStyle } from "@/render/
 import { exportGif, exportMp4, type RenderInput } from "@/render/exportMedia";
 import type { Format, ProjectWithFrames } from "@/lib/stillframe/types";
 import { sizeOf } from "@/lib/stillframe/main-size";
-import { SHOPIFY_SIZES } from "@/lib/shopify/reel-build";
+import { applyReelStyle, SHOPIFY_SIZES, type StyleChange } from "@/lib/shopify/reel-build";
+import { ReelStylePanel } from "@/components/shopify/ReelStylePanel";
+import { Button } from "@/components/ui/button";
 
 type TemplateLite = { id: string; name: string; thumbnail_url: string | null };
 type ReelResponse = { project: ProjectWithFrames; urls: Record<string, string>; templates: TemplateLite[]; notice?: string | null; maxSlides?: number };
@@ -57,17 +59,56 @@ function ShopifyReel() {
   const [reel, setReel] = useState<ReelResponse | null>(null);
   const [images, setImages] = useState<Map<string, HTMLImageElement> | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [panel, setPanel] = useState<"none" | "words" | "template" | "photos">("none");
+  const [panel, setPanel] = useState<"none" | "words" | "template" | "photos" | "style">("none");
   const [busy, setBusy] = useState(false);
   const [info, setInfo] = useState<string | null>(null);
   const [photos, setPhotos] = useState<ProductPhotos | null>(null);
   const [drag, setDrag] = useState<number | null>(null);
+  const [selectedSlide, setSelectedSlide] = useState(0);
+  const currentReel = useRef<ReelResponse | null>(null);
+  const styleQueue = useRef<Promise<void>>(Promise.resolve());
+  const styleRevision = useRef(0);
+  const pendingStyles = useRef<StyleChange[]>([]);
+  const styleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const apply = useCallback(async (r: ReelResponse) => {
     await ensureFonts(r.project.frames, BRAND).catch(() => undefined);
     setImages(await loadImages(r.urls));
     setReel(r);
+    currentReel.current = r;
   }, []);
+
+  function flushStyles() {
+    if (styleTimer.current) clearTimeout(styleTimer.current);
+    styleTimer.current = null;
+    const changes = pendingStyles.current.splice(0);
+    if (!changes.length) return styleQueue.current;
+    const revision = styleRevision.current;
+    styleQueue.current = styleQueue.current.then(async () => {
+      for (const change of changes) {
+        const result = await shopifyFetch<ReelResponse>("/api/public/shopify/reel", { action: "style", id, change });
+        if (revision === styleRevision.current && change === changes[changes.length - 1]) await apply(result);
+      }
+    }).catch((e) => setError((e as Error).message));
+    return styleQueue.current;
+  }
+
+  function updateStyle(change: StyleChange) {
+    const current = currentReel.current;
+    if (!current) return;
+    const next = { ...current, project: applyReelStyle(current.project, change) };
+    currentReel.current = next;
+    setReel(next);
+    styleRevision.current += 1;
+    // Coalesce slider changes to one save while retaining distinct field edits.
+    const last = pendingStyles.current[pendingStyles.current.length - 1];
+    const same = last?.element === change.element && JSON.stringify(Object.keys(last.patch)) === JSON.stringify(Object.keys(change.patch))
+      && (last.element === "logo" || (change.element !== "logo" && last.index === change.index && last.scope === change.scope));
+    if (same) pendingStyles.current.pop();
+    pendingStyles.current.push(change);
+    if (styleTimer.current) clearTimeout(styleTimer.current);
+    styleTimer.current = setTimeout(() => { void flushStyles(); }, 350);
+  }
 
   useEffect(() => {
     shopifyFetch<ReelResponse>("/api/public/shopify/reel", { action: "get", id }).then(apply, (e) => setError((e as Error).message));
@@ -77,6 +118,7 @@ function ShopifyReel() {
     setBusy(true);
     setError(null);
     try {
+      await flushStyles();
       const r = await shopifyFetch<ReelResponse>("/api/public/shopify/reel", { id, ...body });
       await apply(r);
       setInfo(r.notice ?? null);
@@ -133,7 +175,7 @@ function ShopifyReel() {
         {!reel && !error && <p className="mt-6 text-muted-foreground">Loading your reel…</p>}
         {reel && images && (
           <div className="mt-6 grid gap-8 md:grid-cols-[320px_1fr]">
-            <Player project={reel.project} images={images} />
+            <Player project={reel.project} images={images} slide={panel === "style" ? Math.min(selectedSlide, reel.project.frames.length - 1) : undefined} />
             <div className="space-y-3">
               <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Size">
                 {SHOPIFY_SIZES.map((f) => (
@@ -155,8 +197,8 @@ function ShopifyReel() {
                 <p className="text-sm text-muted-foreground tabular-nums">Photos {reel.project.frames.length} of {max}. Drag to reorder.</p>
                 <ol className="mt-2 flex flex-wrap gap-2">
                   {reel.project.frames.map((f, i) => (
-                    <li key={f.id} draggable onDragStart={() => setDrag(i)} onDragOver={(e) => e.preventDefault()} onDrop={() => { if (drag !== null && drag !== i) void send({ action: "move", from: drag, to: i }); setDrag(null); }} className="relative h-20 w-16 cursor-grab overflow-hidden rounded border border-border">
-                      {f.photo?.path && reel.urls[f.photo.path] && <img src={reel.urls[f.photo.path]} alt={`Photo ${i + 1}`} className="h-full w-full object-cover" />}
+                    <li key={f.id} draggable={!busy} onDragStart={() => setDrag(i)} onDragOver={(e) => e.preventDefault()} onDrop={() => { if (drag !== null && drag !== i) void send({ action: "move", from: drag, to: i }); setDrag(null); }} className="relative h-20 w-16 cursor-grab overflow-hidden rounded border border-border">
+                      <Button variant="ghost" data-cta="shopify-select-slide" aria-label={`Select slide ${i + 1}`} aria-pressed={selectedSlide === i} onClick={() => setSelectedSlide(i)} className="h-full w-full rounded-none p-0 aria-pressed:ring-2 aria-pressed:ring-inset aria-pressed:ring-primary">{f.photo?.path && reel.urls[f.photo.path] && <img src={reel.urls[f.photo.path]} alt={`Photo ${i + 1}`} className="h-full w-full object-cover" />}</Button>
                       <button type="button" aria-label={`Remove photo ${i + 1}`} disabled={busy || reel.project.frames.length <= 1} onClick={() => send({ action: "remove", index: i })} className="absolute right-0.5 top-0.5 rounded-full bg-background/90 px-1.5 text-xs disabled:opacity-40">×</button>
                     </li>
                   ))}
@@ -167,7 +209,9 @@ function ShopifyReel() {
                 <button type="button" data-cta="shopify-edit-words" onClick={() => setPanel(panel === "words" ? "none" : "words")} className="rounded-lg border border-border px-4 py-2 text-sm">Edit words</button>
                 <button type="button" data-cta="shopify-add-photos" disabled={full} onClick={() => (panel === "photos" ? setPanel("none") : void openPhotos())} className="rounded-lg border border-border px-4 py-2 text-sm disabled:opacity-60">Add photos</button>
                 <button type="button" data-cta="shopify-change-template" onClick={() => setPanel(panel === "template" ? "none" : "template")} className="rounded-lg border border-border px-4 py-2 text-sm">Change template</button>
+                <Button variant="outline" data-cta="shopify-style" onClick={() => setPanel(panel === "style" ? "none" : "style")}>Style</Button>
               </div>
+              {panel === "style" && <ReelStylePanel project={reel.project} index={Math.min(selectedSlide, reel.project.frames.length - 1)} onChange={updateStyle} onReset={() => send({ action: "reset-style" })} onVisible={(visible) => send({ action: "logo-visible", index: Math.min(selectedSlide, reel.project.frames.length - 1), visible })} />}
               {panel === "words" && <WordsPanel project={reel.project} busy={busy} onSave={(frames, signoff) => send({ action: "words", frames, signoff })} />}
               {panel === "template" && (
                 <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3">
@@ -208,7 +252,7 @@ function ShopifyReel() {
                   {photos && !photos.length && <p className="text-sm text-muted-foreground">No other product photos found.</p>}
                 </div>
               )}
-              <ExportPanel project={reel.project} images={images} />
+              <ExportPanel project={reel.project} images={images} beforeExport={flushStyles} />
             </div>
           </div>
         )}
@@ -217,7 +261,7 @@ function ShopifyReel() {
   );
 }
 
-function Player({ project, images }: { project: ProjectWithFrames; images: Map<string, HTMLImageElement> }) {
+function Player({ project, images, slide }: { project: ProjectWithFrames; images: Map<string, HTMLImageElement>; slide?: number }) {
   const ref = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
     const canvas = ref.current;
@@ -227,13 +271,13 @@ function Player({ project, images }: { project: ProjectWithFrames; images: Map<s
     const start = performance.now();
     let raf = 0;
     const loop = (now: number) => {
-      const t = ((now - start) / 1000) % Math.max(len, 0.1);
+      const t = slide === undefined ? ((now - start) / 1000) % Math.max(len, 0.1) : project.frames.slice(0, slide).reduce((sum, f) => sum + f.duration_sec, 0) + Math.min(project.frames[slide]?.duration_sec ?? 2, 1.5);
       renderAt(ctx, project, project.frames, project.primary_format, t, { width: canvas.width, height: canvas.height, images, brand: BRAND });
       raf = requestAnimationFrame(loop);
     };
     raf = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(raf);
-  }, [project, images]);
+  }, [project, images, slide]);
   const sz = sizeOf(project.primary_format as Format);
   return <canvas ref={ref} width={sz.width / 2} height={sz.height / 2} className="w-full rounded border border-border" aria-label="Reel preview" />;
 }
@@ -260,7 +304,7 @@ function WordsPanel({ project, busy, onSave }: { project: ProjectWithFrames; bus
   );
 }
 
-function ExportPanel({ project, images }: { project: ProjectWithFrames; images: Map<string, HTMLImageElement> }) {
+function ExportPanel({ project, images, beforeExport }: { project: ProjectWithFrames; images: Map<string, HTMLImageElement>; beforeExport: () => Promise<void> }) {
   const [progress, setProgress] = useState<number | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
   const [link, setLink] = useState<string | null>(null);
@@ -270,6 +314,7 @@ function ExportPanel({ project, images }: { project: ProjectWithFrames; images: 
     setLink(null);
     setProgress(0);
     try {
+      await beforeExport();
       const start = await shopifyFetch<{ path: string; uploadUrl: string; watermark: boolean }>("/api/public/shopify/export", { action: "start", id: project.id, kind });
       const sz = sizeOf(project.primary_format as Format);
       const size = kind === "mp4" ? { width: sz.width, height: sz.height } : { width: Math.round(sz.width / 2), height: Math.round(sz.height / 2) };
