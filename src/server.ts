@@ -60,7 +60,8 @@ export default {
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
-      return await normalizeCatastrophicSsrResponse(response, forwardedHost, isDocumentRequest);
+      const out = await normalizeCatastrophicSsrResponse(response, forwardedHost, isDocumentRequest);
+      return withShopifyFrameHeaders(request.url, out);
     } catch (error) {
       console.error(error);
       return new Response(renderErrorPage({ host: forwardedHost }), {
