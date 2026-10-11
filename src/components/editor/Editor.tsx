@@ -309,15 +309,12 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
       const current = { ...base, ...(effective[el] ?? {}), ...patch };
       const shareStyle = current.same_on_all;
       const style = Object.fromEntries(STYLE_KEYS.map((k) => [k, current[k]]));
-      const was = effective;
-      const hadWords = Boolean(was?.headline?.text?.trim() || was?.subline?.text?.trim());
-      const autoDarken = !hadWords && Boolean(patch.text?.trim()) && !was?.photo?.darken_set;
       return {
         ...d,
         frames: d.frames.map((f, j) => {
           if (j === idx) {
             const next = patchTextForFormat(f, format, el, { ...current, animation: patch.animation ?? f[el]?.animation ?? base.animation ?? "none" });
-            return autoDarken ? patchPhotoForFormat(next, format, { darken_for_text: true }) : next;
+            return next;
           }
           if (shareStyle) {
             // Visual style shares within this size; only an explicit animation edit crosses sizes.
@@ -441,7 +438,6 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
           "pan_x",
           "pan_y",
           "brightness",
-          "darken_for_text",
           "background_color",
         ] as const
       )
@@ -548,7 +544,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
           ...(payload as unknown as Frame),
           id: crypto.randomUUID(),
           project_id: doc.project.id,
-          photo: { ...(payload.photo as Frame["photo"]), darken_for_text: false },
+          photo: payload.photo as Frame["photo"],
           headline: null,
         });
       }

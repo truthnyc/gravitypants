@@ -154,7 +154,6 @@ export function framePayloadFromPhoto(photo: UploadedPhoto, index: number) {
       focus: { x: 0.5, y: 0.5 },
       movement: "none",
       brightness: 0,
-      darken_for_text: false,
       background_color: null,
       background: "blur",
       name: photo.name ? photo.name.replace(/\.[a-z0-9]{2,5}$/i, "") : null,
@@ -661,7 +660,6 @@ export function templateFromProject(p: ProjectWithFrames): TemplateSettings {
           "pan_x",
           "pan_y",
           "brightness",
-          "darken_for_text",
           "background_color",
         ] as const)
           .filter((k) => f.photo[k] !== undefined)

@@ -443,7 +443,6 @@ function PhotoPanel({
 }: {
   photo: PhotoSettings;
   frameIndex: number;
-  hasWords: boolean;
   brandName: string;
   brandColors: string[];
   image?: HTMLImageElement | undefined;
