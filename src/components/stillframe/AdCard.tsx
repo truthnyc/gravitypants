@@ -1,3 +1,4 @@
+import { sizeLabel } from "@/lib/stillframe/main-size";
 import { useMakeGlobalTemplate } from "@/components/admin/MakeGlobalTemplate";
 import { useKit } from "@/components/templates/KitAgain";
 import { useRef, useState } from "react";
@@ -106,7 +107,7 @@ export function AdCard({ project, dirStatus, liveUntil, onHide }: { project: Pro
         <div className="px-0.5 pt-2.5 pr-10 lg:px-1 lg:pt-3">
           <p className="truncate text-[16px] font-semibold lg:text-[14px]">{project.name}</p>
           {kit && <span className="mt-1 inline-flex max-w-full truncate rounded-lg bg-control-fill px-2 py-0.5 text-[12px] font-medium text-secondary-text">{kit.name}</span>}
-          <p className="nums mt-0.5 truncate text-[13px] text-secondary-text lg:text-[12px]">{meta}<span className="hidden lg:inline"> · {project.formats.join(", ")}</span></p>
+          <p className="nums mt-0.5 truncate text-[13px] text-secondary-text lg:text-[12px]">{meta}<span> · {sizeLabel(project.primary_format)}</span></p>
           <p className={cn("mt-0.5 truncate text-[12px]", dirStatus === "live" ? "text-ap-green" : dirStatus === "in_review" ? "text-ap-blue" : "text-secondary-text")}>
             {dirStatus === "live" && liveUntil ? `Live until ${new Date(liveUntil).toLocaleDateString(undefined, { dateStyle: "medium" })}` : STATUS_LABEL[dirStatus ?? "private"]}
           </p>

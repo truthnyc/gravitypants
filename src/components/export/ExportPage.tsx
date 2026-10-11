@@ -20,6 +20,8 @@ import { effectiveKit, useBrandKit, useBrandKits } from "@/lib/stillframe/data";
 import { MEDIA_BUCKET } from "@/lib/stillframe/media";
 import { FontLoadError, registerCustomFonts } from "@/lib/stillframe/fonts";
 import { nearestFormat, slugify } from "@/lib/stillframe/channels";
+import { sizeIdOf } from "@/lib/stillframe/main-size";
+import { AdPills, useSaveDoc } from "@/components/app-ui/AdPills";
 import { CUSTOM_MAX, CUSTOM_MIN, CUSTOM_PRESETS, DEFAULT_SIZES, EXPORT_SIZES, PLATFORMS, customError, exportFileName, platformState, ratioLabel, sizeLabelForFile, togglePlatform, type SizeId } from "@/lib/stillframe/export-sizes";
 import { formatSeconds, type Format, type Frame, type Project } from "@/lib/stillframe/types";
 import { FORMAT_SIZE } from "@/render/formats";
@@ -85,7 +87,10 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
     };
   }, [project, frames, brand, kit?.custom_fonts, fontRetry]);
 
-  const [selected, setSelected] = useState<Set<SizeId>>(() => new Set(DEFAULT_SIZES));
+  // Export sizes always include the ad's main size.
+  const mainId = sizeIdOf(project.primary_format) as SizeId;
+  const [selected, setSelected] = useState<Set<SizeId>>(() => new Set([mainId]));
+  useEffect(() => { setSelected((s) => (s.has(mainId) ? s : new Set([...s, mainId]))); }, [mainId]);
   const [customs, setCustoms] = useState<CustomRow[]>([]);
   const [customOn, setCustomOn] = useState(false);
   const [mp4, setMp4] = useState(DEFAULT_EXPORT_FORMATS.mp4);
@@ -334,17 +339,20 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
   const [moreSizes, setMoreSizes] = useState(false);
   const [pulse, setPulse] = useState<Set<SizeId>>(new Set());
   const changeSizes = (next: Set<SizeId>) => {
+    next = new Set([...next, mainId]);
     const added = new Set([...next].filter((s) => !selected.has(s)));
     setSelected(next);
     if (added.size) { setPreviewKey([...added][0] ?? null); setPulse(added); window.setTimeout(() => setPulse(new Set()), 700); }
   };
   const toggleSize = (id: SizeId) => {
     const n = new Set(selected);
+    if (id === mainId) return;
     if (n.has(id)) n.delete(id); else n.add(id);
     changeSizes(n);
   };
 
   const player = useReelPlayer({ project, frames });
+  const saveDoc = useSaveDoc({ project, frames });
   const [previewKey, setPreviewKey] = useState<string | null>(null);
   const previewT = targets.find((t) => t.key === previewKey) ?? targets[0] ?? { key: "4x5", name: "Portrait", ratio: "4:5", format: "4:5" as Format, width: 1080, height: 1350 };
   const doneCount = files.filter((f) => state[f.job]?.blob).length;
@@ -368,6 +376,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
       className="ap-export"
       adId={project.id}
       step="export"
+      pills={<AdPills doc={{ project, frames }} set={saveDoc} />}
       title={{ name: project.name, status: "saved" }}
       left={
         <PreviewPanel

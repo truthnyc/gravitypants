@@ -5,6 +5,7 @@ import { AppSegmented } from "@/components/app-ui";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Link } from "@tanstack/react-router";
 import { AppButton } from "@/components/app-ui";
+import { AdPills } from "@/components/app-ui/AdPills";
 import { ReelCard, StepActions, StepShell, StepTitle } from "@/components/app-ui/StepShell";
 import { KitAgainButton } from "@/components/templates/KitAgain";
 import { effectiveKit, framePayloadFromPhoto, useBrandKit, useBrandKits, useTemplateName, type EditorDoc } from "@/lib/stillframe/data";
@@ -701,6 +702,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
     <StepShell
       adId={doc.project.id}
       step="edit"
+      pills={<AdPills doc={doc} set={(next) => { setFormat(null); apply(() => next); }} onKit={(id) => actions.onKit(id)} readOnly={readOnly} />}
       title={{ name: doc.project.name, onRename: (name) => apply((d) => ({ ...d, project: { ...d.project, name } })), status: readOnly ? undefined : status, readOnly }}
       banner={banner}
       left={
