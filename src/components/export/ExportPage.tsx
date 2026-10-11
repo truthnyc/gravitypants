@@ -692,7 +692,18 @@ function Sub({ label, children }: { label: string; children: React.ReactNode }) 
 
 function Seg<T extends string | number>({ value, onChange, options, label }: { value: T | null; onChange: (v: T) => void; options: { v: T; l: string; s?: string }[]; label: string }) {
   return (
-    <RadioGroup aria-label={label} orientation="horizontal" value={value == null ? "" : String(value)} onValueChange={(v) => {
+    <RadioGroup aria-label={label} orientation="horizontal" value={value == null ? "" : String(value)} onKeyDown={(event) => {
+      const keys = ["ArrowRight", "ArrowDown", "ArrowLeft", "ArrowUp", "Home", "End"];
+      if (!keys.includes(event.key)) return;
+      event.preventDefault();
+      const radios = Array.from(event.currentTarget.querySelectorAll<HTMLButtonElement>('[role="radio"]'));
+      const index = radios.indexOf(event.target as HTMLButtonElement);
+      const next = event.key === "Home" ? 0 : event.key === "End" ? options.length - 1 : (index + (event.key === "ArrowRight" || event.key === "ArrowDown" ? 1 : -1) + options.length) % options.length;
+      const option = options[next];
+      if (!option) return;
+      onChange(option.v);
+      radios[next]?.focus();
+    }} onValueChange={(v) => {
       const option = options.find((o) => String(o.v) === v);
       if (option) onChange(option.v);
     }} className="flex gap-[3px] rounded-lg bg-ap-panel p-[3px]">
