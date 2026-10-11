@@ -62,7 +62,7 @@ function FavoritesPublic() {
         {siteReels.length > 0 && (
           <ul className={`grid gap-5 [grid-template-columns:repeat(auto-fill,minmax(180px,1fr))] ${reels.length ? "mt-5" : ""}`}>
             {siteReels.map((r) => {
-              const inner = <>{r.poster && <img src={r.poster} alt="" loading="lazy" className={POSTER} />}</>;
+              const inner = <>{r.poster && <img src={r.poster} alt="" loading="lazy" className={posterFor(r.format)} />}</>;
               const cls = "relative block aspect-square w-full overflow-hidden rounded-[8px] bg-ap-panel";
               return (
                 <li key={r.id} className="relative">
