@@ -62,7 +62,7 @@ export function FormatStep({ initial, readOnly = false }: { initial: EditorDoc; 
       step="format"
       pills={<AdPills doc={doc} set={set} readOnly={readOnly} />}
       title={{ name: doc.project.name, onRename: (name) => apply((d) => ({ ...d, project: { ...d.project, name } })), status: readOnly ? undefined : status, readOnly }}
-      left={<BlankFramePanel format={main} templateName={templateName.data ?? "Start blank"} title={doc.project.name} />}
+      left={<BlankFramePanel format={main} templateName={templateName ?? "Start blank"} title={doc.project.name} />}
     >
       <StepTitle title={TITLE} lead={LEAD} />
       <FormatChooser format={main} onFormat={change} kitId={doc.project.brand_kit_id ?? null} onKit={kit} readOnly={readOnly} />
