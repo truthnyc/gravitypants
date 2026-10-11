@@ -875,3 +875,87 @@ export const searchDirectory = createServerFn({ method: "POST" })
       facets: { moods: res.moods ?? {}, categories, brands: res.brands ?? {} },
     };
   });
+
+export type PendingStatus = "none" | "in_review" | "declined";
+
+/** Owner: submit the ad's newest export as a replacement for its live reel. The live version stays public until staff approve. */
+export const submitReelUpdate = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ adId: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const sb = context.supabase as any;
+    const { data: reel } = await sb.from("directory_reels").select("id, status, directory_brands(workspace_id)").eq("ad_id", data.adId).maybeSingle();
+    if (!reel) throw new Error("This reel isn't published.");
+    if (reel.status !== "live") throw new Error("Only live reels can be updated. Share it again instead.");
+    const ws = reel.directory_brands?.workspace_id as string;
+    const { findLatestVideo } = await import("./directory.server");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const admin = supabaseAdmin as any;
+    const src = await findLatestVideo(admin, ws, data.adId);
+    if (!src) throw new Error("Export an MP4 of this ad first, then submit the update.");
+    const dest = `${ws}/directory/${data.adId}-pending.mp4`;
+    const store = admin.storage.from("media");
+    await store.remove([dest]);
+    const { error: cpErr } = await store.copy(src.slice(POSTER_PREFIX.length), dest);
+    if (cpErr) throw new Error("Couldn't save the new version. Try again.");
+    const { error } = await sb.from("directory_reels").update({ pending_video_url: `${POSTER_PREFIX}${dest}`, pending_status: "in_review", pending_submitted_at: new Date().toISOString(), pending_note: null }).eq("id", reel.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+/** Owner: cancel a pending update; the live version is unchanged. */
+export const cancelReelUpdate = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ adId: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const sb = context.supabase as any;
+    const { error } = await sb.from("directory_reels").update({ pending_status: "none", pending_video_url: null, pending_submitted_at: null, pending_note: null }).eq("ad_id", data.adId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+/** Staff: pending updates with signed links to the live and proposed videos. */
+export const listReelUpdates = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.supabase);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const sb = supabaseAdmin as any;
+    const { data } = await sb.from("directory_reels").select("id, title, video_url, pending_video_url, pending_submitted_at, directory_brands(name)").eq("pending_status", "in_review").eq("status", "live").order("pending_submitted_at");
+    const rows = (data ?? []) as any[];
+    const paths = rows.flatMap((r) => [r.video_url, r.pending_video_url]).filter((p: string | null) => p?.startsWith(POSTER_PREFIX)).map((p: string) => p.slice(POSTER_PREFIX.length));
+    const signed = new Map<string, string>();
+    if (paths.length) {
+      const { data: s } = await sb.storage.from("media").createSignedUrls(paths, 3600);
+      for (const x of s ?? []) if (x.path && x.signedUrl) signed.set(x.path, x.signedUrl);
+    }
+    const sign = (p: string | null) => (p?.startsWith(POSTER_PREFIX) ? signed.get(p.slice(POSTER_PREFIX.length)) ?? null : null);
+    return rows.map((r) => ({ id: r.id as string, title: (r.title ?? "Untitled") as string, brand: (r.directory_brands?.name ?? "") as string, submitted: r.pending_submitted_at as string, live: sign(r.video_url), proposed: sign(r.pending_video_url) }));
+  });
+
+/** Staff: approve (replace the live video, keeping URL, saves, permissions and placements) or decline a pending update. */
+export const decideReelUpdate = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid(), action: z.enum(["approve", "decline"]), note: z.string().trim().max(500).optional() }).parse(d))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const sb = supabaseAdmin as any;
+    const { data: r } = await sb.from("directory_reels").select("id, ad_id, status, pending_status, pending_video_url, directory_brands(workspace_id)").eq("id", data.id).single();
+    if (!r || r.pending_status !== "in_review") throw new Error("This update isn't waiting for review.");
+    if (data.action === "decline") {
+      const { error } = await sb.from("directory_reels").update({ pending_status: "declined", pending_note: data.note || null }).eq("id", r.id);
+      if (error) throw new Error(error.message);
+    } else {
+      if (r.status !== "live" || !r.pending_video_url) throw new Error("This reel is no longer live.");
+      const dest = `${r.directory_brands.workspace_id}/directory/${r.ad_id}.mp4`;
+      const store = sb.storage.from("media");
+      await store.remove([dest]);
+      const { error: cpErr } = await store.copy(r.pending_video_url.slice(POSTER_PREFIX.length), dest);
+      if (cpErr) throw new Error(cpErr.message);
+      const { error } = await sb.from("directory_reels").update({ video_url: `${POSTER_PREFIX}${dest}`, pending_status: "none", pending_video_url: null, pending_submitted_at: null, pending_note: null }).eq("id", r.id);
+      if (error) throw new Error(error.message);
+    }
+    await sb.from("admin_audit_log").insert({ admin_user_id: context.userId, action: `reel.update.${data.action}`, workspace_id: r.directory_brands?.workspace_id ?? null, target: r.id, reason: data.note || null });
+    return { ok: true };
+  });
