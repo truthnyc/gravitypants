@@ -134,7 +134,7 @@ function StepHeader({ adId, current, title, back }: { adId: string; current: num
 }
 
 /** Shared frame for the four ad steps: header with steps, sticky reel card on the left, step card on the right. */
-export function StepShell({ adId, step, left, children, banner, back, title }: {
+export function StepShell({ adId, step, left, children, banner, back, title, className }: {
   adId: string;
   step: StepKey;
   left: ReactNode;
@@ -142,11 +142,12 @@ export function StepShell({ adId, step, left, children, banner, back, title }: {
   banner?: ReactNode;
   back?: { label: string; to: "/app/ads" | "/app/ad/$id/edit" };
   title: StepTitleInfo;
+  className?: string;
 }) {
   const current = STEPS.findIndex((s) => s.key === step);
   const { large, toggle } = useLargePreviewState();
   return (
-    <div className="ap-flow min-h-dvh">
+    <div className={cn("ap-flow min-h-dvh", className)}>
       <StepHeader adId={adId} current={current} title={title} back={back} />
       {banner}
       <LargeCtx.Provider value={{ large, toggle }}>
@@ -278,7 +279,7 @@ export function ReelCard({
           Editing controls are below the preview ↓
         </button>
       )}
-      {sizesSlot ? sizesSlot : exported ? (
+      {sizesSlot !== undefined ? sizesSlot : exported ? (
         <div className="mt-3.5 flex flex-wrap gap-1.5">
           {exported.map((e) => <span key={e} className="rounded-[10px] bg-ap-panel px-2.5 py-1.5 text-[13px] font-medium"><span className="text-ap-green">✓ </span>{e}</span>)}
         </div>

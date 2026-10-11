@@ -46,4 +46,4 @@
 - Scope Aimanté by site; `brand-page` helpers centralize brand rules.
 
 - SVG uploads share `svg-safety.ts` before preview/storage, including Directory server uploads, to remove active content.
-- Export font loading is strict to prevent fallback files; FontPicker shares phone Drawer and desktop Popover controls.
+- Strict export fonts; FontPicker uses Drawer/Popover. StepShell scopes export tokens; export-sizes.ts owns size mapping.

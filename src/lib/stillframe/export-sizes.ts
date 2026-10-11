@@ -50,11 +50,11 @@ export const PLATFORMS: { id: PlatformId; name: string; sizes: SizeId[] }[] = [
   { id: "tiktok", name: "TikTok", sizes: ["9x16"] },
   { id: "youtube", name: "YouTube", sizes: ["9x16", "16x9"] },
   { id: "facebook", name: "Facebook", sizes: ["9x16", "4x5"] },
-  { id: "linkedin", name: "LinkedIn", sizes: ["1x1"] },
-  { id: "website", name: "Website", sizes: ["16x9"] },
+  { id: "linkedin", name: "LinkedIn", sizes: ["4x5", "16x9"] },
+  { id: "website", name: "Website", sizes: ["16x9", "5x4"] },
 ];
 
-export const DEFAULT_SIZES: SizeId[] = ["9x16", "1x1"];
+export const DEFAULT_SIZES: SizeId[] = ["4x5"];
 export const CUSTOM_MIN = 100;
 export const CUSTOM_MAX = 4096;
 export const CUSTOM_PRESETS = [
@@ -83,15 +83,17 @@ export function migrateSizes(ids: readonly string[]): SizeId[] {
 }
 
 export function platformState(p: PlatformId, selected: ReadonlySet<SizeId>): "on" | "mixed" | "off" {
-  const sizes = PLATFORMS.find((x) => x.id === p)!.sizes;
+  const sizes = PLATFORMS.find((x) => x.id === p)?.sizes;
+  if (!sizes) return "off";
   const n = sizes.filter((s) => selected.has(s)).length;
   return n === sizes.length ? "on" : n ? "mixed" : "off";
 }
 
 /** All of the platform's sizes selected → deselect them; otherwise select them all. */
 export function togglePlatform(p: PlatformId, selected: ReadonlySet<SizeId>): Set<SizeId> {
-  const sizes = PLATFORMS.find((x) => x.id === p)!.sizes;
+  const sizes = PLATFORMS.find((x) => x.id === p)?.sizes;
   const next = new Set(selected);
+  if (!sizes) return next;
   if (platformState(p, selected) === "on") sizes.forEach((s) => next.delete(s));
   else sizes.forEach((s) => next.add(s));
   return next;

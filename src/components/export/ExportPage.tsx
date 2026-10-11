@@ -16,11 +16,11 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { supabase } from "@/integrations/supabase/client";
-import { effectiveKit, useBrandKit, useBrandKits, useTemplateName } from "@/lib/stillframe/data";
+import { effectiveKit, useBrandKit, useBrandKits } from "@/lib/stillframe/data";
 import { MEDIA_BUCKET } from "@/lib/stillframe/media";
 import { FontLoadError, registerCustomFonts } from "@/lib/stillframe/fonts";
 import { nearestFormat, slugify } from "@/lib/stillframe/channels";
-import { CUSTOM_MAX, CUSTOM_MIN, CUSTOM_PRESETS, DEFAULT_SIZES, EXPORT_SIZES, PLATFORMS, customError, exportFileName, migrateSizes, platformState, ratioLabel, sizeLabelForFile, togglePlatform, type PlatformId, type SizeId } from "@/lib/stillframe/export-sizes";
+import { CUSTOM_MAX, CUSTOM_MIN, CUSTOM_PRESETS, DEFAULT_SIZES, EXPORT_SIZES, PLATFORMS, customError, exportFileName, platformState, ratioLabel, sizeLabelForFile, togglePlatform, type SizeId } from "@/lib/stillframe/export-sizes";
 import { formatSeconds, type Format, type Frame, type Project } from "@/lib/stillframe/types";
 import { FORMAT_SIZE } from "@/render/formats";
 import { loadImages } from "@/render/images";
@@ -84,22 +84,6 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
   const [selected, setSelected] = useState<Set<SizeId>>(() => new Set(DEFAULT_SIZES));
   const [customs, setCustoms] = useState<CustomRow[]>([]);
   const [customOn, setCustomOn] = useState(false);
-  const [userId, setUserId] = useState<string | null>(null);
-  const loaded = useRef(false);
-  // Remember the last size choice per user (stored as size ids; old platform ids are migrated).
-  useEffect(() => {
-    if (!userId) return;
-    try {
-      const raw = localStorage.getItem(`gp.exportSizes.${userId}`);
-      if (raw) {
-        const v = JSON.parse(raw) as { sizes?: string[]; channels?: string[]; custom?: { w: number; h: number }[] };
-        const sizes = migrateSizes([...(v.sizes ?? []), ...(v.channels ?? [])]);
-        if (sizes.length || v.custom?.length) setSelected(new Set(sizes));
-        if (v.custom?.length) { setCustoms(v.custom.map((c) => ({ id: rid(), w: String(c.w), h: String(c.h) }))); setCustomOn(true); }
-      }
-    } catch { /* ignore */ }
-    loaded.current = true;
-  }, [userId]);
   const [mp4, setMp4] = useState(true);
   const { canUse, isSuccess: accessReady } = usePlanAccess();
   const [gif, setGif] = useState(true);
@@ -109,18 +93,12 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
   const [gColors, setGColors] = useState<GifColors>("best");
   const [gFps, setGFps] = useState(15);
   const [gLoop, setGLoop] = useState<"forever" | "once">("forever");
-  const templateName = useTemplateName(project.template_id);
 
   const validCustoms = useMemo(
     () => (customOn ? customs.filter((c) => !customError(num(c.w), num(c.h))).map((c) => ({ w: even(num(c.w)!), h: even(num(c.h)!) })) : [])
       .filter((c, i, a) => a.findIndex((x) => x.w === c.w && x.h === c.h) === i && !EXPORT_SIZES.some((s) => selected.has(s.id) && s.width === c.w && s.height === c.h)),
     [customs, customOn, selected],
   );
-  useEffect(() => {
-    if (!userId || !loaded.current) return;
-    try { localStorage.setItem(`gp.exportSizes.${userId}`, JSON.stringify({ sizes: [...selected], custom: validCustoms })); } catch { /* ignore */ }
-  }, [userId, selected, validCustoms]);
-
   const targets: Target[] = useMemo(() => {
     const list: Target[] = EXPORT_SIZES.filter((s) => selected.has(s.id)).map((s) => ({
       key: s.id, name: s.name, ratio: s.ratio, format: s.layout, width: s.width, height: s.height,
@@ -191,7 +169,6 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
   const [preferredPlan, setPreferredPlan] = useState<string | null>(null);
   useEffect(() => { void supabase.auth.getUser().then(({ data }) => {
     if (data.user) {
-      setUserId(data.user.id);
       const choice = getSignupChoice(data.user.id);
       setPreferredPlan(choice ? `${planById(choice.plan).name} ${choice.billing}` : null);
     }
@@ -337,12 +314,12 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
     killFFmpeg();
   };
 
-  const [hoverP, setHoverP] = useState<PlatformId | null>(null);
+  const [moreSizes, setMoreSizes] = useState(false);
   const [pulse, setPulse] = useState<Set<SizeId>>(new Set());
   const changeSizes = (next: Set<SizeId>) => {
     const added = new Set([...next].filter((s) => !selected.has(s)));
     setSelected(next);
-    if (added.size) { setPulse(added); window.setTimeout(() => setPulse(new Set()), 700); }
+    if (added.size) { setPreviewKey([...added][0] ?? null); setPulse(added); window.setTimeout(() => setPulse(new Set()), 700); }
   };
   const toggleSize = (id: SizeId) => {
     const n = new Set(selected);
@@ -352,7 +329,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
 
   const player = useReelPlayer({ project, frames });
   const [previewKey, setPreviewKey] = useState<string | null>(null);
-  const previewT = targets.find((t) => t.key === previewKey) ?? targets[0] ?? null;
+  const previewT = targets.find((t) => t.key === previewKey) ?? targets[0] ?? { key: "4x5", name: "Portrait", ratio: "4:5", format: "4:5" as Format, width: 1080, height: 1350 };
   const doneCount = files.filter((f) => state[f.job]?.blob).length;
   const ready = open && !running && doneCount > 0;
   const overall = files.length ? files.reduce((n, f) => n + (state[f.job]?.progress ?? 0), 0) / files.length : 0;
@@ -367,6 +344,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
 
   return (
     <StepShell
+      className="ap-export"
       adId={project.id}
       step="export"
       title={{ name: project.name, status: "saved" }}
@@ -383,33 +361,31 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
           time={player.time}
           total={player.total}
           name={project.name}
-          meta={[templateName, `${frames.length} ${frames.length === 1 ? "photo" : "photos"}`, `${formatSeconds(seconds)} sec`].filter(Boolean).join(" · ")}
+          meta={[`${frames.length} ${frames.length === 1 ? "photo" : "photos"}`, `${formatSeconds(seconds)} sec`].filter(Boolean).join(" · ")}
           status="saved"
           formats={project.formats}
           format={player.format}
           onFormat={(f) => player.setFormat(f as Format)}
-          sizesSlot={targets.length > 0 && (
-            <>
-              <AppSectionLabel className="mt-5 mb-2">Preview size</AppSectionLabel>
-              <div role="tablist" aria-label="Preview size" className="flex flex-wrap gap-2">
-                {targets.map((t) => {
-                  const on = t.key === previewT?.key;
-                  const r = t.width / t.height;
-                  return (
-                    <button key={t.key} type="button" role="tab" aria-selected={on} onClick={() => setPreviewKey(t.key)}
-                      className={cn("inline-flex min-h-0 items-center gap-2 rounded-lg border bg-ap-card px-3 py-2 text-[13px] font-medium", on ? "border-ap-blue shadow-[0_0_0_1px_var(--ap-blue)]" : "border-ap-hairline")}>
-                      <span aria-hidden className="rounded-[2px] border-[1.5px] border-current" style={{ width: r >= 1 ? 14 : 14 * r, height: r >= 1 ? 14 / r : 14 }} />
-                      {t.name}
-                      <span className="text-[11px] font-normal text-ap-muted nums">{t.ratio}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </>
-          )}
+          sizesSlot={targets.length >= 2 ? (
+            <div role="tablist" aria-label="Preview size" className="mt-4 flex flex-wrap gap-1.5">
+              {targets.map((t) => (
+                <Button key={t.key} variant="ghost" role="tab" aria-selected={t.key === previewT.key}
+                  onClick={() => setPreviewKey(t.key)}
+                  className={cn("h-7 rounded-lg px-2.5 text-[13px] nums", t.key === previewT.key ? "bg-ap-blue text-ap-card hover:bg-ap-blue-hover" : "bg-ap-soft-blue text-ap-blue")}>
+                  {t.ratio}
+                </Button>
+              ))}
+            </div>
+          ) : null}
         />
       }
     >
+      <div className="mb-4 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
+        <Link to="/app/ad/$id/edit" params={{ id: project.id }} data-cta="export-back-edit" className="inline-flex min-w-0 items-center text-[14px] text-ap-muted hover:text-ap-ink">
+          <ChevronLeft className="size-4 shrink-0" strokeWidth={1.7} /> Back to edit
+        </Link>
+        <PreviousExports projectId={project.id} version={historyVersion} />
+      </div>
       {ready ? (
         <>
           <StepTitle title="Your files are ready" lead="Download them one by one or all together. Files stay in Previous exports for 30 days." />
@@ -425,43 +401,47 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
             </div>
             <AppButton asChild size="lg"><Link to="/app/ad/$id/share" params={{ id: project.id }}>Next: Share <ChevronRight className="size-4" strokeWidth={1.7} /></Link></AppButton>
           </div>}
-          <PreviousExports projectId={project.id} version={historyVersion} />
         </>
       ) : (
         <>
-          <StepTitle title="Where will this ad play?" lead="Pick the shapes you need. One file per shape works everywhere listed under it." />
+          <h1 className="mb-5 text-[30px] font-bold leading-tight">Where will this ad play?</h1>
           <div className="-mt-2 mb-4 flex flex-wrap items-center gap-2">
             <span className="mr-1 text-[13px] text-ap-muted">Posting to</span>
             {PLATFORMS.map((p) => {
               const st = platformState(p.id, selected);
               return (
-                <button
+                <Button
+                  variant="ghost"
                   key={p.id}
                   type="button"
-                  aria-pressed={st === "on" ? true : st === "mixed" ? "mixed" : false}
-                  onMouseEnter={() => setHoverP(p.id)}
-                  onMouseLeave={() => setHoverP(null)}
-                  onFocus={() => setHoverP(p.id)}
-                  onBlur={() => setHoverP(null)}
+                  aria-pressed={st === "on"}
                   onClick={() => changeSizes(togglePlatform(p.id, selected))}
                   className={cn(
-                    "inline-flex min-h-0 items-center gap-1 rounded-full px-3 py-1.5 text-[13px] font-medium transition-colors",
-                    st === "on" ? "bg-ap-ink text-ap-card" : st === "mixed" ? "bg-ap-soft-blue text-ap-blue" : "bg-ap-panel text-ap-ink hover:bg-ap-inner",
+                    "h-8 min-h-0 rounded-full border px-3 text-[13px] font-normal transition-colors",
+                    st === "on" ? "border-ap-blue bg-ap-soft-blue text-ap-blue" : "border-transparent bg-ap-panel text-ap-ink hover:bg-ap-inner",
                   )}
                 >
-                  {st === "on" && <Check className="size-3" strokeWidth={2.5} />}
                   {p.name}
-                </button>
+                </Button>
               );
             })}
           </div>
-          <div className="flex flex-col gap-2.5">
-            {EXPORT_SIZES.map((s) => (
-              <SizeCard key={s.id} size={s} selected={selected.has(s.id)} pulse={pulse.has(s.id)} hover={hoverP} onClick={() => toggleSize(s.id)} project={project} frames={frames} brand={brand} images={images} />
+          <div className="flex flex-col gap-2">
+            {EXPORT_SIZES.filter((s) => s.id !== "5x4").map((s) => (
+              <SizeCard key={s.id} size={s} selected={selected.has(s.id)} pulse={pulse.has(s.id)} onClick={() => toggleSize(s.id)} project={project} frames={frames} brand={brand} images={images} />
             ))}
-            <CustomSizes on={customOn} setOn={setCustomOn} rows={customs} setRows={setCustoms} />
           </div>
-          <p className="mt-3 text-[13px] text-ap-muted">Posting to Reels and TikTok? One vertical file covers both.</p>
+          <Collapsible open={moreSizes} onOpenChange={setMoreSizes} className="mt-2">
+            <CollapsibleTrigger asChild>
+              <Button variant="ghost" className="h-7 px-1 text-[13px] font-normal text-ap-muted">More sizes <ChevronDown className={cn("size-3", moreSizes && "rotate-180")} strokeWidth={1.7} /></Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="mt-2 space-y-2">
+              {EXPORT_SIZES.filter((s) => s.id === "5x4").map((s) => (
+                <SizeCard key={s.id} size={s} selected={selected.has(s.id)} pulse={pulse.has(s.id)} onClick={() => toggleSize(s.id)} project={project} frames={frames} brand={brand} images={images} />
+              ))}
+              <CustomSizes on={customOn} setOn={setCustomOn} rows={customs} setRows={setCustoms} />
+            </CollapsibleContent>
+          </Collapsible>
 
           {issues.length > 0 && (
             <div className="mt-5 space-y-2">
@@ -482,6 +462,9 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
             <PickCard on={gif} onClick={() => (gif || canUse("gif") ? setGif((v) => !v) : openUpgrade("gif"))} icon={<ImageIcon className="size-4" strokeWidth={1.7} />} title="Animated GIF" sub="Plays anywhere, no sound" />
           </div>
 
+          <Collapsible className="mt-3">
+            <CollapsibleTrigger asChild><Button variant="ghost" className="h-10 w-full justify-between bg-ap-panel px-3 text-[14px]">Fine-tune quality <ChevronDown className="size-3" strokeWidth={1.7} /></Button></CollapsibleTrigger>
+            <CollapsibleContent>
           <Reveal show={mp4}>
             <div className="mt-5 mb-2 text-[13px] font-semibold" id="vm-label">Video motion</div>
             <Seg label="Video motion" value={fps} onChange={setFps} options={[{ v: 30, l: "Standard", s: "30 fps" }, { v: 60, l: "Smooth", s: "60 fps" }, { v: 24, l: "Film", s: "24 fps" }]} />
@@ -500,7 +483,9 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
             </div>
           </Reveal>
 
-          <div className="mt-6 rounded-[14px] bg-ap-panel p-4 text-[14px]" aria-live="polite">
+          </CollapsibleContent></Collapsible>
+
+          <div className="mt-6 border-t border-ap-hairline pt-4 text-[14px]" aria-live="polite">
             {files.length ? (
               <p className="nums"><b>{files.length} {files.length === 1 ? "file" : "files"}</b> · {targets.map((t) => t.name).join(" + ")} · {[mp4 && "MP4", gif && "GIF"].filter(Boolean).join(" + ")} · {formatSeconds(seconds)} sec each</p>
             ) : (
@@ -551,12 +536,10 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
           {open && !running && !doneCount && <p className="mt-3 text-[13px] text-destructive">No files were made. Try again, or pick a smaller GIF size.</p>}
           {fontError && <div role="alert" className="mt-3 text-[13px] text-destructive"><p>{fontError}</p><Button variant="plain" className="mt-2" onClick={() => setFontRetry((v) => v + 1)}>Retry loading fonts</Button></div>}
           {blocked && <p className="mt-3 text-[12px] text-destructive">Add a photo to every frame to export.</p>}
-          <PreviousExports projectId={project.id} version={historyVersion} />
 
           <StepActions>
             <KitAgainButton adId={project.id} templateId={project.template_id} />
             <span className="flex-1" />
-            <AppButton asChild variant="ghost" size="lg"><Link to="/app/ad/$id/edit" params={{ id: project.id }}><ChevronLeft className="size-4" strokeWidth={1.7} /> Back to Edit</Link></AppButton>
             {running ? <AppButton variant="ghost" size="lg" onClick={cancel}>Cancel</AppButton> : null}
             {exportButton}
           </StepActions>
@@ -630,51 +613,35 @@ function ExportStage({ target, time, project, frames, brand, images }: { target:
   );
 }
 
-function SizeCard({ size, selected, pulse, hover, onClick, ...r }: {
-  size: (typeof EXPORT_SIZES)[number];
-  selected: boolean;
-  pulse: boolean;
-  hover: PlatformId | null;
-  onClick: () => void;
-  project: Project;
-  frames: Frame[];
-  brand: BrandStyle;
-  images: Map<string, HTMLImageElement> | null;
+function SizeCard({ size, selected, pulse, onClick, ...r }: {
+  size: (typeof EXPORT_SIZES)[number]; selected: boolean; pulse: boolean; onClick: () => void;
+  project: Project; frames: Frame[]; brand: BrandStyle; images: Map<string, HTMLImageElement> | null;
 }) {
   const ratio = size.width / size.height;
-  const thumbW = ratio >= 1 ? 44 : Math.round(44 * ratio);
+  const thumbW = ratio >= 1 ? 30 : 30 * ratio;
+  const platforms = [...new Set(size.uses.flatMap((u) => u.platforms))]
+    .map((id) => PLATFORMS.find((p) => p.id === id)?.name).filter(Boolean).slice(0, 3);
+  const useText = platforms.length ? platforms.join(", ") : "Website, Facebook, LinkedIn";
   return (
-    <button
-      type="button"
-      role="checkbox"
-      aria-checked={selected}
-      onClick={onClick}
-      className={cn("flex w-full items-center gap-3.5 rounded-[14px] border bg-ap-card p-3 text-left sm:p-3.5", selected ? "border-ap-blue shadow-[0_0_0_1px_var(--ap-blue)]" : "border-ap-hairline", pulse && "ap-pulse")}
-    >
-      <span className="grid size-16 shrink-0 place-items-center rounded-[10px] bg-ap-panel">
+    <Button variant="ghost" type="button" role="checkbox" aria-checked={selected} onClick={onClick}
+      className={cn("h-auto min-h-16 w-full justify-start gap-3 whitespace-normal rounded-lg border p-2.5 text-left", selected ? "border-ap-blue bg-ap-soft-blue hover:bg-ap-soft-blue" : "border-ap-hairline bg-ap-card hover:bg-ap-panel", pulse && "ap-pulse")}>
+      <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-ap-panel">
         <MiniRender {...r} format={size.layout} width={thumbW} w={size.width} h={size.height} />
       </span>
       <span className="min-w-0 flex-1">
-        <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
-          <span className="text-[16px] font-semibold">{size.name}</span>
-          <span className="text-[15px] text-ap-muted nums">{size.ratio}</span>
-          {size.badge && <span className="rounded-md bg-ap-soft-blue px-1.5 py-0.5 text-[11px] font-medium text-ap-blue">{size.badge}</span>}
+        <span className="flex flex-wrap items-baseline gap-x-1.5">
+          <span className="text-[14px] font-semibold">{size.name}</span>
+          <span className="text-[14px] font-normal text-ap-muted nums">{size.ratio}</span>
+          {size.badge && <span className="text-[11px] font-medium text-ap-blue">★ Recommended</span>}
         </span>
-        <span className="mt-0.5 block text-[13px] leading-snug text-ap-muted">
-          <span className="nums">{size.width.toLocaleString()} × {size.height.toLocaleString()}</span>
-          {" "}
-          {size.uses.map((u, i) => (
-            <span key={u.label}>
-              <span className={cn("transition-colors", hover && u.platforms.includes(hover) && "font-medium text-ap-blue")}>{u.label}</span>
-              {i < size.uses.length - 1 && " · "}
-            </span>
-          ))}
+        <span className="mt-0.5 block truncate text-[12px] font-normal text-ap-muted" title={useText}>
+          <span className="mr-2 text-ap-subhead nums">{size.width}×{size.height}</span>{useText}
         </span>
       </span>
-      <span className={cn("grid size-[22px] shrink-0 place-items-center rounded-full", selected ? "bg-ap-blue text-ap-card" : "border-[1.5px] border-ap-hairline")}>
-        {selected && <Check className="size-3" strokeWidth={2.5} />}
+      <span className={cn("grid size-5 shrink-0 place-items-center rounded-[5px] border", selected ? "border-ap-blue bg-ap-blue text-ap-card" : "border-ap-switch-off")}>
+        {selected && <Check className="size-3" strokeWidth={1.7} />}
       </span>
-    </button>
+    </Button>
   );
 }
 
@@ -690,17 +657,17 @@ function CustomSizes({ on, setOn, rows, setRows }: { on: boolean; setOn: (v: boo
     setRows(empty ? rows.map((r) => (r === empty ? { ...r, w: String(w), h: String(h) } : r)) : [...rows, { id: rid(), w: String(w), h: String(h) }]);
   };
   return (
-    <div className={cn("rounded-[14px] border bg-ap-card", on ? "border-ap-blue shadow-[0_0_0_1px_var(--ap-blue)]" : "border-dashed border-ap-hairline")}>
-      <button type="button" role="checkbox" aria-checked={on} onClick={toggle} className="flex w-full items-center gap-3.5 p-3 text-left sm:p-3.5">
-        <span className="grid size-16 shrink-0 place-items-center rounded-[10px] bg-ap-panel text-ap-muted"><Plus className="size-5" strokeWidth={1.7} /></span>
+    <div className={cn("rounded-lg border", on ? "border-ap-blue bg-ap-soft-blue" : "border-ap-hairline bg-ap-card")}>
+      <Button variant="ghost" type="button" role="checkbox" aria-checked={on} onClick={toggle} className="h-auto min-h-16 w-full justify-start gap-3 whitespace-normal p-2.5 text-left">
+        <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-ap-panel text-ap-muted"><Plus className="size-5" strokeWidth={1.7} /></span>
         <span className="min-w-0 flex-1">
-          <span className="block text-[16px] font-semibold">Custom size</span>
-          <span className="mt-0.5 block text-[13px] text-ap-muted">Any width × height, for ad networks and banners</span>
+          <span className="block text-[14px] font-semibold">Custom size</span>
+          <span className="mt-0.5 block text-[12px] font-normal text-ap-muted">Any width × height, for ad networks and banners</span>
         </span>
-        <span className={cn("grid size-[22px] shrink-0 place-items-center rounded-full", on ? "bg-ap-blue text-ap-card" : "border-[1.5px] border-ap-hairline")}>
+        <span className={cn("grid size-5 shrink-0 place-items-center rounded-[5px]", on ? "bg-ap-blue text-ap-card" : "border-[1.5px] border-ap-hairline")}>
           {on && <Check className="size-3" strokeWidth={2.5} />}
         </span>
-      </button>
+      </Button>
       <Reveal show={on}>
         <div className="space-y-3 px-3 pb-3.5 sm:px-3.5">
           {rows.map((r, i) => {
@@ -889,7 +856,7 @@ function PreviousExports({ projectId, version }: { projectId: string; version: n
     };
   }, [projectId, version]);
 
-  if (!items.length) return null;
+  const [historyOpen, setHistoryOpen] = useState(false);
   const download = async (stamp: string, name: string) => {
     const { data, error } = await supabase.storage.from(MEDIA_BUCKET).createSignedUrl(`${getWorkspaceId()}/exports/${projectId}/${stamp}/${name}`, 300, { download: name });
     if (error || !data) { toast.error("That file couldn't be downloaded. Try again."); return; }
@@ -907,14 +874,15 @@ function PreviousExports({ projectId, version }: { projectId: string; version: n
     return left <= 1 ? "Deleted within a day" : `${left} days left`;
   };
   return (
-    <Collapsible className="mt-6">
-      <CollapsibleTrigger className="group flex items-center gap-1.5 text-[13px] font-semibold">
-        <ChevronDown className="size-4 transition-transform group-data-[state=closed]:-rotate-90" strokeWidth={1.7} />
-        Previous exports
-        <span className="font-normal text-secondary-text nums">({items.length})</span>
-      </CollapsibleTrigger>
-      <p className="mt-1 pl-[22px] text-[12px] text-secondary-text">Kept for 30 days</p>
-      <CollapsibleContent className="mt-3 space-y-3">
+    <>
+      <Button variant="ghost" data-cta="export-history" onClick={() => setHistoryOpen(true)} className="h-7 px-0 text-[13px] font-normal text-ap-muted">
+        Previous exports ({items.length})
+      </Button>
+      <Dialog open={historyOpen} onOpenChange={setHistoryOpen}>
+        <DialogContent className="max-h-[85dvh] overflow-y-auto sm:max-w-[640px]">
+          <DialogHeader><DialogTitle>Previous exports ({items.length})</DialogTitle><DialogDescription>Kept for 30 days</DialogDescription></DialogHeader>
+          {!items.length && <p className="text-[14px] text-ap-muted">No previous exports</p>}
+          <div className="space-y-3">
         {items.map((it) => (
           <div key={it.stamp} className="rounded-[14px] bg-ap-panel p-3">
             <div className="mb-2 flex justify-between gap-2 text-[12px] text-secondary-text nums">
@@ -933,7 +901,9 @@ function PreviousExports({ projectId, version }: { projectId: string; version: n
             </ul>
           </div>
         ))}
-      </CollapsibleContent>
-    </Collapsible>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
