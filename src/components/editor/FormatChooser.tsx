@@ -79,7 +79,6 @@ export function FormatChooser({ format, onFormat, kitId, onKit, template, onTemp
               <span className="min-w-0 flex-1">
                 <span className="block font-semibold">
                   {s.name} <span className="font-normal text-ap-muted nums">{s.format}</span>
-                  {s.format === "4:5" && !platform && <span className="ml-2 text-[12px] font-medium text-ap-blue">★ Recommended for feeds</span>}
                 </span>
                 <span className="block truncate text-[13px] text-ap-muted">
                   <span className="mr-2 text-[12.5px] text-ap-subhead nums">{s.width}×{s.height}</span>{usesOf(s.format)}
