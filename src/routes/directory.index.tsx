@@ -39,7 +39,7 @@ const posterFor = (format: string | undefined) =>
     ? `absolute top-1/2 left-1/2 w-[88%] aspect-[16/9] object-contain -translate-x-1/2 -translate-y-1/2 ${POSTER_RING}`
     : format === "5x4"
       ? `absolute top-1/2 left-1/2 w-[84%] aspect-[5/4] object-contain -translate-x-1/2 -translate-y-1/2 ${POSTER_RING}`
-      : `absolute top-1/2 left-1/2 h-[72%] w-auto max-w-[72%] object-contain -translate-x-1/2 -translate-y-1/2 ${POSTER_RING}`;
+      : `absolute top-1/2 left-1/2 h-auto w-auto max-h-[72%] max-w-[72%] object-contain -translate-x-1/2 -translate-y-1/2 ${POSTER_RING}`;
 
 // Moods the headline cycles through when none are picked.
 const ROTATING = ["soothing", "energizing", "hopeful", "inspiring", "cozy", "luxurious", "playful"];

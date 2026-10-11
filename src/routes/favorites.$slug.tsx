@@ -18,7 +18,7 @@ const POSTER_RING = "rounded-[6px] shadow-[0_0_0_1px_var(--ap-inner),0_18px_34px
 const posterFor = (format: string | undefined) =>
   format === "169"
     ? `absolute top-1/2 left-1/2 w-[88%] aspect-[16/9] object-contain -translate-x-1/2 -translate-y-1/2 ${POSTER_RING}`
-    : `absolute top-1/2 left-1/2 h-[72%] w-auto max-w-[72%] object-contain -translate-x-1/2 -translate-y-1/2 ${POSTER_RING}`;
+    : `absolute top-1/2 left-1/2 h-auto w-auto max-h-[72%] max-w-[72%] object-contain -translate-x-1/2 -translate-y-1/2 ${POSTER_RING}`;
 
 export const Route = createFileRoute("/favorites/$slug")({
   loader: async ({ params }) => {
