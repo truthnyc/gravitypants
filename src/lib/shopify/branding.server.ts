@@ -1,7 +1,9 @@
 // Server-only: shop logo and colours from the Storefront API into the shop's brand kit. Never blocks a reel.
 import { adminGraphql, decryptToken, encryptToken, SHOPIFY_API_VERSION } from "./shopify.server";
 import { sanitizeSvg } from "@/lib/stillframe/svg-safety";
-import { BRAND_BUCKET, BRAND_PREFIX } from "@/lib/stillframe/media";
+// Same bucket and key prefix as getMediaUrl() in media.ts (not imported: that module is browser-side).
+export const BRAND_BUCKET = "brand-assets";
+export const BRAND_PREFIX = "brand-assets:";
 
 type Admin = (typeof import("@/integrations/supabase/client.server"))["supabaseAdmin"];
 const LOGO_TYPES: Record<string, string> = { "image/png": "png", "image/jpeg": "jpg", "image/webp": "webp", "image/svg+xml": "svg" };
