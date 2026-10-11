@@ -96,7 +96,7 @@ function PlacementCard({ kit, save }: SaveProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [size]);
   const positions = kit.default_logo_positions;
-  const def: Record<Format, string> = { "9:16": "top-right", "4:5": "top-right", "1:1": "top-right", "16:9": "bottom-right" };
+  const def: Record<Format, string> = { "9:16": "top-right", "4:5": "top-right", "1:1": "top-right", "16:9": "bottom-right", "5:4": "top-right" };
   return (
     <Card title="Default logo placement" hint="Where the logo sits in each format when you start a new ad.">
       <div className="flex flex-wrap items-end gap-10">

@@ -1,7 +1,7 @@
 import type { Format } from "./types";
 
 /** Export output sizes and the platform shortcuts that select them. One place to change the mapping. */
-export type SizeId = "9x16" | "4x5" | "1x1" | "16x9";
+export type SizeId = "9x16" | "4x5" | "1x1" | "5x4" | "16x9";
 export type PlatformId = "instagram" | "tiktok" | "youtube" | "facebook" | "linkedin" | "website";
 
 export type SizeDef = {
@@ -32,6 +32,10 @@ export const EXPORT_SIZES: SizeDef[] = [
     { label: "Instagram & Facebook feed", platforms: ["instagram", "facebook"] },
     { label: "LinkedIn feed", platforms: ["linkedin"] },
     { label: "Marketplace & catalog", platforms: [] },
+  ] },
+  { id: "5x4", name: "Wide", ratio: "5:4", width: 1350, height: 1080, layout: "5:4", uses: [
+    { label: "Website & banners", platforms: [] },
+    { label: "Facebook & LinkedIn feed", platforms: [] },
   ] },
   { id: "16x9", name: "Landscape", ratio: "16:9", width: 1920, height: 1080, layout: "16:9", uses: [
     { label: "YouTube", platforms: ["youtube"] },

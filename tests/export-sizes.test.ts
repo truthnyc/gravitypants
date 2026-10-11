@@ -24,3 +24,11 @@ describe("export sizes", () => {
     expect(ratioLabel(1200, 628)).toBe("1.91:1");
   });
 });
+
+import { EXPORT_SIZES } from "@/lib/stillframe/export-sizes";
+describe("5x4 size", () => {
+  it("is landscape 1350 × 1080", () => {
+    const s = EXPORT_SIZES.find((x) => x.id === "5x4")!;
+    expect([s.width, s.height, s.layout]).toEqual([1350, 1080, "5:4"]);
+  });
+});
