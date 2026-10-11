@@ -47,3 +47,4 @@
 
 - SVG uploads share `svg-safety.ts` before preview/storage, including Directory server uploads, to remove active content.
 - Strict export fonts; FontPicker uses Drawer/Popover. Export components share size/quality/estimate rules for parity.
+- Main size: `projects.primary_format` is the ad's main size; `main-size.ts` holds the five size names and `refitForMainSize`; header `AdPills` changes it on every step; preview size is temporary UI state.
