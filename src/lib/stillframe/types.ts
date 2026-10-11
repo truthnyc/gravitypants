@@ -11,6 +11,8 @@ export type LogoPosition =
   | "bottom-right";
 
 export type LogoSettings = {
+  /** Whole-video "Show logo" switch; undefined means shown. */
+  enabled?: boolean;
   format_overrides?: Partial<Record<Format, Omit<LogoSettings, "format_overrides" | "positions" | "frame_positions" | "kit_stamp">>>;
   asset_id?: string | null;
   path?: string | null;
