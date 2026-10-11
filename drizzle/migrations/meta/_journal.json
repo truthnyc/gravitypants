@@ -92,6 +92,13 @@
       "when": 1791752422888,
       "tag": "0012_shopify_shops",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1791755580522,
+      "tag": "0013_shopify_shop_workspace",
+      "breakpoints": true
     }
   ]
 }

@@ -1,17 +1,14 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { getShopifyConfig } from "@/lib/shopify/config.functions";
-
-declare global {
-  interface Window {
-    shopify?: { idToken: () => Promise<string> };
-  }
-}
+import { shopifyFetch, waitForAppBridge } from "@/lib/shopify/bridge";
 
 type Result =
   | { state: "loading" }
   | { state: "ok"; name: string; shop: string; logo: string | null }
   | { state: "error"; message: string };
+
+const MAX = 10;
 
 export const Route = createFileRoute("/shopify")({
   validateSearch: (s: Record<string, unknown>) => ({
@@ -35,19 +32,14 @@ export const Route = createFileRoute("/shopify")({
   component: ShopifyHome,
 });
 
-async function waitForAppBridge(ms = 8000) {
-  const start = Date.now();
-  while (!window.shopify?.idToken) {
-    if (Date.now() - start > ms) throw new Error("Shopify App Bridge did not load. Open this app from your Shopify admin.");
-    await new Promise((r) => setTimeout(r, 100));
-  }
-  return window.shopify;
-}
-
 function ShopifyHome() {
   const { shop, host } = Route.useSearch();
   const { apiKey } = Route.useLoaderData();
+  const navigate = useNavigate();
   const [result, setResult] = useState<Result>({ state: "loading" });
+  const [making, setMaking] = useState(false);
+  const [note, setNote] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!apiKey) return setResult({ state: "error", message: "The Shopify app key hasn't been set up yet." });
@@ -55,11 +47,7 @@ function ShopifyHome() {
     let cancelled = false;
     (async () => {
       try {
-        const bridge = await waitForAppBridge();
-        const token = await bridge.idToken();
-        const res = await fetch("/api/public/shopify/auth", { method: "POST", headers: { Authorization: `Bearer ${token}` } });
-        const body = await res.json();
-        if (!res.ok) throw new Error(body.error ?? "Could not connect your store.");
+        const body = await shopifyFetch<{ name: string; shop: string; logo: string | null }>("/api/public/shopify/auth");
         if (!cancelled) setResult({ state: "ok", name: body.name, shop: body.shop, logo: body.logo });
       } catch (e) {
         if (!cancelled) setResult({ state: "error", message: (e as Error).message });
@@ -70,6 +58,25 @@ function ShopifyHome() {
     };
   }, [apiKey, shop, host]);
 
+  async function makeReel() {
+    setError(null);
+    setNote(null);
+    try {
+      const bridge = await waitForAppBridge();
+      if (!bridge.resourcePicker) throw new Error("The Shopify product picker isn't available here.");
+      const picked = await bridge.resourcePicker({ type: "product", multiple: MAX, action: "select" });
+      if (!picked?.length) return;
+      setMaking(true);
+      const ids = picked.map((p) => p.id);
+      const res = await shopifyFetch<{ projectId: string; skipped: string[]; trimmed: boolean }>("/api/public/shopify/products", { ids });
+      const notes = [res.trimmed || ids.length > MAX ? `Only the first ${MAX} products were used.` : "", res.skipped.length ? `Skipped (no photos): ${res.skipped.join(", ")}.` : ""].filter(Boolean).join(" ");
+      void navigate({ to: "/shopify/reel/$id", params: { id: res.projectId }, search: { shop, host, note: notes || undefined } });
+    } catch (e) {
+      setError((e as Error).message);
+      setMaking(false);
+    }
+  }
+
   return (
     <main className="min-h-screen bg-background text-foreground grid place-items-center p-6">
       <div className="w-full max-w-md rounded border border-border bg-card p-8 text-center">
@@ -78,7 +85,18 @@ function ShopifyHome() {
           <>
             {result.logo && <img src={result.logo} alt="" className="mx-auto mb-4 h-12 object-contain" />}
             <h1 className="text-xl font-semibold">Connected to {result.name}</h1>
-            <p className="mt-2 text-sm text-muted-foreground">{result.shop}</p>
+            <p className="mt-2 text-sm text-muted-foreground">Pick up to {MAX} products. We'll use their photos, names and prices.</p>
+            <button
+              type="button"
+              data-cta="shopify-make-reel"
+              onClick={makeReel}
+              disabled={making}
+              className="mt-6 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground disabled:opacity-60"
+            >
+              {making ? "Making your reel…" : "Make a reel"}
+            </button>
+            {note && <p className="mt-3 text-sm text-muted-foreground">{note}</p>}
+            {error && <p role="alert" className="mt-3 text-sm text-destructive">{error}</p>}
           </>
         )}
         {result.state === "error" && (

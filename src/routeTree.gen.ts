@@ -71,6 +71,7 @@ import { Route as ApiPublicDirectoryDailyRouteImport } from './routes/api/public
 import { Route as ApiPublicTrialRemindersRouteImport } from './routes/api/public/trial-reminders'
 import { Route as ApiPublicWeeklyReportRouteImport } from './routes/api/public/weekly-report'
 import { Route as DirectoryCategorySlugRouteImport } from './routes/directory.category.$slug'
+import { Route as ShopifyReelIdRouteImport } from './routes/shopify_.reel.$id'
 import { Route as AuthenticatedAdminClientsIdRouteImport } from './routes/_authenticated/admin/clients_.$id'
 import { Route as AuthenticatedAdminTemplatesIndexRouteImport } from './routes/_authenticated/admin/templates.index'
 import { Route as AuthenticatedAdminTemplatesIdRouteImport } from './routes/_authenticated/admin/templates.$id'
@@ -85,6 +86,9 @@ import { Route as AuthenticatedAppTemplatesIndexRouteImport } from './routes/_au
 import { Route as AuthenticatedAppTemplatesSlugRouteImport } from './routes/_authenticated/app/templates.$slug'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as ApiPublicShopifyAuthRouteImport } from './routes/api/public/shopify/auth'
+import { Route as ApiPublicShopifyExportRouteImport } from './routes/api/public/shopify/export'
+import { Route as ApiPublicShopifyProductsRouteImport } from './routes/api/public/shopify/products'
+import { Route as ApiPublicShopifyReelRouteImport } from './routes/api/public/shopify/reel'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
@@ -415,6 +419,11 @@ const DirectoryCategorySlugRoute = DirectoryCategorySlugRouteImport.update({
   path: '/directory/category/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ShopifyReelIdRoute = ShopifyReelIdRouteImport.update({
+  id: '/shopify_/reel/$id',
+  path: '/shopify/reel/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAdminClientsIdRoute =
   AuthenticatedAdminClientsIdRouteImport.update({
     id: '/clients_/$id',
@@ -496,6 +505,22 @@ const ApiPublicPaymentsWebhookRoute =
 const ApiPublicShopifyAuthRoute = ApiPublicShopifyAuthRouteImport.update({
   id: '/api/public/shopify/auth',
   path: '/api/public/shopify/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicShopifyExportRoute = ApiPublicShopifyExportRouteImport.update({
+  id: '/api/public/shopify/export',
+  path: '/api/public/shopify/export',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicShopifyProductsRoute =
+  ApiPublicShopifyProductsRouteImport.update({
+    id: '/api/public/shopify/products',
+    path: '/api/public/shopify/products',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicShopifyReelRoute = ApiPublicShopifyReelRouteImport.update({
+  id: '/api/public/shopify/reel',
+  path: '/api/public/shopify/reel',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
@@ -616,6 +641,7 @@ export interface FileRoutesByFullPath {
   '/api/public/trial-reminders': typeof ApiPublicTrialRemindersRoute
   '/api/public/weekly-report': typeof ApiPublicWeeklyReportRoute
   '/directory/category/$slug': typeof DirectoryCategorySlugRoute
+  '/shopify/reel/$id': typeof ShopifyReelIdRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/app/': typeof AuthenticatedAppIndexRoute
   '/admin/clients/$id': typeof AuthenticatedAdminClientsIdRoute
@@ -630,6 +656,9 @@ export interface FileRoutesByFullPath {
   '/app/templates/$slug': typeof AuthenticatedAppTemplatesSlugRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/shopify/auth': typeof ApiPublicShopifyAuthRoute
+  '/api/public/shopify/export': typeof ApiPublicShopifyExportRoute
+  '/api/public/shopify/products': typeof ApiPublicShopifyProductsRoute
+  '/api/public/shopify/reel': typeof ApiPublicShopifyReelRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -700,6 +729,7 @@ export interface FileRoutesByTo {
   '/api/public/trial-reminders': typeof ApiPublicTrialRemindersRoute
   '/api/public/weekly-report': typeof ApiPublicWeeklyReportRoute
   '/directory/category/$slug': typeof DirectoryCategorySlugRoute
+  '/shopify/reel/$id': typeof ShopifyReelIdRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/app': typeof AuthenticatedAppIndexRoute
   '/admin/clients/$id': typeof AuthenticatedAdminClientsIdRoute
@@ -714,6 +744,9 @@ export interface FileRoutesByTo {
   '/app/templates/$slug': typeof AuthenticatedAppTemplatesSlugRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/shopify/auth': typeof ApiPublicShopifyAuthRoute
+  '/api/public/shopify/export': typeof ApiPublicShopifyExportRoute
+  '/api/public/shopify/products': typeof ApiPublicShopifyProductsRoute
+  '/api/public/shopify/reel': typeof ApiPublicShopifyReelRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -789,6 +822,7 @@ export interface FileRoutesById {
   '/api/public/trial-reminders': typeof ApiPublicTrialRemindersRoute
   '/api/public/weekly-report': typeof ApiPublicWeeklyReportRoute
   '/directory/category/$slug': typeof DirectoryCategorySlugRoute
+  '/shopify_/reel/$id': typeof ShopifyReelIdRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
   '/_authenticated/admin/clients_/$id': typeof AuthenticatedAdminClientsIdRoute
@@ -803,6 +837,9 @@ export interface FileRoutesById {
   '/_authenticated/app/templates/$slug': typeof AuthenticatedAppTemplatesSlugRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/shopify/auth': typeof ApiPublicShopifyAuthRoute
+  '/api/public/shopify/export': typeof ApiPublicShopifyExportRoute
+  '/api/public/shopify/products': typeof ApiPublicShopifyProductsRoute
+  '/api/public/shopify/reel': typeof ApiPublicShopifyReelRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -878,6 +915,7 @@ export interface FileRouteTypes {
     | '/api/public/trial-reminders'
     | '/api/public/weekly-report'
     | '/directory/category/$slug'
+    | '/shopify/reel/$id'
     | '/admin/'
     | '/app/'
     | '/admin/clients/$id'
@@ -892,6 +930,9 @@ export interface FileRouteTypes {
     | '/app/templates/$slug'
     | '/api/public/payments/webhook'
     | '/api/public/shopify/auth'
+    | '/api/public/shopify/export'
+    | '/api/public/shopify/products'
+    | '/api/public/shopify/reel'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/transactional/preview'
@@ -962,6 +1003,7 @@ export interface FileRouteTypes {
     | '/api/public/trial-reminders'
     | '/api/public/weekly-report'
     | '/directory/category/$slug'
+    | '/shopify/reel/$id'
     | '/admin'
     | '/app'
     | '/admin/clients/$id'
@@ -976,6 +1018,9 @@ export interface FileRouteTypes {
     | '/app/templates/$slug'
     | '/api/public/payments/webhook'
     | '/api/public/shopify/auth'
+    | '/api/public/shopify/export'
+    | '/api/public/shopify/products'
+    | '/api/public/shopify/reel'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/transactional/preview'
@@ -1050,6 +1095,7 @@ export interface FileRouteTypes {
     | '/api/public/trial-reminders'
     | '/api/public/weekly-report'
     | '/directory/category/$slug'
+    | '/shopify_/reel/$id'
     | '/_authenticated/admin/'
     | '/_authenticated/app/'
     | '/_authenticated/admin/clients_/$id'
@@ -1064,6 +1110,9 @@ export interface FileRouteTypes {
     | '/_authenticated/app/templates/$slug'
     | '/api/public/payments/webhook'
     | '/api/public/shopify/auth'
+    | '/api/public/shopify/export'
+    | '/api/public/shopify/products'
+    | '/api/public/shopify/reel'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/transactional/preview'
@@ -1112,8 +1161,12 @@ export interface RootRouteChildren {
   ApiPublicTrialRemindersRoute: typeof ApiPublicTrialRemindersRoute
   ApiPublicWeeklyReportRoute: typeof ApiPublicWeeklyReportRoute
   DirectoryCategorySlugRoute: typeof DirectoryCategorySlugRoute
+  ShopifyReelIdRoute: typeof ShopifyReelIdRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   ApiPublicShopifyAuthRoute: typeof ApiPublicShopifyAuthRoute
+  ApiPublicShopifyExportRoute: typeof ApiPublicShopifyExportRoute
+  ApiPublicShopifyProductsRoute: typeof ApiPublicShopifyProductsRoute
+  ApiPublicShopifyReelRoute: typeof ApiPublicShopifyReelRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
@@ -1556,6 +1609,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DirectoryCategorySlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/shopify_/reel/$id': {
+      id: '/shopify_/reel/$id'
+      path: '/shopify/reel/$id'
+      fullPath: '/shopify/reel/$id'
+      preLoaderRoute: typeof ShopifyReelIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/admin/clients_/$id': {
       id: '/_authenticated/admin/clients_/$id'
       path: '/clients/$id'
@@ -1652,6 +1712,27 @@ declare module '@tanstack/react-router' {
       path: '/api/public/shopify/auth'
       fullPath: '/api/public/shopify/auth'
       preLoaderRoute: typeof ApiPublicShopifyAuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/shopify/export': {
+      id: '/api/public/shopify/export'
+      path: '/api/public/shopify/export'
+      fullPath: '/api/public/shopify/export'
+      preLoaderRoute: typeof ApiPublicShopifyExportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/shopify/products': {
+      id: '/api/public/shopify/products'
+      path: '/api/public/shopify/products'
+      fullPath: '/api/public/shopify/products'
+      preLoaderRoute: typeof ApiPublicShopifyProductsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/shopify/reel': {
+      id: '/api/public/shopify/reel'
+      path: '/api/public/shopify/reel'
+      fullPath: '/api/public/shopify/reel'
+      preLoaderRoute: typeof ApiPublicShopifyReelRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lovable/email/auth/preview': {
@@ -1941,8 +2022,12 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicTrialRemindersRoute: ApiPublicTrialRemindersRoute,
   ApiPublicWeeklyReportRoute: ApiPublicWeeklyReportRoute,
   DirectoryCategorySlugRoute: DirectoryCategorySlugRoute,
+  ShopifyReelIdRoute: ShopifyReelIdRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   ApiPublicShopifyAuthRoute: ApiPublicShopifyAuthRoute,
+  ApiPublicShopifyExportRoute: ApiPublicShopifyExportRoute,
+  ApiPublicShopifyProductsRoute: ApiPublicShopifyProductsRoute,
+  ApiPublicShopifyReelRoute: ApiPublicShopifyReelRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
