@@ -6,7 +6,7 @@ import { KitAgainButton } from "@/components/templates/KitAgain";
 import { TRIAL, planById } from "@/lib/stillframe/plans-config";
 import { getSignupChoice } from "@/lib/stillframe/signup-choice";
 import { AlertCircle, Check, ChevronDown, ChevronLeft, ChevronRight, Download, Film, Image as ImageIcon, Plus, X } from "lucide-react";
-import { AppButton, AppSectionLabel } from "@/components/app-ui";
+import { AppButton, AppSectionLabel, AppSwitch } from "@/components/app-ui";
 import { SHOW_SHARE } from "@/lib/features";
 import { ReelCard, StepActions, StepShell, StepTitle } from "@/components/app-ui/StepShell";
 import { useReelPlayer } from "@/components/editor/ReelPreview";
@@ -30,7 +30,7 @@ import { cn } from "@/lib/utils";
 import { fetchExportStatus, useExportStatus, useRefreshBilling } from "@/lib/stillframe/billing";
 import { PlanCards } from "@/components/billing/PlanCards";
 
-type GifSize = "full" | "half" | "small";
+import { DEFAULT_EXPORT_FORMATS, DEFAULT_VIDEO_FPS, DEFAULT_GIF_LOOP, DEFAULT_GIF_QUALITY, GIF_PRESETS, matchingGifPreset, type GifSize, type GifPresetId } from "@/lib/stillframe/export-quality";
 type Target = { key: string; name: string; ratio: string; format: Format; width: number; height: number; custom?: boolean };
 type CustomRow = { id: string; w: string; h: string };
 type FileRow = { name: string; kind: "mp4" | "gif"; job: string; width: number; height: number };
@@ -84,15 +84,24 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
   const [selected, setSelected] = useState<Set<SizeId>>(() => new Set(DEFAULT_SIZES));
   const [customs, setCustoms] = useState<CustomRow[]>([]);
   const [customOn, setCustomOn] = useState(false);
-  const [mp4, setMp4] = useState(true);
+  const [mp4, setMp4] = useState(DEFAULT_EXPORT_FORMATS.mp4);
   const { canUse, isSuccess: accessReady } = usePlanAccess();
-  const [gif, setGif] = useState(true);
+  const [gif, setGif] = useState(DEFAULT_EXPORT_FORMATS.gif);
   useEffect(() => { if (accessReady && !canUse("gif")) setGif(false); }, [accessReady]); // eslint-disable-line react-hooks/exhaustive-deps
-  const [fps, setFps] = useState(30);
-  const [gSize, setGSize] = useState<GifSize>("half");
-  const [gColors, setGColors] = useState<GifColors>("best");
-  const [gFps, setGFps] = useState(15);
-  const [gLoop, setGLoop] = useState<"forever" | "once">("forever");
+  const [fps, setFps] = useState(DEFAULT_VIDEO_FPS);
+  const [gSize, setGSize] = useState<GifSize>(DEFAULT_GIF_QUALITY.size);
+  const [gColors, setGColors] = useState<GifColors>(DEFAULT_GIF_QUALITY.colors);
+  const [gFps, setGFps] = useState(DEFAULT_GIF_QUALITY.fps);
+  const [gLoop, setGLoop] = useState<"forever" | "once">(DEFAULT_GIF_LOOP);
+  const [qualityOpen, setQualityOpen] = useState(false);
+  const [advancedOpen, setAdvancedOpen] = useState(false);
+  const gifPreset = matchingGifPreset({ size: gSize, colors: gColors, fps: gFps });
+  const applyGifPreset = (id: GifPresetId) => {
+    const preset = GIF_PRESETS.find((p) => p.id === id);
+    if (!preset) return;
+    setGSize(preset.size); setGColors(preset.colors); setGFps(preset.fps);
+  };
+  const qualitySummary = [mp4 && `${fps === 24 ? "Film" : fps === 60 ? "Smooth" : "Standard"} ${fps} fps`, gif && (gifPreset ? `GIF ${gifPreset === "small" ? "small file" : gifPreset}` : "GIF custom")].filter(Boolean).join(" · ");
 
   const validCustoms = useMemo(
     () => (customOn ? customs.filter((c) => !customError(num(c.w), num(c.h))).map((c) => ({ w: even(num(c.w)!), h: even(num(c.h)!) })) : [])
@@ -458,32 +467,40 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
 
           <AppSectionLabel className="mt-7 mb-2.5">Save as</AppSectionLabel>
           <div className="grid grid-cols-2 gap-3">
-            <PickCard on={mp4} onClick={() => setMp4((v) => !v)} icon={<Film className="size-4" strokeWidth={1.7} />} title="Video MP4" sub="With motion and sound" />
+            <PickCard on={mp4} onClick={() => setMp4((v) => !v)} icon={<Film className="size-4" strokeWidth={1.7} />} title="Video MP4" sub="Motion and sound" />
             <PickCard on={gif} onClick={() => (gif || canUse("gif") ? setGif((v) => !v) : openUpgrade("gif"))} icon={<ImageIcon className="size-4" strokeWidth={1.7} />} title="Animated GIF" sub="Plays anywhere, no sound" />
           </div>
 
-          <Collapsible className="mt-3">
-            <CollapsibleTrigger asChild><Button variant="ghost" className="h-10 w-full justify-between bg-ap-panel px-3 text-[14px]">Fine-tune quality <ChevronDown className="size-3" strokeWidth={1.7} /></Button></CollapsibleTrigger>
+          <Collapsible open={qualityOpen} onOpenChange={setQualityOpen} className="mt-3">
+            <CollapsibleTrigger asChild><Button variant="ghost" className="grid h-auto min-h-10 w-full grid-cols-[minmax(0,1fr)_auto] gap-2 bg-ap-panel px-3 py-2 text-left text-[14px]">
+              <span className="min-w-0 whitespace-normal">Fine-tune quality</span>
+              <span className="flex max-w-[150px] items-center gap-1 text-right text-[12px] font-normal text-ap-muted sm:max-w-none"><span className="min-w-0 whitespace-normal nums">{qualitySummary}</span><ChevronDown className={cn("size-3 shrink-0", qualityOpen && "rotate-180")} strokeWidth={1.7} /></span>
+            </Button></CollapsibleTrigger>
             <CollapsibleContent>
-          <Reveal show={mp4}>
-            <div className="mt-5 mb-2 text-[13px] font-semibold" id="vm-label">Video motion</div>
-            <Seg label="Video motion" value={fps} onChange={setFps} options={[{ v: 30, l: "Standard", s: "30 fps" }, { v: 60, l: "Smooth", s: "60 fps" }, { v: 24, l: "Film", s: "24 fps" }]} />
-          </Reveal>
-
-          <Reveal show={gif}>
-            <div className="mt-6 border-t border-ap-hairline pt-5">
-              <AppSectionLabel className="mb-3">GIF quality</AppSectionLabel>
-              <div className="ap-gif-grid grid gap-4 sm:grid-cols-2">
-                <Sub label="Size"><Seg label="GIF size" value={gSize} onChange={setGSize} options={[{ v: "full", l: "Full", s: "same as video" }, { v: "half", l: "Half" }, { v: "small", l: "Small", s: "480 px" }]} /></Sub>
-                <Sub label="Colors"><Seg label="GIF colors" value={gColors} onChange={setGColors} options={[{ v: "best", l: "Best" }, { v: "balanced", l: "Balanced" }, { v: "smallest", l: "Smallest" }]} /></Sub>
-                <Sub label="Frame rate"><Seg label="GIF frame rate" value={gFps} onChange={setGFps} options={[{ v: 25, l: "Smooth", s: "25 fps" }, { v: 15, l: "Light", s: "15 fps" }, { v: 10, l: "Minimal", s: "10 fps" }]} /></Sub>
-                <Sub label="Loop"><Seg label="GIF loop" value={gLoop} onChange={setGLoop} options={[{ v: "forever", l: "Forever" }, { v: "once", l: "Once" }]} /></Sub>
-              </div>
-              <p className="mt-3 text-[12px] text-ap-muted">Full-size GIFs are large files. Pick a smaller size for email.</p>
-            </div>
-          </Reveal>
-
-          </CollapsibleContent></Collapsible>
+              {!mp4 && !gif && <p className="mt-4 text-[13px] text-ap-muted">Pick a format to see its options.</p>}
+              <Reveal show={mp4}>
+                <div className="mt-5 mb-2 text-[13px] font-semibold">Video motion</div>
+                <Seg label="Video motion" value={fps} onChange={setFps} options={[{ v: 24, l: "Film", s: "24 fps" }, { v: 30, l: "Standard", s: "30 fps" }, { v: 60, l: "Smooth", s: "60 fps" }]} />
+              </Reveal>
+              <Reveal show={gif}>
+                <div className="mt-6 border-t border-ap-hairline pt-5">
+                  <AppSectionLabel className="mb-3">GIF quality</AppSectionLabel>
+                  <Seg<GifPresetId> label="GIF quality presets" value={gifPreset} onChange={applyGifPreset} options={GIF_PRESETS.map((p) => ({ v: p.id, l: p.label, s: p.subtitle }))} />
+                  {!gifPreset && <p className="mt-2 text-[12px] text-ap-muted" role="status">Custom settings in use</p>}
+                  <div className="mt-4 flex items-center justify-between gap-3"><label htmlFor="gif-loop" className="text-[13px] font-medium">Loop forever</label><AppSwitch id="gif-loop" aria-label="Loop forever" checked={gLoop === "forever"} onCheckedChange={(v) => setGLoop(v ? "forever" : "once")} /></div>
+                  <Collapsible open={advancedOpen} onOpenChange={setAdvancedOpen} className="mt-3">
+                    <CollapsibleTrigger asChild><Button variant="ghost" className="h-7 px-0 text-[13px] font-normal text-ap-blue">Advanced <ChevronDown className={cn("size-3", advancedOpen && "rotate-180")} strokeWidth={1.7} /></Button></CollapsibleTrigger>
+                    <CollapsibleContent className="mt-3 space-y-3">
+                      <Sub label="Size"><Seg label="GIF size" value={gSize} onChange={setGSize} options={[{ v: "full", l: "Full" }, { v: "half", l: "Half" }, { v: "small", l: "Small", s: "480px" }]} /></Sub>
+                      <Sub label="Colors"><Seg label="GIF colors" value={gColors} onChange={setGColors} options={[{ v: "best", l: "Best" }, { v: "balanced", l: "Balanced" }, { v: "smallest", l: "Smallest" }]} /></Sub>
+                      <Sub label="Frame rate"><Seg label="GIF frame rate" value={gFps} onChange={setGFps} options={[{ v: 25, l: "High", s: "25 fps" }, { v: 15, l: "Medium", s: "15 fps" }, { v: 10, l: "Low", s: "10 fps" }]} /></Sub>
+                    </CollapsibleContent>
+                  </Collapsible>
+                  {gSize === "full" && <p className="mt-3 text-[12px] text-ap-amber">Full-size GIFs are large files. Pick Balanced or Small for email.</p>}
+                </div>
+              </Reveal>
+            </CollapsibleContent>
+          </Collapsible>
 
           <div className="mt-6 border-t border-ap-hairline pt-4 text-[14px]" aria-live="polite">
             {files.length ? (
@@ -745,21 +762,21 @@ function Sub({ label, children }: { label: string; children: React.ReactNode }) 
   );
 }
 
-function Seg<T extends string | number>({ value, onChange, options, label }: { value: T; onChange: (v: T) => void; options: { v: T; l: string; s?: string }[]; label: string }) {
+function Seg<T extends string | number>({ value, onChange, options, label }: { value: T | null; onChange: (v: T) => void; options: { v: T; l: string; s?: string }[]; label: string }) {
   return (
     <div role="radiogroup" aria-label={label} className="flex gap-[3px] rounded-[10px] bg-ap-panel p-[3px]">
       {options.map((o) => (
-        <button
+        <Button variant="ghost"
           key={String(o.v)}
           type="button"
           role="radio"
           aria-checked={value === o.v}
           onClick={() => onChange(o.v)}
-          className={cn("flex min-h-10 flex-1 flex-col items-center justify-center rounded-[7px] px-1.5 py-1 text-[13px] leading-tight", value === o.v && "bg-ap-card font-semibold shadow-ap-soft")}
+          className={cn("flex h-auto min-h-10 min-w-0 flex-1 flex-col items-center justify-center gap-0 whitespace-normal rounded-lg px-1.5 py-1 text-[13px] leading-tight", value === o.v && "bg-ap-card font-semibold shadow-ap-soft")}
         >
           {o.l}
           {o.s && <span className="text-[11px] font-normal text-ap-muted nums">{o.s}</span>}
-        </button>
+        </Button>
       ))}
     </div>
   );
@@ -767,14 +784,14 @@ function Seg<T extends string | number>({ value, onChange, options, label }: { v
 
 function PickCard({ on, onClick, icon, title, sub }: { on: boolean; onClick: () => void; icon: React.ReactNode; title: string; sub: string }) {
   return (
-    <button type="button" role="checkbox" aria-checked={on} onClick={onClick} className={cn("relative min-h-16 rounded-[14px] border bg-ap-card p-3.5 text-left", on ? "border-ap-blue shadow-[0_0_0_1px_var(--ap-blue)]" : "border-ap-hairline")}>
-      <span className={cn("absolute top-3 right-3 grid size-[22px] place-items-center rounded-full", on ? "bg-ap-blue text-ap-card" : "border-[1.5px] border-ap-hairline")}>
-        {on && <Check className="size-3" strokeWidth={2.5} />}
+    <Button variant="ghost" type="button" role="checkbox" aria-checked={on} onClick={onClick} className={cn("relative h-auto min-h-16 min-w-0 flex-col items-start gap-0 whitespace-normal rounded-lg border p-3.5 text-left", on ? "border-ap-blue bg-ap-soft-blue hover:bg-ap-soft-blue" : "border-ap-hairline bg-ap-card")}>
+      <span className={cn("absolute top-3 right-3 grid size-5 place-items-center rounded-[5px] border", on ? "border-ap-blue bg-ap-blue text-ap-card" : "border-ap-switch-off")}>
+        {on && <Check className="size-3" strokeWidth={1.7} />}
       </span>
       {icon}
       <div className="mt-2 text-[14px] font-semibold">{title}</div>
       <div className="text-[12px] text-ap-muted">{sub}</div>
-    </button>
+    </Button>
   );
 }
 
