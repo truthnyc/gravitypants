@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { normalizeHex, photoName, photoPalette } from "@/lib/stillframe/palette";
-import { ChevronRight, Clock, Crop, Play, Image as ImageIcon, Minus, Plus, RefreshCw, Shapes, Sparkles, TextQuote, Type } from "lucide-react";
+import { ChevronDown, ChevronRight, Clock, Crop, Play, Image as ImageIcon, Minus, Plus, RefreshCw, Shapes, Sparkles, TextQuote, Type } from "lucide-react";
 import type { EditorDoc } from "@/lib/stillframe/data";
 import {
   PACE_SECONDS,
@@ -145,89 +145,61 @@ export function Inspector({
   const colors = [...new Set([...(kit?.colors ?? []), ...TEXT_COLORS].map((c) => c.toUpperCase()))];
 
   const brandName = kits.find((k) => k.id === kitId)?.name ?? "Brand";
+  const brandColors = (kit?.colors ?? []).map((c) => c.toUpperCase());
+  void values; void scope; void colors; void meta; void mobile;
+  const tab: "photo" | "text" | "logo" = selected === "logo" ? "logo" : selected === "headline" || selected === "subline" ? "text" : "photo";
+  const TABS: { key: typeof tab; label: string; el: ElementKey }[] = [
+    { key: "photo", label: "Photo", el: "photo" },
+    { key: "text", label: "Text", el: "headline" },
+    { key: "logo", label: "Logo", el: "logo" },
+  ];
 
   return (
-    <aside className={cn("flex shrink-0 flex-col", embedded ? "w-full" : "overflow-y-auto bg-inspector p-4", mobile ? "h-full w-full" : embedded ? "" : "hidden w-[344px] lg:flex")}>
+    <aside className={cn("flex shrink-0 flex-col", embedded ? "w-full" : "overflow-y-auto bg-inspector p-4")}>
       {!hideKit && <BrandKitRow embedded={embedded} kits={kits} kitId={kitId} onKit={actions.onKit} />}
-      {embedded ? (
-        <div className="mb-1 flex flex-wrap items-center gap-3">
-          <span className="mr-auto text-[15px] font-semibold nums">Frame {frameIndex + 1} of {doc.frames.length}</span>
-          <div className="flex rounded-lg bg-control-fill p-0.5" role="tablist" aria-label="What to edit">
-            {(["photo", "headline", "subline", "logo"] as ElementKey[]).map((el) => {
-              const m = ELEMENT_META[el];
-              const active = selected === el;
-              return (
-                <button
-                  key={el}
-                  type="button"
-                  role="tab"
-                  aria-selected={active}
-                  onClick={() => onSelect(el)}
-                  className={cn("flex h-8 items-center gap-1.5 rounded-lg px-3 text-[13px] font-medium", active ? "bg-card shadow-segment" : "text-ap-body")}
-                >
-                  <span className="size-2 rounded-full" style={{ background: m.color }} />
-                  {m.label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      ) : (
-      <div className={cn(mobile ? "flex gap-2 overflow-x-auto pb-1" : "grid grid-cols-2 gap-2")}>
-        {(["photo", "headline", "subline", "logo"] as ElementKey[]).map((el) => {
-          const m = ELEMENT_META[el];
-          const Icon = ICONS[el];
-          const active = selected === el;
-          return (
-            <button
-              key={el}
-              type="button"
-              onClick={() => onSelect(el)}
-              className={cn("flex shrink-0 bg-card text-left transition-shadow rounded-sm shadow-card", mobile ? "h-11 flex-row items-center gap-2 px-3" : "flex-col items-start gap-1.5 p-2.5")}
-              style={active ? { boxShadow: `0 0 0 2px ${m.color}`, background: `color-mix(in srgb, ${m.color} 7%, var(--card))` } : undefined}
-            >
-              <span className="flex size-[22px] items-center justify-center rounded-full" style={{ background: m.color }}>
-                <Icon className="size-3 text-primary-foreground" strokeWidth={1.7} />
-              </span>
-              <span className="text-[13px] font-semibold leading-none">{m.label}</span>
-              {!mobile && <span className="w-full truncate text-[12px] leading-tight text-secondary-text nums">{values[el]}</span>}
-            </button>
-          );
-        })}
+      <div className="text-[15px] font-semibold nums">Frame {frameIndex + 1} of {doc.frames.length}</div>
+      <div className="mt-2 flex gap-1 border-b border-ap-hairline" role="tablist" aria-label="What to edit">
+        {TABS.map((t) => (
+          <button
+            key={t.key}
+            type="button"
+            role="tab"
+            aria-selected={tab === t.key}
+            onClick={() => onSelect(t.el)}
+            className={cn("-mb-px border-b-2 px-4 py-2.5 text-[15px]", tab === t.key ? "border-ap-blue font-semibold text-ap-ink" : "border-transparent text-ap-muted hover:text-ap-ink")}
+          >
+            {t.label}
+          </button>
+        ))}
       </div>
-      )}
 
-      {embedded ? (
-        <div className="mt-5 flex items-center gap-2 text-[12px] font-semibold tracking-[0.06em] text-ap-body uppercase">
-          {meta.label} · Frame {frameIndex + 1}
-          <span className="ml-auto font-normal tracking-normal normal-case nums">{selected === "logo" ? "Whole video" : `Frame ${frameIndex + 1}`}</span>
-        </div>
-      ) : (
-      <div className="mt-4 flex items-center gap-2">
-        <span className="size-2 rounded-full" style={{ background: meta.color }} />
-        <span className="text-[15px] font-semibold">{meta.label}</span>
-        <span className="ml-auto text-[12px] text-secondary-text nums">{scope}</span>
-      </div>
-      )}
-
-      <div className={cn("mt-3 space-y-4", embedded ? "" : "rounded-sm bg-card p-4 shadow-card")}>
-        {selected === "photo" && (
+      <div className={cn("mt-4 space-y-4", embedded ? "" : "rounded-sm bg-card p-4 shadow-card")}>
+        {tab === "photo" && (
           <PhotoPanel
             photo={frame.photo ?? {}}
             frameIndex={frameIndex}
             brandName={brandName}
-            brandColors={(kit?.colors ?? []).map((c) => c.toUpperCase())}
+            brandColors={brandColors}
             image={image}
             keyframe={keyframe}
             onKeyframe={onKeyframe}
             actions={actions}
           />
         )}
-        {(selected === "headline" || selected === "subline") && (
-          <TextPanel key={selected} el={selected} text={frame[selected]} brandColors={(kit?.colors ?? []).map((c) => c.toUpperCase())} brandName={brandName} logoPath={doc.project.logo.dark_path ?? doc.project.logo.light_path ?? doc.project.logo.path ?? null} actions={actions} onChange={(p, k) => actions.onText(selected, p, k)} />
+        {tab === "text" && (
+          <TextTab headline={frame.headline} subline={frame.subline} brandColors={brandColors} brandName={brandName} actions={actions} />
         )}
-        {selected === "logo" && (
-          <LogoPanel logo={doc.project.logo} format={format} frame={frame} frameIndex={frameIndex} hasLogo={hasLogo} actions={actions} />
+        {tab === "logo" && (
+          <LogoPanel
+            logo={doc.project.logo}
+            format={format}
+            frame={frame}
+            frameIndex={frameIndex}
+            hasLogo={hasLogo}
+            actions={actions}
+            kitName={kits.find((k) => k.id === kitId)?.name ?? null}
+            kitPosition={kit?.default_logo_positions?.[format] ?? null}
+          />
         )}
       </div>
     </aside>
@@ -431,6 +403,28 @@ function Swatch({ c, active, onPick }: { c: string; active: boolean; onPick: (c:
   );
 }
 
+/** One scope control per tab: "Style changes apply to: This frame | All frames". */
+function ScopeControl({ value, onChange }: { value: "frame" | "all"; onChange: (v: "frame" | "all") => void }) {
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-2 border-t border-ap-hairline pt-4">
+      <span className="text-[13px] text-ap-body">Style changes apply to:</span>
+      <div className="w-[220px]"><Segmented value={value} options={[{ value: "frame", label: "This frame" }, { value: "all", label: "All frames" }]} onChange={onChange} /></div>
+    </div>
+  );
+}
+
+function Collapse({ label, open, onToggle, children }: { label: string; open: boolean; onToggle: () => void; children: React.ReactNode }) {
+  return (
+    <div>
+      <button type="button" aria-expanded={open} onClick={onToggle} className="flex items-center gap-1 text-[13px] font-medium text-ap-blue">
+        {label} <ChevronDown className={cn("size-3.5 transition-transform motion-reduce:transition-none", open && "rotate-180")} strokeWidth={1.7} />
+      </button>
+      <Reveal open={open}><div className="space-y-4 pt-3">{children}</div></Reveal>
+    </div>
+  );
+}
+
+
 function PhotoPanel({
   photo,
   frameIndex,
@@ -455,9 +449,10 @@ function PhotoPanel({
   const move = photo.movement ?? "none";
   const bgMode = photo.background ?? (photo.background_color ? "solid" : "blur");
   const bg = (photo.background_color ?? "").toUpperCase();
-  const [allBg, setAllBg] = useState(false);
-  const [allMove, setAllMove] = useState(false);
-  const [look, setLook] = useState(false);
+  // Photo and movement default to this frame only.
+  const [scope, setScope] = useState<"frame" | "all">("frame");
+  const all = scope === "all";
+  const [adjust, setAdjust] = useState(move === "custom");
   const [recent, setRecent] = useState<string[]>([]);
   const [hex, setHex] = useState(bg);
   const [hexBad, setHexBad] = useState(false);
@@ -467,20 +462,14 @@ function PhotoPanel({
   useEffect(() => { setHex(bg); setHexBad(false); }, [bg]);
   const palette = useMemo(() => photoPalette(photo.path, image), [photo.path, image]);
   const moved = Boolean((photo.zoom ?? 1) !== 1 || (photo.focus && (photo.focus.x !== 0.5 || photo.focus.y !== 0.5)));
-  const name = photoName(photo, frameIndex);
 
-  const send = (patch: Partial<PhotoSettings>, all: boolean, key?: string) =>
+  const send = (patch: Partial<PhotoSettings>, key?: string) =>
     all && actions.onPhotoAll ? actions.onPhotoAll(patch, key) : actions.onPhoto(patch, key);
 
-  const pickBackground = (patch: Partial<PhotoSettings>, key?: string) => {
-    const switching = fit !== "fit";
-    send(switching ? { ...patch, fit: "fit" } : patch, allBg, key);
-    if (switching) toast(`Frame ${frameIndex + 1} switched to Fit so the background shows`, actions.onUndo ? { action: { label: "Undo", onClick: actions.onUndo } } : undefined);
-  };
   const pickColor = (c: string, key?: string) => {
-    pickBackground({ background: "solid", background_color: c }, key);
-    const all = [...NEUTRALS, ...palette, ...brandColors];
-    if (!all.includes(c)) {
+    send({ background: "solid", background_color: c }, key);
+    const known = [...NEUTRALS, ...palette, ...brandColors];
+    if (!known.includes(c)) {
       const next = [c, ...recent.filter((x) => x !== c)].slice(0, 4);
       setRecent(next);
       try { localStorage.setItem(RECENT_KEY, JSON.stringify(next)); } catch { /* ignore */ }
@@ -490,7 +479,7 @@ function PhotoPanel({
     const patch: Partial<PhotoSettings> = m === "custom"
       ? { movement: "custom", zoom_start: photo.zoom_start ?? 1, zoom_end: photo.zoom_end ?? 1.1, pan_x: photo.pan_x ?? 0 }
       : { movement: m };
-    send(patch, allMove);
+    send(patch);
     if (m === "custom") onKeyframe("start");
     else {
       onKeyframe(null);
@@ -501,11 +490,11 @@ function PhotoPanel({
   return (
     <>
       <div className="flex items-center gap-3">
-        <div className="size-[72px] shrink-0 overflow-hidden rounded-sm bg-control-fill">
+        <div className="size-16 shrink-0 overflow-hidden rounded-sm bg-control-fill">
           {photo.path && <MediaImage path={photo.path} className="size-full object-cover" alt="" />}
         </div>
         <div className="min-w-0 flex-1">
-          <div className="truncate text-[14px] font-semibold">{name}</div>
+          <div className="text-[14px] font-semibold nums">Photo {frameIndex + 1}</div>
           <div className="mt-0.5 text-[12px] leading-snug text-secondary-text">Drag on the preview to reposition · scroll to zoom</div>
           {moved && (
             <button type="button" className="mt-1 text-[12px] font-medium text-link" onClick={() => actions.onPhoto({ focus: { x: 0.5, y: 0.5 }, zoom: 1 })}>
@@ -516,153 +505,119 @@ function PhotoPanel({
         <Button variant="default" size="sm" onClick={actions.onReplacePhoto}>Replace</Button>
       </div>
 
-      <Field label="Fill the frame">
-        <Segmented
-          value={fit}
-          options={[
-            { value: "fill", label: "Fill (crop to fit)" },
-            { value: "fit", label: "Fit (show whole photo)" },
-          ]}
-          onChange={(v) => actions.onPhoto({ fit: v })}
-        />
+      <Field label="Fit">
+        <Segmented value={fit} options={[{ value: "fill", label: "Fill" }, { value: "fit", label: "Fit" }]} onChange={(v) => send({ fit: v })} />
       </Field>
 
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <span className="text-[12px] font-medium text-secondary-text">Background</span>
-          <ApplyAll
-            checked={allBg}
-            onChange={(v) => {
-              setAllBg(v);
-              if (v) actions.onPhotoAll?.({ fit: photo.fit ?? "fill", background: bgMode, background_color: photo.background_color ?? null });
-            }}
+      {fit === "fit" && (
+        <Field label="Background">
+          <Segmented
+            value={bgMode}
+            options={[{ value: "blur", label: "Blurred" }, { value: "solid", label: "Solid" }]}
+            onChange={(v) => send(v === "solid" ? { background: "solid", background_color: photo.background_color || "#1D1D1F" } : { background: "blur" })}
           />
-        </div>
-        {fit === "fill" && (
-          <p className="text-[12px] leading-snug text-secondary-text">Shows around the photo when it's set to Fit. Picking a background switches this frame to Fit.</p>
-        )}
-        <Segmented
-          value={bgMode}
-          options={[
-            { value: "blur", label: "Blurred photo" },
-            { value: "solid", label: "Solid colour" },
-          ]}
-          onChange={(v) => pickBackground(v === "solid" ? { background: "solid", background_color: photo.background_color || "#1D1D1F" } : { background: "blur" })}
-        />
-        {bgMode === "blur" && <p className="text-[12px] text-secondary-text">Soft, matches the photo.</p>}
-        <Reveal open={bgMode === "solid"}>
-          <div className="space-y-3 pt-1">
-            {palette.length > 0 && (
+          <Reveal open={bgMode === "solid"}>
+            <div className="space-y-3 pt-2">
+              {palette.length > 0 && (
+                <div className="space-y-1.5">
+                  <div className="text-[12px] text-secondary-text">From this photo</div>
+                  <div className="flex flex-wrap gap-2">{palette.map((c) => <Swatch key={c} c={c} active={bg === c} onPick={pickColor} />)}</div>
+                </div>
+              )}
+              {brandColors.length > 0 && (
+                <div className="space-y-1.5">
+                  <div className="text-[12px] text-secondary-text">{brandName} brand colours</div>
+                  <div className="flex flex-wrap gap-2">{brandColors.map((c) => <Swatch key={c} c={c} active={bg === c} onPick={pickColor} />)}</div>
+                </div>
+              )}
               <div className="space-y-1.5">
-                <div className="text-[12px] text-secondary-text">From this photo</div>
-                <div className="flex flex-wrap gap-2">{palette.map((c) => <Swatch key={c} c={c} active={bg === c} onPick={pickColor} />)}</div>
-              </div>
-            )}
-            {brandColors.length > 0 && (
-              <div className="space-y-1.5">
-                <div className="text-[12px] text-secondary-text">{brandName} brand colours</div>
-                <div className="flex flex-wrap gap-2">{brandColors.map((c) => <Swatch key={c} c={c} active={bg === c} onPick={pickColor} />)}</div>
-              </div>
-            )}
-            <div className="space-y-1.5">
-              <div className="text-[12px] text-secondary-text">Neutrals &amp; recent</div>
-              <div className="flex flex-wrap items-center gap-2">
-                {[...NEUTRALS, ...recent.filter((c) => !NEUTRALS.includes(c))].map((c) => <Swatch key={c} c={c} active={bg === c} onPick={pickColor} />)}
-                <CustomColor onPick={(c) => pickColor(c, "drag:photo-bg")} />
-                <input
-                  aria-label="Hex colour"
-                  aria-invalid={hexBad}
-                  value={hex}
-                  onChange={(e) => {
-                    setHex(e.target.value);
-                    const n = normalizeHex(e.target.value);
-                    setHexBad(!n && e.target.value.trim() !== "");
-                    if (n) pickColor(n, "drag:photo-hex");
-                  }}
-                  placeholder="#1D1D1F"
-                  className={cn("h-8 w-[92px] rounded-sm border bg-card px-2 text-[13px] uppercase nums", hexBad ? "border-destructive" : "border-ap-hairline")}
-                />
+                <div className="text-[12px] text-secondary-text">Neutrals &amp; recent</div>
+                <div className="flex flex-wrap items-center gap-2">
+                  {[...NEUTRALS, ...recent.filter((c) => !NEUTRALS.includes(c))].map((c) => <Swatch key={c} c={c} active={bg === c} onPick={pickColor} />)}
+                  <CustomColor onPick={(c) => pickColor(c, "drag:photo-bg")} />
+                  <input
+                    aria-label="Hex colour"
+                    aria-invalid={hexBad}
+                    value={hex}
+                    onChange={(e) => {
+                      setHex(e.target.value);
+                      const n = normalizeHex(e.target.value);
+                      setHexBad(!n && e.target.value.trim() !== "");
+                      if (n) pickColor(n, "drag:photo-hex");
+                    }}
+                    placeholder="#1D1D1F"
+                    className={cn("h-8 w-[92px] rounded-sm border bg-card px-2 text-[13px] uppercase nums", hexBad ? "border-destructive" : "border-ap-hairline")}
+                  />
+                </div>
               </div>
             </div>
-          </div>
-        </Reveal>
-      </div>
+          </Reveal>
+        </Field>
+      )}
 
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <span className="text-[12px] font-medium text-secondary-text">Movement</span>
-          <ApplyAll
-            checked={allMove}
-            onChange={(v) => {
-              setAllMove(v);
-              if (v) actions.onPhotoAll?.({ movement: move, movement_intensity: photo.movement_intensity ?? "standard", zoom_start: photo.zoom_start ?? 1, zoom_end: photo.zoom_end ?? 1, pan_x: photo.pan_x ?? 0, pan_y: photo.pan_y ?? 0 });
-            }}
-          />
-        </div>
+      <Field label="Movement">
         <div className="flex flex-wrap gap-1.5">
-          {MOVEMENTS.map((m) => (
+          {MOVEMENTS.filter((m) => m.value !== "custom").map((m) => (
             <button
               key={m.value}
               type="button"
               onClick={() => chooseMove(m.value)}
               aria-pressed={move === m.value}
-              className={cn("mv-chip flex h-8 items-center gap-1.5 rounded-lg pl-1 pr-2.5 text-[12px] font-medium", move === m.value ? "bg-el-photo text-primary-foreground" : "bg-control-fill")}
+              className={cn("h-8 rounded-full border px-3 text-[13px]", move === m.value ? "border-ap-blue bg-ap-soft-blue text-ap-blue" : "border-transparent bg-control-fill")}
             >
-              <span className="mv-thumb size-6 overflow-hidden rounded-sm bg-card" data-mv={m.value}>
-                {photo.path && <MediaImage path={photo.path} className="size-full object-cover" alt="" />}
-              </span>
               {m.label}
             </button>
           ))}
+          {move === "custom" && <span className="inline-flex h-8 items-center rounded-full border border-ap-blue bg-ap-soft-blue px-3 text-[13px] text-ap-blue">Custom</span>}
         </div>
         <Reveal open={move !== "none" && move !== "custom"}>
-          <div className="pt-1">
+          <div className="pt-2">
             <Field label="Amount">
-              <Segmented value={photo.movement_intensity ?? "standard"} options={INTENSITIES} onChange={(v) => { send({ movement_intensity: v }, allMove); actions.onPlayFrame?.(); }} />
+              <Segmented value={photo.movement_intensity ?? "standard"} options={INTENSITIES} onChange={(v) => { send({ movement_intensity: v }); actions.onPlayFrame?.(); }} />
             </Field>
           </div>
         </Reveal>
-        <Reveal open={move === "custom"}>
-          <div className="space-y-2 pt-1">
-            <Segmented
-              value={keyframe ?? "start"}
-              options={[
-                { value: "start", label: "Start framing" },
-                { value: "end", label: "End framing" },
-              ]}
-              onChange={(v) => onKeyframe(v)}
-            />
-            <p className="text-[12px] leading-snug text-secondary-text">Drag and zoom the photo on the preview to set where the movement starts and where it ends.</p>
-            <Button variant="default" size="sm" onClick={() => { onKeyframe(null); actions.onPlayFrame?.(); }}>
-              <Play strokeWidth={1.7} /> Preview movement
-            </Button>
-          </div>
-        </Reveal>
-      </div>
+      </Field>
 
-      <div>
-        <button type="button" aria-expanded={look} onClick={() => setLook((v) => !v)} className="flex w-full items-center gap-1 text-[12px] font-medium text-secondary-text">
-          <ChevronRight className={cn("size-3.5 transition-transform motion-reduce:transition-none", look && "rotate-90")} strokeWidth={1.7} /> Adjust
-        </button>
-        <Reveal open={look}>
-          <div className="space-y-4 pt-3">
-            <Field label="Brightness" value={brightness > 0 ? `+${brightness}` : brightness}>
-              <ElementSlider
-                name="Brightness"
-                color="var(--el-photo)"
-                min={-40}
-                max={40}
-                value={Math.max(-40, Math.min(40, brightness))}
-                snap={(v) => (Math.abs(v) <= 2 ? 0 : v)}
-                onChange={(v, k) => actions.onPhoto({ brightness: v / 200 }, k)}
-              />
-            </Field>
-          </div>
-        </Reveal>
-      </div>
+      <ScopeControl
+        value={scope}
+        onChange={(v) => {
+          setScope(v);
+          if (v === "all") actions.onPhotoAll?.({ fit, background: bgMode, background_color: photo.background_color ?? null, movement: move, movement_intensity: photo.movement_intensity ?? "standard", zoom_start: photo.zoom_start ?? 1, zoom_end: photo.zoom_end ?? 1, pan_x: photo.pan_x ?? 0, pan_y: photo.pan_y ?? 0 });
+        }}
+      />
+
+      <Collapse label="Adjust" open={adjust} onToggle={() => setAdjust((v) => !v)}>
+        <Field label="Custom movement">
+          <Button variant={move === "custom" ? "default" : "plain"} size="sm" onClick={() => chooseMove("custom")} aria-pressed={move === "custom"}>
+            {move === "custom" ? "Custom movement on" : "Set a custom movement"}
+          </Button>
+          <Reveal open={move === "custom"}>
+            <div className="space-y-2 pt-2">
+              <Segmented value={keyframe ?? "start"} options={[{ value: "start", label: "Start framing" }, { value: "end", label: "End framing" }]} onChange={(v) => onKeyframe(v)} />
+              <p className="text-[12px] leading-snug text-secondary-text">Drag and zoom the photo on the preview to set where the movement starts and where it ends.</p>
+              <Button variant="default" size="sm" onClick={() => { onKeyframe(null); actions.onPlayFrame?.(); }}>
+                <Play strokeWidth={1.7} /> Preview movement
+              </Button>
+            </div>
+          </Reveal>
+        </Field>
+        <Field label="Brightness" value={brightness > 0 ? `+${brightness}` : brightness}>
+          <ElementSlider
+            name="Brightness"
+            color="var(--el-photo)"
+            min={-40}
+            max={40}
+            value={Math.max(-40, Math.min(40, brightness))}
+            snap={(v) => (Math.abs(v) <= 2 ? 0 : v)}
+            onChange={(v, k) => actions.onPhoto({ brightness: v / 200 }, k)}
+          />
+        </Field>
+      </Collapse>
     </>
   );
 }
+
 
 function CustomColor({ onPick }: { onPick: (c: string) => void }) {
   return (
@@ -685,31 +640,51 @@ const ANIMATIONS: { value: NonNullable<TextSettings["animation"]>; label: string
 
 const TEXT_SWATCHES = ["#FFFFFF", "#000000", "#FFD60A", "#FF9F0A", "#0A84FF", "#BF5AF2"];
 const RECENT_TEXT = "sf-recent-text-colors";
+const ACCENT = "var(--accent-blue)";
 
-function TextPanel({
-  el,
-  text,
-  brandColors,
-  brandName,
-  logoPath,
-  actions,
-  onChange,
-}: {
-  el: "headline" | "subline";
-  text: TextSettings | null;
-  brandColors: string[];
-  brandName: string;
-  logoPath: string | null;
-  actions: InspectorActions;
-  onChange: (patch: Partial<TextSettings>, key?: string) => void;
-}) {
-  const isHead = el === "headline";
-  const t = text ?? {};
-  const color = "var(--accent-blue)";
-  const size = t.size_px ?? (isHead ? 108 : 48);
+function FontField({ el, t, brandName, actions, onChange }: { el: "headline" | "subline"; t: TextSettings; brandName: string; actions: InspectorActions; onChange: (p: Partial<TextSettings>, k?: string) => void }) {
   const family = t.font_family ?? DEFAULT_FONT;
-  const weight = t.font_weight ?? (isHead ? 700 : 500);
-  const under = t.keep_under_headline ?? true;
+  const weight = t.font_weight ?? (el === "headline" ? 700 : 500);
+  return (
+    <Field label="Font">
+      <FontPicker
+        title={el === "headline" ? "Headline font" : "Subline font"}
+        family={family}
+        weight={weight}
+        brandName={brandName}
+        sampleText={t.text ?? ""}
+        onPreview={(f, w) => actions.onFontPreview?.(f ? { el, family: f, weight: w } : null)}
+        onChange={(f, w) => onChange({ font_family: f, font_weight: w })}
+      >
+        <button type="button" className="flex h-9 w-full items-center justify-between rounded-sm border bg-card px-3 text-left text-[14px]" aria-label={`Font: ${family}`}>
+          <span className="truncate" style={{ fontFamily: `"${family}"`, fontWeight: weight }}>{family}</span>
+          <ChevronRight className="size-3.5 text-secondary-text" strokeWidth={1.7} />
+        </button>
+      </FontPicker>
+    </Field>
+  );
+}
+
+function SizeField({ el, t, onChange }: { el: "headline" | "subline"; t: TextSettings; onChange: (p: Partial<TextSettings>, k?: string) => void }) {
+  const isHead = el === "headline";
+  const size = t.size_px ?? (isHead ? 108 : 48);
+  return (
+    <Field label="Size" value={`${size} px`}>
+      <ElementSlider
+        name={`${isHead ? "Headline" : "Subline"} size`}
+        color={ACCENT}
+        min={isHead ? 24 : 11}
+        max={240}
+        value={size}
+        onChange={(v, k) => onChange({ size_px: v }, k)}
+        left={<span className="text-[11px] font-semibold text-secondary-text">A</span>}
+        right={<span className="text-[19px] font-semibold text-secondary-text">A</span>}
+      />
+    </Field>
+  );
+}
+
+function ColorField({ el, t, brandColors, onChange }: { el: "headline" | "subline"; t: TextSettings; brandColors: string[]; onChange: (p: Partial<TextSettings>, k?: string) => void }) {
   const current = (t.color ?? "#FFFFFF").toUpperCase();
   const [recent, setRecent] = useState<string[]>([]);
   useEffect(() => {
@@ -717,273 +692,146 @@ function TextPanel({
   }, []);
   const base = [...brandColors, ...TEXT_SWATCHES];
   const swatches = [...new Set([...base, ...recent, ...(base.includes(current) || recent.includes(current) ? [] : [current])])];
-  const spacing = t.letter_spacing ?? 0;
-  const lineHeight = t.line_height ?? (isHead ? 1.08 : 1.25);
-  const imageMode = !isHead && t.mode === "image";
-  const imgSize = t.image_size_pct ?? 30;
-  const fileRef = useRef<HTMLInputElement>(null);
-  const [busy, setBusy] = useState(false);
-  const [dropErr, setDropErr] = useState<string | null>(null);
-  const [over, setOver] = useState(false);
+  return (
+    <Field label="Color">
+      <div className="flex flex-wrap items-center gap-2">
+        {swatches.map((c) => (
+          <button
+            key={c}
+            type="button"
+            aria-label={`Color ${c}`}
+            aria-pressed={current === c}
+            onClick={() => onChange({ color: c })}
+            className={cn("size-8 rounded-full border border-border lg:size-7", current === c && "ring-2 ring-offset-2")}
+            style={{ background: c, ["--tw-ring-color" as string]: ACCENT }}
+          />
+        ))}
+        <CustomColor
+          onPick={(c) => {
+            if (!base.includes(c)) {
+              const next = [c, ...recent.filter((x) => x !== c)].slice(0, 4);
+              setRecent(next);
+              try { localStorage.setItem(RECENT_TEXT, JSON.stringify(next)); } catch { /* ignore */ }
+            }
+            onChange({ color: c }, `drag:${el}-color`);
+          }}
+        />
+      </div>
+    </Field>
+  );
+}
+
+function AnimationField({ value, onPick }: { value: NonNullable<TextSettings["animation"]>; onPick: (a: NonNullable<TextSettings["animation"]>) => void }) {
+  return (
+    <Field label="Animation">
+      <div className="flex flex-wrap gap-1.5" role="radiogroup" aria-label="Animation">
+        {ANIMATIONS.map((a) => (
+          <button
+            key={a.value}
+            type="button"
+            role="radio"
+            aria-checked={value === a.value}
+            onClick={() => onPick(a.value)}
+            className={cn("h-8 rounded-full border px-3 text-[13px]", value === a.value ? "border-ap-blue bg-ap-soft-blue text-ap-blue" : "border-transparent bg-control-fill")}
+          >
+            {a.label}
+          </button>
+        ))}
+      </div>
+    </Field>
+  );
+}
+
+/** Text tab: headline and subline together, with one scope control at the bottom. */
+function TextTab({ headline, subline, brandColors, brandName, actions }: { headline: TextSettings | null; subline: TextSettings | null; brandColors: string[]; brandName: string; actions: InspectorActions }) {
+  const h = headline ?? {};
+  const s = subline ?? {};
+  const [moreHead, setMoreHead] = useState(false);
+  const [moreSub, setMoreSub] = useState(false);
+  const setH = (p: Partial<TextSettings>, k?: string) => actions.onText("headline", p, k);
+  // A new subline starts from the headline's font and colour.
+  const setS = (p: Partial<TextSettings>, k?: string) =>
+    actions.onText("subline", subline ? p : { font_family: h.font_family ?? DEFAULT_FONT, color: h.color ?? "#FFFFFF", ...p }, k);
+  const play = (fn: (p: Partial<TextSettings>) => void, a: NonNullable<TextSettings["animation"]>) => { fn({ animation: a }); if (a !== "none") actions.onPlayFrame?.(); };
+  const family = h.font_family ?? DEFAULT_FONT;
+  const weight = h.font_weight ?? 700;
   const { data: fontList } = useFontList();
   const weights = weightChoices(weightsOf(fontList?.fonts.find((f) => f.family === family)));
-
-  const uploadBadge = async (file: File) => {
-    const err = logoFileError(file);
-    setDropErr(err);
-    if (err) return;
-    setBusy(true);
-    try {
-      const up = await uploadMedia(file, "logo");
-      onChange({ image_path: up.path });
-    } catch {
-      toast.error("That image couldn't be uploaded. Try again.");
-    } finally {
-      setBusy(false);
-    }
-  };
-
+  const spacing = h.letter_spacing ?? 0;
+  const lineHeight = h.line_height ?? 1.08;
+  const under = s.keep_under_headline ?? true;
+  const shared = (headline?.same_on_all ?? true) && (!subline || (subline.same_on_all ?? true));
   return (
     <>
-      {!isHead && (
-        <Field label="Show">
-          <Segmented
-            value={imageMode ? "image" : "text"}
-            options={[
-              { value: "text", label: "Text" },
-              { value: "image", label: "Logo / Badge" },
-            ]}
-            onChange={(v) => onChange({ mode: v as "text" | "image" })}
-          />
+      <div className="text-[14px] font-semibold">Headline</div>
+      <Textarea value={h.text ?? ""} placeholder="Add a headline" aria-label="Headline" onChange={(e) => setH({ text: e.target.value }, "headline-text")} className="min-h-[72px] rounded-sm text-[15px]" />
+      <FontField el="headline" t={h} brandName={brandName} actions={actions} onChange={setH} />
+      <SizeField el="headline" t={h} onChange={setH} />
+      <ColorField el="headline" t={h} brandColors={brandColors} onChange={setH} />
+      <AnimationField value={h.animation ?? "none"} onPick={(a) => play(setH, a)} />
+      <Collapse label="More text options" open={moreHead} onToggle={() => setMoreHead((v) => !v)}>
+        {weights.length > 1 && (
+          <Field label="Weight">
+            <Segmented
+              value={String(closestWeight(weights, weight))}
+              options={weights.map((w) => ({ value: String(w), label: WEIGHT_NAMES[w] ?? String(w) }))}
+              onChange={(v) => { const w = Number(v); void loadFont(family, w).then(() => setH({ font_weight: w })); setH({ font_weight: w }); }}
+            />
+          </Field>
+        )}
+        <Field label="Letter spacing" value={`${spacing > 0 ? "+" : ""}${spacing}`}>
+          <ElementSlider name="Headline letter spacing" color={ACCENT} min={-10} max={50} value={spacing} snap={(v) => (Math.abs(v) <= 1 ? 0 : v)} onChange={(v, k) => setH({ letter_spacing: v }, k)} />
         </Field>
-      )}
-      <Reveal open={!imageMode}>
-        <div className="space-y-4">
-          <Field label="Text">
-            <Textarea
-              value={t.text ?? ""}
-              placeholder={isHead ? "Add a headline" : "Add a line under the headline"}
-              onChange={(e) => onChange({ text: e.target.value }, `${el}-text`)}
-              className="min-h-[72px] rounded-sm text-[15px]"
-            />
-          </Field>
-          <Field label="Font">
-            <FontPicker
-              title={isHead ? "Headline font" : "Subline font"}
-              family={family}
-              weight={weight}
-              brandName={brandName}
-              sampleText={t.text ?? ""}
-              onPreview={(f, w) => actions.onFontPreview?.(f ? { el, family: f, weight: w } : null)}
-              onChange={(f, w) => onChange({ font_family: f, font_weight: w })}
-            >
-              <button
-                type="button"
-                className="flex h-9 w-full items-center justify-between rounded-sm border bg-card px-3 text-left text-[14px]"
-                aria-label={`Font: ${family}`}
-              >
-                <span className="truncate" style={{ fontFamily: `"${family}"`, fontWeight: weight }}>
-                  {family} · {WEIGHT_NAMES[weight] ?? weight}
-                </span>
-                <ChevronRight className="size-3.5 text-secondary-text" strokeWidth={1.7} />
-              </button>
-            </FontPicker>
-            {weights.length > 1 && (
-              <div className="pt-1.5">
-                <Segmented
-                  value={String(closestWeight(weights, weight))}
-                  options={weights.map((w) => ({ value: String(w), label: WEIGHT_NAMES[w] ?? String(w) }))}
-                  onChange={(v) => {
-                    const w = Number(v);
-                    void loadFont(family, w).then(() => onChange({ font_weight: w }));
-                    onChange({ font_weight: w });
-                  }}
-                />
-              </div>
-            )}
-          </Field>
-          <Field label="Size" value={`${size} px`}>
-            <ElementSlider
-              name={`${isHead ? "Headline" : "Subline"} size`}
-              color={color}
-              min={isHead ? 24 : 11}
-              max={240}
-              value={size}
-              onChange={(v, k) => onChange({ size_px: v }, k)}
-              left={<span className="text-[11px] font-semibold text-secondary-text">A</span>}
-              right={<span className="text-[19px] font-semibold text-secondary-text">A</span>}
-            />
-          </Field>
-          <Field label="Letter spacing" value={`${spacing > 0 ? "+" : ""}${spacing}`}>
-            <ElementSlider
-              name={`${isHead ? "Headline" : "Subline"} letter spacing`}
-              color={color}
-              min={-10}
-              max={50}
-              value={spacing}
-              snap={(v) => (Math.abs(v) <= 1 ? 0 : v)}
-              onChange={(v, k) => onChange({ letter_spacing: v }, k)}
-            />
-          </Field>
-          <Field label="Line height" value={lineHeight.toFixed(2)}>
-            <ElementSlider
-              name={`${isHead ? "Headline" : "Subline"} line height`}
-              color={color}
-              min={80}
-              max={200}
-              value={Math.round(lineHeight * 100)}
-              onChange={(v, k) => onChange({ line_height: v / 100 }, k)}
-            />
-          </Field>
-          <Field label="Color">
-            <div className="flex flex-wrap items-center gap-2">
-              {swatches.map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  aria-label={`Color ${c}`}
-                  aria-pressed={current === c}
-                  onClick={() => onChange({ color: c })}
-                  className={cn("size-8 rounded-full border border-border lg:size-7", current === c && "ring-2 ring-offset-2")}
-                  style={{ background: c, ["--tw-ring-color" as string]: color }}
-                />
-              ))}
-              <CustomColor
-                onPick={(c) => {
-                  if (!base.includes(c)) {
-                    const next = [c, ...recent.filter((x) => x !== c)].slice(0, 4);
-                    setRecent(next);
-                    try { localStorage.setItem(RECENT_TEXT, JSON.stringify(next)); } catch { /* ignore */ }
-                  }
-                  onChange({ color: c }, `drag:${el}-color`);
-                }}
-              />
-            </div>
-          </Field>
-        </div>
-      </Reveal>
-      <Reveal open={imageMode}>
-        <div className="space-y-4">
-          {t.image_path ? (
-            <div className="flex items-center gap-3 rounded-sm border border-ap-hairline p-2.5">
-              <span className="checker flex h-12 w-20 items-center justify-center rounded-sm">
-                <MediaImage path={t.image_path} alt="Badge" className="max-h-10 max-w-[90%] object-contain" />
-              </span>
-              <span className="min-w-0 flex-1 truncate text-[13px] font-medium">Badge</span>
-              <Button size="sm" variant="default" disabled={busy} onClick={() => fileRef.current?.click()}>Replace</Button>
-              <button type="button" className="text-[12px] text-destructive" onClick={() => onChange({ image_path: null })}>Remove</button>
-            </div>
-          ) : (
-            <div
-              onDragOver={(e) => { e.preventDefault(); setOver(true); }}
-              onDragLeave={() => setOver(false)}
-              onDrop={(e) => { e.preventDefault(); setOver(false); const f = e.dataTransfer.files?.[0]; if (f) void uploadBadge(f); }}
-              className={cn("rounded-sm border border-dashed p-4 text-center", over ? "border-primary bg-primary/5" : "border-placeholder-border")}
-            >
-              <p className="text-[13px] font-medium">Drop a badge or second logo…</p>
-              <p className="mt-1 text-[12px] text-secondary-text">e.g. "New season", a partner logo or an award · PNG or SVG · up to 5 MB</p>
-              <div className="mt-3 flex justify-center gap-2">
-                <Button size="sm" variant="default" disabled={busy} onClick={() => fileRef.current?.click()}>{busy ? "Uploading…" : "Choose a file"}</Button>
-                {logoPath && <Button size="sm" variant="plain" onClick={() => onChange({ image_path: logoPath })}>Use my logo</Button>}
-              </div>
-            </div>
-          )}
-          {dropErr && <p className="text-[12px] text-destructive">{dropErr}</p>}
-          <input
-            ref={fileRef}
-            type="file"
-            accept={LOGO_TYPES.join(",")}
-            className="hidden"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              e.target.value = "";
-              if (file) void uploadBadge(file);
-            }}
-          />
-          <Reveal open={Boolean(t.image_path)}>
-            <Field label="Size" value={`${imgSize}% of width`}>
-              <ElementSlider name="Subline image size" color={color} min={5} max={100} value={imgSize} onChange={(v, k) => onChange({ image_size_pct: v }, k)} />
-            </Field>
-          </Reveal>
-        </div>
-      </Reveal>
-      <Field label="Animation">
-        <div className="flex flex-wrap gap-1.5">
-          {ANIMATIONS.map((a) => (
-            <button
-              key={a.value}
-              type="button"
-              onClick={() => { onChange({ animation: a.value }); if (a.value !== "none") actions.onPlayFrame?.(); }}
-              aria-pressed={(t.animation ?? "none") === a.value}
-              className={cn("h-7 rounded-lg px-2.5 text-[12px] font-medium", (t.animation ?? "none") !== a.value && "bg-control-fill")}
-              style={(t.animation ?? "none") === a.value ? { background: color, color: "var(--on-accent)" } : undefined}
-            >
-              {a.label}
-            </button>
-          ))}
-        </div>
-      </Field>
-      {!isHead && (
-        <label className="flex items-center justify-between gap-3">
-          <span>
-            <span className="block text-[13px]">Keep under headline</span>
-            <span className="block text-[12px] text-secondary-text">Moves with the headline</span>
-          </span>
-          <Switch checked={under} onCheckedChange={(v) => onChange({ keep_under_headline: v })} className="data-[state=checked]:bg-toggle-on" />
-        </label>
-      )}
-      <Reveal open={isHead || !under}>
+        <Field label="Line height" value={lineHeight.toFixed(2)}>
+          <ElementSlider name="Headline line height" color={ACCENT} min={80} max={200} value={Math.round(lineHeight * 100)} onChange={(v, k) => setH({ line_height: v / 100 }, k)} />
+        </Field>
         <Field label="Position">
           <div className="flex items-center gap-3">
-            <PositionGrid value={t.position ?? (isHead ? "center" : "bottom-center")} color={color} onChange={(a) => onChange({ position: a })} />
-            <p className="text-[12px] leading-snug text-secondary-text">Or drag it on the preview — it snaps into place. Use the corner handle to resize.</p>
+            <PositionGrid value={h.position ?? "center"} color={ACCENT} onChange={(a) => setH({ position: a })} />
+            <p className="text-[12px] leading-snug text-secondary-text">Or drag it on the preview. It snaps into place.</p>
           </div>
         </Field>
-      </Reveal>
+      </Collapse>
+
+      <div className="border-t border-ap-hairline pt-4 text-[14px] font-semibold">Subline <span className="font-normal text-ap-muted">· optional</span></div>
+      <input
+        value={s.text ?? ""}
+        placeholder="Add a line under the headline"
+        aria-label="Subline"
+        onChange={(e) => setS({ text: e.target.value }, "subline-text")}
+        className="h-10 w-full rounded-sm border border-ap-hairline bg-card px-3 text-[15px]"
+      />
       <label className="flex items-center justify-between gap-3">
-        <span>
-          <span className="block text-[13px]">Same on all frames</span>
-          <span className="block text-[12px] text-secondary-text">Style changes apply to every frame. Words stay per frame.</span>
-        </span>
-        <Switch
-          checked={Boolean(t.same_on_all)}
-          onCheckedChange={(v) => {
-            onChange({ same_on_all: v });
-            if (v) toast(`${isHead ? "Headline" : "Subline"} style copied to every frame`, actions.onUndo ? { action: { label: "Undo", onClick: actions.onUndo } } : undefined);
-          }}
-          className="data-[state=checked]:bg-toggle-on"
-        />
+        <span className="text-[13px]">Keep under headline</span>
+        <Switch checked={under} onCheckedChange={(v) => setS({ keep_under_headline: v })} className="data-[state=checked]:bg-toggle-on" />
       </label>
+      <AnimationField value={subline ? s.animation ?? "none" : "fade"} onPick={(a) => play(setS, a)} />
+      <Collapse label="Customize subline style" open={moreSub} onToggle={() => setMoreSub((v) => !v)}>
+        <FontField el="subline" t={{ ...s, font_family: s.font_family ?? h.font_family ?? null }} brandName={brandName} actions={actions} onChange={setS} />
+        <SizeField el="subline" t={s} onChange={setS} />
+        <ColorField el="subline" t={{ ...s, color: s.color ?? h.color ?? "#FFFFFF" }} brandColors={brandColors} onChange={setS} />
+        {!under && (
+          <Field label="Position">
+            <PositionGrid value={s.position ?? "bottom-center"} color={ACCENT} onChange={(a) => setS({ position: a })} />
+          </Field>
+        )}
+      </Collapse>
+
+      <ScopeControl
+        value={shared ? "all" : "frame"}
+        onChange={(v) => {
+          const on = v === "all";
+          if (headline) actions.onText("headline", { same_on_all: on });
+          if (subline) actions.onText("subline", { same_on_all: on });
+          if (on) toast("Text style copied to every frame", actions.onUndo ? { action: { label: "Undo", onClick: actions.onUndo } } : undefined);
+        }}
+      />
     </>
   );
 }
 
-/* ---------------- Logo */
 
-function LogoFileRow({ label, path, onUpload, onRemove, onMake, makeLabel }: { label: string; path: string | null | undefined; onUpload: () => void; onRemove: () => void; onMake?: (() => void) | undefined; makeLabel: string }) {
-  return (
-    <div className="flex items-center gap-3 rounded-sm border border-ap-hairline p-2.5">
-      <span className="checker flex h-11 w-16 shrink-0 items-center justify-center rounded-sm">
-        {path && <MediaImage path={path} alt="" className="max-h-9 max-w-[90%] object-contain" />}
-      </span>
-      <span className="min-w-0 flex-1">
-        <span className="block text-[13px] font-medium">{label}</span>
-        <span className="block truncate text-[12px] text-secondary-text">{path ? photoName({ path }, 0).replace(/^Photo 1$/, "Uploaded") : "Not added yet"}</span>
-      </span>
-      {path ? (
-        <>
-          <Button size="sm" variant="default" onClick={onUpload}>Replace</Button>
-          <button type="button" className="text-[12px] text-destructive" onClick={onRemove}>Remove</button>
-        </>
-      ) : (
-        <>
-          <Button size="sm" variant="default" onClick={onUpload}>Upload</Button>
-          {onMake && <button type="button" className="text-[12px] font-medium text-link" onClick={onMake}>{makeLabel}</button>}
-        </>
-      )}
-    </div>
-  );
-}
+/* ---------------- Logo */
 
 function LogoPanel({
   logo,
@@ -992,6 +840,8 @@ function LogoPanel({
   frameIndex,
   hasLogo,
   actions,
+  kitName,
+  kitPosition,
 }: {
   logo: LogoSettings;
   format: Format;
@@ -999,176 +849,94 @@ function LogoPanel({
   frameIndex: number;
   hasLogo: boolean;
   actions: InspectorActions;
+  kitName: string | null;
+  kitPosition: string | null;
 }) {
-  const fileRef = useRef<HTMLInputElement>(null);
-  const target = useRef<"auto" | "light" | "dark">("auto");
-  const [err, setErr] = useState<string | null>(null);
-  const [over, setOver] = useState(false);
-  const posScopeState = useState<"all" | "frame" | null>(null);
-  const pick = (v: "auto" | "light" | "dark") => { target.current = v; fileRef.current?.click(); };
-  const take = (f: File | undefined) => {
-    if (!f) return;
-    const e = logoFileError(f);
-    setErr(e);
-    if (!e) actions.onAddLogo(f, target.current);
-  };
-  const input = (
-    <input ref={fileRef} type="file" accept={LOGO_TYPES.join(",")} className="hidden" onChange={(e) => {
-      const f = e.target.files?.[0];
-      e.target.value = "";
-      take(f);
-    }} />
-  );
-  if (!hasLogo) {
-    return (
-      <>
-        <div
-          onDragOver={(e) => { e.preventDefault(); setOver(true); }}
-          onDragLeave={() => setOver(false)}
-          onDrop={(e) => { e.preventDefault(); setOver(false); target.current = "auto"; take(e.dataTransfer.files?.[0]); }}
-          className={cn("flex flex-col items-center rounded-sm border border-dashed px-4 py-6 text-center", over ? "border-primary bg-primary/5" : "border-placeholder-border")}
-        >
-          <span className="flex size-11 items-center justify-center rounded-full bg-control-fill">
-            <Shapes className="size-5 text-el-logo" strokeWidth={1.7} />
-          </span>
-          <p className="mt-3 text-[14px] font-semibold">Drop your logo here or <button type="button" className="text-link" onClick={() => pick("auto")}>choose a file</button></p>
-          <p className="mt-1 max-w-[300px] text-[12px] text-secondary-text">PNG or SVG with a transparent background works best · up to 5 MB. We'll tell if it's a light or dark logo.</p>
-        </div>
-        {err && <p className="text-[12px] text-destructive">{err}</p>}
-        {input}
-      </>
-    );
-  }
+  const on = logo.enabled !== false;
   const size = logo.size_pct ?? 16;
-  const ownPos = Boolean(logo.frame_positions?.[frame.id]?.[format]);
-  const posScope = posScopeState[0] ?? (ownPos ? "frame" : "all");
-  const setPosScope = posScopeState[1];
   const version = frame.logo_variant ?? logo.version ?? "auto";
   const show = logo.show_on ?? "all";
   const light = logo.light_path;
   const dark = logo.dark_path ?? (logo.path && logo.path !== light ? logo.path : null);
-  const tiles: { value: NonNullable<LogoSettings["version"]>; label: string; hint: string; bg: string; path: string | null | undefined }[] = [
-    { value: "auto", label: "Auto", hint: "Best contrast", bg: "logo-split", path: dark ?? light },
-    { value: "light", label: "Light logo", hint: "For dark photos", bg: "bg-foreground", path: light },
-    { value: "dark", label: "Dark logo", hint: "For light photos", bg: "bg-background", path: dark },
-  ];
+  const files = light && dark ? "Light + Dark" : dark ? "Dark only" : light ? "Light only" : "No logo yet";
   const clearFormat = () => Object.fromEntries(Object.entries(logo.frame_positions ?? {}).map(([k, v]) => { const { [format]: _x, ...rest } = v; return [k, rest]; }));
   return (
     <>
-      <Field label="Version">
-        <div className="grid grid-cols-3 gap-2">
-          {tiles.map((t) => {
-            const disabled = !t.path;
-            return (
-              <button
-                key={t.value}
-                type="button"
-                disabled={disabled}
-                aria-pressed={version === t.value}
-                onClick={() => actions.onLogoVariant(t.value)}
-                className={cn("flex flex-col items-center gap-1 rounded-sm p-2 text-center disabled:opacity-40", version === t.value ? "ring-2 ring-primary" : "ring-1 ring-border")}
-              >
-                <span className={cn("flex h-10 w-full items-center justify-center rounded-sm border border-ap-hairline", t.bg)}>
-                  {t.path && <MediaImage path={t.path} className="max-h-6 max-w-[80%] object-contain" alt="" />}
+      <label className="flex items-center justify-between gap-3">
+        <span>
+          <span className="block text-[14px] font-semibold">Show logo</span>
+          <span className="block text-[12px] text-secondary-text">Applies to the whole video. Logo files live in your Brand Kit.</span>
+        </span>
+        <Switch checked={on} onCheckedChange={(v) => actions.onLogo({ enabled: v })} className="data-[state=checked]:bg-toggle-on" />
+      </label>
+      {on && (
+        <>
+          {hasLogo && (
+            <>
+              <Field label={`Position on ${format}`}>
+                <PositionGrid
+                  value={logo.frame_positions?.[frame.id]?.[format] ?? logo.positions?.[format] ?? kitPosition ?? "top-right"}
+                  color={ACCENT}
+                  onChange={(a) => actions.onLogo({ positions: { ...logo.positions, [format]: a }, frame_positions: clearFormat() })}
+                />
+              </Field>
+              <Field label="Size" value={`${size}% of width`}>
+                <div className="flex items-center gap-3">
+                  <div className="flex-1">
+                    <ElementSlider name="Logo size" color={ACCENT} min={5} max={100} value={size} onChange={(v, k) => actions.onLogo({ size_pct: v }, k)} />
+                  </div>
+                </div>
+              </Field>
+              <Field label="See-through">
+                <Segmented value={logo.opacity ?? "solid"} options={[{ value: "solid", label: "Solid" }, { value: "soft", label: "Soft" }]} onChange={(v) => actions.onLogo({ opacity: v })} />
+              </Field>
+              <Field label="Show on">
+                <Segmented
+                  value={show}
+                  options={[{ value: "all", label: "All frames" }, { value: "first_last", label: "First & last" }, { value: "selected", label: "Choose frames" }]}
+                  onChange={(v) => actions.onLogoScope(v)}
+                />
+                <Reveal open={show === "selected"}>
+                  <div className="pt-2"><ToggleRow label={`Show on frame ${frameIndex + 1}`} checked={frame.logo_visible} onChange={actions.onLogoVisible} /></div>
+                </Reveal>
+              </Field>
+            </>
+          )}
+          <Field label="Logo file">
+            <div className="rounded-sm border border-ap-hairline p-3">
+              <div className="flex items-center gap-3">
+                <span className="checker flex h-11 w-16 shrink-0 items-center justify-center rounded-sm">
+                  {(dark ?? light) && <MediaImage path={(dark ?? light)!} alt="" className="max-h-9 max-w-[90%] object-contain" />}
                 </span>
-                <span className="text-[12px] font-medium leading-tight">{t.label}</span>
-                <span className="text-[10px] leading-tight text-secondary-text">{t.hint}</span>
-              </button>
-            );
-          })}
-        </div>
-        {(!light || !dark) && (
-          <p className="text-[12px] text-secondary-text">{!dark ? "Add a dark version so Auto can switch on light photos." : "Add a light version so Auto can switch on dark photos."}</p>
-        )}
-      </Field>
-      <div className="space-y-2">
-        <LogoFileRow label="Light logo" path={light} onUpload={() => pick("light")} onRemove={() => actions.onLogo({ light_path: null, path: dark ?? null })} onMake={dark ? () => actions.onMakeLogo?.("light") : undefined} makeLabel="Make from your dark logo" />
-        <LogoFileRow label="Dark logo" path={dark} onUpload={() => pick("dark")} onRemove={() => actions.onLogo({ dark_path: null, path: light ?? null })} onMake={light ? () => actions.onMakeLogo?.("dark") : undefined} makeLabel="Make from your light logo" />
-        {err && <p className="text-[12px] text-destructive">{err}</p>}
-        {input}
-      </div>
-      <Field label={`Position on ${format.replace("x", ":")}`}>
-        <PositionGrid
-          value={logo.frame_positions?.[frame.id]?.[format] ?? logo.positions?.[format] ?? "top-right"}
-          color="var(--accent-blue)"
-          onChange={(a) => {
-            if (posScope === "frame") {
-              const fp = logo.frame_positions ?? {};
-              actions.onLogo({ frame_positions: { ...fp, [frame.id]: { ...fp[frame.id], [format]: a } } });
-            } else {
-              actions.onLogo({ positions: { ...logo.positions, [format]: a }, frame_positions: clearFormat() });
-            }
-          }}
-        />
-        <div className="mt-2"><Segmented value={posScope} options={[{ value: "all", label: "All frames" }, { value: "frame", label: "This frame" }]} onChange={setPosScope} /></div>
-        {ownPos && (
-          <p className="text-[12px] text-secondary-text">
-            Frame {frameIndex + 1} has its own position ·{" "}
-            <button
-              type="button"
-              className="font-medium text-link"
-              onClick={() => {
-                const fp = logo.frame_positions ?? {};
-                const { [format]: _x, ...rest } = fp[frame.id] ?? {};
-                actions.onLogo({ frame_positions: { ...fp, [frame.id]: rest } });
-                setPosScope("all");
-              }}
-            >
-              Use the same as other frames
-            </button>
-          </p>
-        )}
-      </Field>
-      <Field label="Size" value={`${size}% of width`}>
-        <ElementSlider
-          name="Logo size"
-          color="var(--accent-blue)"
-          min={5}
-          max={100}
-          value={size}
-          onChange={(v, k) => actions.onLogo({ size_pct: v }, k)}
-          left={<span className="size-2.5 rounded-[2px] bg-secondary-text/50" />}
-          right={<span className="size-4 rounded-[3px] bg-secondary-text/50" />}
-        />
-      </Field>
-      <Field label="See-through">
-        <Segmented
-          value={logo.opacity ?? "solid"}
-          options={[
-            { value: "solid", label: "Solid" },
-            { value: "soft", label: "Soft (70% opacity)" },
-          ]}
-          onChange={(v) => actions.onLogo({ opacity: v })}
-        />
-      </Field>
-      <Field label="Show logo on">
-        <Segmented
-          value={show}
-          options={[
-            { value: "all", label: "All frames" },
-            { value: "first_last", label: "First & last" },
-            { value: "selected", label: "Choose frames" },
-          ]}
-          onChange={(v) => actions.onLogoScope(v)}
-        />
-        <Reveal open={show === "selected"}>
-          <div className="pt-2"><ToggleRow label={`Show on frame ${frameIndex + 1}`} checked={frame.logo_visible} onChange={actions.onLogoVisible} /></div>
-        </Reveal>
-      </Field>
-      <Button
-        variant="destructive-plain"
-        size="sm"
-        className="w-full"
-        onClick={() => {
-          actions.onLogo({ path: null, light_path: null, dark_path: null, asset_id: null });
-          toast("Logo removed", actions.onUndo ? { action: { label: "Undo", onClick: actions.onUndo } } : undefined);
-        }}
-      >
-        Remove logo
-      </Button>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-[13px] font-medium">{kitName ?? "No brand kit"}</span>
+                  <span className="block text-[12px] text-secondary-text">{files}</span>
+                </span>
+                <Link to="/app/brand" className="shrink-0 text-[13px] font-medium text-ap-blue">{hasLogo ? "Edit in Brand Kit ›" : "Add one in Brand Kit"}</Link>
+              </div>
+              {hasLogo && (
+                <div className="mt-3 space-y-2">
+                  <Segmented
+                    value={version}
+                    options={[{ value: "auto", label: "Auto" }, { value: "light", label: "Light" }, { value: "dark", label: "Dark" }]}
+                    onChange={(v) => {
+                      if ((v === "light" && !light) || (v === "dark" && !dark)) return;
+                      actions.onLogoVariant(v);
+                    }}
+                  />
+                  {!light && dark && (
+                    <button type="button" className="text-[12px] font-medium text-link" onClick={() => actions.onMakeLogo?.("light")}>Make from dark logo</button>
+                  )}
+                </div>
+              )}
+            </div>
+          </Field>
+        </>
+      )}
     </>
   );
 }
+
 
 /* ---------------- Timing */
 
