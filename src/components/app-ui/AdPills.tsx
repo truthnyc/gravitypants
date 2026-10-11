@@ -36,7 +36,7 @@ export function useSaveDoc(doc: EditorDoc) {
   };
 }
 
-export function SizePill({ value, onChange, disabled }: { value: Format; onChange: (f: Format) => void; disabled?: boolean }) {
+export function SizePill({ value, onChange, disabled }: { value: Format; onChange: (f: Format) => void; disabled?: boolean | undefined }) {
   const r = MAIN_SIZES.find((s) => s.format === value)!;
   return (
     <DropdownMenu>
@@ -62,7 +62,7 @@ export function SizePill({ value, onChange, disabled }: { value: Format; onChang
   );
 }
 
-export function BrandPill({ value, onChange, disabled }: { value: string | null; onChange: (id: string | null) => void; disabled?: boolean }) {
+export function BrandPill({ value, onChange, disabled }: { value: string | null; onChange: (id: string | null) => void; disabled?: boolean | undefined }) {
   const { data: kits } = useBrandKits();
   const current = kits?.find((k) => k.id === value);
   return (
@@ -88,7 +88,7 @@ export function BrandPill({ value, onChange, disabled }: { value: string | null;
 }
 
 /** Header right side for every ad step. Without onKit the brand choice is applied by linking the kit only. */
-export function AdPills({ doc, set, onKit, readOnly }: { doc: EditorDoc; set: (next: EditorDoc) => void; onKit?: (id: string | null) => void; readOnly?: boolean }) {
+export function AdPills({ doc, set, onKit, readOnly }: { doc: EditorDoc; set: (next: EditorDoc) => void; onKit?: (id: string | null) => void; readOnly?: boolean | undefined }) {
   const change = useMainSizeChange(doc, set);
   const kit = onKit ?? ((id: string | null) => set({ ...doc, project: { ...doc.project, brand_kit_id: id, logo: { ...doc.project.logo, kit_stamp: null } } }));
   return (
