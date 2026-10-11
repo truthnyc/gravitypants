@@ -211,7 +211,7 @@ const tabCopy: Record<Tab, { title: string; body: string }> = {
   },
   Export: {
     title: "Download every size you need.",
-    body: "Export Vertical 9:16, Portrait 4:5, Square 1:1 and Landscape 16:9 together, plus custom sizes. Choose MP4 for ads and social posts, or GIF for email and websites.",
+    body: "Export Vertical 9:16, Portrait 4:5, Square 1:1, Wide 5:4 and Landscape 16:9 together, plus custom sizes. Choose MP4 for ads and social posts, or GIF for email and websites.",
   },
 };
 function Primary({ children, to = "/signup", cta }: { children: React.ReactNode; to?: "/signup" | "/examples"; cta?: string }) {
@@ -489,7 +489,7 @@ const features = [
   },
   {
     title: "Export all your formats",
-    body: "Download Vertical 9:16, Portrait 4:5, Square 1:1 and Landscape 16:9 together as MP4 or GIF.",
+    body: "Download Vertical 9:16, Portrait 4:5, Square 1:1, Wide 5:4 and Landscape 16:9 together as MP4 or GIF.",
     art: "export",
   },
   {
@@ -625,6 +625,7 @@ function Home() {
                 <span>9:16</span>
                 <span>4:5</span>
                 <span>1:1</span>
+                <span>5:4</span>
                 <span>16:9</span>
               </div>
               <b>
@@ -672,7 +673,7 @@ function Home() {
               <div className="home-step-copy">
                 <span>03</span>
                 <h3>Download your files</h3>
-                <p>Get 9:16, 4:5, 1:1, 16:9 and custom-size versions as MP4 or GIF, ready for social, ads, email and websites.</p>
+                <p>Get 9:16, 4:5, 1:1, 5:4, 16:9 and custom-size versions as MP4 or GIF, ready for social, ads, email and websites.</p>
               </div>
             </article>
           </div>
