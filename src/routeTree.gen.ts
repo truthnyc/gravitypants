@@ -63,6 +63,7 @@ import { Route as AuthenticatedAppAdsRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedAppBrandRouteImport } from './routes/_authenticated/app/brand'
 import { Route as AuthenticatedAppExportsRouteImport } from './routes/_authenticated/app/exports'
 import { Route as AuthenticatedAppHelpRouteImport } from './routes/_authenticated/app/help'
+import { Route as AuthenticatedAppNewRouteImport } from './routes/_authenticated/app/new'
 import { Route as AuthenticatedAppStatsRouteImport } from './routes/_authenticated/app/stats'
 import { Route as ApiPublicCleanupExportsRouteImport } from './routes/api/public/cleanup-exports'
 import { Route as ApiPublicDirectoryDailyRouteImport } from './routes/api/public/directory-daily'
@@ -372,6 +373,11 @@ const AuthenticatedAppHelpRoute = AuthenticatedAppHelpRouteImport.update({
   path: '/help',
   getParentRoute: () => AuthenticatedAppRouteRoute,
 } as any)
+const AuthenticatedAppNewRoute = AuthenticatedAppNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => AuthenticatedAppRouteRoute,
+} as any)
 const AuthenticatedAppStatsRoute = AuthenticatedAppStatsRouteImport.update({
   id: '/stats',
   path: '/stats',
@@ -590,6 +596,7 @@ export interface FileRoutesByFullPath {
   '/app/brand': typeof AuthenticatedAppBrandRoute
   '/app/exports': typeof AuthenticatedAppExportsRoute
   '/app/help': typeof AuthenticatedAppHelpRoute
+  '/app/new': typeof AuthenticatedAppNewRoute
   '/app/stats': typeof AuthenticatedAppStatsRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
   '/api/public/directory-daily': typeof ApiPublicDirectoryDailyRoute
@@ -671,6 +678,7 @@ export interface FileRoutesByTo {
   '/app/brand': typeof AuthenticatedAppBrandRoute
   '/app/exports': typeof AuthenticatedAppExportsRoute
   '/app/help': typeof AuthenticatedAppHelpRoute
+  '/app/new': typeof AuthenticatedAppNewRoute
   '/app/stats': typeof AuthenticatedAppStatsRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
   '/api/public/directory-daily': typeof ApiPublicDirectoryDailyRoute
@@ -757,6 +765,7 @@ export interface FileRoutesById {
   '/_authenticated/app/brand': typeof AuthenticatedAppBrandRoute
   '/_authenticated/app/exports': typeof AuthenticatedAppExportsRoute
   '/_authenticated/app/help': typeof AuthenticatedAppHelpRoute
+  '/_authenticated/app/new': typeof AuthenticatedAppNewRoute
   '/_authenticated/app/stats': typeof AuthenticatedAppStatsRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
   '/api/public/directory-daily': typeof ApiPublicDirectoryDailyRoute
@@ -843,6 +852,7 @@ export interface FileRouteTypes {
     | '/app/brand'
     | '/app/exports'
     | '/app/help'
+    | '/app/new'
     | '/app/stats'
     | '/api/public/cleanup-exports'
     | '/api/public/directory-daily'
@@ -924,6 +934,7 @@ export interface FileRouteTypes {
     | '/app/brand'
     | '/app/exports'
     | '/app/help'
+    | '/app/new'
     | '/app/stats'
     | '/api/public/cleanup-exports'
     | '/api/public/directory-daily'
@@ -1009,6 +1020,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/brand'
     | '/_authenticated/app/exports'
     | '/_authenticated/app/help'
+    | '/_authenticated/app/new'
     | '/_authenticated/app/stats'
     | '/api/public/cleanup-exports'
     | '/api/public/directory-daily'
@@ -1462,6 +1474,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppHelpRouteImport
       parentRoute: typeof AuthenticatedAppRouteRoute
     }
+    '/_authenticated/app/new': {
+      id: '/_authenticated/app/new'
+      path: '/new'
+      fullPath: '/app/new'
+      preLoaderRoute: typeof AuthenticatedAppNewRouteImport
+      parentRoute: typeof AuthenticatedAppRouteRoute
+    }
     '/_authenticated/app/stats': {
       id: '/_authenticated/app/stats'
       path: '/stats'
@@ -1741,6 +1760,7 @@ interface AuthenticatedAppRouteRouteChildren {
   AuthenticatedAppBrandRoute: typeof AuthenticatedAppBrandRoute
   AuthenticatedAppExportsRoute: typeof AuthenticatedAppExportsRoute
   AuthenticatedAppHelpRoute: typeof AuthenticatedAppHelpRoute
+  AuthenticatedAppNewRoute: typeof AuthenticatedAppNewRoute
   AuthenticatedAppStatsRoute: typeof AuthenticatedAppStatsRoute
   AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
   AuthenticatedAppAccountBillingRoute: typeof AuthenticatedAppAccountBillingRoute
@@ -1764,6 +1784,7 @@ const AuthenticatedAppRouteRouteChildren: AuthenticatedAppRouteRouteChildren = {
   AuthenticatedAppBrandRoute: AuthenticatedAppBrandRoute,
   AuthenticatedAppExportsRoute: AuthenticatedAppExportsRoute,
   AuthenticatedAppHelpRoute: AuthenticatedAppHelpRoute,
+  AuthenticatedAppNewRoute: AuthenticatedAppNewRoute,
   AuthenticatedAppStatsRoute: AuthenticatedAppStatsRoute,
   AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
   AuthenticatedAppAccountBillingRoute: AuthenticatedAppAccountBillingRoute,
