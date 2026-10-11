@@ -783,6 +783,43 @@ export function useCreateAdFromTemplate() {
   });
 }
 
+/** New ad from the Format step, before any photos: chosen main size, optional template styles and brand kit. */
+export function useCreateAdFromFormat() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ format, template, kitId }: { format: Format; template: Template | null; kitId: string | null }) => {
+      if (template) {
+        const source = sourceFromTemplate(template, Math.max(1, template.settings.frames.length));
+        source.primary_format = format;
+        source.formats = [format];
+        source.brand_kit_id = kitId;
+        source.logo = { ...source.logo, kit_stamp: null };
+        return insertCopy(source, source.name);
+      }
+      const [settings, kits] = await Promise.all([fetchBrandKit(), fetchBrandKits()]);
+      const named = kits.find((k) => k.id === kitId) ?? null;
+      const kit = settings ? effectiveKit(settings, named) : null;
+      const { data, error } = await supabase
+        .from("projects")
+        .insert({
+          workspace_id: getWorkspaceId(),
+          name: "Untitled ad",
+          primary_format: format,
+          formats: [format],
+          pace: "standard",
+          logo: { ...logoFromBrandKit(kit), kit_stamp: null },
+          end_card: kit?.end_card ?? {},
+          brand_kit_id: named?.id ?? null,
+        })
+        .select("id")
+        .single();
+      if (error) throw error;
+      return data.id as string;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: projectKeys.all }),
+  });
+}
+
 /** Workspace name and what its plan allows for templates. */
 export function useTemplateAccess() {
   return useQuery({

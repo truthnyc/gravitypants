@@ -79,6 +79,12 @@ function StepBar({ adId, current, className }: { adId: string; current: number; 
       {STEPS.map((s, i) => {
         const done = i < current;
         const on = i === current;
+        if (!adId) return (
+          <span key={s.key} aria-current={on ? "step" : undefined} className={cn("inline-flex min-h-0 min-w-0 items-center gap-1.5 whitespace-nowrap rounded-[7px] px-3 py-1.5 text-[13px]", on ? "bg-ap-card font-semibold text-ap-ink shadow-ap-soft" : "text-ap-muted")}>
+            <span className={cn("grid size-[18px] place-items-center rounded-full text-[11px] font-semibold nums", on ? "bg-ap-blue text-ap-card" : "bg-ap-media text-ap-muted")}>{i + 1}</span>
+            {s.label}
+          </span>
+        );
         return (
           <Link
             key={s.key}

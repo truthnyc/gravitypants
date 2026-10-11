@@ -108,12 +108,12 @@ export function DropZone({ spacious = false }: { spacious?: boolean }) {
         <h2 className="text-[20px] font-bold lg:text-[28px]">New ad from photos</h2>
         <p className="mt-1 hidden text-[15px] text-secondary-text lg:block">Drop photos here, or</p>
         <Button
+          asChild={!busy}
           className="mt-3 min-h-12 w-full text-[16px] sm:w-auto lg:mt-4 lg:min-h-10 lg:text-[14px]"
           size="main"
           disabled={busy}
-          onClick={() => fileInput.current?.click()}
         >
-          {busy ? "Uploading…" : "Choose Photos"}
+          {busy ? "Uploading…" : <Link to="/app/new">Choose Photos</Link>}
         </Button>
         <Button
           asChild
@@ -121,7 +121,7 @@ export function DropZone({ spacious = false }: { spacious?: boolean }) {
           className="mt-2 min-h-12 w-full text-[16px] sm:ml-2 sm:mt-3 sm:w-auto lg:mt-4 lg:min-h-10 lg:text-[14px]"
           size="main"
         >
-          <Link to="/app/templates">Start from a template</Link>
+          <Link to="/app/new">Start from a template</Link>
         </Button>
 
         {uploads.length > 0 && (
