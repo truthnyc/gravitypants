@@ -768,9 +768,9 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
           format={format}
           onFormat={(f) => setFormat(f as Format)}
           onSegment={(i) => { if (i < frames.length) selectFrame(i); }}
-          sizesSlot={
-            <>
-            <div className="mt-5 flex items-center gap-3">
+          topSlot={
+            <div className="mb-3.5">
+            <div className="flex items-center gap-3">
               <span className="shrink-0 text-[12px] font-semibold tracking-[0.08em] text-ap-muted uppercase">Preview as</span>
               <AppSegmented
                 className="grid flex-1 grid-cols-5"
@@ -805,6 +805,10 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
                 Show Reels / TikTok safe zones
               </label>
             )}
+            </div>
+          }
+          sizesSlot={
+            <>
             {(here || elsewhere.length > 0) && (
               <p className="mt-2 text-[12px] leading-snug text-ap-amber" role="status">
                 {here ? (
@@ -818,29 +822,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
                 )}
               </p>
             )}
-            </>
-          }
-        />
-      }
-    >
-      <StepTitle
-        title="Edit"
-        lead="Tap anything on the preview to change it."
-        actions={readOnly ? undefined : (
-          <>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <AppButton variant="ghost" size="sm" aria-label="More actions"><MoreHorizontal className="size-4" strokeWidth={1.7} /></AppButton>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-[220px]">
-                <DropdownMenuItem asChild><Link to="/app/ad/$id/photos" params={{ id: doc.project.id }}>Replace all photos…</Link></DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <StaffMenu adId={doc.project.id} />
-          </>
-        )}
-      />
-      <div className={cn(readOnly && "pointer-events-none select-none")} aria-readonly={readOnly || undefined}>
+            <div className={cn("mt-5", readOnly && "pointer-events-none select-none")}>
         <FrameRail
           horizontal
           doc={doc}
@@ -861,6 +843,28 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
           onPasteStyle={pasteStyle}
           onDelete={(i) => deleteFrame(i)}
         />
+            </div>
+            </>
+          }
+        />
+      }
+    >
+      {!readOnly && (
+        <div className="-mt-1 mb-2 flex justify-end gap-1">
+          
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <AppButton variant="ghost" size="sm" aria-label="More actions"><MoreHorizontal className="size-4" strokeWidth={1.7} /></AppButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-[220px]">
+                <DropdownMenuItem asChild><Link to="/app/ad/$id/photos" params={{ id: doc.project.id }}>Replace all photos…</Link></DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <StaffMenu adId={doc.project.id} />
+          
+        </div>
+      )}
+      <div className={cn(readOnly && "pointer-events-none select-none")} aria-readonly={readOnly || undefined}>
         <input
           ref={replaceRef}
           type="file"
@@ -872,7 +876,6 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
             if (f) void onReplaceFile(f);
           }}
         />
-        <div className="mt-5" />
         <Inspector
           embedded
           hideKit
