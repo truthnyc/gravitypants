@@ -15,8 +15,8 @@ type Result =
 
 export const Route = createFileRoute("/shopify")({
   validateSearch: (s: Record<string, unknown>) => ({
-    shop: typeof s.shop === "string" ? s.shop : undefined,
-    host: typeof s.host === "string" ? s.host : undefined,
+    shop: typeof s["shop"] === "string" ? (s["shop"] as string) : undefined,
+    host: typeof s["host"] === "string" ? (s["host"] as string) : undefined,
   }),
   loader: () => getShopifyConfig(),
   head: ({ loaderData }) => ({
