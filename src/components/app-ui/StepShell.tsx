@@ -196,7 +196,7 @@ const FORMAT_PX = Object.fromEntries(MAIN_SIZES.map((s) => [s.format, `${s.width
 
 /** Left card: reel preview, play + progress, name and meta, sizes. Same on every step. */
 export function ReelCard({
-  preview, playing, onTogglePlay, segments, time, total, name, onRename, meta, status, formats, format, onFormat, onToggleFormat, exported, readOnly, sizesSlot, onSegment,
+  preview, playing, onTogglePlay, segments, time, total, name, onRename, meta, status, formats, format, onFormat, onToggleFormat, exported, readOnly, sizesSlot, topSlot, onSegment,
 }: {
   /** Clicking a play-bar segment jumps to that frame and stops. */
   onSegment?: (i: number) => void;
@@ -218,12 +218,15 @@ export function ReelCard({
   readOnly?: boolean;
   /** Replaces the Sizes section (Export step shows its own preview-size tabs). */
   sizesSlot?: ReactNode;
+  /** Toolbar shown above the preview (Edit step: Preview as). */
+  topSlot?: ReactNode;
 }) {
   const fmt = (s: number) => `${Math.floor(s / 60)}:${(s % 60).toFixed(1).padStart(4, "0")}`;
   const lp = useContext(LargeCtx);
   let acc = 0;
   return (
     <AppCard>
+      {topSlot}
       <div className="ap-preview-box relative grid h-[340px] grid-cols-[minmax(0,1fr)] grid-rows-[minmax(0,1fr)] place-items-center overflow-hidden rounded-[18px] bg-ap-panel p-[22px] sm:h-[380px]">
         {preview}
         {(FORMAT_PX as Record<string, string>)[format] && (

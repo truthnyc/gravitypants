@@ -409,7 +409,7 @@ function Swatch({ c, active, onPick }: { c: string; active: boolean; onPick: (c:
 /** One scope control per tab: "Style changes apply to: This frame | All frames". */
 function ScopeControl({ value, onChange }: { value: "frame" | "all"; onChange: (v: "frame" | "all") => void }) {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-2 border-t border-ap-hairline pt-4">
+    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-ap-hairline pb-4">
       <span className="text-[13px] text-ap-body">Style changes apply to:</span>
       <div className="w-[220px]"><Segmented value={value} options={[{ value: "frame", label: "This frame" }, { value: "all", label: "All frames" }]} onChange={onChange} /></div>
     </div>
@@ -492,6 +492,13 @@ function PhotoPanel({
 
   return (
     <>
+      <ScopeControl
+        value={scope}
+        onChange={(v) => {
+          setScope(v);
+          if (v === "all") actions.onPhotoAll?.({ fit, background: bgMode, background_color: photo.background_color ?? null, movement: move, movement_intensity: photo.movement_intensity ?? "standard", zoom_start: photo.zoom_start ?? 1, zoom_end: photo.zoom_end ?? 1, pan_x: photo.pan_x ?? 0, pan_y: photo.pan_y ?? 0 });
+        }}
+      />
       <div className="flex items-center gap-3">
         <div className="size-16 shrink-0 overflow-hidden rounded-sm bg-control-fill">
           {photo.path && <MediaImage path={photo.path} className="size-full object-cover" alt="" />}
@@ -582,13 +589,6 @@ function PhotoPanel({
         </Reveal>
       </Field>
 
-      <ScopeControl
-        value={scope}
-        onChange={(v) => {
-          setScope(v);
-          if (v === "all") actions.onPhotoAll?.({ fit, background: bgMode, background_color: photo.background_color ?? null, movement: move, movement_intensity: photo.movement_intensity ?? "standard", zoom_start: photo.zoom_start ?? 1, zoom_end: photo.zoom_end ?? 1, pan_x: photo.pan_x ?? 0, pan_y: photo.pan_y ?? 0 });
-        }}
-      />
 
       <Collapse label="Adjust" open={adjust} onToggle={() => setAdjust((v) => !v)}>
         <Field label="Custom movement">
@@ -751,6 +751,7 @@ function TextTab({ headline, subline, brandColors, brandName, actions }: { headl
   const s = subline ?? {};
   const [moreHead, setMoreHead] = useState(false);
   const [moreSub, setMoreSub] = useState(false);
+  const [part, setPart] = useState<"headline" | "subline">("headline");
   const setH = (p: Partial<TextSettings>, k?: string) => actions.onText("headline", p, k);
   // A new subline starts from the headline's font and colour.
   const setS = (p: Partial<TextSettings>, k?: string) =>
@@ -766,7 +767,17 @@ function TextTab({ headline, subline, brandColors, brandName, actions }: { headl
   const shared = (headline?.same_on_all ?? true) && (!subline || (subline.same_on_all ?? true));
   return (
     <>
-      <div className="text-[14px] font-semibold">Headline</div>
+      <ScopeControl
+        value={shared ? "all" : "frame"}
+        onChange={(v) => {
+          const on = v === "all";
+          if (headline) actions.onText("headline", { same_on_all: on });
+          if (subline) actions.onText("subline", { same_on_all: on });
+          if (on) toast("Text style copied to every frame", actions.onUndo ? { action: { label: "Undo", onClick: actions.onUndo } } : undefined);
+        }}
+      />
+      <Segmented value={part} options={[{ value: "headline", label: "Headline" }, { value: "subline", label: "Subline" }]} onChange={setPart} />
+      {part === "headline" && (<>
       <Textarea value={h.text ?? ""} placeholder="Add a headline" aria-label="Headline" onChange={(e) => setH({ text: e.target.value }, "headline-text")} className="min-h-[72px] rounded-sm text-[15px]" />
       <FontField el="headline" t={h} brandName={brandName} actions={actions} onChange={setH} />
       <SizeField el="headline" t={h} onChange={setH} />
@@ -795,8 +806,9 @@ function TextTab({ headline, subline, brandColors, brandName, actions }: { headl
           </div>
         </Field>
       </Collapse>
-
-      <div className="border-t border-ap-hairline pt-4 text-[14px] font-semibold">Subline <span className="font-normal text-ap-muted">· optional</span></div>
+      </>)}
+      {part === "subline" && (<>
+      <p className="text-[13px] text-ap-muted">Optional</p>
       <Textarea value={s.text ?? ""} placeholder="Add a line under the headline" aria-label="Subline" onChange={(e) => setS({ text: e.target.value }, "subline-text")} className="min-h-[56px] rounded-sm text-[15px]" />
       <label className="flex items-center justify-between gap-3">
         <span className="text-[13px]">Keep under headline</span>
@@ -813,16 +825,7 @@ function TextTab({ headline, subline, brandColors, brandName, actions }: { headl
           </Field>
         )}
       </Collapse>
-
-      <ScopeControl
-        value={shared ? "all" : "frame"}
-        onChange={(v) => {
-          const on = v === "all";
-          if (headline) actions.onText("headline", { same_on_all: on });
-          if (subline) actions.onText("subline", { same_on_all: on });
-          if (on) toast("Text style copied to every frame", actions.onUndo ? { action: { label: "Undo", onClick: actions.onUndo } } : undefined);
-        }}
-      />
+      </>)}
     </>
   );
 }
