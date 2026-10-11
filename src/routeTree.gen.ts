@@ -88,6 +88,7 @@ import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/l
 import { Route as AuthenticatedAdminTemplatesIdEditRouteImport } from './routes/_authenticated/admin/templates.$id.edit'
 import { Route as AuthenticatedAppAdIdEditRouteImport } from './routes/_authenticated/app/ad.$id.edit'
 import { Route as AuthenticatedAppAdIdExportRouteImport } from './routes/_authenticated/app/ad.$id.export'
+import { Route as AuthenticatedAppAdIdFormatRouteImport } from './routes/_authenticated/app/ad.$id.format'
 import { Route as AuthenticatedAppAdIdPhotosRouteImport } from './routes/_authenticated/app/ad.$id.photos'
 import { Route as AuthenticatedAppAdIdShareRouteImport } from './routes/_authenticated/app/ad.$id.share'
 import { Route as ApiPublicOgBrandSlugRouteImport } from './routes/api/public/og.brand.$slug'
@@ -513,6 +514,12 @@ const AuthenticatedAppAdIdExportRoute =
     path: '/ad/$id/export',
     getParentRoute: () => AuthenticatedAppRouteRoute,
   } as any)
+const AuthenticatedAppAdIdFormatRoute =
+  AuthenticatedAppAdIdFormatRouteImport.update({
+    id: '/ad/$id/format',
+    path: '/ad/$id/format',
+    getParentRoute: () => AuthenticatedAppRouteRoute,
+  } as any)
 const AuthenticatedAppAdIdPhotosRoute =
   AuthenticatedAppAdIdPhotosRouteImport.update({
     id: '/ad/$id/photos',
@@ -610,6 +617,7 @@ export interface FileRoutesByFullPath {
   '/admin/templates/$id/edit': typeof AuthenticatedAdminTemplatesIdEditRoute
   '/app/ad/$id/edit': typeof AuthenticatedAppAdIdEditRoute
   '/app/ad/$id/export': typeof AuthenticatedAppAdIdExportRoute
+  '/app/ad/$id/format': typeof AuthenticatedAppAdIdFormatRoute
   '/app/ad/$id/photos': typeof AuthenticatedAppAdIdPhotosRoute
   '/app/ad/$id/share': typeof AuthenticatedAppAdIdShareRoute
   '/api/public/og/brand/$slug': typeof ApiPublicOgBrandSlugRoute
@@ -690,6 +698,7 @@ export interface FileRoutesByTo {
   '/admin/templates/$id/edit': typeof AuthenticatedAdminTemplatesIdEditRoute
   '/app/ad/$id/edit': typeof AuthenticatedAppAdIdEditRoute
   '/app/ad/$id/export': typeof AuthenticatedAppAdIdExportRoute
+  '/app/ad/$id/format': typeof AuthenticatedAppAdIdFormatRoute
   '/app/ad/$id/photos': typeof AuthenticatedAppAdIdPhotosRoute
   '/app/ad/$id/share': typeof AuthenticatedAppAdIdShareRoute
   '/api/public/og/brand/$slug': typeof ApiPublicOgBrandSlugRoute
@@ -775,6 +784,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/templates/$id/edit': typeof AuthenticatedAdminTemplatesIdEditRoute
   '/_authenticated/app/ad/$id/edit': typeof AuthenticatedAppAdIdEditRoute
   '/_authenticated/app/ad/$id/export': typeof AuthenticatedAppAdIdExportRoute
+  '/_authenticated/app/ad/$id/format': typeof AuthenticatedAppAdIdFormatRoute
   '/_authenticated/app/ad/$id/photos': typeof AuthenticatedAppAdIdPhotosRoute
   '/_authenticated/app/ad/$id/share': typeof AuthenticatedAppAdIdShareRoute
   '/api/public/og/brand/$slug': typeof ApiPublicOgBrandSlugRoute
@@ -860,6 +870,7 @@ export interface FileRouteTypes {
     | '/admin/templates/$id/edit'
     | '/app/ad/$id/edit'
     | '/app/ad/$id/export'
+    | '/app/ad/$id/format'
     | '/app/ad/$id/photos'
     | '/app/ad/$id/share'
     | '/api/public/og/brand/$slug'
@@ -940,6 +951,7 @@ export interface FileRouteTypes {
     | '/admin/templates/$id/edit'
     | '/app/ad/$id/edit'
     | '/app/ad/$id/export'
+    | '/app/ad/$id/format'
     | '/app/ad/$id/photos'
     | '/app/ad/$id/share'
     | '/api/public/og/brand/$slug'
@@ -1024,6 +1036,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/templates/$id/edit'
     | '/_authenticated/app/ad/$id/edit'
     | '/_authenticated/app/ad/$id/export'
+    | '/_authenticated/app/ad/$id/format'
     | '/_authenticated/app/ad/$id/photos'
     | '/_authenticated/app/ad/$id/share'
     | '/api/public/og/brand/$slug'
@@ -1624,6 +1637,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppAdIdExportRouteImport
       parentRoute: typeof AuthenticatedAppRouteRoute
     }
+    '/_authenticated/app/ad/$id/format': {
+      id: '/_authenticated/app/ad/$id/format'
+      path: '/ad/$id/format'
+      fullPath: '/app/ad/$id/format'
+      preLoaderRoute: typeof AuthenticatedAppAdIdFormatRouteImport
+      parentRoute: typeof AuthenticatedAppRouteRoute
+    }
     '/_authenticated/app/ad/$id/photos': {
       id: '/_authenticated/app/ad/$id/photos'
       path: '/ad/$id/photos'
@@ -1733,6 +1753,7 @@ interface AuthenticatedAppRouteRouteChildren {
   AuthenticatedAppTemplatesIndexRoute: typeof AuthenticatedAppTemplatesIndexRoute
   AuthenticatedAppAdIdEditRoute: typeof AuthenticatedAppAdIdEditRoute
   AuthenticatedAppAdIdExportRoute: typeof AuthenticatedAppAdIdExportRoute
+  AuthenticatedAppAdIdFormatRoute: typeof AuthenticatedAppAdIdFormatRoute
   AuthenticatedAppAdIdPhotosRoute: typeof AuthenticatedAppAdIdPhotosRoute
   AuthenticatedAppAdIdShareRoute: typeof AuthenticatedAppAdIdShareRoute
 }
@@ -1755,6 +1776,7 @@ const AuthenticatedAppRouteRouteChildren: AuthenticatedAppRouteRouteChildren = {
   AuthenticatedAppTemplatesIndexRoute: AuthenticatedAppTemplatesIndexRoute,
   AuthenticatedAppAdIdEditRoute: AuthenticatedAppAdIdEditRoute,
   AuthenticatedAppAdIdExportRoute: AuthenticatedAppAdIdExportRoute,
+  AuthenticatedAppAdIdFormatRoute: AuthenticatedAppAdIdFormatRoute,
   AuthenticatedAppAdIdPhotosRoute: AuthenticatedAppAdIdPhotosRoute,
   AuthenticatedAppAdIdShareRoute: AuthenticatedAppAdIdShareRoute,
 }
