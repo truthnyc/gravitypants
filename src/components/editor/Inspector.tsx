@@ -157,20 +157,23 @@ export function Inspector({
   return (
     <aside className={cn("flex shrink-0 flex-col", embedded ? "w-full" : "overflow-y-auto bg-inspector p-4")}>
       {!hideKit && <BrandKitRow embedded={embedded} kits={kits} kitId={kitId} onKit={actions.onKit} />}
-      <div className="text-[15px] font-semibold nums">Frame {frameIndex + 1} of {doc.frames.length}</div>
-      <div className="mt-2 flex gap-1 border-b border-ap-hairline" role="tablist" aria-label="What to edit">
-        {TABS.map((t) => (
-          <button
-            key={t.key}
-            type="button"
-            role="tab"
-            aria-selected={tab === t.key}
-            onClick={() => onSelect(t.el)}
-            className={cn("-mb-px border-b-2 px-4 py-2.5 text-[15px]", tab === t.key ? "border-ap-blue font-semibold text-ap-ink" : "border-transparent text-ap-muted hover:text-ap-ink")}
-          >
-            {t.label}
-          </button>
-        ))}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="text-[15px] font-semibold nums">Frame {frameIndex + 1} of {doc.frames.length}</div>
+        <div className="flex gap-1 rounded-lg bg-ap-panel p-1" role="tablist" aria-label="What to edit">
+          {TABS.map((t) => (
+            <button
+              key={t.key}
+              type="button"
+              role="tab"
+              aria-selected={tab === t.key}
+              onClick={() => onSelect(t.el)}
+              className={cn("flex min-h-9 items-center gap-2 rounded-lg px-4 text-[15px] transition-colors", tab === t.key ? "bg-ap-card text-ap-ink shadow-[var(--ap-shadow-soft)]" : "text-ap-body hover:text-ap-ink")}
+            >
+              <span aria-hidden className={cn("size-2.5 rounded-full", t.key === "photo" ? "bg-ap-dot-photo" : t.key === "text" ? "bg-ap-dot-text" : "bg-ap-dot-logo")} />
+              {t.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className={cn("mt-4 space-y-4", embedded ? "" : "rounded-sm bg-card p-4 shadow-card")}>
@@ -563,12 +566,12 @@ function PhotoPanel({
               type="button"
               onClick={() => chooseMove(m.value)}
               aria-pressed={move === m.value}
-              className={cn("h-8 rounded-full border px-3 text-[13px]", move === m.value ? "border-ap-blue bg-ap-soft-blue text-ap-blue" : "border-transparent bg-control-fill")}
+              className={cn("h-9 rounded-lg px-4 text-[14px] font-medium", move === m.value ? "bg-ap-blue text-ap-card" : "bg-ap-panel text-ap-ink hover:bg-ap-segment-hover")}
             >
               {m.label}
             </button>
           ))}
-          {move === "custom" && <span className="inline-flex h-8 items-center rounded-full border border-ap-blue bg-ap-soft-blue px-3 text-[13px] text-ap-blue">Custom</span>}
+          {move === "custom" && <span className="inline-flex h-9 items-center rounded-lg bg-ap-blue px-4 text-[14px] font-medium text-ap-card">Custom</span>}
         </div>
         <Reveal open={move !== "none" && move !== "custom"}>
           <div className="pt-2">
@@ -732,7 +735,7 @@ function AnimationField({ value, onPick }: { value: NonNullable<TextSettings["an
             role="radio"
             aria-checked={value === a.value}
             onClick={() => onPick(a.value)}
-            className={cn("h-8 rounded-full border px-3 text-[13px]", value === a.value ? "border-ap-blue bg-ap-soft-blue text-ap-blue" : "border-transparent bg-control-fill")}
+            className={cn("h-9 rounded-lg px-4 text-[14px] font-medium", value === a.value ? "bg-ap-blue text-ap-card" : "bg-ap-panel text-ap-ink hover:bg-ap-segment-hover")}
           >
             {a.label}
           </button>
