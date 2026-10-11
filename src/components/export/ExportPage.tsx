@@ -22,7 +22,7 @@ import { FontLoadError, registerCustomFonts } from "@/lib/stillframe/fonts";
 import { nearestFormat, slugify } from "@/lib/stillframe/channels";
 import { sizeIdOf } from "@/lib/stillframe/main-size";
 import { AdPills, useSaveDoc } from "@/components/app-ui/AdPills";
-import { CUSTOM_MAX, CUSTOM_MIN, CUSTOM_PRESETS, DEFAULT_SIZES, EXPORT_SIZES, PLATFORMS, customError, exportFileName, platformState, ratioLabel, sizeLabelForFile, togglePlatform, type SizeId } from "@/lib/stillframe/export-sizes";
+import { CUSTOM_MAX, CUSTOM_MIN, CUSTOM_PRESETS, EXPORT_SIZES, PLATFORMS, customError, exportFileName, platformState, ratioLabel, sizeLabelForFile, togglePlatform, type SizeId } from "@/lib/stillframe/export-sizes";
 import { formatSeconds, type Format, type Frame, type Project } from "@/lib/stillframe/types";
 import { FORMAT_SIZE } from "@/render/formats";
 import { loadImages } from "@/render/images";
