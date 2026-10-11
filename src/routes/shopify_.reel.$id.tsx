@@ -9,6 +9,7 @@ import { sizeOf } from "@/lib/stillframe/main-size";
 import { applyReelStyle, SHOPIFY_SIZES, type StyleChange } from "@/lib/shopify/reel-build";
 import { ReelStylePanel } from "@/components/shopify/ReelStylePanel";
 import { Button } from "@/components/ui/button";
+import { PlanBar, UpgradeButton, useShopPlan } from "@/components/shopify/ShopPlan";
 
 type TemplateLite = { id: string; name: string; thumbnail_url: string | null };
 type ReelResponse = { project: ProjectWithFrames; urls: Record<string, string>; templates: TemplateLite[]; notice?: string | null; maxSlides?: number };
@@ -65,6 +66,7 @@ function ShopifyReel() {
   const [photos, setPhotos] = useState<ProductPhotos | null>(null);
   const [drag, setDrag] = useState<number | null>(null);
   const [selectedSlide, setSelectedSlide] = useState(0);
+  const plan = useShopPlan();
   const currentReel = useRef<ReelResponse | null>(null);
   const styleQueue = useRef<Promise<void>>(Promise.resolve());
   const styleRevision = useRef(0);
@@ -173,6 +175,7 @@ function ShopifyReel() {
         {note && <p className="mt-1 text-sm text-muted-foreground">{note}</p>}
         {info && <p className="mt-1 text-sm text-muted-foreground" aria-live="polite">{info}</p>}
         {error && <p role="alert" className="mt-3 text-sm text-destructive">{error}</p>}
+        <div className="mt-3"><PlanBar info={plan.info} returnTo={id} /></div>
         {!reel && !error && <p className="mt-6 text-muted-foreground">Loading your reel…</p>}
         {reel && images && (
           <div className="mt-6 grid gap-8 md:grid-cols-[320px_1fr]">
@@ -253,7 +256,7 @@ function ShopifyReel() {
                   {photos && !photos.length && <p className="text-sm text-muted-foreground">No other product photos found.</p>}
                 </div>
               )}
-              <ExportPanel project={reel.project} images={images} beforeExport={flushStyles} />
+              <ExportPanel project={reel.project} images={images} beforeExport={flushStyles} watermarked={Boolean(plan.info?.status?.watermark) && plan.info?.plan.source === "shopify"} onDone={plan.refresh} />
             </div>
           </div>
         )}
@@ -305,7 +308,8 @@ function WordsPanel({ project, busy, onSave }: { project: ProjectWithFrames; bus
   );
 }
 
-function ExportPanel({ project, images, beforeExport }: { project: ProjectWithFrames; images: Map<string, HTMLImageElement>; beforeExport: () => Promise<void> }) {
+function ExportPanel({ project, images, beforeExport, watermarked, onDone }: { project: ProjectWithFrames; images: Map<string, HTMLImageElement>; beforeExport: () => Promise<void>; watermarked: boolean; onDone: () => void }) {
+  const [lastWatermarked, setLastWatermarked] = useState(false);
   const [progress, setProgress] = useState<number | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
   const [link, setLink] = useState<string | null>(null);
@@ -329,11 +333,13 @@ function ExportPanel({ project, images, beforeExport }: { project: ProjectWithFr
       const { url } = await shopifyFetch<{ url: string }>("/api/public/shopify/export", { action: "download", path: start.path });
       setLink(url);
       window.open(url, "_blank");
+      setLastWatermarked(start.watermark);
       setMsg(start.watermark ? "Done. Free trial exports carry a small watermark." : "Done.");
     } catch (e) {
       setMsg((e as Error).message);
     } finally {
       setProgress(null);
+      onDone();
     }
   }
 
@@ -346,6 +352,7 @@ function ExportPanel({ project, images, beforeExport }: { project: ProjectWithFr
       {progress !== null && <p className="mt-2 text-sm text-muted-foreground tabular-nums" aria-live="polite">Exporting… {Math.round(progress * 100)}%</p>}
       {msg && <p className="mt-2 text-sm" aria-live="polite">{msg}</p>}
       {link && <a href={link} target="_blank" rel="noreferrer" className="mt-1 inline-block text-sm text-primary hover:underline">Download file</a>}
+      {(watermarked || lastWatermarked) && <div className="mt-2"><p className="mb-1 text-sm text-muted-foreground">This export carries a small watermark.</p><UpgradeButton returnTo={project.id} label="Remove watermark" cta="shopify-remove-watermark" variant="outline" /></div>}
     </div>
   );
 }
