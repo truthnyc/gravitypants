@@ -6,7 +6,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Link } from "@tanstack/react-router";
 import { AppButton } from "@/components/app-ui";
 import { AdPills, useMainSizeChange } from "@/components/app-ui/AdPills";
-import { ReelCard, StepActions, StepShell, StepTitle } from "@/components/app-ui/StepShell";
+import { ReelCard, StepActions, StepShell } from "@/components/app-ui/StepShell";
 import { KitAgainButton } from "@/components/templates/KitAgain";
 import { effectiveKit, framePayloadFromPhoto, useBrandKit, useBrandKits, useTemplateName, type EditorDoc } from "@/lib/stillframe/data";
 import type { NamedBrandKit } from "@/lib/stillframe/types";
