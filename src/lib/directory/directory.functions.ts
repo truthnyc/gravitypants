@@ -187,7 +187,8 @@ export const shareReel = createServerFn({ method: "POST" })
     const status: DirStatus = data.show ? (brand.first_approved_at ? "live" : "in_review") : prev?.status === "hidden" ? "hidden" : "private";
     const tags = [...new Set(data.tags.map((t) => t.toLowerCase()))];
     const { pinReelVideo } = await import("./directory.server");
-    const videoUrl = data.show ? await pinReelVideo(sb, ad.workspace_id, ad.id).catch(() => null) : null;
+    // A live reel's video only changes through a staff-reviewed update (submitReelUpdate).
+    const videoUrl = data.show && prev?.status !== "live" ? await pinReelVideo(sb, ad.workspace_id, ad.id).catch(() => null) : null;
     const row = {
       ad_id: ad.id, brand_id: brand.id, status, tags, moods: await cleanMoods(sb, data.moods), template_id: ad.template_id, formats: (ad.formats as string[]).map((f) => f.replace(":", "x")),
       description: data.description || null,
@@ -238,7 +239,7 @@ export const hideReel = createServerFn({ method: "POST" })
       ip_address: req?.headers.get("cf-connecting-ip") ?? null, user_agent: req?.headers.get("user-agent")?.slice(0, 400) ?? null,
     });
     if (logErr) throw new Error(logErr.message);
-    const { error } = await sb.from("directory_reels").update({ status: "hidden", hidden_reason: "brand", in_showcase: false, showcase_order: null, showcase_at: null, showcase_by: null }).eq("id", reel.id);
+    const { error } = await sb.from("directory_reels").update({ status: "hidden", hidden_reason: "brand", in_showcase: false, showcase_order: null, showcase_at: null, showcase_by: null, pending_status: "none", pending_video_url: null, pending_submitted_at: null }).eq("id", reel.id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
@@ -265,7 +266,7 @@ export const getDirectoryAccount = createServerFn({ method: "POST" })
     const sb = context.supabase as any;
     const { data: b } = await sb.from("directory_brands").select("*").eq("workspace_id", data.workspaceId).maybeSingle();
     if (!b) return null;
-    const { data: reels } = await sb.from("directory_reels").select("id, ad_id, status, updated_at, title, formats, poster_url, projects(name)").eq("brand_id", b.id).order("updated_at", { ascending: false });
+    const { data: reels } = await sb.from("directory_reels").select("id, ad_id, status, updated_at, title, formats, poster_url, in_showcase, pending_status, pending_submitted_at, pending_note, projects(name)").eq("brand_id", b.id).order("updated_at", { ascending: false });
     const { data: log } = await sb.from("permission_log").select("id, created_at, ad_id, action, full_name, job_title, email, wording_version, wording_text").eq("brand_id", b.id).order("created_at", { ascending: false }).limit(500);
     const names = new Map<string, string>((reels ?? []).map((r: any) => [r.ad_id, r.title ?? r.projects?.name ?? "Untitled"]));
     const { data: featured } = await sb.rpc("is_featured_brand", { _brand: b.id });
@@ -278,7 +279,7 @@ export const getDirectoryAccount = createServerFn({ method: "POST" })
     }
     return {
       brand: { id: b.id as string, name: b.name as string, slug: b.slug as string, description: (b.description ?? "") as string, logo: await signLogo(b.logo_url), website: (b.website_url ?? "") as string, category: (b.category ?? "Other") as string, moods: (b.moods ?? []) as string[], featured: !!featured, planEndedAt: (b.plan_ended_at ?? null) as string | null },
-      reels: ((reels ?? []) as any[]).map((r: any) => ({ adId: r.ad_id as string, name: (r.title as string | null) ?? r.projects?.name ?? "Untitled", status: r.status as DirStatus, updated: r.updated_at as string, size: ((r.formats ?? [])[0] ?? "").replace("x", ":") as string, thumb: r.poster_url?.startsWith("media:") ? signedPosters.get(r.poster_url.slice(6)) ?? null : null })),
+      reels: ((reels ?? []) as any[]).map((r: any) => ({ adId: r.ad_id as string, name: (r.title as string | null) ?? r.projects?.name ?? "Untitled", status: r.status as DirStatus, updated: r.updated_at as string, size: ((r.formats ?? [])[0] ?? "").replace("x", ":") as string, thumb: r.poster_url?.startsWith("media:") ? signedPosters.get(r.poster_url.slice(6)) ?? null : null, inShowcase: !!r.in_showcase, pending: (r.pending_status ?? "none") as PendingStatus, pendingAt: (r.pending_submitted_at ?? null) as string | null, pendingNote: (r.pending_note ?? null) as string | null })),
       log: (log ?? []).map((l: any) => ({ ...l, reel: names.get(l.ad_id) ?? "Removed ad" })) as {
         id: string; created_at: string; reel: string; action: "granted" | "withdrawn"; full_name: string; job_title: string | null; email: string; wording_version: string; wording_text: string;
       }[],
@@ -873,4 +874,88 @@ export const searchDirectory = createServerFn({ method: "POST" })
       reels, total, page: res.page, pageSize: res.pageSize, hasMore: res.page * res.pageSize < total,
       facets: { moods: res.moods ?? {}, categories, brands: res.brands ?? {} },
     };
+  });
+
+export type PendingStatus = "none" | "in_review" | "declined";
+
+/** Owner: submit the ad's newest export as a replacement for its live reel. The live version stays public until staff approve. */
+export const submitReelUpdate = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ adId: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const sb = context.supabase as any;
+    const { data: reel } = await sb.from("directory_reels").select("id, status, directory_brands(workspace_id)").eq("ad_id", data.adId).maybeSingle();
+    if (!reel) throw new Error("This reel isn't published.");
+    if (reel.status !== "live") throw new Error("Only live reels can be updated. Share it again instead.");
+    const ws = reel.directory_brands?.workspace_id as string;
+    const { findLatestVideo } = await import("./directory.server");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const admin = supabaseAdmin as any;
+    const src = await findLatestVideo(admin, ws, data.adId);
+    if (!src) throw new Error("Export an MP4 of this ad first, then submit the update.");
+    const dest = `${ws}/directory/${data.adId}-pending.mp4`;
+    const store = admin.storage.from("media");
+    await store.remove([dest]);
+    const { error: cpErr } = await store.copy(src.slice(POSTER_PREFIX.length), dest);
+    if (cpErr) throw new Error("Couldn't save the new version. Try again.");
+    const { error } = await sb.from("directory_reels").update({ pending_video_url: `${POSTER_PREFIX}${dest}`, pending_status: "in_review", pending_submitted_at: new Date().toISOString(), pending_note: null }).eq("id", reel.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+/** Owner: cancel a pending update; the live version is unchanged. */
+export const cancelReelUpdate = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ adId: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const sb = context.supabase as any;
+    const { error } = await sb.from("directory_reels").update({ pending_status: "none", pending_video_url: null, pending_submitted_at: null, pending_note: null }).eq("ad_id", data.adId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+/** Staff: pending updates with signed links to the live and proposed videos. */
+export const listReelUpdates = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.supabase);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const sb = supabaseAdmin as any;
+    const { data } = await sb.from("directory_reels").select("id, title, video_url, pending_video_url, pending_submitted_at, directory_brands(name)").eq("pending_status", "in_review").eq("status", "live").order("pending_submitted_at");
+    const rows = (data ?? []) as any[];
+    const paths = rows.flatMap((r) => [r.video_url, r.pending_video_url]).filter((p: string | null) => p?.startsWith(POSTER_PREFIX)).map((p: string) => p.slice(POSTER_PREFIX.length));
+    const signed = new Map<string, string>();
+    if (paths.length) {
+      const { data: s } = await sb.storage.from("media").createSignedUrls(paths, 3600);
+      for (const x of s ?? []) if (x.path && x.signedUrl) signed.set(x.path, x.signedUrl);
+    }
+    const sign = (p: string | null) => (p?.startsWith(POSTER_PREFIX) ? signed.get(p.slice(POSTER_PREFIX.length)) ?? null : null);
+    return rows.map((r) => ({ id: r.id as string, title: (r.title ?? "Untitled") as string, brand: (r.directory_brands?.name ?? "") as string, submitted: r.pending_submitted_at as string, live: sign(r.video_url), proposed: sign(r.pending_video_url) }));
+  });
+
+/** Staff: approve (replace the live video, keeping URL, saves, permissions and placements) or decline a pending update. */
+export const decideReelUpdate = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid(), action: z.enum(["approve", "decline"]), note: z.string().trim().max(500).optional() }).parse(d))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const sb = supabaseAdmin as any;
+    const { data: r } = await sb.from("directory_reels").select("id, ad_id, status, pending_status, pending_video_url, directory_brands(workspace_id)").eq("id", data.id).single();
+    if (!r || r.pending_status !== "in_review") throw new Error("This update isn't waiting for review.");
+    if (data.action === "decline") {
+      const { error } = await sb.from("directory_reels").update({ pending_status: "declined", pending_note: data.note || null }).eq("id", r.id);
+      if (error) throw new Error(error.message);
+    } else {
+      if (r.status !== "live" || !r.pending_video_url) throw new Error("This reel is no longer live.");
+      const dest = `${r.directory_brands.workspace_id}/directory/${r.ad_id}.mp4`;
+      const store = sb.storage.from("media");
+      await store.remove([dest]);
+      const { error: cpErr } = await store.copy(r.pending_video_url.slice(POSTER_PREFIX.length), dest);
+      if (cpErr) throw new Error(cpErr.message);
+      const { error } = await sb.from("directory_reels").update({ video_url: `${POSTER_PREFIX}${dest}`, pending_status: "none", pending_video_url: null, pending_submitted_at: null, pending_note: null }).eq("id", r.id);
+      if (error) throw new Error(error.message);
+    }
+    await sb.from("admin_audit_log").insert({ admin_user_id: context.userId, action: `reel.update.${data.action}`, workspace_id: r.directory_brands?.workspace_id ?? null, target: r.id, reason: data.note || null });
+    return { ok: true };
   });
