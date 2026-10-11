@@ -7,15 +7,11 @@ import {
   verifySessionToken,
 } from "@/lib/shopify/shopify.server";
 
-type BrandColor = { background: string | null; foreground: string | null };
-type ShopBrand = {
+type ShopBasics = {
   shop: {
     name: string;
-    brand: {
-      logo: { image: { url: string } | null } | null;
-      squareLogo: { image: { url: string } | null } | null;
-      colors: { primary: BrandColor[]; secondary: BrandColor[] };
-    } | null;
+    myshopifyDomain: string;
+    primaryDomain: { url: string };
   };
 };
 
@@ -41,8 +37,16 @@ export const Route = createFileRoute("/api/public/shopify/auth")({
           return json({ error: (e as Error).message }, 401);
         }
 
+        let access_token: string;
+        let scope: string;
         try {
-          const { access_token, scope } = await exchangeOfflineToken(shop, sessionToken, apiKey, secret);
+          ({ access_token, scope } = await exchangeOfflineToken(shop, sessionToken, apiKey, secret));
+        } catch (e) {
+          console.error("shopify-auth exchange", e);
+          return json({ error: (e as Error).message }, 502);
+        }
+
+        try {
           const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
           const { error } = await supabaseAdmin.from("shopify_shops").upsert(
             {
@@ -54,19 +58,24 @@ export const Route = createFileRoute("/api/public/shopify/auth")({
             { onConflict: "shop_domain" },
           );
           if (error) throw new Error(`Could not save shop: ${error.message}`);
-
-          const data = await adminGraphql<ShopBrand>(shop, access_token, SHOP_BRAND_QUERY);
-          const b = data.shop.brand;
-          return json({
-            shop,
-            name: data.shop.name,
-            logo: b?.logo?.image?.url ?? b?.squareLogo?.image?.url ?? null,
-            colors: b?.colors ?? null,
-          });
         } catch (e) {
-          console.error("shopify-auth", e);
+          console.error("shopify-auth save", e);
           return json({ error: (e as Error).message }, 502);
         }
+
+        // The install already succeeded: everything below is optional, so a failed
+        // lookup must never surface to the merchant as "Couldn't connect".
+        // TODO: real branding (logo, squareLogo, colors) lives in shop.brand on the
+        // Storefront API, not the Admin API — fetch it there in a later step.
+        let name = shop;
+        try {
+          const data = await adminGraphql<ShopBasics>(shop, access_token, SHOP_BRAND_QUERY);
+          name = data.shop.name || shop;
+        } catch (e) {
+          console.error("shopify-auth basics", e);
+        }
+
+        return json({ shop, name, logo: null, colors: null });
       },
     },
   },

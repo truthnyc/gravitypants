@@ -78,16 +78,6 @@ export async function adminGraphql<T>(shop: string, accessToken: string, query: 
   return json.data as T;
 }
 
-export const SHOP_BRAND_QUERY = `query ShopBrand {
-  shop {
-    name
-    brand {
-      logo { image { url } }
-      squareLogo { image { url } }
-      colors {
-        primary { background foreground }
-        secondary { background foreground }
-      }
-    }
-  }
-}`;
+// Admin API only. TODO: shop.brand (logo, squareLogo, colors) is a Storefront API
+// field and does not exist in the Admin schema — fetch branding there in a later step.
+export const SHOP_BRAND_QUERY = `query ShopBasics { shop { name myshopifyDomain primaryDomain { url } } }`;
