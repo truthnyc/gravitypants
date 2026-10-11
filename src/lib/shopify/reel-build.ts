@@ -220,7 +220,8 @@ export function appendReelSlides(reel: ProjectWithFrames, more: ReelItem[]): { r
   const sharedHeadline = reel.frames.find((f) => f.headline?.same_on_all === true) ?? source;
   const sharedSubline = reel.frames.find((f) => f.subline?.same_on_all === true) ?? source;
   const headlineStyle = frameForFormat(sharedHeadline, reel.primary_format).headline ?? visible.headline;
-  const sublineStyle = frameForFormat(sharedSubline, reel.primary_format).subline ?? visible.subline;
+  const sublineStyle = frameForFormat(sharedSubline, reel.primary_format).subline ?? visible.subline
+    ?? { ...headlineStyle, size_px: Math.round((headlineStyle?.size_px ?? 96) * 0.55), keep_under_headline: true };
   const frames = more.map((item, i): Frame => ({
     ...structuredClone(source), id: crypto.randomUUID(), sort_order: reel.frames.length + i,
     photo: { ...source.photo, path: item.path, url: item.path, asset_id: null, shopify_product_id: item.productId ?? null } as Frame["photo"],
@@ -242,6 +243,11 @@ export function resetReelStyle(reel: ProjectWithFrames, template: Template): Pro
     format: reel.primary_format, logoPath: reel.logo.path ?? null, signoff: Boolean(reel.end_card.enabled),
   });
   return { ...reel, logo: next.logo, pace: next.pace, template_id: next.template_id ?? null,
-    frames: next.frames.map((f, i) => ({ ...f, id: reel.frames[i]?.id ?? f.id, project_id: reel.id, photo: reel.frames[i]?.photo ?? f.photo })),
+    frames: next.frames.map((f, i) => {
+      const photo = reel.frames[i]?.photo;
+      return { ...f, id: reel.frames[i]?.id ?? f.id, project_id: reel.id,
+        photo: { ...f.photo, path: photo?.path ?? null, url: photo?.url ?? null, asset_id: photo?.asset_id ?? null, name: photo?.name ?? null },
+      };
+    }),
   };
 }

@@ -108,7 +108,7 @@ describe("Shopify styling persistence", () => {
     const reset = resetReelStyle(edited, launch);
     expect(reset.logo.size_pct).toBe(64);
     expect(reset.logo.positions?.["9:16"]).toBe("bottom-center");
-    expect(reset.frames.map((f) => f.photo)).toEqual(base.frames.map((f) => f.photo));
+    expect(reset.frames.map((f) => f.photo.path)).toEqual(base.frames.map((f) => f.photo.path));
     expect(reset.frames.map((f) => f.headline)).toEqual(base.frames.map((f) => f.headline));
   });
 });
