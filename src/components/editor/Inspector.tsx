@@ -563,12 +563,12 @@ function PhotoPanel({
               type="button"
               onClick={() => chooseMove(m.value)}
               aria-pressed={move === m.value}
-              className={cn("h-8 rounded-full border px-3 text-[13px]", move === m.value ? "border-ap-blue bg-ap-soft-blue text-ap-blue" : "border-transparent bg-control-fill")}
+              className={cn("h-9 rounded-lg px-4 text-[14px] font-medium", move === m.value ? "bg-ap-blue text-ap-card" : "bg-ap-panel text-ap-ink hover:bg-ap-segment-hover")}
             >
               {m.label}
             </button>
           ))}
-          {move === "custom" && <span className="inline-flex h-8 items-center rounded-full border border-ap-blue bg-ap-soft-blue px-3 text-[13px] text-ap-blue">Custom</span>}
+          {move === "custom" && <span className="inline-flex h-9 items-center rounded-lg bg-ap-blue px-4 text-[14px] font-medium text-ap-card">Custom</span>}
         </div>
         <Reveal open={move !== "none" && move !== "custom"}>
           <div className="pt-2">
@@ -732,7 +732,7 @@ function AnimationField({ value, onPick }: { value: NonNullable<TextSettings["an
             role="radio"
             aria-checked={value === a.value}
             onClick={() => onPick(a.value)}
-            className={cn("h-8 rounded-full border px-3 text-[13px]", value === a.value ? "border-ap-blue bg-ap-soft-blue text-ap-blue" : "border-transparent bg-control-fill")}
+            className={cn("h-9 rounded-lg px-4 text-[14px] font-medium", value === a.value ? "bg-ap-blue text-ap-card" : "bg-ap-panel text-ap-ink hover:bg-ap-segment-hover")}
           >
             {a.label}
           </button>
