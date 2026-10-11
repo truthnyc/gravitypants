@@ -1,14 +1,13 @@
 import { useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { AppButton, AppSectionLabel } from "@/components/app-ui";
 import { AdPills } from "@/components/app-ui/AdPills";
 import { ReelCard, StepActions, StepShell, StepTitle } from "@/components/app-ui/StepShell";
 import { framePayloadFromPhoto, useTemplateName, type EditorDoc } from "@/lib/stillframe/data";
 import { ACCEPTED_IMAGE_TYPES, uploadMedia } from "@/lib/stillframe/media";
 import type { Format, Frame } from "@/lib/stillframe/types";
-import { ALL_FORMATS } from "@/render/formats";
 import { cn } from "@/lib/utils";
 import { FrameThumb } from "./FrameThumb";
 import { useReelPlayer } from "./ReelPreview";
@@ -77,14 +76,6 @@ export function PhotosStep({ initial, readOnly = false }: { initial: EditorDoc; 
       if (moved) next.splice(to, 0, moved);
       return { ...d, frames: next };
     });
-  const toggleFormat = (f: Format, on: boolean) =>
-    apply((d) => {
-      const set = new Set(d.project.formats);
-      if (on) set.add(f);
-      else if (set.size > 1) set.delete(f);
-      return { ...d, project: { ...d.project, formats: ALL_FORMATS.filter((x) => set.has(x)) } };
-    });
-
   const meta = [templateName, `${frames.length} ${frames.length === 1 ? "photo" : "photos"}`, `${player.total.toFixed(1)} sec`].filter(Boolean).join(" · ");
 
   return (
@@ -109,11 +100,11 @@ export function PhotosStep({ initial, readOnly = false }: { initial: EditorDoc; 
           formats={doc.project.formats}
           format={player.format}
           onFormat={(f) => player.setFormat(f as Format)}
-          onToggleFormat={(f, on) => toggleFormat(f as Format, on)}
+          sizesSlot={null}
         />
       }
     >
-      <StepTitle title="Add your photos" lead="Each photo becomes a frame in your reel. Drag to change the order." />
+      <StepTitle title="Add your photos" lead={`Each photo becomes a frame in your ${doc.project.primary_format} reel. Drag to change the order.`} />
       <div className={cn(readOnly && "pointer-events-none opacity-60")}>
         <div
           onDragOver={(e) => { if (e.dataTransfer.types.includes("Files")) { e.preventDefault(); setDropping(true); } }}
@@ -172,12 +163,11 @@ export function PhotosStep({ initial, readOnly = false }: { initial: EditorDoc; 
           ))}
         </div>
 
-        <div className="mt-6 flex items-center justify-between gap-3 rounded-[14px] bg-ap-panel px-4 py-3.5 text-[14px]">
-          <span><span className="font-semibold">Template:</span> {templateName ?? "None"}</span>
-          <Link to="/app/templates" className="font-medium text-ap-blue">Change template</Link>
-        </div>
       </div>
-      <StepActions note="You can add or swap photos later in Edit.">
+      <StepActions>
+        <AppButton asChild variant="ghost" size="lg" className="mr-auto">
+          <Link to="/app/ad/$id/format" params={{ id: doc.project.id }}><ChevronLeft className="size-4" strokeWidth={1.7} /> Format</Link>
+        </AppButton>
         <AppButton asChild size="lg">
           <Link to="/app/ad/$id/edit" params={{ id: doc.project.id }}>Next: Edit <ChevronRight className="size-4" strokeWidth={1.7} /></Link>
         </AppButton>
