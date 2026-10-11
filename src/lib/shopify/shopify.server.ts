@@ -15,7 +15,7 @@ const bytesToB64 = (b: Uint8Array) => btoa(String.fromCharCode(...b));
 export async function verifySessionToken(token: string, apiKey: string, secret: string): Promise<string> {
   const parts = token.split(".");
   if (parts.length !== 3) throw new Error("Malformed session token");
-  const [h, p, s] = parts;
+  const [h, p, s] = parts as [string, string, string];
   const header = JSON.parse(new TextDecoder().decode(b64urlToBytes(h)));
   if (header.alg !== "HS256") throw new Error("Unexpected token algorithm");
   const key = await crypto.subtle.importKey("raw", enc.encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["verify"]);
@@ -43,7 +43,7 @@ export async function encryptToken(plain: string, keyRaw: string) {
   return `v1:${bytesToB64(iv)}:${bytesToB64(ct)}`;
 }
 export async function decryptToken(stored: string, keyRaw: string) {
-  const [, iv, ct] = stored.split(":");
+  const [, iv = "", ct = ""] = stored.split(":");
   const toB = (x: string) => Uint8Array.from(atob(x), (c) => c.charCodeAt(0));
   const pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv: toB(iv) }, await aesKey(keyRaw), toB(ct));
   return new TextDecoder().decode(pt);
