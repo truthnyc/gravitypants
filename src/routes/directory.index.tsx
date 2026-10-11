@@ -366,7 +366,7 @@ function DirectoryPage() {
                 <li key={`${r.kind}-${r.id}`} data-reel-idx={i} className="dir-card-in relative" style={{ animationDelay: `${(i % PAGE) * 40}ms` }}>
                   <button type="button" onClick={() => openReel(r)} aria-label={`Open ${r.title}`}
                     className="dir-result-tile relative block aspect-square w-full overflow-hidden rounded-[8px] bg-ap-panel">
-                    <HoverReelPreview video={r.video_url ?? r.preview_url} poster={r.poster} className={POSTER} />
+                    <HoverReelPreview video={r.video_url ?? r.preview_url} poster={r.poster} className={posterFor(r.formats[0])} />
                   </button>
                   {r.kind === "site" ? <SiteReelHeart reelId={r.id} name={r.title} /> : <DirectoryReelHeart reelId={r.id} name={`${r.brand_name} reel`} />}
                   <p className="dir-result-title mt-2.5 truncate text-[14px] font-semibold">{r.title}</p>
