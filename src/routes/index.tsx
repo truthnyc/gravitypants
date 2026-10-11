@@ -257,8 +257,8 @@ function Reel({
 }
 function FormatShapes({ labelled = false }: { labelled?: boolean }) {
   return (
-    <div className="home-formats home-formats-four">
-      {["9:16", "4:5", "1:1", "16:9"].map((x, i) => (
+    <div className="home-formats home-formats-five">
+      {["9:16", "4:5", "1:1", "5:4", "16:9"].map((x, i) => (
         <div key={x} className="home-format">
           <div className={`home-format-shape home-format-${i}`}>
             <b>
