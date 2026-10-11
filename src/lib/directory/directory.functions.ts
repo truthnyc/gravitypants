@@ -187,7 +187,8 @@ export const shareReel = createServerFn({ method: "POST" })
     const status: DirStatus = data.show ? (brand.first_approved_at ? "live" : "in_review") : prev?.status === "hidden" ? "hidden" : "private";
     const tags = [...new Set(data.tags.map((t) => t.toLowerCase()))];
     const { pinReelVideo } = await import("./directory.server");
-    const videoUrl = data.show ? await pinReelVideo(sb, ad.workspace_id, ad.id).catch(() => null) : null;
+    // A live reel's video only changes through a staff-reviewed update (submitReelUpdate).
+    const videoUrl = data.show && prev?.status !== "live" ? await pinReelVideo(sb, ad.workspace_id, ad.id).catch(() => null) : null;
     const row = {
       ad_id: ad.id, brand_id: brand.id, status, tags, moods: await cleanMoods(sb, data.moods), template_id: ad.template_id, formats: (ad.formats as string[]).map((f) => f.replace(":", "x")),
       description: data.description || null,
@@ -238,7 +239,7 @@ export const hideReel = createServerFn({ method: "POST" })
       ip_address: req?.headers.get("cf-connecting-ip") ?? null, user_agent: req?.headers.get("user-agent")?.slice(0, 400) ?? null,
     });
     if (logErr) throw new Error(logErr.message);
-    const { error } = await sb.from("directory_reels").update({ status: "hidden", hidden_reason: "brand", in_showcase: false, showcase_order: null, showcase_at: null, showcase_by: null }).eq("id", reel.id);
+    const { error } = await sb.from("directory_reels").update({ status: "hidden", hidden_reason: "brand", in_showcase: false, showcase_order: null, showcase_at: null, showcase_by: null, pending_status: "none", pending_video_url: null, pending_submitted_at: null }).eq("id", reel.id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
@@ -265,7 +266,7 @@ export const getDirectoryAccount = createServerFn({ method: "POST" })
     const sb = context.supabase as any;
     const { data: b } = await sb.from("directory_brands").select("*").eq("workspace_id", data.workspaceId).maybeSingle();
     if (!b) return null;
-    const { data: reels } = await sb.from("directory_reels").select("id, ad_id, status, updated_at, title, formats, poster_url, projects(name)").eq("brand_id", b.id).order("updated_at", { ascending: false });
+    const { data: reels } = await sb.from("directory_reels").select("id, ad_id, status, updated_at, title, formats, poster_url, in_showcase, pending_status, pending_submitted_at, pending_note, projects(name)").eq("brand_id", b.id).order("updated_at", { ascending: false });
     const { data: log } = await sb.from("permission_log").select("id, created_at, ad_id, action, full_name, job_title, email, wording_version, wording_text").eq("brand_id", b.id).order("created_at", { ascending: false }).limit(500);
     const names = new Map<string, string>((reels ?? []).map((r: any) => [r.ad_id, r.title ?? r.projects?.name ?? "Untitled"]));
     const { data: featured } = await sb.rpc("is_featured_brand", { _brand: b.id });
@@ -278,7 +279,7 @@ export const getDirectoryAccount = createServerFn({ method: "POST" })
     }
     return {
       brand: { id: b.id as string, name: b.name as string, slug: b.slug as string, description: (b.description ?? "") as string, logo: await signLogo(b.logo_url), website: (b.website_url ?? "") as string, category: (b.category ?? "Other") as string, moods: (b.moods ?? []) as string[], featured: !!featured, planEndedAt: (b.plan_ended_at ?? null) as string | null },
-      reels: ((reels ?? []) as any[]).map((r: any) => ({ adId: r.ad_id as string, name: (r.title as string | null) ?? r.projects?.name ?? "Untitled", status: r.status as DirStatus, updated: r.updated_at as string, size: ((r.formats ?? [])[0] ?? "").replace("x", ":") as string, thumb: r.poster_url?.startsWith("media:") ? signedPosters.get(r.poster_url.slice(6)) ?? null : null })),
+      reels: ((reels ?? []) as any[]).map((r: any) => ({ adId: r.ad_id as string, name: (r.title as string | null) ?? r.projects?.name ?? "Untitled", status: r.status as DirStatus, updated: r.updated_at as string, size: ((r.formats ?? [])[0] ?? "").replace("x", ":") as string, thumb: r.poster_url?.startsWith("media:") ? signedPosters.get(r.poster_url.slice(6)) ?? null : null, inShowcase: !!r.in_showcase, pending: (r.pending_status ?? "none") as PendingStatus, pendingAt: (r.pending_submitted_at ?? null) as string | null, pendingNote: (r.pending_note ?? null) as string | null })),
       log: (log ?? []).map((l: any) => ({ ...l, reel: names.get(l.ad_id) ?? "Removed ad" })) as {
         id: string; created_at: string; reel: string; action: "granted" | "withdrawn"; full_name: string; job_title: string | null; email: string; wording_version: string; wording_text: string;
       }[],
