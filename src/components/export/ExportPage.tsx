@@ -1,14 +1,14 @@
 import { getWorkspaceId } from "@/lib/stillframe/workspace";
 import { openUpgrade, usePlanAccess } from "@/lib/stillframe/plan";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ComponentProps } from "react";
 import { Link } from "@tanstack/react-router";
 import { KitAgainButton } from "@/components/templates/KitAgain";
 import { TRIAL, planById } from "@/lib/stillframe/plans-config";
 import { getSignupChoice } from "@/lib/stillframe/signup-choice";
 import { AlertCircle, Check, ChevronDown, ChevronLeft, ChevronRight, Download, Film, Image as ImageIcon, Plus, X } from "lucide-react";
-import { AppButton, AppSectionLabel, AppSwitch } from "@/components/app-ui";
+import { AppButton, AppSectionLabel } from "@/components/app-ui";
 import { SHOW_SHARE } from "@/lib/features";
-import { ReelCard, StepActions, StepShell, StepTitle } from "@/components/app-ui/StepShell";
+import { ReelCard, StepShell, StepTitle } from "@/components/app-ui/StepShell";
 import { useReelPlayer } from "@/components/editor/ReelPreview";
 import { zipSync } from "fflate";
 import { toast } from "sonner";
@@ -28,12 +28,16 @@ import { ensureFonts, layoutFrame, mediaPaths, renderAt, restTime, videoDuration
 import { ExportCancelled, exportGif, exportMp4, isOutOfMemory, killFFmpeg, type GifColors, type RenderInput } from "@/render/exportMedia";
 import { cn } from "@/lib/utils";
 import { fetchExportStatus, useExportStatus, useRefreshBilling } from "@/lib/stillframe/billing";
+import { ExportFooter } from "./ExportFooter";
+import { Switch } from "@/components/ui/switch";
+import { RadioGroup } from "@/components/ui/radio-group";
+import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import { PlanCards } from "@/components/billing/PlanCards";
 
 import { DEFAULT_EXPORT_FORMATS, DEFAULT_VIDEO_FPS, DEFAULT_GIF_LOOP, DEFAULT_GIF_QUALITY, GIF_PRESETS, matchingGifPreset, type GifSize, type GifPresetId } from "@/lib/stillframe/export-quality";
 type Target = { key: string; name: string; ratio: string; format: Format; width: number; height: number; custom?: boolean };
 type CustomRow = { id: string; w: string; h: string };
-type FileRow = { name: string; kind: "mp4" | "gif"; job: string; width: number; height: number };
+type FileRow = { sizeName: string; ratio: string; name: string; kind: "mp4" | "gif"; job: string; width: number; height: number };
 const num = (s: string) => (s.trim() === "" ? null : Number(s));
 const rid = () => Math.random().toString(36).slice(2, 9);
 type JobState = { progress: number; status: "waiting" | "working" | "done" | "error" | "cancelled"; blob?: Blob; note?: string };
@@ -104,7 +108,11 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
   const qualitySummary = [mp4 && `${fps === 24 ? "Film" : fps === 60 ? "Smooth" : "Standard"} ${fps} fps`, gif && (gifPreset ? `GIF ${gifPreset === "small" ? "small file" : gifPreset}` : "GIF custom")].filter(Boolean).join(" · ");
 
   const validCustoms = useMemo(
-    () => (customOn ? customs.filter((c) => !customError(num(c.w), num(c.h))).map((c) => ({ w: even(num(c.w)!), h: even(num(c.h)!) })) : [])
+    () => (customOn ? customs.flatMap((c) => {
+      const w = num(c.w), h = num(c.h);
+      if (w == null || h == null || customError(w, h)) return [];
+      return [{ w: even(w), h: even(h) }];
+    }) : [])
       .filter((c, i, a) => a.findIndex((x) => x.w === c.w && x.h === c.h) === i && !EXPORT_SIZES.some((s) => selected.has(s.id) && s.width === c.w && s.height === c.h)),
     [customs, customOn, selected],
   );
@@ -124,13 +132,13 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
       if (mp4) {
         const job = `mp4:${t.width}x${t.height}:${t.format}`;
         jobs.set(job, { kind: "mp4", format: t.format, width: t.width, height: t.height });
-        files.push({ name: exportFileName(base, t.width, t.height, "mp4"), kind: "mp4", job, width: t.width, height: t.height });
+        files.push({ sizeName: t.name, ratio: t.ratio, name: exportFileName(base, t.width, t.height, "mp4"), kind: "mp4", job, width: t.width, height: t.height });
       }
       if (gif) {
         const s = gifSize(t.width, t.height, gSize);
         const job = `gif:${s.width}x${s.height}:${t.format}`;
         jobs.set(job, { kind: "gif", format: t.format, ...s });
-        files.push({ name: exportFileName(base, t.width, t.height, "gif"), kind: "gif", job, width: s.width, height: s.height });
+        files.push({ sizeName: t.name, ratio: t.ratio, name: exportFileName(base, t.width, t.height, "gif"), kind: "gif", job, width: s.width, height: s.height });
       }
     }
     return { files, jobs };
@@ -343,13 +351,17 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
   const ready = open && !running && doneCount > 0;
   const overall = files.length ? files.reduce((n, f) => n + (state[f.job]?.progress ?? 0), 0) / files.length : 0;
   void videos; void gifs;
-  const exportButton = exportStatus && !exportStatus.allowed ? (
-    <AppButton size="lg" onClick={() => setPlanSheet(exportStatus.reason ?? "no_plan")}>Choose a Plan to Export</AppButton>
-  ) : (
-    <AppButton size="lg" disabled={!files.length || blocked || !images || !fontsReady || running} onClick={() => void start()}>
-      {fontError ? "Export unavailable" : !images || !fontsReady ? "Getting ready…" : running ? "Exporting…" : `Export ${files.length} ${files.length === 1 ? "File" : "Files"}`}
+  const exportButton = (
+    <AppButton size="lg" disabled={!files.length || blocked || !images || !fontsReady || running} onClick={() => exportStatus && !exportStatus.allowed ? setPlanSheet(exportStatus.reason ?? "no_plan") : void start()}>
+      {!files.length ? "Choose a size" : running ? "Exporting…" : `Export ${files.length} ${files.length === 1 ? "file" : "files"}`}
     </AppButton>
   );
+  const remainingSummary = [
+    exportStatus?.limit != null ? exportStatus.trial
+      ? `Trial · ${Math.max(0, exportStatus.limit - (exportStatus.used ?? 0))} of ${exportStatus.limit} exports left`
+      : `${Math.max(0, exportStatus.limit - (exportStatus.used ?? 0))} of ${exportStatus.limit} exports left this month` : null,
+    exportStatus?.extras ? `Plus ${exportStatus.extras} extra ${exportStatus.extras === 1 ? "export" : "exports"} that never expire` : null,
+  ].filter(Boolean).join(" · ");
 
   return (
     <StepShell
@@ -358,7 +370,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
       step="export"
       title={{ name: project.name, status: "saved" }}
       left={
-        <ReelCard
+        <PreviewPanel
           preview={previewT ? (
             <ExportStage target={previewT} time={player.time} project={project} frames={frames} brand={brand} images={images} />
           ) : (
@@ -414,27 +426,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
       ) : (
         <>
           <h1 className="mb-5 text-[30px] font-bold leading-tight">Where will this ad play?</h1>
-          <div className="-mt-2 mb-4 flex flex-wrap items-center gap-2">
-            <span className="mr-1 text-[13px] text-ap-muted">Posting to</span>
-            {PLATFORMS.map((p) => {
-              const st = platformState(p.id, selected);
-              return (
-                <Button
-                  variant="ghost"
-                  key={p.id}
-                  type="button"
-                  aria-pressed={st === "on"}
-                  onClick={() => changeSizes(togglePlatform(p.id, selected))}
-                  className={cn(
-                    "h-8 min-h-0 rounded-full border px-3 text-[13px] font-normal transition-colors",
-                    st === "on" ? "border-ap-blue bg-ap-soft-blue text-ap-blue" : "border-transparent bg-ap-panel text-ap-ink hover:bg-ap-inner",
-                  )}
-                >
-                  {p.name}
-                </Button>
-              );
-            })}
-          </div>
+          <PlatformPills selected={selected} onChange={changeSizes} />
           <div className="flex flex-col gap-2">
             {EXPORT_SIZES.filter((s) => s.id !== "5x4").map((s) => (
               <SizeCard key={s.id} size={s} selected={selected.has(s.id)} pulse={pulse.has(s.id)} onClick={() => toggleSize(s.id)} project={project} frames={frames} brand={brand} images={images} />
@@ -467,53 +459,14 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
 
           <AppSectionLabel className="mt-7 mb-2.5">Save as</AppSectionLabel>
           <div className="grid grid-cols-2 gap-3">
-            <PickCard on={mp4} onClick={() => setMp4((v) => !v)} icon={<Film className="size-4" strokeWidth={1.7} />} title="Video MP4" sub="Motion and sound" />
-            <PickCard on={gif} onClick={() => (gif || canUse("gif") ? setGif((v) => !v) : openUpgrade("gif"))} icon={<ImageIcon className="size-4" strokeWidth={1.7} />} title="Animated GIF" sub="Plays anywhere, no sound" />
+            <FormatCard on={mp4} onClick={() => setMp4((v) => !v)} icon={<Film className="size-4" strokeWidth={1.7} />} title="Video MP4" sub="Motion and sound" />
+            <FormatCard on={gif} onClick={() => (gif || canUse("gif") ? setGif((v) => !v) : openUpgrade("gif"))} icon={<ImageIcon className="size-4" strokeWidth={1.7} />} title="Animated GIF" sub="Plays anywhere, no sound" />
           </div>
 
-          <Collapsible open={qualityOpen} onOpenChange={setQualityOpen} className="mt-3">
-            <CollapsibleTrigger asChild><Button variant="ghost" className="grid h-auto min-h-10 w-full grid-cols-[minmax(0,1fr)_auto] gap-2 bg-ap-panel px-3 py-2 text-left text-[14px]">
-              <span className="min-w-0 whitespace-normal">Fine-tune quality</span>
-              <span className="flex max-w-[150px] items-center gap-1 text-right text-[12px] font-normal text-ap-muted sm:max-w-none"><span className="min-w-0 whitespace-normal nums">{qualitySummary}</span><ChevronDown className={cn("size-3 shrink-0", qualityOpen && "rotate-180")} strokeWidth={1.7} /></span>
-            </Button></CollapsibleTrigger>
-            <CollapsibleContent>
-              {!mp4 && !gif && <p className="mt-4 text-[13px] text-ap-muted">Pick a format to see its options.</p>}
-              <Reveal show={mp4}>
-                <div className="mt-5 mb-2 text-[13px] font-semibold">Video motion</div>
-                <Seg label="Video motion" value={fps} onChange={setFps} options={[{ v: 24, l: "Film", s: "24 fps" }, { v: 30, l: "Standard", s: "30 fps" }, { v: 60, l: "Smooth", s: "60 fps" }]} />
-              </Reveal>
-              <Reveal show={gif}>
-                <div className="mt-6 border-t border-ap-hairline pt-5">
-                  <AppSectionLabel className="mb-3">GIF quality</AppSectionLabel>
-                  <Seg<GifPresetId> label="GIF quality presets" value={gifPreset} onChange={applyGifPreset} options={GIF_PRESETS.map((p) => ({ v: p.id, l: p.label, s: p.subtitle }))} />
-                  {!gifPreset && <p className="mt-2 text-[12px] text-ap-muted" role="status">Custom settings in use</p>}
-                  <div className="mt-4 flex items-center justify-between gap-3"><label htmlFor="gif-loop" className="text-[13px] font-medium">Loop forever</label><AppSwitch id="gif-loop" aria-label="Loop forever" checked={gLoop === "forever"} onCheckedChange={(v) => setGLoop(v ? "forever" : "once")} /></div>
-                  <Collapsible open={advancedOpen} onOpenChange={setAdvancedOpen} className="mt-3">
-                    <CollapsibleTrigger asChild><Button variant="ghost" className="h-7 px-0 text-[13px] font-normal text-ap-blue">Advanced <ChevronDown className={cn("size-3", advancedOpen && "rotate-180")} strokeWidth={1.7} /></Button></CollapsibleTrigger>
-                    <CollapsibleContent className="mt-3 space-y-3">
-                      <Sub label="Size"><Seg label="GIF size" value={gSize} onChange={setGSize} options={[{ v: "full", l: "Full" }, { v: "half", l: "Half" }, { v: "small", l: "Small", s: "480px" }]} /></Sub>
-                      <Sub label="Colors"><Seg label="GIF colors" value={gColors} onChange={setGColors} options={[{ v: "best", l: "Best" }, { v: "balanced", l: "Balanced" }, { v: "smallest", l: "Smallest" }]} /></Sub>
-                      <Sub label="Frame rate"><Seg label="GIF frame rate" value={gFps} onChange={setGFps} options={[{ v: 25, l: "High", s: "25 fps" }, { v: 15, l: "Medium", s: "15 fps" }, { v: 10, l: "Low", s: "10 fps" }]} /></Sub>
-                    </CollapsibleContent>
-                  </Collapsible>
-                  {gSize === "full" && <p className="mt-3 text-[12px] text-ap-amber">Full-size GIFs are large files. Pick Balanced or Small for email.</p>}
-                </div>
-              </Reveal>
-            </CollapsibleContent>
-          </Collapsible>
+          <QualitySettings {...{ mp4, gif, fps, setFps, gSize, setGSize, gColors, setGColors, gFps, setGFps, gLoop, setGLoop, qualityOpen, setQualityOpen, advancedOpen, setAdvancedOpen, gifPreset, applyGifPreset, qualitySummary }} />
 
-          <div className="mt-6 border-t border-ap-hairline pt-4 text-[14px]" aria-live="polite">
-            {files.length ? (
-              <p className="nums"><b>{files.length} {files.length === 1 ? "file" : "files"}</b> · {targets.map((t) => t.name).join(" + ")} · {[mp4 && "MP4", gif && "GIF"].filter(Boolean).join(" + ")} · {formatSeconds(seconds)} sec each</p>
-            ) : (
-              <p><b>Nothing to export yet</b> · {targets.length ? "pick a file type" : "pick at least one size"}</p>
-            )}
-            <p className="mt-1 text-[13px] text-ap-muted nums">
-              {[
-                exportStatus?.trial && exportStatus.limit != null ? `Trial · ${Math.max(0, exportStatus.limit - (exportStatus.used ?? 0))} of ${exportStatus.limit} exports left` : exportStatus?.limit != null ? `${Math.max(0, exportStatus.limit - (exportStatus.used ?? 0))} of ${exportStatus.limit} left${exportStatus.trial ? " in your free trial" : " this month"}` : null,
-                exportStatus?.extras ? `Plus ${exportStatus.extras} extra ${exportStatus.extras === 1 ? "export" : "exports"} that never expire` : null,
-              ].filter(Boolean).join(" · ")}
-            </p>
+          <ExportFooter files={files} sizeNames={targets.map((t) => t.name)} formats={[mp4 && "MP4", gif && "GIF"].filter((v): v is string => !!v)} seconds={seconds} remaining={remainingSummary} action={exportButton} />
+          <div className="mt-2">
             {exportStatus?.trial && !exportStatus.watermark && <p className="mt-1 text-[13px] font-medium text-ap-blue">Your first reel is on us — no watermark.</p>}
             {exportStatus?.watermark && (
               <p className="mt-1 text-[13px] text-ap-muted">
@@ -533,33 +486,17 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
                 <p className="mt-1.5 text-[12px] text-ap-muted">Making your files… Keep this tab open until everything is done.</p>
               </div>
             )}
-            {files.length > 0 && !running && (
-              <Collapsible className="mt-2">
-                <CollapsibleTrigger className="text-[13px] font-medium text-ap-blue hover:underline">See the file list</CollapsibleTrigger>
-                <CollapsibleContent>
-                  <ul className="mt-2 space-y-1 text-[13px]">
-                    {files.map((f) => (
-                      <li key={f.name} className="flex justify-between gap-3 nums">
-                        <span className="min-w-0 truncate">{f.name}</span>
-                        <span className="shrink-0 text-ap-muted">~{estimateMb(f, seconds, fps, gFps, gColors)} MB</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CollapsibleContent>
-              </Collapsible>
-            )}
+
           </div>
           {running && <div className="mt-3"><FileList files={files} state={state} /></div>}
           {open && !running && !doneCount && <p className="mt-3 text-[13px] text-destructive">No files were made. Try again, or pick a smaller GIF size.</p>}
           {fontError && <div role="alert" className="mt-3 text-[13px] text-destructive"><p>{fontError}</p><Button variant="plain" className="mt-2" onClick={() => setFontRetry((v) => v + 1)}>Retry loading fonts</Button></div>}
           {blocked && <p className="mt-3 text-[12px] text-destructive">Add a photo to every frame to export.</p>}
 
-          <StepActions>
+          <div className="mt-4 flex items-center justify-between gap-3">
             <KitAgainButton adId={project.id} templateId={project.template_id} />
-            <span className="flex-1" />
-            {running ? <AppButton variant="ghost" size="lg" onClick={cancel}>Cancel</AppButton> : null}
-            {exportButton}
-          </StepActions>
+            {running && <AppButton variant="ghost" size="lg" onClick={cancel}>Cancel</AppButton>}
+          </div>
         </>
       )}
 
@@ -640,8 +577,9 @@ function SizeCard({ size, selected, pulse, onClick, ...r }: {
     .map((id) => PLATFORMS.find((p) => p.id === id)?.name).filter(Boolean).slice(0, 3);
   const useText = platforms.length ? platforms.join(", ") : "Website, Facebook, LinkedIn";
   return (
-    <Button variant="ghost" type="button" role="checkbox" aria-checked={selected} onClick={onClick}
-      className={cn("h-auto min-h-16 w-full justify-start gap-3 whitespace-normal rounded-lg border p-2.5 text-left", selected ? "border-ap-blue bg-ap-soft-blue hover:bg-ap-soft-blue" : "border-ap-hairline bg-ap-card hover:bg-ap-panel", pulse && "ap-pulse")}>
+    <label
+      className={cn("relative flex cursor-pointer h-auto min-h-16 w-full items-center justify-start gap-3 whitespace-normal rounded-lg border p-2.5 text-left", selected ? "border-ap-blue bg-ap-soft-blue hover:bg-ap-soft-blue" : "border-ap-hairline bg-ap-card hover:bg-ap-panel", pulse && "ap-pulse")}>
+      <input type="checkbox" checked={selected} onChange={onClick} aria-label={`${size.name} ${size.ratio}`} className="ap-export-card-input" />
       <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-ap-panel">
         <MiniRender {...r} format={size.layout} width={thumbW} w={size.width} h={size.height} />
       </span>
@@ -658,7 +596,7 @@ function SizeCard({ size, selected, pulse, onClick, ...r }: {
       <span className={cn("grid size-5 shrink-0 place-items-center rounded-[5px] border", selected ? "border-ap-blue bg-ap-blue text-ap-card" : "border-ap-switch-off")}>
         {selected && <Check className="size-3" strokeWidth={1.7} />}
       </span>
-    </Button>
+    </label>
   );
 }
 
@@ -675,7 +613,8 @@ function CustomSizes({ on, setOn, rows, setRows }: { on: boolean; setOn: (v: boo
   };
   return (
     <div className={cn("rounded-lg border", on ? "border-ap-blue bg-ap-soft-blue" : "border-ap-hairline bg-ap-card")}>
-      <Button variant="ghost" type="button" role="checkbox" aria-checked={on} onClick={toggle} className="h-auto min-h-16 w-full justify-start gap-3 whitespace-normal p-2.5 text-left">
+      <label className="relative flex cursor-pointer h-auto min-h-16 w-full items-center justify-start gap-3 whitespace-normal p-2.5 text-left">
+        <input type="checkbox" checked={on} onChange={toggle} aria-label="Custom size" className="ap-export-card-input" />
         <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-ap-panel text-ap-muted"><Plus className="size-5" strokeWidth={1.7} /></span>
         <span className="min-w-0 flex-1">
           <span className="block text-[14px] font-semibold">Custom size</span>
@@ -684,7 +623,7 @@ function CustomSizes({ on, setOn, rows, setRows }: { on: boolean; setOn: (v: boo
         <span className={cn("grid size-5 shrink-0 place-items-center rounded-[5px]", on ? "bg-ap-blue text-ap-card" : "border-[1.5px] border-ap-hairline")}>
           {on && <Check className="size-3" strokeWidth={2.5} />}
         </span>
-      </Button>
+      </label>
       <Reveal show={on}>
         <div className="space-y-3 px-3 pb-3.5 sm:px-3.5">
           {rows.map((r, i) => {
@@ -738,17 +677,6 @@ function Reveal({ show, children }: { show: boolean; children: React.ReactNode }
   );
 }
 
-/** Rough file size estimate for the file list. */
-function estimateMb(f: FileRow, seconds: number, fps: number, gFps: number, colors: GifColors) {
-  const px = f.width * f.height * seconds;
-  // MP4 size follows the encoder's bitrate (same for every shape); GIF factor calibrated against real downloads.
-  const bytes = f.kind === "mp4"
-    ? ((fps >= 60 ? 10_000_000 : 6_000_000) / 8) * seconds * 1.05
-    : px * gFps * 0.1 * (colors === "best" ? 1 : colors === "balanced" ? 0.75 : 0.5);
-  const mb = bytes / 1_000_000;
-  return mb < 10 ? mb.toFixed(1) : Math.round(mb).toString();
-}
-
 function IssueThumb({ project, frames, index, images, brand }: { project: Project; frames: Frame[]; index: number; images: Map<string, HTMLImageElement> | null; brand: BrandStyle }) {
   return <MiniRender project={project} frames={frames} brand={brand} images={images} format="1:1" width={36} index={index} />;
 }
@@ -764,34 +692,103 @@ function Sub({ label, children }: { label: string; children: React.ReactNode }) 
 
 function Seg<T extends string | number>({ value, onChange, options, label }: { value: T | null; onChange: (v: T) => void; options: { v: T; l: string; s?: string }[]; label: string }) {
   return (
-    <div role="radiogroup" aria-label={label} className="flex gap-[3px] rounded-[10px] bg-ap-panel p-[3px]">
+    <RadioGroup aria-label={label} orientation="horizontal" value={value == null ? "" : String(value)} onValueChange={(v) => {
+      const option = options.find((o) => String(o.v) === v);
+      if (option) onChange(option.v);
+    }} className="flex gap-[3px] rounded-lg bg-ap-panel p-[3px]">
       {options.map((o) => (
-        <Button variant="ghost"
-          key={String(o.v)}
-          type="button"
-          role="radio"
-          aria-checked={value === o.v}
-          onClick={() => onChange(o.v)}
-          className={cn("flex h-auto min-h-10 min-w-0 flex-1 flex-col items-center justify-center gap-0 whitespace-normal rounded-lg px-1.5 py-1 text-[13px] leading-tight", value === o.v && "bg-ap-card font-semibold shadow-ap-soft")}
-        >
-          {o.l}
-          {o.s && <span className="text-[11px] font-normal text-ap-muted nums">{o.s}</span>}
-        </Button>
+        <RadioGroupPrimitive.Item key={String(o.v)} value={String(o.v)} asChild>
+          <Button variant="ghost" className={cn("flex h-auto min-h-10 min-w-0 flex-1 flex-col items-center justify-center gap-0 whitespace-normal rounded-lg px-1.5 py-1 text-[13px] leading-tight", value === o.v && "bg-ap-card font-semibold shadow-ap-soft")}>
+            {o.l}{o.s && <span className="text-[11px] font-normal text-ap-muted nums">{o.s}</span>}
+          </Button>
+        </RadioGroupPrimitive.Item>
       ))}
-    </div>
+    </RadioGroup>
   );
 }
 
-function PickCard({ on, onClick, icon, title, sub }: { on: boolean; onClick: () => void; icon: React.ReactNode; title: string; sub: string }) {
+function FormatCard({ on, onClick, icon, title, sub }: { on: boolean; onClick: () => void; icon: React.ReactNode; title: string; sub: string }) {
   return (
-    <Button variant="ghost" type="button" role="checkbox" aria-checked={on} onClick={onClick} className={cn("relative h-auto min-h-16 min-w-0 flex-col items-start gap-0 whitespace-normal rounded-lg border p-3.5 text-left", on ? "border-ap-blue bg-ap-soft-blue hover:bg-ap-soft-blue" : "border-ap-hairline bg-ap-card")}>
-      <span className={cn("absolute top-3 right-3 grid size-5 place-items-center rounded-[5px] border", on ? "border-ap-blue bg-ap-blue text-ap-card" : "border-ap-switch-off")}>
+    <label className={cn("relative flex cursor-pointer h-auto min-h-16 min-w-0 flex-col items-start gap-0 whitespace-normal rounded-lg border p-3.5 text-left", on ? "border-ap-blue bg-ap-soft-blue" : "border-ap-hairline bg-ap-card")}>
+      <input type="checkbox" checked={on} onChange={onClick} aria-label={title} className="ap-export-card-input" />
+      <span aria-hidden="true" className={cn("absolute top-3 right-3 grid size-5 place-items-center rounded-[5px] border", on ? "border-ap-blue bg-ap-blue text-ap-card" : "border-ap-switch-off")}>
         {on && <Check className="size-3" strokeWidth={1.7} />}
       </span>
-      {icon}
-      <div className="mt-2 text-[14px] font-semibold">{title}</div>
-      <div className="text-[12px] text-ap-muted">{sub}</div>
-    </Button>
+      {icon}<span className="mt-2 text-[14px] font-semibold">{title}</span><span className="text-[12px] text-ap-muted">{sub}</span>
+    </label>
+  );
+}
+
+function PreviewPanel(props: ComponentProps<typeof ReelCard>) {
+  return <ReelCard {...props} />;
+}
+
+function PlatformPills({ selected, onChange }: { selected: Set<SizeId>; onChange: (sizes: Set<SizeId>) => void }) {
+  return (
+          <div className="-mt-2 mb-4 flex flex-wrap items-center gap-2">
+            <span className="mr-1 text-[13px] text-ap-muted">Posting to</span>
+            {PLATFORMS.map((p) => {
+              const st = platformState(p.id, selected);
+              return (
+                <Button
+                  variant="ghost"
+                  key={p.id}
+                  type="button"
+                  aria-pressed={st === "on"}
+                  onClick={() => onChange(togglePlatform(p.id, selected))}
+                  className={cn(
+                    "h-8 min-h-0 rounded-full border px-3 text-[13px] font-normal transition-colors",
+                    st === "on" ? "border-ap-blue bg-ap-soft-blue text-ap-blue" : "border-transparent bg-ap-panel text-ap-ink hover:bg-ap-inner",
+                  )}
+                >
+                  {p.name}
+                </Button>
+              );
+            })}
+          </div>
+  );
+}
+
+type QualityProps = {
+  mp4: boolean; gif: boolean; fps: number; setFps: (v: number) => void;
+  gSize: GifSize; setGSize: (v: GifSize) => void; gColors: GifColors; setGColors: (v: GifColors) => void;
+  gFps: number; setGFps: (v: number) => void; gLoop: "forever" | "once"; setGLoop: (v: "forever" | "once") => void;
+  qualityOpen: boolean; setQualityOpen: (v: boolean) => void; advancedOpen: boolean; setAdvancedOpen: (v: boolean) => void;
+  gifPreset: GifPresetId | null; applyGifPreset: (v: GifPresetId) => void; qualitySummary: string;
+};
+function QualitySettings({ mp4, gif, fps, setFps, gSize, setGSize, gColors, setGColors, gFps, setGFps, gLoop, setGLoop, qualityOpen, setQualityOpen, advancedOpen, setAdvancedOpen, gifPreset, applyGifPreset, qualitySummary }: QualityProps) {
+  return (
+          <Collapsible open={qualityOpen} onOpenChange={setQualityOpen} className="mt-3">
+            <CollapsibleTrigger asChild><Button variant="ghost" className="grid h-auto min-h-10 w-full grid-cols-[minmax(0,1fr)_auto] gap-2 bg-ap-panel px-3 py-2 text-left text-[14px]">
+              <span className="min-w-0 whitespace-normal">Fine-tune quality</span>
+              <span className="flex max-w-[150px] items-center gap-1 text-right text-[12px] font-normal text-ap-muted sm:max-w-none"><span className="min-w-0 whitespace-normal nums">{qualitySummary}</span><ChevronDown className={cn("size-3 shrink-0", qualityOpen && "rotate-180")} strokeWidth={1.7} /></span>
+            </Button></CollapsibleTrigger>
+            <CollapsibleContent>
+              {!mp4 && !gif && <p className="mt-4 text-[13px] text-ap-muted">Pick a format to see its options.</p>}
+              <Reveal show={mp4}>
+                <div className="mt-5 mb-2 text-[13px] font-semibold">Video motion</div>
+                <Seg label="Video motion" value={fps} onChange={setFps} options={[{ v: 24, l: "Film", s: "24 fps" }, { v: 30, l: "Standard", s: "30 fps" }, { v: 60, l: "Smooth", s: "60 fps" }]} />
+              </Reveal>
+              <Reveal show={gif}>
+                <div className="mt-6 border-t border-ap-hairline pt-5">
+                  <AppSectionLabel className="mb-3">GIF quality</AppSectionLabel>
+                  <Seg<GifPresetId> label="GIF quality presets" value={gifPreset} onChange={applyGifPreset} options={GIF_PRESETS.map((p) => ({ v: p.id, l: p.label, s: p.subtitle }))} />
+                  {!gifPreset && <p className="mt-2 text-[12px] text-ap-muted" role="status">Custom settings in use</p>}
+                  <div className="mt-4 flex items-center justify-between gap-3"><label htmlFor="gif-loop" className="text-[13px] font-medium">Loop forever</label><Switch id="gif-loop" aria-label="Loop forever" checked={gLoop === "forever"} onCheckedChange={(v) => setGLoop(v ? "forever" : "once")} /></div>
+                  <Collapsible open={advancedOpen} onOpenChange={setAdvancedOpen} className="mt-3">
+                    <CollapsibleTrigger asChild><Button variant="ghost" className="h-7 px-0 text-[13px] font-normal text-ap-blue">Advanced <ChevronDown className={cn("size-3", advancedOpen && "rotate-180")} strokeWidth={1.7} /></Button></CollapsibleTrigger>
+                    <CollapsibleContent className="mt-3 space-y-3">
+                      <Sub label="Size"><Seg label="GIF size" value={gSize} onChange={setGSize} options={[{ v: "full", l: "Full" }, { v: "half", l: "Half" }, { v: "small", l: "Small", s: "480px" }]} /></Sub>
+                      <Sub label="Colors"><Seg label="GIF colors" value={gColors} onChange={setGColors} options={[{ v: "best", l: "Best" }, { v: "balanced", l: "Balanced" }, { v: "smallest", l: "Smallest" }]} /></Sub>
+                      <Sub label="Frame rate"><Seg label="GIF frame rate" value={gFps} onChange={setGFps} options={[{ v: 25, l: "High", s: "25 fps" }, { v: 15, l: "Medium", s: "15 fps" }, { v: 10, l: "Low", s: "10 fps" }]} /></Sub>
+                    </CollapsibleContent>
+                  </Collapsible>
+                  {gSize === "full" && <p className="mt-3 text-[12px] text-ap-amber">Full-size GIFs are large files. Pick Balanced or Small for email.</p>}
+                </div>
+              </Reveal>
+            </CollapsibleContent>
+          </Collapsible>
+
   );
 }
 
