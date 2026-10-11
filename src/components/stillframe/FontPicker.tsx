@@ -55,7 +55,7 @@ type FontPickerProps = {
 export function FontPicker(props: FontPickerProps) {
   const { data: kit } = useBrandKit();
   const updateKit = useUpdateBrandKit();
-  return <FontPickerCore {...props} kit={kit} onUpload={async (file) => {
+  return <FontPickerCore {...props} kit={kit ?? null} onUpload={async (file) => {
     const up = await uploadMedia(file, "font");
     const name = file.name.replace(/\.[^.]+$/, "").replace(/[-_]+/g, " ").trim();
     const next = [...(kit?.custom_fonts ?? []).filter((f) => f.family !== name), { family: name, path: up.path }];

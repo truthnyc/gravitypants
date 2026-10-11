@@ -261,7 +261,7 @@ function ShopifyReel() {
   );
 }
 
-function Player({ project, images, slide }: { project: ProjectWithFrames; images: Map<string, HTMLImageElement>; slide?: number }) {
+function Player({ project, images, slide }: { project: ProjectWithFrames; images: Map<string, HTMLImageElement>; slide?: number | undefined }) {
   const ref = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
     const canvas = ref.current;

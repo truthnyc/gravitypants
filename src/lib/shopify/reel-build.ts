@@ -4,7 +4,7 @@ import type { Template, TemplateFrame } from "@/lib/stillframe/data";
 import { sourceFromTemplate } from "@/lib/stillframe/template-source";
 import { MAX_SLIDES } from "@/lib/stillframe/template-doc";
 import { refitForMainSize } from "@/lib/stillframe/main-size";
-import { frameForFormat, patchTextForFormat, projectForFormat, REEL_FORMATS } from "@/lib/stillframe/format-settings";
+import { frameForFormat, patchTextForFormat, REEL_FORMATS } from "@/lib/stillframe/format-settings";
 
 export const MAX_PRODUCTS = 10;
 export const MAX_FRAMES = MAX_SLIDES;
@@ -99,7 +99,7 @@ export function templateLogo(template: Template, path: string | null): LogoSetti
   const own = template.settings.logo ?? {};
   const fallback = own.positions?.[template.settings.primary_format]
     ?? Object.values(own.positions ?? {}).find(Boolean)
-    ?? template.style?.logo_position ?? "top-right";
+    ?? template.style?.["logo_position"] ?? "top-right";
   return { ...DEFAULT_LOGO, ...own, path, light_path: null, dark_path: null,
     positions: Object.fromEntries(REEL_FORMATS.map((f) => [f, own.positions?.[f] ?? fallback])),
   };
@@ -180,15 +180,17 @@ export function changeSize(reel: ProjectWithFrames, format: Format): ProjectWith
   return { ...doc.project, formats: [format], frames: doc.frames };
 }
 
-export type TextStylePatch = Pick<TextSettings, "font_family" | "font_weight" | "size_px" | "color" | "position" | "animation" | "keep_under_headline">;
+type OptionalPatch<T> = { [K in keyof T]?: T[K] | undefined };
+export type TextStylePatch = OptionalPatch<Pick<TextSettings, "font_family" | "font_weight" | "size_px" | "color" | "position" | "animation" | "keep_under_headline">>;
 export type StyleChange =
   | { element: "headline" | "subline"; scope: "all" | "slide"; index: number; patch: TextStylePatch }
-  | { element: "logo"; patch: Partial<Pick<LogoSettings, "positions" | "size_pct" | "show_on" | "enabled" | "opacity">> };
+  | { element: "logo"; patch: OptionalPatch<Pick<LogoSettings, "positions" | "size_pct" | "show_on" | "enabled" | "opacity">> };
 
 export function applyReelStyle(reel: ProjectWithFrames, change: StyleChange): ProjectWithFrames {
   const format = reel.primary_format;
   if (change.element === "logo") {
-    const logo = { ...reel.logo, ...change.patch };
+    const clean = Object.fromEntries(Object.entries(change.patch).filter(([, v]) => v !== undefined)) as Partial<LogoSettings>;
+    const logo = { ...reel.logo, ...clean };
     // Existing per-size overrides must not conceal the newly selected reel-wide settings.
     const overrides = { ...logo.format_overrides };
     if (overrides[format]) {
@@ -204,7 +206,7 @@ export function applyReelStyle(reel: ProjectWithFrames, change: StyleChange): Pr
   return { ...reel, frames: reel.frames.map((f, i) => {
     if (scope !== "all" && i !== index) return f;
     // Keep each slide's words and visibility; style-only changes never create price text.
-    const updated = patchTextForFormat(f, format, element, patch);
+    const updated = patchTextForFormat(f, format, element, Object.fromEntries(Object.entries(patch).filter(([, v]) => v !== undefined)) as Partial<TextSettings>);
     return { ...updated, [element]: f[element] ? { ...updated[element], text: f[element]?.text } : updated[element] };
   }) };
 }
@@ -233,9 +235,9 @@ export function appendReelSlides(reel: ProjectWithFrames, more: ReelItem[]): { r
 export function resetReelStyle(reel: ProjectWithFrames, template: Template): ProjectWithFrames {
   const next = buildReel(template, itemsFromFrames(reel.frames), {
     workspaceId: reel.workspace_id, shopName: reel.end_card.cta_text ?? "", name: reel.name,
-    format: reel.primary_format, logoPath: reel.logo.path, signoff: reel.end_card.enabled,
+    format: reel.primary_format, logoPath: reel.logo.path ?? null, signoff: Boolean(reel.end_card.enabled),
   });
-  return { ...reel, logo: next.logo, pace: next.pace, template_id: next.template_id,
+  return { ...reel, logo: next.logo, pace: next.pace, template_id: next.template_id ?? null,
     frames: next.frames.map((f, i) => ({ ...f, id: reel.frames[i]?.id ?? f.id, project_id: reel.id, photo: reel.frames[i]?.photo ?? f.photo })),
   };
 }
