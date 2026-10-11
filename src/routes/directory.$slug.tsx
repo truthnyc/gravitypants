@@ -143,7 +143,7 @@ function BrandPage() {
               {siteReels.map((r) => (
                 <li key={r.id} className="relative">
                   <button type="button" onClick={() => openSiteReel(r)} aria-label={`Open ${r.title}`} className="relative block aspect-square w-full overflow-hidden rounded-[8px] bg-ap-panel">
-                    {r.poster && <img src={r.poster} alt="" loading="lazy" className={POSTER} />}
+                    {r.poster && <img src={r.poster} alt="" loading="lazy" className={posterFor(r.format)} />}
                   </button>
                   <SiteReelHeart reelId={r.id} name={r.title} />
                   <p className="mt-2.5 truncate text-[14px] font-semibold">{r.title}</p>
