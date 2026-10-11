@@ -1,9 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { handle, json, shopFromRequest } from "@/lib/shopify/session.server";
+import { checkShopPlan } from "@/lib/shopify/app-pricing.server";
+import { limitsFor } from "@/lib/shopify/app-pricing";
 
 const Body = z.discriminatedUnion("action", [
   z.object({ action: z.literal("status") }),
+  z.object({ action: z.literal("upgrade"), returnTo: z.string().uuid().optional() }),
+  z.object({ action: z.literal("welcome") }),
   z.object({ action: z.literal("start"), id: z.string().uuid(), kind: z.enum(["mp4", "gif"]) }),
   z.object({ action: z.literal("download"), path: z.string().max(300) }),
 ]);
@@ -19,12 +23,28 @@ export const Route = createFileRoute("/api/public/shopify/export")({
           if (!parsed.success) return json({ error: "Invalid request." }, 400);
           const b = parsed.data;
 
-          if (b.action === "status") {
+          if (b.action === "status" || b.action === "welcome") {
+            const plan = await checkShopPlan(ctx, b.action === "welcome");
             const { data } = await ctx.admin.rpc("export_status", { _ws: ctx.ws });
-            return json({ status: data });
+            let returnTo: string | null = null;
+            if (b.action === "welcome") {
+              const { data: row } = await ctx.admin.from("shopify_shops").select("upgrade_return_project").eq("shop_domain", ctx.shop).single();
+              returnTo = row?.upgrade_return_project ?? null;
+              if (returnTo) await ctx.admin.from("shopify_shops").update({ upgrade_return_project: null }).eq("shop_domain", ctx.shop);
+            }
+            const name = plan.source === "web" ? "your Gravity Pants plan" : limitsFor(plan.plan.handle).name;
+            return json({ status: data, plan: { source: plan.source, handle: plan.plan.handle, name, period: plan.plan.period, configured: plan.configured }, returnTo });
+          }
+
+          if (b.action === "upgrade") {
+            const plan = await checkShopPlan(ctx);
+            if (!plan.upgradeUrl) return json({ error: "Billing isn't set up for this app yet. Exports use the free plan until it is." }, 409);
+            await ctx.admin.from("shopify_shops").update({ upgrade_return_project: b.returnTo ?? null }).eq("shop_domain", ctx.shop);
+            return json({ url: plan.upgradeUrl });
           }
 
           if (b.action === "start") {
+            await checkShopPlan(ctx);
             const { data: p } = await ctx.admin.from("projects").select("id").eq("id", b.id).eq("workspace_id", ctx.ws).maybeSingle();
             if (!p) return json({ error: "Reel not found." }, 404);
             const { data: status } = await ctx.admin.rpc("export_status", { _ws: ctx.ws });
