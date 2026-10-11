@@ -6,7 +6,7 @@ import { SHOW_SHARE } from "@/lib/features";
 const tabs = [
   { to: "/app/account", label: "Profile" },
   { to: "/app/account/billing", label: "Billing" },
-  { to: "/app/account/directory", label: "Directory" },
+  { to: "/app/account/directory", label: "Published reels" },
   { to: "/app/account/favorites", label: "Favorites" },
   { to: "/app/account/stats", label: "Stats" },
   { to: "/app/account/members", label: "Team" },
@@ -17,7 +17,7 @@ export function AccountTabs() {
   const statsOk = !!access && canUse("brand_stats");
   return (
     <nav className="mb-2 flex gap-[3px] rounded-[10px] bg-ap-inner p-[3px] font-ap" aria-label="Account sections">
-      {tabs.filter((t) => (t.label !== "Team" || access?.team) && (t.label !== "Directory" || SHOW_SHARE) && (t.label !== "Stats" || statsOk)).map((t) => (
+      {tabs.filter((t) => (t.label !== "Team" || access?.team) && (t.label !== "Published reels" || SHOW_SHARE) && (t.label !== "Stats" || statsOk)).map((t) => (
         <Link
           key={t.to}
           to={t.to}

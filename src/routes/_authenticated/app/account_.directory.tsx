@@ -6,8 +6,8 @@ import { toast } from "sonner";
 import { ArrowUpRight, Pencil } from "lucide-react";
 import { AccountTabs } from "@/components/billing/AccountTabs";
 import { AppButton } from "@/components/app-ui";
-import { checkSlug, getDirectoryAccount, hideReel, renameDirectoryReel, saveBrandDescription, saveSlug, setBrandLogo } from "@/lib/directory/directory.functions";
-import { STATUS_LABEL } from "@/lib/directory/directory";
+import { cancelReelUpdate, checkSlug, getDirectoryAccount, hideReel, renameDirectoryReel, saveBrandDescription, saveSlug, setBrandLogo, submitReelUpdate, type PendingStatus } from "@/lib/directory/directory.functions";
+import { STATUS_LABEL, type DirStatus } from "@/lib/directory/directory";
 import { getWorkspaceId } from "@/lib/stillframe/workspace";
 import { useMoodCatalog } from "@/lib/directory/moods";
 import { cn } from "@/lib/utils";
@@ -81,38 +81,33 @@ function DirectoryAccount() {
         </section>
 
         <section className="acct-card">
-          <h2 className="text-[20px] font-semibold">Reels in the Directory</h2>
-          <p className="mt-1 mb-4 text-[14px] leading-[1.5] text-ap-body">Share new reels from the last step of the editor. Hide any reel here at any time.</p>
-          <div className="overflow-x-auto">
-          <table className="w-full min-w-[520px] text-left text-[14px]">
-            <thead><tr className="border-b border-ap-hairline text-[13px] text-ap-muted"><th className="w-[64px] py-2" /><th className="py-2 font-medium">Reel</th><th className="py-2 font-medium">Size</th><th className="py-2 font-medium">Status</th><th /></tr></thead>
-            <tbody>
-              {d.reels.map((r) => {
-                const until = r.status === "live" && d.brand.planEndedAt ? new Date(new Date(d.brand.planEndedAt).getTime() + GRACE_DAYS * 86400000) : null;
-                const label = until ? `Live until ${until.toLocaleDateString(undefined, { month: "short", day: "numeric" })}` : r.status === "live" ? "Live" : STATUS_LABEL[r.status];
-                const tone = r.status === "live" ? (until ? "text-ap-amber" : "text-ap-green") : r.status === "in_review" ? "text-ap-amber" : "text-ap-muted";
-                return (
-                <tr key={r.adId} className="border-b border-ap-hairline last:border-0">
-                  <td className="py-3 pr-3">{r.thumb ? <img src={r.thumb} alt="" className="size-11 rounded-[8px] object-cover" /> : <span className="block size-11 rounded-[8px] bg-ap-panel" />}</td>
-                  <td className="py-3"><ReelName adId={r.adId} name={r.name} onSaved={() => void qc.invalidateQueries({ queryKey: ["directory-account", ws] })} /></td>
-                  <td className="py-3 nums text-ap-body">{r.size || "—"}</td>
-                  <td className="py-3"><span className={cn("inline-flex items-center gap-1.5 font-medium", tone)}><span className="size-2 rounded-full bg-current" />{label}</span></td>
-                  <td className="py-3 text-right">
-                    {(r.status === "live" || r.status === "in_review") ? (
-                      <AppButton variant="ghost" size="sm" onClick={async () => {
-                        try { await hide({ data: { adId: r.adId } }); toast("Hidden from the Directory. Withdrawal saved to your log."); void qc.invalidateQueries({ queryKey: ["directory-account", ws] }); }
-                        catch (e) { toast.error(e instanceof Error ? e.message : "Couldn't hide it. Try again."); }
-                      }}>Hide</AppButton>
-                    ) : (
-                      <AppButton asChild variant="ghost" size="sm"><Link to="/app/ad/$id/share" params={{ id: r.adId }}>Share again</Link></AppButton>
-                    )}
-                  </td>
-                </tr>
-              );})}
-              {!d.reels.length && <tr><td colSpan={5} className="py-4 text-ap-muted">No reels shared yet.</td></tr>}
-            </tbody>
-          </table>
-          </div>
+          <h2 className="text-[20px] font-semibold">Published reels</h2>
+          <p className="mt-1 mb-4 text-[14px] leading-[1.5] text-ap-body">Reels you shared appear on Aimanté. Our team may also feature them on the Showcase and Examples pages. To change a live reel, edit and export the ad, then submit the update. It's checked before it replaces the live version.</p>
+          <ul className="flex flex-col">
+            {d.reels.map((r) => {
+              const until = r.status === "live" && d.brand.planEndedAt ? new Date(new Date(d.brand.planEndedAt).getTime() + GRACE_DAYS * 86400000) : null;
+              const label = until ? `Live until ${until.toLocaleDateString(undefined, { month: "short", day: "numeric" })}` : r.status === "live" ? "Live" : STATUS_LABEL[r.status];
+              const tone = r.status === "live" ? (until ? "text-ap-amber" : "text-ap-green") : r.status === "in_review" ? "text-ap-amber" : "text-ap-muted";
+              const refresh = () => void qc.invalidateQueries({ queryKey: ["directory-account", ws] });
+              return (
+                <li key={r.adId} className="flex flex-wrap items-start gap-3 border-b border-ap-hairline py-3.5 last:border-0">
+                  {r.thumb ? <img src={r.thumb} alt="" className="size-11 flex-none rounded-[8px] object-cover" /> : <span className="block size-11 flex-none rounded-[8px] bg-ap-panel" />}
+                  <div className="min-w-0 flex-1">
+                    <ReelName adId={r.adId} name={r.name} onSaved={refresh} />
+                    <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px]">
+                      <span className="nums text-ap-body">{r.size || "—"}</span>
+                      <span className={cn("inline-flex items-center gap-1.5 font-medium", tone)}><span className="size-2 rounded-full bg-current" />Aimanté: {label}</span>
+                      {r.inShowcase && r.status === "live" && <span className="text-ap-body">Featured on Showcase and Examples</span>}
+                    </div>
+                    {r.pending === "in_review" && <p className="mt-1 text-[13px] text-ap-amber">Update in review. The current version stays live until it's approved.</p>}
+                    {r.pending === "declined" && <p className="mt-1 text-[13px] text-destructive">Update not approved{r.pendingNote ? `: ${r.pendingNote}` : "."} The live version is unchanged.</p>}
+                  </div>
+                  <ReelActions adId={r.adId} status={r.status} pending={r.pending} onDone={refresh} />
+                </li>
+              );
+            })}
+            {!d.reels.length && <li className="py-4 text-[14px] text-ap-muted">No reels shared yet.</li>}
+          </ul>
         </section>
 
         <section className="acct-card">
@@ -149,6 +144,40 @@ function DirectoryAccount() {
         </>
       )}
     </main>
+  );
+}
+
+function ReelActions({ adId, status, pending, onDone }: { adId: string; status: DirStatus; pending: PendingStatus; onDone: () => void }) {
+  const hide = useServerFn(hideReel);
+  const submit = useServerFn(submitReelUpdate);
+  const cancel = useServerFn(cancelReelUpdate);
+  const [busy, setBusy] = useState(false);
+  const run = async (fn: () => Promise<unknown>, ok: string) => {
+    setBusy(true);
+    try { await fn(); toast.success(ok); onDone(); }
+    catch (e) { toast.error(e instanceof Error ? e.message : "Something went wrong. Try again."); }
+    finally { setBusy(false); }
+  };
+  const shown = status === "live" || status === "in_review";
+  return (
+    <div className="flex flex-wrap items-center gap-1">
+      {status === "live" && (
+        <>
+          <AppButton asChild variant="ghost" size="sm"><Link to="/app/ad/$id/edit" params={{ id: adId }}>Edit ad</Link></AppButton>
+          {pending === "in_review"
+            ? <AppButton variant="ghost" size="sm" disabled={busy} onClick={() => void run(() => cancel({ data: { adId } }), "Update cancelled.")}>Cancel update</AppButton>
+            : <AppButton variant="ghost" size="sm" disabled={busy} onClick={() => void run(() => submit({ data: { adId } }), "Update sent for review. Your live reel stays up meanwhile.")}>Submit latest export</AppButton>}
+        </>
+      )}
+      {shown ? (
+        <AppButton variant="ghost" size="sm" disabled={busy} onClick={() => {
+          if (!window.confirm("Remove this reel from Aimanté? It also leaves the Showcase and Examples pages. Your permission log keeps a record.")) return;
+          void run(() => hide({ data: { adId } }), "Removed from Aimanté. Withdrawal saved to your log.");
+        }}>Remove from Aimanté</AppButton>
+      ) : (
+        <AppButton asChild variant="ghost" size="sm"><Link to="/app/ad/$id/share" params={{ id: adId }}>Publish again</Link></AppButton>
+      )}
+    </div>
   );
 }
 
