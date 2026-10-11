@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Finish Export footer/list/empty states and small components; verify real checkboxes, keyboard segments and mobile touch targets.
 - [x] Add Export format defaults, quality summary, GIF presets/advanced/loop controls; exact presets, custom detection, looping and format visibility verified signed-in at 375/768/1440px; 18 tests passed, clean preview.
 - [x] Redesign Export with compact size cards, platform shortcuts, portrait default, true-ratio previews and top history; signed-in selection/custom/history/larger-preview/reload verified at 375/768/1440px with no overflow or runtime errors; 23 tests passed.
 - [x] Separate photo/logo/headline/subline settings by size; signed-in edits and reload verified, shared animation/movement confirmed, originals restored; 28 regression tests passed and preview/export share size-aware rendering.
