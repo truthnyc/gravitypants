@@ -716,12 +716,13 @@ html:has(.features-page) { scroll-behavior: smooth; }
 .home-formats.home-formats-five .home-format-3 { aspect-ratio: 5 / 4; }
 .home-formats.home-formats-five .home-format-4 { aspect-ratio: 16 / 9; }
 .home-formats.home-formats-five b { font-size: 11px; left: 6px; bottom: 8px; }
-.features-media-formats .features-formats-art.features-formats-four { display: grid; grid-template-columns: 9fr 12fr 14fr 18fr; align-items: end; gap: 10px; width: min(480px, 90%); height: auto; padding: 0; transform: none; flex-shrink: 1; }
+.features-media-formats .features-formats-art.features-formats-four { display: grid; grid-template-columns: 9fr 12fr 14fr 18fr 16fr; align-items: end; gap: 10px; width: min(560px, 90%); height: auto; padding: 0; transform: none; flex-shrink: 1; }
 .features-formats-four .features-format { min-width: 0; padding-bottom: 0; }
 .features-formats-four .features-format > span { width: 100%; height: auto; aspect-ratio: 9 / 16; padding: 8px; border-radius: 4px; }
 .features-formats-four .features-format-1 > span { aspect-ratio: 4 / 5; }
 .features-formats-four .features-format-2 > span { aspect-ratio: 1; }
 .features-formats-four .features-format-3 > span { aspect-ratio: 16 / 9; }
+.features-formats-four .features-format-4 > span { aspect-ratio: 5 / 4; }
 .features-formats-four .features-format b { font-size: 11px; }
 @media (prefers-reduced-motion:reduce) { html:has(.features-page),.features-page,.features-page * { scroll-behavior:auto !important; animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }.features-upload-photos span{opacity:1 !important;transform:none !important}.features-progress i{width:75% !important}.features-timeline i{left:40% !important}.features-closing-orbit{transform:none !important} }
 
