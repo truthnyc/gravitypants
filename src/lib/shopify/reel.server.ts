@@ -36,6 +36,7 @@ export async function copyImage(admin: Admin, ws: string, stamp: string, n: numb
 
 function frameRows(projectId: string, reel: ProjectWithFrames) {
   return reel.frames.map((f, i) => ({
+    id: f.id || crypto.randomUUID(),
     project_id: projectId,
     sort_order: i,
     duration_sec: f.duration_sec,
@@ -78,7 +79,8 @@ export async function replaceReel(admin: Admin, ws: string, id: string, reel: Pr
     .eq("id", id)
     .eq("workspace_id", ws);
   if (error) throw new Error(error.message);
-  await admin.from("frames").delete().eq("project_id", id);
+  const { error: de } = await admin.from("frames").delete().eq("project_id", id);
+  if (de) throw new Error(de.message);
   const { error: fe } = await admin.from("frames").insert(frameRows(id, reel));
   if (fe) throw new Error(fe.message);
 }

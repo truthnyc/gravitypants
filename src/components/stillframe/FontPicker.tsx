@@ -25,6 +25,7 @@ import {
 } from "@/lib/stillframe/fonts";
 import { uploadMedia } from "@/lib/stillframe/media";
 import { cn } from "@/lib/utils";
+import type { BrandKit } from "@/lib/stillframe/types";
 
 const CHIPS: { value: FontCategory; label: string }[] = [
   { value: "all", label: "All" },
@@ -39,17 +40,7 @@ type Row = { kind: "header"; label: string } | { kind: "font"; font: WebFont };
 const ROW_H = 44;
 const HEADER_H = 30;
 
-export function FontPicker({
-  title,
-  family,
-  weight,
-  onChange,
-  side = "left",
-  children,
-  onPreview,
-  sampleText = "",
-  brandName = "Brand",
-}: {
+type FontPickerProps = {
   onPreview?: (family: string | null, weight: number) => void;
   sampleText?: string;
   brandName?: string;
@@ -59,7 +50,37 @@ export function FontPicker({
   onChange: (family: string, weight: number) => void;
   side?: "left" | "right" | "bottom";
   children: React.ReactNode;
-}) {
+};
+
+export function FontPicker(props: FontPickerProps) {
+  const { data: kit } = useBrandKit();
+  const updateKit = useUpdateBrandKit();
+  return <FontPickerCore {...props} kit={kit} onUpload={async (file) => {
+    const up = await uploadMedia(file, "font");
+    const name = file.name.replace(/\.[^.]+$/, "").replace(/[-_]+/g, " ").trim();
+    const next = [...(kit?.custom_fonts ?? []).filter((f) => f.family !== name), { family: name, path: up.path }];
+    await updateKit.mutateAsync({ custom_fonts: next });
+    await registerCustomFonts(next);
+    props.onChange(name, 400);
+    toast(`${name} added to your Brand Kit`);
+  }} />;
+}
+
+/** Same font browser without account reads or browser-storage preferences in Shopify. */
+export function FontPickerCore({
+  title,
+  family,
+  weight,
+  onChange,
+  side = "left",
+  children,
+  onPreview,
+  sampleText = "",
+  brandName = "Brand",
+  kit,
+  onUpload,
+  remember = true,
+}: FontPickerProps & { kit?: BrandKit | null; onUpload?: (file: File) => Promise<void>; remember?: boolean }) {
   const [open, setOpen] = useState(false);
   const isMobile = useIsMobile();
   const [query, setQuery] = useState("");
@@ -69,8 +90,6 @@ export function FontPicker({
   const listRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const { data } = useFontList();
-  const { data: kit } = useBrandKit();
-  const updateKit = useUpdateBrandKit();
 
   const custom: WebFont[] = useMemo(
     () => (kit?.custom_fonts ?? []).map((f) => ({ family: f.family, category: "custom", variants: ["regular"] })),
@@ -85,7 +104,7 @@ export function FontPicker({
 
   const needs = useMemo(() => scriptsOf(sampleText), [sampleText]);
   const [recentList, setRecentList] = useState<string[]>([]);
-  useEffect(() => { if (open) setRecentList(recentFonts()); }, [open]);
+  useEffect(() => { if (open && remember) setRecentList(recentFonts()); }, [open, remember]);
   const preview = (font: WebFont | null) => {
     if (!onPreview) return;
     if (!font) return onPreview(null, weight);
@@ -155,7 +174,7 @@ export function FontPicker({
   const choose = (font: WebFont) => {
     const w = closestWeight(weightsOf(font), weight);
     onPreview?.(null, weight);
-    rememberFont(font.family);
+    if (remember) rememberFont(font.family);
     void loadFont(font.family, w).then(() => onChange(font.family, w));
     onChange(font.family, w);
   };
@@ -187,13 +206,7 @@ export function FontPicker({
       return;
     }
     try {
-      const up = await uploadMedia(file, "font");
-      const name = file.name.replace(/\.[^.]+$/, "").replace(/[-_]+/g, " ").trim();
-      const next = [...(kit?.custom_fonts ?? []).filter((f) => f.family !== name), { family: name, path: up.path }];
-      await updateKit.mutateAsync({ custom_fonts: next });
-      await registerCustomFonts(next);
-      onChange(name, 400);
-      toast(`${name} added to your Brand Kit`);
+      await onUpload?.(file);
     } catch {
       toast.error("That font couldn't be uploaded. Try again.");
     }
@@ -280,14 +293,14 @@ export function FontPicker({
           <a href="https://fonts.google.com" target="_blank" rel="noreferrer" className="text-link">Google Fonts ↗</a>
         </div>
         <div className="flex items-center gap-2 px-4 py-3">
-          <Button
+          {onUpload && <Button
             variant="ghost"
             type="button"
             onClick={() => fileRef.current?.click()}
             className="inline-flex items-center gap-1.5 text-[13px] font-medium text-link"
           >
             <Upload className="size-3.5" strokeWidth={1.7} /> Upload a font…
-          </Button>
+          </Button>}
           <input
             ref={fileRef}
             type="file"
