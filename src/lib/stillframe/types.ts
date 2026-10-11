@@ -50,9 +50,6 @@ export type PhotoSettings = {
   pan_x?: number;
   pan_y?: number;
   brightness?: number;
-  darken_for_text?: boolean;
-  /** true once the user has switched "Darken for text" themselves */
-  darken_set?: boolean;
   background_color?: string | null;
   /** What shows around a Fit photo; defaults to blur unless a colour was set. */
   background?: "blur" | "solid";

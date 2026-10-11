@@ -44,7 +44,7 @@ export function PhotosStep({ initial, readOnly = false }: { initial: EditorDoc; 
           ...(payload as unknown as Frame),
           id: crypto.randomUUID(),
           project_id: doc.project.id,
-          photo: { ...(payload.photo as Frame["photo"]), darken_for_text: false },
+          photo: payload.photo as Frame["photo"],
           headline: null,
         });
       }

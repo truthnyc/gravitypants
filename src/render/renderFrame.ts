@@ -501,17 +501,6 @@ function drawFrame(
   drawPhoto(ctx, frame, W, H, localT / span, images);
 
   const layout = layoutFrame(ctx, project, frames, j, format, W, H, images);
-  const texts = [layout.headline, layout.subline].filter(Boolean) as TextBlock[];
-
-  if (frame.photo?.darken_for_text && texts.length) {
-    const pad = W * 0.04;
-    const x0 = Math.min(...texts.map((t) => t.x)) - pad;
-    const y0 = Math.min(...texts.map((t) => t.y)) - pad;
-    const x1 = Math.max(...texts.map((t) => t.x + t.w)) + pad;
-    const y1 = Math.max(...texts.map((t) => t.y + t.h)) + pad;
-    ctx.fillStyle = "rgba(0,0,0,0.25)";
-    ctx.fillRect(x0, y0, x1 - x0, y1 - y0);
-  }
 
   if (layout.logo) {
     const l = project.logo;
