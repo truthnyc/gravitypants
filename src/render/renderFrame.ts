@@ -211,6 +211,7 @@ function logoPathFor(project: Project) {
 }
 
 function logoShown(project: Project, frame: Frame, index: number, count: number) {
+  if (project.logo.enabled === false) return false;
   const on = project.logo.show_on ?? "all";
   if (on === "first_last") return index === 0 || index === count - 1;
   if (on === "selected") return frame.logo_visible;

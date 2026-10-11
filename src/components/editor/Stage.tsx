@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState, type PointerEvent as RPointerEvent } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type PointerEvent as RPointerEvent, type ReactNode } from "react";
 import type { EditorDoc } from "@/lib/stillframe/data";
 import type { Format, Frame, LogoPosition, TextSettings } from "@/lib/stillframe/types";
 import { FORMAT_SIZE, type Rect } from "@/render/formats";
@@ -37,10 +37,13 @@ export function Stage({
   onFocus,
   onAdjustDone,
   adjustHint,
+  overlay,
   interactive = true,
   brand,
   aspect,
 }: {
+  /** Drawn over the preview, ignores pointer input (e.g. safe zones). */
+  overlay?: ReactNode;
   /** Override the canvas shape (e.g. 4:5) while laying out with `format`'s rules. */
   aspect?: number | undefined;
   brand?: BrandStyle;
@@ -311,6 +314,7 @@ export function Stage({
         onPointerCancel={() => setPan(null)}
       >
         <canvas ref={canvasRef} width={W || 1} height={H || 1} className="block h-full w-full rounded-lg" aria-label="Ad preview" role="img" />
+        {overlay && <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-lg">{overlay}</div>}
         {showTags && frame && (
           <>
             <button
