@@ -46,4 +46,4 @@
 - Scope Aimanté by site; `brand-page` helpers centralize brand rules.
 
 - SVG uploads share `svg-safety.ts` before preview/storage, including Directory server uploads, to remove active content.
-- Strict export fonts; FontPicker uses Drawer/Popover. Export uses small UI components and centralized size/quality rules.
+- Strict export fonts; FontPicker uses Drawer/Popover. Export components share size/quality/estimate rules for parity.

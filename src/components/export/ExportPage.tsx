@@ -34,7 +34,7 @@ import { RadioGroup } from "@/components/ui/radio-group";
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import { PlanCards } from "@/components/billing/PlanCards";
 
-import { DEFAULT_EXPORT_FORMATS, DEFAULT_VIDEO_FPS, DEFAULT_GIF_LOOP, DEFAULT_GIF_QUALITY, GIF_PRESETS, matchingGifPreset, type GifSize, type GifPresetId } from "@/lib/stillframe/export-quality";
+import { DEFAULT_EXPORT_FORMATS, DEFAULT_VIDEO_FPS, DEFAULT_GIF_LOOP, DEFAULT_GIF_QUALITY, GIF_PRESETS, matchingGifPreset, estimateExportBytes, type GifSize, type GifPresetId } from "@/lib/stillframe/export-quality";
 type Target = { key: string; name: string; ratio: string; format: Format; width: number; height: number; custom?: boolean };
 type CustomRow = { id: string; w: string; h: string };
 type FileRow = { sizeName: string; ratio: string; name: string; kind: "mp4" | "gif"; job: string; width: number; height: number };
@@ -428,18 +428,15 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
           <h1 className="mb-5 text-[30px] font-bold leading-tight">Where will this ad play?</h1>
           <PlatformPills selected={selected} onChange={changeSizes} />
           <div className="flex flex-col gap-2">
-            {EXPORT_SIZES.filter((s) => s.id !== "5x4").map((s) => (
+            {[...EXPORT_SIZES.filter((s) => s.id !== "5x4"), ...EXPORT_SIZES.filter((s) => s.id === "5x4")].map((s) => (
               <SizeCard key={s.id} size={s} selected={selected.has(s.id)} pulse={pulse.has(s.id)} onClick={() => toggleSize(s.id)} project={project} frames={frames} brand={brand} images={images} />
             ))}
           </div>
           <Collapsible open={moreSizes} onOpenChange={setMoreSizes} className="mt-2">
             <CollapsibleTrigger asChild>
-              <Button variant="ghost" className="h-7 px-1 text-[13px] font-normal text-ap-muted">More sizes <ChevronDown className={cn("size-3", moreSizes && "rotate-180")} strokeWidth={1.7} /></Button>
+              <Button variant="ghost" className="h-7 px-1 text-[13px] font-normal text-ap-blue hover:text-ap-blue-hover">Custom Size <ChevronDown className={cn("size-3", moreSizes && "rotate-180")} strokeWidth={1.7} /></Button>
             </CollapsibleTrigger>
             <CollapsibleContent className="mt-2 space-y-2">
-              {EXPORT_SIZES.filter((s) => s.id === "5x4").map((s) => (
-                <SizeCard key={s.id} size={s} selected={selected.has(s.id)} pulse={pulse.has(s.id)} onClick={() => toggleSize(s.id)} project={project} frames={frames} brand={brand} images={images} />
-              ))}
               <CustomSizes on={customOn} setOn={setCustomOn} rows={customs} setRows={setCustoms} />
             </CollapsibleContent>
           </Collapsible>
@@ -465,7 +462,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
 
           <QualitySettings {...{ mp4, gif, fps, setFps, gSize, setGSize, gColors, setGColors, gFps, setGFps, gLoop, setGLoop, qualityOpen, setQualityOpen, advancedOpen, setAdvancedOpen, gifPreset, applyGifPreset, qualitySummary }} />
 
-          <ExportFooter files={files} sizeNames={targets.map((t) => t.name)} formats={[mp4 && "MP4", gif && "GIF"].filter((v): v is string => !!v)} seconds={seconds} remaining={remainingSummary} action={exportButton} />
+          <ExportFooter files={files.map((file) => ({ ...file, estimatedBytes: estimateExportBytes(file.kind, file.width, file.height, seconds, file.kind === "mp4" ? fps : gFps, gColors) }))} sizeNames={targets.map((t) => t.name)} formats={[mp4 && "MP4", gif && "GIF"].filter((v): v is string => !!v)} seconds={seconds} remaining={remainingSummary} action={exportButton} />
           <div className="mt-2">
             {exportStatus?.trial && !exportStatus.watermark && <p className="mt-1 text-[13px] font-medium text-ap-blue">Your first reel is on us — no watermark.</p>}
             {exportStatus?.watermark && (
