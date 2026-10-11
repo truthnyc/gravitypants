@@ -7,12 +7,13 @@ import { setKitLogo, storeLogo } from "@/lib/shopify/branding.server";
 import { MAX_SLIDES } from "@/lib/stillframe/template-doc";
 import type { Template } from "@/lib/stillframe/data";
 import type { Format, ProjectWithFrames } from "@/lib/stillframe/types";
+import { fetchGoogleFonts } from "@/lib/stillframe/font-list.server";
 
 const id = z.string().uuid();
 const textPatch = z.object({
   font_family: z.string().min(1).max(100).optional(), font_weight: z.number().int().min(100).max(900).optional(),
   size_px: z.number().min(11).max(240).optional(), color: z.string().regex(/^#[0-9a-f]{6}$/i).optional(),
-  position: z.enum(["top-left", "top-center", "top-right", "center-left", "center", "center-right", "bottom-left", "bottom-center", "bottom-right"]).optional(),
+  position: z.enum(["top-left", "top-center", "top-right", "middle-left", "center", "middle-right", "bottom-left", "bottom-center", "bottom-right"]).optional(),
   animation: z.enum(["none", "rise", "fade", "pop", "typewriter"]).optional(), keep_under_headline: z.boolean().optional(),
 }).strict();
 const styleChange = z.union([
@@ -25,6 +26,7 @@ const styleChange = z.union([
 ]);
 const Body = z.discriminatedUnion("action", [
   z.object({ action: z.literal("get"), id }),
+  z.object({ action: z.literal("fonts"), id }),
   z.object({
     action: z.literal("words"),
     id,
@@ -58,6 +60,7 @@ export const Route = createFileRoute("/api/public/shopify/reel")({
           const b = parsed.data;
           const current = await loadReel(ctx.admin, ctx.ws, b.id);
           if (!current) return json({ error: "Reel not found." }, 404);
+          if (b.action === "fonts") return json(await fetchGoogleFonts());
           const p = current.project;
           const templates = await listTemplates(ctx.admin);
           const uploads = `${ctx.ws}/shopify/uploads/`;

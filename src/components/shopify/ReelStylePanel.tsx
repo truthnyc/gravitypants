@@ -4,7 +4,9 @@ import { FontPickerCore } from "@/components/stillframe/FontPicker";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { frameForFormat, projectForFormat } from "@/lib/stillframe/format-settings";
-import { useFontList, weightsOf, WEIGHT_NAMES } from "@/lib/stillframe/fonts";
+import { FALLBACK_FONTS, weightsOf, WEIGHT_NAMES, type WebFont } from "@/lib/stillframe/fonts";
+import { useQuery } from "@tanstack/react-query";
+import { shopifyFetch } from "@/lib/shopify/bridge";
 import { DEFAULT_FONT } from "@/render/renderFrame";
 import type { ProjectWithFrames, TextSettings } from "@/lib/stillframe/types";
 import type { StyleChange } from "@/lib/shopify/reel-build";
@@ -15,7 +17,8 @@ export function ReelStylePanel({ project, index, onChange, onReset, onVisible }:
 }) {
   const [part, setPart] = useState<"logo" | "headline" | "subline">("logo");
   const [scope, setScope] = useState<"all" | "slide">("all");
-  const { data: fonts } = useFontList();
+  const { data } = useQuery({ queryKey: ["shopify-fonts", project.id], queryFn: () => shopifyFetch<{ fonts: WebFont[] }>("/api/public/shopify/reel", { action: "fonts", id: project.id }), staleTime: 86400000 });
+  const fonts = data?.fonts.length ? data.fonts : FALLBACK_FONTS;
   const base = project.frames[index] ?? project.frames[0];
   if (!base) return null;
   const frame = frameForFormat(base, project.primary_format);
@@ -23,7 +26,7 @@ export function ReelStylePanel({ project, index, onChange, onReset, onVisible }:
   const text = (part === "subline" ? frame.subline : frame.headline) ?? {};
   const family = text.font_family ?? frame.headline?.font_family ?? DEFAULT_FONT;
   const weight = text.font_weight ?? (part === "headline" ? 700 : 500);
-  const weights = weightsOf(fonts?.fonts.find((f) => f.family === family));
+  const weights = weightsOf(fonts.find((f) => f.family === family));
   const patchText = (patch: Partial<TextSettings>) => {
     if (part !== "logo") onChange({ element: part, scope, index, patch });
   };
@@ -39,7 +42,7 @@ export function ReelStylePanel({ project, index, onChange, onReset, onVisible }:
         {logo.show_on === "selected" && <label className="flex items-center justify-between text-sm">Show on slide {index + 1}<Switch checked={frame.logo_visible} onCheckedChange={onVisible} /></label>}
       </> : <>
         <Segmented value={scope} options={[{ value: "all", label: "Apply to all slides" }, { value: "slide", label: "This slide only" }]} onChange={setScope} />
-        <Field label="Font"><FontPickerCore title={`${part === "headline" ? "Headline" : "Subline"} font`} family={family} weight={weight} sampleText={text.text ?? ""} remember={false} side="bottom" onChange={(font_family, font_weight) => patchText({ font_family, font_weight })}><Button variant="outline" className="w-full justify-between" aria-label={`${part === "headline" ? "Headline" : "Subline"} font: ${family}`}>{family}</Button></FontPickerCore></Field>
+        <Field label="Font"><FontPickerCore fonts={fonts} title={`${part === "headline" ? "Headline" : "Subline"} font`} family={family} weight={weight} sampleText={text.text ?? ""} remember={false} side="bottom" onChange={(font_family, font_weight) => patchText({ font_family, font_weight })}><Button variant="outline" className="w-full justify-between" aria-label={`${part === "headline" ? "Headline" : "Subline"} font: ${family}`}>{family}</Button></FontPickerCore></Field>
         <Field label="Weight"><select aria-label={`${part === "headline" ? "Headline" : "Subline"} weight`} value={weight} onChange={(e) => patchText({ font_weight: Number(e.target.value) })} className="h-9 w-full rounded border border-input bg-background px-2 text-sm">{[...new Set([...weights, weight])].sort((a, b) => a - b).map((w) => <option key={w} value={w}>{WEIGHT_NAMES[w] ?? w}</option>)}</select></Field>
         <SizeField el={part} t={text} onChange={patchText} />
         <ColorField el={part} t={text} brandColors={[]} remember={false} onChange={patchText} />

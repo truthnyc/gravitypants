@@ -53,9 +53,10 @@ type FontPickerProps = {
 };
 
 export function FontPicker(props: FontPickerProps) {
+  const { data: fonts } = useFontList();
   const { data: kit } = useBrandKit();
   const updateKit = useUpdateBrandKit();
-  return <FontPickerCore {...props} kit={kit ?? null} onUpload={async (file) => {
+  return <FontPickerCore {...props} fonts={fonts?.fonts ?? []} kit={kit ?? null} onUpload={async (file) => {
     const up = await uploadMedia(file, "font");
     const name = file.name.replace(/\.[^.]+$/, "").replace(/[-_]+/g, " ").trim();
     const next = [...(kit?.custom_fonts ?? []).filter((f) => f.family !== name), { family: name, path: up.path }];
@@ -80,7 +81,8 @@ export function FontPickerCore({
   kit,
   onUpload,
   remember = true,
-}: FontPickerProps & { kit?: BrandKit | null; onUpload?: (file: File) => Promise<void>; remember?: boolean }) {
+  fonts = [],
+}: FontPickerProps & { kit?: BrandKit | null; onUpload?: (file: File) => Promise<void>; remember?: boolean; fonts?: WebFont[] }) {
   const [open, setOpen] = useState(false);
   const isMobile = useIsMobile();
   const [query, setQuery] = useState("");
@@ -89,7 +91,7 @@ export function FontPickerCore({
   const [scrollTop, setScrollTop] = useState(0);
   const listRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
-  const { data } = useFontList();
+  const data = useMemo(() => ({ fonts }), [fonts]);
 
   const custom: WebFont[] = useMemo(
     () => (kit?.custom_fonts ?? []).map((f) => ({ family: f.family, category: "custom", variants: ["regular"] })),
