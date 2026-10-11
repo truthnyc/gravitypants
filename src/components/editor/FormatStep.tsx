@@ -43,12 +43,12 @@ export function FormatStep({ initial, readOnly = false }: { initial: EditorDoc; 
             <button
               key={s.format} type="button" role="radio" aria-checked={on} disabled={readOnly}
               onClick={() => change(s.format)}
-              className={cn("flex min-h-[56px] items-center gap-3.5 rounded-[14px] border bg-ap-card px-3.5 py-2.5 text-left", on ? "border-ap-blue bg-ap-blue-soft shadow-[0_0_0_1px_var(--ap-blue)]" : "border-ap-hairline hover:border-ap-muted")}
+              className={cn("flex min-h-[56px] items-center gap-3.5 rounded-[14px] border bg-ap-card px-3.5 py-2.5 text-left", on ? "border-ap-blue bg-ap-soft-blue shadow-[0_0_0_1px_var(--ap-blue)]" : "border-ap-hairline hover:border-ap-muted")}
             >
               <span className="grid size-11 shrink-0 place-items-center rounded-[10px] bg-ap-panel"><span className="block rounded-[2px] bg-ap-blue" style={{ width: tw, height: th }} /></span>
               <span className="min-w-0 flex-1">
                 <span className="block font-semibold">{s.name} <span className="font-normal text-ap-muted nums">{s.format}</span></span>
-                <span className="block text-[12.5px] text-ap-faint nums">{s.width} × {s.height}</span>
+                <span className="block text-[12.5px] text-ap-subhead nums">{s.width} × {s.height}</span>
               </span>
               <span className={cn("grid size-[22px] shrink-0 place-items-center rounded-full border-[1.5px]", on ? "border-ap-blue bg-ap-blue text-ap-card" : "border-ap-hairline")}>
                 {on && <Check className="size-3.5" strokeWidth={2.5} />}
