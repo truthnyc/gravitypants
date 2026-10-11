@@ -33,7 +33,8 @@ export const Route = createFileRoute("/api/public/shopify/export")({
             const stamp = new Date().toISOString().replace(/[:.]/g, "-");
             const { data: ok } = await ctx.admin.rpc("record_export", { _ws: ctx.ws, _project: b.id, _stamp: stamp });
             if (!ok) return json({ error: "Exporting isn't available right now." }, 402);
-            const name = `reel-9x16.${b.kind}`;
+            const { data: pf } = await ctx.admin.from("projects").select("primary_format").eq("id", b.id).maybeSingle();
+            const name = `reel-${String(pf?.primary_format ?? "9:16").replace(":", "x")}.${b.kind}`;
             const path = `${ctx.ws}/exports/${b.id}/${stamp}/${name}`;
             const { data: up, error } = await ctx.admin.storage.from("media").createSignedUploadUrl(path);
             if (error || !up) return json({ error: "Could not prepare the upload." }, 500);
