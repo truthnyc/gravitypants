@@ -31,7 +31,6 @@ export const Route = createFileRoute("/_authenticated/app/account_/directory")({
 function DirectoryAccount() {
   const ws = getWorkspaceId();
   const load = useServerFn(getDirectoryAccount);
-  const hide = useServerFn(hideReel);
   const qc = useQueryClient();
   const q = useQuery({ queryKey: ["directory-account", ws], queryFn: () => load({ data: { workspaceId: ws } }) });
   const d = q.data;
