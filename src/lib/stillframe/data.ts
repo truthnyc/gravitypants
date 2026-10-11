@@ -3,6 +3,7 @@ import { getWorkspaceId } from "./workspace";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { uploadMedia, type UploadedPhoto } from "./media";
+import { sourceFromTemplate as sharedSourceFromTemplate } from "./template-source";
 import {
   DEFAULT_LOGO,
   
