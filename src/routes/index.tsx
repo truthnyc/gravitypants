@@ -73,7 +73,7 @@ export const Route = createFileRoute("/")({
         {
           rel: "preload",
           as: "image",
-          href: loaderData ? pickVideo(loaderData.content.hero.reelId, loaderData.reels, 3).poster : heroPoster.url,
+          href: loaderData ? pickVideo(loaderData.content.hero.reelId, loaderData.allReels, 3).poster : heroPoster.url,
         },
       ],
       scripts: [{ type: "application/ld+json", children: JSON.stringify(jsonLd) }],
@@ -81,10 +81,11 @@ export const Route = createFileRoute("/")({
   },
   loader: async () => {
     const [reels, content] = await Promise.all([
-      listSiteReels().then((rs) => rs.filter((r) => r.source !== "client")).catch(() => [] as SiteReel[]),
+      listSiteReels().catch(() => [] as SiteReel[]),
       getHomepageContent().catch(() => DEFAULT_CONTENT),
     ]);
-    return { reels, content };
+    // allReels lets the banner use a featured Directory reel; the carousel stays studio-only.
+    return { reels: reels.filter((r) => r.source !== "client"), allReels: reels, content };
   },
   component: Home,
 });
@@ -570,10 +571,10 @@ function FeatureArt({ art }: { art: string }) {
   );
 }
 function Home() {
-  const { reels, content } = Route.useLoaderData();
+  const { reels, allReels, content } = Route.useLoaderData();
   const examples = homeExamples(reels);
   const hero = content.hero;
-  const heroVideo = pickVideo(hero.reelId, reels, 3);
+  const heroVideo = pickVideo(hero.reelId, allReels, 3);
   return (
     <SiteShell>
       <div className="home-page">
