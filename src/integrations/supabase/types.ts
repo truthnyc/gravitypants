@@ -1328,46 +1328,70 @@ export type Database = {
         Row: {
           access_token: string
           aimante_opt_in: boolean
+          billing_period: string | null
           billing_source: string
           branding_synced_at: string | null
           id: string
           installed_at: string
+          last_checked_at: string | null
           linked_user_id: string | null
+          plan_cancel_at_end: boolean
+          plan_cycle_end: string | null
+          plan_cycle_start: string | null
+          plan_handle: string
           scopes: string | null
           shop_domain: string
+          shop_gid: string | null
           storefront_token: string | null
           uninstalled_at: string | null
           updated_at: string
+          upgrade_return_project: string | null
           workspace_id: string | null
         }
         Insert: {
           access_token: string
           aimante_opt_in?: boolean
+          billing_period?: string | null
           billing_source?: string
           branding_synced_at?: string | null
           id?: string
           installed_at?: string
+          last_checked_at?: string | null
           linked_user_id?: string | null
+          plan_cancel_at_end?: boolean
+          plan_cycle_end?: string | null
+          plan_cycle_start?: string | null
+          plan_handle?: string
           scopes?: string | null
           shop_domain: string
+          shop_gid?: string | null
           storefront_token?: string | null
           uninstalled_at?: string | null
           updated_at?: string
+          upgrade_return_project?: string | null
           workspace_id?: string | null
         }
         Update: {
           access_token?: string
           aimante_opt_in?: boolean
+          billing_period?: string | null
           billing_source?: string
           branding_synced_at?: string | null
           id?: string
           installed_at?: string
+          last_checked_at?: string | null
           linked_user_id?: string | null
+          plan_cancel_at_end?: boolean
+          plan_cycle_end?: string | null
+          plan_cycle_start?: string | null
+          plan_handle?: string
           scopes?: string | null
           shop_domain?: string
+          shop_gid?: string | null
           storefront_token?: string | null
           uninstalled_at?: string | null
           updated_at?: string
+          upgrade_return_project?: string | null
           workspace_id?: string | null
         }
         Relationships: [

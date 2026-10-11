@@ -9,3 +9,4 @@
 - Shopify reels reuse `template-source.ts`, `renderAt` and `exportMedia.ts`; `reel-build.ts` holds the pure product→reel rules. No second renderer.
 - `export_status` allows `service_role` so shop routes can enforce the same export rules for member-less workspaces.
 - Slide mutations preserve Frame identity and visual overrides; only template changes/reset rebuild styling, so artwork and custom styling stay together.
+- Shopify billing is Shopify App Pricing only (never appSubscriptionCreate): `app-pricing.server.ts` reads the Partner API and mirrors the plan into the shop workspace's `workspace_billing`, so SQL `export_status`/`record_export` stay the single source of limits; failed checks keep the last confirmed plan.
