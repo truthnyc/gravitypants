@@ -85,6 +85,9 @@ import { Route as AuthenticatedAppTemplatesIndexRouteImport } from './routes/_au
 import { Route as AuthenticatedAppTemplatesSlugRouteImport } from './routes/_authenticated/app/templates.$slug'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as ApiPublicShopifyAuthRouteImport } from './routes/api/public/shopify/auth'
+import { Route as ApiPublicShopifyExportRouteImport } from './routes/api/public/shopify/export'
+import { Route as ApiPublicShopifyProductsRouteImport } from './routes/api/public/shopify/products'
+import { Route as ApiPublicShopifyReelRouteImport } from './routes/api/public/shopify/reel'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
@@ -498,6 +501,22 @@ const ApiPublicShopifyAuthRoute = ApiPublicShopifyAuthRouteImport.update({
   path: '/api/public/shopify/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicShopifyExportRoute = ApiPublicShopifyExportRouteImport.update({
+  id: '/api/public/shopify/export',
+  path: '/api/public/shopify/export',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicShopifyProductsRoute =
+  ApiPublicShopifyProductsRouteImport.update({
+    id: '/api/public/shopify/products',
+    path: '/api/public/shopify/products',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicShopifyReelRoute = ApiPublicShopifyReelRouteImport.update({
+  id: '/api/public/shopify/reel',
+  path: '/api/public/shopify/reel',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
   id: '/lovable/email/auth/preview',
   path: '/lovable/email/auth/preview',
@@ -630,6 +649,9 @@ export interface FileRoutesByFullPath {
   '/app/templates/$slug': typeof AuthenticatedAppTemplatesSlugRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/shopify/auth': typeof ApiPublicShopifyAuthRoute
+  '/api/public/shopify/export': typeof ApiPublicShopifyExportRoute
+  '/api/public/shopify/products': typeof ApiPublicShopifyProductsRoute
+  '/api/public/shopify/reel': typeof ApiPublicShopifyReelRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -714,6 +736,9 @@ export interface FileRoutesByTo {
   '/app/templates/$slug': typeof AuthenticatedAppTemplatesSlugRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/shopify/auth': typeof ApiPublicShopifyAuthRoute
+  '/api/public/shopify/export': typeof ApiPublicShopifyExportRoute
+  '/api/public/shopify/products': typeof ApiPublicShopifyProductsRoute
+  '/api/public/shopify/reel': typeof ApiPublicShopifyReelRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -803,6 +828,9 @@ export interface FileRoutesById {
   '/_authenticated/app/templates/$slug': typeof AuthenticatedAppTemplatesSlugRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/shopify/auth': typeof ApiPublicShopifyAuthRoute
+  '/api/public/shopify/export': typeof ApiPublicShopifyExportRoute
+  '/api/public/shopify/products': typeof ApiPublicShopifyProductsRoute
+  '/api/public/shopify/reel': typeof ApiPublicShopifyReelRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -892,6 +920,9 @@ export interface FileRouteTypes {
     | '/app/templates/$slug'
     | '/api/public/payments/webhook'
     | '/api/public/shopify/auth'
+    | '/api/public/shopify/export'
+    | '/api/public/shopify/products'
+    | '/api/public/shopify/reel'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/transactional/preview'
@@ -976,6 +1007,9 @@ export interface FileRouteTypes {
     | '/app/templates/$slug'
     | '/api/public/payments/webhook'
     | '/api/public/shopify/auth'
+    | '/api/public/shopify/export'
+    | '/api/public/shopify/products'
+    | '/api/public/shopify/reel'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/transactional/preview'
@@ -1064,6 +1098,9 @@ export interface FileRouteTypes {
     | '/_authenticated/app/templates/$slug'
     | '/api/public/payments/webhook'
     | '/api/public/shopify/auth'
+    | '/api/public/shopify/export'
+    | '/api/public/shopify/products'
+    | '/api/public/shopify/reel'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/transactional/preview'
@@ -1114,6 +1151,9 @@ export interface RootRouteChildren {
   DirectoryCategorySlugRoute: typeof DirectoryCategorySlugRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   ApiPublicShopifyAuthRoute: typeof ApiPublicShopifyAuthRoute
+  ApiPublicShopifyExportRoute: typeof ApiPublicShopifyExportRoute
+  ApiPublicShopifyProductsRoute: typeof ApiPublicShopifyProductsRoute
+  ApiPublicShopifyReelRoute: typeof ApiPublicShopifyReelRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
@@ -1654,6 +1694,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicShopifyAuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/shopify/export': {
+      id: '/api/public/shopify/export'
+      path: '/api/public/shopify/export'
+      fullPath: '/api/public/shopify/export'
+      preLoaderRoute: typeof ApiPublicShopifyExportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/shopify/products': {
+      id: '/api/public/shopify/products'
+      path: '/api/public/shopify/products'
+      fullPath: '/api/public/shopify/products'
+      preLoaderRoute: typeof ApiPublicShopifyProductsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/shopify/reel': {
+      id: '/api/public/shopify/reel'
+      path: '/api/public/shopify/reel'
+      fullPath: '/api/public/shopify/reel'
+      preLoaderRoute: typeof ApiPublicShopifyReelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable/email/auth/preview': {
       id: '/lovable/email/auth/preview'
       path: '/lovable/email/auth/preview'
@@ -1943,6 +2004,9 @@ const rootRouteChildren: RootRouteChildren = {
   DirectoryCategorySlugRoute: DirectoryCategorySlugRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   ApiPublicShopifyAuthRoute: ApiPublicShopifyAuthRoute,
+  ApiPublicShopifyExportRoute: ApiPublicShopifyExportRoute,
+  ApiPublicShopifyProductsRoute: ApiPublicShopifyProductsRoute,
+  ApiPublicShopifyReelRoute: ApiPublicShopifyReelRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
