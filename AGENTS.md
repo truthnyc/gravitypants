@@ -45,3 +45,4 @@
 
 - SVG uploads share `svg-safety.ts` before preview/storage, including Directory server uploads, to remove active content.
 - Strict export fonts; FontPicker uses Drawer/Popover. Export components share size/quality/estimate rules for parity.
+- Shopify styling uses the editor's shared controls and format patch helpers with shop-verified persistence; its font picker core avoids account hooks so iframe identity stays Shopify-only.

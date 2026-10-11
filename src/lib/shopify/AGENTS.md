@@ -8,3 +8,4 @@
 - Each shop owns one member-less workspace (`shopify_shops.workspace_id`, created by SQL `ensure_shop_workspace`); routes resolve it via `shopFromRequest()` in session.server.ts so the browser never sends a workspace id.
 - Shopify reels reuse `template-source.ts`, `renderAt` and `exportMedia.ts`; `reel-build.ts` holds the pure product→reel rules. No second renderer.
 - `export_status` allows `service_role` so shop routes can enforce the same export rules for member-less workspaces.
+- Slide mutations preserve Frame identity and visual overrides; only template changes/reset rebuild styling, so artwork and custom styling stay together.
