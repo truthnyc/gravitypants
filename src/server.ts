@@ -46,6 +46,20 @@ function isH3SwallowedErrorBody(body: string): boolean {
   }
 }
 
+// Shopify embeds /shopify in the admin iframe: allow only that shop and admin.shopify.com as frame parents.
+function withShopifyFrameHeaders(href: string, response: Response): Response {
+  const url = new URL(href);
+  if (!/^\/shopify(\/|$)/.test(url.pathname)) return response;
+  const shop = url.searchParams.get("shop") ?? "";
+  const ancestors = /^[a-z0-9][a-z0-9-]*\.myshopify\.com$/.test(shop)
+    ? `https://${shop} https://admin.shopify.com`
+    : "https://*.myshopify.com https://admin.shopify.com";
+  const headers = new Headers(response.headers);
+  headers.delete("x-frame-options");
+  headers.set("content-security-policy", `frame-ancestors ${ancestors};`);
+  return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+}
+
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     const forwardedHost = request.headers.get("x-forwarded-host") ?? request.headers.get("host");

@@ -25,6 +25,7 @@ import { Route as ProductRouteImport } from './routes/product'
 import { Route as ProductCategoryRouteImport } from './routes/product-category'
 import { Route as ResetRouteImport } from './routes/reset'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
+import { Route as ShopifyRouteImport } from './routes/shopify'
 import { Route as ShowcaseRouteImport } from './routes/showcase'
 import { Route as SigninRouteImport } from './routes/signin'
 import { Route as SignupRouteImport } from './routes/signup'
@@ -83,6 +84,7 @@ import { Route as AuthenticatedAppAdminSplatRouteImport } from './routes/_authen
 import { Route as AuthenticatedAppTemplatesIndexRouteImport } from './routes/_authenticated/app/templates.index'
 import { Route as AuthenticatedAppTemplatesSlugRouteImport } from './routes/_authenticated/app/templates.$slug'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
+import { Route as ApiPublicShopifyAuthRouteImport } from './routes/api/public/shopify/auth'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
@@ -171,6 +173,11 @@ const ResetRoute = ResetRouteImport.update({
 const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
   id: '/robots.txt',
   path: '/robots.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShopifyRoute = ShopifyRouteImport.update({
+  id: '/shopify',
+  path: '/shopify',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ShowcaseRoute = ShowcaseRouteImport.update({
@@ -486,6 +493,11 @@ const ApiPublicPaymentsWebhookRoute =
     path: '/api/public/payments/webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicShopifyAuthRoute = ApiPublicShopifyAuthRouteImport.update({
+  id: '/api/public/shopify/auth',
+  path: '/api/public/shopify/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
   id: '/lovable/email/auth/preview',
   path: '/lovable/email/auth/preview',
@@ -560,6 +572,7 @@ export interface FileRoutesByFullPath {
   '/product-category': typeof ProductCategoryRouteWithChildren
   '/reset': typeof ResetRoute
   '/robots.txt': typeof RobotsDottxtRoute
+  '/shopify': typeof ShopifyRoute
   '/showcase': typeof ShowcaseRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
@@ -616,6 +629,7 @@ export interface FileRoutesByFullPath {
   '/app/admin/$': typeof AuthenticatedAppAdminSplatRoute
   '/app/templates/$slug': typeof AuthenticatedAppTemplatesSlugRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/api/public/shopify/auth': typeof ApiPublicShopifyAuthRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -644,6 +658,7 @@ export interface FileRoutesByTo {
   '/product-category': typeof ProductCategoryRouteWithChildren
   '/reset': typeof ResetRoute
   '/robots.txt': typeof RobotsDottxtRoute
+  '/shopify': typeof ShopifyRoute
   '/showcase': typeof ShowcaseRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
@@ -698,6 +713,7 @@ export interface FileRoutesByTo {
   '/app/admin/$': typeof AuthenticatedAppAdminSplatRoute
   '/app/templates/$slug': typeof AuthenticatedAppTemplatesSlugRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/api/public/shopify/auth': typeof ApiPublicShopifyAuthRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -729,6 +745,7 @@ export interface FileRoutesById {
   '/product-category': typeof ProductCategoryRouteWithChildren
   '/reset': typeof ResetRoute
   '/robots.txt': typeof RobotsDottxtRoute
+  '/shopify': typeof ShopifyRoute
   '/showcase': typeof ShowcaseRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
@@ -785,6 +802,7 @@ export interface FileRoutesById {
   '/_authenticated/app/admin/$': typeof AuthenticatedAppAdminSplatRoute
   '/_authenticated/app/templates/$slug': typeof AuthenticatedAppTemplatesSlugRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/api/public/shopify/auth': typeof ApiPublicShopifyAuthRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -816,6 +834,7 @@ export interface FileRouteTypes {
     | '/product-category'
     | '/reset'
     | '/robots.txt'
+    | '/shopify'
     | '/showcase'
     | '/signin'
     | '/signup'
@@ -872,6 +891,7 @@ export interface FileRouteTypes {
     | '/app/admin/$'
     | '/app/templates/$slug'
     | '/api/public/payments/webhook'
+    | '/api/public/shopify/auth'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/transactional/preview'
@@ -900,6 +920,7 @@ export interface FileRouteTypes {
     | '/product-category'
     | '/reset'
     | '/robots.txt'
+    | '/shopify'
     | '/showcase'
     | '/signin'
     | '/signup'
@@ -954,6 +975,7 @@ export interface FileRouteTypes {
     | '/app/admin/$'
     | '/app/templates/$slug'
     | '/api/public/payments/webhook'
+    | '/api/public/shopify/auth'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/transactional/preview'
@@ -984,6 +1006,7 @@ export interface FileRouteTypes {
     | '/product-category'
     | '/reset'
     | '/robots.txt'
+    | '/shopify'
     | '/showcase'
     | '/signin'
     | '/signup'
@@ -1040,6 +1063,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/admin/$'
     | '/_authenticated/app/templates/$slug'
     | '/api/public/payments/webhook'
+    | '/api/public/shopify/auth'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/transactional/preview'
@@ -1071,6 +1095,7 @@ export interface RootRouteChildren {
   ProductCategoryRoute: typeof ProductCategoryRouteWithChildren
   ResetRoute: typeof ResetRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
+  ShopifyRoute: typeof ShopifyRoute
   ShowcaseRoute: typeof ShowcaseRoute
   SigninRoute: typeof SigninRoute
   SignupRoute: typeof SignupRoute
@@ -1088,6 +1113,7 @@ export interface RootRouteChildren {
   ApiPublicWeeklyReportRoute: typeof ApiPublicWeeklyReportRoute
   DirectoryCategorySlugRoute: typeof DirectoryCategorySlugRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
+  ApiPublicShopifyAuthRoute: typeof ApiPublicShopifyAuthRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
@@ -1206,6 +1232,13 @@ declare module '@tanstack/react-router' {
       path: '/robots.txt'
       fullPath: '/robots.txt'
       preLoaderRoute: typeof RobotsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shopify': {
+      id: '/shopify'
+      path: '/shopify'
+      fullPath: '/shopify'
+      preLoaderRoute: typeof ShopifyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/showcase': {
@@ -1614,6 +1647,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/shopify/auth': {
+      id: '/api/public/shopify/auth'
+      path: '/api/public/shopify/auth'
+      fullPath: '/api/public/shopify/auth'
+      preLoaderRoute: typeof ApiPublicShopifyAuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable/email/auth/preview': {
       id: '/lovable/email/auth/preview'
       path: '/lovable/email/auth/preview'
@@ -1884,6 +1924,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProductCategoryRoute: ProductCategoryRouteWithChildren,
   ResetRoute: ResetRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
+  ShopifyRoute: ShopifyRoute,
   ShowcaseRoute: ShowcaseRoute,
   SigninRoute: SigninRoute,
   SignupRoute: SignupRoute,
@@ -1901,6 +1942,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicWeeklyReportRoute: ApiPublicWeeklyReportRoute,
   DirectoryCategorySlugRoute: DirectoryCategorySlugRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
+  ApiPublicShopifyAuthRoute: ApiPublicShopifyAuthRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
