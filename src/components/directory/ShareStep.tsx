@@ -303,9 +303,6 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
     </StepShell>
   );
 }
-    </StepShell>
-  );
-}
 
 function FieldCount({ value, max }: { value: string; max: number }) {
   return <small className={cn("block text-right text-[12px] nums", nearLimit(value.length, max) ? "text-ap-amber" : "text-ap-muted")}>{value.length} / {max}</small>;
@@ -316,15 +313,6 @@ function Notice({ children, action, tone }: { children: React.ReactNode; action:
     <div className={cn("mb-[22px] flex flex-col gap-3.5 rounded-[14px] border px-4 py-3.5 text-[14px] leading-normal sm:flex-row sm:items-center", tone === "amber" ? "border-[#f3d9a4] bg-[#fff8eb] text-[#6b4a00]" : "border-ap-hairline bg-ap-card text-ap-body")}>
       <p className="flex-1">{children}</p>
       {action}
-    </div>
-  );
-}
-
-function Feature({ children, on }: { children: React.ReactNode; on?: boolean }) {
-  return (
-    <div className="mb-[22px] flex items-start gap-3 rounded-[14px] border border-ap-hairline px-4 py-3.5 text-[14px] leading-normal text-ap-body [&_b]:text-ap-ink">
-      <span className={cn("grid size-[26px] shrink-0 place-items-center rounded-lg text-[13px] font-bold", on ? "bg-ap-blue text-ap-card" : "bg-ap-panel text-ap-muted")}>★</span>
-      <p>{children}</p>
     </div>
   );
 }
