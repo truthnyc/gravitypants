@@ -1324,6 +1324,53 @@ export type Database = {
           },
         ]
       }
+      shopify_shops: {
+        Row: {
+          access_token: string
+          aimante_opt_in: boolean
+          billing_source: string
+          id: string
+          installed_at: string
+          linked_user_id: string | null
+          scopes: string | null
+          shop_domain: string
+          uninstalled_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          access_token: string
+          aimante_opt_in?: boolean
+          billing_source?: string
+          id?: string
+          installed_at?: string
+          linked_user_id?: string | null
+          scopes?: string | null
+          shop_domain: string
+          uninstalled_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          access_token?: string
+          aimante_opt_in?: boolean
+          billing_source?: string
+          id?: string
+          installed_at?: string
+          linked_user_id?: string | null
+          scopes?: string | null
+          shop_domain?: string
+          uninstalled_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shopify_shops_linked_user_id_fkey"
+            columns: ["linked_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       site_reel_favorites: {
         Row: {
           created_at: string
