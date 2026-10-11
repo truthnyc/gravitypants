@@ -49,7 +49,12 @@ export function PhotosStep({ initial, readOnly = false }: { initial: EditorDoc; 
           headline: null,
         });
       }
-      apply((d) => ({ ...d, frames: [...d.frames, ...added] }));
+      // Template frames without a photo are filled first, so their styles are kept.
+      apply((d) => {
+        const queue = [...added];
+        const filled = d.frames.map((f) => (!f.photo?.path && queue.length ? { ...f, photo: { ...f.photo, ...queue.shift()!.photo } } : f));
+        return { ...d, frames: [...filled, ...queue] };
+      });
       toast(`${added.length} ${added.length === 1 ? "photo" : "photos"} added`);
     } catch {
       toast.error("Some photos couldn't be added. Try again.");
