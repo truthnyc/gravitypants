@@ -794,13 +794,7 @@ function TextTab({ headline, subline, brandColors, brandName, actions }: { headl
       </Collapse>
 
       <div className="border-t border-ap-hairline pt-4 text-[14px] font-semibold">Subline <span className="font-normal text-ap-muted">· optional</span></div>
-      <input
-        value={s.text ?? ""}
-        placeholder="Add a line under the headline"
-        aria-label="Subline"
-        onChange={(e) => setS({ text: e.target.value }, "subline-text")}
-        className="h-10 w-full rounded-sm border border-ap-hairline bg-card px-3 text-[15px]"
-      />
+      <Textarea value={s.text ?? ""} placeholder="Add a line under the headline" aria-label="Subline" onChange={(e) => setS({ text: e.target.value }, "subline-text")} className="min-h-[56px] rounded-sm text-[15px]" />
       <label className="flex items-center justify-between gap-3">
         <span className="text-[13px]">Keep under headline</span>
         <Switch checked={under} onCheckedChange={(v) => setS({ keep_under_headline: v })} className="data-[state=checked]:bg-toggle-on" />
