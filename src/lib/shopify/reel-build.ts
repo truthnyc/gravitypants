@@ -63,9 +63,9 @@ export function buildReel(template: Template, items: ReelItem[], shopName: strin
   const frames: Frame[] = base.frames.map((f, i) => {
     const item = items[i];
     const h = (f.headline ?? FALLBACK_FRAME.headline) as TextSettings;
-    const sub: TextSettings | null = item?.subline
-      ? { ...(f.subline ?? { ...h, size_px: Math.round(h.size_px * 0.55), animation: h.animation, keep_under_headline: true }), text: item.subline, same_on_all: false }
-      : null;
+    const sub = (item?.subline
+      ? { ...(f.subline ?? { ...h, size_px: Math.round((h.size_px ?? 96) * 0.55), keep_under_headline: true }), text: item.subline, same_on_all: false }
+      : null) as TextSettings | null;
     return {
       ...f,
       photo: { ...f.photo, path: item?.path ?? null, url: item?.path ?? null, asset_id: null },

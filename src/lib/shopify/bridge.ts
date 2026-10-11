@@ -23,11 +23,12 @@ export async function waitForAppBridge(ms = 8000) {
 export async function shopifyFetch<T>(path: string, body?: unknown): Promise<T> {
   const bridge = await waitForAppBridge();
   const token = await bridge.idToken();
-  const res = await fetch(path, {
+  const init: RequestInit = {
     method: "POST",
     headers: { Authorization: `Bearer ${token}`, "content-type": "application/json" },
-    body: body === undefined ? undefined : JSON.stringify(body),
-  });
+    body: body === undefined ? null : JSON.stringify(body),
+  };
+  const res = await fetch(path, init);
   const json = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error((json as { error?: string }).error ?? "Something went wrong.");
   return json as T;

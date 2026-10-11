@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatPrice, pickPhotos, MAX_PRODUCTS, MAX_FRAMES, type PickedProduct } from "./reel-build";
+import { formatPrice, pickPhotos, MAX_PRODUCTS, MAX_FRAMES, type PickedProduct } from "@/lib/shopify/reel-build";
 
 const prod = (id: string, n: number): PickedProduct => ({
   id, title: id, price: { amount: "10.00", currencyCode: "USD" },
