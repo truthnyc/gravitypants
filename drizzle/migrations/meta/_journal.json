@@ -85,6 +85,13 @@
       "when": 1791736249012,
       "tag": "0011_directory_showcase_order",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1791752422888,
+      "tag": "0012_shopify_shops",
+      "breakpoints": true
     }
   ]
 }
