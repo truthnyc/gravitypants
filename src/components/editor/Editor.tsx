@@ -81,7 +81,6 @@ type FrameStyle = Pick<Frame, "transition_in"> & {
     | "pan_x"
     | "pan_y"
     | "brightness"
-    | "darken_for_text"
     | "background_color"
   >;
   headline: Partial<TextSettings> | null;
