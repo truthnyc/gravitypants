@@ -298,14 +298,20 @@ export const adminAction = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+async function myWorkspaceIds(db: any, userId: string): Promise<string[]> {
+  const { data } = await db.from("workspace_members").select("workspace_id").eq("user_id", userId);
+  return (data ?? []).map((m: any) => m.workspace_id as string);
+}
+
 export const adminExports = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const db = await adminDb(context as any);
-    const [{ data: ex }, { data: ws }, { data: ps }] = await Promise.all([
+    const [{ data: ex }, { data: ws }, { data: ps }, mine] = await Promise.all([
       db.from("exports").select("*").order("created_at", { ascending: false }).limit(500),
       db.from("workspaces").select("id, name"),
       db.from("projects").select("id, name"),
+      myWorkspaceIds(db, (context as any).userId),
     ]);
     return ((ex ?? []) as any[]).map((e) => ({
       id: e.id as string,
@@ -318,7 +324,25 @@ export const adminExports = createServerFn({ method: "GET" })
       status: e.status as string,
       error: e.error as string | null,
       created_at: e.created_at as string,
+      mine: mine.includes(e.workspace_id),
     }));
+  });
+
+/** Staff testing aid: deletes one of the admin's OWN exports — files plus the usage record, so the export is given back. */
+export const adminDeleteOwnExport = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ id: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const ctx = context as any as Ctx;
+    const db = await adminDb(ctx);
+    const { data: e } = await db.from("exports").select("id, workspace_id, project_id, stamp").eq("id", data.id).maybeSingle();
+    if (!e) throw new Error("Export not found");
+    if (!(await myWorkspaceIds(db, ctx.userId)).includes(e.workspace_id)) throw new Error("You can only delete exports from your own account");
+    if (e.project_id && e.stamp) await removeTree(db.storage.from("media"), `${e.workspace_id}/exports/${e.project_id}/${e.stamp}`);
+    await db.from("export_usage").delete().eq("workspace_id", e.workspace_id).eq("stamp", e.stamp);
+    await db.from("exports").delete().eq("id", e.id);
+    await log(db, ctx.userId, "delete_own_export", e.workspace_id, e.stamp, "Test export removed");
+    return { ok: true };
   });
 
 export const adminAdmins = createServerFn({ method: "GET" })
