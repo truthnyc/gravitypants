@@ -60,6 +60,7 @@ export function renderErrorPage({ host }: ErrorPageOptions = {}): string {
       <a class="service" href="https://status.gravitypants.com" target="_blank" rel="noreferrer">Check service status →</a>
     </div></main>
     <footer><div class="footer-inner">© ${new Date().getFullYear()} ${copyright}</div></footer>
+    <script>try{var k="gp:auto-retry-ssr",l=JSON.parse(sessionStorage.getItem(k)||"null");if(!l||l.p!==location.pathname||Date.now()-l.t>60000){sessionStorage.setItem(k,JSON.stringify({p:location.pathname,t:Date.now()}));setTimeout(function(){location.reload()},1500)}}catch(e){}</script>
   </body>
 </html>`;
 }
