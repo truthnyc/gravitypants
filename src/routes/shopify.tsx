@@ -2,7 +2,8 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { getShopifyConfig } from "@/lib/shopify/config.functions";
 import { shopifyFetch, waitForAppBridge } from "@/lib/shopify/bridge";
-import { PlanBar, useShopPlan } from "@/components/shopify/ShopPlan";
+import { OutsideAdmin, PlanBar, usePlanWelcome, useShopPlan } from "@/components/shopify/ShopPlan";
+import { OUTSIDE_ADMIN_MESSAGE } from "@/lib/shopify/bridge";
 
 type Result =
   | { state: "loading" }
@@ -15,6 +16,7 @@ export const Route = createFileRoute("/shopify")({
   validateSearch: (s: Record<string, unknown>) => ({
     shop: typeof s["shop"] === "string" ? (s["shop"] as string) : undefined,
     host: typeof s["host"] === "string" ? (s["host"] as string) : undefined,
+    plan_handle: typeof s["plan_handle"] === "string" ? (s["plan_handle"] as string) : undefined,
   }),
   loader: () => getShopifyConfig(),
   head: ({ loaderData }) => ({
