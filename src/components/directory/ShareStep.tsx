@@ -211,6 +211,11 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
               <FieldCount value={aimTitle} max={60} />
             </AppField>
 
+            <AppField label="Description" htmlFor="d-desc" className="mb-[18px]">
+              <textarea id="d-desc" value={desc} rows={2} maxLength={REEL_DESCRIPTION_MAX} placeholder="A short line about this reel" onChange={(e) => setDesc(e.target.value)} className="w-full resize-y bg-ap-card px-3.5 py-2.5 text-[14px] leading-[1.5]" />
+              <FieldCount value={desc} max={REEL_DESCRIPTION_MAX} />
+            </AppField>
+
             <AppField label="Mood" className="mb-[18px]">
               {(() => {
                 const all = [...new Set([...moods, ...forCategory(category)])];

@@ -5,7 +5,7 @@ import { Fragment, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { decideReelUpdate, listReelUpdates, setReelFeatured, adminSetAimanteTitle, pinAllDirectoryVideos, adminDeleteReel, adminMoveReel, adminBrandDetail, adminRenameReel, adminSaveBrand, adminSaveBrandSlug, setBrandLogo, listDirectoryBrands, listDirectoryReview, resolveReport, reviewDirectoryReel } from "@/lib/directory/directory.functions";
-import { BRAND_DESCRIPTION_MAX, BRAND_NAME_MAX, CATEGORIES, SLUG_MAX, BRAND_MOODS_MAX, moodLabel, STATUS_LABEL, nearLimit, type Category } from "@/lib/directory/directory";
+import { BRAND_DESCRIPTION_MAX, BRAND_NAME_MAX, CATEGORIES, SLUG_MAX, BRAND_MOODS_MAX, REEL_DESCRIPTION_MAX, moodLabel, STATUS_LABEL, nearLimit, type Category } from "@/lib/directory/directory";
 import { useMoodCatalog } from "@/lib/directory/moods";
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
@@ -373,6 +373,7 @@ function AdminReel({ r, brandId, onChanged, siteReels }: { r: Detail["reels"][nu
   const review = useServerFn(reviewDirectoryReel);
   const moodCatalog = useMoodCatalog();
   const [title, setTitle] = useState(r.title);
+  const [desc, setDesc] = useState(r.description ?? "");
   const [tags, setTags] = useState(r.tags.join(", "));
   const [moods, setMoods] = useState<string[]>(r.moods);
   const [busy, setBusy] = useState(false);
@@ -382,7 +383,7 @@ function AdminReel({ r, brandId, onChanged, siteReels }: { r: Detail["reels"][nu
   };
   const save = () => run(async () => {
     if (title.trim() && title.trim() !== r.title) await rename({ data: { reelId: r.id, title: title.trim() } });
-    await review({ data: { id: r.id, action: "edit", tags: tags.split(",").map((t) => t.trim()).filter(Boolean), moods: moods as string[] } });
+    await review({ data: { id: r.id, action: "edit", tags: tags.split(",").map((t) => t.trim()).filter(Boolean), moods: moods as string[], description: desc.trim() } });
   }, "Reel saved");
   return (
     <div className="flex gap-3 rounded-sm border border-border p-3">
@@ -396,6 +397,8 @@ function AdminReel({ r, brandId, onChanged, siteReels }: { r: Detail["reels"][nu
         <AimanteTitleField reelId={r.id} kind="directory" initial={r.displayTitle} onSaved={onChanged} />
         <FeatureToggle reelId={r.id} status={r.status} featured={r.inShowcase} order={r.showcaseOrder} onChanged={onChanged} />
         {r.inShowcase && siteReels.filter((s) => s.published).map((s) => <DuplicateSiteReel key={s.id} id={s.id} title={s.title} onChanged={onChanged} />)}
+        <textarea value={desc} maxLength={REEL_DESCRIPTION_MAX} rows={2} onChange={(e) => setDesc(e.target.value)} aria-label="Reel description" placeholder="Description shown with the reel" className={cn(field, "h-auto min-h-16 resize-y py-1.5")} />
+        <small className="block text-right text-[12px] nums"><span className={cn(nearLimit(desc.length, REEL_DESCRIPTION_MAX) && "text-amber-700")}>{desc.length} / {REEL_DESCRIPTION_MAX}</span></small>
         <input value={tags} onChange={(e) => setTags(e.target.value)} aria-label="Tags" placeholder="Tags, comma separated" className={field} />
         <div className="flex flex-wrap gap-1">
           {moodCatalog.all.map((m) => {
