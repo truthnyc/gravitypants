@@ -12,6 +12,35 @@ export function useShopPlan() {
   return { info, refresh };
 }
 
+export type WelcomeInfo = PlanInfo & { returnTo: string | null };
+
+/** Immediate (uncached) subscription re-check after Shopify returns the merchant from the hosted plan page. */
+export function usePlanWelcome(run: boolean) {
+  const [info, setInfo] = useState<WelcomeInfo | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  useEffect(() => {
+    if (!run) return;
+    let cancelled = false;
+    shopifyFetch<WelcomeInfo>("/api/public/shopify/export", { action: "welcome" })
+      .then((r) => { if (!cancelled) setInfo(r); })
+      .catch((e) => { if (!cancelled) setError((e as Error).message); });
+    return () => { cancelled = true; };
+  }, [run]);
+  return { info, error };
+}
+
+export const OUTSIDE_ADMIN_MESSAGE = "Gravity Pants for Shopify runs inside your Shopify admin. Open it from Apps in your store.";
+
+/** Shown when a /shopify page is opened outside the Shopify admin (App Bridge missing). */
+export function OutsideAdmin() {
+  return (
+    <>
+      <p role="alert" className="mt-2 text-sm text-destructive">{OUTSIDE_ADMIN_MESSAGE}</p>
+      <a href="https://gravitypants.com" className="mt-3 inline-block text-sm text-primary underline">gravitypants.com</a>
+    </>
+  );
+}
+
 export function remainingText(s: ExportStatus | null) {
   if (!s) return "";
   if (s.staff || s.limit == null) return "Unlimited exports";

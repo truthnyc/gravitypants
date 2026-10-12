@@ -1,5 +1,7 @@
 // Browser-side App Bridge helpers. The session token is the only identity inside the Shopify admin iframe:
 // no cookies, no localStorage.
+import { OUTSIDE_ADMIN_MESSAGE } from "@/components/shopify/ShopPlan";
+
 type PickerItem = { id: string; title?: string };
 declare global {
   interface Window {
