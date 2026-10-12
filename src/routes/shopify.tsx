@@ -96,6 +96,11 @@ function ShopifyHome() {
         {result.state === "ok" && (
           <>
             {result.logo && <img src={result.logo} alt="" className="mx-auto mb-4 h-12 object-contain" />}
+            {welcome.info && (
+              <p role="status" className="mb-4 rounded border border-border bg-background p-3 text-sm">
+                You're on {welcome.info.plan.name}.{welcome.info.returnTo ? " Taking you back to your reel…" : ""}
+              </p>
+            )}
             <h1 className="text-xl font-semibold">Connected to {result.name}</h1>
             <p className="mt-2 text-sm text-muted-foreground">Pick up to {MAX} products. We'll use their photos, names and prices.</p>
             <button
@@ -115,7 +120,7 @@ function ShopifyHome() {
         {result.state === "error" && (
           <>
             <h1 className="text-xl font-semibold">Couldn't connect</h1>
-            <p role="alert" className="mt-2 text-sm text-destructive">{result.message}</p>
+            {result.message === OUTSIDE_ADMIN_MESSAGE ? <OutsideAdmin /> : <p role="alert" className="mt-2 text-sm text-destructive">{result.message}</p>}
           </>
         )}
       </div>
