@@ -32,10 +32,9 @@ function Welcome() {
   const { info, error } = usePlanWelcome(true);
 
   useEffect(() => {
-    if (info?.returnTo) {
-      const t = setTimeout(() => void navigate({ to: "/shopify/reel/$id", params: { id: info.returnTo! }, search: { shop, host, note: `You're on ${info.plan.name}.` } }), 1500);
-      return () => clearTimeout(t);
-    }
+    if (!info?.returnTo) return;
+    const t = setTimeout(() => void navigate({ to: "/shopify/reel/$id", params: { id: info.returnTo! }, search: { shop, host, note: `You're on ${info.plan.name}.` } }), 1500);
+    return () => clearTimeout(t);
   }, [info, navigate, shop, host]);
 
   return (
@@ -47,7 +46,7 @@ function Welcome() {
           <>
             <h1 className="text-xl font-semibold">You're on {info.plan.name}</h1>
             <p className="mt-2 text-sm text-muted-foreground tabular-nums">{remainingText(info.status)}</p>
-            {info.returnTo ? <p className="mt-4 text-sm text-muted-foreground">Taking you back to your reel…</p> : <Link to="/shopify" search={{ shop, host }} data-cta="shopify-welcome-continue" className="mt-6 inline-block rounded-lg bg-primary px-5 py-2.5 text-sm text-primary-foreground">Make a reel</Link>}
+            {info.returnTo ? <p className="mt-4 text-sm text-muted-foreground">Taking you back to your reel…</p> : <Link to="/shopify" search={{ shop, host, plan_handle: undefined }} data-cta="shopify-welcome-continue" className="mt-6 inline-block rounded-lg bg-primary px-5 py-2.5 text-sm text-primary-foreground">Make a reel</Link>}
           </>
         )}
       </div>

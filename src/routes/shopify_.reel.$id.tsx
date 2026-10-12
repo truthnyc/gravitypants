@@ -170,7 +170,7 @@ function ShopifyReel() {
   return (
     <main className="min-h-screen bg-background text-foreground p-6">
       <div className="mx-auto max-w-4xl">
-        <Link to="/shopify" search={{ shop, host }} className="text-sm text-primary hover:underline">Back</Link>
+        <Link to="/shopify" search={{ shop, host, plan_handle: undefined }} className="text-sm text-primary hover:underline">Back</Link>
         <h1 className="mt-2 text-xl font-semibold">{reel?.project.name ?? "Your reel"}</h1>
         {note && <p className="mt-1 text-sm text-muted-foreground">{note}</p>}
         {info && <p className="mt-1 text-sm text-muted-foreground" aria-live="polite">{info}</p>}
