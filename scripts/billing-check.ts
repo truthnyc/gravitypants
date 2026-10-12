@@ -9,6 +9,7 @@ import { execSync } from "node:child_process";
 import { createStripeClient } from "../src/lib/stripe.server";
 import { ensurePortalConfig } from "../src/lib/stillframe/portal.server";
 import { BILLING_PLAN_VALUES, PLAN_BY_PRICE, PLAN_PRICE_KEYS } from "../src/lib/stillframe/plan-map";
+import { checkoutProductCopy, planById, type PlanId } from "../src/lib/stillframe/plans-config";
 
 const stripe = createStripeClient("sandbox");
 let failed = 0;
@@ -56,6 +57,21 @@ async function main() {
         ok(`choose ${key} → ${PLAN_BY_PRICE[key]}`);
       });
     }
+
+    // Checkout product names and descriptions must stay in lockstep with /pricing.
+    await step("checkout catalogue copy", async () => {
+      for (const key of PLAN_PRICE_KEYS) {
+        const priceId = prices.get(key);
+        if (!priceId) throw new Error(`${key}: price not found`);
+        const price = await stripe.prices.retrieve(priceId, { expand: ["product"] });
+        if (typeof price.product === "string" || price.product.deleted) throw new Error(`${key}: product not found`);
+        const planId = key.replace(/_(monthly|yearly)$/, "") as PlanId;
+        const expected = checkoutProductCopy(planById(planId));
+        if (price.product.name !== expected.name) throw new Error(`${key}: name is “${price.product.name}”`);
+        if (price.product.description !== expected.description) throw new Error(`${key}: description is out of date`);
+      }
+      ok("every checkout product matches /pricing");
+    });
 
     // 2. Manage Billing opens and lets people switch to every plan.
     await step("manage billing", async () => {

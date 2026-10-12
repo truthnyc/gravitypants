@@ -79,6 +79,14 @@ export const PLANS: PlanConfig[] = [
   },
 ];
 
+/** Customer-visible Stripe catalogue copy, derived from the same plan rows shown on /pricing. */
+export function checkoutProductCopy(p: PlanConfig) {
+  return {
+    name: `Gravity Pants ${p.name}`,
+    description: p.features.join(", "),
+  };
+}
+
 export const planById = (id: PlanId) => PLANS.find((p) => p.id === id)!;
 
 const usd = (n: number) => `$${n.toLocaleString("en-US")}`;
