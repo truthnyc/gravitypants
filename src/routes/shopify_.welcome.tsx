@@ -1,8 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { getShopifyConfig } from "@/lib/shopify/config.functions";
-import { shopifyFetch } from "@/lib/shopify/bridge";
-import { remainingText, type PlanInfo } from "@/components/shopify/ShopPlan";
+import { remainingText, usePlanWelcome } from "@/components/shopify/ShopPlan";
 
 export const Route = createFileRoute("/shopify_/welcome")({
   validateSearch: (s: Record<string, unknown>) => ({
@@ -30,17 +29,14 @@ export const Route = createFileRoute("/shopify_/welcome")({
 function Welcome() {
   const { shop, host } = Route.useSearch();
   const navigate = useNavigate();
-  const [info, setInfo] = useState<(PlanInfo & { returnTo: string | null }) | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const { info, error } = usePlanWelcome(true);
 
   useEffect(() => {
-    shopifyFetch<PlanInfo & { returnTo: string | null }>("/api/public/shopify/export", { action: "welcome" })
-      .then((r) => {
-        setInfo(r);
-        if (r.returnTo) setTimeout(() => void navigate({ to: "/shopify/reel/$id", params: { id: r.returnTo! }, search: { shop, host, note: `You're on ${r.plan.name}.` } }), 1500);
-      })
-      .catch((e) => setError((e as Error).message));
-  }, [navigate, shop, host]);
+    if (info?.returnTo) {
+      const t = setTimeout(() => void navigate({ to: "/shopify/reel/$id", params: { id: info.returnTo! }, search: { shop, host, note: `You're on ${info.plan.name}.` } }), 1500);
+      return () => clearTimeout(t);
+    }
+  }, [info, navigate, shop, host]);
 
   return (
     <main className="min-h-screen bg-background text-foreground grid place-items-center p-6">
