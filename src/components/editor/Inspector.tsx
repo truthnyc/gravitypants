@@ -190,7 +190,7 @@ export function Inspector({
           />
         )}
         {tab === "text" && (
-          <TextTab headline={frame.headline} subline={frame.subline} brandColors={brandColors} brandName={brandName} actions={actions} />
+          <TextTab selected={selected} headline={frame.headline} subline={frame.subline} brandColors={brandColors} brandName={brandName} actions={actions} />
         )}
         {tab === "logo" && (
           <LogoPanel
@@ -746,12 +746,16 @@ export function AnimationField({ value, onPick }: { value: NonNullable<TextSetti
 }
 
 /** Text tab: headline and subline together, with one scope control at the bottom. */
-function TextTab({ headline, subline, brandColors, brandName, actions }: { headline: TextSettings | null; subline: TextSettings | null; brandColors: string[]; brandName: string; actions: InspectorActions }) {
+function TextTab({ selected, headline, subline, brandColors, brandName, actions }: { selected: ElementKey; headline: TextSettings | null; subline: TextSettings | null; brandColors: string[]; brandName: string; actions: InspectorActions }) {
   const h = headline ?? {};
   const s = subline ?? {};
   const [moreHead, setMoreHead] = useState(false);
   const [moreSub, setMoreSub] = useState(false);
   const [part, setPart] = useState<"headline" | "subline">("headline");
+  // Tapping an element on the preview opens that element's fields.
+  useEffect(() => {
+    if (selected === "headline" || selected === "subline") setPart(selected);
+  }, [selected]);
   const setH = (p: Partial<TextSettings>, k?: string) => actions.onText("headline", p, k);
   // A new subline starts from the headline's font and colour.
   const setS = (p: Partial<TextSettings>, k?: string) =>
