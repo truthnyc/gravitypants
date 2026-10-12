@@ -1,8 +1,8 @@
 // Browser-side App Bridge helpers. The session token is the only identity inside the Shopify admin iframe:
 // no cookies, no localStorage.
-import { OUTSIDE_ADMIN_MESSAGE } from "@/components/shopify/ShopPlan";
-
 type PickerItem = { id: string; title?: string };
+
+export const OUTSIDE_ADMIN_MESSAGE = "Gravity Pants for Shopify runs inside your Shopify admin. Open it from Apps in your store.";
 declare global {
   interface Window {
     shopify?: {
@@ -15,7 +15,7 @@ declare global {
 export async function waitForAppBridge(ms = 8000) {
   const start = Date.now();
   while (!window.shopify?.idToken) {
-    if (Date.now() - start > ms) throw new Error("Shopify App Bridge did not load. Open this app from your Shopify admin.");
+    if (Date.now() - start > ms) throw new Error(OUTSIDE_ADMIN_MESSAGE);
     await new Promise((r) => setTimeout(r, 100));
   }
   return window.shopify;

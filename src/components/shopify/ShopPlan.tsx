@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { shopifyFetch } from "@/lib/shopify/bridge";
+import { OUTSIDE_ADMIN_MESSAGE, shopifyFetch } from "@/lib/shopify/bridge";
 
 export type ExportStatus = { allowed?: boolean; reason?: string | null; used?: number; limit?: number; trial?: boolean; watermark?: boolean; staff?: boolean };
 export type PlanInfo = { status: ExportStatus | null; plan: { source: "web" | "shopify"; handle: string; name: string; period: string | null; configured: boolean } };
