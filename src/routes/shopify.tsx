@@ -36,17 +36,26 @@ export const Route = createFileRoute("/shopify")({
 });
 
 function ShopifyHome() {
-  const { shop, host } = Route.useSearch();
+  const { shop, host, plan_handle } = Route.useSearch();
   const { apiKey } = Route.useLoaderData();
   const navigate = useNavigate();
   const [result, setResult] = useState<Result>({ state: "loading" });
   const [making, setMaking] = useState(false);
   const [note, setNote] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Shopify may return the merchant here (not /shopify/welcome) after they approve a plan.
+  const welcome = usePlanWelcome(Boolean(plan_handle));
+
+  useEffect(() => {
+    if (welcome.info?.returnTo) {
+      const t = setTimeout(() => void navigate({ to: "/shopify/reel/$id", params: { id: welcome.info!.returnTo! }, search: { shop, host, note: `You're on ${welcome.info!.plan.name}.` } }), 1500);
+      return () => clearTimeout(t);
+    }
+  }, [welcome.info, navigate, shop, host]);
 
   useEffect(() => {
     if (!apiKey) return setResult({ state: "error", message: "The Shopify app key hasn't been set up yet." });
-    if (!shop || !host) return setResult({ state: "error", message: "Open Gravity Pants from your Shopify admin to connect your store." });
+    if (!shop || !host) return setResult({ state: "error", message: OUTSIDE_ADMIN_MESSAGE });
     let cancelled = false;
     (async () => {
       try {
