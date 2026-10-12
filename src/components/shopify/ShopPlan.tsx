@@ -29,8 +29,6 @@ export function usePlanWelcome(run: boolean) {
   return { info, error };
 }
 
-export const OUTSIDE_ADMIN_MESSAGE = "Gravity Pants for Shopify runs inside your Shopify admin. Open it from Apps in your store.";
-
 /** Shown when a /shopify page is opened outside the Shopify admin (App Bridge missing). */
 export function OutsideAdmin() {
   return (
