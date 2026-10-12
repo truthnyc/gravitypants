@@ -471,6 +471,7 @@ export const reviewDirectoryReel = createServerFn({ method: "POST" })
     reason: z.string().trim().max(500).optional(),
     tags: z.array(z.string().trim().min(1).max(40)).max(20).optional(),
     moods: z.array(z.string().trim().toLowerCase().max(30)).max(3).optional(),
+    description: z.string().trim().max(REEL_DESCRIPTION_MAX).optional(),
     category: z.enum(CATEGORIES).optional(),
   }).parse(d))
   .handler(async ({ data, context }) => {
@@ -478,8 +479,8 @@ export const reviewDirectoryReel = createServerFn({ method: "POST" })
     await assertAdmin(sb);
     const { data: reel } = await sb.from("directory_reels").select("id, brand_id").eq("id", data.id).single();
     const { brandOwnerEmail, sendDirectoryEmail, SITE } = await import("./directory.server");
-    if (data.tags || data.moods) {
-      const { error } = await sb.from("directory_reels").update({ ...(data.tags ? { tags: data.tags.map((t) => t.toLowerCase()) } : {}), ...(data.moods ? { moods: await cleanMoods(sb, data.moods) } : {}) }).eq("id", data.id);
+    if (data.tags || data.moods || data.description !== undefined) {
+      const { error } = await sb.from("directory_reels").update({ ...(data.tags ? { tags: data.tags.map((t) => t.toLowerCase()) } : {}), ...(data.moods ? { moods: await cleanMoods(sb, data.moods) } : {}), ...(data.description !== undefined ? { description: data.description || null } : {}) }).eq("id", data.id);
       if (error) throw new Error(error.message);
     }
     if (data.category) await sb.from("directory_brands").update({ category: data.category }).eq("id", reel.brand_id);
