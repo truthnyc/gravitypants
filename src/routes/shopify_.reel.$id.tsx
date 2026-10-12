@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getShopifyConfig } from "@/lib/shopify/config.functions";
-import { shopifyFetch } from "@/lib/shopify/bridge";
+import { OUTSIDE_ADMIN_MESSAGE, shopifyFetch } from "@/lib/shopify/bridge";
 import { ensureFonts, renderAt, videoDuration, type BrandStyle } from "@/render/renderFrame";
 import { exportGif, exportMp4, type RenderInput } from "@/render/exportMedia";
 import type { Format, ProjectWithFrames } from "@/lib/stillframe/types";
@@ -9,7 +9,7 @@ import { sizeOf } from "@/lib/stillframe/main-size";
 import { applyReelStyle, SHOPIFY_SIZES, type StyleChange } from "@/lib/shopify/reel-build";
 import { ReelStylePanel } from "@/components/shopify/ReelStylePanel";
 import { Button } from "@/components/ui/button";
-import { PlanBar, UpgradeButton, useShopPlan } from "@/components/shopify/ShopPlan";
+import { OutsideAdmin, PlanBar, UpgradeButton, useShopPlan } from "@/components/shopify/ShopPlan";
 
 type TemplateLite = { id: string; name: string; thumbnail_url: string | null };
 type ReelResponse = { project: ProjectWithFrames; urls: Record<string, string>; templates: TemplateLite[]; notice?: string | null; maxSlides?: number };
@@ -170,11 +170,11 @@ function ShopifyReel() {
   return (
     <main className="min-h-screen bg-background text-foreground p-6">
       <div className="mx-auto max-w-4xl">
-        <Link to="/shopify" search={{ shop, host }} className="text-sm text-primary hover:underline">Back</Link>
+        <Link to="/shopify" search={{ shop, host, plan_handle: undefined }} className="text-sm text-primary hover:underline">Back</Link>
         <h1 className="mt-2 text-xl font-semibold">{reel?.project.name ?? "Your reel"}</h1>
         {note && <p className="mt-1 text-sm text-muted-foreground">{note}</p>}
         {info && <p className="mt-1 text-sm text-muted-foreground" aria-live="polite">{info}</p>}
-        {error && <p role="alert" className="mt-3 text-sm text-destructive">{error}</p>}
+        {error && (error === OUTSIDE_ADMIN_MESSAGE ? <OutsideAdmin /> : <p role="alert" className="mt-3 text-sm text-destructive">{error}</p>)}
         <div className="mt-3"><PlanBar info={plan.info} returnTo={id} /></div>
         {!reel && !error && <p className="mt-6 text-muted-foreground">Loading your reel…</p>}
         {reel && images && (

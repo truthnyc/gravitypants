@@ -2,7 +2,8 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { getShopifyConfig } from "@/lib/shopify/config.functions";
 import { shopifyFetch, waitForAppBridge } from "@/lib/shopify/bridge";
-import { PlanBar, useShopPlan } from "@/components/shopify/ShopPlan";
+import { OutsideAdmin, PlanBar, usePlanWelcome, useShopPlan } from "@/components/shopify/ShopPlan";
+import { OUTSIDE_ADMIN_MESSAGE } from "@/lib/shopify/bridge";
 
 type Result =
   | { state: "loading" }
@@ -15,6 +16,7 @@ export const Route = createFileRoute("/shopify")({
   validateSearch: (s: Record<string, unknown>) => ({
     shop: typeof s["shop"] === "string" ? (s["shop"] as string) : undefined,
     host: typeof s["host"] === "string" ? (s["host"] as string) : undefined,
+    plan_handle: typeof s["plan_handle"] === "string" ? (s["plan_handle"] as string) : undefined,
   }),
   loader: () => getShopifyConfig(),
   head: ({ loaderData }) => ({
@@ -34,17 +36,25 @@ export const Route = createFileRoute("/shopify")({
 });
 
 function ShopifyHome() {
-  const { shop, host } = Route.useSearch();
+  const { shop, host, plan_handle } = Route.useSearch();
   const { apiKey } = Route.useLoaderData();
   const navigate = useNavigate();
   const [result, setResult] = useState<Result>({ state: "loading" });
   const [making, setMaking] = useState(false);
   const [note, setNote] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Shopify may return the merchant here (not /shopify/welcome) after they approve a plan.
+  const welcome = usePlanWelcome(Boolean(plan_handle));
+
+  useEffect(() => {
+    if (!welcome.info?.returnTo) return;
+    const t = setTimeout(() => void navigate({ to: "/shopify/reel/$id", params: { id: welcome.info!.returnTo! }, search: { shop, host, note: `You're on ${welcome.info!.plan.name}.` } }), 1500);
+    return () => clearTimeout(t);
+  }, [welcome.info, navigate, shop, host]);
 
   useEffect(() => {
     if (!apiKey) return setResult({ state: "error", message: "The Shopify app key hasn't been set up yet." });
-    if (!shop || !host) return setResult({ state: "error", message: "Open Gravity Pants from your Shopify admin to connect your store." });
+    if (!shop || !host) return setResult({ state: "error", message: OUTSIDE_ADMIN_MESSAGE });
     let cancelled = false;
     (async () => {
       try {
@@ -85,6 +95,11 @@ function ShopifyHome() {
         {result.state === "ok" && (
           <>
             {result.logo && <img src={result.logo} alt="" className="mx-auto mb-4 h-12 object-contain" />}
+            {welcome.info && (
+              <p role="status" className="mb-4 rounded border border-border bg-background p-3 text-sm">
+                You're on {welcome.info.plan.name}.{welcome.info.returnTo ? " Taking you back to your reel…" : ""}
+              </p>
+            )}
             <h1 className="text-xl font-semibold">Connected to {result.name}</h1>
             <p className="mt-2 text-sm text-muted-foreground">Pick up to {MAX} products. We'll use their photos, names and prices.</p>
             <button
@@ -104,7 +119,7 @@ function ShopifyHome() {
         {result.state === "error" && (
           <>
             <h1 className="text-xl font-semibold">Couldn't connect</h1>
-            <p role="alert" className="mt-2 text-sm text-destructive">{result.message}</p>
+            {result.message === OUTSIDE_ADMIN_MESSAGE ? <OutsideAdmin /> : <p role="alert" className="mt-2 text-sm text-destructive">{result.message}</p>}
           </>
         )}
       </div>

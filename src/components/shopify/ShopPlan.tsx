@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { shopifyFetch } from "@/lib/shopify/bridge";
+import { OUTSIDE_ADMIN_MESSAGE, shopifyFetch } from "@/lib/shopify/bridge";
 
 export type ExportStatus = { allowed?: boolean; reason?: string | null; used?: number; limit?: number; trial?: boolean; watermark?: boolean; staff?: boolean };
 export type PlanInfo = { status: ExportStatus | null; plan: { source: "web" | "shopify"; handle: string; name: string; period: string | null; configured: boolean } };
@@ -10,6 +10,33 @@ export function useShopPlan() {
   const refresh = useCallback(() => shopifyFetch<PlanInfo>("/api/public/shopify/export", { action: "status" }).then(setInfo).catch(() => undefined), []);
   useEffect(() => { void refresh(); }, [refresh]);
   return { info, refresh };
+}
+
+export type WelcomeInfo = PlanInfo & { returnTo: string | null };
+
+/** Immediate (uncached) subscription re-check after Shopify returns the merchant from the hosted plan page. */
+export function usePlanWelcome(run: boolean) {
+  const [info, setInfo] = useState<WelcomeInfo | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  useEffect(() => {
+    if (!run) return;
+    let cancelled = false;
+    shopifyFetch<WelcomeInfo>("/api/public/shopify/export", { action: "welcome" })
+      .then((r) => { if (!cancelled) setInfo(r); })
+      .catch((e) => { if (!cancelled) setError((e as Error).message); });
+    return () => { cancelled = true; };
+  }, [run]);
+  return { info, error };
+}
+
+/** Shown when a /shopify page is opened outside the Shopify admin (App Bridge missing). */
+export function OutsideAdmin() {
+  return (
+    <>
+      <p role="alert" className="mt-2 text-sm text-destructive">{OUTSIDE_ADMIN_MESSAGE}</p>
+      <a href="https://gravitypants.com" className="mt-3 inline-block text-sm text-primary underline">gravitypants.com</a>
+    </>
+  );
 }
 
 export function remainingText(s: ExportStatus | null) {
