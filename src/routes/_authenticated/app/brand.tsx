@@ -64,7 +64,12 @@ function BrandKitPage() {
 
 function BrandKitEditor({ kit }: { kit: BrandKit }) {
   const update = useUpdateBrandKit();
-  const save = (patch: Partial<BrandKit>) => update.mutate(patch);
+  // Settings save as you change them; confirm each save so nobody wonders whether it stuck.
+  const save = (patch: Partial<BrandKit>) =>
+    update.mutate(patch, {
+      onSuccess: () => toast.success("Saved", { id: "brand-kit-saved" }),
+      onError: () => toast.error("That change didn't save. Try again.", { id: "brand-kit-saved" }),
+    });
 
   return (
     <main className="mx-auto max-w-[960px] space-y-5 px-4 pb-16 pt-6 sm:px-8 sm:pt-8">
