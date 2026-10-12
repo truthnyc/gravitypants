@@ -174,7 +174,7 @@ function ShopifyReel() {
         <h1 className="mt-2 text-xl font-semibold">{reel?.project.name ?? "Your reel"}</h1>
         {note && <p className="mt-1 text-sm text-muted-foreground">{note}</p>}
         {info && <p className="mt-1 text-sm text-muted-foreground" aria-live="polite">{info}</p>}
-        {error && <p role="alert" className="mt-3 text-sm text-destructive">{error}</p>}
+        {error && (error === OUTSIDE_ADMIN_MESSAGE ? <OutsideAdmin /> : <p role="alert" className="mt-3 text-sm text-destructive">{error}</p>)}
         <div className="mt-3"><PlanBar info={plan.info} returnTo={id} /></div>
         {!reel && !error && <p className="mt-6 text-muted-foreground">Loading your reel…</p>}
         {reel && images && (
