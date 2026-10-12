@@ -68,6 +68,7 @@ import { Route as AuthenticatedAppHelpRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedAppNewRouteImport } from './routes/_authenticated/app/new'
 import { Route as AuthenticatedAppStatsRouteImport } from './routes/_authenticated/app/stats'
 import { Route as ApiPublicCleanupExportsRouteImport } from './routes/api/public/cleanup-exports'
+import { Route as ApiPublicClientErrorRouteImport } from './routes/api/public/client-error'
 import { Route as ApiPublicDirectoryDailyRouteImport } from './routes/api/public/directory-daily'
 import { Route as ApiPublicTrialRemindersRouteImport } from './routes/api/public/trial-reminders'
 import { Route as ApiPublicWeeklyReportRouteImport } from './routes/api/public/weekly-report'
@@ -405,6 +406,11 @@ const ApiPublicCleanupExportsRoute = ApiPublicCleanupExportsRouteImport.update({
   path: '/api/public/cleanup-exports',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicClientErrorRoute = ApiPublicClientErrorRouteImport.update({
+  id: '/api/public/client-error',
+  path: '/api/public/client-error',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicDirectoryDailyRoute = ApiPublicDirectoryDailyRouteImport.update({
   id: '/api/public/directory-daily',
   path: '/api/public/directory-daily',
@@ -644,6 +650,7 @@ export interface FileRoutesByFullPath {
   '/app/new': typeof AuthenticatedAppNewRoute
   '/app/stats': typeof AuthenticatedAppStatsRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
+  '/api/public/client-error': typeof ApiPublicClientErrorRoute
   '/api/public/directory-daily': typeof ApiPublicDirectoryDailyRoute
   '/api/public/trial-reminders': typeof ApiPublicTrialRemindersRoute
   '/api/public/weekly-report': typeof ApiPublicWeeklyReportRoute
@@ -733,6 +740,7 @@ export interface FileRoutesByTo {
   '/app/new': typeof AuthenticatedAppNewRoute
   '/app/stats': typeof AuthenticatedAppStatsRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
+  '/api/public/client-error': typeof ApiPublicClientErrorRoute
   '/api/public/directory-daily': typeof ApiPublicDirectoryDailyRoute
   '/api/public/trial-reminders': typeof ApiPublicTrialRemindersRoute
   '/api/public/weekly-report': typeof ApiPublicWeeklyReportRoute
@@ -827,6 +835,7 @@ export interface FileRoutesById {
   '/_authenticated/app/new': typeof AuthenticatedAppNewRoute
   '/_authenticated/app/stats': typeof AuthenticatedAppStatsRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
+  '/api/public/client-error': typeof ApiPublicClientErrorRoute
   '/api/public/directory-daily': typeof ApiPublicDirectoryDailyRoute
   '/api/public/trial-reminders': typeof ApiPublicTrialRemindersRoute
   '/api/public/weekly-report': typeof ApiPublicWeeklyReportRoute
@@ -921,6 +930,7 @@ export interface FileRouteTypes {
     | '/app/new'
     | '/app/stats'
     | '/api/public/cleanup-exports'
+    | '/api/public/client-error'
     | '/api/public/directory-daily'
     | '/api/public/trial-reminders'
     | '/api/public/weekly-report'
@@ -1010,6 +1020,7 @@ export interface FileRouteTypes {
     | '/app/new'
     | '/app/stats'
     | '/api/public/cleanup-exports'
+    | '/api/public/client-error'
     | '/api/public/directory-daily'
     | '/api/public/trial-reminders'
     | '/api/public/weekly-report'
@@ -1103,6 +1114,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/new'
     | '/_authenticated/app/stats'
     | '/api/public/cleanup-exports'
+    | '/api/public/client-error'
     | '/api/public/directory-daily'
     | '/api/public/trial-reminders'
     | '/api/public/weekly-report'
@@ -1170,6 +1182,7 @@ export interface RootRouteChildren {
   ShopifyWelcomeRoute: typeof ShopifyWelcomeRoute
   DirectoryIndexRoute: typeof DirectoryIndexRoute
   ApiPublicCleanupExportsRoute: typeof ApiPublicCleanupExportsRoute
+  ApiPublicClientErrorRoute: typeof ApiPublicClientErrorRoute
   ApiPublicDirectoryDailyRoute: typeof ApiPublicDirectoryDailyRoute
   ApiPublicTrialRemindersRoute: typeof ApiPublicTrialRemindersRoute
   ApiPublicWeeklyReportRoute: typeof ApiPublicWeeklyReportRoute
@@ -1599,6 +1612,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/cleanup-exports'
       fullPath: '/api/public/cleanup-exports'
       preLoaderRoute: typeof ApiPublicCleanupExportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/client-error': {
+      id: '/api/public/client-error'
+      path: '/api/public/client-error'
+      fullPath: '/api/public/client-error'
+      preLoaderRoute: typeof ApiPublicClientErrorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/directory-daily': {
@@ -2039,6 +2059,7 @@ const rootRouteChildren: RootRouteChildren = {
   ShopifyWelcomeRoute: ShopifyWelcomeRoute,
   DirectoryIndexRoute: DirectoryIndexRoute,
   ApiPublicCleanupExportsRoute: ApiPublicCleanupExportsRoute,
+  ApiPublicClientErrorRoute: ApiPublicClientErrorRoute,
   ApiPublicDirectoryDailyRoute: ApiPublicDirectoryDailyRoute,
   ApiPublicTrialRemindersRoute: ApiPublicTrialRemindersRoute,
   ApiPublicWeeklyReportRoute: ApiPublicWeeklyReportRoute,

@@ -8,7 +8,7 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -42,13 +42,37 @@ function NotFoundComponent() {
   );
 }
 
+const RETRY_KEY = "gp:auto-retry";
+
 function ErrorComponent({ error, reset }: { error: unknown; reset: () => void }) {
   console.error(error);
   const router = useRouter();
+  const [retrying, setRetrying] = useState(true);
   useEffect(() => {
     reportLovableError(error, { boundary: "tanstack_root_error_component" });
+    const message = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+    // Record every occurrence so we can see what went wrong and when.
+    try {
+      void fetch("/api/public/client-error", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ path: location.pathname, message, stack: error instanceof Error ? error.stack : undefined }),
+        keepalive: true,
+      });
+    } catch { /* never block the page */ }
+    // Quietly reload once per page per minute; most failures are brief hiccups or a stale tab after publishing.
+    try {
+      const last = JSON.parse(sessionStorage.getItem(RETRY_KEY) ?? "null") as { path: string; at: number } | null;
+      if (!last || last.path !== location.pathname || Date.now() - last.at > 60_000) {
+        sessionStorage.setItem(RETRY_KEY, JSON.stringify({ path: location.pathname, at: Date.now() }));
+        location.reload();
+        return;
+      }
+    } catch { /* storage unavailable: show the message */ }
+    setRetrying(false);
   }, [error]);
 
+  if (retrying) return <div className="min-h-dvh" aria-busy="true" />;
   return <ServiceUnavailable onRetry={() => { router.invalidate(); reset(); }} />;
 }
 
