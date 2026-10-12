@@ -47,10 +47,9 @@ function ShopifyHome() {
   const welcome = usePlanWelcome(Boolean(plan_handle));
 
   useEffect(() => {
-    if (welcome.info?.returnTo) {
-      const t = setTimeout(() => void navigate({ to: "/shopify/reel/$id", params: { id: welcome.info!.returnTo! }, search: { shop, host, note: `You're on ${welcome.info!.plan.name}.` } }), 1500);
-      return () => clearTimeout(t);
-    }
+    if (!welcome.info?.returnTo) return;
+    const t = setTimeout(() => void navigate({ to: "/shopify/reel/$id", params: { id: welcome.info!.returnTo! }, search: { shop, host, note: `You're on ${welcome.info!.plan.name}.` } }), 1500);
+    return () => clearTimeout(t);
   }, [welcome.info, navigate, shop, host]);
 
   useEffect(() => {
