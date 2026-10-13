@@ -38,6 +38,7 @@ const daysLeft = (stamp: string) => {
 
 function ExportsPage() {
   const [items, setItems] = useState<Item[] | null>(null);
+  const [busy, setBusy] = useState<string | null>(null);
 
   useEffect(() => {
     let alive = true;
@@ -81,6 +82,21 @@ function ExportsPage() {
       return;
     }
     window.location.href = data.signedUrl;
+  };
+
+  const remove = async (it: Item) => {
+    if (!window.confirm(`Delete this export of "${it.name}"? The files are removed and the export is given back to your account.`)) return;
+    const key = `${it.projectId}/${it.stamp}`;
+    setBusy(key);
+    try {
+      await deleteMyExport({ data: { workspaceId: getWorkspaceId(), projectId: it.projectId, stamp: it.stamp } });
+      setItems((prev) => (prev ?? []).filter((x) => `${x.projectId}/${x.stamp}` !== key));
+      toast.success("Export deleted");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "That export couldn't be deleted. Try again.");
+    } finally {
+      setBusy(null);
+    }
   };
 
   return (
