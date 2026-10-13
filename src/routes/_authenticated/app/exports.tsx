@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Download } from "lucide-react";
+import { Download, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { getWorkspaceId } from "@/lib/stillframe/workspace";
 import { MEDIA_BUCKET } from "@/lib/stillframe/media";
+import { deleteMyExport } from "@/lib/stillframe/account.functions";
 
 export const Route = createFileRoute("/_authenticated/app/exports")({
   head: () => ({
