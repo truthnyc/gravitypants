@@ -123,8 +123,18 @@ function ExportsPage() {
                 <Link to="/app/ad/$id/export" params={{ id: it.projectId }} className="text-[15px] font-semibold hover:underline">
                   {it.name}
                 </Link>
-                <span className="text-[12px] text-secondary-text nums">
+                <span className="flex items-center gap-1 text-[12px] text-secondary-text nums">
                   {when(it.stamp)} · {daysLeft(it.stamp)}
+                  <button
+                    type="button"
+                    data-cta="delete-export"
+                    disabled={busy === `${it.projectId}/${it.stamp}`}
+                    onClick={() => void remove(it)}
+                    aria-label={`Delete export of ${it.name}`}
+                    className="ml-1 flex h-8 w-8 items-center justify-center rounded-lg text-secondary-text hover:text-destructive disabled:opacity-50"
+                  >
+                    <Trash2 size={15} strokeWidth={1.7} />
+                  </button>
                 </span>
               </div>
               <ul className="space-y-1">
