@@ -39,6 +39,7 @@ const daysLeft = (stamp: string) => {
 function ExportsPage() {
   const [items, setItems] = useState<Item[] | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
+  const [liveAds, setLiveAds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     let alive = true;
@@ -51,6 +52,8 @@ function ExportsPage() {
       if (ids.length) {
         const { data } = await supabase.from("projects").select("id,name").in("id", ids);
         for (const p of (data ?? []) as { id: string; name: string }[]) names.set(p.id, p.name);
+        const { data: reels } = await supabase.from("directory_reels").select("ad_id").in("ad_id", ids).eq("status", "live");
+        if (alive) setLiveAds(new Set((reels ?? []).map((r: { ad_id: string }) => r.ad_id)));
       }
       const out: Item[] = [];
       await Promise.all(
@@ -85,7 +88,11 @@ function ExportsPage() {
   };
 
   const remove = async (it: Item) => {
-    if (!window.confirm(`Delete this export of "${it.name}"? The files are removed and the export is given back to your account.`)) return;
+    const published = liveAds.has(it.projectId);
+    const msg = published
+      ? `Delete this export of "${it.name}"? The files are removed and the export is given back to your account. This ad is live in the Directory — deleting the export won't unpublish it.`
+      : `Delete this export of "${it.name}"? The files are removed and the export is given back to your account.`;
+    if (!window.confirm(msg)) return;
     const key = `${it.projectId}/${it.stamp}`;
     setBusy(key);
     try {
