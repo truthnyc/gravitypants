@@ -39,6 +39,7 @@ const daysLeft = (stamp: string) => {
 function ExportsPage() {
   const [items, setItems] = useState<Item[] | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
+  const [liveAds, setLiveAds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     let alive = true;
@@ -51,6 +52,8 @@ function ExportsPage() {
       if (ids.length) {
         const { data } = await supabase.from("projects").select("id,name").in("id", ids);
         for (const p of (data ?? []) as { id: string; name: string }[]) names.set(p.id, p.name);
+        const { data: reels } = await supabase.from("directory_reels").select("ad_id").in("ad_id", ids).eq("status", "live");
+        if (alive) setLiveAds(new Set((reels ?? []).map((r: { ad_id: string }) => r.ad_id)));
       }
       const out: Item[] = [];
       await Promise.all(
