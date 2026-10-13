@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Download } from "lucide-react";
+import { Download, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { getWorkspaceId } from "@/lib/stillframe/workspace";
 import { MEDIA_BUCKET } from "@/lib/stillframe/media";
+import { deleteMyExport } from "@/lib/stillframe/account.functions";
 
 export const Route = createFileRoute("/_authenticated/app/exports")({
   head: () => ({
@@ -37,6 +38,7 @@ const daysLeft = (stamp: string) => {
 
 function ExportsPage() {
   const [items, setItems] = useState<Item[] | null>(null);
+  const [busy, setBusy] = useState<string | null>(null);
 
   useEffect(() => {
     let alive = true;
@@ -82,6 +84,21 @@ function ExportsPage() {
     window.location.href = data.signedUrl;
   };
 
+  const remove = async (it: Item) => {
+    if (!window.confirm(`Delete this export of "${it.name}"? The files are removed and the export is given back to your account.`)) return;
+    const key = `${it.projectId}/${it.stamp}`;
+    setBusy(key);
+    try {
+      await deleteMyExport({ data: { workspaceId: getWorkspaceId(), projectId: it.projectId, stamp: it.stamp } });
+      setItems((prev) => (prev ?? []).filter((x) => `${x.projectId}/${x.stamp}` !== key));
+      toast.success("Export deleted");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "That export couldn't be deleted. Try again.");
+    } finally {
+      setBusy(null);
+    }
+  };
+
   return (
     <main className="mx-auto max-w-[960px] space-y-5 px-4 pb-16 pt-6 sm:px-8 sm:pt-8">
       <div>
@@ -106,8 +123,18 @@ function ExportsPage() {
                 <Link to="/app/ad/$id/export" params={{ id: it.projectId }} className="text-[15px] font-semibold hover:underline">
                   {it.name}
                 </Link>
-                <span className="text-[12px] text-secondary-text nums">
+                <span className="flex items-center gap-1 text-[12px] text-secondary-text nums">
                   {when(it.stamp)} · {daysLeft(it.stamp)}
+                  <button
+                    type="button"
+                    data-cta="delete-export"
+                    disabled={busy === `${it.projectId}/${it.stamp}`}
+                    onClick={() => void remove(it)}
+                    aria-label={`Delete export of ${it.name}`}
+                    className="ml-1 flex h-8 w-8 items-center justify-center rounded-lg text-secondary-text hover:text-destructive disabled:opacity-50"
+                  >
+                    <Trash2 size={15} strokeWidth={1.7} />
+                  </button>
                 </span>
               </div>
               <ul className="space-y-1">
