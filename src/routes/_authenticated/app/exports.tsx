@@ -88,7 +88,11 @@ function ExportsPage() {
   };
 
   const remove = async (it: Item) => {
-    if (!window.confirm(`Delete this export of "${it.name}"? The files are removed and the export is given back to your account.`)) return;
+    const published = liveAds.has(it.projectId);
+    const msg = published
+      ? `Delete this export of "${it.name}"? The files are removed and the export is given back to your account. This ad is live in the Directory — deleting the export won't unpublish it.`
+      : `Delete this export of "${it.name}"? The files are removed and the export is given back to your account.`;
+    if (!window.confirm(msg)) return;
     const key = `${it.projectId}/${it.stamp}`;
     setBusy(key);
     try {
