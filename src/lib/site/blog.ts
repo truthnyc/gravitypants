@@ -1,4 +1,5 @@
 import type { BlogVisualKind } from "@/components/site/BlogVisual";
+import katherinePoster from "@/assets/site/fine-jewelry-gifts-poster.webp.asset.json";
 export type BlogPost = {
   slug: string;
   title: string;
@@ -8,6 +9,8 @@ export type BlogPost = {
   date: string;
   minutes: number;
   tag: string;
+  /** Cover image for blog cards; falls back to the default photo set. */
+  cover?: string;
   body: { h?: string; p: string[]; visual?: BlogVisualKind }[];
 };
 
@@ -20,6 +23,7 @@ export const POSTS: BlogPost[] = [
     date: "October 14, 2026",
     minutes: 4,
     tag: "How to",
+    cover: katherinePoster.url,
     body: [
       {
         p: [
