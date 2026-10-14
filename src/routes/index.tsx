@@ -635,6 +635,46 @@ function Home() {
           </div>
         </section>
         {/* Hidden until brand approvals: <section id="customers" className="home-logos home-section"><p>Brands making reels with Gravity Pants</p><div>{Array.from({ length: 6 }, (_, i) => <span key={i}>[Customer logo]</span>)}</div></section> */}
+        <section id="examples" className="home-examples">
+          <div className="home-examples-top home-section">
+            <Heading eyebrow="Made with Gravity Pants">
+              Every one of these
+              <br className="home-desktop-only" /> started as a few photos.
+            </Heading>
+            <div className="home-gallery-desktop">
+              <Primary to="/examples">
+                Browse the gallery <ArrowRight size={18} strokeWidth={1.7} />
+              </Primary>
+            </div>
+          </div>
+          <ReelCarousel
+            label="Example reels made with Gravity Pants"
+            items={examples.map((ex, i) => ({
+              key: ex.name,
+              media: () => <HomeExampleMedia example={ex} index={i} count={examples.length} />,
+              title: ex.name,
+              detail: ex.detail,
+              visit: ex.href ? { href: ex.href, label: `Visit ${ex.logo ?? ex.name}` } : undefined,
+            }))}
+          />
+          <p className="site-gallery-cta home-section">
+            Prefer we make it for you?{" "}
+            <Link to="/contact" search={{ topic: "brand-reel" }} data-cta="commission-reel">
+              Commission a reel <ArrowRight size={16} strokeWidth={1.7} />
+            </Link>
+          </p>
+          <div className="home-gallery-mobile home-section">
+            <span className="home-swipe-dots" aria-hidden="true">
+              <i />
+              <i />
+              <i />
+              <i />
+            </span>
+            <Link className="home-text-link" to="/examples">
+              Browse the gallery <ArrowRight size={16} />
+            </Link>
+          </div>
+        </section>
         <section id="how" className="home-section home-how">
           <Heading eyebrow="How it works">From photos to a finished reel.</Heading>
           <div className="home-how-grid">
@@ -676,46 +716,6 @@ function Home() {
                 <p>Get 9:16, 4:5, 1:1, 5:4, 16:9 and custom-size versions as MP4 or GIF, ready for social, ads, email and websites.</p>
               </div>
             </article>
-          </div>
-        </section>
-        <section id="examples" className="home-examples">
-          <div className="home-examples-top home-section">
-            <Heading eyebrow="Made with Gravity Pants">
-              Every one of these
-              <br className="home-desktop-only" /> started as a few photos.
-            </Heading>
-            <div className="home-gallery-desktop">
-              <Primary to="/examples">
-                Browse the gallery <ArrowRight size={18} strokeWidth={1.7} />
-              </Primary>
-            </div>
-          </div>
-          <ReelCarousel
-            label="Example reels made with Gravity Pants"
-            items={examples.map((ex, i) => ({
-              key: ex.name,
-              media: () => <HomeExampleMedia example={ex} index={i} count={examples.length} />,
-              title: ex.name,
-              detail: ex.detail,
-              visit: ex.href ? { href: ex.href, label: `Visit ${ex.logo ?? ex.name}` } : undefined,
-            }))}
-          />
-          <p className="site-gallery-cta home-section">
-            Prefer we make it for you?{" "}
-            <Link to="/contact" search={{ topic: "brand-reel" }} data-cta="commission-reel">
-              Commission a reel <ArrowRight size={16} strokeWidth={1.7} />
-            </Link>
-          </p>
-          <div className="home-gallery-mobile home-section">
-            <span className="home-swipe-dots" aria-hidden="true">
-              <i />
-              <i />
-              <i />
-              <i />
-            </span>
-            <Link className="home-text-link" to="/examples">
-              Browse the gallery <ArrowRight size={16} />
-            </Link>
           </div>
         </section>
         <section id="before-after" className="home-section home-before">
