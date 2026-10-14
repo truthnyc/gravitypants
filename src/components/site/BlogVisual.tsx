@@ -5,6 +5,38 @@ import meaumeGrapes from "@/assets/site/chateau-meaume-grapes.jpg.asset.json";
 import meaumeGlass from "@/assets/site/chateau-meaume-glass.jpg.asset.json";
 import meaumeVineyard from "@/assets/site/chateau-meaume-vineyard.jpg.asset.json";
 import { FeaturedAdVideo } from "@/components/site/FeaturedAdVideo";
+import { useEffect, useState } from "react";
+import reel0 from "@/assets/site/chateau-meaume-reel-0.jpg.asset.json";
+import reel1 from "@/assets/site/chateau-meaume-reel-1.jpg.asset.json";
+import reel2 from "@/assets/site/chateau-meaume-reel-2.jpg.asset.json";
+import reel3 from "@/assets/site/chateau-meaume-reel-3.jpg.asset.json";
+import reel4 from "@/assets/site/chateau-meaume-reel-4.jpg.asset.json";
+import reel5 from "@/assets/site/chateau-meaume-reel-5.jpg.asset.json";
+import reel6 from "@/assets/site/chateau-meaume-reel-6.jpg.asset.json";
+import reel7 from "@/assets/site/chateau-meaume-reel-7.jpg.asset.json";
+
+const MEAUME_REEL = [
+  { src: reel0.url, alt: "Château Méaume vineyard at dawn with the Château Méaume logo" },
+  { src: reel1.url, alt: "Where it all begins." },
+  { src: reel2.url, alt: "Visit, taste, stay." },
+  { src: reel3.url, alt: "Make yourself at home." },
+  { src: reel4.url, alt: "Come and stay." },
+  { src: reel5.url, alt: "Bottled at the château." },
+  { src: reel6.url, alt: "Ripe fruit. Fresh finish." },
+  { src: reel7.url, alt: "From our vines." },
+];
+
+function MeaumeReel() {
+  const [i, setI] = useState(0);
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const t = window.setInterval(() => setI((n) => (n + 1) % MEAUME_REEL.length), 2200);
+    return () => window.clearInterval(t);
+  }, []);
+  return <div className="relative mx-auto aspect-square w-full max-w-[560px] overflow-hidden rounded-[8px] bg-site-panel" role="img" aria-label={`Château Méaume reel: ${MEAUME_REEL.slice(1).map((f) => f.alt).join(" ")}`}>
+    {MEAUME_REEL.map((f, n) => <img key={f.src} src={f.src} alt="" aria-hidden="true" loading="lazy" className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 motion-reduce:transition-none ${n === i ? "opacity-100" : "opacity-0"}`} />)}
+  </div>;
+}
 
 export type BlogVisualKind = "photo-vs-reel" | "formats" | "three-shots" | "timeline-vs-tap" | "meaume-three-shots" | "meaume-formats" | "meaume-hero";
 
@@ -59,7 +91,7 @@ export function BlogVisual({ kind }: { kind: BlogVisualKind }) {
   if (kind === "meaume-hero") {
     return <figure className="mt-8">
       <div className="rounded-[8px] bg-site-panel p-5 md:p-8">
-        <img src={MEAUME_PHOTOS[0]} alt="The vineyard at Château Méaume at sunset" loading="lazy" className="aspect-[16/9] w-full rounded-[8px] object-cover" />
+        <MeaumeReel />
       </div>
       <Caption>Photos like these are all a reel needs.</Caption>
     </figure>;
