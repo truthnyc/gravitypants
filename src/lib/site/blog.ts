@@ -13,6 +13,65 @@ export type BlogPost = {
 
 export const POSTS: BlogPost[] = [
   {
+    slug: "how-to-turn-photos-into-a-video",
+    title: "How to turn photos into a video (without editing anything)",
+    seoTitle: "How to Turn Photos Into a Video Ad",
+    dek: "A few photos, a size and your own words. Here is how to get from a camera roll to a finished video ad.",
+    date: "October 14, 2026",
+    minutes: 4,
+    tag: "How to",
+    body: [
+      {
+        p: [
+          "You have good photos of your product, your shop or your work. You want a video for Reels, Stories or TikTok, but you don't have footage and you don't want to learn a video editor.",
+          "You don't need either. A short video ad can be built entirely from still photos. Here is the whole process, step by step.",
+        ],
+      },
+      {
+        h: "1. Choose three to five photos",
+        p: [
+          "Pick photos that show one thing clearly. A useful set is one wide shot, one detail and one close-up, in that order. The wide shot says what we are looking at, the detail makes it believable and the close-up gives the ending somewhere to land.",
+          "Photos you already have are fine. Clear, well lit and in focus matters more than a new camera.",
+        ],
+        visual: "three-shots",
+      },
+      {
+        h: "2. Pick the size first",
+        p: [
+          "Decide where the video will be posted before you start. Vertical 9:16 suits Reels, Stories and TikTok. Portrait 4:5 and square 1:1 suit feeds. Wide 16:9 and 5:4 suit banners, websites and YouTube.",
+          "Choosing the size first means your photos and words are placed for that shape from the start, instead of being cropped later.",
+        ],
+        visual: "formats",
+      },
+      {
+        h: "3. Change the words, not the timing",
+        p: [
+          "In Gravity Pants your photos already move and the words are already in place when the reel opens. Tap the headline to rewrite it, tap a photo to replace it and tap the text to change how it moves.",
+          "Keep the words short. One headline and one short line under it is usually enough. Finish with what you want people to do, such as visit, book or shop.",
+        ],
+      },
+      {
+        h: "4. Add your brand once",
+        p: [
+          "Set up your logo, colors and fonts in a brand kit. Every new ad starts with them, so your videos look like they come from the same business without extra work.",
+        ],
+      },
+      {
+        h: "5. Download an MP4 or GIF",
+        p: [
+          "Export the finished reel as an MP4 for social posts or as an animated GIF for emails and websites. You can export the other sizes from the same ad, so one set of photos covers several places.",
+          "Then post it where your customers already look.",
+        ],
+      },
+      {
+        h: "Try it with photos you already have",
+        p: [
+          "The free trial needs no card and has no time limit. Your first export has no watermark, so you can make a real ad and see how it does.",
+        ],
+      },
+    ],
+  },
+  {
     slug: "photos-beat-nothing-video-beats-photos",
     title: "Photos beat nothing. Video beats photos.",
     dek: "A little movement can make the product photos you already have work harder in a busy feed.",
