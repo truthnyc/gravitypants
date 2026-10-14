@@ -23,7 +23,7 @@ export function useBodyScrollLock(open: boolean) {
   }, [open]);
 }
 
-type Item = { label: string; to: string; exact?: boolean };
+type Item = { label: string; to: string; exact?: boolean; cta?: string };
 const work: Item[] = [
   { label: "Your Ads", to: "/app/ads", exact: true },
   { label: "Brand Kit", to: "/app/brand" },
@@ -41,6 +41,7 @@ const account: Item[] = [
   { label: "Account", to: "/app/account", exact: true },
   { label: "Favorites", to: "/app/account/favorites" },
   { label: "Billing", to: "/app/account/billing" },
+  { label: "Tutorial", to: "/app/guide", cta: "menu-tutorial" },
   { label: "Help", to: "/help" },
 ];
 
@@ -61,6 +62,7 @@ function Row({ item, pathname, size, onNavigate }: { item: Item; pathname: strin
     <Link
       to={item.to as "/"}
       onClick={onNavigate}
+      data-cta={item.cta}
       aria-current={on ? "page" : undefined}
       className={cn(
         "flex min-h-12 items-center rounded-lg px-3 text-ap-ink transition-colors hover:bg-ap-panel",
