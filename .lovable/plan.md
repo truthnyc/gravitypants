@@ -36,25 +36,23 @@ These points were checked against the current files; the trial was also checked 
 
 ## Shared content: 13 sections
 
-`src/lib/stillframe/guide.ts` will hold the section order, IDs, headings, numbered instructions, tips, illustration keys, coming-soon status, link labels/destinations and support action, plus the small FAQ collection reused by `/app/help`. Keep editorial content out of the presentation components. Import existing trial/plan/size constants rather than creating another list of prices or limits.
+`src/lib/stillframe/guide.ts` holds section IDs/order, headings, instructions, tips, illustration keys, badges, links and support action, plus FAQs reused by `/app/help`. Import existing trial/plan/size constants instead of duplicating prices or limits.
 
-| # | Section | Coverage and destination |
-| --- | --- | --- |
-| 1 | Before you start | Still photos become short MP4 videos or animated GIFs. Explain the usage-based trial and recommend clear photos with room around the subject. **Start a reel → `/app/new`**. |
-| 2 | Make your first reel | **Format → Photos**: choose a main size, optional template/kit, add 3–5 photos and arrange their order. Explain that custom dimensions come later at Export. **Start a reel → `/app/new`**. |
-| 3 | Edit your reel | Frame rail, preview stage, Inspector Photo/Text/Logo controls; headline/subline, fonts, colours, framing and motion; frame timing/transitions, undo, autosave and the phone layout. Explain main size versus temporary preview size. **Open Your Ads → `/app/ads`**. |
-| 4 | Start from a template | Preview a template, supply photos, edit words; reusable kits offer “Make another from this kit”. **Open Templates → `/app/templates`**. |
-| 5 | Set up your brand kit | Logo versions for light/dark photos, colours and Google fonts; selecting a kit, saving changes and adjusting logo visibility per frame in Edit. **Open Brand Kit → `/app/brand`**. |
-| 6 | Export your files | MP4 for video destinations, GIF for email/compatible placements; main and additional sizes, crop checks, custom size, quality and approximate file-size estimates. One export can produce multiple files. Previous exports remain downloadable for 30 days; deleting files does not refund customer export usage. **Previous Exports → `/app/exports`**. |
-| 7 | Share your reel | Download for use elsewhere; explain the optional Share step, private-by-default submission control, description and explicit permission/review. Keep this concise; no Directory/Aimanté destination links and no social-posting promise. **Open Your Ads → `/app/ads`**. |
-| 8 | Work with your team | Team plan, owner/admin invitations from **Account → Team**, shared kits/templates and workspace switching. **Open Team → `/app/account/members`** with a clear plan/role note. |
-| 9 | Read your brand stats | Views, saves, website clicks, date ranges and estimated revenue; Business/Team availability and an honest no-data explanation. **Open Brand stats → `/app/stats`**. |
-| 10 | Aimanté directory | **Coming soon** badge, brief description and one preview illustration; no deep link or activation action. |
-| 11 | Shopify | **Coming soon** badge, brief description and one product-to-reel illustration; no deep link or activation action. |
-| 12 | Plans and billing | Trial, upgrades, included exports, top-ups and Manage billing. Reuse the existing plan/pack definitions; explain owner/admin control and that Manage billing appears when a billing account is available. **Open Billing → `/app/account/billing`**. |
-| 13 | Troubleshooting and support | Photo upload problems, crop/text fit, font-loading failures, large GIFs and exhausted exports; short practical remedies. **Contact support** opens the existing `ContactSupportDialog` with its existing topic/message/attachment flow. |
+1. **Before you start:** photos → MP4/GIF; usage-based trial; photo preparation. Link: `/app/new`.
+2. **First reel:** Format → Photos; five main sizes, optional template/kit, 3–5 recommended photos, ordering. Explain custom sizes at Export. Link: `/app/new`.
+3. **Edit:** rail, stage, Photo/Text/Logo Inspector, fonts, colours, framing, motion, timing/transitions, undo, autosave and mobile controls; main versus preview size. Link: `/app/ads`.
+4. **Templates:** preview, photos, words, reusable kits and “Make another”. **Open Templates → `/app/templates`**.
+5. **Brand kit:** logo versions, colours, Google fonts, saving/selecting a kit; per-frame visibility in Edit. Link: `/app/brand`.
+6. **Export:** MP4/GIF, main/additional/custom sizes, crop checks, quality, approximate file estimate; multiple files per export, 30-day downloads. Deleting files does not refund usage. Link: `/app/exports`.
+7. **Share:** download; optional Share step, initially private, description, permission/review. No Directory destination links or direct social-posting promises. Link: `/app/ads`.
+8. **Team:** owner/admin invites via Account → Team, shared kits/templates and workspace switcher. Link: `/app/account/members`, with plan/role note.
+9. **Stats:** views, saves, clicks, date ranges, estimated revenue and empty state; Business/Team availability. Link: `/app/stats`.
+10. **Aimanté:** Coming soon badge, brief description and illustration; no deep links.
+11. **Shopify:** same coming-soon treatment; no deep links.
+12. **Billing:** trial, upgrade, limits, top-ups, Manage billing; current shared plan definitions and owner/admin permissions. Link: `/app/account/billing`.
+13. **Troubleshooting:** upload, crop/text fit, fonts, GIF size and exhausted exports; short remedies. **Contact support** opens the existing dialog.
 
-The trial answer shared with `/app/help` will be: **“No time limit and no card. You get 3 exports: the first without a watermark, then 2 more with a small Gravity Pants mark.”** Counts will be sourced from the existing trial configuration.
+Shared trial answer: **“No time limit and no card. You get 3 exports: the first without a watermark, then 2 more with a small Gravity Pants mark.”** Source counts from existing trial configuration.
 
 ## Illustration component breakdown
 
@@ -94,10 +92,10 @@ Maintain stable view boxes/aspect ratios and readable labels at phone widths. Ea
 
 ## Verification after approval
 
-- Signed out: `/app/guide` redirects to sign-in and returns there after authentication. Signed in: guide uses the normal header/footer and all 13 sections render.
-- Confirm `noindex`, unique metadata and absence from the sitemap; no public mirror is created.
-- Exercise both entry points, all app destinations, direct section fragments, desktop contents and mobile dropdown, including keyboard focus and back/forward behaviour.
-- Open the existing support dialog from the guide, verify close/reopen and fields, without sending a real support ticket merely for testing.
-- Check 375px, 768px and 1440px layouts, sticky offsets, long headings, mockups and reduced-motion mode; inspect screenshots for overlap and overflow.
-- Confirm shared Help/trial output against the existing trial constants and live rule already inspected. Run the relevant existing rule tests; do not add brittle tests of prose, styling or screenshots. No business rules are changing.
-- Check the preview’s error signals before reporting completion.
+- Check signed-out redirect/return and signed-in normal shell with all 13 sections.
+- Confirm `noindex`, unique metadata and sitemap exclusion.
+- Exercise entry points, app links, fragments, contents/dropdown, keyboard focus and back/forward.
+- Open/close the support dialog; do not send a real ticket merely for testing.
+- Inspect 375px, 768px and 1440px screenshots for overflow, sticky overlap and illustration clarity; check reduced motion.
+- Verify shared trial output against existing constants/rules and run relevant existing tests. No brittle prose/style/snapshot tests; no business-rule changes.
+- Check preview error signals before reporting completion.
