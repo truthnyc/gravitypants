@@ -1,15 +1,15 @@
 import photo1 from "@/assets/site/purl-soho-photo-1.webp.asset.json";
 import photo2 from "@/assets/site/purl-soho-photo-2.webp.asset.json";
 import photo3 from "@/assets/site/purl-soho-photo-3.webp.asset.json";
-import katherineVideo from "@/assets/site/fine-jewelry-gifts.mp4.asset.json";
-import katherineVideoWebm from "@/assets/site/fine-jewelry-gifts.webm.asset.json";
-import katherinePoster from "@/assets/site/fine-jewelry-gifts-poster.webp.asset.json";
+import beniRug1 from "@/assets/site/beni-rug-1.jpg.asset.json";
+import beniRug2 from "@/assets/site/beni-rug-2.jpg.asset.json";
+import beniRug3 from "@/assets/site/beni-rug-3.jpg.asset.json";
 import { FeaturedAdVideo } from "@/components/site/FeaturedAdVideo";
 
-export type BlogVisualKind = "photo-vs-reel" | "formats" | "three-shots" | "timeline-vs-tap" | "katherine-three-shots" | "katherine-formats" | "katherine-reel";
+export type BlogVisualKind = "photo-vs-reel" | "formats" | "three-shots" | "timeline-vs-tap" | "beni-three-shots" | "beni-formats" | "beni-hero";
 
 const PHOTOS = [photo1.url, photo2.url, photo3.url];
-const KATHERINE_POSTER = katherinePoster.url;
+const BENI_PHOTOS = [beniRug1.url, beniRug2.url, beniRug3.url];
 
 function Caption({ children }: { children: string }) {
   return <figcaption className="mt-3 text-[14px] leading-[1.5] text-site-muted">{children}</figcaption>;
