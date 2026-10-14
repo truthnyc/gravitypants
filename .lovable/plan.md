@@ -12,25 +12,25 @@ These points were checked against the current files; the trial was also checked 
 
 | Topic | What the tutorial should say |
 | --- | --- |
-| First-reel order | `/app/new` opens **Format first**, then **Photos → Edit → Export → Share**. Format includes the main size, an optional template and a brand kit. It currently starts at **4:5**. Sources: `app/new.tsx`, `editor/FormatStep.tsx`. |
-| Custom sizes | The initial Format picker offers **9:16, 4:5, 1:1, 16:9 and 5:4**. **Custom dimensions are set on Export**, not Format. Sources: `FormatChooser.tsx`, `ExportPage.tsx`. |
-| Photo count | **3–5 photos is a recommendation**, not a minimum or limit. Photos currently allows up to 20. Source: `PhotosStep.tsx`. |
-| Trial | No time limit and no card; **3 included exports: first without a watermark, next 2 with a small Gravity Pants mark**. The live function also exempts exports backed by purchased extras from the watermark, so do not claim every later export must be marked. `/app/help` currently gives the wrong duration and watermark rule. |
-| Timing | Teach timing and transitions through the **frame rail’s controls**, rather than promising a separate full timeline in the current Edit screen. The active editor renders `FrameRail` and `Inspector`. |
-| Templates | “Make another from this kit” applies to **reusable kits**, and carries over words, **not photos**. Source: `KitAgain.tsx`. |
-| Brand kit | Store logo versions, colours and fonts in the kit; choose **per-frame logo visibility/version in Edit**, not as a per-frame setting on the Brand Kit page. |
-| Team navigation | The account tab/menu label is **Team**, although its address is `/app/account/members`. Use **Account → Team**. Invitations and billing management require the relevant owner/admin permissions. Team includes the owner plus 4 teammates. |
-| Stats | `/app/stats` **is Brand stats**, not a separate general ad-performance dashboard. `/app/account/stats` reuses that view. Business and Team have access, with staff access too; figures cover reels on Aimanté and Gravity Pants, not Instagram analytics. Revenue is an estimate. |
-| Sharing / coming soon | Share already supports optional Directory submission; Aimanté and Shopify also have existing implementation. Treat **“Coming soon” as tutorial presentation requested here**, not a claim that their code is absent. Keep those two tutorial sections brief, badged and unlinked. Share must not promise direct Instagram posting. |
-| Theme | The app currently defines a **light theme**, with no dark theme switch. Illustrations will inherit semantic tokens and remain theme-compatible, without adding dark mode or altering the existing theme. |
+| First-reel order | `/app/new` is **Format → Photos → Edit → Export → Share**. Format offers size, template and kit; default **4:5** (`FormatStep.tsx`). |
+| Custom sizes | Format offers **9:16, 4:5, 1:1, 16:9, 5:4**. **Custom dimensions belong on Export**, not Format (`FormatChooser.tsx`, `ExportPage.tsx`). |
+| Photo count | **3–5 is a recommendation**; Photos allows up to 20 (`PhotosStep.tsx`). |
+| Trial | No time limit/card; **3 included exports: first clean, next 2 marked**. Purchased extras have different watermark handling. `/app/help` has the wrong duration and watermark rule. |
+| Timing | Teach **frame-rail timing/transition controls**, not a separate full timeline; current Edit renders `FrameRail` and `Inspector`. |
+| Templates | “Make another from this kit” is for **reusable kits**; carries words, **not photos** (`KitAgain.tsx`). |
+| Brand kit | Save logo versions, colours/fonts in the kit; **per-frame logo visibility/version is in Edit**. |
+| Team navigation | Label: **Account → Team**, URL `/app/account/members`. Invitations require owner/admin permissions; Team includes you plus 4 teammates. |
+| Stats | `/app/stats` **is Brand stats**, also at `/app/account/stats`. Business/Team and staff have access. It covers Aimanté/Gravity Pants interactions, not Instagram analytics; revenue is estimated. |
+| Coming soon | Directory sharing, Aimanté and Shopify have existing implementation. **Coming soon is the requested tutorial presentation**, not a claim of absent code. Keep those sections unlinked; no direct Instagram posting promise. |
+| Theme | Existing app is **light-only**. Use semantic tokens so illustrations are theme-compatible; do not introduce a dark-mode switch. |
 
 ## Page and navigation
 
-- Unframed two-column reading layout: sticky table of contents on the left at desktop widths, readable article on the right. Sections separated by spacing/hairlines, not floating cards.
-- Below desktop widths, replace the side list with a labelled **“Jump to”** dropdown using the existing Select control. Keep it below the app header without covering headings or content.
+- Unframed desktop layout: sticky contents left, readable article right, spacing/hairlines between sections.
+- Mobile: labelled **“Jump to”** dropdown using existing Select; never cover headings with sticky controls.
 - All 13 sections have stable IDs, a short heading, **2–4 numbered instructions**, **one illustrated mockup**, and a short **Tip** callout. The two coming-soon sections use informational steps, not fake setup actions.
 - Table of contents and dropdown share the same section list. Selecting an item updates the section fragment and focuses its heading; back/forward and direct section links work. Mark the current section accessibly as the reader scrolls.
-- Header-aware scroll offsets, visible keyboard focus, sensible heading hierarchy, 44px mobile targets and no horizontal overflow at 375px.
+- Header-aware scroll offsets, keyboard focus, logical headings, 44px mobile targets; no overflow at 375px.
 - Plain, human copy; no invented product capabilities or promotional claims. Use the supplied title and entry labels exactly. Give every new or touched CTA a stable `data-cta` value.
 - Deep links use existing app routes. Do not invent an ad ID for Edit/Export/Share: direct those sections to **Your Ads** to choose a reel, and explain the next step in the instructions.
 
@@ -88,7 +88,7 @@ Maintain stable view boxes/aspect ratios and readable labels at phone widths. Ea
 
 **No expected changes to `src/styles.css`**: use existing tokens and local utility classes. **No sitemap changes**: its explicit public-page list already excludes `/app/*`. Do not modify generated routing files, add public tutorial routes, or change authentication.
 
-**Entry-point caveat:** `HelpMenu` is desktop-only today, while the phone menu’s Help link opens public `/help`. Keep the requested changes scoped to HelpMenu and `/app/help`; phone users can use the tutorial’s direct URL or its private Help card. A separate phone-menu entry is not included in this plan.
+**Entry-point caveat:** HelpMenu is desktop-only; phone Help opens public `/help`. Scope stays with the two requested entry points. No extra phone-menu entry is included.
 
 ## Verification after approval
 
