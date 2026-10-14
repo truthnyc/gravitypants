@@ -13,8 +13,7 @@
 
 - Project/frame data uses `data.ts` autosave; strip popovers reuse Inspector panels and editor undo actions to avoid parallel logic.
 - Types/constants live in `types.ts`; `format-settings.ts` resolves size visuals and shared motion for preview/export parity.
-- Private media URLs use `getMediaUrl()` in `media.ts`.
-- Colors use semantic tokens in `src/styles.css`, never raw component colors.
+- Media URLs: `getMediaUrl()` in `media.ts`. Colors: semantic tokens in `src/styles.css`, never raw colors.
 - Share `ReelPopup`, `HoverReelPreview` and `ConceptReelNotice` for consistent reel UI.
 - Preview/export share `renderAt()` in `src/render/renderFrame.ts` to match.
 - Exports: private media storage, listed from storage; GIF limit 500MB.
@@ -46,4 +45,5 @@
 - SVG uploads share `svg-safety.ts` before preview/storage, including Directory server uploads, to remove active content.
 - Strict export fonts; FontPicker uses Drawer/Popover. Export components share size/quality/estimate rules for parity.
 - Shopify uses shared editor controls/format helpers with shop-verified saves; its font picker core avoids account hooks to keep iframe identity Shopify-only.
-- Google font catalog fetching is shared server-side; account and Shopify entry points validate their own identities.
+- Google font catalog is shared server-side; account/Shopify entries verify their own identities.
+- Tutorial and app Help share `guide.ts`; token-based SVG mockups avoid coupling illustrations to editor rendering.
