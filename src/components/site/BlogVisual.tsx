@@ -16,17 +16,17 @@ function Caption({ children }: { children: string }) {
 }
 
 export function BlogVisual({ kind }: { kind: BlogVisualKind }) {
-  if (kind === "katherine-three-shots") {
+  if (kind === "beni-three-shots") {
     const shots = [
-      { n: "1", name: "The wide", pos: "50% 50%", zoom: 1 },
-      { n: "2", name: "The detail", pos: "50% 45%", zoom: 1.8 },
-      { n: "3", name: "The close-up", pos: "55% 40%", zoom: 2.8 },
+      { n: "1", name: "The wide" },
+      { n: "2", name: "The detail" },
+      { n: "3", name: "The close-up" },
     ];
     return <figure className="mt-8">
       <div className="grid grid-cols-3 gap-3 rounded-[8px] bg-site-panel p-5 md:gap-5 md:p-8">
-        {shots.map((s) => <div key={s.n}>
+        {shots.map((s, i) => <div key={s.n}>
           <div className="aspect-[4/5] overflow-hidden rounded-[8px]">
-            <img src={KATHERINE_POSTER} alt={`${s.name} shot of Katherine Grover Fine Jewellery`} loading="lazy" className="h-full w-full object-cover" style={{ transform: `scale(${s.zoom})`, transformOrigin: s.pos }} />
+            <img src={BENI_PHOTOS[i]} alt={`${s.name} shot of a Beni rug`} loading="lazy" className="h-full w-full object-cover" />
           </div>
           <p className="mt-3 text-[13px] font-semibold tabular-nums text-site-eyebrow">{s.n}</p>
           <p className="text-[15px] font-semibold text-site-ink">{s.name}</p>
@@ -35,7 +35,7 @@ export function BlogVisual({ kind }: { kind: BlogVisualKind }) {
       <Caption>Wide, detail, close-up. Shot in the same order every time.</Caption>
     </figure>;
   }
-  if (kind === "katherine-formats") {
+  if (kind === "beni-formats") {
     const formats = [
       { label: "9:16", use: "Reels, Stories, TikTok", cls: "aspect-[9/16] w-[28%]" },
       { label: "1:1", use: "Feeds", cls: "aspect-square w-[34%]" },
@@ -43,10 +43,10 @@ export function BlogVisual({ kind }: { kind: BlogVisualKind }) {
     ];
     return <figure className="mt-8">
       <div className="flex items-end gap-3 rounded-[8px] bg-site-panel p-5 md:gap-5 md:p-8">
-        {formats.map((f) => <div key={f.label} className={f.cls}>
+        {formats.map((f, i) => <div key={f.label} className={f.cls}>
           <div className="relative h-full w-full overflow-hidden rounded-[8px]">
-            <img src={KATHERINE_POSTER} alt="" aria-hidden="true" loading="lazy" className="absolute inset-0 h-full w-full scale-125 object-cover blur-md" />
-            <img src={KATHERINE_POSTER} alt={`${f.label} version of the Katherine Grover Fine Jewellery ad`} loading="lazy" className="relative h-full w-full object-contain" />
+            <img src={BENI_PHOTOS[i]} alt="" aria-hidden="true" loading="lazy" className="absolute inset-0 h-full w-full scale-125 object-cover blur-md" />
+            <img src={BENI_PHOTOS[i]} alt={`${f.label} version of a Beni rugs ad`} loading="lazy" className="relative h-full w-full object-cover" />
           </div>
           <p className="mt-2 text-[14px] font-semibold tabular-nums text-site-ink">{f.label}</p>
           <p className="text-[13px] text-site-muted">{f.use}</p>
@@ -55,15 +55,12 @@ export function BlogVisual({ kind }: { kind: BlogVisualKind }) {
       <Caption>One reel, every size you need, exported at the same time.</Caption>
     </figure>;
   }
-  if (kind === "katherine-reel") {
+  if (kind === "beni-hero") {
     return <figure className="mt-8">
       <div className="rounded-[8px] bg-site-panel p-5 md:p-8">
-        <video className="w-full rounded-[8px]" poster={KATHERINE_POSTER} autoPlay muted loop playsInline preload="metadata" aria-label="A reel made from Katherine Grover Fine Jewellery's photos">
-          <source src={katherineVideoWebm.url} type="video/webm" />
-          <source src={katherineVideo.url} type="video/mp4" />
-        </video>
+        <img src={BENI_PHOTOS[0]} alt="A Beni rug in a living room" loading="lazy" className="aspect-[16/9] w-full rounded-[8px] object-cover" />
       </div>
-      <Caption>A reel made from Katherine Grover Fine Jewellery's photos.</Caption>
+      <Caption>Photos like these are all a reel needs.</Caption>
     </figure>;
   }
   if (kind === "photo-vs-reel") {
