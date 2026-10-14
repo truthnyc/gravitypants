@@ -144,6 +144,6 @@ export function BlogVisual({ kind }: { kind: BlogVisualKind }) {
 }
 
 /** Small cover image for blog cards. */
-export function BlogCover({ index, src, className = "" }: { index: number; src?: string; className?: string }) {
+export function BlogCover({ index, src, className = "" }: { index: number; src?: string | undefined; className?: string }) {
   return <img src={src ?? PHOTOS[index % 3]} alt="" loading="lazy" className={`w-full rounded-[8px] object-cover ${className}`} />;
 }
