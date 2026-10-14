@@ -46,4 +46,4 @@
 - Strict export fonts; FontPicker uses Drawer/Popover. Export components share size/quality/estimate rules for parity.
 - Shopify uses shared editor controls/format helpers with shop-verified saves; its font picker core avoids account hooks to keep iframe identity Shopify-only.
 - Google font catalog is shared server-side; account/Shopify entries verify their own identities.
-- Tutorial and app Help share `guide.ts`; token-based SVG mockups avoid coupling illustrations to editor rendering.
+- Tutorial/Help share `guide.ts`; `GuideScreenshot` uses CDN captures cropped for privacy, independent of the editor.
