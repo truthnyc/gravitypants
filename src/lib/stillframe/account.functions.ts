@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-/** Deletes one of the caller's own exports: files plus the usage record, so the export is given back. */
+/** Deletes one of the caller's own exports: files and the export record. The usage record is kept, so the export still counts toward the plan limit. */
 export const deleteMyExport = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d) => z.object({ workspaceId: z.string().uuid(), projectId: z.string().uuid(), stamp: z.string().min(1).max(80) }).parse(d))
@@ -20,7 +20,7 @@ export const deleteMyExport = createServerFn({ method: "POST" })
     const { data: files } = await store.list(dir, { limit: 1000 });
     const paths = (files ?? []).filter((f) => f.id).map((f) => `${dir}/${f.name}`);
     if (paths.length) await store.remove(paths);
-    await supabaseAdmin.from("export_usage").delete().eq("workspace_id", data.workspaceId).eq("stamp", data.stamp);
+    // export_usage is intentionally kept: deleting files must not refund the export or let plan limits be bypassed.
     await supabaseAdmin.from("exports").delete().eq("workspace_id", data.workspaceId).eq("stamp", data.stamp);
     return { ok: true };
   });
