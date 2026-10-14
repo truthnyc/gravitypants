@@ -46,7 +46,7 @@ export function BlogVisual({ kind }: { kind: BlogVisualKind }) {
         {formats.map((f, i) => <div key={f.label} className={f.cls}>
           <div className="relative h-full w-full overflow-hidden rounded-[8px]">
             <img src={BENI_PHOTOS[i]} alt="" aria-hidden="true" loading="lazy" className="absolute inset-0 h-full w-full scale-125 object-cover blur-md" />
-            <img src={BENI_PHOTOS[i]} alt={`${f.label} version of a Beni rugs ad`} loading="lazy" className="relative h-full w-full object-cover" />
+            <img src={BENI_PHOTOS[i]} alt={`${f.label} version of a Beni rugs ad`} loading="lazy" className="relative h-full w-full object-contain" />
           </div>
           <p className="mt-2 text-[14px] font-semibold tabular-nums text-site-ink">{f.label}</p>
           <p className="text-[13px] text-site-muted">{f.use}</p>
