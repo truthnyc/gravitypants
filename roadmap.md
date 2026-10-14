@@ -5,6 +5,6 @@
 - [x] Run regression tests and verify real shop-scoped saving/reload at desktop and phone sizes. Actual Shopify-admin incognito embedding remains a merchant-side check.
 
 # Getting started tutorial
-- [ ] Add shared guide/Help content and thirteen illustrated sections.
-- [ ] Add private guide route, desktop/mobile navigation, Help entry points and support dialog.
+- [x] Add shared guide/Help content and thirteen illustrated sections.
+- [x] Add private guide route, desktop/mobile navigation, Help entry points and support dialog.
 - [ ] Verify authenticated flow, metadata, navigation, mobile layouts and existing rule tests.
