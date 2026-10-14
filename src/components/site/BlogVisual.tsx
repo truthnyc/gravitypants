@@ -44,7 +44,10 @@ export function BlogVisual({ kind }: { kind: BlogVisualKind }) {
     return <figure className="mt-8">
       <div className="flex items-end gap-3 rounded-[8px] bg-site-panel p-5 md:gap-5 md:p-8">
         {formats.map((f) => <div key={f.label} className={f.cls}>
-          <img src={KATHERINE_POSTER} alt={`${f.label} version of the Katherine Grover Fine Jewellery ad`} loading="lazy" className="h-full w-full rounded-[8px] object-cover" />
+          <div className="relative h-full w-full overflow-hidden rounded-[8px]">
+            <img src={KATHERINE_POSTER} alt="" aria-hidden="true" loading="lazy" className="absolute inset-0 h-full w-full scale-125 object-cover blur-md" />
+            <img src={KATHERINE_POSTER} alt={`${f.label} version of the Katherine Grover Fine Jewellery ad`} loading="lazy" className="relative h-full w-full object-contain" />
+          </div>
           <p className="mt-2 text-[14px] font-semibold tabular-nums text-site-ink">{f.label}</p>
           <p className="text-[13px] text-site-muted">{f.use}</p>
         </div>)}
