@@ -10,3 +10,4 @@
 - [x] Add private guide route, desktop/mobile navigation, Help entry points and support dialog.
 - [x] Verify signed-out redirect and signed-in guide, metadata/sitemap exclusion, section history/focus, Help links/support dialog, 375/768/1440px layouts and 12 existing rule tests.
 - [x] Add Tutorial row to the phone ☰ menu for signed-in users, between Billing and Help.
+- [x] Add a Tutorial link next to Templates on the Your Ads home screen; verified desktop/phone display and that it opens /app/guide.
