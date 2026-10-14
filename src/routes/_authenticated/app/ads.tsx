@@ -98,7 +98,10 @@ function YourAds() {
       {welcome && <TrialUnlocked onClose={() => setWelcome(false)} />}
       <div className="mb-6 flex items-end justify-between lg:mb-4 lg:justify-end">
         <h1 className="text-[36px] font-bold leading-none lg:hidden">Your ads</h1>
-        <Link to="/app/templates" className="flex h-11 items-center text-[14px] font-medium text-link">Templates</Link>
+        <div className="flex items-center gap-5">
+          <Link to="/app/guide" data-cta="ads-tutorial" className="flex h-11 items-center text-[14px] font-medium text-link">Tutorial</Link>
+          <Link to="/app/templates" data-cta="ads-templates" className="flex h-11 items-center text-[14px] font-medium text-link">Templates</Link>
+        </div>
       </div>
       <div className={isEmpty ? "mx-auto max-w-[860px] py-4 lg:py-16" : ""}>
         <DropZone spacious={isEmpty} />
