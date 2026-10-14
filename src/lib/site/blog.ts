@@ -1,5 +1,5 @@
 import type { BlogVisualKind } from "@/components/site/BlogVisual";
-import beniRug1 from "@/assets/site/beni-rug-1.jpg.asset.json";
+import meaumeVineyard from "@/assets/site/chateau-meaume-vineyard.jpg.asset.json";
 export type BlogPost = {
   slug: string;
   title: string;
@@ -23,7 +23,7 @@ export const POSTS: BlogPost[] = [
     date: "October 14, 2026",
     minutes: 4,
     tag: "How to",
-    cover: beniRug1.url,
+    cover: meaumeVineyard.url,
     body: [
       {
         p: [
@@ -37,7 +37,7 @@ export const POSTS: BlogPost[] = [
           "Pick photos that show one thing clearly. A useful set is one wide shot, one detail and one close-up, in that order. The wide shot says what we are looking at, the detail makes it believable and the close-up gives the ending somewhere to land.",
           "Photos you already have are fine. Clear, well lit and in focus matters more than a new camera.",
         ],
-        visual: "beni-three-shots",
+        visual: "meaume-three-shots",
       },
       {
         h: "2. Pick the size first",
@@ -45,7 +45,7 @@ export const POSTS: BlogPost[] = [
           "Decide where the video will be posted before you start. Vertical 9:16 suits Reels, Stories and TikTok. Portrait 4:5 and square 1:1 suit feeds. Wide 16:9 and 5:4 suit banners, websites and YouTube.",
           "Choosing the size first means your photos and words are placed for that shape from the start, instead of being cropped later.",
         ],
-        visual: "beni-formats",
+        visual: "meaume-formats",
       },
       {
         h: "3. Change the words, not the timing",
@@ -72,7 +72,7 @@ export const POSTS: BlogPost[] = [
         p: [
           "The free trial needs no card and has no time limit. Your first export has no watermark, so you can make a real ad and see how it does.",
         ],
-        visual: "beni-hero",
+        visual: "meaume-hero",
       },
     ],
   },

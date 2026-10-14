@@ -17,7 +17,7 @@ function Caption({ children }: { children: string }) {
 }
 
 export function BlogVisual({ kind }: { kind: BlogVisualKind }) {
-  if (kind === "beni-three-shots") {
+  if (kind === "meaume-three-shots") {
     const shots = [
       { n: "1", name: "The wide" },
       { n: "2", name: "The detail" },
@@ -27,7 +27,7 @@ export function BlogVisual({ kind }: { kind: BlogVisualKind }) {
       <div className="grid grid-cols-3 gap-3 rounded-[8px] bg-site-panel p-5 md:gap-5 md:p-8">
         {shots.map((s, i) => <div key={s.n}>
           <div className="aspect-[4/5] overflow-hidden rounded-[8px]">
-            <img src={BENI_PHOTOS[i]} alt={`${s.name} shot of a Beni rug`} loading="lazy" className="h-full w-full object-cover" />
+            <img src={MEAUME_PHOTOS[i]} alt={`${s.name} shot at Château Méaume`} loading="lazy" className="h-full w-full object-cover" />
           </div>
           <p className="mt-3 text-[13px] font-semibold tabular-nums text-site-eyebrow">{s.n}</p>
           <p className="text-[15px] font-semibold text-site-ink">{s.name}</p>
@@ -36,7 +36,7 @@ export function BlogVisual({ kind }: { kind: BlogVisualKind }) {
       <Caption>Wide, detail, close-up. Shot in the same order every time.</Caption>
     </figure>;
   }
-  if (kind === "beni-formats") {
+  if (kind === "meaume-formats") {
     const formats = [
       { label: "9:16", use: "Reels, Stories, TikTok", cls: "aspect-[9/16] w-[28%]" },
       { label: "1:1", use: "Feeds", cls: "aspect-square w-[34%]" },
@@ -46,8 +46,8 @@ export function BlogVisual({ kind }: { kind: BlogVisualKind }) {
       <div className="flex items-end gap-3 rounded-[8px] bg-site-panel p-5 md:gap-5 md:p-8">
         {formats.map((f, i) => <div key={f.label} className={f.cls}>
           <div className="relative h-full w-full overflow-hidden rounded-[8px]">
-            <img src={BENI_PHOTOS[i]} alt="" aria-hidden="true" loading="lazy" className="absolute inset-0 h-full w-full scale-125 object-cover blur-md" />
-            <img src={BENI_PHOTOS[i]} alt={`${f.label} version of a Beni rugs ad`} loading="lazy" className="relative h-full w-full object-contain" />
+            <img src={MEAUME_PHOTOS[i]} alt="" aria-hidden="true" loading="lazy" className="absolute inset-0 h-full w-full scale-125 object-cover blur-md" />
+            <img src={MEAUME_PHOTOS[i]} alt={`${f.label} version of a Château Méaume ad`} loading="lazy" className="relative h-full w-full object-contain" />
           </div>
           <p className="mt-2 text-[14px] font-semibold tabular-nums text-site-ink">{f.label}</p>
           <p className="text-[13px] text-site-muted">{f.use}</p>
@@ -56,10 +56,10 @@ export function BlogVisual({ kind }: { kind: BlogVisualKind }) {
       <Caption>One reel, every size you need, exported at the same time.</Caption>
     </figure>;
   }
-  if (kind === "beni-hero") {
+  if (kind === "meaume-hero") {
     return <figure className="mt-8">
       <div className="rounded-[8px] bg-site-panel p-5 md:p-8">
-        <img src={BENI_PHOTOS[0]} alt="A Beni rug in a living room" loading="lazy" className="aspect-[16/9] w-full rounded-[8px] object-cover" />
+        <img src={MEAUME_PHOTOS[0]} alt="The vineyard at Château Méaume at sunset" loading="lazy" className="aspect-[16/9] w-full rounded-[8px] object-cover" />
       </div>
       <Caption>Photos like these are all a reel needs.</Caption>
     </figure>;
