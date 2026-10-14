@@ -7,4 +7,4 @@
 # Getting started tutorial
 - [x] Add shared guide/Help content and thirteen illustrated sections.
 - [x] Add private guide route, desktop/mobile navigation, Help entry points and support dialog.
-- [ ] Verify authenticated flow, metadata, navigation, mobile layouts and existing rule tests.
+- [x] Verify signed-out redirect and signed-in guide, metadata/sitemap exclusion, section history/focus, Help links/support dialog, 375/768/1440px layouts and 12 existing rule tests.
