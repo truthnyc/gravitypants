@@ -1,3 +1,4 @@
+import { AIMANTE_ORIGIN } from "@/lib/site/brand-site";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -76,7 +77,7 @@ function DirectoryAccount() {
           </div>
           <LogoBox brandId={d.brand.id} name={d.brand.name} logo={d.brand.logo} onSaved={() => void qc.invalidateQueries({ queryKey: ["directory-account", ws] })} />
           <DescriptionBox brand={d.brand} onSaved={() => void qc.invalidateQueries({ queryKey: ["directory-account", ws] })} />
-          <SlugBox brandId={d.brand.id} slug={d.brand.slug} onSaved={() => void qc.invalidateQueries({ queryKey: ["directory-account", ws] })} />
+          <SlugBox brandId={d.brand.id} slug={d.brand.slug} live={d.brand.live} onSaved={() => void qc.invalidateQueries({ queryKey: ["directory-account", ws] })} />
         </section>
 
         <section className="acct-card">
@@ -265,7 +266,7 @@ function ReelName({ adId, name, onSaved }: { adId: string; name: string; onSaved
   );
 }
 
-function SlugBox({ brandId, slug, onSaved }: { brandId: string; slug: string; onSaved: () => void }) {
+function SlugBox({ brandId, slug, live, onSaved }: { brandId: string; slug: string; live: boolean; onSaved: () => void }) {
   const check = useServerFn(checkSlug);
   const save = useServerFn(saveSlug);
   const [value, setValue] = useState(slug);
@@ -295,7 +296,11 @@ function SlugBox({ brandId, slug, onSaved }: { brandId: string; slug: string; on
           onSaved();
         } catch (e) { toast.error(e instanceof Error ? e.message : "Couldn't save. Try again."); } finally { setBusy(false); }
       }}>Save address</AppButton>
-      <a href={`/directory/${slug}`} target="_blank" rel="noreferrer" className="ml-auto inline-flex items-center gap-1 text-ap-blue">View page <ArrowUpRight className="size-3.5" strokeWidth={1.7} /></a>
+      {live ? (
+        <a href={`${AIMANTE_ORIGIN}/b/${slug}`} target="_blank" rel="noreferrer" data-cta="account-directory-aimante" className="ml-auto inline-flex items-center gap-1 text-ap-blue">View on Aimanté <ArrowUpRight className="size-3.5" strokeWidth={1.7} /></a>
+      ) : (
+        <span className="ml-auto text-[13px] text-ap-muted">Not live on Aimanté yet</span>
+      )}
     </div>
   );
 }
