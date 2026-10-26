@@ -5,6 +5,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { brandPublicationFields } from "./admin-fields";
 import { sanitizeSvg } from "@/lib/stillframe/svg-safety";
+import { normalizeWebsite } from "./application-security";
 import {
   BRAND_DESCRIPTION_MAX, BRAND_NAME_MAX, CATEGORIES, categorySlug, GRACE_DAYS, BRAND_MOODS_MAX, REEL_DESCRIPTION_MAX, SLUG_MAX,
   WORDING_VERSION, permissionWording, toSlug, validFullName,
@@ -732,6 +733,7 @@ export const adminCreateBrand = createServerFn({ method: "POST" })
     slug: z.string().regex(/^[a-z0-9-]{3,30}$/),
     workspaceId: z.string().uuid().nullable(),
     siteReelIds: z.array(z.string().uuid()).max(100),
+    moods: z.array(z.string().trim().toLowerCase().max(30)).max(BRAND_MOODS_MAX).default([]),
     affiliated: brandPublicationFields.affiliated.default(false), status: brandPublicationFields.status.default("live"),
   }).parse(d))
   .handler(async ({ data, context }) => {
@@ -741,8 +743,26 @@ export const adminCreateBrand = createServerFn({ method: "POST" })
     if (st !== "available") throw new Error("That address is taken. Try another.");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const admin = supabaseAdmin as any;
+    const website = data.website ? normalizeWebsite(data.website) : null;
+    if (website) {
+      const { data: brands, error } = await admin.from("directory_brands").select("website_url");
+      if (error) throw new Error("Couldn't check existing shops. Try again.");
+      if ((brands ?? []).some((b: { website_url: string | null }) => {
+        try { return b.website_url && normalizeWebsite(b.website_url).key === website.key; } catch { return false; }
+      })) throw new Error("That shop already has a brand page. Open it in Admin → Directory.");
+    }
+    const { data: category, error: categoryError } = await admin.from("categories").select("id").eq("name", data.category).single();
+    if (categoryError) throw new Error("Choose an available category.");
+    const moods = await cleanMoods(admin, data.moods);
+    if (moods.length !== new Set(data.moods).size) throw new Error("Choose moods from the current list.");
+    if (data.siteReelIds.length) {
+      const { data: reels, error } = await admin.from("site_reels").select("id, brand_id").in("id", data.siteReelIds);
+      if (error || reels?.length !== new Set(data.siteReelIds).size || reels.some((r: { brand_id: string | null }) => r.brand_id)) throw new Error("One of these reels is already linked or no longer available.");
+    }
     let ws = data.workspaceId;
     if (ws) {
+      const { data: workspace } = await admin.from("workspaces").select("id, owner_id").eq("id", ws).maybeSingle();
+      if (!workspace?.owner_id) throw new Error("Choose an existing client workspace.");
       const { data: existing } = await admin.from("directory_brands").select("id").eq("workspace_id", ws).maybeSingle();
       if (existing) throw new Error("That workspace already has a brand page.");
     } else {
@@ -751,8 +771,8 @@ export const adminCreateBrand = createServerFn({ method: "POST" })
       ws = w.id as string;
     }
     const { data: b, error } = await admin.from("directory_brands").insert({
-      workspace_id: ws, name: data.name, slug: data.slug, category: data.category,
-      website_url: data.website || null, description: data.description || null,
+      workspace_id: ws, name: data.name, slug: data.slug, category: data.category, category_id: category.id, moods,
+      website_url: website?.url || null, description: data.description || null,
       first_approved_at: new Date().toISOString(), is_editorial: !data.workspaceId,
       affiliated: data.affiliated, status: data.status,
     }).select("id, slug").single();
