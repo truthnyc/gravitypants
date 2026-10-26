@@ -1,3 +1,7 @@
+# Public-site performance
+- [ ] Rank 1: verify and improve long-lived static asset caching without caching private pages or media.
+- [ ] Rank 2: compress public-site media without changing the visuals; verify loaded media and transfer savings.
+
 # Shopify reel styling
 - [x] Preserve template logo settings across creation, uploads and size changes; repaired six existing Shopify reels.
 - [x] Add shared editor Style controls with immediate preview and saved changes.
