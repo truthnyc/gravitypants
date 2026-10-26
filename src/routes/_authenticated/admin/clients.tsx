@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Input } from "@/components/ui/input";
@@ -61,7 +61,7 @@ function Clients() {
 
   return (
     <>
-      <PageTitle title="Clients" sub={data ? `${rows.length} of ${data.length}` : undefined} right={<InviteClient />} />
+      <PageTitle title="Clients" sub={data ? `${rows.length} of ${data.length}` : undefined} right={<div className="flex flex-wrap gap-2"><Button asChild variant="outline"><Link to="/admin/onboarding" data-cta="clients-onboarding">Add shop</Link></Button><InviteClient /></div>} />
       <div className="mb-4 flex flex-wrap gap-2">
         <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search name or email" className="h-11 w-full bg-card sm:h-9 sm:w-[260px]" aria-label="Search clients" />
         <F label="Plan" value={plan} set={setPlan} items={[["all", "All plans"], ["trial", "Trial"], ["simple", "Simple"], ["simple_yearly", "Simple Yearly"], ["business", "Business"], ["business_yearly", "Business Yearly"], ["none", "No plan"]]} />

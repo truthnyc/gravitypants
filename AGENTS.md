@@ -29,6 +29,7 @@
 
 - Public art uses `public/site-art`; site video uses shared `FeaturedAdVideo` and CDN pointers.
 - Public media variants use immutable CDN pointers; `public-media.ts` maps only exact known public video URLs so private/signed files and new uploads remain untouched. Fixed-name artwork stays available for old links; active icons/share covers use immutable pointers for safe year-long caching.
+- Admin onboarding reuses `adminCreateBrand` for a single shared Directory/Aimanté brand identity; existing client workspaces are selected explicitly, otherwise editorial ownership is used until handover. It never provisions Shopify credentials, grants a plan, or publishes private reels.
 - Reusable kits: ads made from an `is_reusable` template store `projects.template_id`; `KitAgain.tsx` (useKit/KitAgainButton) drives the label, search and "Make another" (`/app/templates/$slug?from=<ad>` prefills text, no photos) from one place.
 - Staff role: `user_roles` (enum app_role, admin) checked via `has_role()`; `is_platform_admin()` wraps it; staff area at `/admin` (`_authenticated/admin/`) 404s non-admins — roles never live on profiles.
 - Site reels/homepage photos: private `site-reels` files, signed links; home banner/Example of the week in `site_settings`, bundled defaults. Project logos: light/dark artwork, per-frame visibility, auto/light/dark; drawn by `renderAt`.
