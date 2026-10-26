@@ -3,7 +3,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { brandPublicationFields } from "./admin-fields";
+import { brandPublicationFields, createBrandInput } from "./admin-fields";
 import { sanitizeSvg } from "@/lib/stillframe/svg-safety";
 import { normalizeWebsite } from "./application-security";
 import {
@@ -719,23 +719,10 @@ export const adminBrandWorkspaces = createServerFn({ method: "POST" })
       .map((w) => ({ id: w.id as string, name: w.name as string, email: emails.get(w.owner_id) ?? null, plan: plan.get(w.id) ?? "none" }));
   });
 
-const brandFields = {
-  name: z.string().trim().min(1).max(BRAND_NAME_MAX),
-  website: z.string().trim().max(200).refine((v) => !v || /^https?:\/\//.test(v), "Website must start with http:// or https://"),
-  category: z.enum(CATEGORIES), description: z.string().trim().max(BRAND_DESCRIPTION_MAX),
-};
-
 /** Admin: create a brand page, either for a client workspace or as an editorial page. */
 export const adminCreateBrand = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({
-    ...brandFields,
-    slug: z.string().regex(/^[a-z0-9-]{3,30}$/),
-    workspaceId: z.string().uuid().nullable(),
-    siteReelIds: z.array(z.string().uuid()).max(100),
-    moods: z.array(z.string().trim().toLowerCase().max(30)).max(BRAND_MOODS_MAX).default([]),
-    affiliated: brandPublicationFields.affiliated.default(false), status: brandPublicationFields.status.default("live"),
-  }).parse(d))
+  .inputValidator((d: unknown) => createBrandInput.parse(d))
   .handler(async ({ data, context }) => {
     const sb = context.supabase as any;
     await assertAdmin(sb);
