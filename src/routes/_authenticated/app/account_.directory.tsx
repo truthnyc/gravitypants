@@ -54,6 +54,7 @@ function DirectoryAccount() {
     <main className="acct mx-auto flex w-full max-w-[780px] flex-col gap-4 px-4 pb-20 pt-9 sm:px-6">
       <h1 className="acct-h1">Account</h1>
       <AccountTabs />
+      <p className="text-[14px] text-ap-body">Questions about your brand page? <Link to="/app/contact" data-cta="account-directory-contact" className="text-ap-blue">Contact Gravity Pants</Link></p>
       {q.isLoading ? (
         <div className="h-40 rounded-[24px] bg-ap-card" aria-busy="true" />
       ) : !d ? (

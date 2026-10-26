@@ -454,3 +454,39 @@ export const adminInviteClient = createServerFn({ method: "POST" })
     }
     return { ok: true, workspaceId: ws.id };
   });
+
+/** Staff inbox: every client support message, newest first. */
+export const adminSupportTickets = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const db = await adminDb(context as any);
+    const [{ data: t }, { data: ws }, users] = await Promise.all([
+      db.from("support_tickets").select("*").order("created_at", { ascending: false }).limit(500),
+      db.from("workspaces").select("id, name"),
+      allUsers(db),
+    ]);
+    const wsName = new Map(((ws ?? []) as any[]).map((w) => [w.id, w.name as string]));
+    const email = new Map(users.map((u) => [u.id, u.email]));
+    return ((t ?? []) as any[]).map((r) => ({
+      id: r.id as string,
+      workspaceId: r.workspace_id as string,
+      client: wsName.get(r.workspace_id) ?? "Unknown",
+      email: email.get(r.user_id) ?? "",
+      topic: r.topic as string,
+      message: r.message as string,
+      priority: r.priority === "priority",
+      status: r.status as "open" | "answered" | "closed",
+      created_at: r.created_at as string,
+    }));
+  });
+
+export const adminSetTicketStatus = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid(), status: z.enum(["open", "answered", "closed"]) }).parse(d))
+  .handler(async ({ data, context }) => {
+    const db = await adminDb(context as any);
+    const { data: row, error } = await db.from("support_tickets").update({ status: data.status }).eq("id", data.id).select("workspace_id").single();
+    if (error || !row) throw new Error("Couldn't update the message");
+    await log(db, (context as any).userId, `support_ticket_${data.status}`, row.workspace_id, data.id);
+    return { ok: true };
+  });
