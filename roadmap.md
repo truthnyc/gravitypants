@@ -1,6 +1,6 @@
 # Public-site performance
-- [ ] Add staff-only client onboarding with shared Directory/Aimanté brand details and safe workspace linking.
-- [ ] Recheck public asset Cache-Control and confirm private files cannot be opened anonymously.
+- [x] Add staff-only client onboarding with shared Directory/Aimanté brand details and explicit workspace linking; verified private draft creation and Directory read-back as info@gravitypants.com, with 28 regression tests. Private verification rows removed after testing.
+- [x] Recheck public asset Cache-Control: tested immutable assets return one-year caching; media, brand-assets and site-reels buckets remain private, unsigned downloads and anonymous signing are denied.
 - [x] Rank 1: verified hashed bundles/CDN media already have one-year immutable caching; moved active icons/share artwork to immutable CDN URLs while preserving old links and private-file protections.
 - [x] Rank 2: compressed three public MP4s by 81–85% with unchanged dimensions/durations and three blog photos by 31–57%; verified headers, blog images/animation and existing WebM playback, plus 21 regression tests. Sandbox Chromium cannot decode H.264, so optimized MP4 browser playback remains unverified; local decoding/frame checks passed.
 
