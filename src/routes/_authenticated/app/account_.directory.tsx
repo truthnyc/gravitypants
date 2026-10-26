@@ -80,6 +80,22 @@ function DirectoryAccount() {
           <SlugBox brandId={d.brand.id} slug={d.brand.slug} live={d.brand.live} onSaved={() => void qc.invalidateQueries({ queryKey: ["directory-account", ws] })} />
         </section>
 
+        {d.siteReels.length > 0 && (
+          <section className="acct-card">
+            <h2 className="text-[20px] font-semibold">Reels added by Gravity Pants</h2>
+            <p className="mt-1 mb-4 text-[14px] leading-[1.5] text-ap-body">Our team added these reels to your brand page. To change or remove one, contact support.</p>
+            <ul className="flex flex-col">
+              {d.siteReels.map((r) => (
+                <li key={r.id} className="flex flex-wrap items-center gap-3 border-b border-ap-hairline py-3.5 last:border-0">
+                  <span className="min-w-0 flex-1 font-medium break-words">{r.name}</span>
+                  <span className="nums text-[13px] text-ap-body">{r.size || "—"}</span>
+                  <span className="inline-flex items-center gap-1.5 text-[13px] font-medium text-ap-green"><span className="size-2 rounded-full bg-current" />Live</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
         <section className="acct-card">
           <h2 className="text-[20px] font-semibold">Published reels</h2>
           <p className="mt-1 mb-4 text-[14px] leading-[1.5] text-ap-body">Reels you shared appear on Aimanté. Our team may also feature them on the Showcase and Examples pages. To change a live reel, edit and export the ad, then submit the update. It's checked before it replaces the live version.</p>
