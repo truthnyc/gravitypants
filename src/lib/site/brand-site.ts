@@ -1,6 +1,7 @@
 import { createIsomorphicFn } from "@tanstack/react-start";
 import { getCookie, getRequestHost, getRequestUrl, setCookie } from "@tanstack/react-start/server";
 import type { LocationRewrite } from "@tanstack/react-router";
+import aimanteCover from "@/assets/site/og-aimante.jpg.asset.json";
 
 /** Which brand a visit is on. aimante.co shows the Aimanté directory; everything else is Gravity Pants. */
 export type BrandSite = "gravitypants" | "aimante";
@@ -136,7 +137,7 @@ export function domainRedirect(href: string, forwardedHost?: string | null): str
 }
 
 /** Head tags for an Aimanté page: its own origin, canonical and share image. */
-export function aimanteHead({ path, title, description, image = `${AIMANTE_ORIGIN}/og-aimante.jpg` }: { path: string; title: string; description: string; image?: string }) {
+export function aimanteHead({ path, title, description, image = `${AIMANTE_ORIGIN}${aimanteCover.url}` }: { path: string; title: string; description: string; image?: string }) {
   const url = `${AIMANTE_ORIGIN}${path}`;
   return {
     meta: [

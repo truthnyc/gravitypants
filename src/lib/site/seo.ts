@@ -1,8 +1,10 @@
+import cover from "@/assets/site/og-cover.jpg.asset.json";
+
 /** One place for the website's page titles, descriptions, social previews and canonical URLs. */
 export const SITE_ORIGIN = "https://gravitypants.com";
 export const SITE_NAME = "Gravity Pants";
 /** Absolute URL: social networks never resolve bundled or relative image paths. */
-export const SITE_OG_IMAGE = `${SITE_ORIGIN}/og-cover.jpg`;
+export const SITE_OG_IMAGE = `${SITE_ORIGIN}${cover.url}`;
 // Every gravitypants.com page shares the home page card.
 export const SHOWCASE_OG_IMAGE = SITE_OG_IMAGE;
 export const EXAMPLES_OG_IMAGE = SITE_OG_IMAGE;

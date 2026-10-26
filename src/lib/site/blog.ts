@@ -1,5 +1,5 @@
 import type { BlogVisualKind } from "@/components/site/BlogVisual";
-import meaumeVineyard from "@/assets/site/chateau-meaume-vineyard.jpg.asset.json";
+import meaumeVineyard from "@/assets/site/chateau-meaume-vineyard.webp.asset.json";
 export type BlogPost = {
   slug: string;
   title: string;

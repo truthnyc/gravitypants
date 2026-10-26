@@ -1,9 +1,9 @@
 import photo1 from "@/assets/site/purl-soho-photo-1.webp.asset.json";
 import photo2 from "@/assets/site/purl-soho-photo-2.webp.asset.json";
 import photo3 from "@/assets/site/purl-soho-photo-3.webp.asset.json";
-import meaumeGrapes from "@/assets/site/chateau-meaume-grapes.jpg.asset.json";
-import meaumeGlass from "@/assets/site/chateau-meaume-glass.jpg.asset.json";
-import meaumeVineyard from "@/assets/site/chateau-meaume-vineyard.jpg.asset.json";
+import meaumeGrapes from "@/assets/site/chateau-meaume-grapes.webp.asset.json";
+import meaumeGlass from "@/assets/site/chateau-meaume-glass.webp.asset.json";
+import meaumeVineyard from "@/assets/site/chateau-meaume-vineyard.webp.asset.json";
 import { FeaturedAdVideo } from "@/components/site/FeaturedAdVideo";
 import { useEffect, useState } from "react";
 import reel0 from "@/assets/site/chateau-meaume-reel-0.jpg.asset.json";

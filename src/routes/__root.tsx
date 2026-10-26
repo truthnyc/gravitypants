@@ -19,6 +19,8 @@ import { PaymentTestModeBanner } from "@/components/billing/BillingNotices";
 import { trackPageView } from "@/lib/site/track";
 import { currentSite } from "@/lib/site/brand-site";
 import { ServiceUnavailable } from "@/components/site/ServiceUnavailable";
+import favicon from "@/assets/site/favicon.svg.asset.json";
+import touchIcon from "@/assets/site/apple-touch-icon.png.asset.json";
 
 function NotFoundComponent() {
   return (
@@ -105,8 +107,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700;800&family=Fraunces:wght@500;700;900&family=Montserrat:wght@300;400&family=Playfair+Display:wght@500;700;900&family=Space+Grotesk:wght@400;500;700&display=swap",
       },
-      { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
-      { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
+      { rel: "icon", type: "image/svg+xml", href: favicon.url },
+      { rel: "apple-touch-icon", href: touchIcon.url },
     ],
   }),
   beforeLoad: () => ({ site: currentSite() }),

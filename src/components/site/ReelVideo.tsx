@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
+import { optimizedPublicVideo } from "@/lib/site/public-media";
 
 export type ReelVideoSource = {
   /** MP4 URL. */
@@ -119,7 +120,7 @@ export function ReelVideo({ video, videoWebm, poster, label, className, onPlayin
       onPause={() => onPlayingChange?.(false)}
     >
       {active && videoWebm && <source src={videoWebm} type="video/webm" />}
-      {active && <source src={video} type="video/mp4" />}
+      {active && <source src={optimizedPublicVideo(video)} type="video/mp4" />}
     </video>
     {overlay && typeof document !== "undefined" && createPortal(
       <div className="reel-overlay" role="dialog" aria-modal="true" aria-label={label} onClick={closeOverlay}>
@@ -136,7 +137,7 @@ export function ReelVideo({ video, videoWebm, poster, label, className, onPlayin
           onClick={event => event.stopPropagation()}
         >
           {videoWebm && <source src={videoWebm} type="video/webm" />}
-          <source src={video} type="video/mp4" />
+          <source src={optimizedPublicVideo(video)} type="video/mp4" />
         </video>
       </div>,
       document.body,
