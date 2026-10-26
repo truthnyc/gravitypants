@@ -60,10 +60,12 @@ import { Route as AuthenticatedAdminMoodsRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminNewsletterRouteImport } from './routes/_authenticated/admin/newsletter'
 import { Route as AuthenticatedAdminOnboardingRouteImport } from './routes/_authenticated/admin/onboarding'
 import { Route as AuthenticatedAdminReelsRouteImport } from './routes/_authenticated/admin/reels'
+import { Route as AuthenticatedAdminSupportRouteImport } from './routes/_authenticated/admin/support'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app/index'
 import { Route as AuthenticatedAppAccountRouteImport } from './routes/_authenticated/app/account'
 import { Route as AuthenticatedAppAdsRouteImport } from './routes/_authenticated/app/ads'
 import { Route as AuthenticatedAppBrandRouteImport } from './routes/_authenticated/app/brand'
+import { Route as AuthenticatedAppContactRouteImport } from './routes/_authenticated/app/contact'
 import { Route as AuthenticatedAppExportsRouteImport } from './routes/_authenticated/app/exports'
 import { Route as AuthenticatedAppGuideRouteImport } from './routes/_authenticated/app/guide'
 import { Route as AuthenticatedAppHelpRouteImport } from './routes/_authenticated/app/help'
@@ -369,6 +371,12 @@ const AuthenticatedAdminReelsRoute = AuthenticatedAdminReelsRouteImport.update({
   path: '/reels',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
 } as any)
+const AuthenticatedAdminSupportRoute =
+  AuthenticatedAdminSupportRouteImport.update({
+    id: '/support',
+    path: '/support',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAppIndexRoute = AuthenticatedAppIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -387,6 +395,11 @@ const AuthenticatedAppAdsRoute = AuthenticatedAppAdsRouteImport.update({
 const AuthenticatedAppBrandRoute = AuthenticatedAppBrandRouteImport.update({
   id: '/brand',
   path: '/brand',
+  getParentRoute: () => AuthenticatedAppRouteRoute,
+} as any)
+const AuthenticatedAppContactRoute = AuthenticatedAppContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
   getParentRoute: () => AuthenticatedAppRouteRoute,
 } as any)
 const AuthenticatedAppExportsRoute = AuthenticatedAppExportsRouteImport.update({
@@ -656,9 +669,11 @@ export interface FileRoutesByFullPath {
   '/admin/newsletter': typeof AuthenticatedAdminNewsletterRoute
   '/admin/onboarding': typeof AuthenticatedAdminOnboardingRoute
   '/admin/reels': typeof AuthenticatedAdminReelsRoute
+  '/admin/support': typeof AuthenticatedAdminSupportRoute
   '/app/account': typeof AuthenticatedAppAccountRoute
   '/app/ads': typeof AuthenticatedAppAdsRoute
   '/app/brand': typeof AuthenticatedAppBrandRoute
+  '/app/contact': typeof AuthenticatedAppContactRoute
   '/app/exports': typeof AuthenticatedAppExportsRoute
   '/app/guide': typeof AuthenticatedAppGuideRoute
   '/app/help': typeof AuthenticatedAppHelpRoute
@@ -748,9 +763,11 @@ export interface FileRoutesByTo {
   '/admin/newsletter': typeof AuthenticatedAdminNewsletterRoute
   '/admin/onboarding': typeof AuthenticatedAdminOnboardingRoute
   '/admin/reels': typeof AuthenticatedAdminReelsRoute
+  '/admin/support': typeof AuthenticatedAdminSupportRoute
   '/app/account': typeof AuthenticatedAppAccountRoute
   '/app/ads': typeof AuthenticatedAppAdsRoute
   '/app/brand': typeof AuthenticatedAppBrandRoute
+  '/app/contact': typeof AuthenticatedAppContactRoute
   '/app/exports': typeof AuthenticatedAppExportsRoute
   '/app/guide': typeof AuthenticatedAppGuideRoute
   '/app/help': typeof AuthenticatedAppHelpRoute
@@ -845,9 +862,11 @@ export interface FileRoutesById {
   '/_authenticated/admin/newsletter': typeof AuthenticatedAdminNewsletterRoute
   '/_authenticated/admin/onboarding': typeof AuthenticatedAdminOnboardingRoute
   '/_authenticated/admin/reels': typeof AuthenticatedAdminReelsRoute
+  '/_authenticated/admin/support': typeof AuthenticatedAdminSupportRoute
   '/_authenticated/app/account': typeof AuthenticatedAppAccountRoute
   '/_authenticated/app/ads': typeof AuthenticatedAppAdsRoute
   '/_authenticated/app/brand': typeof AuthenticatedAppBrandRoute
+  '/_authenticated/app/contact': typeof AuthenticatedAppContactRoute
   '/_authenticated/app/exports': typeof AuthenticatedAppExportsRoute
   '/_authenticated/app/guide': typeof AuthenticatedAppGuideRoute
   '/_authenticated/app/help': typeof AuthenticatedAppHelpRoute
@@ -942,9 +961,11 @@ export interface FileRouteTypes {
     | '/admin/newsletter'
     | '/admin/onboarding'
     | '/admin/reels'
+    | '/admin/support'
     | '/app/account'
     | '/app/ads'
     | '/app/brand'
+    | '/app/contact'
     | '/app/exports'
     | '/app/guide'
     | '/app/help'
@@ -1034,9 +1055,11 @@ export interface FileRouteTypes {
     | '/admin/newsletter'
     | '/admin/onboarding'
     | '/admin/reels'
+    | '/admin/support'
     | '/app/account'
     | '/app/ads'
     | '/app/brand'
+    | '/app/contact'
     | '/app/exports'
     | '/app/guide'
     | '/app/help'
@@ -1130,9 +1153,11 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/newsletter'
     | '/_authenticated/admin/onboarding'
     | '/_authenticated/admin/reels'
+    | '/_authenticated/admin/support'
     | '/_authenticated/app/account'
     | '/_authenticated/app/ads'
     | '/_authenticated/app/brand'
+    | '/_authenticated/app/contact'
     | '/_authenticated/app/exports'
     | '/_authenticated/app/guide'
     | '/_authenticated/app/help'
@@ -1583,6 +1608,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminReelsRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/support': {
+      id: '/_authenticated/admin/support'
+      path: '/support'
+      fullPath: '/admin/support'
+      preLoaderRoute: typeof AuthenticatedAdminSupportRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/app/': {
       id: '/_authenticated/app/'
       path: '/'
@@ -1609,6 +1641,13 @@ declare module '@tanstack/react-router' {
       path: '/brand'
       fullPath: '/app/brand'
       preLoaderRoute: typeof AuthenticatedAppBrandRouteImport
+      parentRoute: typeof AuthenticatedAppRouteRoute
+    }
+    '/_authenticated/app/contact': {
+      id: '/_authenticated/app/contact'
+      path: '/contact'
+      fullPath: '/app/contact'
+      preLoaderRoute: typeof AuthenticatedAppContactRouteImport
       parentRoute: typeof AuthenticatedAppRouteRoute
     }
     '/_authenticated/app/exports': {
@@ -1917,6 +1956,7 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminNewsletterRoute: typeof AuthenticatedAdminNewsletterRoute
   AuthenticatedAdminOnboardingRoute: typeof AuthenticatedAdminOnboardingRoute
   AuthenticatedAdminReelsRoute: typeof AuthenticatedAdminReelsRoute
+  AuthenticatedAdminSupportRoute: typeof AuthenticatedAdminSupportRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
   AuthenticatedAdminClientsIdRoute: typeof AuthenticatedAdminClientsIdRoute
   AuthenticatedAdminTemplatesIdRoute: typeof AuthenticatedAdminTemplatesIdRouteWithChildren
@@ -1942,6 +1982,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminNewsletterRoute: AuthenticatedAdminNewsletterRoute,
     AuthenticatedAdminOnboardingRoute: AuthenticatedAdminOnboardingRoute,
     AuthenticatedAdminReelsRoute: AuthenticatedAdminReelsRoute,
+    AuthenticatedAdminSupportRoute: AuthenticatedAdminSupportRoute,
     AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
     AuthenticatedAdminClientsIdRoute: AuthenticatedAdminClientsIdRoute,
     AuthenticatedAdminTemplatesIdRoute:
@@ -1960,6 +2001,7 @@ interface AuthenticatedAppRouteRouteChildren {
   AuthenticatedAppAccountRoute: typeof AuthenticatedAppAccountRoute
   AuthenticatedAppAdsRoute: typeof AuthenticatedAppAdsRoute
   AuthenticatedAppBrandRoute: typeof AuthenticatedAppBrandRoute
+  AuthenticatedAppContactRoute: typeof AuthenticatedAppContactRoute
   AuthenticatedAppExportsRoute: typeof AuthenticatedAppExportsRoute
   AuthenticatedAppGuideRoute: typeof AuthenticatedAppGuideRoute
   AuthenticatedAppHelpRoute: typeof AuthenticatedAppHelpRoute
@@ -1985,6 +2027,7 @@ const AuthenticatedAppRouteRouteChildren: AuthenticatedAppRouteRouteChildren = {
   AuthenticatedAppAccountRoute: AuthenticatedAppAccountRoute,
   AuthenticatedAppAdsRoute: AuthenticatedAppAdsRoute,
   AuthenticatedAppBrandRoute: AuthenticatedAppBrandRoute,
+  AuthenticatedAppContactRoute: AuthenticatedAppContactRoute,
   AuthenticatedAppExportsRoute: AuthenticatedAppExportsRoute,
   AuthenticatedAppGuideRoute: AuthenticatedAppGuideRoute,
   AuthenticatedAppHelpRoute: AuthenticatedAppHelpRoute,
