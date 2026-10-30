@@ -1,6 +1,6 @@
 # Photo-to-video article
 - [x] Correct 5:4/16:9 guidance, add manual Instagram posting steps and a contextual How it works link; preserve Château Méaume visuals.
-- [ ] Verify the link and updated article in the preview.
+- [x] Verified contextual-link navigation, format advice, manual posting instructions and retained images in the preview; build passed.
 
 # Admin client replies
 - [x] Add staff-only reply sending, saved reply history and clear delivery outcomes.
