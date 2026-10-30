@@ -15,6 +15,7 @@ import { template as paymentFailed } from './payment-failed'
 import { template as planCancelled } from './plan-cancelled'
 import { template as invite } from './team-invite'
 import { template as supportTicket } from './support-ticket'
+import { template as supportReply } from './support-reply'
 import { template as brandRequest } from './brand-request'
 import { template as weeklyReport } from './weekly-report'
 import { template as clientInviteCopy } from './client-invite-copy'
@@ -33,6 +34,7 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'plan-cancelled': planCancelled,
   invite,
   'support-ticket': supportTicket,
+  'support-reply': supportReply,
   'brand-request': brandRequest,
   'weekly-report': weeklyReport,
   'client-invite-copy': clientInviteCopy,
