@@ -42,7 +42,7 @@ export const POSTS: BlogPost[] = [
       {
         h: "2. Pick the size first",
         p: [
-          "Decide where the video will be posted before you start. Vertical 9:16 suits Reels, Stories and TikTok. Portrait 4:5 and square 1:1 suit feeds. Wide 16:9 and 5:4 suit banners, websites and YouTube.",
+          "Decide where the video will be posted before you start. Vertical 9:16 suits Reels, Stories and TikTok. Portrait 4:5 and square 1:1 suit feeds. Landscape 16:9 suits banners and YouTube. Wide 5:4 suits websites, Facebook and LinkedIn feeds.",
           "Choosing the size first means your photos and words are placed for that shape from the start, instead of being cropped later.",
         ],
         visual: "meaume-formats",
@@ -65,6 +65,14 @@ export const POSTS: BlogPost[] = [
         p: [
           "Export the finished reel as an MP4 for social posts or as an animated GIF for emails and websites. You can export the other sizes from the same ad, so one set of photos covers several places.",
           "Then post it where your customers already look.",
+        ],
+      },
+      {
+        h: "How to make a reel from photos and post it to Instagram",
+        p: [
+          "Start with three to five product photos, choose Vertical 9:16 and change the words to fit your brand. Preview the reel, then export and download the MP4. Use the MP4 for Instagram, not the GIF.",
+          "Save the downloaded video on your phone. In Instagram, create a Reel and select that video from your gallery. Check the preview, choose a cover, add your caption and share it. If you downloaded the file on your computer, transfer it to your phone first.",
+          "You post the file yourself. Gravity Pants does not publish directly to your Instagram account.",
         ],
       },
       {
