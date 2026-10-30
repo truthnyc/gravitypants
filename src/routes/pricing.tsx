@@ -1,4 +1,3 @@
-// TODO placeholders to confirm before launch: "[USD]", "[Taxes may apply.]", and the FAQ answers written in [brackets].
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Check } from "lucide-react";
@@ -99,7 +98,7 @@ function Pricing() {
               );
             })}
           </div>
-          <p className="pr-fine">Prices in [USD]. [Taxes may apply.] One export is one reel, whatever the number of formats and files. Export counts reset on each billing date. Run out early? Add a pack: 5 exports for $15, 10 for $25 or 20 for $45. Packs work on any plan and never expire. Need more seats? <Link to="/app/help">Write to us</Link>.</p>
+          <p className="pr-fine">Prices in USD. Taxes may apply. One export is one reel, whatever the number of formats and files. Export counts reset on each billing date. Run out early? Add a pack: 5 exports for $15, 10 for $25 or 20 for $45. Packs work on any plan and never expire. Need more seats? <a href="mailto:help@gravitypants.com" data-cta="pricing-write-to-us">Write to us</a>.</p>
         </section>
 
         <section className="pr-compare">
