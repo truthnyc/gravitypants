@@ -30,7 +30,7 @@ const values = [
 const stats = [
   { n: "3", l: "photos to start an ad" },
   { n: "Minutes", l: "from photos to a finished reel" },
-  { n: "4", l: "export shapes: Vertical, Portrait, Square and Landscape — plus custom sizes" },
+  { n: "5", l: "export shapes: Vertical, Portrait, Square, Landscape and Wide — plus custom sizes" },
 ];
 
 function AboutPage() {
