@@ -130,7 +130,7 @@ function Pricing() {
         </section>
 
         <section className="pr-faq">
-          <div className="pr-faq-head"><h2 className="site-h2">Questions</h2><p className="site-lede">Something else? <Link to="/app/help">Get in touch</Link>.</p></div>
+          <div className="pr-faq-head"><h2 className="site-h2">Questions</h2><p className="site-lede">Something else? <a href="mailto:help@gravitypants.com" data-cta="pricing-get-in-touch">Get in touch</a>.</p></div>
           <div>
             {FAQ.map((f, i) => (
               <div key={f.q} className="pr-faq-item">
