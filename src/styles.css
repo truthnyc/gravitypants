@@ -469,6 +469,7 @@
 .home-button { gap: 9px; }
 .home-text-link { color: var(--site-primary); font-size: 16px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; }
 .home-text-link:hover { color: var(--site-primary-hover); }
+.home-how-more { margin: 4px 0 0; }
 .home-mobile-only,.home-gallery-mobile,.home-stories-mobile { display: none; }
 .home-hero { min-height: 860px; display: grid; grid-template-columns: 640px minmax(0,1fr); gap: 40px; align-items: center; }
 .home-hero-copy { display: flex; flex-direction: column; gap: 32px; position: relative; z-index: 2; }

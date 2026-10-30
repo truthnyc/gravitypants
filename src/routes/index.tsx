@@ -717,6 +717,16 @@ function Home() {
               </div>
             </article>
           </div>
+          <p className="home-how-more">
+            <Link
+              className="home-text-link"
+              to="/blog/$slug"
+              params={{ slug: "how-to-turn-photos-into-a-video" }}
+              data-cta="home-photo-video-guide"
+            >
+              How to turn photos into a video: a step-by-step guide <ArrowRight size={16} />
+            </Link>
+          </p>
         </section>
         <section id="before-after" className="home-section home-before">
           <div className="home-before-top">
