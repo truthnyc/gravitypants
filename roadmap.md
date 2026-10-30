@@ -1,6 +1,6 @@
 # Admin client replies
-- [ ] Add staff-only reply sending, saved reply history and clear delivery outcomes.
-- [ ] Verify permissions, retry safety and the signed-in reply flow.
+- [x] Add staff-only reply sending, saved reply history and clear delivery outcomes.
+- [x] Verify permissions, retry safety and signed-in sending to the staff account; email log confirms sent, and Answered status/reply history survive reload.
 
 # Public-site performance
 - [x] Add staff-only client onboarding with shared Directory/Aimanté brand details and explicit workspace linking; verified private draft creation and Directory read-back as info@gravitypants.com, with 28 regression tests. Private verification rows removed after testing.
