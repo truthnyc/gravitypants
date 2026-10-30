@@ -1570,6 +1570,57 @@ export type Database = {
           },
         ]
       }
+      support_ticket_replies: {
+        Row: {
+          admin_user_id: string
+          created_at: string
+          delivery_status: string
+          id: string
+          message: string
+          recipient_email: string
+          sent_at: string | null
+          ticket_id: string
+          workspace_id: string
+        }
+        Insert: {
+          admin_user_id: string
+          created_at?: string
+          delivery_status?: string
+          id: string
+          message: string
+          recipient_email: string
+          sent_at?: string | null
+          ticket_id: string
+          workspace_id: string
+        }
+        Update: {
+          admin_user_id?: string
+          created_at?: string
+          delivery_status?: string
+          id?: string
+          message?: string
+          recipient_email?: string
+          sent_at?: string | null
+          ticket_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_ticket_replies_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "support_tickets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "support_ticket_replies_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       support_tickets: {
         Row: {
           ad_id: string | null

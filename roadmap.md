@@ -1,3 +1,7 @@
+# Admin client replies
+- [ ] Add staff-only reply sending, saved reply history and clear delivery outcomes.
+- [ ] Verify permissions, retry safety and the signed-in reply flow.
+
 # Public-site performance
 - [x] Add staff-only client onboarding with shared Directory/Aimanté brand details and explicit workspace linking; verified private draft creation and Directory read-back as info@gravitypants.com, with 28 regression tests. Private verification rows removed after testing.
 - [x] Recheck public asset Cache-Control: tested immutable assets return one-year caching; media, brand-assets and site-reels buckets remain private, unsigned downloads and anonymous signing are denied.
