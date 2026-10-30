@@ -46,7 +46,8 @@ export const Route = createFileRoute("/blog/$slug")({
         ],
       },
     ];
-    return { ...head, scripts: jsonLd.map((d) => ({ type: "application/ld+json", children: JSON.stringify(d) })) };
+    const cover = post.cover?.startsWith("https://") ? post.cover : undefined;
+    return { ...head, meta: cover ? [...(head.meta ?? []).filter((meta) => !("property" in meta && meta.property === "og:image") && !("name" in meta && meta.name === "twitter:image")), { property: "og:image", content: cover }, { name: "twitter:image", content: cover }] : head.meta, scripts: jsonLd.map((d) => ({ type: "application/ld+json", children: JSON.stringify(d) })) };
   },
 
   component: BlogPostPage,
