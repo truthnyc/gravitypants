@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { deliverSupportReply, supportReplyInput, type ReplyDelivery } from "./support-reply";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type Ctx = { supabase: any; userId: string };
@@ -460,11 +461,13 @@ export const adminSupportTickets = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const db = await adminDb(context as any);
-    const [{ data: t }, { data: ws }, users] = await Promise.all([
+    const [{ data: t, error: ticketError }, { data: ws }, users, { data: replies, error: replyError }] = await Promise.all([
       db.from("support_tickets").select("*").order("created_at", { ascending: false }).limit(500),
       db.from("workspaces").select("id, name"),
       allUsers(db),
+      db.from("support_ticket_replies").select("id, ticket_id, message, delivery_status, created_at, sent_at").order("created_at"),
     ]);
+    if (ticketError || replyError) throw new Error("Couldn't load client messages");
     const wsName = new Map(((ws ?? []) as any[]).map((w) => [w.id, w.name as string]));
     const email = new Map(users.map((u) => [u.id, u.email]));
     return ((t ?? []) as any[]).map((r) => ({
@@ -477,6 +480,11 @@ export const adminSupportTickets = createServerFn({ method: "GET" })
       priority: r.priority === "priority",
       status: r.status as "open" | "answered" | "closed",
       created_at: r.created_at as string,
+      replies: ((replies ?? []) as any[]).filter((reply) => reply.ticket_id === r.id).map((reply) => ({
+        id: reply.id as string, message: reply.message as string,
+        deliveryStatus: reply.delivery_status as ReplyDelivery,
+        createdAt: reply.created_at as string,
+      })),
     }));
   });
 
@@ -489,4 +497,42 @@ export const adminSetTicketStatus = createServerFn({ method: "POST" })
     if (error || !row) throw new Error("Couldn't update the message");
     await log(db, (context as any).userId, `support_ticket_${data.status}`, row.workspace_id, data.id);
     return { ok: true };
+  });
+
+export const adminReplyToTicket = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => supportReplyInput.parse(d))
+  .handler(async ({ data, context }) => {
+    const db = await adminDb(context as any);
+    const { data: ticket, error: ticketError } = await db.from("support_tickets").select("id, workspace_id, user_id, message").eq("id", data.id).single();
+    if (ticketError || !ticket) throw new Error("Message not found");
+    const { data: user, error: userError } = await db.auth.admin.getUserById(ticket.user_id);
+    const recipient = user?.user?.email;
+    if (userError || !recipient) throw new Error("This client has no email address to reply to");
+    const { error: insertError } = await db.from("support_ticket_replies").upsert({
+      id: data.replyId, ticket_id: ticket.id, workspace_id: ticket.workspace_id,
+      admin_user_id: context.userId, message: data.message, recipient_email: recipient,
+    }, { onConflict: "id", ignoreDuplicates: true });
+    if (insertError) throw new Error("Couldn't save your reply");
+    const { data: reply, error: readError } = await db.from("support_ticket_replies").select("*").eq("id", data.replyId).single();
+    if (readError || !reply || reply.ticket_id !== ticket.id || reply.admin_user_id !== context.userId || reply.message !== data.message) {
+      throw new Error("This reply has changed. Reload the page before sending.");
+    }
+    const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
+    const result = await deliverSupportReply(reply.delivery_status, {
+      send: () => sendTemplateEmail("support-reply", reply.recipient_email, {
+        templateData: { message: reply.message, originalMessage: ticket.message, ticketId: ticket.id },
+        idempotencyKey: `support-reply-${reply.id}`, replyTo: "help@gravitypants.com",
+      }),
+      saveDelivery: async (status) => {
+        const { error } = await db.from("support_ticket_replies").update({ delivery_status: status, sent_at: status === "sent" ? new Date().toISOString() : null }).eq("id", reply.id);
+        if (error) throw new Error("Couldn't update delivery status. Retry the saved reply.");
+      },
+      markAnswered: async () => {
+        const { error } = await db.from("support_tickets").update({ status: "answered" }).eq("id", ticket.id);
+        if (error) throw new Error("Reply sent, but the message status couldn't be updated. Retry the saved reply.");
+      },
+    });
+    await log(db, context.userId, result.sent ? "support_ticket_reply_sent" : "support_ticket_reply_suppressed", ticket.workspace_id, reply.id);
+    return result;
   });

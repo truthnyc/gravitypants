@@ -26,6 +26,7 @@
 - Brand kits: `brand_kits` (logos in private `brand-assets` bucket, `brand-assets:` path prefix for `getMediaUrl`); ads link via `projects.brand_kit_id`; `effectiveKit()` merges over the legacy `brand_kit` row (workspace ad settings only). Gated by SQL `brand_kits_enabled()` in RLS.
 
 - Support: tickets in `support_tickets` via `submitTicket` server fn; priority set by SQL trigger from the plan (never the browser); each ticket emails help@gravitypants.com.
+- Support replies use staff-checked `adminReplyToTicket`, persisted `support_ticket_replies` and the fixed support-reply email; derive the recipient from the original ticket and reuse reply IDs for retry idempotency so browser input cannot select recipients or duplicate sends.
 
 - Public art uses `public/site-art`; site video uses shared `FeaturedAdVideo` and CDN pointers.
 - Public media variants use immutable CDN pointers; `public-media.ts` maps only exact known public video URLs so private/signed files and new uploads remain untouched. Fixed-name artwork stays available for old links; active icons/share covers use immutable pointers for safe year-long caching.

@@ -113,6 +113,20 @@
       "when": 1791761215176,
       "tag": "0015_shopify_app_pricing",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1793398354820,
+      "tag": "0016_support_ticket_replies",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1793398432791,
+      "tag": "0017_simplify_support_reply_staff_policy",
+      "breakpoints": true
     }
   ]
 }

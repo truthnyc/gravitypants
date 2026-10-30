@@ -1,0 +1,1 @@
+ALTER POLICY "Staff read support replies" ON public.support_ticket_replies TO authenticated USING (public.is_platform_admin());
