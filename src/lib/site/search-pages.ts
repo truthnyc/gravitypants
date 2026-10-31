@@ -13,6 +13,9 @@ import aro3 from "@/assets/site/aro-shoe-3.webp.asset.json";
 import sachajuanShampoo from "@/assets/site/sachajuan-bioshield-shampoo.webp.asset.json";
 import sachajuanMist from "@/assets/site/sachajuan-glow-hair-mist.webp.asset.json";
 import sachajuanBanner from "@/assets/site/sachajuan-bioshield-banner.png.asset.json";
+import annGishDetail from "@/assets/site/ann-gish-pickstitch-detail-1.jpg.asset.json";
+import annGishBed from "@/assets/site/ann-gish-pickstitch-lifestyle-1.webp.asset.json";
+import annGishSet from "@/assets/site/ann-gish-rib-lifestyle-1.webp.asset.json";
 
 /** Website reel IDs (site_reels) used as examples on the search pages. */
 export const REEL = {
@@ -56,6 +59,11 @@ const SOURCE_PHOTOS: Record<string, { src: string; alt: string }[]> = {
     { src: sachajuanShampoo.url, alt: "Sachajuan Bioshield Shampoo 200 ml product photo" },
     { src: sachajuanMist.url, alt: "Sachajuan Glow Hair Mist 150 ml product photo" },
     { src: sachajuanBanner.url, alt: "Sachajuan Bioshield shampoo bottle on a red background" },
+  ],
+  [REEL.annGish]: [
+    { src: annGishDetail.url, alt: "Ann Gish Pickstitch bone coverlet detail with dark running stitches" },
+    { src: annGishBed.url, alt: "Ann Gish bed styled with pickstitch bone coverlet and rib slate shams" },
+    { src: annGishSet.url, alt: "Ann Gish Rib Slate and Pickstitch Bone bed set in a styled bedroom" },
   ],
 };
 export const sourcePhotos = (reelId: string) => SOURCE_PHOTOS[reelId] ?? [];
