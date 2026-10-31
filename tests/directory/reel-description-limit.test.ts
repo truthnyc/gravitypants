@@ -35,4 +35,9 @@ describe("Reel description limit", () => {
   it("rejects 301 characters", () => {
     expect(shareSchema.safeParse({ ...base, description: "a".repeat(301) }).success).toBe(false);
   });
+  it("keeps the database check at 300 characters", () => {
+    const sql = latestReelDescriptionMigration();
+    expect(sql).toContain("char_length(description) <= 300");
+    expect(sql).not.toContain("char_length(description) <= 120");
+  });
 });
