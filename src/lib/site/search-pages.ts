@@ -60,7 +60,7 @@ const industry = (slug: string, name: string, title: string, description: string
   description,
   h1: `Video ads for ${name} brands`,
   subhead: `Turn your ${name} photos into short video ads and Reels, with your words and brand, in every size.`,
-  example: { reelId: grid[0], label: "" },
+  example: { reelId: grid[0] ?? "", label: "" },
   why,
   section: { title: "Made with Gravity Pants", grid },
   faqs: PHOTO_FAQS,
