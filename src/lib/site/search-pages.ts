@@ -31,6 +31,9 @@ import filicoriRoasted from "@/assets/site/filicori-roasted-beans.webp.asset.jso
 import mfkTriptych from "@/assets/site/mfk-triptych.webp.asset.json";
 import mfkEdp from "@/assets/site/mfk-edp.jpg.asset.json";
 import mfkCoffret from "@/assets/site/mfk-coffret.jpg.asset.json";
+import frenchBloomPour from "@/assets/site/french-bloom-01.jpg.asset.json";
+import frenchBloomRose from "@/assets/site/french-bloom-03.jpg.asset.json";
+import frenchBloomIce from "@/assets/site/french-bloom-06.jpg.asset.json";
 
 /** Website reel IDs (site_reels) used as examples on the search pages. */
 export const REEL = {
@@ -46,6 +49,7 @@ export const REEL = {
   filicori: "4ff544bb-e181-46cf-af57-f720a00e4fc1",
   meaume: "2622b7db-614a-405f-a1da-79276bbe2de2",
   mfk: "afb7a588-8a41-44d6-9bef-c09be883b3dd",
+  frenchBloom: "d5e802e6-8f19-4db3-b2bf-cb056498c863",
 } as const;
 
 /** Source photos are only listed where the reel's real originals exist on the site. */
@@ -104,6 +108,11 @@ const SOURCE_PHOTOS: Record<string, { src: string; alt: string }[]> = {
     { src: mfkTriptych.url, alt: "Maison Francis Kurkdjian Baccarat Rouge 540 extrait de parfum bottles on red" },
     { src: mfkEdp.url, alt: "Maison Francis Kurkdjian Baccarat Rouge 540 eau de parfum bottle on red and gold" },
     { src: mfkCoffret.url, alt: "Maison Francis Kurkdjian Baccarat Rouge 540 travel set coffret" },
+  ],
+  [REEL.frenchBloom]: [
+    { src: frenchBloomPour.url, alt: "French Bloom sparkling rosé poured by the sea with cheese and raspberries" },
+    { src: frenchBloomRose.url, alt: "French Bloom Le Rosé alcohol-free sparkling bottle" },
+    { src: frenchBloomIce.url, alt: "French Bloom bottles chilling on ice" },
   ],
 };
 export const sourcePhotos = (reelId: string) => SOURCE_PHOTOS[reelId] ?? [];
@@ -355,7 +364,7 @@ export const SEARCH_PAGES: SearchPage[] = [
     ["Collections change every season and there's never time to film them all. Turn each new lookbook into Reels and ads the same week it lands."]),
   industry("food-and-drink", "food and drink", "Food and Drink Video Ads From Your Photos | Gravity Pants",
     "Turn photos of chocolate, coffee and wine into short video ads and email GIFs. Your brand, every size. First one free.",
-    [REEL.filicori, REEL.vosges, REEL.meaume],
+    [REEL.frenchBloom, REEL.filicori, REEL.vosges],
     ["Food sells on appetite. Movement makes a close-up feel fresh. Lead with the close-up, then the setting, then the offer or the occasion."]),
   industry("beauty-and-fragrance", "beauty and fragrance", "Beauty and Fragrance Video Ads From Photos | Gravity Pants",
     "Turn product photos of skincare, hair care and fragrance into short, polished video ads. Your brand, every size. First one free.",
