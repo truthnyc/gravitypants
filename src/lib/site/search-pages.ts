@@ -35,7 +35,7 @@ import frenchBloomPour from "@/assets/site/french-bloom-01.jpg.asset.json";
 import frenchBloomRose from "@/assets/site/french-bloom-03.jpg.asset.json";
 import frenchBloomIce from "@/assets/site/french-bloom-06.jpg.asset.json";
 
-/** Website reel IDs (site_reels) used as examples on the search pages. */
+/** Published website or featured Directory reel IDs used as search-page examples. */
 export const REEL = {
   purl: "c875b9a8-a2e9-4553-86aa-765fc349705d",
   beni: "f575acf3-fc9a-4f44-9b0b-9db52a62dfe3",
@@ -49,7 +49,7 @@ export const REEL = {
   filicori: "4ff544bb-e181-46cf-af57-f720a00e4fc1",
   meaume: "2622b7db-614a-405f-a1da-79276bbe2de2",
   mfk: "afb7a588-8a41-44d6-9bef-c09be883b3dd",
-  frenchBloom: "d5e802e6-8f19-4db3-b2bf-cb056498c863",
+  frenchBloom: "f53784c8-26eb-419a-9947-517b20d918d4",
 } as const;
 
 /** Source photos are only listed where the reel's real originals exist on the site. */
