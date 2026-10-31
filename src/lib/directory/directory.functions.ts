@@ -98,7 +98,9 @@ export const getShareContext = createServerFn({ method: "POST" })
     const { data: ad } = await sb.from("projects").select("id, workspace_id, name, template_id, formats").eq("id", data.adId).maybeSingle();
     if (!ad) throw new Error("This ad isn't available");
     const { data: b } = await sb.from("directory_brands").select("*").eq("workspace_id", ad.workspace_id).maybeSingle();
-    const { data: reel } = b ? await sb.from("directory_reels").select("id, status, tags, moods, title, display_title, description").eq("ad_id", ad.id).maybeSingle() : { data: null };
+    const { data: isStaff } = await sb.rpc("is_platform_admin");
+    // Staff may file a reel under any existing brand page; read the reel by ad so a reel already filed elsewhere is found.
+    const { data: reel } = b || isStaff === true ? await sb.from("directory_reels").select("id, status, tags, moods, title, display_title, description, brand_id").eq("ad_id", ad.id).maybeSingle() : { data: null };
     const { data: last } = b && !reel ? await sb.from("directory_reels").select("tags, moods").eq("brand_id", b.id).order("updated_at", { ascending: false }).limit(1).maybeSingle() : { data: null };
     const { data: kit } = await sb.from("brand_kits").select("name").eq("workspace_id", ad.workspace_id).order("is_default", { ascending: false }).limit(1).maybeSingle();
     const { data: ws } = await sb.from("workspaces").select("name").eq("id", ad.workspace_id).maybeSingle();
@@ -109,8 +111,15 @@ export const getShareContext = createServerFn({ method: "POST" })
     const brand: ShareBrand = b
       ? { id: b.id, name: b.name, website_url: b.website_url ?? "", category: b.category, description: b.description ?? "", slug: b.slug, first_approved_at: b.first_approved_at }
       : { id: null, name: fallbackName, website_url: "", category: "Other", description: "", slug: toSlug(fallbackName || "brand"), first_approved_at: null };
+    let brandChoices: { id: string; name: string; slug: string; category: string; approved: boolean }[] = [];
+    if (isStaff === true) {
+      const { data: all } = await sb.from("directory_brands").select("id, name, slug, category, first_approved_at").order("name").limit(1000);
+      brandChoices = ((all ?? []) as any[]).filter((x) => x.id !== b?.id).map((x) => ({ id: x.id, name: x.name, slug: x.slug, category: x.category, approved: !!x.first_approved_at }));
+    }
     return {
       brand,
+      brandChoices,
+      currentBrandId: ((reel as any)?.brand_id as string | undefined) ?? null,
       reel: reel ? { id: reel.id as string, status: reel.status as DirStatus, tags: reel.tags as string[], moods: reel.moods as string[], title: (reel.title as string | null) ?? null, displayTitle: (reel.display_title as string | null) ?? "", description: (reel.description as string | null) ?? "" } : null,
       prefill: { tags: (reel?.tags ?? last?.tags ?? []) as string[], moods: (reel?.moods ?? last?.moods ?? []) as string[] },
       plan,
@@ -146,6 +155,8 @@ export const shareSchema = z.object({
   agreed: z.boolean(),
   posterPath: z.string().max(400).nullable(),
   displayTitle: z.string().trim().max(60).optional(),
+  /** Staff only: file the reel under this existing brand page without changing its details. */
+  targetBrandId: z.string().uuid().nullable().optional(),
 });
 
 /** Saves the brand and the reel's listing; when shown, records the permission in the same request. */
@@ -174,17 +185,30 @@ export const shareReel = createServerFn({ method: "POST" })
     if (website) { try { new URL(website); } catch { throw new Error("That website link doesn't look right."); } }
 
     let { data: brand } = await sb.from("directory_brands").select("id, name, first_approved_at").eq("workspace_id", ad.workspace_id).maybeSingle();
-    const fields = { name: data.brand.name, website_url: website || null, category: data.brand.category };
-    if (brand) {
-      const { error } = await sb.from("directory_brands").update(fields).eq("id", brand.id);
-      if (error) throw new Error(error.message);
+    // Staff can file the reel under another existing brand page; that page's details are never overwritten.
+    let db = sb;
+    if (data.targetBrandId && data.targetBrandId !== brand?.id) {
+      const { data: isStaff } = await sb.rpc("is_platform_admin");
+      if (isStaff !== true) throw new Error("You can only share to your own brand page.");
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      db = supabaseAdmin as any;
+      const { data: target } = await db.from("directory_brands").select("id, name, first_approved_at").eq("id", data.targetBrandId).maybeSingle();
+      if (!target) throw new Error("That brand page isn't available.");
+      brand = target;
+      await db.from("admin_audit_log").insert({ admin_user_id: context.userId, action: "reel.share.to_brand", workspace_id: ad.workspace_id, target: target.id });
     } else {
-      const slug = await uniqueSlug(sb, toSlug(data.brand.name));
-      const { data: created, error } = await sb.from("directory_brands").insert({ ...fields, workspace_id: ad.workspace_id, slug }).select("id, name, first_approved_at").single();
-      if (error) throw new Error(error.message);
-      brand = created;
+      const fields = { name: data.brand.name, website_url: website || null, category: data.brand.category };
+      if (brand) {
+        const { error } = await sb.from("directory_brands").update(fields).eq("id", brand.id);
+        if (error) throw new Error(error.message);
+      } else {
+        const slug = await uniqueSlug(sb, toSlug(data.brand.name));
+        const { data: created, error } = await sb.from("directory_brands").insert({ ...fields, workspace_id: ad.workspace_id, slug }).select("id, name, first_approved_at").single();
+        if (error) throw new Error(error.message);
+        brand = created;
+      }
     }
-    const { data: prev } = await sb.from("directory_reels").select("id, status, title").eq("ad_id", ad.id).maybeSingle();
+    const { data: prev } = await db.from("directory_reels").select("id, status, title").eq("ad_id", ad.id).maybeSingle();
     const status: DirStatus = data.show ? (brand.first_approved_at ? "live" : "in_review") : prev?.status === "hidden" ? "hidden" : "private";
     const tags = [...new Set(data.tags.map((t) => t.toLowerCase()))];
     const { pinReelVideo } = await import("./directory.server");
@@ -199,21 +223,21 @@ export const shareReel = createServerFn({ method: "POST" })
       ...(videoUrl ? { video_url: videoUrl } : {}),
     };
     const { data: reel, error } = prev
-      ? await sb.from("directory_reels").update(row).eq("id", prev.id).select("id, status").single()
-      : await sb.from("directory_reels").insert(row).select("id, status").single();
+      ? await db.from("directory_reels").update(row).eq("id", prev.id).select("id, status").single()
+      : await db.from("directory_reels").insert(row).select("id, status").single();
     if (error) throw new Error(listingError(error.message));
 
     if (data.show && !keepShared) {
       const req = getRequest();
       const ip = req?.headers.get("cf-connecting-ip") ?? req?.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
-      const { error: logErr } = await sb.from("permission_log").insert({
+      const { error: logErr } = await db.from("permission_log").insert({
         directory_reel_id: reel.id, ad_id: ad.id, brand_id: brand.id, user_id: context.userId, action: "granted",
         full_name: data.fullName.trim(), job_title: data.jobTitle || null, wording_version: WORDING_VERSION,
-        wording_text: permissionWording(data.brand.name), ip_address: ip, user_agent: req?.headers.get("user-agent")?.slice(0, 400) ?? null,
+        wording_text: permissionWording(brand.name ?? data.brand.name), ip_address: ip, user_agent: req?.headers.get("user-agent")?.slice(0, 400) ?? null,
       });
       if (logErr) {
         // Never leave a reel public without a recorded permission.
-        await sb.from("directory_reels").update({ status: prev?.status === "live" ? "live" : "private" }).eq("id", reel.id);
+        await db.from("directory_reels").update({ status: prev?.status === "live" ? "live" : "private" }).eq("id", reel.id);
         throw new Error("Your permission couldn't be saved, so the reel wasn't shared. Try again.");
       }
     }
