@@ -109,6 +109,11 @@ const SOURCE_PHOTOS: Record<string, { src: string; alt: string }[]> = {
     { src: mfkEdp.url, alt: "Maison Francis Kurkdjian Baccarat Rouge 540 eau de parfum bottle on red and gold" },
     { src: mfkCoffret.url, alt: "Maison Francis Kurkdjian Baccarat Rouge 540 travel set coffret" },
   ],
+  [REEL.frenchBloom]: [
+    { src: frenchBloomPour.url, alt: "French Bloom sparkling rosé poured by the sea with cheese and raspberries" },
+    { src: frenchBloomRose.url, alt: "French Bloom Le Rosé alcohol-free sparkling bottle" },
+    { src: frenchBloomIce.url, alt: "French Bloom bottles chilling on ice" },
+  ],
 };
 export const sourcePhotos = (reelId: string) => SOURCE_PHOTOS[reelId] ?? [];
 
@@ -359,7 +364,7 @@ export const SEARCH_PAGES: SearchPage[] = [
     ["Collections change every season and there's never time to film them all. Turn each new lookbook into Reels and ads the same week it lands."]),
   industry("food-and-drink", "food and drink", "Food and Drink Video Ads From Your Photos | Gravity Pants",
     "Turn photos of chocolate, coffee and wine into short video ads and email GIFs. Your brand, every size. First one free.",
-    [REEL.filicori, REEL.vosges, REEL.meaume],
+    [REEL.frenchBloom, REEL.filicori, REEL.vosges],
     ["Food sells on appetite. Movement makes a close-up feel fresh. Lead with the close-up, then the setting, then the offer or the occasion."]),
   industry("beauty-and-fragrance", "beauty and fragrance", "Beauty and Fragrance Video Ads From Photos | Gravity Pants",
     "Turn product photos of skincare, hair care and fragrance into short, polished video ads. Your brand, every size. First one free.",
