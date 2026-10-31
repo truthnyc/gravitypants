@@ -285,12 +285,6 @@ export const SEARCH_PAGES: SearchPage[] = [
 
 export const searchPage = (path: string) => SEARCH_PAGES.find((p) => p.path === path)!;
 
-/** Link labels for Related lists: each page's own H1. */
-export const pageLabel = (path: string) => {
-  if (path === "/blog/how-to-turn-photos-into-a-video") return "How to turn photos into a video";
-  return SEARCH_PAGES.find((p) => p.path === path)?.h1 ?? path;
-};
-
 /** Short footer labels for the "Made for" column. */
 export const MADE_FOR_LINKS: { label: string; to: string }[] = [
   { label: "Photo to video", to: "/photo-to-video" },
