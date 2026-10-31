@@ -283,7 +283,7 @@ export const SEARCH_PAGES: SearchPage[] = [
     description: "Turn your Etsy product photos into a short listing video in minutes. No filming, no editing. Your first video is free.",
     h1: "Make an Etsy listing video from your photos",
     subhead: "A short video for your listing, made from the photos you already took.",
-    example: { reelId: REEL.annGish, label: "Ann Gish, Pitchstitch Bed Set" },
+    example: { reelId: REEL.annGish, label: "Ann Gish, Pickstitch Bed Set" },
     why: [
       "On Etsy, buyers compare similar items side by side. A listing with a video shows more of your work and feels more trustworthy than one with photos alone.",
       "Most sellers skip video because filming takes time. With Gravity Pants you start from your listing photos, so a video takes a few minutes.",
