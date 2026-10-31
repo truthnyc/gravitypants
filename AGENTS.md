@@ -43,6 +43,7 @@
 - Shared `SiteHeader` (site|app) delegates Aimanté to `AimanteHeader` regardless of session; `AimanteShell` shares its logo/footer with auth. Directory links use `SHOW_DIRECTORY`.
 - Website reel favorites use own `site_reel_favorites` rows via `SiteReelHeart`/`useSiteReelFavorites`; Favorites includes Directory reels.
 - App/SSR failures share dependency-free `ServiceUnavailable`.
+- Search landing pages: content in `src/lib/site/search-pages.ts`, one `SearchPage` layout and route factory; add pages via data plus a thin route file so copy, SEO and FAQ data stay in one place.
 - Scope Aimanté by site; `brand-page` helpers centralize brand rules.
 
 - SVG uploads share `svg-safety.ts` before preview/storage, including Directory server uploads, to remove active content.
