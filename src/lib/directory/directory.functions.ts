@@ -230,14 +230,14 @@ export const shareReel = createServerFn({ method: "POST" })
     if (data.show && !keepShared) {
       const req = getRequest();
       const ip = req?.headers.get("cf-connecting-ip") ?? req?.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
-      const { error: logErr } = await sb.from("permission_log").insert({
+      const { error: logErr } = await db.from("permission_log").insert({
         directory_reel_id: reel.id, ad_id: ad.id, brand_id: brand.id, user_id: context.userId, action: "granted",
         full_name: data.fullName.trim(), job_title: data.jobTitle || null, wording_version: WORDING_VERSION,
-        wording_text: permissionWording(data.brand.name), ip_address: ip, user_agent: req?.headers.get("user-agent")?.slice(0, 400) ?? null,
+        wording_text: permissionWording(brand.name ?? data.brand.name), ip_address: ip, user_agent: req?.headers.get("user-agent")?.slice(0, 400) ?? null,
       });
       if (logErr) {
         // Never leave a reel public without a recorded permission.
-        await sb.from("directory_reels").update({ status: prev?.status === "live" ? "live" : "private" }).eq("id", reel.id);
+        await db.from("directory_reels").update({ status: prev?.status === "live" ? "live" : "private" }).eq("id", reel.id);
         throw new Error("Your permission couldn't be saved, so the reel wasn't shared. Try again.");
       }
     }
