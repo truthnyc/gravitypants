@@ -28,6 +28,9 @@ import reschioFireGrate from "@/assets/site/reschio-fire-grate.jpg.asset.json";
 import filicoriEspresso from "@/assets/site/filicori-espresso-pour.webp.asset.json";
 import filicoriLogos from "@/assets/site/filicori-vintage-logos.webp.asset.json";
 import filicoriRoasted from "@/assets/site/filicori-roasted-beans.webp.asset.json";
+import mfkTriptych from "@/assets/site/mfk-triptych.webp.asset.json";
+import mfkEdp from "@/assets/site/mfk-edp.jpg.asset.json";
+import mfkCoffret from "@/assets/site/mfk-coffret.jpg.asset.json";
 
 /** Website reel IDs (site_reels) used as examples on the search pages. */
 export const REEL = {
@@ -96,6 +99,11 @@ const SOURCE_PHOTOS: Record<string, { src: string; alt: string }[]> = {
     { src: filicoriRoasted.url, alt: "Filicori Zecchini roasted coffee beans in the cooling drum" },
     { src: filicoriLogos.url, alt: "Filicori Zecchini vintage logo sheet with an espresso cup and coffee beans" },
     { src: filicoriEspresso.url, alt: "Espresso pouring into Filicori Zecchini branded cups" },
+  ],
+  [REEL.mfk]: [
+    { src: mfkTriptych.url, alt: "Maison Francis Kurkdjian Baccarat Rouge 540 extrait de parfum bottles on red" },
+    { src: mfkEdp.url, alt: "Maison Francis Kurkdjian Baccarat Rouge 540 eau de parfum bottle on red and gold" },
+    { src: mfkCoffret.url, alt: "Maison Francis Kurkdjian Baccarat Rouge 540 travel set coffret" },
   ],
 };
 export const sourcePhotos = (reelId: string) => SOURCE_PHOTOS[reelId] ?? [];
