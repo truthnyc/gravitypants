@@ -155,6 +155,8 @@ export const shareSchema = z.object({
   agreed: z.boolean(),
   posterPath: z.string().max(400).nullable(),
   displayTitle: z.string().trim().max(60).optional(),
+  /** Staff only: file the reel under this existing brand page without changing its details. */
+  targetBrandId: z.string().uuid().nullable().optional(),
 });
 
 /** Saves the brand and the reel's listing; when shown, records the permission in the same request. */
