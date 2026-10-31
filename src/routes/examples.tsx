@@ -7,6 +7,7 @@ import { ArrowRight, ArrowUpRight, Check, ChevronDown, X } from "lucide-react";
 import { useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { SiteShell } from "@/components/site/SiteShell";
+import { SearchPageLinks } from "@/components/site/SearchPage";
 import { FeaturedAdVideo } from "@/components/site/FeaturedAdVideo";
 import { GravityPantsLogo } from "@/components/GravityPantsLogo";
 import { Button } from "@/components/ui/button";
@@ -111,6 +112,7 @@ function ExamplesPage() {
       {visible.length > 0 ? <div className="examples-grid">{visible.map(example => <GalleryCard key={example.id} example={example} />)}</div> : <div className="site-card examples-empty"><h2>No examples in this combination yet.</h2><Button variant="siteSecondary" size="site" onClick={() => navigate({ search: { cat: undefined, format: undefined }, hash: "gallery", replace: true })}>Show all examples</Button></div>}
     </section>
     <section className="examples-submit examples-container"><span>Want a reel like these for your brand?</span><Link to="/contact">Tell us about it <ArrowRight size={16} strokeWidth={1.7} /></Link></section>
+    <SearchPageLinks className="examples-container pt-12" paths={["/for/jewelry", "/for/home-decor", "/for/fashion", "/for/food-and-drink", "/for/beauty-and-fragrance", "/photo-to-video"]} />
     <section className="examples-closing examples-container"><div className="site-card examples-closing-inner"><div className="examples-closing-copy"><div className="examples-closing-logo"><GravityPantsLogo size={64} /></div><h2>Found a style you like?</h2><p>Use it with your own photos and change anything you want.</p><div><Button asChild variant="site" size="site"><Link to="/signup" data-cta="begin-with-style">Begin with this style</Link></Button><Button asChild variant="siteSecondary" size="site"><Link to="/pricing" data-cta="view-plans">View plans</Link></Button></div></div><div className="examples-closing-orbit" aria-hidden="true"><span /></div></div></section>
   </div></SiteShell>;
 }
