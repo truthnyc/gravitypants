@@ -7,6 +7,9 @@ import kg3 from "@/assets/site/fine-jewelry-frame-3.webp.asset.json";
 import beni1 from "@/assets/site/beni-rug-1.jpg.asset.json";
 import beni2 from "@/assets/site/beni-rug-2.jpg.asset.json";
 import beni3 from "@/assets/site/beni-rug-3.jpg.asset.json";
+import aro1 from "@/assets/site/aro-shoe-1.webp.asset.json";
+import aro2 from "@/assets/site/aro-shoe-2.webp.asset.json";
+import aro3 from "@/assets/site/aro-shoe-3.webp.asset.json";
 
 /** Website reel IDs (site_reels) used as examples on the search pages. */
 export const REEL = {
@@ -40,6 +43,11 @@ const SOURCE_PHOTOS: Record<string, { src: string; alt: string }[]> = {
     { src: beni1.url, alt: "Beni Rugs Chelsea Collection rug photo 1" },
     { src: beni2.url, alt: "Beni Rugs Chelsea Collection rug photo 2" },
     { src: beni3.url, alt: "Beni Rugs Chelsea Collection rug photo 3" },
+  ],
+  [REEL.aro]: [
+    { src: aro1.url, alt: "Aro Shoes red sneaker with pink overlays product photo" },
+    { src: aro2.url, alt: "Aro Shoes mustard yellow suede and mesh sneaker product photo" },
+    { src: aro3.url, alt: "Aro Shoes lavender mesh sneaker product photo" },
   ],
 };
 export const sourcePhotos = (reelId: string) => SOURCE_PHOTOS[reelId] ?? [];
