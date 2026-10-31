@@ -98,7 +98,9 @@ export const getShareContext = createServerFn({ method: "POST" })
     const { data: ad } = await sb.from("projects").select("id, workspace_id, name, template_id, formats").eq("id", data.adId).maybeSingle();
     if (!ad) throw new Error("This ad isn't available");
     const { data: b } = await sb.from("directory_brands").select("*").eq("workspace_id", ad.workspace_id).maybeSingle();
-    const { data: reel } = b ? await sb.from("directory_reels").select("id, status, tags, moods, title, display_title, description").eq("ad_id", ad.id).maybeSingle() : { data: null };
+    const { data: isStaff } = await sb.rpc("is_platform_admin");
+    // Staff may file a reel under any existing brand page; read the reel by ad so a reel already filed elsewhere is found.
+    const { data: reel } = b || isStaff === true ? await sb.from("directory_reels").select("id, status, tags, moods, title, display_title, description, brand_id").eq("ad_id", ad.id).maybeSingle() : { data: null };
     const { data: last } = b && !reel ? await sb.from("directory_reels").select("tags, moods").eq("brand_id", b.id).order("updated_at", { ascending: false }).limit(1).maybeSingle() : { data: null };
     const { data: kit } = await sb.from("brand_kits").select("name").eq("workspace_id", ad.workspace_id).order("is_default", { ascending: false }).limit(1).maybeSingle();
     const { data: ws } = await sb.from("workspaces").select("name").eq("id", ad.workspace_id).maybeSingle();
@@ -109,8 +111,15 @@ export const getShareContext = createServerFn({ method: "POST" })
     const brand: ShareBrand = b
       ? { id: b.id, name: b.name, website_url: b.website_url ?? "", category: b.category, description: b.description ?? "", slug: b.slug, first_approved_at: b.first_approved_at }
       : { id: null, name: fallbackName, website_url: "", category: "Other", description: "", slug: toSlug(fallbackName || "brand"), first_approved_at: null };
+    let brandChoices: { id: string; name: string; slug: string; category: string; approved: boolean }[] = [];
+    if (isStaff === true) {
+      const { data: all } = await sb.from("directory_brands").select("id, name, slug, category, first_approved_at").order("name").limit(1000);
+      brandChoices = ((all ?? []) as any[]).filter((x) => x.id !== b?.id).map((x) => ({ id: x.id, name: x.name, slug: x.slug, category: x.category, approved: !!x.first_approved_at }));
+    }
     return {
       brand,
+      brandChoices,
+      currentBrandId: ((reel as any)?.brand_id as string | undefined) ?? null,
       reel: reel ? { id: reel.id as string, status: reel.status as DirStatus, tags: reel.tags as string[], moods: reel.moods as string[], title: (reel.title as string | null) ?? null, displayTitle: (reel.display_title as string | null) ?? "", description: (reel.description as string | null) ?? "" } : null,
       prefill: { tags: (reel?.tags ?? last?.tags ?? []) as string[], moods: (reel?.moods ?? last?.moods ?? []) as string[] },
       plan,
