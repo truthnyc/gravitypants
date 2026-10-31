@@ -7,6 +7,9 @@ import kg3 from "@/assets/site/fine-jewelry-frame-3.webp.asset.json";
 import beni1 from "@/assets/site/beni-rug-1.jpg.asset.json";
 import beni2 from "@/assets/site/beni-rug-2.jpg.asset.json";
 import beni3 from "@/assets/site/beni-rug-3.jpg.asset.json";
+import aro1 from "@/assets/site/aro-shoe-1.webp.asset.json";
+import aro2 from "@/assets/site/aro-shoe-2.webp.asset.json";
+import aro3 from "@/assets/site/aro-shoe-3.webp.asset.json";
 
 /** Website reel IDs (site_reels) used as examples on the search pages. */
 export const REEL = {
