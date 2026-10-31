@@ -22,6 +22,9 @@ import vosgesBox from "@/assets/site/vosges-skulls-box.webp.asset.json";
 import agnonaCoatScarf from "@/assets/site/agnona-coat-scarf.jpg.asset.json";
 import agnonaWhiteCoat from "@/assets/site/agnona-white-coat.jpg.asset.json";
 import agnonaSageCoat from "@/assets/site/agnona-sage-coat-hat.jpg.asset.json";
+import reschioCanaryBed from "@/assets/site/reschio-canary-bed.webp.asset.json";
+import reschioCampaignBed from "@/assets/site/reschio-campaign-bed.webp.asset.json";
+import reschioFireGrate from "@/assets/site/reschio-fire-grate.jpg.asset.json";
 
 /** Website reel IDs (site_reels) used as examples on the search pages. */
 export const REEL = {
@@ -80,6 +83,11 @@ const SOURCE_PHOTOS: Record<string, { src: string; alt: string }[]> = {
     { src: agnonaCoatScarf.url, alt: "Agnona dark wool coat with fringed scarf, sunglasses and leather gloves" },
     { src: agnonaWhiteCoat.url, alt: "Agnona white wool coat from behind on a dark background" },
     { src: agnonaSageCoat.url, alt: "Agnona sage coat with draped collar, wide-brim hat and leather gloves" },
+  ],
+  [REEL.reschio]: [
+    { src: reschioCanaryBed.url, alt: "Reschio Canary Bed in yellow with a metal canopy frame" },
+    { src: reschioCampaignBed.url, alt: "Reschio Campaign Bed, a black four-poster with brass details" },
+    { src: reschioFireGrate.url, alt: "Reschio kitchen fire grate in a stone fireplace with candles and logs" },
   ],
 };
 export const sourcePhotos = (reelId: string) => SOURCE_PHOTOS[reelId] ?? [];
@@ -323,7 +331,7 @@ export const SEARCH_PAGES: SearchPage[] = [
     ["Jewelry is small on a phone screen. Close-ups that move slowly show the detail and light that a still photo misses. Use a close-up, then the piece being worn, then a gift line (\"Ready to gift\")."]),
   industry("home-decor", "home decor", "Home Decor Video Ads From Your Photos | Gravity Pants",
     "Turn photos of rugs, bedding and homeware into short video ads that show texture and scale. Every size. First one free.",
-    [REEL.beni, REEL.annGish, REEL.reschio],
+    [REEL.reschio, REEL.beni, REEL.annGish],
     ["Buyers want to see how a piece looks in a real room. Start with the room, then a close-up of the texture, then the piece on its own."]),
   industry("fashion", "fashion", "Fashion Video Ads From Your Photos | Gravity Pants",
     "Turn lookbook and product photos into short video ads for new collections and sales. Your brand, every size. First one free.",
