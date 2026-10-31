@@ -41,7 +41,7 @@ export const Route = createFileRoute("/_authenticated")({
     // Fire-and-forget: sends the welcome email once for brand-new workspaces.
     void sendWelcomeEmail().catch(() => {});
     // First signed-in load: save where this signup came from (database keeps only the first value).
-    void saveSignupSource(data.user.user_metadata?.first_touch);
+    void saveSignupSource(data.user.user_metadata?.["first_touch"]);
     const { data: w } = await supabase.from("workspaces").select("suspended_at").eq("id", activeWorkspace).maybeSingle();
     return { user: data.user, workspaceId: activeWorkspace, suspended: !!(w as { suspended_at: string | null } | null)?.suspended_at };
   },
