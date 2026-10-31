@@ -19,6 +19,9 @@ import annGishSet from "@/assets/site/ann-gish-rib-lifestyle-1.webp.asset.json";
 import vosgesBoard from "@/assets/site/vosges-skulls-board.webp.asset.json";
 import vosgesIngredients from "@/assets/site/vosges-skulls-ingredients.webp.asset.json";
 import vosgesBox from "@/assets/site/vosges-skulls-box.webp.asset.json";
+import agnonaCoatScarf from "@/assets/site/agnona-coat-scarf.jpg.asset.json";
+import agnonaWhiteCoat from "@/assets/site/agnona-white-coat.jpg.asset.json";
+import agnonaSageCoat from "@/assets/site/agnona-sage-coat-hat.jpg.asset.json";
 
 /** Website reel IDs (site_reels) used as examples on the search pages. */
 export const REEL = {
@@ -72,6 +75,11 @@ const SOURCE_PHOTOS: Record<string, { src: string; alt: string }[]> = {
     { src: vosgesBoard.url, alt: "Vosges chocolate skulls on a wood serving board with cherries and prosciutto" },
     { src: vosgesIngredients.url, alt: "Vosges chocolate skulls with cinnamon, cloves, nutmeg and crispy rice" },
     { src: vosgesBox.url, alt: "Vosges Crispy Rice Chocolate Skulls box with three chocolate skulls" },
+  ],
+  [REEL.agnona]: [
+    { src: agnonaCoatScarf.url, alt: "Agnona dark wool coat with fringed scarf, sunglasses and leather gloves" },
+    { src: agnonaWhiteCoat.url, alt: "Agnona white wool coat from behind on a dark background" },
+    { src: agnonaSageCoat.url, alt: "Agnona sage coat with draped collar, wide-brim hat and leather gloves" },
   ],
 };
 export const sourcePhotos = (reelId: string) => SOURCE_PHOTOS[reelId] ?? [];
