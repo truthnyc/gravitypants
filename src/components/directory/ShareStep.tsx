@@ -67,6 +67,8 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
   save: ReturnType<typeof useServerFn<typeof shareReel>>; onSaved: () => void;
 }) {
   const locked = ctx.plan.tag === "ended";
+  const [target, setTarget] = useState<string>(ctx.brandChoices.some((b) => b.id === ctx.currentBrandId) ? ctx.currentBrandId! : "");
+  const targetBrand = ctx.brandChoices.find((b) => b.id === target) ?? null;
   const [name, setName] = useState(ctx.brand.name);
   const [site, setSite] = useState(ctx.brand.website_url);
   const [category, setCategory] = useState<Category>(ctx.brand.category);
@@ -86,9 +88,9 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
   const [thumbFrame, setThumbFrame] = useState(0);
   const { forCategory } = useMoodCatalog();
   const suggestions = useMemo(() => suggestionsFrom(doc).filter((s) => !tags.includes(s)), [doc, tags]);
-  const brandName = name.trim() || "your brand";
+  const brandName = targetBrand?.name ?? (name.trim() || "your brand");
   const nameOk = validFullName(fullName);
-  const approved = !!ctx.brand.first_approved_at;
+  const approved = targetBrand ? targetBrand.approved : !!ctx.brand.first_approved_at;
   const alreadyShared = ctx.reel?.status === "live" || ctx.reel?.status === "in_review";
   const canSubmit = !locked && !busy && name.trim().length > 0 && (!show || alreadyShared || (agreed && nameOk));
   const primaryLabel = !show ? "Done" : alreadyShared && !agreed ? "Save changes" : approved ? "Publish" : "Submit for review";
@@ -117,7 +119,7 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
       }
       const res = await save({ data: {
         adId: doc.project.id, brand: { name: name.trim(), website_url: site.trim(), category }, description: desc.trim(), displayTitle: aimTitle.trim(),
-        tags, moods: moods as string[], show, fullName, jobTitle: title, agreed, posterPath,
+        tags, moods: moods as string[], show, fullName, jobTitle: title, agreed, posterPath, targetBrandId: target || null,
       } });
       if (alreadyShared && show && !agreed) toast.success("Changes saved.");
       else if (res.status === "live") toast.success("Published. It's live in the Directory. Permission saved to your log.");
@@ -195,7 +197,16 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
                 On the free trial your brand page shows up to 3 watermark-free reels. Upgrade for unlimited reels.
               </Notice>
             )}
-            <div className="grid gap-x-3.5 sm:grid-cols-2">
+            {ctx.brandChoices.length > 0 && (
+              <AppField label="Brand page" htmlFor="d-brand-page" className="mb-[18px]">
+                <AppSelect id="d-brand-page" value={target} onChange={(e) => setTarget(e.target.value)}>
+                  <option value="">{ctx.brand.id ? `${ctx.brand.name} (this workspace)` : "This workspace's brand page"}</option>
+                  {ctx.brandChoices.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
+                </AppSelect>
+                {targetBrand && <p className="mt-1.5 text-[13px] text-ap-muted">Files this reel under {targetBrand.name}. That brand page's details stay as they are.</p>}
+              </AppField>
+            )}
+            {!targetBrand && <div className="grid gap-x-3.5 sm:grid-cols-2">
               <AppField label="Brand name" htmlFor="d-name" className="mb-[18px]">
                 <AppInput id="d-name" value={name} maxLength={BRAND_NAME_MAX} onChange={(e) => setName(e.target.value)} />
                 <FieldCount value={name} max={BRAND_NAME_MAX} />
@@ -205,7 +216,7 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
                   {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
                 </AppSelect>
               </AppField>
-            </div>
+            </div>}
             <AppField label="Title" htmlFor="d-aim-title" className="mb-[18px]">
               <AppInput id="d-aim-title" value={aimTitle} placeholder="e.g. Autumn cashmere" maxLength={60} onChange={(e) => setAimTitle(e.target.value)} />
               <FieldCount value={aimTitle} max={60} />
@@ -218,7 +229,7 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
 
             <AppField label="Mood" className="mb-[18px]">
               {(() => {
-                const all = [...new Set([...moods, ...forCategory(category)])];
+                const all = [...new Set([...moods, ...forCategory((targetBrand?.category as Category | undefined) ?? category)])];
                 const list = moreMoods ? all : all.slice(0, 6);
                 return (
                   <div className="flex flex-wrap items-center gap-1.5">
