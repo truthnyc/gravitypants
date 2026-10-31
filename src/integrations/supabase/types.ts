@@ -1236,18 +1236,39 @@ export type Database = {
           avatar_url: string | null
           created_at: string
           display_name: string | null
+          signup_landing_path: string | null
+          signup_ref: string | null
+          signup_referrer_host: string | null
+          signup_source_saved_at: string | null
+          signup_utm_campaign: string | null
+          signup_utm_medium: string | null
+          signup_utm_source: string | null
           user_id: string
         }
         Insert: {
           avatar_url?: string | null
           created_at?: string
           display_name?: string | null
+          signup_landing_path?: string | null
+          signup_ref?: string | null
+          signup_referrer_host?: string | null
+          signup_source_saved_at?: string | null
+          signup_utm_campaign?: string | null
+          signup_utm_medium?: string | null
+          signup_utm_source?: string | null
           user_id: string
         }
         Update: {
           avatar_url?: string | null
           created_at?: string
           display_name?: string | null
+          signup_landing_path?: string | null
+          signup_ref?: string | null
+          signup_referrer_host?: string | null
+          signup_source_saved_at?: string | null
+          signup_utm_campaign?: string | null
+          signup_utm_medium?: string | null
+          signup_utm_source?: string | null
           user_id?: string
         }
         Relationships: []
@@ -2076,6 +2097,17 @@ export type Database = {
       }
       record_export: {
         Args: { _project: string; _stamp: string; _ws: string }
+        Returns: boolean
+      }
+      record_signup_source: {
+        Args: {
+          _landing_path: string
+          _ref: string
+          _referrer_host: string
+          _utm_campaign: string
+          _utm_medium: string
+          _utm_source: string
+        }
         Returns: boolean
       }
       search_directory: {
