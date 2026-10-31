@@ -31,6 +31,9 @@ import filicoriRoasted from "@/assets/site/filicori-roasted-beans.webp.asset.jso
 import mfkTriptych from "@/assets/site/mfk-triptych.webp.asset.json";
 import mfkEdp from "@/assets/site/mfk-edp.jpg.asset.json";
 import mfkCoffret from "@/assets/site/mfk-coffret.jpg.asset.json";
+import frenchBloomPour from "@/assets/site/french-bloom-01.jpg.asset.json";
+import frenchBloomRose from "@/assets/site/french-bloom-03.jpg.asset.json";
+import frenchBloomIce from "@/assets/site/french-bloom-06.jpg.asset.json";
 
 /** Website reel IDs (site_reels) used as examples on the search pages. */
 export const REEL = {
@@ -46,6 +49,7 @@ export const REEL = {
   filicori: "4ff544bb-e181-46cf-af57-f720a00e4fc1",
   meaume: "2622b7db-614a-405f-a1da-79276bbe2de2",
   mfk: "afb7a588-8a41-44d6-9bef-c09be883b3dd",
+  frenchBloom: "d5e802e6-8f19-4db3-b2bf-cb056498c863",
 } as const;
 
 /** Source photos are only listed where the reel's real originals exist on the site. */
