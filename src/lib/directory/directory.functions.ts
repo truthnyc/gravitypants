@@ -185,17 +185,30 @@ export const shareReel = createServerFn({ method: "POST" })
     if (website) { try { new URL(website); } catch { throw new Error("That website link doesn't look right."); } }
 
     let { data: brand } = await sb.from("directory_brands").select("id, name, first_approved_at").eq("workspace_id", ad.workspace_id).maybeSingle();
-    const fields = { name: data.brand.name, website_url: website || null, category: data.brand.category };
-    if (brand) {
-      const { error } = await sb.from("directory_brands").update(fields).eq("id", brand.id);
-      if (error) throw new Error(error.message);
+    // Staff can file the reel under another existing brand page; that page's details are never overwritten.
+    let db = sb;
+    if (data.targetBrandId && data.targetBrandId !== brand?.id) {
+      const { data: isStaff } = await sb.rpc("is_platform_admin");
+      if (isStaff !== true) throw new Error("You can only share to your own brand page.");
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      db = supabaseAdmin as any;
+      const { data: target } = await db.from("directory_brands").select("id, name, first_approved_at").eq("id", data.targetBrandId).maybeSingle();
+      if (!target) throw new Error("That brand page isn't available.");
+      brand = target;
+      await db.from("admin_audit_log").insert({ admin_user_id: context.userId, action: "reel.share.to_brand", workspace_id: ad.workspace_id, target: target.id });
     } else {
-      const slug = await uniqueSlug(sb, toSlug(data.brand.name));
-      const { data: created, error } = await sb.from("directory_brands").insert({ ...fields, workspace_id: ad.workspace_id, slug }).select("id, name, first_approved_at").single();
-      if (error) throw new Error(error.message);
-      brand = created;
+      const fields = { name: data.brand.name, website_url: website || null, category: data.brand.category };
+      if (brand) {
+        const { error } = await sb.from("directory_brands").update(fields).eq("id", brand.id);
+        if (error) throw new Error(error.message);
+      } else {
+        const slug = await uniqueSlug(sb, toSlug(data.brand.name));
+        const { data: created, error } = await sb.from("directory_brands").insert({ ...fields, workspace_id: ad.workspace_id, slug }).select("id, name, first_approved_at").single();
+        if (error) throw new Error(error.message);
+        brand = created;
+      }
     }
-    const { data: prev } = await sb.from("directory_reels").select("id, status, title").eq("ad_id", ad.id).maybeSingle();
+    const { data: prev } = await db.from("directory_reels").select("id, status, title").eq("ad_id", ad.id).maybeSingle();
     const status: DirStatus = data.show ? (brand.first_approved_at ? "live" : "in_review") : prev?.status === "hidden" ? "hidden" : "private";
     const tags = [...new Set(data.tags.map((t) => t.toLowerCase()))];
     const { pinReelVideo } = await import("./directory.server");
@@ -210,8 +223,8 @@ export const shareReel = createServerFn({ method: "POST" })
       ...(videoUrl ? { video_url: videoUrl } : {}),
     };
     const { data: reel, error } = prev
-      ? await sb.from("directory_reels").update(row).eq("id", prev.id).select("id, status").single()
-      : await sb.from("directory_reels").insert(row).select("id, status").single();
+      ? await db.from("directory_reels").update(row).eq("id", prev.id).select("id, status").single()
+      : await db.from("directory_reels").insert(row).select("id, status").single();
     if (error) throw new Error(listingError(error.message));
 
     if (data.show && !keepShared) {
