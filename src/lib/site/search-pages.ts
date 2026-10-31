@@ -44,6 +44,11 @@ const SOURCE_PHOTOS: Record<string, { src: string; alt: string }[]> = {
     { src: beni2.url, alt: "Beni Rugs Chelsea Collection rug photo 2" },
     { src: beni3.url, alt: "Beni Rugs Chelsea Collection rug photo 3" },
   ],
+  [REEL.aro]: [
+    { src: aro1.url, alt: "Aro Shoes red sneaker with pink overlays product photo" },
+    { src: aro2.url, alt: "Aro Shoes mustard yellow suede and mesh sneaker product photo" },
+    { src: aro3.url, alt: "Aro Shoes lavender mesh sneaker product photo" },
+  ],
 };
 export const sourcePhotos = (reelId: string) => SOURCE_PHOTOS[reelId] ?? [];
 
