@@ -25,6 +25,9 @@ import agnonaSageCoat from "@/assets/site/agnona-sage-coat-hat.jpg.asset.json";
 import reschioCanaryBed from "@/assets/site/reschio-canary-bed.webp.asset.json";
 import reschioCampaignBed from "@/assets/site/reschio-campaign-bed.webp.asset.json";
 import reschioFireGrate from "@/assets/site/reschio-fire-grate.jpg.asset.json";
+import filicoriEspresso from "@/assets/site/filicori-espresso-pour.webp.asset.json";
+import filicoriLogos from "@/assets/site/filicori-vintage-logos.webp.asset.json";
+import filicoriRoasted from "@/assets/site/filicori-roasted-beans.webp.asset.json";
 
 /** Website reel IDs (site_reels) used as examples on the search pages. */
 export const REEL = {
@@ -88,6 +91,11 @@ const SOURCE_PHOTOS: Record<string, { src: string; alt: string }[]> = {
     { src: reschioCanaryBed.url, alt: "Reschio Canary Bed in yellow with a metal canopy frame" },
     { src: reschioCampaignBed.url, alt: "Reschio Campaign Bed, a black four-poster with brass details" },
     { src: reschioFireGrate.url, alt: "Reschio kitchen fire grate in a stone fireplace with candles and logs" },
+  ],
+  [REEL.filicori]: [
+    { src: filicoriRoasted.url, alt: "Filicori Zecchini roasted coffee beans in the cooling drum" },
+    { src: filicoriLogos.url, alt: "Filicori Zecchini vintage logo sheet with an espresso cup and coffee beans" },
+    { src: filicoriEspresso.url, alt: "Espresso pouring into Filicori Zecchini branded cups" },
   ],
 };
 export const sourcePhotos = (reelId: string) => SOURCE_PHOTOS[reelId] ?? [];
@@ -339,7 +347,7 @@ export const SEARCH_PAGES: SearchPage[] = [
     ["Collections change every season and there's never time to film them all. Turn each new lookbook into Reels and ads the same week it lands."]),
   industry("food-and-drink", "food and drink", "Food and Drink Video Ads From Your Photos | Gravity Pants",
     "Turn photos of chocolate, coffee and wine into short video ads and email GIFs. Your brand, every size. First one free.",
-    [REEL.vosges, REEL.filicori, REEL.meaume],
+    [REEL.filicori, REEL.vosges, REEL.meaume],
     ["Food sells on appetite. Movement makes a close-up feel fresh. Lead with the close-up, then the setting, then the offer or the occasion."]),
   industry("beauty-and-fragrance", "beauty and fragrance", "Beauty and Fragrance Video Ads From Photos | Gravity Pants",
     "Turn product photos of skincare, hair care and fragrance into short, polished video ads. Your brand, every size. First one free.",
