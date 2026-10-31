@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Card, fmtMoney, PageTitle } from "@/components/admin/AdminShell";
 import { newsletterStats } from "@/lib/site/newsletter-stats.functions";
+import { adminSignupSources } from "@/lib/stillframe/admin.functions";
 import { adminAnalytics, adminSearch, getReportPrefs, setReportPrefs } from "@/lib/stillframe/admin-analytics.functions";
 
 const TABS = ["traffic", "funnel", "search", "marketing", "revenue", "newsletter"] as const;
@@ -93,6 +94,7 @@ function Analytics() {
               <p className="px-4 pb-4 text-[13px] text-secondary-text">Ad spend appears here once Google Ads or Meta Ads is connected.</p>
             </Card>
           )}
+          {tab === "marketing" && <SignupSources />}
           {tab === "revenue" && (
             <>
               <Stats items={[["Monthly recurring revenue", fmtMoney(data.revenue.mrrCents)], ["New paid plans", data.revenue.newPaid], ["Cancelled", data.revenue.canceled], ["Exports", data.exports]]} />
@@ -102,6 +104,22 @@ function Analytics() {
         </>
       )}
     </>
+  );
+}
+
+function SignupSources() {
+  const get = useServerFn(adminSignupSources);
+  const { data } = useQuery({ queryKey: ["admin", "signup-sources"], queryFn: () => get() });
+  return (
+    <section className="mt-4">
+      <h2 className="mb-2 text-[15px] font-semibold">Signups by source <span className="font-normal text-secondary-text">· last 30 days{data ? ` · ${data.total.toLocaleString()} total` : ""}</span></h2>
+      {!data ? <div aria-busy="true" className="h-40" /> : (
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <TopList title="By ref" rows={data.byRef} />
+          <TopList title="By utm_source" rows={data.bySource} />
+        </div>
+      )}
+    </section>
   );
 }
 
