@@ -130,7 +130,7 @@ async function uniqueSlug(sb: any, base: string) {
   return `${base.slice(0, 23)}-${crypto.randomUUID().slice(0, 6)}`;
 }
 
-const shareSchema = z.object({
+export const shareSchema = z.object({
   adId: z.string().uuid(),
   brand: z.object({
     name: z.string().trim().min(1).max(BRAND_NAME_MAX),
