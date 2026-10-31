@@ -14,23 +14,31 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as BlogRouteImport } from './routes/blog'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as EtsyListingVideosRouteImport } from './routes/etsy-listing-videos'
 import { Route as ExamplesRouteImport } from './routes/examples'
 import { Route as FeaturesRouteImport } from './routes/features'
 import { Route as GalleryPatternsRouteImport } from './routes/gallery-patterns'
+import { Route as GifForEmailRouteImport } from './routes/gif-for-email'
 import { Route as HelpRouteImport } from './routes/help'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
+import { Route as InstagramReelsFromPhotosRouteImport } from './routes/instagram-reels-from-photos'
+import { Route as PhotoToVideoRouteImport } from './routes/photo-to-video'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ProductRouteImport } from './routes/product'
 import { Route as ProductCategoryRouteImport } from './routes/product-category'
+import { Route as ProductVideoMakerRouteImport } from './routes/product-video-maker'
 import { Route as ResetRouteImport } from './routes/reset'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as ShopifyRouteImport } from './routes/shopify'
+import { Route as ShopifyProductVideosRouteImport } from './routes/shopify-product-videos'
 import { Route as ShowcaseRouteImport } from './routes/showcase'
 import { Route as SigninRouteImport } from './routes/signin'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as TiktokVideoFromPhotosRouteImport } from './routes/tiktok-video-from-photos'
+import { Route as VideoAdsForSmallBusinessRouteImport } from './routes/video-ads-for-small-business'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedAppRouteRouteImport } from './routes/_authenticated/app/route'
 import { Route as AimanteAboutRouteImport } from './routes/aimante.about'
@@ -40,6 +48,11 @@ import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as DirectoryIndexRouteImport } from './routes/directory.index'
 import { Route as DirectorySlugRouteImport } from './routes/directory.$slug'
 import { Route as FavoritesSlugRouteImport } from './routes/favorites.$slug'
+import { Route as ForBeautyAndFragranceRouteImport } from './routes/for.beauty-and-fragrance'
+import { Route as ForFashionRouteImport } from './routes/for.fashion'
+import { Route as ForFoodAndDrinkRouteImport } from './routes/for.food-and-drink'
+import { Route as ForHomeDecorRouteImport } from './routes/for.home-decor'
+import { Route as ForJewelryRouteImport } from './routes/for.jewelry'
 import { Route as GalleryPatternsSplatRouteImport } from './routes/gallery-patterns.$'
 import { Route as InviteTokenRouteImport } from './routes/invite.$token'
 import { Route as ProductCategorySplatRouteImport } from './routes/product-category.$'
@@ -130,6 +143,11 @@ const ContactRoute = ContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EtsyListingVideosRoute = EtsyListingVideosRouteImport.update({
+  id: '/etsy-listing-videos',
+  path: '/etsy-listing-videos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ExamplesRoute = ExamplesRouteImport.update({
   id: '/examples',
   path: '/examples',
@@ -145,6 +163,11 @@ const GalleryPatternsRoute = GalleryPatternsRouteImport.update({
   path: '/gallery-patterns',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GifForEmailRoute = GifForEmailRouteImport.update({
+  id: '/gif-for-email',
+  path: '/gif-for-email',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HelpRoute = HelpRouteImport.update({
   id: '/help',
   path: '/help',
@@ -153,6 +176,17 @@ const HelpRoute = HelpRouteImport.update({
 const HowItWorksRoute = HowItWorksRouteImport.update({
   id: '/how-it-works',
   path: '/how-it-works',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InstagramReelsFromPhotosRoute =
+  InstagramReelsFromPhotosRouteImport.update({
+    id: '/instagram-reels-from-photos',
+    path: '/instagram-reels-from-photos',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const PhotoToVideoRoute = PhotoToVideoRouteImport.update({
+  id: '/photo-to-video',
+  path: '/photo-to-video',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PricingRoute = PricingRouteImport.update({
@@ -175,6 +209,11 @@ const ProductCategoryRoute = ProductCategoryRouteImport.update({
   path: '/product-category',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProductVideoMakerRoute = ProductVideoMakerRouteImport.update({
+  id: '/product-video-maker',
+  path: '/product-video-maker',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResetRoute = ResetRouteImport.update({
   id: '/reset',
   path: '/reset',
@@ -188,6 +227,11 @@ const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
 const ShopifyRoute = ShopifyRouteImport.update({
   id: '/shopify',
   path: '/shopify',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShopifyProductVideosRoute = ShopifyProductVideosRouteImport.update({
+  id: '/shopify-product-videos',
+  path: '/shopify-product-videos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ShowcaseRoute = ShowcaseRouteImport.update({
@@ -215,6 +259,17 @@ const TermsRoute = TermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TiktokVideoFromPhotosRoute = TiktokVideoFromPhotosRouteImport.update({
+  id: '/tiktok-video-from-photos',
+  path: '/tiktok-video-from-photos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VideoAdsForSmallBusinessRoute =
+  VideoAdsForSmallBusinessRouteImport.update({
+    id: '/video-ads-for-small-business',
+    path: '/video-ads-for-small-business',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -258,6 +313,31 @@ const DirectorySlugRoute = DirectorySlugRouteImport.update({
 const FavoritesSlugRoute = FavoritesSlugRouteImport.update({
   id: '/favorites/$slug',
   path: '/favorites/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForBeautyAndFragranceRoute = ForBeautyAndFragranceRouteImport.update({
+  id: '/for/beauty-and-fragrance',
+  path: '/for/beauty-and-fragrance',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForFashionRoute = ForFashionRouteImport.update({
+  id: '/for/fashion',
+  path: '/for/fashion',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForFoodAndDrinkRoute = ForFoodAndDrinkRouteImport.update({
+  id: '/for/food-and-drink',
+  path: '/for/food-and-drink',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForHomeDecorRoute = ForHomeDecorRouteImport.update({
+  id: '/for/home-decor',
+  path: '/for/home-decor',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForJewelryRoute = ForJewelryRouteImport.update({
+  id: '/for/jewelry',
+  path: '/for/jewelry',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GalleryPatternsSplatRoute = GalleryPatternsSplatRouteImport.update({
@@ -624,23 +704,31 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/blog': typeof BlogRouteWithChildren
   '/contact': typeof ContactRoute
+  '/etsy-listing-videos': typeof EtsyListingVideosRoute
   '/examples': typeof ExamplesRoute
   '/features': typeof FeaturesRoute
   '/gallery-patterns': typeof GalleryPatternsRouteWithChildren
+  '/gif-for-email': typeof GifForEmailRoute
   '/help': typeof HelpRoute
   '/how-it-works': typeof HowItWorksRoute
+  '/instagram-reels-from-photos': typeof InstagramReelsFromPhotosRoute
+  '/photo-to-video': typeof PhotoToVideoRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/product': typeof ProductRouteWithChildren
   '/product-category': typeof ProductCategoryRouteWithChildren
+  '/product-video-maker': typeof ProductVideoMakerRoute
   '/reset': typeof ResetRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/shopify': typeof ShopifyRoute
+  '/shopify-product-videos': typeof ShopifyProductVideosRoute
   '/showcase': typeof ShowcaseRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/tiktok-video-from-photos': typeof TiktokVideoFromPhotosRoute
+  '/video-ads-for-small-business': typeof VideoAdsForSmallBusinessRoute
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/app': typeof AuthenticatedAppRouteRouteWithChildren
   '/aimante/about': typeof AimanteAboutRoute
@@ -648,6 +736,11 @@ export interface FileRoutesByFullPath {
   '/blog/$slug': typeof BlogSlugRoute
   '/directory/$slug': typeof DirectorySlugRoute
   '/favorites/$slug': typeof FavoritesSlugRoute
+  '/for/beauty-and-fragrance': typeof ForBeautyAndFragranceRoute
+  '/for/fashion': typeof ForFashionRoute
+  '/for/food-and-drink': typeof ForFoodAndDrinkRoute
+  '/for/home-decor': typeof ForHomeDecorRoute
+  '/for/jewelry': typeof ForJewelryRoute
   '/gallery-patterns/$': typeof GalleryPatternsSplatRoute
   '/invite/$token': typeof InviteTokenRoute
   '/product-category/$': typeof ProductCategorySplatRoute
@@ -720,28 +813,41 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
+  '/etsy-listing-videos': typeof EtsyListingVideosRoute
   '/examples': typeof ExamplesRoute
   '/features': typeof FeaturesRoute
   '/gallery-patterns': typeof GalleryPatternsRouteWithChildren
+  '/gif-for-email': typeof GifForEmailRoute
   '/help': typeof HelpRoute
   '/how-it-works': typeof HowItWorksRoute
+  '/instagram-reels-from-photos': typeof InstagramReelsFromPhotosRoute
+  '/photo-to-video': typeof PhotoToVideoRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/product': typeof ProductRouteWithChildren
   '/product-category': typeof ProductCategoryRouteWithChildren
+  '/product-video-maker': typeof ProductVideoMakerRoute
   '/reset': typeof ResetRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/shopify': typeof ShopifyRoute
+  '/shopify-product-videos': typeof ShopifyProductVideosRoute
   '/showcase': typeof ShowcaseRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/tiktok-video-from-photos': typeof TiktokVideoFromPhotosRoute
+  '/video-ads-for-small-business': typeof VideoAdsForSmallBusinessRoute
   '/aimante/about': typeof AimanteAboutRoute
   '/aimante/join': typeof AimanteJoinRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/directory/$slug': typeof DirectorySlugRoute
   '/favorites/$slug': typeof FavoritesSlugRoute
+  '/for/beauty-and-fragrance': typeof ForBeautyAndFragranceRoute
+  '/for/fashion': typeof ForFashionRoute
+  '/for/food-and-drink': typeof ForFoodAndDrinkRoute
+  '/for/home-decor': typeof ForHomeDecorRoute
+  '/for/jewelry': typeof ForJewelryRoute
   '/gallery-patterns/$': typeof GalleryPatternsSplatRoute
   '/invite/$token': typeof InviteTokenRoute
   '/product-category/$': typeof ProductCategorySplatRoute
@@ -817,23 +923,31 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/blog': typeof BlogRouteWithChildren
   '/contact': typeof ContactRoute
+  '/etsy-listing-videos': typeof EtsyListingVideosRoute
   '/examples': typeof ExamplesRoute
   '/features': typeof FeaturesRoute
   '/gallery-patterns': typeof GalleryPatternsRouteWithChildren
+  '/gif-for-email': typeof GifForEmailRoute
   '/help': typeof HelpRoute
   '/how-it-works': typeof HowItWorksRoute
+  '/instagram-reels-from-photos': typeof InstagramReelsFromPhotosRoute
+  '/photo-to-video': typeof PhotoToVideoRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/product': typeof ProductRouteWithChildren
   '/product-category': typeof ProductCategoryRouteWithChildren
+  '/product-video-maker': typeof ProductVideoMakerRoute
   '/reset': typeof ResetRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/shopify': typeof ShopifyRoute
+  '/shopify-product-videos': typeof ShopifyProductVideosRoute
   '/showcase': typeof ShowcaseRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/tiktok-video-from-photos': typeof TiktokVideoFromPhotosRoute
+  '/video-ads-for-small-business': typeof VideoAdsForSmallBusinessRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/app': typeof AuthenticatedAppRouteRouteWithChildren
   '/aimante/about': typeof AimanteAboutRoute
@@ -841,6 +955,11 @@ export interface FileRoutesById {
   '/blog/$slug': typeof BlogSlugRoute
   '/directory/$slug': typeof DirectorySlugRoute
   '/favorites/$slug': typeof FavoritesSlugRoute
+  '/for/beauty-and-fragrance': typeof ForBeautyAndFragranceRoute
+  '/for/fashion': typeof ForFashionRoute
+  '/for/food-and-drink': typeof ForFoodAndDrinkRoute
+  '/for/home-decor': typeof ForHomeDecorRoute
+  '/for/jewelry': typeof ForJewelryRoute
   '/gallery-patterns/$': typeof GalleryPatternsSplatRoute
   '/invite/$token': typeof InviteTokenRoute
   '/product-category/$': typeof ProductCategorySplatRoute
@@ -916,23 +1035,31 @@ export interface FileRouteTypes {
     | '/about'
     | '/blog'
     | '/contact'
+    | '/etsy-listing-videos'
     | '/examples'
     | '/features'
     | '/gallery-patterns'
+    | '/gif-for-email'
     | '/help'
     | '/how-it-works'
+    | '/instagram-reels-from-photos'
+    | '/photo-to-video'
     | '/pricing'
     | '/privacy'
     | '/product'
     | '/product-category'
+    | '/product-video-maker'
     | '/reset'
     | '/robots.txt'
     | '/shopify'
+    | '/shopify-product-videos'
     | '/showcase'
     | '/signin'
     | '/signup'
     | '/sitemap.xml'
     | '/terms'
+    | '/tiktok-video-from-photos'
+    | '/video-ads-for-small-business'
     | '/admin'
     | '/app'
     | '/aimante/about'
@@ -940,6 +1067,11 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/directory/$slug'
     | '/favorites/$slug'
+    | '/for/beauty-and-fragrance'
+    | '/for/fashion'
+    | '/for/food-and-drink'
+    | '/for/home-decor'
+    | '/for/jewelry'
     | '/gallery-patterns/$'
     | '/invite/$token'
     | '/product-category/$'
@@ -1012,28 +1144,41 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/contact'
+    | '/etsy-listing-videos'
     | '/examples'
     | '/features'
     | '/gallery-patterns'
+    | '/gif-for-email'
     | '/help'
     | '/how-it-works'
+    | '/instagram-reels-from-photos'
+    | '/photo-to-video'
     | '/pricing'
     | '/privacy'
     | '/product'
     | '/product-category'
+    | '/product-video-maker'
     | '/reset'
     | '/robots.txt'
     | '/shopify'
+    | '/shopify-product-videos'
     | '/showcase'
     | '/signin'
     | '/signup'
     | '/sitemap.xml'
     | '/terms'
+    | '/tiktok-video-from-photos'
+    | '/video-ads-for-small-business'
     | '/aimante/about'
     | '/aimante/join'
     | '/blog/$slug'
     | '/directory/$slug'
     | '/favorites/$slug'
+    | '/for/beauty-and-fragrance'
+    | '/for/fashion'
+    | '/for/food-and-drink'
+    | '/for/home-decor'
+    | '/for/jewelry'
     | '/gallery-patterns/$'
     | '/invite/$token'
     | '/product-category/$'
@@ -1108,23 +1253,31 @@ export interface FileRouteTypes {
     | '/about'
     | '/blog'
     | '/contact'
+    | '/etsy-listing-videos'
     | '/examples'
     | '/features'
     | '/gallery-patterns'
+    | '/gif-for-email'
     | '/help'
     | '/how-it-works'
+    | '/instagram-reels-from-photos'
+    | '/photo-to-video'
     | '/pricing'
     | '/privacy'
     | '/product'
     | '/product-category'
+    | '/product-video-maker'
     | '/reset'
     | '/robots.txt'
     | '/shopify'
+    | '/shopify-product-videos'
     | '/showcase'
     | '/signin'
     | '/signup'
     | '/sitemap.xml'
     | '/terms'
+    | '/tiktok-video-from-photos'
+    | '/video-ads-for-small-business'
     | '/_authenticated/admin'
     | '/_authenticated/app'
     | '/aimante/about'
@@ -1132,6 +1285,11 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/directory/$slug'
     | '/favorites/$slug'
+    | '/for/beauty-and-fragrance'
+    | '/for/fashion'
+    | '/for/food-and-drink'
+    | '/for/home-decor'
+    | '/for/jewelry'
     | '/gallery-patterns/$'
     | '/invite/$token'
     | '/product-category/$'
@@ -1207,27 +1365,40 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   BlogRoute: typeof BlogRouteWithChildren
   ContactRoute: typeof ContactRoute
+  EtsyListingVideosRoute: typeof EtsyListingVideosRoute
   ExamplesRoute: typeof ExamplesRoute
   FeaturesRoute: typeof FeaturesRoute
   GalleryPatternsRoute: typeof GalleryPatternsRouteWithChildren
+  GifForEmailRoute: typeof GifForEmailRoute
   HelpRoute: typeof HelpRoute
   HowItWorksRoute: typeof HowItWorksRoute
+  InstagramReelsFromPhotosRoute: typeof InstagramReelsFromPhotosRoute
+  PhotoToVideoRoute: typeof PhotoToVideoRoute
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
   ProductRoute: typeof ProductRouteWithChildren
   ProductCategoryRoute: typeof ProductCategoryRouteWithChildren
+  ProductVideoMakerRoute: typeof ProductVideoMakerRoute
   ResetRoute: typeof ResetRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   ShopifyRoute: typeof ShopifyRoute
+  ShopifyProductVideosRoute: typeof ShopifyProductVideosRoute
   ShowcaseRoute: typeof ShowcaseRoute
   SigninRoute: typeof SigninRoute
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
+  TiktokVideoFromPhotosRoute: typeof TiktokVideoFromPhotosRoute
+  VideoAdsForSmallBusinessRoute: typeof VideoAdsForSmallBusinessRoute
   AimanteAboutRoute: typeof AimanteAboutRoute
   AimanteJoinRoute: typeof AimanteJoinRoute
   DirectorySlugRoute: typeof DirectorySlugRoute
   FavoritesSlugRoute: typeof FavoritesSlugRoute
+  ForBeautyAndFragranceRoute: typeof ForBeautyAndFragranceRoute
+  ForFashionRoute: typeof ForFashionRoute
+  ForFoodAndDrinkRoute: typeof ForFoodAndDrinkRoute
+  ForHomeDecorRoute: typeof ForHomeDecorRoute
+  ForJewelryRoute: typeof ForJewelryRoute
   InviteTokenRoute: typeof InviteTokenRoute
   ShopifyWelcomeRoute: typeof ShopifyWelcomeRoute
   DirectoryIndexRoute: typeof DirectoryIndexRoute
@@ -1286,6 +1457,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/etsy-listing-videos': {
+      id: '/etsy-listing-videos'
+      path: '/etsy-listing-videos'
+      fullPath: '/etsy-listing-videos'
+      preLoaderRoute: typeof EtsyListingVideosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/examples': {
       id: '/examples'
       path: '/examples'
@@ -1307,6 +1485,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GalleryPatternsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/gif-for-email': {
+      id: '/gif-for-email'
+      path: '/gif-for-email'
+      fullPath: '/gif-for-email'
+      preLoaderRoute: typeof GifForEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/help': {
       id: '/help'
       path: '/help'
@@ -1319,6 +1504,20 @@ declare module '@tanstack/react-router' {
       path: '/how-it-works'
       fullPath: '/how-it-works'
       preLoaderRoute: typeof HowItWorksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/instagram-reels-from-photos': {
+      id: '/instagram-reels-from-photos'
+      path: '/instagram-reels-from-photos'
+      fullPath: '/instagram-reels-from-photos'
+      preLoaderRoute: typeof InstagramReelsFromPhotosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/photo-to-video': {
+      id: '/photo-to-video'
+      path: '/photo-to-video'
+      fullPath: '/photo-to-video'
+      preLoaderRoute: typeof PhotoToVideoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pricing': {
@@ -1349,6 +1548,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductCategoryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/product-video-maker': {
+      id: '/product-video-maker'
+      path: '/product-video-maker'
+      fullPath: '/product-video-maker'
+      preLoaderRoute: typeof ProductVideoMakerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reset': {
       id: '/reset'
       path: '/reset'
@@ -1368,6 +1574,13 @@ declare module '@tanstack/react-router' {
       path: '/shopify'
       fullPath: '/shopify'
       preLoaderRoute: typeof ShopifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shopify-product-videos': {
+      id: '/shopify-product-videos'
+      path: '/shopify-product-videos'
+      fullPath: '/shopify-product-videos'
+      preLoaderRoute: typeof ShopifyProductVideosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/showcase': {
@@ -1403,6 +1616,20 @@ declare module '@tanstack/react-router' {
       path: '/terms'
       fullPath: '/terms'
       preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tiktok-video-from-photos': {
+      id: '/tiktok-video-from-photos'
+      path: '/tiktok-video-from-photos'
+      fullPath: '/tiktok-video-from-photos'
+      preLoaderRoute: typeof TiktokVideoFromPhotosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/video-ads-for-small-business': {
+      id: '/video-ads-for-small-business'
+      path: '/video-ads-for-small-business'
+      fullPath: '/video-ads-for-small-business'
+      preLoaderRoute: typeof VideoAdsForSmallBusinessRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin': {
@@ -1466,6 +1693,41 @@ declare module '@tanstack/react-router' {
       path: '/favorites/$slug'
       fullPath: '/favorites/$slug'
       preLoaderRoute: typeof FavoritesSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/for/beauty-and-fragrance': {
+      id: '/for/beauty-and-fragrance'
+      path: '/for/beauty-and-fragrance'
+      fullPath: '/for/beauty-and-fragrance'
+      preLoaderRoute: typeof ForBeautyAndFragranceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/for/fashion': {
+      id: '/for/fashion'
+      path: '/for/fashion'
+      fullPath: '/for/fashion'
+      preLoaderRoute: typeof ForFashionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/for/food-and-drink': {
+      id: '/for/food-and-drink'
+      path: '/for/food-and-drink'
+      fullPath: '/for/food-and-drink'
+      preLoaderRoute: typeof ForFoodAndDrinkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/for/home-decor': {
+      id: '/for/home-decor'
+      path: '/for/home-decor'
+      fullPath: '/for/home-decor'
+      preLoaderRoute: typeof ForHomeDecorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/for/jewelry': {
+      id: '/for/jewelry'
+      path: '/for/jewelry'
+      fullPath: '/for/jewelry'
+      preLoaderRoute: typeof ForJewelryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/gallery-patterns/$': {
@@ -2120,27 +2382,40 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   BlogRoute: BlogRouteWithChildren,
   ContactRoute: ContactRoute,
+  EtsyListingVideosRoute: EtsyListingVideosRoute,
   ExamplesRoute: ExamplesRoute,
   FeaturesRoute: FeaturesRoute,
   GalleryPatternsRoute: GalleryPatternsRouteWithChildren,
+  GifForEmailRoute: GifForEmailRoute,
   HelpRoute: HelpRoute,
   HowItWorksRoute: HowItWorksRoute,
+  InstagramReelsFromPhotosRoute: InstagramReelsFromPhotosRoute,
+  PhotoToVideoRoute: PhotoToVideoRoute,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
   ProductRoute: ProductRouteWithChildren,
   ProductCategoryRoute: ProductCategoryRouteWithChildren,
+  ProductVideoMakerRoute: ProductVideoMakerRoute,
   ResetRoute: ResetRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   ShopifyRoute: ShopifyRoute,
+  ShopifyProductVideosRoute: ShopifyProductVideosRoute,
   ShowcaseRoute: ShowcaseRoute,
   SigninRoute: SigninRoute,
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
+  TiktokVideoFromPhotosRoute: TiktokVideoFromPhotosRoute,
+  VideoAdsForSmallBusinessRoute: VideoAdsForSmallBusinessRoute,
   AimanteAboutRoute: AimanteAboutRoute,
   AimanteJoinRoute: AimanteJoinRoute,
   DirectorySlugRoute: DirectorySlugRoute,
   FavoritesSlugRoute: FavoritesSlugRoute,
+  ForBeautyAndFragranceRoute: ForBeautyAndFragranceRoute,
+  ForFashionRoute: ForFashionRoute,
+  ForFoodAndDrinkRoute: ForFoodAndDrinkRoute,
+  ForHomeDecorRoute: ForHomeDecorRoute,
+  ForJewelryRoute: ForJewelryRoute,
   InviteTokenRoute: InviteTokenRoute,
   ShopifyWelcomeRoute: ShopifyWelcomeRoute,
   DirectoryIndexRoute: DirectoryIndexRoute,

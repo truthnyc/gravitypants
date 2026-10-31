@@ -126,9 +126,9 @@ export function SearchPage({ page, reels }: { page: Page; reels: SiteReel[] }) {
 
       <section className={`${wrap} pb-20`} aria-labelledby="questions">
         <h2 id="questions" className={h2}>Questions</h2>
-        <div className="mt-6 max-w-[760px] border-t border-site-hairline">
+        <div className="mt-6 max-w-[760px] border-t border-site-line">
           {page.faqs.map((f) => (
-            <details key={f.q} className="group border-b border-site-hairline">
+            <details key={f.q} className="group border-b border-site-line">
               <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 py-4 text-[17px] font-semibold text-site-ink [&::-webkit-details-marker]:hidden">
                 {f.q}
                 <ChevronDown size={18} strokeWidth={1.7} className="shrink-0 text-site-muted group-open:rotate-180 motion-reduce:transition-none" aria-hidden />

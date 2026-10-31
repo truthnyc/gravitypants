@@ -7,6 +7,7 @@ import { FooterNewsletter, NewsletterPopup } from "@/components/site/Newsletter"
 import { SHOW_DIRECTORY } from "@/lib/features";
 import { SOCIAL_LINKS } from "@/lib/site/social";
 import { AimanteShell, useBrandSite } from "@/components/site/AimanteShell";
+import { MADE_FOR_LINKS } from "@/lib/site/search-pages";
 
 const STATUS_URL = "https://status.gravitypants.com";
 
@@ -22,6 +23,7 @@ const columns: { label: string; links: FooterLink[] }[] = [
       { label: "Blog", to: "/blog" },
     ],
   },
+  { label: "Made for", links: MADE_FOR_LINKS },
   { label: "Company", links: [{ label: "About", to: "/about" }, { label: "Commission a reel", to: "/contact", search: { topic: "brand-reel" } }, { label: "Contact", to: "/contact" }] },
   { label: "Help", links: [{ label: "Help center", to: "/help" }, { label: "Status", to: STATUS_URL, external: true }] },
 ];
@@ -71,7 +73,7 @@ function Column({ column }: { column: (typeof columns)[number] }) {
 
 function Collapsible({ column, defaultOpen }: { column: (typeof columns)[number]; defaultOpen: boolean }) {
   const [open, setOpen] = useState(defaultOpen);
-  const id = `footer-${column.label.toLowerCase()}`;
+  const id = `footer-${column.label.toLowerCase().replace(/\s+/g, "-")}`;
   return (
     <div className="border-b border-ap-hairline">
       <button type="button" aria-expanded={open} aria-controls={id} onClick={() => setOpen((v) => !v)} className="flex min-h-12 w-full items-center justify-between text-[15px] font-semibold text-ap-ink">
@@ -88,7 +90,7 @@ function SiteFooter() {
     <footer className="mt-auto border-t border-ap-hairline bg-ap-panel font-ap text-ap-ink">
       <div className="mx-auto max-w-[1280px] px-6 pb-7 pt-12">
         {/* Desktop */}
-        <div className="hidden gap-7 lg:grid lg:grid-cols-[1.3fr_1fr_1fr_1fr_1fr_1.6fr]">
+        <div className="hidden gap-7 lg:grid lg:grid-cols-[1.3fr_1fr_1fr_1.2fr_1fr_1fr_1.6fr]">
           <Brand />
           {columns.map((c) => <Column key={c.label} column={c} />)}
           <FooterNewsletter />
@@ -96,7 +98,7 @@ function SiteFooter() {
         {/* Tablet */}
         <div className="hidden md:block lg:hidden">
           <div className="grid grid-cols-2 gap-7"><Brand /><FooterNewsletter /></div>
-          <div className="mt-10 grid grid-cols-4 gap-7">{columns.map((c) => <Column key={c.label} column={c} />)}</div>
+          <div className="mt-10 grid grid-cols-5 gap-7">{columns.map((c) => <Column key={c.label} column={c} />)}</div>
         </div>
         {/* Phone */}
         <div className="md:hidden">

@@ -1,6 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { SiteShell } from "@/components/site/SiteShell";
 import { BlogVisual } from "@/components/site/BlogVisual";
+import { SearchPageLinks } from "@/components/site/SearchPage";
 import { POSTS, postBySlug } from "@/lib/site/blog";
 import { SITE_OG_IMAGE, SITE_ORIGIN, siteHead } from "@/lib/site/seo";
 
@@ -74,6 +75,7 @@ function BlogPostPage() {
             {block.visual && <BlogVisual kind={block.visual} />}
           </section>
         ))}
+        {post.slug === "how-to-turn-photos-into-a-video" && <SearchPageLinks className="mt-12" paths={["/photo-to-video", "/instagram-reels-from-photos", "/tiktok-video-from-photos", "/product-video-maker"]} />}
       </article>
 
       <section className="mx-auto w-full max-w-[1248px] px-5 pb-24 md:px-8 lg:px-16 xl:px-24">
