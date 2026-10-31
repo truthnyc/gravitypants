@@ -1,6 +1,12 @@
 import photo1 from "@/assets/site/purl-soho-photo-1.webp.asset.json";
 import photo2 from "@/assets/site/purl-soho-photo-2.webp.asset.json";
 import photo3 from "@/assets/site/purl-soho-photo-3.webp.asset.json";
+import kg1 from "@/assets/site/fine-jewelry-frame-1.webp.asset.json";
+import kg2 from "@/assets/site/fine-jewelry-frame-2.webp.asset.json";
+import kg3 from "@/assets/site/fine-jewelry-frame-3.webp.asset.json";
+import beni1 from "@/assets/site/beni-rug-1.jpg.asset.json";
+import beni2 from "@/assets/site/beni-rug-2.jpg.asset.json";
+import beni3 from "@/assets/site/beni-rug-3.jpg.asset.json";
 
 /** Website reel IDs (site_reels) used as examples on the search pages. */
 export const REEL = {
@@ -24,6 +30,16 @@ const SOURCE_PHOTOS: Record<string, { src: string; alt: string }[]> = {
     { src: photo1.url, alt: "Purl Soho Japanese Denim Cotton yarn product photo" },
     { src: photo2.url, alt: "Purl Soho knitted denim cotton sweater photo" },
     { src: photo3.url, alt: "Purl Soho denim cotton yarn skeins photo" },
+  ],
+  [REEL.katherine]: [
+    { src: kg1.url, alt: "Katherine Grover Fine Jewelry photo 1" },
+    { src: kg2.url, alt: "Katherine Grover Fine Jewelry photo 2" },
+    { src: kg3.url, alt: "Katherine Grover Fine Jewelry photo 3" },
+  ],
+  [REEL.beni]: [
+    { src: beni1.url, alt: "Beni Rugs Chelsea Collection rug photo 1" },
+    { src: beni2.url, alt: "Beni Rugs Chelsea Collection rug photo 2" },
+    { src: beni3.url, alt: "Beni Rugs Chelsea Collection rug photo 3" },
   ],
 };
 export const sourcePhotos = (reelId: string) => SOURCE_PHOTOS[reelId] ?? [];
