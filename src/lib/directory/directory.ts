@@ -38,7 +38,7 @@ export const WORDING_VERSION = "v1.1";
 export const GRACE_DAYS = 30;
 export const BRAND_NAME_MAX = 50;
 export const BRAND_DESCRIPTION_MAX = 300;
-export const REEL_DESCRIPTION_MAX = 120;
+export const REEL_DESCRIPTION_MAX = 300;
 export const SLUG_MAX = 30;
 
 export const nearLimit = (length: number, limit: number) => length >= Math.ceil(limit * 0.85);
