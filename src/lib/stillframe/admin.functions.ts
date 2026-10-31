@@ -127,6 +127,24 @@ export const adminOverview = createServerFn({ method: "GET" })
     };
   });
 
+/** Signups in the last 30 days counted by first-touch ?ref= and utm_source (saved on profiles). */
+export const adminSignupSources = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const db = await adminDb(context as any);
+    const users = await allUsers(db);
+    const since = Date.now() - 30 * 864e5;
+    const ids = users.filter((u) => new Date(u.created_at).getTime() > since).map((u) => u.id);
+    const { data } = ids.length ? await db.from("profiles").select("user_id, signup_ref, signup_utm_source").in("user_id", ids) : { data: [] };
+    const byId = new Map((data ?? []).map((p: any) => [p.user_id, p]));
+    const count = (key: "signup_ref" | "signup_utm_source") => {
+      const m = new Map<string, number>();
+      for (const id of ids) { const v = (byId.get(id) as any)?.[key] || "(none)"; m.set(v, (m.get(v) ?? 0) + 1); }
+      return [...m].map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count);
+    };
+    return { total: ids.length, byRef: count("signup_ref"), bySource: count("signup_utm_source") };
+  });
+
 export const adminClients = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => clientRows(await adminDb(context as any)));
@@ -147,6 +165,11 @@ export const adminClient = createServerFn({ method: "POST" })
       db.from("exports").select("*").eq("workspace_id", data.id).order("created_at", { ascending: false }).limit(10),
       db.from("support_sessions").select("expires_at").eq("workspace_id", data.id).eq("admin_user_id", ctx.userId).is("ended_at", null).gt("expires_at", new Date().toISOString()).maybeSingle(),
     ]);
+    const memberIds = (mem ?? []).map((m: any) => m.user_id as string);
+    const { data: srcRows } = memberIds.length
+      ? await db.from("profiles").select("user_id, signup_ref, signup_utm_source, signup_utm_medium, signup_utm_campaign, signup_landing_path, signup_referrer_host").in("user_id", memberIds)
+      : { data: [] };
+    const srcById = new Map((srcRows ?? []).map((p: any) => [p.user_id as string, p]));
     const byMonth: Record<string, number> = {};
     for (const u of usage ?? []) byMonth[u.created_at.slice(0, 7)] = (byMonth[u.created_at.slice(0, 7)] ?? 0) + 1;
     let invoices: { id: string; amount: number; status: string; created: number; url: string | null }[] = [];
@@ -173,7 +196,7 @@ export const adminClient = createServerFn({ method: "POST" })
       client,
       members: (mem ?? []).map((m: any) => {
         const u = users.find((x) => x.id === m.user_id);
-        return { userId: m.user_id as string, email: u?.email ?? "", role: m.role as string, lastSignIn: u?.last_sign_in_at ?? null };
+        return { userId: m.user_id as string, email: u?.email ?? "", role: m.role as string, lastSignIn: u?.last_sign_in_at ?? null, source: (srcById.get(m.user_id) ?? null) as Record<string, string | null> | null };
       }),
       ads: (ads ?? []) as { id: string; name: string; primary_format: string; thumbnail_url: string | null; updated_at: string }[],
       exportsByMonth: Object.entries(byMonth).sort((a, b) => b[0].localeCompare(a[0])).slice(0, 12),

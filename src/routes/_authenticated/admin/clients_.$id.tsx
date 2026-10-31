@@ -26,6 +26,11 @@ export const Route = createFileRoute("/_authenticated/admin/clients_/$id")({
   component: ClientPage,
 });
 
+const SOURCE_FIELDS = [
+  ["signup_ref", "Ref"], ["signup_utm_source", "UTM source"], ["signup_utm_medium", "UTM medium"],
+  ["signup_utm_campaign", "UTM campaign"], ["signup_landing_path", "Landing page"], ["signup_referrer_host", "Referrer"],
+] as const;
+
 type Act = "extend_trial" | "comp_plan" | "end_comp" | "reset_exports" | "suspend" | "unsuspend" | "delete" | "support";
 const TITLES: Record<Act, string> = {
   extend_trial: "Extend trial",
@@ -105,10 +110,20 @@ function ClientPage() {
         <Card>
           <h2 className="mb-2 text-[15px] font-semibold">Members</h2>
           <ul className="divide-y divide-border text-[14px]">
-            {data.members.map((m: { userId: string; email: string; role: string; lastSignIn: string | null }) => (
-              <li key={m.userId} className="flex items-center justify-between py-2">
-                <span>{m.email} <span className="text-secondary-text">· {m.role}</span></span>
-                <span className="text-[13px] text-secondary-text nums">Last sign-in {fmtDateTime(m.lastSignIn)}</span>
+            {data.members.map((m: { userId: string; email: string; role: string; lastSignIn: string | null; source: Record<string, string | null> | null }) => (
+              <li key={m.userId} className="py-2">
+                <div className="flex items-center justify-between">
+                  <span>{m.email} <span className="text-secondary-text">· {m.role}</span></span>
+                  <span className="text-[13px] text-secondary-text nums">Last sign-in {fmtDateTime(m.lastSignIn)}</span>
+                </div>
+                <dl className="mt-1 grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-[13px]">
+                  {SOURCE_FIELDS.map(([k, label]) => (
+                    <div key={k} className="contents">
+                      <dt className="text-secondary-text">{label}</dt>
+                      <dd className="break-all">{m.source?.[k] || "—"}</dd>
+                    </div>
+                  ))}
+                </dl>
               </li>
             ))}
           </ul>
