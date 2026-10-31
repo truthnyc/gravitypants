@@ -80,7 +80,7 @@ export function SearchPage({ page, reels }: { page: Page; reels: SiteReel[] }) {
           <div className={`mt-8 grid items-center gap-6 ${stills.length ? "md:grid-cols-[1fr_auto_1fr]" : "md:max-w-[420px]"}`}>
             {stills.length > 0 && <>
               <div className="grid grid-cols-3 gap-3">
-                {stills.map((s) => <img key={s.src} src={s.src} alt={s.alt} loading="lazy" className="aspect-[4/5] w-full rounded-lg object-cover" />)}
+                {stills.map((s) => <img key={s.src} src={s.src} alt={s.alt} className="aspect-[4/5] w-full rounded-lg object-cover" />)}
               </div>
               <ArrowRight className="mx-auto rotate-90 text-site-muted md:rotate-0" size={28} strokeWidth={1.7} aria-hidden />
             </>}

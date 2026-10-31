@@ -93,7 +93,7 @@ function SiteFooter() {
         <div className="hidden gap-7 lg:grid lg:grid-cols-[1.3fr_1fr_1fr_1.2fr_1fr_1fr_1.6fr]">
           <Brand />
           {columns.map((c) => <Column key={c.label} column={c} />)}
-          <FooterNewsletter />
+          <div className="self-start"><FooterNewsletter /></div>
         </div>
         {/* Tablet */}
         <div className="hidden md:block lg:hidden">
