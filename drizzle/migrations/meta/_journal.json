@@ -134,6 +134,13 @@
       "when": 1793455970793,
       "tag": "0018_signup_source",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1793482220100,
+      "tag": "0019_reel_description_limit_300",
+      "breakpoints": true
     }
   ]
 }
