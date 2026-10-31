@@ -4,9 +4,9 @@ import photo3 from "@/assets/site/purl-soho-photo-3.webp.asset.json";
 import kg1 from "@/assets/site/fine-jewelry-frame-1.webp.asset.json";
 import kg2 from "@/assets/site/fine-jewelry-frame-2.webp.asset.json";
 import kg3 from "@/assets/site/fine-jewelry-frame-3.webp.asset.json";
-import beni1 from "@/assets/site/beni-rug-1.jpg.asset.json";
-import beni2 from "@/assets/site/beni-rug-2.jpg.asset.json";
-import beni3 from "@/assets/site/beni-rug-3.jpg.asset.json";
+import beni1 from "@/assets/site/beni-rug-room.jpg.asset.json";
+import beni2 from "@/assets/site/beni-rug-overhead.jpg.asset.json";
+import beni3 from "@/assets/site/beni-rug-detail.jpg.asset.json";
 import aro1 from "@/assets/site/aro-shoe-1.webp.asset.json";
 import aro2 from "@/assets/site/aro-shoe-2.webp.asset.json";
 import aro3 from "@/assets/site/aro-shoe-3.webp.asset.json";
@@ -61,9 +61,9 @@ const SOURCE_PHOTOS: Record<string, { src: string; alt: string }[]> = {
     { src: kg3.url, alt: "Katherine Grover Fine Jewelry photo 3" },
   ],
   [REEL.beni]: [
-    { src: beni1.url, alt: "Beni Rugs Chelsea Collection rug photo 1" },
-    { src: beni2.url, alt: "Beni Rugs Chelsea Collection rug photo 2" },
-    { src: beni3.url, alt: "Beni Rugs Chelsea Collection rug photo 3" },
+    { src: beni1.url, alt: "Beni Rugs red rug with green paisley motif in a sitting room with checkered floor" },
+    { src: beni2.url, alt: "Beni Rugs red rug with green paisley motif seen from above" },
+    { src: beni3.url, alt: "Beni Rugs red rug corner detail with dark woven squares on a checkered floor" },
   ],
   [REEL.aro]: [
     { src: aro1.url, alt: "Aro Shoes red sneaker with pink overlays product photo" },
