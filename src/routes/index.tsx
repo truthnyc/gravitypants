@@ -731,6 +731,11 @@ function Home() {
               How to turn photos into a video: a step-by-step guide <ArrowRight size={16} />
             </Link>
           </p>
+          <p className="home-how-more">
+            <a className="home-text-link" href="https://aimante.co" data-cta="home-aimante">
+              Browse brand reels by mood on Aimanté <ArrowRight size={16} />
+            </a>
+          </p>
         </section>
         <section id="before-after" className="home-section home-before">
           <div className="home-before-top">

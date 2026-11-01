@@ -21,6 +21,7 @@ const columns: { label: string; links: FooterLink[] }[] = [
       { label: "Examples", to: "/examples" },
       { label: "Showcase", to: "/showcase" },
       { label: "Blog", to: "/blog" },
+      { label: "Aimanté directory", to: "https://aimante.co", external: true },
     ],
   },
   { label: "Made for", links: MADE_FOR_LINKS },
