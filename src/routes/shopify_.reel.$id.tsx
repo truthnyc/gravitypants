@@ -313,10 +313,12 @@ function ExportPanel({ project, images, beforeExport, watermarked, onDone }: { p
   const [progress, setProgress] = useState<number | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
   const [link, setLink] = useState<string | null>(null);
+  const [mp4Path, setMp4Path] = useState<string | null>(null);
 
   async function run(kind: "mp4" | "gif") {
     setMsg(null);
     setLink(null);
+    setMp4Path(null);
     setProgress(0);
     try {
       await beforeExport();
@@ -332,6 +334,7 @@ function ExportPanel({ project, images, beforeExport, watermarked, onDone }: { p
       if (!put.ok) throw new Error("Upload failed. Please try again.");
       const { url } = await shopifyFetch<{ url: string }>("/api/public/shopify/export", { action: "download", path: start.path });
       setLink(url);
+      if (kind === "mp4") setMp4Path(start.path);
       window.open(url, "_blank");
       setLastWatermarked(start.watermark);
       setMsg(start.watermark ? "Done. Free trial exports carry a small watermark." : "Done.");
@@ -352,6 +355,7 @@ function ExportPanel({ project, images, beforeExport, watermarked, onDone }: { p
       {progress !== null && <p className="mt-2 text-sm text-muted-foreground tabular-nums" aria-live="polite">Exporting… {Math.round(progress * 100)}%</p>}
       {msg && <p className="mt-2 text-sm" aria-live="polite">{msg}</p>}
       {link && <a href={link} target="_blank" rel="noreferrer" className="mt-1 inline-block text-sm text-primary hover:underline">Download file</a>}
+      {mp4Path && <AddToProducts reelId={project.id} path={mp4Path} />}
       {(watermarked || lastWatermarked) && <div className="mt-2"><p className="mb-1 text-sm text-muted-foreground">This export carries a small watermark.</p><UpgradeButton returnTo={project.id} label="Remove watermark" cta="shopify-remove-watermark" variant="outline" /></div>}
     </div>
   );
