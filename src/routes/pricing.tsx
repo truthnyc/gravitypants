@@ -8,13 +8,16 @@ import { COMPARE, FAQ, PLANS, POPULAR_PLAN, REFERRAL_NOTE, TRIAL, YEARLY_LABEL, 
 import { SITE_ORIGIN, siteHead } from "@/lib/site/seo";
 
 export const Route = createFileRoute("/pricing")({
-  head: () => ({
-    ...siteHead({ path: "/pricing", title: "Video Ad Maker Pricing — Gravity Pants", description: "Free, Starter, Simple, Business and Team plans for turning photos into video ads and GIFs, with HTML5 on Business and Team. Free plan: first export clean, then 5 more watermarked. No card needed." }),
-    scripts: [{
+  head: () => {
+    const head = siteHead({ path: "/pricing", title: "Video Ad Maker Pricing — Gravity Pants", description: "Compare plans for making product video ads." });
+    return {
+    ...head,
+    scripts: [...head.scripts, {
       type: "application/ld+json",
       children: JSON.stringify({
         "@context": "https://schema.org",
         "@type": "SoftwareApplication",
+        "@id": `${SITE_ORIGIN}/#software`,
         name: "Gravity Pants",
         applicationCategory: "MultimediaApplication",
         operatingSystem: "Web browser",
@@ -25,7 +28,8 @@ export const Route = createFileRoute("/pricing")({
         ],
       }),
     }],
-  }),
+    };
+  },
   component: Pricing,
 });
 

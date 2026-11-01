@@ -3,7 +3,8 @@ import { SiteShell } from "@/components/site/SiteShell";
 import { BlogVisual } from "@/components/site/BlogVisual";
 import { SearchPageLinks, relatedLabel } from "@/components/site/SearchPage";
 import { POSTS, postBySlug } from "@/lib/site/blog";
-import { SITE_OG_IMAGE, SITE_ORIGIN, siteHead } from "@/lib/site/seo";
+import { SITE_ORIGIN, siteHead } from "@/lib/site/seo";
+import { PAGE_METADATA } from "@/lib/site/page-metadata";
 
 
 export const Route = createFileRoute("/blog/$slug")({
@@ -18,10 +19,12 @@ export const Route = createFileRoute("/blog/$slug")({
     }
     const post = loaderData.post;
     const url = `${SITE_ORIGIN}/blog/${params.slug}`;
+    const description = PAGE_METADATA[`/blog/${params.slug}`]?.description ?? post.dek;
+    const cover = post.cover?.startsWith("https://") ? post.cover : undefined;
     const head = siteHead({
       path: `/blog/${params.slug}`,
       title: post.seoTitle ? `${post.seoTitle} — Gravity Pants` : `${post.title} — Gravity Pants Blog`,
-      description: post.dek,
+      description,
       ogType: "article",
     });
     const published = new Date(post.date);
@@ -29,13 +32,14 @@ export const Route = createFileRoute("/blog/$slug")({
       {
         "@context": "https://schema.org",
         "@type": "BlogPosting",
+        "@id": `${url}#article`,
         headline: post.title,
-        description: post.dek,
+        description,
         ...(Number.isNaN(published.getTime()) ? {} : { datePublished: published.toISOString().slice(0, 10) }),
         author: { "@type": "Organization", name: "Gravity Pants", url: `${SITE_ORIGIN}/` },
         publisher: { "@type": "Organization", name: "Gravity Pants", logo: { "@type": "ImageObject", url: `${SITE_ORIGIN}/apple-touch-icon.png` } },
         mainEntityOfPage: url,
-        image: SITE_OG_IMAGE,
+        ...(cover ? { image: cover } : {}),
       },
       {
         "@context": "https://schema.org",
@@ -47,8 +51,7 @@ export const Route = createFileRoute("/blog/$slug")({
         ],
       },
     ];
-    const cover = post.cover?.startsWith("https://") ? post.cover : undefined;
-    return { ...head, meta: cover ? [...(head.meta ?? []).filter((meta) => !("property" in meta && meta.property === "og:image") && !("name" in meta && meta.name === "twitter:image")), { property: "og:image", content: cover }, { name: "twitter:image", content: cover }] : head.meta, scripts: jsonLd.map((d) => ({ type: "application/ld+json", children: JSON.stringify(d) })) };
+    return { ...head, meta: cover ? [...(head.meta ?? []).filter((meta) => !("property" in meta && meta.property === "og:image") && !("name" in meta && meta.name === "twitter:image")), { property: "og:image", content: cover }, { name: "twitter:image", content: cover }] : head.meta, scripts: [...head.scripts, ...jsonLd.map((d) => ({ type: "application/ld+json", children: JSON.stringify(d) }))] };
   },
 
   component: BlogPostPage,

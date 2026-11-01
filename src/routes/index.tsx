@@ -49,12 +49,14 @@ export const Route = createFileRoute("/")({
         },
         {
           "@type": "WebSite",
+          "@id": `${SITE_ORIGIN}/#website`,
           name: "Gravity Pants",
           url: `${SITE_ORIGIN}/`,
           publisher: { "@id": `${SITE_ORIGIN}/#org` },
         },
         {
           "@type": "SoftwareApplication",
+          "@id": `${SITE_ORIGIN}/#software`,
           name: "Gravity Pants",
           applicationCategory: "MultimediaApplication",
           operatingSystem: "Web browser",
@@ -76,7 +78,7 @@ export const Route = createFileRoute("/")({
           href: loaderData ? pickVideo(loaderData.content.hero.reelId, loaderData.allReels, 3).poster : heroPoster.url,
         },
       ],
-      scripts: [{ type: "application/ld+json", children: JSON.stringify(jsonLd) }],
+      scripts: [...head.scripts, { type: "application/ld+json", children: JSON.stringify(jsonLd) }],
     };
   },
   loader: async () => {
