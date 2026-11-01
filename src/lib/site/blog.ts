@@ -1,4 +1,5 @@
 import type { BlogVisualKind } from "@/components/site/BlogVisual";
+import { GUIDES } from "./blog-guides";
 import meaumeVineyard from "@/assets/site/chateau-meaume-vineyard.webp.asset.json";
 export type BlogPost = {
   slug: string;
@@ -12,9 +13,11 @@ export type BlogPost = {
   /** Cover image for blog cards; falls back to the default photo set. */
   cover?: string;
   body: { h?: string; p: string[]; visual?: BlogVisualKind }[];
+  /** Landing pages this article supports; linked at the end of the article. */
+  pages?: string[];
 };
 
-export const POSTS: BlogPost[] = [
+const ORIGINAL: BlogPost[] = [
   {
     slug: "how-to-turn-photos-into-a-video",
     title: "How to turn photos into a video (without editing anything)",
@@ -193,6 +196,19 @@ export const POSTS: BlogPost[] = [
     ],
   },
 ];
+
+/** Landing page each original article supports. */
+const ORIGINAL_PAGES: Record<string, string[]> = {
+  "how-to-turn-photos-into-a-video": ["/photo-to-video"],
+  "photos-beat-nothing-video-beats-photos": ["/video-ads-for-small-business"],
+  "three-photos-one-ad": ["/product-video-maker"],
+  "why-tap-anything": ["/photo-to-video"],
+};
+
+export const POSTS: BlogPost[] = [...GUIDES, ...ORIGINAL.map((p) => ({ ...p, pages: p.pages ?? ORIGINAL_PAGES[p.slug] }))];
+
+/** Articles that support a landing page, for its Related links. */
+export const postsForPage = (path: string) => POSTS.filter((p) => p.pages?.includes(path));
 
 export function postBySlug(slug: string): BlogPost | undefined {
   return POSTS.find((p) => p.slug === slug);

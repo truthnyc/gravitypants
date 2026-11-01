@@ -5,7 +5,6 @@ import sachajuan from "@/assets/site/sachajuan-bioshield-shampoo.webp.asset.json
 import annGish from "@/assets/site/ann-gish-pickstitch-lifestyle-1.webp.asset.json";
 import vosges from "@/assets/site/vosges-skulls-board.webp.asset.json";
 import reschio from "@/assets/site/reschio-canary-bed.webp.asset.json";
-import filicori from "@/assets/site/filicori-espresso-pour.webp.asset.json";
 
 const DATE = "November 1, 2026";
 
@@ -31,7 +30,7 @@ export const GUIDES: BlogPost[] = [
         "Square 1:1 and portrait 4:5 both sit well in the listing photo area. If you also sell on Instagram, export a Vertical 9:16 copy from the same ad at the same time.",
       ] },
       { h: "4. Download the MP4 and upload it to the listing", p: [
-        "Export the MP4, open the listing in Etsy, and add the file in the video slot under Photos. You add the file yourself; Gravity Pants does not connect to your Etsy shop.",
+        "Export the MP4, open the listing in Etsy, and add the file in the listing's photos and video section. You add the file yourself; Gravity Pants does not connect to your Etsy shop.",
       ] },
     ],
   },
@@ -184,5 +183,3 @@ export const GUIDES: BlogPost[] = [
     ],
   },
 ];
-
-export { filicori as _unusedFilicori };
