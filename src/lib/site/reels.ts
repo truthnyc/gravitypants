@@ -1,6 +1,16 @@
 import { CATEGORIES, normalizeCategory } from "@/lib/directory/directory";
 
 export type ReelFormat = "916" | "11" | "169";
+/** Display-only formats a measured video can fall into beyond the stored ones. */
+export type ThumbFormat = ReelFormat | "45" | "54";
+/** Nearest display format for a measured video ratio (width / height). */
+export function ratioToFormat(ratio: number): ThumbFormat {
+  if (ratio < 0.75) return "916";
+  if (ratio < 0.95) return "45";
+  if (ratio < 1.15) return "11";
+  if (ratio < 1.45) return "54";
+  return "169";
+}
 /** Website reels use the shared brand categories; older values remain readable. */
 export type ReelCategory = string;
 export const CATEGORY_LABEL: Record<string, string> = Object.fromEntries(CATEGORIES.map((c) => [c, c]));

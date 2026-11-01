@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import type { GalleryExample } from "@/lib/site/examples";
 import { EXAMPLES_OG_IMAGE, siteHead } from "@/lib/site/seo";
 import { listSiteReels } from "@/lib/site/reels.functions";
-import { categoryLabel, type SiteReel } from "@/lib/site/reels";
+import { categoryLabel, ratioToFormat, type SiteReel } from "@/lib/site/reels";
 import { getHomepageContent } from "@/lib/site/homepage.functions";
 import { DEFAULT_CONTENT, featuredVideo, photoSrc } from "@/lib/site/homepage";
 
@@ -56,9 +56,11 @@ function ExampleFilter({ label, value, options, onChange, total }: {
 }
 
 function GalleryReel({ example }: { example: GalleryExample }) {
+  const [ratio, setRatio] = useState<number | null>(null);
   if (example.video) {
-    return <div className={`examples-reel examples-reel-${example.format}`}>
-      <ReelVideo className="examples-reel-video" video={example.video} videoWebm={example.videoWebm} poster={example.poster} label={`${example.name} video ad`} />
+    const thumb = ratio ? ratioToFormat(ratio) : example.format;
+    return <div className={`examples-reel examples-reel-${thumb}`}>
+      <ReelVideo className="examples-reel-video" video={example.video} videoWebm={example.videoWebm} poster={example.poster} label={`${example.name} video ad`} onRatio={setRatio} />
     </div>;
   }
 
