@@ -155,6 +155,13 @@
       "when": 1793541444680,
       "tag": "0021_shopify_expiring_tokens",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1793542889856,
+      "tag": "0022_shopify_web_workspace",
+      "breakpoints": true
     }
   ]
 }
