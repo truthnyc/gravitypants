@@ -1,3 +1,4 @@
+import { BrandProfileLink } from "@/components/site/BrandPreview";
 import { ConceptReelNotice } from "@/components/directory/ConceptReelNotice";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
@@ -60,9 +61,9 @@ function BrandCard({ reel }: { reel: SiteReel }) {
           </p>
           <ConceptReelNotice brandName={reel.brand} brandSlug={reel.brandSlug} />
           {reel.brandSlug && (
-            <a className="showcase-visit" href={`https://aimante.co/b/${reel.brandSlug}`} data-cta="showcase-brand-profile">
+            <BrandProfileLink className="showcase-visit" slug={reel.brandSlug} cta="showcase-brand-profile">
               About {reel.brand} <ArrowRight size={15} strokeWidth={1.7} />
-            </a>
+            </BrandProfileLink>
           )}
           
         </div>
