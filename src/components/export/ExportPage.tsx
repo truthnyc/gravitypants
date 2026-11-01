@@ -151,7 +151,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
         jobs.set(job, { kind: "gif", format: t.format, ...s });
         files.push({ sizeName: t.name, ratio: t.ratio, name: exportFileName(base, t.width, t.height, "gif"), kind: "gif", job, width: s.width, height: s.height });
       }
-      if (html5 && t.key === mainId) {
+      if (html5 && canUse("html5") && t.key === mainId) {
         const job = `html5:${t.width}x${t.height}:${t.format}`;
         jobs.set(job, { kind: "html5", format: t.format, width: t.width, height: t.height });
         files.push({ sizeName: t.name, ratio: t.ratio, name: exportFileName(base, t.width, t.height, "zip"), kind: "html5", job, width: t.width, height: t.height });
@@ -485,7 +485,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             <FormatCard on={mp4} onClick={() => setMp4((v) => !v)} icon={<Film className="size-4" strokeWidth={1.7} />} title="Video MP4" sub="Motion and sound" />
             <FormatCard on={gif} onClick={() => (gif || canUse("gif") ? setGif((v) => !v) : openUpgrade("gif"))} icon={<ImageIcon className="size-4" strokeWidth={1.7} />} title="Animated GIF" sub="Plays anywhere, no sound" />
-            <FormatCard on={html5} onClick={() => setHtml5((v) => !v)} icon={<Code2 className="size-4" strokeWidth={1.7} />} title="HTML5" sub="Display ads, .zip" />
+            <FormatCard on={html5} onClick={() => (html5 || canUse("html5") ? setHtml5((v) => !v) : openUpgrade("html5"))} icon={<Code2 className="size-4" strokeWidth={1.7} />} title="HTML5" sub="Business and Team, .zip" />
           </div>
           {html5 && (
             <div className="mt-3">
