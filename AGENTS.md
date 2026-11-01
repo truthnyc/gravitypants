@@ -52,3 +52,4 @@
 - Google font catalog is shared server-side; account/Shopify entries verify their own identities.
 - Tutorial/Help share `guide.ts`; `GuideScreenshot` uses CDN captures cropped for privacy, independent of the editor.
 - Google video schema points at permanent `/api/public/reel/$id/{video|poster}` links that redirect only published/live Showcase reels to fresh signed files, so search listings never expire while storage stays private.
+- Video sitemap `/sitemap-video.xml` is built from search-page reels via `videoObjects()` so it always matches on-page VideoObject data and uses permanent reel links.
