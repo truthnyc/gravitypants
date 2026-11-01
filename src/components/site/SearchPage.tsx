@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { listSiteReels } from "@/lib/site/reels.functions";
 import type { SiteReel } from "@/lib/site/reels";
 import { siteHead } from "@/lib/site/seo";
+import { videoObjects } from "@/lib/site/video-schema";
 import { POSTS } from "@/lib/site/blog";
 import { SEARCH_PAGES, SEARCH_STEPS, sourcePhotos, type SearchPage as Page } from "@/lib/site/search-pages";
 
@@ -20,14 +21,17 @@ export function relatedLabel(path: string) {
 export function searchPageRoute(page: Page) {
   return {
     loader: async () => ({ reels: await listSiteReels().catch(() => [] as SiteReel[]) }),
-    head: () => {
+    head: ({ loaderData }: { loaderData?: { reels: SiteReel[] } }) => {
       const head = siteHead({ path: page.path, title: page.title, description: page.description });
       const faq = {
         "@context": "https://schema.org",
         "@type": "FAQPage",
         mainEntity: page.faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
       };
-      return { ...head, scripts: [{ type: "application/ld+json", children: JSON.stringify(faq) }] };
+      const byId = new Map((loaderData?.reels ?? []).map((r) => [r.id, r]));
+      const shown = [page.example.reelId, ...("grid" in page.section ? page.section.grid : [])].map((id) => byId.get(id));
+      const videos = videoObjects(shown, page.path);
+      return { ...head, scripts: [faq, ...videos].map((d) => ({ type: "application/ld+json", children: JSON.stringify(d) })) };
     },
   };
 }
