@@ -3,7 +3,7 @@ import { SiteShell } from "@/components/site/SiteShell";
 import { BlogVisual } from "@/components/site/BlogVisual";
 import { SearchPageLinks, relatedLabel } from "@/components/site/SearchPage";
 import { POSTS, postBySlug } from "@/lib/site/blog";
-import { SITE_OG_IMAGE, SITE_ORIGIN, siteHead } from "@/lib/site/seo";
+import { SITE_ORIGIN, siteHead } from "@/lib/site/seo";
 import { PAGE_METADATA } from "@/lib/site/page-metadata";
 
 
