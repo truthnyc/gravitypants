@@ -8,7 +8,8 @@ import { SiteReelHeart } from "@/components/site/SiteReelHeart";
 import { Button } from "@/components/ui/button";
 import { SHOWCASE_OG_IMAGE, siteHead } from "@/lib/site/seo";
 import { listSiteReels } from "@/lib/site/reels.functions";
-import { FORMAT_LABEL, type SiteReel } from "@/lib/site/reels";
+import { FORMAT_LABEL, ratioToFormat, type SiteReel } from "@/lib/site/reels";
+import { useState } from "react";
 
 export const Route = createFileRoute("/showcase")({
   head: () =>
@@ -24,14 +25,17 @@ export const Route = createFileRoute("/showcase")({
 });
 
 function BrandCard({ reel }: { reel: SiteReel }) {
+  const [ratio, setRatio] = useState<number | null>(null);
+  const thumb = ratio ? ratioToFormat(ratio) : reel.format;
   const media = (
-    <div className={`examples-reel examples-reel-${reel.format}`}>
+    <div className={`examples-reel examples-reel-${thumb}`}>
       <ReelVideo
         className="examples-reel-video"
         video={reel.video}
         videoWebm={reel.videoWebm ?? undefined}
         poster={reel.poster ?? undefined}
         label={`${reel.title} video ad by ${reel.brand}`}
+        onRatio={setRatio}
       />
     </div>
   );

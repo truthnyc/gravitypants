@@ -148,13 +148,16 @@ function homeExamples(reels: SiteReel[]): HomeExample[] {
   }));
 }
 function HomeReelVideo({ example }: { example: HomeExample }) {
+  const [ratio, setRatio] = useState<number | null>(null);
+  const thumb = ratio ? ratioToFormat(ratio) : example.videoFormat;
   return (
-    <div className={`home-example-video${example.videoFormat ? ` home-example-video-${example.videoFormat}` : ""}`}>
+    <div className={`home-example-video${thumb ? ` home-example-video-${thumb}` : ""}`}>
       <ReelVideo
         video={example.video!}
         videoWebm={example.videoWebm}
         poster={example.poster}
         label={`${example.name} video ad`}
+        onRatio={setRatio}
       />
     </div>
   );
