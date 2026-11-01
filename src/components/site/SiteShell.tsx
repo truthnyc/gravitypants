@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Instagram, Minus, Plus } from "lucide-react";
+import { Instagram, Minus, Plus, Youtube } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { GravityPantsLogo } from "@/components/GravityPantsLogo";
@@ -54,7 +54,7 @@ function Brand() {
         <div className="mt-4 flex gap-2">
           {SOCIAL_LINKS.filter((s) => s.url).map((s) => (
             <a key={s.name} href={s.url} target="_blank" rel="noreferrer" aria-label={s.name} className="grid size-[34px] min-h-0 min-w-0 place-items-center rounded-lg border border-ap-hairline bg-ap-card text-ap-ink hover:text-ap-blue">
-              <Instagram size={17} strokeWidth={1.7} />
+              {s.name === "YouTube" ? <Youtube size={17} strokeWidth={1.7} /> : <Instagram size={17} strokeWidth={1.7} />}
             </a>
           ))}
         </div>
