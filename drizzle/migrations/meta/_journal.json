@@ -148,6 +148,13 @@
       "when": 1793539221500,
       "tag": "0020_klaviyo_connections",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1793541444680,
+      "tag": "0021_shopify_expiring_tokens",
+      "breakpoints": true
     }
   ]
 }

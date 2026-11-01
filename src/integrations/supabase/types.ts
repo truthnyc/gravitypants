@@ -1384,10 +1384,13 @@ export type Database = {
           plan_cycle_end: string | null
           plan_cycle_start: string | null
           plan_handle: string
+          refresh_token: string | null
+          refresh_token_expires_at: string | null
           scopes: string | null
           shop_domain: string
           shop_gid: string | null
           storefront_token: string | null
+          token_expires_at: string | null
           uninstalled_at: string | null
           updated_at: string
           upgrade_return_project: string | null
@@ -1407,10 +1410,13 @@ export type Database = {
           plan_cycle_end?: string | null
           plan_cycle_start?: string | null
           plan_handle?: string
+          refresh_token?: string | null
+          refresh_token_expires_at?: string | null
           scopes?: string | null
           shop_domain: string
           shop_gid?: string | null
           storefront_token?: string | null
+          token_expires_at?: string | null
           uninstalled_at?: string | null
           updated_at?: string
           upgrade_return_project?: string | null
@@ -1430,10 +1436,13 @@ export type Database = {
           plan_cycle_end?: string | null
           plan_cycle_start?: string | null
           plan_handle?: string
+          refresh_token?: string | null
+          refresh_token_expires_at?: string | null
           scopes?: string | null
           shop_domain?: string
           shop_gid?: string | null
           storefront_token?: string | null
+          token_expires_at?: string | null
           uninstalled_at?: string | null
           updated_at?: string
           upgrade_return_project?: string | null
