@@ -7,6 +7,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { getWorkspaceId } from "@/lib/stillframe/workspace";
 import { MEDIA_BUCKET } from "@/lib/stillframe/media";
 import { deleteMyExport } from "@/lib/stillframe/account.functions";
+import { getKlaviyoStatus } from "@/lib/stillframe/klaviyo.functions";
+import { KlaviyoDisconnect, KlaviyoSend } from "@/components/export/KlaviyoSend";
+import { useServerFn } from "@tanstack/react-start";
+
 
 export const Route = createFileRoute("/_authenticated/app/exports")({
   head: () => ({
@@ -40,6 +44,14 @@ function ExportsPage() {
   const [items, setItems] = useState<Item[] | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [liveAds, setLiveAds] = useState<Set<string>>(new Set());
+  const klaviyoStatus = useServerFn(getKlaviyoStatus);
+  const [klaviyoConnected, setKlaviyoConnected] = useState<boolean | null>(null);
+  const refreshKlaviyo = () =>
+    klaviyoStatus({ data: { workspaceId: getWorkspaceId() } }).then((r) => setKlaviyoConnected(r.connected)).catch(() => setKlaviyoConnected(false));
+  useEffect(() => {
+    void refreshKlaviyo();
+  }, []);
+
 
   useEffect(() => {
     let alive = true;
@@ -124,6 +136,8 @@ function ExportsPage() {
         </section>
       ) : (
         <div className="space-y-3">
+          <KlaviyoDisconnect />
+
           {items.map((it) => (
             <section key={`${it.projectId}/${it.stamp}`} className="rounded-sm bg-card p-4 shadow-card">
               <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
@@ -148,9 +162,13 @@ function ExportsPage() {
                 {it.files.map((f) => (
                   <li key={f} className="flex items-center justify-between gap-2 text-[13px]">
                     <span className="truncate">{f}</span>
-                    <Button variant="ghost" size="sm" onClick={() => void download(it, f)}>
-                      <Download strokeWidth={1.7} /> Download
-                    </Button>
+                    <span className="flex shrink-0 items-center gap-1">
+                      {/\.gif$/i.test(f) && <KlaviyoSend projectId={it.projectId} stamp={it.stamp} name={f} connected={klaviyoConnected} onConnected={() => void refreshKlaviyo()} />}
+                      <Button variant="ghost" size="sm" onClick={() => void download(it, f)}>
+                        <Download strokeWidth={1.7} /> Download
+                      </Button>
+                    </span>
+
                   </li>
                 ))}
               </ul>
