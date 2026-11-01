@@ -68,7 +68,7 @@ export const Route = createFileRoute("/api/public/shopify/export")({
           if (b.action === "products" || b.action === "add-to-products") {
             const { data: p } = await ctx.admin.from("projects").select("id, name").eq("id", b.id).eq("workspace_id", ctx.ws).maybeSingle();
             if (!p) return json({ error: "Reel not found." }, 404);
-            const { data: frames } = await ctx.admin.from("frames").select("photo").eq("project_id", b.id).order("position");
+            const { data: frames } = await ctx.admin.from("frames").select("photo").eq("project_id", b.id).order("sort_order");
             const ids = reelProductIds((frames ?? []).map((f) => f.photo));
             if (b.action === "products") {
               const products = ids.length ? await fetchProducts(ctx.shop, await ctx.accessToken(), ids) : [];
