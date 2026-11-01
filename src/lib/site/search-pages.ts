@@ -34,6 +34,9 @@ import mfkCoffret from "@/assets/site/mfk-coffret.jpg.asset.json";
 import frenchBloomPour from "@/assets/site/french-bloom-01.jpg.asset.json";
 import frenchBloomRose from "@/assets/site/french-bloom-03.jpg.asset.json";
 import frenchBloomIce from "@/assets/site/french-bloom-06.jpg.asset.json";
+import drususPair from "@/assets/site/drusus-tabor-grand-turk-pair.webp.asset.json";
+import drususSingle from "@/assets/site/drusus-tabor-grand-turk-single.webp.asset.json";
+import drususSofa from "@/assets/site/drusus-tabor-pillows-sofa.webp.asset.json";
 
 /** Published website or featured Directory reel IDs used as search-page examples. */
 export const REEL = {
@@ -50,6 +53,7 @@ export const REEL = {
   meaume: "2622b7db-614a-405f-a1da-79276bbe2de2",
   mfk: "afb7a588-8a41-44d6-9bef-c09be883b3dd",
   frenchBloom: "f53784c8-26eb-419a-9947-517b20d918d4",
+  drusus: "fd53864c-49b5-4c12-ae00-a55887cbddfe",
 } as const;
 
 /** Source photos are only listed where the reel's real originals exist on the site. */
@@ -113,6 +117,11 @@ const SOURCE_PHOTOS: Record<string, { src: string; alt: string }[]> = {
     { src: frenchBloomPour.url, alt: "French Bloom sparkling rosé poured by the sea with cheese and raspberries" },
     { src: frenchBloomRose.url, alt: "French Bloom Le Rosé alcohol-free sparkling bottle" },
     { src: frenchBloomIce.url, alt: "French Bloom bottles chilling on ice" },
+  ],
+  [REEL.drusus]: [
+    { src: drususPair.url, alt: "Drusus Tabor Grand Turk block print pillows in blue and gold" },
+    { src: drususSingle.url, alt: "Drusus Tabor Grand Turk block print pillow, single" },
+    { src: drususSofa.url, alt: "Drusus Tabor block print pillows on a sofa beneath framed paintings" },
   ],
 };
 export const sourcePhotos = (reelId: string) => SOURCE_PHOTOS[reelId] ?? [];
@@ -333,7 +342,7 @@ export const SEARCH_PAGES: SearchPage[] = [
     description: "Make video ads from your product photos, sized for Instagram, Facebook, TikTok and Google. No agency, no editor. Your first ad is free.",
     h1: "Video ads for small businesses",
     subhead: "Make video ads from your product photos, in every size, without an agency or an editor.",
-    example: { reelId: REEL.agnona, label: "Agnona, Seasonal Sale" },
+    example: { reelId: REEL.drusus, label: "Drusus Tabor, Grand Turk Pillow" },
     why: [
       "Ads with movement usually get more attention than still images, but a filmed ad can cost more than a small brand spends on ads all month.",
       "Gravity Pants gives you the same short, branded video ads from photos you already have. Make a few versions, see which one people click, and make more like it.",
