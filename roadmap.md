@@ -1,4 +1,9 @@
 # Photo-to-video article
+# Gravity Pants pixel
+- [ ] Add website-visit measurement with regional advertising consent, withdrawal and privacy disclosure.
+- [ ] Verify allowed transmission, rejection and host exclusions; publication requires user approval.
+
+# Photo-to-video article
 - [x] Correct 5:4/16:9 guidance, add manual Instagram posting steps and a contextual How it works link; preserve Château Méaume visuals.
 - [x] Verified contextual-link navigation, format advice, manual posting instructions and retained images in the preview; build passed.
 
