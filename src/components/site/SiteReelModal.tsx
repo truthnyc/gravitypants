@@ -1,4 +1,3 @@
-import { Link } from "@tanstack/react-router";
 import { categoryLabel, type SiteReel } from "@/lib/site/reels";
 import { ReelPopup, ReelPopupBody } from "@/components/directory/ReelPopup";
 import { SiteReelHeart } from "./SiteReelHeart";
