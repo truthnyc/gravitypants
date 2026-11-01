@@ -24,7 +24,7 @@ import jewelryFrame2 from "@/assets/site/fine-jewelry-frame-2.webp.asset.json";
 import jewelryFrame3 from "@/assets/site/fine-jewelry-frame-3.webp.asset.json";
 import { SITE_ORIGIN, siteHead } from "@/lib/site/seo";
 import { listSiteReels } from "@/lib/site/reels.functions";
-import { FORMAT_LABEL, type SiteReel } from "@/lib/site/reels";
+import { FORMAT_LABEL, ratioToFormat, type SiteReel } from "@/lib/site/reels";
 import { getHomepageContent } from "@/lib/site/homepage.functions";
 import { DEFAULT_CONTENT, featuredVideo as pickVideo, photoSrc } from "@/lib/site/homepage";
 
