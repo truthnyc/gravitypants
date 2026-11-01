@@ -66,7 +66,7 @@ function HelpPage() {
 
       <section className="mx-auto max-w-[1248px] px-5 pb-20 md:px-8 lg:px-16 xl:px-24">
         <h2 className="text-[28px] font-semibold tracking-[-0.02em] text-site-ink md:text-[40px]">HTML5 ads</h2>
-        <p className="mt-4 max-w-[680px] text-[15px] leading-[1.5] text-site-secondary">Turn the same ad into an HTML5 banner for display advertising: a zip with the banner, your fonts and a click-through link, ready to upload to an ad platform. It comes from the same edit as your MP4 and GIF.</p>
+        <p className="mt-4 max-w-[680px] text-[15px] leading-[1.5] text-site-secondary">Turn the same ad into an HTML5 banner for display advertising: a zip with the banner and a click-through link, in your ad's main size, ready to upload to an ad platform. It comes from the same edit as your MP4 and GIF.</p>
         <p className="mt-4"><Link to="/html5-ads" data-cta="help-html5-guide" className="text-[15px] font-semibold text-site-primary underline underline-offset-4">How to make and use an HTML5 ad</Link></p>
       </section>
 

@@ -134,23 +134,23 @@ export const GUIDES: BlogPost[] = [
     slug: "how-to-make-html5-display-ads-from-photos",
     title: "How to make HTML5 display ads from photos",
     seoTitle: "How to Make HTML5 Display Ads From Photos",
-    dek: "Ad networks ask for HTML5 banners in fixed sizes. Here is how to make them from photos, with no code.",
+    dek: "Ad platforms ask for HTML5 ads as a zip. Here is how to make one from the photos you already have, with no code.",
     date: DATE, minutes: 4, tag: "How to", pages: ["/html5-ads"],
     body: [
       { p: [
-        "HTML5 ads are the moving banners you see on websites. Ad platforms ask for them as a ZIP file in exact sizes. You can make them from the same photos and words as your social ads.",
+        "HTML5 ads are the moving banners you see on websites. Ad platforms ask for them as a ZIP file you upload as it is. You can make them from the same photos and words as your social ads.",
       ] },
       { h: "1. Make the ad first", p: [
         "Build the ad as usual with your photos, words and brand kit. Then open Export and choose HTML5.",
       ] },
-      { h: "2. Pick the sizes the platform asks for", p: [
-        "Choose the banner sizes your ad platform lists, or use Custom size to type any width and height. Each size downloads as its own ZIP.",
+      { h: "2. Check the size", p: [
+        "The banner is made in your ad's main size — the shape you picked when you started the ad. One export makes one ZIP.",
       ] },
       { h: "3. Add the click-through link", p: [
         "Type the page you want people to land on. It is written into the ad as a click tag, the standard way ad platforms read where a click should go.",
       ] },
-      { h: "4. Check the file size, then upload", p: [
-        "Many networks set a small size limit for HTML5 ads. Fewer photos and smaller sizes keep the ZIP light. Upload each ZIP to your ad platform as an HTML5 creative.",
+      { h: "4. Upload it", p: [
+        "Many networks set a size limit for HTML5 ads, so fewer photos keep the ZIP lighter. Upload it to your ad platform as an HTML5 creative. Google Ads does not accept these yet.",
       ] },
     ],
   },
