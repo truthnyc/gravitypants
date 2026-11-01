@@ -176,6 +176,13 @@
       "when": 1793543453806,
       "tag": "0024_brand_join_role_editor",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1793555718003,
+      "tag": "0025_starter_plan_referrals_pricing",
+      "breakpoints": true
     }
   ]
 }

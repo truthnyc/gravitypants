@@ -1260,6 +1260,7 @@ export type Database = {
           avatar_url: string | null
           created_at: string
           display_name: string | null
+          referral_code: string | null
           signup_landing_path: string | null
           signup_ref: string | null
           signup_referrer_host: string | null
@@ -1273,6 +1274,7 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           display_name?: string | null
+          referral_code?: string | null
           signup_landing_path?: string | null
           signup_ref?: string | null
           signup_referrer_host?: string | null
@@ -1286,6 +1288,7 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           display_name?: string | null
+          referral_code?: string | null
           signup_landing_path?: string | null
           signup_ref?: string | null
           signup_referrer_host?: string | null
@@ -1368,6 +1371,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      referrals: {
+        Row: {
+          created_at: string
+          credited_workspace_id: string | null
+          referred_user_id: string
+          referrer_user_id: string
+        }
+        Insert: {
+          created_at?: string
+          credited_workspace_id?: string | null
+          referred_user_id: string
+          referrer_user_id: string
+        }
+        Update: {
+          created_at?: string
+          credited_workspace_id?: string | null
+          referred_user_id?: string
+          referrer_user_id?: string
+        }
+        Relationships: []
       }
       shopify_shops: {
         Row: {
@@ -1885,6 +1909,7 @@ export type Database = {
           extra_exports: number
           last_topup_session: string | null
           plan: string
+          referral_credits: number
           status: string
           stripe_customer_id: string | null
           stripe_subscription_id: string | null
@@ -1903,6 +1928,7 @@ export type Database = {
           extra_exports?: number
           last_topup_session?: string | null
           plan?: string
+          referral_credits?: number
           status?: string
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
@@ -1921,6 +1947,7 @@ export type Database = {
           extra_exports?: number
           last_topup_session?: string | null
           plan?: string
+          referral_credits?: number
           status?: string
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
@@ -2132,6 +2159,7 @@ export type Database = {
       }
       kit_shared: { Args: { _ws: string }; Returns: boolean }
       kit_workspaces: { Args: { _ws: string }; Returns: string[] }
+      my_referral: { Args: never; Returns: Json }
       record_directory_reel_open: {
         Args: { _event_id: string; _kind: string; _reel_id: string }
         Returns: boolean
