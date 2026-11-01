@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { AccountTabs } from "@/components/billing/AccountTabs";
+import { JoinPasswordCard } from "@/components/team/JoinPasswordCard";
 import { inviteMember, resendInvite } from "@/lib/stillframe/team.functions";
 import { useBilling } from "@/lib/stillframe/billing";
 import { getWorkspaceId, rememberWorkspaceId } from "@/lib/stillframe/workspace";
@@ -296,6 +297,8 @@ function MembersPage() {
           ))}
         </div>
       </section>
+
+      {isAdmin && <JoinPasswordCard workspaceId={ws} className="acct-card" />}
 
       {isAdmin && (
         <section className="acct-card">

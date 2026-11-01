@@ -1,3 +1,4 @@
+import { JoinPasswordCard } from "@/components/team/JoinPasswordCard";
 import { useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -107,6 +108,7 @@ function ClientPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <Card><JoinPasswordCard workspaceId={c.id} /></Card>
         <Card>
           <h2 className="mb-2 text-[15px] font-semibold">Members</h2>
           <ul className="divide-y divide-border text-[14px]">
