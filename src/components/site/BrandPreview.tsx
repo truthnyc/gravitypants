@@ -24,7 +24,7 @@ function closeBrandPreview() { current = null; setUrl(null); emit(); }
 const subscribe = (l: () => void) => { listeners.add(l); return () => listeners.delete(l); };
 
 /** "About [Brand]": opens the in-page preview on Gravity Pants; a normal profile link on Aimanté. */
-export function BrandProfileLink({ slug, className, children, cta, tabIndex }: { slug: string; className?: string; children: ReactNode; cta?: string; tabIndex?: number }) {
+export function BrandProfileLink({ slug, className, children, cta, tabIndex }: { slug: string; className?: string | undefined; children: ReactNode; cta?: string | undefined; tabIndex?: number | undefined }) {
   const site = useBrandSite();
   const href = `${AIMANTE}/b/${slug}`;
   if (site === "aimante") return <a href={href} className={className} data-cta={cta} tabIndex={tabIndex}>{children}</a>;
