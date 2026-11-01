@@ -4,7 +4,6 @@ import { SiteReelHeart } from "@/components/site/SiteReelHeart";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
 import { ArrowRight, ArrowUpRight, Check, ChevronDown, Download, X } from "lucide-react";
-import { reelDownloadUrl } from "@/lib/site/reel-download";
 import { useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { SiteShell } from "@/components/site/SiteShell";
@@ -72,7 +71,7 @@ function GalleryReel({ example }: { example: GalleryExample }) {
 function GalleryCard({ example }: { example: GalleryExample }) {
   return <article className="examples-card">
     <div className="examples-card-media">{!example.client && <SiteReelHeart reelId={example.id} name={example.name} />}{example.href ? <a className="site-reel-link" href={example.href} target="_blank" rel="noreferrer" aria-label={example.frames?.length ? undefined : `Visit ${example.logo ?? example.name}`}><GalleryReel example={example} /></a> : <GalleryReel example={example} />}</div>
-    <div className="examples-card-info"><div><h3>{example.name}</h3><p className="examples-card-meta-desktop">{categoryLabel(example.category)} · {formatLabel[example.format]} · {example.photos} {example.photos === 1 ? "photo" : "photos"} · {example.seconds} sec</p><p className="examples-card-meta-mobile">{categoryLabel(example.category)} · {formatLabel[example.format]}</p><ConceptReelNotice brandName={example.logo ?? example.sub} />{example.href && <a className="showcase-visit" href={example.href} target="_blank" rel="noreferrer">Visit {example.logo ?? example.name} <ArrowUpRight size={13} strokeWidth={1.7} /></a>}{reelDownloadUrl(example.video, example.name) && <a className="showcase-visit" data-cta="reel-download" onClick={() => window.__lovableEvents?.track?.("project.reel_download_clicked", { reel_id: example.id, reel_title: example.name.slice(0, 80), page: "examples" })} href={reelDownloadUrl(example.video, example.name)!} download target="_blank" rel="noreferrer">Download reel <Download size={13} strokeWidth={1.7} /></a>}</div>
+    <div className="examples-card-info"><div><h3>{example.name}</h3><p className="examples-card-meta-desktop">{categoryLabel(example.category)} · {formatLabel[example.format]} · {example.photos} {example.photos === 1 ? "photo" : "photos"} · {example.seconds} sec</p><p className="examples-card-meta-mobile">{categoryLabel(example.category)} · {formatLabel[example.format]}</p><ConceptReelNotice brandName={example.logo ?? example.sub} />{example.href && <a className="showcase-visit" href={example.href} target="_blank" rel="noreferrer">Visit {example.logo ?? example.name} <ArrowUpRight size={13} strokeWidth={1.7} /></a>}</div>
     </div>
   </article>;
 }
