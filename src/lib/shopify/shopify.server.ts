@@ -39,7 +39,7 @@ async function aesKey(raw: string) {
 /** AES-256-GCM; stored as "v1:<iv>:<ciphertext>" (base64). */
 export async function encryptToken(plain: string, keyRaw: string) {
   const iv = crypto.getRandomValues(new Uint8Array(12));
-  const ct = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, await aesKey(keyRaw), enc.encode(plain));
+  const ct = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv }, await aesKey(keyRaw), enc.encode(plain)));
   return `v1:${bytesToB64(iv)}:${bytesToB64(ct)}`;
 }
 export async function decryptToken(stored: string, keyRaw: string) {
