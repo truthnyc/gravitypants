@@ -1,4 +1,5 @@
 import { AIMANTE_ORIGIN } from "@/lib/site/brand-site";
+import { EmbedDialog } from "@/components/site/EmbedCode";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -119,7 +120,7 @@ function DirectoryAccount() {
                     {r.pending === "in_review" && <p className="mt-1 text-[13px] text-ap-amber">Update in review. The current version stays live until it's approved.</p>}
                     {r.pending === "declined" && <p className="mt-1 text-[13px] text-destructive">Update not approved{r.pendingNote ? `: ${r.pendingNote}` : "."} The live version is unchanged.</p>}
                   </div>
-                  <ReelActions adId={r.adId} status={r.status} pending={r.pending} onDone={refresh} />
+                  <ReelActions adId={r.adId} title={r.name} format={r.size} status={r.status} pending={r.pending} onDone={refresh} />
                 </li>
               );
             })}
@@ -164,11 +165,12 @@ function DirectoryAccount() {
   );
 }
 
-function ReelActions({ adId, status, pending, onDone }: { adId: string; status: DirStatus; pending: PendingStatus; onDone: () => void }) {
+function ReelActions({ adId, title, format, status, pending, onDone }: { adId: string; title: string; format: string; status: DirStatus; pending: PendingStatus; onDone: () => void }) {
   const hide = useServerFn(hideReel);
   const submit = useServerFn(submitReelUpdate);
   const cancel = useServerFn(cancelReelUpdate);
   const [busy, setBusy] = useState(false);
+  const [embed, setEmbed] = useState(false);
   const run = async (fn: () => Promise<unknown>, ok: string) => {
     setBusy(true);
     try { await fn(); toast.success(ok); onDone(); }
@@ -194,6 +196,8 @@ function ReelActions({ adId, status, pending, onDone }: { adId: string; status: 
       ) : (
         <AppButton asChild variant="ghost" size="sm"><Link to="/app/ad/$id/share" params={{ id: adId }}>Publish again</Link></AppButton>
       )}
+      {status === "live" && <AppButton variant="ghost" size="sm" onClick={() => setEmbed(true)}>Embed</AppButton>}
+      <EmbedDialog reel={status === "live" ? { id: adId, title, format } : null} open={embed} onClose={() => setEmbed(false)} />
     </div>
   );
 }
