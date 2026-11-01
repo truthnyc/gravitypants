@@ -162,6 +162,13 @@
       "when": 1793542889856,
       "tag": "0022_shopify_web_workspace",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1793543411827,
+      "tag": "0023_brand_join_password",
+      "breakpoints": true
     }
   ]
 }
