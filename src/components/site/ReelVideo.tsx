@@ -28,6 +28,8 @@ function isHandheld() {
 export function ReelVideo({ video, videoWebm, poster, label, className, onPlayingChange, tabIndex, noFullscreen = false }: ReelVideoSource & {
   className?: string;
   onPlayingChange?: (playing: boolean) => void;
+  /** Called with the video's real width/height ratio once metadata loads. */
+  onRatio?: (ratio: number) => void;
   tabIndex?: number;
   /** Set when the surrounding panel handles the click itself (play/pause in place). */
   noFullscreen?: boolean;
