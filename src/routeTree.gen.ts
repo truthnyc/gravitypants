@@ -106,6 +106,7 @@ import { Route as AuthenticatedAppTemplatesIndexRouteImport } from './routes/_au
 import { Route as AuthenticatedAppTemplatesSlugRouteImport } from './routes/_authenticated/app/templates.$slug'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as ApiPublicShopifyAuthRouteImport } from './routes/api/public/shopify/auth'
+import { Route as ApiPublicShopifyConnectRouteImport } from './routes/api/public/shopify/connect'
 import { Route as ApiPublicShopifyExportRouteImport } from './routes/api/public/shopify/export'
 import { Route as ApiPublicShopifyProductsRouteImport } from './routes/api/public/shopify/products'
 import { Route as ApiPublicShopifyReelRouteImport } from './routes/api/public/shopify/reel'
@@ -631,6 +632,11 @@ const ApiPublicShopifyAuthRoute = ApiPublicShopifyAuthRouteImport.update({
   path: '/api/public/shopify/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicShopifyConnectRoute = ApiPublicShopifyConnectRouteImport.update({
+  id: '/api/public/shopify/connect',
+  path: '/api/public/shopify/connect',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicShopifyExportRoute = ApiPublicShopifyExportRouteImport.update({
   id: '/api/public/shopify/export',
   path: '/api/public/shopify/export',
@@ -800,6 +806,7 @@ export interface FileRoutesByFullPath {
   '/app/templates/$slug': typeof AuthenticatedAppTemplatesSlugRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/shopify/auth': typeof ApiPublicShopifyAuthRoute
+  '/api/public/shopify/connect': typeof ApiPublicShopifyConnectRoute
   '/api/public/shopify/export': typeof ApiPublicShopifyExportRoute
   '/api/public/shopify/products': typeof ApiPublicShopifyProductsRoute
   '/api/public/shopify/reel': typeof ApiPublicShopifyReelRoute
@@ -908,6 +915,7 @@ export interface FileRoutesByTo {
   '/app/templates/$slug': typeof AuthenticatedAppTemplatesSlugRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/shopify/auth': typeof ApiPublicShopifyAuthRoute
+  '/api/public/shopify/connect': typeof ApiPublicShopifyConnectRoute
   '/api/public/shopify/export': typeof ApiPublicShopifyExportRoute
   '/api/public/shopify/products': typeof ApiPublicShopifyProductsRoute
   '/api/public/shopify/reel': typeof ApiPublicShopifyReelRoute
@@ -1021,6 +1029,7 @@ export interface FileRoutesById {
   '/_authenticated/app/templates/$slug': typeof AuthenticatedAppTemplatesSlugRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/shopify/auth': typeof ApiPublicShopifyAuthRoute
+  '/api/public/shopify/connect': typeof ApiPublicShopifyConnectRoute
   '/api/public/shopify/export': typeof ApiPublicShopifyExportRoute
   '/api/public/shopify/products': typeof ApiPublicShopifyProductsRoute
   '/api/public/shopify/reel': typeof ApiPublicShopifyReelRoute
@@ -1134,6 +1143,7 @@ export interface FileRouteTypes {
     | '/app/templates/$slug'
     | '/api/public/payments/webhook'
     | '/api/public/shopify/auth'
+    | '/api/public/shopify/connect'
     | '/api/public/shopify/export'
     | '/api/public/shopify/products'
     | '/api/public/shopify/reel'
@@ -1242,6 +1252,7 @@ export interface FileRouteTypes {
     | '/app/templates/$slug'
     | '/api/public/payments/webhook'
     | '/api/public/shopify/auth'
+    | '/api/public/shopify/connect'
     | '/api/public/shopify/export'
     | '/api/public/shopify/products'
     | '/api/public/shopify/reel'
@@ -1354,6 +1365,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/templates/$slug'
     | '/api/public/payments/webhook'
     | '/api/public/shopify/auth'
+    | '/api/public/shopify/connect'
     | '/api/public/shopify/export'
     | '/api/public/shopify/products'
     | '/api/public/shopify/reel'
@@ -1424,6 +1436,7 @@ export interface RootRouteChildren {
   ShopifyReelIdRoute: typeof ShopifyReelIdRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   ApiPublicShopifyAuthRoute: typeof ApiPublicShopifyAuthRoute
+  ApiPublicShopifyConnectRoute: typeof ApiPublicShopifyConnectRoute
   ApiPublicShopifyExportRoute: typeof ApiPublicShopifyExportRoute
   ApiPublicShopifyProductsRoute: typeof ApiPublicShopifyProductsRoute
   ApiPublicShopifyReelRoute: typeof ApiPublicShopifyReelRoute
@@ -2114,6 +2127,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicShopifyAuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/shopify/connect': {
+      id: '/api/public/shopify/connect'
+      path: '/api/public/shopify/connect'
+      fullPath: '/api/public/shopify/connect'
+      preLoaderRoute: typeof ApiPublicShopifyConnectRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/shopify/export': {
       id: '/api/public/shopify/export'
       path: '/api/public/shopify/export'
@@ -2449,6 +2469,7 @@ const rootRouteChildren: RootRouteChildren = {
   ShopifyReelIdRoute: ShopifyReelIdRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   ApiPublicShopifyAuthRoute: ApiPublicShopifyAuthRoute,
+  ApiPublicShopifyConnectRoute: ApiPublicShopifyConnectRoute,
   ApiPublicShopifyExportRoute: ApiPublicShopifyExportRoute,
   ApiPublicShopifyProductsRoute: ApiPublicShopifyProductsRoute,
   ApiPublicShopifyReelRoute: ApiPublicShopifyReelRoute,
