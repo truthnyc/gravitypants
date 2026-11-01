@@ -10,3 +10,4 @@
 - Main size: `projects.primary_format` is the ad's main size; `main-size.ts` holds the five size names and `refitForMainSize`; header `AdPills` changes it on every step; preview size is temporary UI state.
 - Plan gates: every feature check goes through `usePlanAccess().canUse(feature)` in `src/lib/stillframe/plan.ts`; blocked features call `openUpgrade()` (one shared dialog) instead of hiding — one place for plan rules.
 - Templates are photo-less styles; examples reuse `insertCopy`; imported system templates preserve per-slide overrides and logo visibility.
+- Klaviyo: each workspace's own private key is stored AES-GCM encrypted (KLAVIYO_TOKEN_KEY) in service-only `klaviyo_connections`; `klaviyo.functions.ts` verifies membership and sends GIFs via Klaviyo import_from_url with a user-signed storage link, so keys never reach the browser.

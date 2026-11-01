@@ -141,6 +141,13 @@
       "when": 1793482220100,
       "tag": "0019_reel_description_limit_300",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1793539221500,
+      "tag": "0020_klaviyo_connections",
+      "breakpoints": true
     }
   ]
 }

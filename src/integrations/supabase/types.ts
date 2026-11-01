@@ -1044,6 +1044,30 @@ export type Database = {
           },
         ]
       }
+      klaviyo_connections: {
+        Row: {
+          account_name: string | null
+          api_key_enc: string
+          connected_at: string
+          connected_by: string | null
+          workspace_id: string
+        }
+        Insert: {
+          account_name?: string | null
+          api_key_enc: string
+          connected_at?: string
+          connected_by?: string | null
+          workspace_id: string
+        }
+        Update: {
+          account_name?: string | null
+          api_key_enc?: string
+          connected_at?: string
+          connected_by?: string | null
+          workspace_id?: string
+        }
+        Relationships: []
+      }
       mood_families: {
         Row: {
           created_at: string

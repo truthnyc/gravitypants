@@ -31,6 +31,7 @@ import { ExportCancelled, exportGif, exportMp4, isOutOfMemory, killFFmpeg, type 
 import { cn } from "@/lib/utils";
 import { fetchExportStatus, useExportStatus, useRefreshBilling } from "@/lib/stillframe/billing";
 import { ExportFooter } from "./ExportFooter";
+import { KlaviyoDisconnect, KlaviyoSend } from "./KlaviyoSend";
 import { Switch } from "@/components/ui/switch";
 import { RadioGroup } from "@/components/ui/radio-group";
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
@@ -419,7 +420,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
       </div>
       {ready ? (
         <>
-          <StepTitle title="Your files are ready" lead="Download them one by one or all together. Files stay in Previous exports for 30 days." />
+          <StepTitle title="Your files are ready" lead="Download them one by one or all together. Files stay in Previous exports for 30 days, where GIFs can also be sent to Klaviyo." />
           <FileList files={files} state={state} />
           <div className="mt-4 flex flex-wrap gap-2">
             {doneCount > 1 && <AppButton onClick={() => void zipAll(files, state, `${base}.zip`)}><Download className="size-4" strokeWidth={1.7} /> Download all</AppButton>}
@@ -920,6 +921,7 @@ function PreviousExports({ projectId, version }: { projectId: string; version: n
         <DialogContent className="max-h-[85dvh] overflow-y-auto sm:max-w-[640px]">
           <DialogHeader><DialogTitle>Previous exports ({items.length})</DialogTitle><DialogDescription>Kept for 30 days</DialogDescription></DialogHeader>
           {!items.length && <p className="text-[14px] text-ap-muted">No previous exports</p>}
+          <KlaviyoDisconnect />
           <div className="space-y-3">
         {items.map((it) => (
           <div key={it.stamp} className="rounded-[14px] bg-ap-panel p-3">
@@ -931,9 +933,12 @@ function PreviousExports({ projectId, version }: { projectId: string; version: n
               {it.files.map((n) => (
                 <li key={n} className="flex items-center justify-between gap-2 text-[13px]">
                   <span className="truncate">{n}{sizeLabelForFile(n) && <span className="ml-2 text-secondary-text">{sizeLabelForFile(n)}</span>}</span>
-                  <Button variant="ghost" size="sm" onClick={() => void download(it.stamp, n)}>
-                    <Download strokeWidth={1.7} /> Download
-                  </Button>
+                  <span className="flex shrink-0 items-center gap-1">
+                    {/\.gif$/i.test(n) && <KlaviyoSend projectId={projectId} stamp={it.stamp} name={n} />}
+                    <Button variant="ghost" size="sm" onClick={() => void download(it.stamp, n)}>
+                      <Download strokeWidth={1.7} /> Download
+                    </Button>
+                  </span>
                 </li>
               ))}
             </ul>
