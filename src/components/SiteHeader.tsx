@@ -35,6 +35,7 @@ const exploreNav: NavItem[] = [
 ];
 const appNav: NavItem[] = [
   { label: "Your Ads", to: "/app/ads", exact: true },
+  { label: "Brand home", to: "/app/brand-home" },
   { label: "Brand Kit", to: "/app/brand" },
   { label: "Previous Exports", to: "/app/exports" },
   { label: "Brand stats", to: "/app/stats" },
