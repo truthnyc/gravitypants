@@ -25,7 +25,7 @@ function isHandheld() {
  * (preload="none" plus an IntersectionObserver), pauses when it leaves the
  * viewport, and stays still for visitors who prefer reduced motion.
  */
-export function ReelVideo({ video, videoWebm, poster, label, className, onPlayingChange, tabIndex, noFullscreen = false }: ReelVideoSource & {
+export function ReelVideo({ video, videoWebm, poster, label, className, onPlayingChange, onRatio, tabIndex, noFullscreen = false }: ReelVideoSource & {
   className?: string;
   onPlayingChange?: (playing: boolean) => void;
   /** Called with the video's real width/height ratio once metadata loads. */
@@ -120,6 +120,10 @@ export function ReelVideo({ video, videoWebm, poster, label, className, onPlayin
       aria-label={label}
       onPlay={() => onPlayingChange?.(true)}
       onPause={() => onPlayingChange?.(false)}
+      onLoadedMetadata={(event) => {
+        const el = event.currentTarget;
+        if (el.videoWidth && el.videoHeight) onRatio?.(el.videoWidth / el.videoHeight);
+      }}
     >
       {active && videoWebm && <source src={videoWebm} type="video/webm" />}
       {active && <source src={optimizedPublicVideo(video)} type="video/mp4" />}
