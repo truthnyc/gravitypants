@@ -10,3 +10,4 @@
 - `export_status` allows `service_role` so shop routes can enforce the same export rules for member-less workspaces.
 - Slide mutations preserve Frame identity and visual overrides; only template changes/reset rebuild styling, so artwork and custom styling stay together.
 - Shopify billing is Shopify App Pricing only (never appSubscriptionCreate): `app-pricing.server.ts` reads the Partner API and mirrors the plan into the shop workspace's `workspace_billing`, so SQL `export_status`/`record_export` stay the single source of limits; failed checks keep the last confirmed plan.
+- Shopify product videos: `product-media.server.ts` stages the exported MP4 once (stagedUploadsCreate) then productCreateMedia per product; only products already in the reel and that reel's own MP4 exports are accepted. Needs write_products scope.

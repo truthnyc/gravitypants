@@ -3,6 +3,8 @@ import { z } from "zod";
 import { handle, json, shopFromRequest } from "@/lib/shopify/session.server";
 import { checkShopPlan } from "@/lib/shopify/app-pricing.server";
 import { limitsFor } from "@/lib/shopify/app-pricing";
+import { fetchProducts } from "@/lib/shopify/reel.server";
+import { addVideoToProducts, reelProductIds } from "@/lib/shopify/product-media.server";
 
 const Body = z.discriminatedUnion("action", [
   z.object({ action: z.literal("status") }),
@@ -10,6 +12,8 @@ const Body = z.discriminatedUnion("action", [
   z.object({ action: z.literal("welcome") }),
   z.object({ action: z.literal("start"), id: z.string().uuid(), kind: z.enum(["mp4", "gif"]) }),
   z.object({ action: z.literal("download"), path: z.string().max(300) }),
+  z.object({ action: z.literal("products"), id: z.string().uuid() }),
+  z.object({ action: z.literal("add-to-products"), id: z.string().uuid(), path: z.string().max(300), productIds: z.array(z.string().regex(/^gid:\/\/shopify\/Product\/\d+$/)).min(1).max(20) }),
 ]);
 
 // Export allowance uses the same SQL rules as the web app, against the shop's workspace.
@@ -59,6 +63,32 @@ export const Route = createFileRoute("/api/public/shopify/export")({
             const { data: up, error } = await ctx.admin.storage.from("media").createSignedUploadUrl(path);
             if (error || !up) return json({ error: "Could not prepare the upload." }, 500);
             return json({ path, uploadUrl: up.signedUrl, watermark: Boolean(st.watermark) });
+          }
+
+          if (b.action === "products" || b.action === "add-to-products") {
+            const { data: p } = await ctx.admin.from("projects").select("id, name").eq("id", b.id).eq("workspace_id", ctx.ws).maybeSingle();
+            if (!p) return json({ error: "Reel not found." }, 404);
+            const { data: frames } = await ctx.admin.from("frames").select("photo").eq("project_id", b.id).order("position");
+            const ids = reelProductIds((frames ?? []).map((f) => f.photo));
+            if (b.action === "products") {
+              const products = ids.length ? await fetchProducts(ctx.shop, await ctx.accessToken(), ids) : [];
+              return json({ products: products.map((x) => ({ id: x.id, title: x.title })) });
+            }
+            // Only products already in this reel, and only this reel's own MP4 exports.
+            const chosen = b.productIds.filter((x) => ids.includes(x));
+            if (!chosen.length) return json({ error: "Choose a product from this reel." }, 400);
+            if (!b.path.startsWith(`${ctx.ws}/exports/${b.id}/`) || b.path.includes("..") || !b.path.endsWith(".mp4")) return json({ error: "Only MP4 exports can be added to product pages." }, 400);
+            const { data: file, error } = await ctx.admin.storage.from("media").download(b.path);
+            if (error || !file) return json({ error: "File not found." }, 404);
+            try {
+              const r = await addVideoToProducts(ctx.shop, await ctx.accessToken(), file, b.path.split("/").pop()!, chosen, p.name ?? "Product video");
+              return json(r);
+            } catch (e) {
+              const m = (e as Error).message;
+              console.error("shopify add-to-products failed", ctx.shop, m);
+              if (/access denied|write_products|ACCESS_DENIED/i.test(m)) return json({ error: "This store hasn't allowed Gravity Pants to edit products yet. Reopen the app and approve the updated permissions." }, 403);
+              return json({ error: "Shopify couldn't add the video. Please try again." }, 502);
+            }
           }
 
           if (!b.path.startsWith(`${ctx.ws}/exports/`) || b.path.includes("..")) return json({ error: "Not found." }, 404);
