@@ -21,6 +21,7 @@ import { Route as GalleryPatternsRouteImport } from './routes/gallery-patterns'
 import { Route as GifForEmailRouteImport } from './routes/gif-for-email'
 import { Route as HelpRouteImport } from './routes/help'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
+import { Route as Html5AdsRouteImport } from './routes/html5-ads'
 import { Route as InstagramReelsFromPhotosRouteImport } from './routes/instagram-reels-from-photos'
 import { Route as PhotoToVideoRouteImport } from './routes/photo-to-video'
 import { Route as PricingRouteImport } from './routes/pricing'
@@ -176,6 +177,11 @@ const HelpRoute = HelpRouteImport.update({
 const HowItWorksRoute = HowItWorksRouteImport.update({
   id: '/how-it-works',
   path: '/how-it-works',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Html5AdsRoute = Html5AdsRouteImport.update({
+  id: '/html5-ads',
+  path: '/html5-ads',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InstagramReelsFromPhotosRoute =
@@ -711,6 +717,7 @@ export interface FileRoutesByFullPath {
   '/gif-for-email': typeof GifForEmailRoute
   '/help': typeof HelpRoute
   '/how-it-works': typeof HowItWorksRoute
+  '/html5-ads': typeof Html5AdsRoute
   '/instagram-reels-from-photos': typeof InstagramReelsFromPhotosRoute
   '/photo-to-video': typeof PhotoToVideoRoute
   '/pricing': typeof PricingRoute
@@ -820,6 +827,7 @@ export interface FileRoutesByTo {
   '/gif-for-email': typeof GifForEmailRoute
   '/help': typeof HelpRoute
   '/how-it-works': typeof HowItWorksRoute
+  '/html5-ads': typeof Html5AdsRoute
   '/instagram-reels-from-photos': typeof InstagramReelsFromPhotosRoute
   '/photo-to-video': typeof PhotoToVideoRoute
   '/pricing': typeof PricingRoute
@@ -930,6 +938,7 @@ export interface FileRoutesById {
   '/gif-for-email': typeof GifForEmailRoute
   '/help': typeof HelpRoute
   '/how-it-works': typeof HowItWorksRoute
+  '/html5-ads': typeof Html5AdsRoute
   '/instagram-reels-from-photos': typeof InstagramReelsFromPhotosRoute
   '/photo-to-video': typeof PhotoToVideoRoute
   '/pricing': typeof PricingRoute
@@ -1042,6 +1051,7 @@ export interface FileRouteTypes {
     | '/gif-for-email'
     | '/help'
     | '/how-it-works'
+    | '/html5-ads'
     | '/instagram-reels-from-photos'
     | '/photo-to-video'
     | '/pricing'
@@ -1151,6 +1161,7 @@ export interface FileRouteTypes {
     | '/gif-for-email'
     | '/help'
     | '/how-it-works'
+    | '/html5-ads'
     | '/instagram-reels-from-photos'
     | '/photo-to-video'
     | '/pricing'
@@ -1260,6 +1271,7 @@ export interface FileRouteTypes {
     | '/gif-for-email'
     | '/help'
     | '/how-it-works'
+    | '/html5-ads'
     | '/instagram-reels-from-photos'
     | '/photo-to-video'
     | '/pricing'
@@ -1372,6 +1384,7 @@ export interface RootRouteChildren {
   GifForEmailRoute: typeof GifForEmailRoute
   HelpRoute: typeof HelpRoute
   HowItWorksRoute: typeof HowItWorksRoute
+  Html5AdsRoute: typeof Html5AdsRoute
   InstagramReelsFromPhotosRoute: typeof InstagramReelsFromPhotosRoute
   PhotoToVideoRoute: typeof PhotoToVideoRoute
   PricingRoute: typeof PricingRoute
@@ -1504,6 +1517,13 @@ declare module '@tanstack/react-router' {
       path: '/how-it-works'
       fullPath: '/how-it-works'
       preLoaderRoute: typeof HowItWorksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/html5-ads': {
+      id: '/html5-ads'
+      path: '/html5-ads'
+      fullPath: '/html5-ads'
+      preLoaderRoute: typeof Html5AdsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/instagram-reels-from-photos': {
@@ -2389,6 +2409,7 @@ const rootRouteChildren: RootRouteChildren = {
   GifForEmailRoute: GifForEmailRoute,
   HelpRoute: HelpRoute,
   HowItWorksRoute: HowItWorksRoute,
+  Html5AdsRoute: Html5AdsRoute,
   InstagramReelsFromPhotosRoute: InstagramReelsFromPhotosRoute,
   PhotoToVideoRoute: PhotoToVideoRoute,
   PricingRoute: PricingRoute,

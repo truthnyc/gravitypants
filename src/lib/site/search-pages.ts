@@ -137,6 +137,8 @@ export type SearchPage = {
   example: { reelId: string; label: string };
   why: string[];
   section: { title: string; items: string[]; ordered?: boolean } | { title: string; grid: string[] };
+  /** Extra sections rendered after `section`, in order. */
+  extra?: { title: string; items: string[]; ordered?: boolean }[];
   faqs: Faq[];
   related: string[];
 };
@@ -359,6 +361,57 @@ export const SEARCH_PAGES: SearchPage[] = [
     ],
     related: ["/tiktok-video-from-photos", "/instagram-reels-from-photos", "/shopify-product-videos"],
   },
+  {
+    slug: "html5-ads", path: "/html5-ads",
+    title: "HTML5 Ads From Your Photos | Gravity Pants",
+    description: "Turn product photos into an HTML5 ad: a zip with your banner, its fonts and a click-through link, ready to upload to a display ad platform. First one free.",
+    h1: "HTML5 ads from the photos you already have",
+    subhead: "Export your reel as an HTML5 banner: a zip with the ad, your fonts and a click-through link, ready to upload.",
+    example: { reelId: REEL.drusus, label: "Drusus Tabor, Grand Turk Pillow" },
+    why: [
+      "Display ads run on millions of websites and apps, and most ad platforms ask for an HTML5 ad: a small zip with the ad inside it. That is the format they can serve and measure, and it is not held to the file size and length rules that make a GIF blurry or short.",
+      "Your reel already has everything the banner needs: the photos, the words, the logo and the movement. Gravity Pants packs it into a zip with the click-through link written in, so the same ad you post to Instagram can run as a display ad.",
+    ],
+    section: { title: "How to make one", ordered: true, items: [
+      "Open the ad you want to run as a banner and go to Export.",
+      "Under Save as, turn on HTML5.",
+      "Type the page people go to when they tap the banner. Ad platforms can replace this link when they serve the ad.",
+      "Pick the sizes your ad platform asks for, or use Custom size to type any width and height.",
+      "Export and download the zip. Upload it to your ad platform as it is.",
+    ] },
+    extra: [
+      { title: "What is in the zip", items: [
+        "index.html — the banner itself, with its width and height written in the page so ad platforms can read it",
+        "ad.js — the player that runs your ad, built from the same code as your preview",
+        "Your photos, resized for the banner",
+        "The exact fonts your ad uses",
+        "Your click-through link, written in as a click tag",
+      ] },
+      { title: "Where to use it", items: [
+        "Display ad platforms that take an HTML5 zip, such as Display & Video 360 and Campaign Manager 360",
+        "Ad servers and buying platforms that accept a zip of HTML, JavaScript and images",
+        "Your own website: put the zip's files in a folder and show the banner on a page",
+        "Sponsor and newsletter slots that accept an HTML banner instead of a GIF",
+      ] },
+      { title: "Before you upload", items: [
+        "Animation stops within 30 seconds. Your reels are short, so this is usually already true.",
+        "No sound. The banner plays without audio.",
+        "Display & Video 360 allows up to 5 MB for all files in the ad. Google Ads is stricter: 600 KB in total, and only .html, .js, .css, .gif, .png, .jpeg and .svg files.",
+        "Some platforms ask for a still backup image beside the zip. Export a GIF or use one of your photos.",
+        "Social posts still take MP4 or GIF. Instagram, TikTok and Facebook do not run HTML5 ads in feed.",
+      ] },
+    ],
+    faqs: [
+      { q: "What is an HTML5 ad?", a: "A small zip with the ad inside it: an HTML page, a JavaScript player, your images and your fonts. Ad platforms serve it as a display banner and can measure views and clicks. It is the standard format for display ads on websites and apps." },
+      { q: "How is it different from a GIF?", a: "A GIF is one file that plays anywhere, but platforms limit its size and length, so it can turn blurry or cut short. An HTML5 ad is sharper, runs at any size and carries a click-through link, but it has to go to a platform that accepts it." },
+      { q: "Do I need to code anything?", a: "No. Turn on HTML5 in Export and Gravity Pants makes the zip. You upload it as it is." },
+      { q: "Does the banner link work?", a: "Yes. The link you type is written into the ad as a click tag, the standard way ad platforms read where a click should go. Most platforms let you set or replace the link when they serve the ad." },
+      { q: "Will it work on Google Ads?", a: "Not yet. Google Ads only accepts .html, .js, .css, .gif, .png, .jpeg and .svg inside the zip, and 600 KB in total. Gravity Pants bundles your font files, which are not on that list, so uploads there can be rejected. Platforms that take a full HTML5 zip, such as Display & Video 360, work today." },
+      { q: "Does it use another export?", a: "No. One export is one reel, however many files it makes, so adding HTML5 to an export you already run does not use another one." },
+      { q: "Is it free to try?", a: "Yes. HTML5 is on every plan, including your free trial exports." },
+    ],
+    related: ["/gif-for-email", "/product-video-maker", "/video-ads-for-small-business"],
+  },
   industry("jewelry", "jewelry", "Jewelry Video Ads From Your Photos | Gravity Pants",
     "Turn jewelry photos into short video ads and Reels that show the sparkle. Your words, your brand, every size. First one free.",
     [REEL.katherine],
@@ -392,6 +445,7 @@ export const MADE_FOR_LINKS: { label: string; to: string }[] = [
   { label: "Shopify product videos", to: "/shopify-product-videos" },
   { label: "Etsy listing videos", to: "/etsy-listing-videos" },
   { label: "GIFs for email", to: "/gif-for-email" },
+  { label: "HTML5 ads", to: "/html5-ads" },
   { label: "Small business ads", to: "/video-ads-for-small-business" },
   { label: "Jewelry", to: "/for/jewelry" },
   { label: "Home decor", to: "/for/home-decor" },

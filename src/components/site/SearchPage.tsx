@@ -124,6 +124,17 @@ export function SearchPage({ page, reels }: { page: Page; reels: SiteReel[] }) {
         )}
       </section>
 
+      {page.extra?.map((extra) => (
+        <section key={extra.title} className={`${wrap} pb-20`} aria-label={extra.title}>
+          <h2 className={h2}>{extra.title}</h2>
+          {extra.ordered ? (
+            <ol className={`mt-6 max-w-[720px] list-decimal space-y-3 pl-6 ${body}`}>{extra.items.map((t) => <li key={t}>{t}</li>)}</ol>
+          ) : (
+            <ul className={`mt-6 max-w-[720px] list-disc space-y-3 pl-6 ${body}`}>{extra.items.map((t) => <li key={t}>{t}</li>)}</ul>
+          )}
+        </section>
+      ))}
+
       <section className={`${wrap} pb-20`} aria-labelledby="questions">
         <h2 id="questions" className={h2}>Questions</h2>
         <div className="mt-6 max-w-[760px] border-t border-site-line">

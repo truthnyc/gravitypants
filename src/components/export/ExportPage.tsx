@@ -485,7 +485,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             <FormatCard on={mp4} onClick={() => setMp4((v) => !v)} icon={<Film className="size-4" strokeWidth={1.7} />} title="Video MP4" sub="Motion and sound" />
             <FormatCard on={gif} onClick={() => (gif || canUse("gif") ? setGif((v) => !v) : openUpgrade("gif"))} icon={<ImageIcon className="size-4" strokeWidth={1.7} />} title="Animated GIF" sub="Plays anywhere, no sound" />
-            <FormatCard on={html5} onClick={() => setHtml5((v) => !v)} icon={<Code2 className="size-4" strokeWidth={1.7} />} title="HTML5 banner" sub="Display ads, .zip" />
+            <FormatCard on={html5} onClick={() => setHtml5((v) => !v)} icon={<Code2 className="size-4" strokeWidth={1.7} />} title="HTML5" sub="Display ads, .zip" />
           </div>
           {html5 && (
             <div className="mt-3">

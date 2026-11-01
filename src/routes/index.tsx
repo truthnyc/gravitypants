@@ -59,7 +59,7 @@ export const Route = createFileRoute("/")({
           applicationCategory: "MultimediaApplication",
           operatingSystem: "Web browser",
           url: `${SITE_ORIGIN}/`,
-          description: "Turns still product photos into short MP4 video ads and animated GIFs for social media.",
+          description: "Turns still product photos into short MP4 video ads, animated GIFs and HTML5 display ads for social media and the web.",
           publisher: { "@id": `${SITE_ORIGIN}/#org` },
           offers: { "@type": "Offer", name: "Free trial", price: "0", priceCurrency: "USD" },
         },
@@ -211,7 +211,7 @@ const tabCopy: Record<Tab, { title: string; body: string }> = {
   },
   Export: {
     title: "Download every size you need.",
-    body: "Export Vertical 9:16, Portrait 4:5, Square 1:1, Wide 5:4 and Landscape 16:9 together, plus custom sizes. Choose MP4 for ads and social posts, or GIF for email and websites.",
+    body: "Export Vertical 9:16, Portrait 4:5, Square 1:1, Wide 5:4 and Landscape 16:9 together, plus custom sizes. Choose MP4 for ads and social posts, GIF for email and websites, or HTML5 for display ads.",
   },
 };
 function Primary({ children, to = "/signup", cta }: { children: React.ReactNode; to?: "/signup" | "/examples"; cta?: string }) {
@@ -489,7 +489,7 @@ const features = [
   },
   {
     title: "Export all your formats",
-    body: "Download Vertical 9:16, Portrait 4:5, Square 1:1, Wide 5:4 and Landscape 16:9 together as MP4 or GIF.",
+    body: "Download Vertical 9:16, Portrait 4:5, Square 1:1, Wide 5:4 and Landscape 16:9 together as MP4, GIF or HTML5.",
     art: "export",
   },
   {
@@ -551,6 +551,10 @@ function FeatureArt({ art }: { art: string }) {
         <span>
           <b>GIF</b>
           <small>for email &amp; web</small>
+        </span>
+        <span>
+          <b>HTML5</b>
+          <small>for display ads</small>
         </span>
       </div>
     );
@@ -629,7 +633,7 @@ function Home() {
                 <span>16:9</span>
               </div>
               <b>
-                <Check size={14} strokeWidth={2} /> MP4 + GIF ready
+                <Check size={14} strokeWidth={2} /> MP4, GIF + HTML5 ready
               </b>
             </div>
           </div>
@@ -713,7 +717,7 @@ function Home() {
               <div className="home-step-copy">
                 <span>03</span>
                 <h3>Download your files</h3>
-                <p>Get 9:16, 4:5, 1:1, 5:4, 16:9 and custom-size versions as MP4 or GIF, ready for social, ads, email and websites.</p>
+                <p>Get 9:16, 4:5, 1:1, 5:4, 16:9 and custom-size versions as MP4, GIF or HTML5, ready for social, ads, email and websites.</p>
               </div>
             </article>
           </div>
