@@ -99,7 +99,7 @@ function InvitedSignUp() {
   );
 }
 
-function RegularSignUp({ redirect, plan, billing, template }: { redirect?: string | undefined; plan?: "simple" | "business" | "team" | undefined; billing?: "monthly" | "yearly" | undefined; template?: string | undefined }) {
+function RegularSignUp({ redirect, plan, billing, template }: { redirect?: string | undefined; plan?: "starter" | "simple" | "business" | "team" | undefined; billing?: "monthly" | "yearly" | undefined; template?: string | undefined }) {
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");

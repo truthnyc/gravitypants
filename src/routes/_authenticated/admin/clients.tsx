@@ -112,7 +112,7 @@ function InviteClient() {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
-  const [plan, setPlan] = useState<"simple" | "business" | "team">("business");
+  const [plan, setPlan] = useState<"starter" | "simple" | "business" | "team">("business");
   const [until, setUntil] = useState(() => new Date(Date.now() + 365 * 864e5).toISOString().slice(0, 10));
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
