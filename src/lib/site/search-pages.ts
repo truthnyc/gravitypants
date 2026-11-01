@@ -118,6 +118,11 @@ const SOURCE_PHOTOS: Record<string, { src: string; alt: string }[]> = {
     { src: frenchBloomRose.url, alt: "French Bloom Le Rosé alcohol-free sparkling bottle" },
     { src: frenchBloomIce.url, alt: "French Bloom bottles chilling on ice" },
   ],
+  [REEL.drusus]: [
+    { src: drususPair.url, alt: "Drusus Tabor Grand Turk block print pillows in blue and gold" },
+    { src: drususSingle.url, alt: "Drusus Tabor Grand Turk block print pillow, single" },
+    { src: drususSofa.url, alt: "Drusus Tabor block print pillows on a sofa beneath framed paintings" },
+  ],
 };
 export const sourcePhotos = (reelId: string) => SOURCE_PHOTOS[reelId] ?? [];
 
@@ -337,7 +342,7 @@ export const SEARCH_PAGES: SearchPage[] = [
     description: "Make video ads from your product photos, sized for Instagram, Facebook, TikTok and Google. No agency, no editor. Your first ad is free.",
     h1: "Video ads for small businesses",
     subhead: "Make video ads from your product photos, in every size, without an agency or an editor.",
-    example: { reelId: REEL.agnona, label: "Agnona, Seasonal Sale" },
+    example: { reelId: REEL.drusus, label: "Drusus Tabor, Grand Turk Pillow" },
     why: [
       "Ads with movement usually get more attention than still images, but a filmed ad can cost more than a small brand spends on ads all month.",
       "Gravity Pants gives you the same short, branded video ads from photos you already have. Make a few versions, see which one people click, and make more like it.",
