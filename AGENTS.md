@@ -53,3 +53,4 @@
 - Tutorial/Help share `guide.ts`; `GuideScreenshot` uses CDN captures cropped for privacy, independent of the editor.
 - Google video schema points at permanent `/api/public/reel/$id/{video|poster}` links that redirect only published/live Showcase reels to fresh signed files, so search listings never expire while storage stays private.
 - Video sitemap `/sitemap-video.xml` is built from search-page reels via `videoObjects()` so it always matches on-page VideoObject data and uses permanent reel links.
+- The `/embed/reel/$id` player runs the root shell in bare mode (no auth listener, page tracking or notices) because other people's sites frame it where the browser blocks stored sign-in data; keep that route free of app-wide boot.
