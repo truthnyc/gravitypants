@@ -36,6 +36,7 @@ import { Route as ShopifyProductVideosRouteImport } from './routes/shopify-produ
 import { Route as ShowcaseRouteImport } from './routes/showcase'
 import { Route as SigninRouteImport } from './routes/signin'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as SitemapVideoDotxmlRouteImport } from './routes/sitemap-video[.]xml'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as TiktokVideoFromPhotosRouteImport } from './routes/tiktok-video-from-photos'
@@ -257,6 +258,11 @@ const SigninRoute = SigninRouteImport.update({
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapVideoDotxmlRoute = SitemapVideoDotxmlRouteImport.update({
+  id: '/sitemap-video.xml',
+  path: '/sitemap-video.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -757,6 +763,7 @@ export interface FileRoutesByFullPath {
   '/showcase': typeof ShowcaseRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
+  '/sitemap-video.xml': typeof SitemapVideoDotxmlRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/tiktok-video-from-photos': typeof TiktokVideoFromPhotosRoute
@@ -871,6 +878,7 @@ export interface FileRoutesByTo {
   '/showcase': typeof ShowcaseRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
+  '/sitemap-video.xml': typeof SitemapVideoDotxmlRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/tiktok-video-from-photos': typeof TiktokVideoFromPhotosRoute
@@ -986,6 +994,7 @@ export interface FileRoutesById {
   '/showcase': typeof ShowcaseRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
+  '/sitemap-video.xml': typeof SitemapVideoDotxmlRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/tiktok-video-from-photos': typeof TiktokVideoFromPhotosRoute
@@ -1103,6 +1112,7 @@ export interface FileRouteTypes {
     | '/showcase'
     | '/signin'
     | '/signup'
+    | '/sitemap-video.xml'
     | '/sitemap.xml'
     | '/terms'
     | '/tiktok-video-from-photos'
@@ -1217,6 +1227,7 @@ export interface FileRouteTypes {
     | '/showcase'
     | '/signin'
     | '/signup'
+    | '/sitemap-video.xml'
     | '/sitemap.xml'
     | '/terms'
     | '/tiktok-video-from-photos'
@@ -1331,6 +1342,7 @@ export interface FileRouteTypes {
     | '/showcase'
     | '/signin'
     | '/signup'
+    | '/sitemap-video.xml'
     | '/sitemap.xml'
     | '/terms'
     | '/tiktok-video-from-photos'
@@ -1448,6 +1460,7 @@ export interface RootRouteChildren {
   ShowcaseRoute: typeof ShowcaseRoute
   SigninRoute: typeof SigninRoute
   SignupRoute: typeof SignupRoute
+  SitemapVideoDotxmlRoute: typeof SitemapVideoDotxmlRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   TiktokVideoFromPhotosRoute: typeof TiktokVideoFromPhotosRoute
@@ -1673,6 +1686,13 @@ declare module '@tanstack/react-router' {
       path: '/signup'
       fullPath: '/signup'
       preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap-video.xml': {
+      id: '/sitemap-video.xml'
+      path: '/sitemap-video.xml'
+      fullPath: '/sitemap-video.xml'
+      preLoaderRoute: typeof SitemapVideoDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.xml': {
@@ -2507,6 +2527,7 @@ const rootRouteChildren: RootRouteChildren = {
   ShowcaseRoute: ShowcaseRoute,
   SigninRoute: SigninRoute,
   SignupRoute: SignupRoute,
+  SitemapVideoDotxmlRoute: SitemapVideoDotxmlRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   TiktokVideoFromPhotosRoute: TiktokVideoFromPhotosRoute,
