@@ -7,14 +7,18 @@ import { currentWorkspaceId, isPaid, money, useBilling, useManageBilling, usePla
 import { cn } from "@/lib/utils";
 
 const FEATURE: Record<string, string[]> = {
+  starter: ["5 exports every month", "1 seat"],
+  starter_yearly: ["5 exports every month", "1 seat"],
   simple: ["10 exports every month", "1 seat"],
   simple_yearly: ["10 exports every month", "1 seat"],
-  business: ["50 exports every month", "1 seat"],
-  business_yearly: ["50 exports every month", "1 seat"],
-  team: ["150 shared exports every month", "You + 4 teammates", "Shared brand kits and templates", "Priority support"],
-  team_yearly: ["150 shared exports every month", "You + 4 teammates", "Shared brand kits and templates", "Priority support"],
+  business: ["30 exports every month", "1 seat", "HTML5 export", "Aimanté insights"],
+  business_yearly: ["30 exports every month", "1 seat", "HTML5 export", "Aimanté insights"],
+  team: ["150 shared exports every month", "You + 4 teammates", "HTML5 export", "Shared brand kits and templates", "Priority support"],
+  team_yearly: ["150 shared exports every month", "You + 4 teammates", "HTML5 export", "Shared brand kits and templates", "Priority support"],
 };
 const CTA: Record<string, { label: string; variant: "plain" | "default" }> = {
+  starter: { label: "Choose Starter", variant: "plain" },
+  starter_yearly: { label: "Choose Starter Yearly", variant: "plain" },
   simple: { label: "Choose Simple", variant: "plain" },
   simple_yearly: { label: "Choose Simple Yearly", variant: "plain" },
   business: { label: "Choose Business", variant: "default" },
@@ -44,7 +48,7 @@ export function PlanCards({ compact = false }: { compact?: boolean }) {
 
   return (
     <>
-      <div className={cn("grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3", compact ? "gap-3" : "gap-5")}>
+      <div className={cn("grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4", compact ? "gap-3" : "gap-5")}>
         {(plans ?? []).map((p) => {
           const current = paid && billing?.plan === p.id;
           const cta = CTA[p.id] ?? { label: `Choose ${p.name}`, variant: "plain" as const };

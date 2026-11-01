@@ -15,7 +15,7 @@ export const Route = createFileRoute("/signup")({
   validateSearch: z.object({
     redirect: z.string().optional(),
     template: z.string().optional(),
-    plan: z.enum(["simple", "business", "team"]).optional(),
+    plan: z.enum(["starter", "simple", "business", "team"]).optional(),
     billing: z.enum(["monthly", "yearly"]).optional(),
     invited: z.coerce.string().optional(),
     ref: z.string().optional(),

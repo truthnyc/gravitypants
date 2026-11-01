@@ -267,7 +267,7 @@ function ActionDialog({ act, name, id, onClose, onDone }: { act: Act; name: stri
           )}
           {act === "comp_plan" && (
             <div className="flex items-center gap-2">
-              {(["simple", "business", "team"] as const).map((p) => (
+              {(["starter", "simple", "business", "team"] as const).map((p) => (
                 <Button key={p} variant={plan === p ? "default" : "plain"} size="sm" onClick={() => setPlan(p)}>{planLabel(p)}</Button>
               ))}
               <span className="text-secondary-text">until</span>

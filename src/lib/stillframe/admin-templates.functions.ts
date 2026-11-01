@@ -153,7 +153,7 @@ export const adminTemplateSave = createServerFn({ method: "POST" })
 export const adminTemplatePublish = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d) =>
-    z.object({ id: z.string().uuid(), doc: docSchema, audience: z.array(z.enum(["simple", "business", "team"])), newBadge: z.boolean(), featured: z.boolean() }).parse(d),
+    z.object({ id: z.string().uuid(), doc: docSchema, audience: z.array(z.enum(["starter", "simple", "business", "team"])), newBadge: z.boolean(), featured: z.boolean() }).parse(d),
   )
   .handler(async ({ data, context }) => {
     const ctx = context as any as Ctx;
