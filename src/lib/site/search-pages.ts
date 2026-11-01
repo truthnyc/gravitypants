@@ -149,7 +149,7 @@ export const SEARCH_STEPS = STEPS;
 const PHOTO_FAQS: Faq[] = [
   { q: "How many photos do I need?", a: "Three is enough. You can use up to eight." },
   { q: "Do I need editing skills?", a: "No. You tap a photo, headline or logo to change it." },
-  { q: "What do I get?", a: "An MP4 or GIF in every size: 9:16, 4:5, 1:1, 5:4, 16:9 and custom." },
+  { q: "What do I get?", a: "An MP4 or GIF in every size: 9:16, 4:5, 1:1, 5:4, 16:9 and custom. HTML5 zips for display ads are available too." },
   { q: "Is it free?", a: "Your first video is free, with no watermark and no card." },
 ];
 
