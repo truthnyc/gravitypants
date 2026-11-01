@@ -64,9 +64,9 @@ const ORIGINAL: BlogPost[] = [
         ],
       },
       {
-        h: "5. Download an MP4 or GIF",
+        h: "5. Download an MP4, GIF or HTML5",
         p: [
-          "Export the finished reel as an MP4 for social posts or as an animated GIF for emails and websites. You can export the other sizes from the same ad, so one set of photos covers several places.",
+          "Export the finished reel as an MP4 for social posts, as an animated GIF for emails and websites, or as an HTML5 zip for display ad networks. You can export the other sizes from the same ad, so one set of photos covers several places.",
           "Then post it where your customers already look.",
         ],
       },
