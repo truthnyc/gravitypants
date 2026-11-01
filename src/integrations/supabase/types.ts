@@ -1907,6 +1907,7 @@ export type Database = {
           current_period_start: string | null
           environment: string
           extra_exports: number
+          grandfathered_exports: number | null
           last_topup_session: string | null
           plan: string
           referral_credits: number
@@ -1926,6 +1927,7 @@ export type Database = {
           current_period_start?: string | null
           environment?: string
           extra_exports?: number
+          grandfathered_exports?: number | null
           last_topup_session?: string | null
           plan?: string
           referral_credits?: number
@@ -1945,6 +1947,7 @@ export type Database = {
           current_period_start?: string | null
           environment?: string
           extra_exports?: number
+          grandfathered_exports?: number | null
           last_topup_session?: string | null
           plan?: string
           referral_credits?: number
