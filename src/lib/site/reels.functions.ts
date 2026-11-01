@@ -51,6 +51,7 @@ export const listSiteReels = createServerFn({ method: "GET" }).handler(async ():
       videoWebm: resolve(r.video_webm_url),
       poster: resolve(r.poster_url),
       source: "studio" as const,
+      uploadDate: r.created_at as string,
     } as SiteReel }))
     .filter((x) => x.reel.video);
   const client = await featuredDirectoryReels().catch((e) => { console.error("featured directory reels failed", e); return []; });
@@ -87,7 +88,7 @@ async function featuredDirectoryReels() {
   return keep.flatMap((r: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
     const l = len.get(r.ad_id) ?? { sec: 0, n: 0 };
     const reel = directoryToSiteReel({ ...r, brand: r.directory_brands, video: res(r.video_url), poster: res(r.poster_url), seconds: Math.round(l.sec * 10) / 10, photos: l.n });
-    return reel ? [{ reel, order: Number(r.showcase_order ?? 0), created: r.created_at as string }] : [];
+    return reel ? [{ reel: { ...reel, uploadDate: r.created_at as string }, order: Number(r.showcase_order ?? 0), created: r.created_at as string }] : [];
   });
 }
 
