@@ -5,7 +5,7 @@
 import { zipSync, strToU8 } from "fflate";
 import runtimeJs from "virtual:html5-runtime";
 import type { CustomFont } from "@/lib/stillframe/types";
-import { allFormatFrames } from "@/lib/stillframe/format-settings";
+import { allFormatFrames, projectForFormat, REEL_FORMATS } from "@/lib/stillframe/format-settings";
 import { getMediaUrl } from "@/lib/stillframe/media";
 import { DEFAULT_FONT, fontFamilyOf } from "./renderFrame";
 import { ExportCancelled, type RenderInput } from "./exportMedia";
@@ -48,10 +48,11 @@ export async function exportHtml5(input: RenderInput, opts: Html5Options, signal
   // Images: resized to what this banner can show (2x for sharp screens).
   const maxSide = Math.max(input.width, input.height) * 2.5;
   const alphaPaths = new Set<string>();
-  for (const p of [project.logo.path, project.logo.light_path, project.logo.dark_path]) if (p) alphaPaths.add(p);
+  for (const format of REEL_FORMATS) {
+    const l = projectForFormat(project, format).logo;
+    for (const p of [l.path, l.light_path, l.dark_path]) if (p) alphaPaths.add(p);
+  }
   for (const f of all) if (f.subline?.mode === "image" && f.subline.image_path) alphaPaths.add(f.subline.image_path);
-  const lp = (project as unknown as { formats?: Record<string, { logo?: { path?: string; light_path?: string; dark_path?: string } }> }).formats;
-  if (lp) for (const v of Object.values(lp)) for (const p of [v?.logo?.path, v?.logo?.light_path, v?.logo?.dark_path]) if (p) alphaPaths.add(p);
   const imageMap: Record<string, string> = {};
   let i = 0;
   const entries = [...images.entries()];
@@ -73,7 +74,7 @@ export async function exportHtml5(input: RenderInput, opts: Html5Options, signal
   }
   const endFam = brand?.font || DEFAULT_FONT;
   specs.set(`600|${endFam}`, { family: endFam, weight: 600 });
-  const text = all.map((f) => `${f.headline?.text ?? ""} ${f.subline?.mode === "image" ? "" : f.subline?.text ?? ""}`).join(" ") + " Made with Gravity Pants " + (project.end_card?.text ?? "");
+  const text = all.map((f) => `${f.headline?.text ?? ""} ${f.subline?.mode === "image" ? "" : f.subline?.text ?? ""}`).join(" ") + " Made with Gravity Pants " + (project.end_card?.cta_text ?? "") + " " + (brand?.endCard?.cta_text ?? "");
   const fonts: Html5Doc["fonts"] = [];
   let n = 0;
   for (const { family, weight } of specs.values()) {
