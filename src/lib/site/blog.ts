@@ -205,7 +205,7 @@ const ORIGINAL_PAGES: Record<string, string[]> = {
   "why-tap-anything": ["/photo-to-video"],
 };
 
-export const POSTS: BlogPost[] = [...GUIDES, ...ORIGINAL.map((p) => ({ ...p, pages: p.pages ?? ORIGINAL_PAGES[p.slug] }))];
+export const POSTS: BlogPost[] = [...GUIDES, ...ORIGINAL.map((p) => ({ ...p, pages: p.pages ?? ORIGINAL_PAGES[p.slug] ?? [] }))];
 
 /** Articles that support a landing page, for its Related links. */
 export const postsForPage = (path: string) => POSTS.filter((p) => p.pages?.includes(path));
