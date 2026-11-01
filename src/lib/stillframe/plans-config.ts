@@ -3,28 +3,35 @@
  * Read by the public /pricing page and by the app's plan checks (plan.ts, plan-map.ts).
  * The payment provider prices and the SQL export_status limits must match these numbers.
  */
-export type PlanId = "simple" | "business" | "team";
+export type PlanId = "starter" | "simple" | "business" | "team";
 export type Billing = "monthly" | "yearly";
 
 export const TRIAL = {
-  name: "Free trial",
-  exports: 3, // in total, no time limit
+  name: "Free",
+  exports: 6, // in total, no time limit
   cleanExports: 1, // the first export has no watermark
   watermark: true, // exports after the clean one
-  blurb: "Your first reel free, no watermark. Try every feature, then 2 more watermarked exports. No credit card.",
+  blurb: "Your first reel free, no watermark. Then 5 more watermarked exports. No credit card.",
 } as const;
 
-/** Extra export packs: never expire, usable on any plan. Priced so no pack beats Business per export.
+/** Extra export packs: never expire, paid plans only (checked server-side in createTopUpSession).
  *  Ids are payment price ids; the webhook credits `exports` for the matching id. */
 export const EXPORT_PACKS = [
-  { id: "extra_exports_5", exports: 5, price: 15 },
-  { id: "extra_exports_10", exports: 10, price: 25 },
-  { id: "extra_exports_20", exports: 20, price: 45 },
+  { id: "extra_exports_5", exports: 5, price: 25 },
+  { id: "extra_exports_10", exports: 10, price: 45 },
+  { id: "extra_exports_20", exports: 20, price: 80 },
 ] as const;
 export type ExportPackId = (typeof EXPORT_PACKS)[number]["id"];
-export const PACKS_LINE = "Extra exports: 5 for $15, 10 for $25, 20 for $45";
+export const PACKS_LINE = "Extra exports: 5 for $25, 10 for $45, 20 for $80";
 
-export const YEARLY_LABEL = "two months included";
+export const YEARLY_LABEL = "2 months free";
+
+/** Plan families that may buy export packs. */
+export const PACK_TIERS: readonly string[] = ["starter", "simple", "business", "team"];
+/** Plan families with HTML5 export and Aimanté insights. */
+export const HTML5_TIERS: readonly string[] = ["business", "team"];
+
+export const REFERRAL_NOTE = "Give a reel, get a reel. Share your referral link: when a friend signs up and exports their first reel, you get 1 free export with no watermark.";
 
 export type PlanConfig = {
   id: PlanId;
@@ -42,6 +49,18 @@ export type PlanConfig = {
 
 export const PLANS: PlanConfig[] = [
   {
+    id: "starter",
+    name: "Starter",
+    tagline: "For trying video ads on a few products.",
+    seats: 1,
+    monthlyExports: 5,
+    sharedExports: false,
+    monthly: 19,
+    yearly: 190,
+    team: false,
+    features: ["1 seat", "5 exports a month", "No watermark", "MP4 and GIF", "Brand kit: logo, colors, fonts", "Every Google Font"],
+  },
+  {
     id: "simple",
     name: "Simple",
     tagline: "For businesses making a few ads each month.",
@@ -56,14 +75,14 @@ export const PLANS: PlanConfig[] = [
   {
     id: "business",
     name: "Business",
-    tagline: "For businesses making ads every week.",
+    tagline: "For businesses running ads every week.",
     seats: 1,
-    monthlyExports: 50,
+    monthlyExports: 30,
     sharedExports: false,
-    monthly: 125,
-    yearly: 1250,
+    monthly: 79,
+    yearly: 790,
     team: false,
-    features: ["Everything in Simple", "50 exports a month"],
+    features: ["Everything in Simple", "30 exports a month", "HTML5 export", "Aimanté insights"],
   },
   {
     id: "team",
@@ -75,9 +94,12 @@ export const PLANS: PlanConfig[] = [
     monthly: 175,
     yearly: 1750,
     team: true,
-    features: ["Everything in Business", "You + 4 teammates", "150 exports a month, shared", "Shared brand kits", "Shared templates", "Priority support"],
+    features: ["Everything in Business", "HTML5 export", "You + 4 teammates", "150 exports a month, shared", "Shared brand kits", "Shared templates", "Priority support"],
   },
 ];
+
+/** The plan marked "Most popular" on /pricing. */
+export const POPULAR_PLAN: PlanId = "business";
 
 /** Customer-visible Stripe catalogue copy, derived from the same plan rows shown on /pricing. */
 export function checkoutProductCopy(p: PlanConfig) {
@@ -91,15 +113,17 @@ export const planById = (id: PlanId) => PLANS.find((p) => p.id === id)!;
 
 const usd = (n: number) => `$${n.toLocaleString("en-US")}`;
 
-/** Price text for a plan card in the chosen billing mode. */
+/** Cost of one reel at the plan's monthly price, e.g. "$3.50". */
+export const perReel = (p: PlanConfig) => `$${(p.monthly / p.monthlyExports).toFixed(2)}`;
+
+/** Price text for a plan card in the chosen billing mode. Yearly shows the per-month equivalent. */
 export function priceFor(p: PlanConfig, billing: Billing) {
   if (billing === "yearly" && p.yearly != null) {
     const perMonth = Math.round(p.yearly / 12);
-    const saved = p.monthly * 12 - p.yearly;
-    return { price: usd(p.yearly), per: "/ year", note: `About ${usd(perMonth)} a month · save ${usd(saved)}` };
+    return { price: usd(perMonth), per: "/mo", note: `billed ${usd(p.yearly)} yearly` };
   }
   const note = billing === "yearly" ? "Monthly billing only" : p.seats > 1 ? `Billed monthly · ${p.seats} seats` : "Billed monthly";
-  return { price: usd(p.monthly), per: "/ month", note };
+  return { price: usd(p.monthly), per: "/mo", note };
 }
 
 export function signupHref(p: PlanConfig, billing: Billing) {
@@ -108,43 +132,52 @@ export function signupHref(p: PlanConfig, billing: Billing) {
 }
 
 type Cell = string | boolean;
-export type CompareRow = { label: string; href?: string; cells: [Cell, Cell, Cell, Cell] }; // trial, simple, business, team
+export type CompareRow = { label: string; href?: string; cells: Cell[] }; // free, then each plan in PLANS order
 export type CompareGroup = { group: string; rows: CompareRow[] };
 
-const S = planById("simple"), B = planById("business"), T = planById("team");
 const priceCell = (p: PlanConfig) => (p.yearly ? `${usd(p.monthly)} / month|or ${usd(p.yearly)} / year` : `${usd(p.monthly)} / month`);
+const all = (v: Cell) => [v, ...PLANS.map(() => v)];
+const byPlan = (free: Cell, f: (p: PlanConfig) => Cell) => [free, ...PLANS.map(f)];
 
 export const COMPARE: CompareGroup[] = [
   {
     group: "Plan",
     rows: [
-      { label: "Price", cells: ["Free, no card", priceCell(S), priceCell(B), priceCell(T)] },
-      { label: "Seats", cells: ["1", String(S.seats), String(B.seats), String(T.seats)] },
-      { label: "Exports a month", cells: [`${TRIAL.exports} in total`, String(S.monthlyExports), String(B.monthlyExports), `${T.monthlyExports}, shared`] },
-      { label: "Watermark", cells: ["After first export", "No", "No", "No"] },
-      { label: "Aimanté brand page", href: "https://aimante.co/join", cells: ["Your page, reels without a watermark", "Full page, unlimited reels", "Full page + insights", "Full page + insights"] },
+      { label: "Price", cells: byPlan("Free, no card", priceCell) },
+      { label: "Cost per reel", cells: byPlan("—", perReel) },
+      { label: "Seats", cells: byPlan("1", (p) => String(p.seats)) },
+      { label: "Exports a month", cells: byPlan(`${TRIAL.exports} in total`, (p) => (p.sharedExports ? `${p.monthlyExports}, shared` : String(p.monthlyExports))) },
+      { label: "Watermark", cells: byPlan("After first export", () => "No") },
+      { label: "Export packs", cells: byPlan(false, () => true) },
+      { label: "Aimanté brand page", href: "https://aimante.co/join", cells: byPlan("Your page, reels without a watermark", (p) => (HTML5_TIERS.includes(p.id) ? "Full page + insights" : "Full page, unlimited reels")) },
     ],
   },
   {
     group: "Create & export",
-    rows: ["9:16, 4:5, 1:1, 5:4, 16:9 and custom", "MP4", "GIF", "Every Google Font"].map((label) => ({ label, cells: [true, true, true, true] as [Cell, Cell, Cell, Cell] })),
+    rows: [
+      ...["9:16, 4:5, 1:1, 5:4, 16:9 and custom", "MP4", "GIF", "Every Google Font"].map((label) => ({ label, cells: all(true) })),
+      { label: "HTML5", cells: byPlan(false, (p) => HTML5_TIERS.includes(p.id)) },
+    ],
   },
   {
     group: "Brand & reuse",
-    rows: ["Brand kit", "Duplicate with new photos", "Save as template"].map((label) => ({ label, cells: [true, true, true, true] as [Cell, Cell, Cell, Cell] })),
+    rows: [
+      { label: "Brand kit", cells: all(true) },
+      ...["Duplicate with new photos", "Save as template"].map((label) => ({ label, cells: byPlan(true, (p) => p.id !== "starter") })),
+    ],
   },
   {
     group: "Team",
-    rows: ["Shared brand kits", "Shared templates", "Priority support"].map((label) => ({ label, cells: [false, S.team, B.team, T.team] as [Cell, Cell, Cell, Cell] })),
+    rows: ["Shared brand kits", "Shared templates", "Priority support"].map((label) => ({ label, cells: byPlan(false, (p) => p.team) })),
   },
 ];
 
 export const FAQ = [
-  { q: "Can I try it before paying?", a: "Yes. Every account begins with a free trial, with no time limit and no card. Your first reel exports without a watermark, and you get 2 more exports with a small Gravity Pants mark. Your reels and brand kit stay saved, and a reel on Aimanté stays live." },
-  { q: "What if I need more than 10 exports on Simple?", a: "Buy a pack from Account → Billing whenever you need it: 5 exports for $15, 10 for $25 or 20 for $45. Extra exports never expire and work on any plan, so a busy month doesn’t mean jumping to Business." },
+  { q: "Can I try it before paying?", a: "Yes. Every account starts on the Free plan, with no time limit and no card. Your first export has no watermark, and you get 5 more exports with a small Gravity Pants mark. Your reels and brand kit stay saved, and a reel on Aimanté stays live." },
+  { q: "What if I need more than 10 exports on Simple?", a: "Upgrading is usually the better deal: Business gives you 30 exports a month for $79. For a one-off busy month, buy a pack from Account → Billing: 5 exports for $25, 10 for $45 or 20 for $80. Packs never expire and are available on every paid plan." },
   { q: "What kind of photos work best?", a: "Clear product photos with some space around the product work best. Phone photos are fine: three to five of them make a good reel." },
-   { q: "Which formats can I export?", a: "Choose Vertical 9:16 for Reels, Stories and TikTok; Portrait 4:5, recommended for Instagram, Facebook and LinkedIn feeds; Square 1:1 for square posts; Wide 5:4 for websites, Facebook and LinkedIn feeds; or Landscape 16:9 for banners and YouTube. Custom sizes are available too. Each selected shape exports as MP4, GIF or both." },
+  { q: "Which formats can I export?", a: "Choose Vertical 9:16 for Reels, Stories and TikTok; Portrait 4:5, recommended for Instagram, Facebook and LinkedIn feeds; Square 1:1 for square posts; Wide 5:4 for websites, Facebook and LinkedIn feeds; or Landscape 16:9 for banners and YouTube. Custom sizes are available too. Each selected shape exports as MP4, GIF or both. HTML5 is on Business and Team." },
   { q: "Can I cancel anytime?", a: "Yes. Cancel from Account → Billing in the app whenever you like. You keep full access until the end of the period you've already paid for, and we don't charge you again." },
-  { q: "Do I own the reels I make?", a: "Yes. Every reel you export is yours to use wherever you like, forever — including reels made during the free trial. We never claim any rights over your photos or your finished videos." },
-  { q: "Do you offer discounts?", a: "Yearly billing already saves you 17% on every plan. If you're a nonprofit or a school, write to info@gravitypants.com and we'll see what we can do." },
+  { q: "Do I own the reels I make?", a: "Yes. Every reel you export is yours to use wherever you like, forever — including reels made on the Free plan. We never claim any rights over your photos or your finished videos." },
+  { q: "Do you offer discounts?", a: "Yes. Registered nonprofits get 10% off any plan: write to help@gravitypants.com with proof of status. Yearly billing also gives you 2 months free on every plan." },
 ];
