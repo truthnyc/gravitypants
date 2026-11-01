@@ -58,7 +58,7 @@ export const GUIDE_SECTIONS: readonly GuideSectionData[] = [
     tip: "You can make a reel here with your own photos without connecting a Shopify store.",
     imageDescription: "Product photo tiles lead into a vertical reel preview." },
   { id: "billing", title: "Plans and billing", shortTitle: "Plans & billing", illustration: "billing",
-    steps: ["Open Account → Billing to see your plan and remaining exports. The free trial has no time limit; its included exports do not reset each month.", `${PLANS.map((p) => `${p.name} includes ${p.monthlyExports}`).join(", ")} exports a month. Choose a plan when you need to keep exporting.`, `Need more exports? Top-ups come in packs of ${EXPORT_PACKS.map((p) => p.exports).join(", ")} and never expire.`, "Workspace owners and admins can change billing. If you already have a billing account, use Manage billing to update payment details or cancel."],
+    steps: ["Open Account → Billing to see your plan and remaining exports. The Free plan has no time limit; its included exports do not reset each month.", `${PLANS.map((p) => `${p.name} includes ${p.monthlyExports}`).join(", ")} exports a month. Choose a plan when you need to keep exporting.`, `Need more exports? On a paid plan, top-ups come in packs of ${EXPORT_PACKS.map((p) => p.exports).join(", ")} and never expire.`, "Workspace owners and admins can change billing. If you already have a billing account, use Manage billing to update payment details or cancel."],
     tip: "The remaining count belongs to the selected workspace and its billing coverage. Check which workspace you are in before changing a plan.",
     imageDescription: "A plan summary with an exports-used meter and separate extra-export balance.", link: { label: "Open Billing", to: "/app/account/billing" } },
   { id: "support", title: "Troubleshooting and support", shortTitle: "Support", illustration: "support", support: true,
@@ -69,7 +69,7 @@ export const GUIDE_SECTIONS: readonly GuideSectionData[] = [
 
 export const HELP_FAQ = [
   ["How do I make an ad?", "On Your Ads, start a new ad. Choose a main size, add your photos, then edit the words and logo before exporting."],
-  ["What does the free trial include?", TRIAL_ANSWER],
+  ["What does the Free plan include?", TRIAL_ANSWER],
   ["How long are my files kept?", "Finished exports stay under Previous exports for 30 days."],
   ["How do I change or cancel my plan?", "Go to Account → Billing and choose Manage billing."],
   ["Can I share with my team?", `On the Team plan, you and up to ${(team?.seats ?? 5) - 1} teammates share brand kits, templates and ${team?.monthlyExports ?? 150} exports a month.`],
