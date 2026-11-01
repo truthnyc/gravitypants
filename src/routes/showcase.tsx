@@ -1,7 +1,6 @@
 import { ConceptReelNotice } from "@/components/directory/ConceptReelNotice";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, ArrowUpRight, Download } from "lucide-react";
-import { reelDownloadUrl } from "@/lib/site/reel-download";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { ReelVideo } from "@/components/site/ReelVideo";
 import { SiteReelHeart } from "@/components/site/SiteReelHeart";
@@ -65,7 +64,7 @@ function BrandCard({ reel }: { reel: SiteReel }) {
               Visit {reel.brand} <ArrowUpRight size={15} strokeWidth={1.7} />
             </a>
           )}
-          {reelDownloadUrl(reel.video, reel.title) && <a className="showcase-visit" data-cta="reel-download" onClick={() => window.__lovableEvents?.track?.("project.reel_download_clicked", { reel_id: reel.id, reel_title: reel.title.slice(0, 80), page: "showcase" })} href={reelDownloadUrl(reel.video, reel.title)!} download target="_blank" rel="noreferrer">Download reel <Download size={15} strokeWidth={1.7} /></a>}
+          
         </div>
       </div>
     </article>
