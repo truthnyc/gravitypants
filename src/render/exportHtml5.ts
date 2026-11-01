@@ -99,8 +99,11 @@ export async function exportHtml5(input: RenderInput, opts: Html5Options, signal
       continue;
     }
     for (const face of await googleFaces(family, weight, text)) {
-      const name = `font${++n}.${face.url.split("?")[0]!.split(".").pop() || "woff2"}`;
-      files[name] = await fetchBytes(face.url);
+      const r = await fetch(face.url);
+      if (!r.ok) continue;
+      const type = r.headers.get("content-type") ?? "";
+      const name = `font${++n}.${type.includes("woff2") ? "woff2" : type.includes("woff") ? "woff" : "ttf"}`;
+      files[name] = new Uint8Array(await r.arrayBuffer());
       fonts.push({ family, weight, file: name, ...(face.range ? { unicodeRange: face.range } : {}) });
     }
   }
