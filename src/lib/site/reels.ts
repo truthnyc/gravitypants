@@ -26,6 +26,8 @@ export type SiteReel = {
   poster: string | null;
   /** "studio" = admin-uploaded site reel; "client" = featured Directory reel. Missing means studio. */
   source?: "studio" | "client";
+  /** When the reel was published (ISO); used for search video results. */
+  uploadDate?: string;
 };
 
 /** Files uploaded from the admin form are stored as `site-reels:<path>`. */

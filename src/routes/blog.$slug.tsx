@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { SiteShell } from "@/components/site/SiteShell";
 import { BlogVisual } from "@/components/site/BlogVisual";
-import { SearchPageLinks } from "@/components/site/SearchPage";
+import { SearchPageLinks, relatedLabel } from "@/components/site/SearchPage";
 import { POSTS, postBySlug } from "@/lib/site/blog";
 import { SITE_OG_IMAGE, SITE_ORIGIN, siteHead } from "@/lib/site/seo";
 
@@ -75,7 +75,15 @@ function BlogPostPage() {
             {block.visual && <BlogVisual kind={block.visual} />}
           </section>
         ))}
-        {post.slug === "how-to-turn-photos-into-a-video" && <SearchPageLinks className="mt-12" paths={["/photo-to-video", "/instagram-reels-from-photos", "/tiktok-video-from-photos", "/product-video-maker"]} />}
+        {post.pages?.length ? (
+          <aside className="mt-12 rounded-lg bg-site-panel p-6">
+            <p className="text-[17px] font-semibold text-site-ink">Make yours with Gravity Pants</p>
+            <ul className="mt-3 space-y-2">
+              {post.pages.map((p) => <li key={p}><a href={p} data-cta={`blog-${post.slug}-page-${p.replace(/\W+/g, "-").replace(/^-|-$/g, "")}`} className="text-[17px] text-site-primary hover:underline">{relatedLabel(p)}</a></li>)}
+            </ul>
+          </aside>
+        ) : null}
+        {post.slug === "how-to-turn-photos-into-a-video" && <SearchPageLinks className="mt-12" paths={["/instagram-reels-from-photos", "/tiktok-video-from-photos", "/product-video-maker"]} />}
       </article>
 
       <section className="mx-auto w-full max-w-[1248px] px-5 pb-24 md:px-8 lg:px-16 xl:px-24">

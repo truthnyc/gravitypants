@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { listSiteReels } from "@/lib/site/reels.functions";
 import type { SiteReel } from "@/lib/site/reels";
 import { siteHead } from "@/lib/site/seo";
-import { POSTS } from "@/lib/site/blog";
+import { videoObjects } from "@/lib/site/video-schema";
+import { POSTS, postsForPage } from "@/lib/site/blog";
 import { SEARCH_PAGES, SEARCH_STEPS, sourcePhotos, type SearchPage as Page } from "@/lib/site/search-pages";
 
 const ASPECT: Record<string, string> = { "916": "9 / 16", "11": "1 / 1", "169": "16 / 9" };
@@ -20,14 +21,17 @@ export function relatedLabel(path: string) {
 export function searchPageRoute(page: Page) {
   return {
     loader: async () => ({ reels: await listSiteReels().catch(() => [] as SiteReel[]) }),
-    head: () => {
+    head: ({ loaderData }: { loaderData?: { reels: SiteReel[] } }) => {
       const head = siteHead({ path: page.path, title: page.title, description: page.description });
       const faq = {
         "@context": "https://schema.org",
         "@type": "FAQPage",
         mainEntity: page.faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
       };
-      return { ...head, scripts: [{ type: "application/ld+json", children: JSON.stringify(faq) }] };
+      const byId = new Map((loaderData?.reels ?? []).map((r) => [r.id, r]));
+      const shown = [page.example.reelId, ...("grid" in page.section ? page.section.grid : [])].map((id) => byId.get(id));
+      const videos = videoObjects(shown, page.path);
+      return { ...head, scripts: [faq, ...videos].map((d) => ({ type: "application/ld+json", children: JSON.stringify(d) })) };
     },
   };
 }
@@ -158,7 +162,7 @@ export function SearchPage({ page, reels }: { page: Page; reels: SiteReel[] }) {
       <nav className={`${wrap} pb-24`} aria-labelledby="related">
         <h2 id="related" className="text-[17px] font-semibold text-site-ink">Related</h2>
         <ul className="mt-3 space-y-2">
-          {page.related.map((p) => <li key={p}><a href={p} className="text-[17px] text-site-primary hover:underline">{relatedLabel(p)}</a></li>)}
+          {[...page.related, ...postsForPage(page.path).map((b) => `/blog/${b.slug}`)].filter((p, i, a) => a.indexOf(p) === i).map((p) => <li key={p}><a href={p} className="text-[17px] text-site-primary hover:underline">{relatedLabel(p)}</a></li>)}
         </ul>
       </nav>
     </SiteShell>
