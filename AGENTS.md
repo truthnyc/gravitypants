@@ -45,6 +45,7 @@
 - Website reel favorites use own `site_reel_favorites` rows via `SiteReelHeart`/`useSiteReelFavorites`; Favorites includes Directory reels.
 - App/SSR failures share dependency-free `ServiceUnavailable`.
 - Search landing pages: content in `src/lib/site/search-pages.ts`, one `SearchPage` layout and route factory; add pages via data plus a thin route file so copy, SEO and FAQ data stay in one place.
+- Gravity Pants sitemap metadata is authoritative in `src/lib/site/page-metadata.ts`, applied by `siteHead`; preserve its page schema when adding route-specific article, pricing or video scripts so every listed page has consistent search metadata without replacing specialised data.
 - Scope Aimanté by site; `brand-page` helpers centralize brand rules.
 
 - SVG uploads share `svg-safety.ts` before preview/storage, including Directory server uploads, to remove active content.

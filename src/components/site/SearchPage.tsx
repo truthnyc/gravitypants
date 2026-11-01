@@ -31,7 +31,7 @@ export function searchPageRoute(page: Page) {
       const byId = new Map((loaderData?.reels ?? []).map((r) => [r.id, r]));
       const shown = [page.example.reelId, ...("grid" in page.section ? page.section.grid : [])].map((id) => byId.get(id));
       const videos = videoObjects(shown, page.path);
-      return { ...head, scripts: [faq, ...videos].map((d) => ({ type: "application/ld+json", children: JSON.stringify(d) })) };
+      return { ...head, scripts: [...head.scripts, ...[faq, ...videos].map((d) => ({ type: "application/ld+json", children: JSON.stringify(d) }))] };
     },
   };
 }

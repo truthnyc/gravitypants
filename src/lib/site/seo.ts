@@ -1,4 +1,5 @@
 import cover from "@/assets/site/og-cover.jpg.asset.json";
+import { PAGE_METADATA, pageStructuredData } from "./page-metadata";
 
 /** One place for the website's page titles, descriptions, social previews and canonical URLs. */
 export const SITE_ORIGIN = "https://gravitypants.com";
@@ -22,6 +23,9 @@ type HeadInput = {
 };
 
 export function siteHead({ path, title, description, image = SITE_OG_IMAGE, ogType = "website", noindex = false }: HeadInput) {
+  const page = noindex ? undefined : PAGE_METADATA[path];
+  title = page?.title ?? title;
+  description = page?.description ?? description;
   const url = `${SITE_ORIGIN}${path}`;
   return {
     meta: [
@@ -41,5 +45,6 @@ export function siteHead({ path, title, description, image = SITE_OG_IMAGE, ogTy
       ...(noindex ? [{ name: "robots", content: "noindex, follow" }] : []),
     ],
     links: [{ rel: "canonical", href: url }],
+    scripts: page ? [{ type: "application/ld+json", children: JSON.stringify(pageStructuredData(path, page, SITE_ORIGIN)) }] : [],
   };
 }
