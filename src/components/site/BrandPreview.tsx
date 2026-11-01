@@ -74,8 +74,8 @@ function BrandPreviewBody({ slug }: { slug: string }) {
           <div className="relative aspect-square overflow-hidden rounded-[4px] bg-ap-card">
             {playing === r.id && r.video
               ? <video src={r.video} poster={r.poster ?? undefined} controls autoPlay loop muted playsInline className="size-full object-contain" />
-              : <button type="button" onClick={() => setPlaying(r.id)} disabled={!r.video} className="group relative size-full" aria-label={`Play ${r.title}`}>
-                  {r.poster && <img src={r.poster} alt="" className="size-full object-cover" />}
+              : <button type="button" onClick={() => setPlaying(r.id)} disabled={!r.video} className="absolute inset-0 block" aria-label={`Play ${r.title}`}>
+                  {r.poster && <img src={r.poster} alt="" className="absolute inset-0 size-full object-cover" />}
                   {r.video && <span className="absolute inset-0 grid place-items-center"><span className="grid size-10 place-items-center rounded-full bg-background/85 text-ap-ink"><Play className="size-4" strokeWidth={1.7} /></span></span>}
                 </button>}
           </div>
