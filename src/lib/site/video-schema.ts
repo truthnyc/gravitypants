@@ -26,7 +26,6 @@ export function videoObjects(reels: (SiteReel | undefined)[], path: string) {
       contentUrl,
       uploadDate: r.uploadDate,
       ...(r.seconds ? { duration: `PT${seconds}S` } : {}),
-      embedUrl: undefined,
       url: `${SITE_ORIGIN}${path}`,
       publisher: { "@type": "Organization", name: "Gravity Pants", logo: { "@type": "ImageObject", url: `${SITE_ORIGIN}/apple-touch-icon.png` } },
     }];
