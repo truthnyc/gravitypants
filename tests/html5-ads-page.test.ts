@@ -16,11 +16,14 @@ describe("HTML5 ads page", () => {
     expect(page!.extra?.[1].items.some((i) => i.includes("Display & Video 360"))).toBe(true);
   });
 
-  it("states the Google Ads file-type and 600 KB limit instead of promising it works", () => {
+  it("matches the export: one banner in the ad's main size, and Google Ads not supported yet", () => {
     const google = page!.faqs.find((f) => f.q === "Will it work on Google Ads?");
-    expect(google?.a).toContain("600 KB");
-    expect(google?.a).toContain(".svg");
     expect(google?.a).toMatch(/Not yet/);
+    expect(page!.faqs.some((f) => /main size/.test(f.a))).toBe(true);
+    // The walkthrough must not promise a size picker the export does not have.
+    expect(page!.section.items.some((i) => /main size/.test(i))).toBe(true);
+    expect(page!.section.items.join(" ")).not.toMatch(/Pick the sizes/);
+    expect(page!.extra?.[2].items.some((i) => /Google Ads/.test(i))).toBe(true);
   });
 
   it("is linked from the footer and from Help", () => {
