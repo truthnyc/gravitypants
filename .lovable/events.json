@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "events": {
+    "project.reel_download_clicked": {
+      "event_schema_version": 1,
+      "description": "A visitor clicked a published reel's Download reel link (popup, Showcase or Examples).",
+      "privacy": {
+        "contains_pii": false,
+        "purpose": "product_analytics"
+      },
+      "properties_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "reel_id",
+          "reel_title",
+          "page"
+        ],
+        "properties": {
+          "reel_id": {
+            "type": "string"
+          },
+          "reel_title": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "page": {
+            "type": "string",
+            "enum": [
+              "popup",
+              "showcase",
+              "examples"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
