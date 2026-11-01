@@ -19,6 +19,7 @@ import { PaymentTestModeBanner } from "@/components/billing/BillingNotices";
 import { trackPageView } from "@/lib/site/track";
 import { currentSite } from "@/lib/site/brand-site";
 import { ServiceUnavailable } from "@/components/site/ServiceUnavailable";
+import { AdvertisingConsent } from "@/components/site/AdvertisingConsent";
 import favicon from "@/assets/site/favicon.svg.asset.json";
 import touchIcon from "@/assets/site/apple-touch-icon.png.asset.json";
 
@@ -170,6 +171,7 @@ function RootComponent() {
               </div>
             </div>
             <Toaster />
+            <AdvertisingConsent pathname={pathname} />
           </>
         )}
       </SearchProvider>

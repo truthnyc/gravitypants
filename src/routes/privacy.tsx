@@ -51,6 +51,14 @@ const sections: { h: string; body: string[] }[] = [
     ],
   },
   {
+    h: "Advertising measurement and cookies",
+    body: [
+      "On Gravity Pants public pages, Meta Pixel measures page visits for Facebook and Instagram advertising. Meta receives the page address (without query parameters or fragments), advertising cookie identifiers and technical connection data such as IP address and browser information. We do not send account details, uploaded content, registrations or purchase events through this installation. Aimanté, private account pages, Shopify and embedded reel players do not load it.",
+      "In regions requiring advertising consent, tracking remains off until you accept. Elsewhere it may run without a banner, subject to your saved refusal and browser opt-outs. Unresolved locations default to requiring consent. Ad clicks and impressions are reported by the advertising platforms regardless of your website choice.",
+      "Cookie settings lets you accept, reject or withdraw advertising consent at any time. We keep a visitor reference, timestamps, region and the notice and choices shown in this browser, preserving earlier acceptance when you later withdraw. Changes apply to other open tabs on the same site. Clearing browser storage removes that local record. Withdrawal stops new advertising events; it does not undo data already received by Meta.",
+    ],
+  },
+  {
     h: "Contact",
     body: ["Questions about this policy? Email info@gravitypants.com."],
   },
@@ -62,7 +70,7 @@ function PrivacyPage() {
       <article className="mx-auto max-w-[760px] px-5 pb-24 pt-16 md:pt-24">
         <p className="text-[15px] font-semibold text-site-eyebrow">Legal</p>
         <h1 className="mt-3 text-[40px] font-semibold leading-[1.05] tracking-[-0.03em] text-site-ink md:text-[56px]">Privacy policy</h1>
-        <p className="mt-4 text-[15px] text-site-muted">Last updated: October 2026</p>
+        <p className="mt-4 text-[15px] text-site-muted">Last updated: November 2026</p>
         <p className="mt-6 text-[17px] leading-[1.5] text-site-secondary">Gravity Pants turns your photos into video ads. This policy explains what we collect, why, and the choices you have. The short version: your content is yours, we don't sell data, and we keep things private by default.</p>
         {sections.map((s) => (
           <section key={s.h} className="mt-10">

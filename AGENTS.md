@@ -40,6 +40,7 @@
 - Folder rules: see `AGENTS.md` in src/components/editor, src/render, src/lib/stillframe (billing details), src/lib/directory and src/routes/_authenticated/admin.
 - Directory greetings use hosting geo or browser GeoJS, then server weather; no stored location or shared cache. Reduced motion removes transitions, not word rotation.
 - Admin analytics: public visits go to `page_views` (anon insert) via `src/lib/site/track.ts`; sign-up UTM in user metadata; `analytics.server.ts` feeds the Analytics page and deduped Monday `/api/public/weekly-report`.
+- Advertising uses one browser-only Pixel behind shared regional consent on exact Gravity Pants public hosts; preserve consent history, cross-tab withdrawal and private/Shopify/embed exclusions so visit measurement cannot expose customer content.
 - Shared `SiteHeader` (site|app) delegates Aimanté to `AimanteHeader` regardless of session; `AimanteShell` shares its logo/footer with auth. Directory links use `SHOW_DIRECTORY`.
 - Website reel favorites use own `site_reel_favorites` rows via `SiteReelHeart`/`useSiteReelFavorites`; Favorites includes Directory reels.
 - App/SSR failures share dependency-free `ServiceUnavailable`.
