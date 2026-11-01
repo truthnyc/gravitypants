@@ -364,9 +364,9 @@ export const SEARCH_PAGES: SearchPage[] = [
   {
     slug: "html5-ads", path: "/html5-ads",
     title: "HTML5 Ads From Your Photos | Gravity Pants",
-    description: "Turn product photos into an HTML5 ad: a zip with your banner, its fonts and a click-through link, ready to upload to a display ad platform. First one free.",
+    description: "Turn product photos into an HTML5 ad: a zip with your banner and a click-through link, in your ad's main size, ready to upload to a display ad platform. First one free.",
     h1: "HTML5 ads from the photos you already have",
-    subhead: "Export your reel as an HTML5 banner: a zip with the ad, your fonts and a click-through link, ready to upload.",
+    subhead: "Export your reel as an HTML5 banner: a zip with the ad and a click-through link, in your ad's main size, ready to upload.",
     example: { reelId: REEL.drusus, label: "Drusus Tabor, Grand Turk Pillow" },
     why: [
       "Display ads run on millions of websites and apps, and most ad platforms ask for an HTML5 ad: a small zip with the ad inside it. That is the format they can serve and measure, and it is not held to the file size and length rules that make a GIF blurry or short.",
@@ -376,7 +376,7 @@ export const SEARCH_PAGES: SearchPage[] = [
       "Open the ad you want to run as a banner and go to Export.",
       "Under Save as, turn on HTML5.",
       "Type the page people go to when they tap the banner. Ad platforms can replace this link when they serve the ad.",
-      "Pick the sizes your ad platform asks for, or use Custom size to type any width and height.",
+      "The banner is made in your ad's main size, the shape you picked when you started the ad. Your other sizes still export as MP4 and GIF.",
       "Export and download the zip. Upload it to your ad platform as it is.",
     ] },
     extra: [
@@ -384,7 +384,7 @@ export const SEARCH_PAGES: SearchPage[] = [
         "index.html — the banner itself, with its width and height written in the page so ad platforms can read it",
         "ad.js — the player that runs your ad, built from the same code as your preview",
         "Your photos, resized for the banner",
-        "The exact fonts your ad uses",
+        "Your fonts, built into the page so the words look the same as your preview",
         "Your click-through link, written in as a click tag",
       ] },
       { title: "Where to use it", items: [
@@ -394,9 +394,9 @@ export const SEARCH_PAGES: SearchPage[] = [
         "Sponsor and newsletter slots that accept an HTML banner instead of a GIF",
       ] },
       { title: "Before you upload", items: [
-        "Animation stops within 30 seconds. Your reels are short, so this is usually already true.",
         "No sound. The banner plays without audio.",
-        "Display & Video 360 allows up to 5 MB for all files in the ad. Google Ads is stricter: 600 KB in total, and only .html, .js, .css, .gif, .png, .jpeg and .svg files.",
+        "One banner per export, in your ad's main size.",
+        "Google Ads does not accept these yet. Its upload rules are tighter than most ad platforms. Display & Video 360 and other platforms that take a full HTML5 zip work today.",
         "Some platforms ask for a still backup image beside the zip. Export a GIF or use one of your photos.",
         "Social posts still take MP4 or GIF. Instagram, TikTok and Facebook do not run HTML5 ads in feed.",
       ] },
