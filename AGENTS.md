@@ -51,3 +51,4 @@
 - Shopify uses shared editor controls/format helpers with shop-verified saves; its font picker core avoids account hooks to keep iframe identity Shopify-only.
 - Google font catalog is shared server-side; account/Shopify entries verify their own identities.
 - Tutorial/Help share `guide.ts`; `GuideScreenshot` uses CDN captures cropped for privacy, independent of the editor.
+- Google video schema points at permanent `/api/public/reel/$id/{video|poster}` links that redirect only published/live Showcase reels to fresh signed files, so search listings never expire while storage stays private.

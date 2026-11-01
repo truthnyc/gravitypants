@@ -122,6 +122,7 @@ import { Route as AuthenticatedAppAdIdFormatRouteImport } from './routes/_authen
 import { Route as AuthenticatedAppAdIdPhotosRouteImport } from './routes/_authenticated/app/ad.$id.photos'
 import { Route as AuthenticatedAppAdIdShareRouteImport } from './routes/_authenticated/app/ad.$id.share'
 import { Route as ApiPublicOgBrandSlugRouteImport } from './routes/api/public/og.brand.$slug'
+import { Route as ApiPublicReelIdKindRouteImport } from './routes/api/public/reel.$id.$kind'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -723,6 +724,11 @@ const ApiPublicOgBrandSlugRoute = ApiPublicOgBrandSlugRouteImport.update({
   path: '/api/public/og/brand/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicReelIdKindRoute = ApiPublicReelIdKindRouteImport.update({
+  id: '/api/public/reel/$id/$kind',
+  path: '/api/public/reel/$id/$kind',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -837,6 +843,7 @@ export interface FileRoutesByFullPath {
   '/app/ad/$id/photos': typeof AuthenticatedAppAdIdPhotosRoute
   '/app/ad/$id/share': typeof AuthenticatedAppAdIdShareRoute
   '/api/public/og/brand/$slug': typeof ApiPublicOgBrandSlugRoute
+  '/api/public/reel/$id/$kind': typeof ApiPublicReelIdKindRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -948,6 +955,7 @@ export interface FileRoutesByTo {
   '/app/ad/$id/photos': typeof AuthenticatedAppAdIdPhotosRoute
   '/app/ad/$id/share': typeof AuthenticatedAppAdIdShareRoute
   '/api/public/og/brand/$slug': typeof ApiPublicOgBrandSlugRoute
+  '/api/public/reel/$id/$kind': typeof ApiPublicReelIdKindRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -1064,6 +1072,7 @@ export interface FileRoutesById {
   '/_authenticated/app/ad/$id/photos': typeof AuthenticatedAppAdIdPhotosRoute
   '/_authenticated/app/ad/$id/share': typeof AuthenticatedAppAdIdShareRoute
   '/api/public/og/brand/$slug': typeof ApiPublicOgBrandSlugRoute
+  '/api/public/reel/$id/$kind': typeof ApiPublicReelIdKindRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -1180,6 +1189,7 @@ export interface FileRouteTypes {
     | '/app/ad/$id/photos'
     | '/app/ad/$id/share'
     | '/api/public/og/brand/$slug'
+    | '/api/public/reel/$id/$kind'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -1291,6 +1301,7 @@ export interface FileRouteTypes {
     | '/app/ad/$id/photos'
     | '/app/ad/$id/share'
     | '/api/public/og/brand/$slug'
+    | '/api/public/reel/$id/$kind'
   id:
     | '__root__'
     | '/'
@@ -1406,6 +1417,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/ad/$id/photos'
     | '/_authenticated/app/ad/$id/share'
     | '/api/public/og/brand/$slug'
+    | '/api/public/reel/$id/$kind'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1469,6 +1481,7 @@ export interface RootRouteChildren {
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
   ApiPublicOgBrandSlugRoute: typeof ApiPublicOgBrandSlugRoute
+  ApiPublicReelIdKindRoute: typeof ApiPublicReelIdKindRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -2264,6 +2277,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicOgBrandSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/reel/$id/$kind': {
+      id: '/api/public/reel/$id/$kind'
+      path: '/api/public/reel/$id/$kind'
+      fullPath: '/api/public/reel/$id/$kind'
+      preLoaderRoute: typeof ApiPublicReelIdKindRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -2520,6 +2540,7 @@ const rootRouteChildren: RootRouteChildren = {
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
   ApiPublicOgBrandSlugRoute: ApiPublicOgBrandSlugRoute,
+  ApiPublicReelIdKindRoute: ApiPublicReelIdKindRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
