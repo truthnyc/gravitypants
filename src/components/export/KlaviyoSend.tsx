@@ -9,19 +9,34 @@ import { getWorkspaceId } from "@/lib/stillframe/workspace";
 import { connectKlaviyo, disconnectKlaviyo, getKlaviyoStatus, sendGifToKlaviyo } from "@/lib/stillframe/klaviyo.functions";
 
 /** "Send to Klaviyo" for one exported GIF; asks for the brand's key once if not connected. */
-export function KlaviyoSend({ projectId, stamp, name }: { projectId: string; stamp: string; name: string }) {
+export function KlaviyoSend({
+  projectId,
+  stamp,
+  name,
+  connected: connectedProp,
+  onConnected,
+}: {
+  projectId: string;
+  stamp: string;
+  name: string;
+  /** Pass when the parent already knows the status, so many rows share one check. */
+  connected?: boolean | null;
+  onConnected?: () => void;
+}) {
   const status = useServerFn(getKlaviyoStatus);
   const connect = useServerFn(connectKlaviyo);
   const send = useServerFn(sendGifToKlaviyo);
-  const [connected, setConnected] = useState<boolean | null>(null);
+  const [checked, setChecked] = useState<boolean | null>(null);
+  const connected = connectedProp !== undefined ? connectedProp : checked;
   const [open, setOpen] = useState(false);
   const [key, setKey] = useState("");
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
 
   useEffect(() => {
-    void status({ data: { workspaceId: getWorkspaceId() } }).then((r) => setConnected(r.connected)).catch(() => setConnected(false));
-  }, [status]);
+    if (connectedProp !== undefined) return;
+    void status({ data: { workspaceId: getWorkspaceId() } }).then((r) => setChecked(r.connected)).catch(() => setChecked(false));
+  }, [status, connectedProp]);
 
   const doSend = async () => {
     setBusy(true);
@@ -37,7 +52,8 @@ export function KlaviyoSend({ projectId, stamp, name }: { projectId: string; sta
     try {
       const r = await connect({ data: { workspaceId: getWorkspaceId(), apiKey: key } });
       if (!r.ok) { toast.error(r.error); setBusy(false); return; }
-      setConnected(true); setOpen(false); setKey("");
+      setChecked(true); setOpen(false); setKey("");
+      onConnected?.();
       toast.success(r.accountName ? `Connected to ${r.accountName}` : "Klaviyo connected");
     } catch (e) { toast.error(e instanceof Error && e.message.includes("pk_") ? "That doesn't look like a Klaviyo private key (it starts with pk_)." : "Couldn't connect. Try again."); setBusy(false); return; }
     setBusy(false);
