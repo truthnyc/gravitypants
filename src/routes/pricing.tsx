@@ -84,7 +84,7 @@ function Pricing() {
               <span className="pr-note">No time limit. Your ads stay saved.</span>
               <span className="pr-reel">&nbsp;</span>
               <Link to="/signup" data-cta="make-first-reel" className="pr-btn sec full">Make your first reel</Link>
-              <ul>{["First export with no watermark", `${TRIAL.exports - TRIAL.cleanExports} more watermarked exports`, "Vertical 9:16, Portrait 4:5, Square 1:1, Wide 5:4, Landscape 16:9 and custom", "MP4 and GIF", "Brand kits", "Templates", "No export packs"].map((f) => <li key={f}><Tick /><span>{f}</span></li>)}</ul>
+              <ul>{["First export with no watermark", `${TRIAL.exports - TRIAL.cleanExports} more watermarked exports`, "Vertical 9:16, Portrait 4:5, Square 1:1, Wide 5:4, Landscape 16:9 and custom", "MP4 and GIF", "Brand kits", "Templates"].map((f) => <li key={f}><Tick /><span>{f}</span></li>)}</ul>
             </article>
             {PLANS.map((p) => {
               const pr = priceFor(p, billing);
