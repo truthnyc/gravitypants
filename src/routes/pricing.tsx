@@ -4,7 +4,7 @@ import { Check } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { CheckoutDialog, type CheckoutTarget } from "@/components/billing/CheckoutDialog";
 import { currentWorkspaceId, isPaid, useBilling, useManageBilling } from "@/lib/stillframe/billing";
-import { COMPARE, FAQ, PACKS_LINE, PLANS, POPULAR_PLAN, REFERRAL_NOTE, TRIAL, YEARLY_LABEL, perReel, priceFor, signupHref, type Billing, type PlanConfig } from "@/lib/stillframe/plans-config";
+import { COMPARE, FAQ, PLANS, POPULAR_PLAN, REFERRAL_NOTE, TRIAL, YEARLY_LABEL, perReel, priceFor, signupHref, type Billing, type PlanConfig } from "@/lib/stillframe/plans-config";
 import { SITE_ORIGIN, siteHead } from "@/lib/site/seo";
 
 export const Route = createFileRoute("/pricing")({
@@ -103,6 +103,7 @@ function Pricing() {
             })}
           </div>
           <p className="pr-fine">Prices in USD. Taxes may apply. One export is one reel, whatever the number of formats and files. Export counts reset on each billing date. Run out often? Moving up a plan costs less per reel. For a one-off busy month, paid plans can add a pack: 5 exports for $25, 10 for $45 or 20 for $80. Packs never expire. Registered nonprofits get 10% off. Need more seats? <a href="mailto:help@gravitypants.com" data-cta="pricing-write-to-us">Write to us</a>.</p>
+          <p className="pr-refer" data-testid="pricing-referral"><b>Give a reel, get a reel.</b> {REFERRAL_NOTE.replace(/^Give a reel, get a reel\. /, "")}</p>
         </section>
 
         <section className="pr-compare">
