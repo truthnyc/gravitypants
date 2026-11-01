@@ -34,6 +34,9 @@ import mfkCoffret from "@/assets/site/mfk-coffret.jpg.asset.json";
 import frenchBloomPour from "@/assets/site/french-bloom-01.jpg.asset.json";
 import frenchBloomRose from "@/assets/site/french-bloom-03.jpg.asset.json";
 import frenchBloomIce from "@/assets/site/french-bloom-06.jpg.asset.json";
+import drususPair from "@/assets/site/drusus-tabor-grand-turk-pair.webp.asset.json";
+import drususSingle from "@/assets/site/drusus-tabor-grand-turk-single.webp.asset.json";
+import drususSofa from "@/assets/site/drusus-tabor-pillows-sofa.webp.asset.json";
 
 /** Published website or featured Directory reel IDs used as search-page examples. */
 export const REEL = {
@@ -50,6 +53,7 @@ export const REEL = {
   meaume: "2622b7db-614a-405f-a1da-79276bbe2de2",
   mfk: "afb7a588-8a41-44d6-9bef-c09be883b3dd",
   frenchBloom: "f53784c8-26eb-419a-9947-517b20d918d4",
+  drusus: "fd53864c-49b5-4c12-ae00-a55887cbddfe",
 } as const;
 
 /** Source photos are only listed where the reel's real originals exist on the site. */
