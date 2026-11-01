@@ -24,7 +24,7 @@ const videoAds = [
   { q: "Should I export an MP4 or a GIF?", a: "Use MP4 for social media ads and anywhere video plays. Use an animated GIF for email newsletters and places that do not play video. Use HTML5 for display ads on websites and apps. Gravity Pants makes all three from the same ad, and they look the same." },
   { q: "Do I need video editing experience?", a: "No. Gravity Pants starts with a finished reel instead of an empty timeline. Tap the words, colors, photo framing or movement to change them." },
   { q: "Can my video ads match my brand?", a: "Yes. Save your logo, colors and fonts in a brand kit and every new ad starts with them. You can also add a light and a dark version of your logo and pick which one shows on each frame." },
-  { q: "Can I try it before paying?", a: "Yes. Every account begins with a free trial, with no time limit and no card. Your first reel exports without a watermark, and you get 2 more exports with a small Gravity Pants mark. Your reels and brand kit stay saved, and a reel on Aimanté stays live." },
+  { q: "Can I try it before paying?", a: "Yes. Every account starts on the Free plan, with no time limit and no card. Your first export has no watermark, and you get 5 more exports with a small Gravity Pants mark. Your reels and brand kit stay saved, and a reel on Aimanté stays live." },
 ];
 
 function HelpPage() {

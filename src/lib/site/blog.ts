@@ -81,7 +81,7 @@ const ORIGINAL: BlogPost[] = [
       {
         h: "Try it with photos you already have",
         p: [
-          "The free trial needs no card and has no time limit. Your first export has no watermark, so you can make a real ad and see how it does.",
+          "The Free plan needs no card and has no time limit. Your first export has no watermark, so you can make a real ad and see how it does.",
         ],
         visual: "meaume-hero",
       },
