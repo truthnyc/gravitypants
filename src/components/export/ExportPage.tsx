@@ -34,6 +34,7 @@ import { ExportCancelled, exportGif, exportMp4, isOutOfMemory, killFFmpeg, type 
 import { cn } from "@/lib/utils";
 import { fetchExportStatus, useExportStatus, useRefreshBilling } from "@/lib/stillframe/billing";
 import { ExportFooter } from "./ExportFooter";
+import { ReferralNote } from "@/components/billing/ReferralCard";
 import { KlaviyoDisconnect, KlaviyoSend } from "./KlaviyoSend";
 import { Switch } from "@/components/ui/switch";
 import { RadioGroup } from "@/components/ui/radio-group";
@@ -437,6 +438,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
             {doneCount > 1 && <AppButton onClick={() => void zipAll(files, state, `${base}.zip`)}><Download className="size-4" strokeWidth={1.7} /> Download all</AppButton>}
             <AppButton variant="ghost" onClick={() => setOpen(false)}>Export more sizes</AppButton>
           </div>
+          <div className="mt-3"><ReferralNote /></div>
           {SHOW_SHARE && <div className="mt-6 flex flex-col gap-4 rounded-[18px] bg-ap-soft-blue p-5 sm:flex-row sm:items-center">
             <div className="flex-1">
               <b className="mb-1 block text-[17px]">Share it to the Directory</b>
@@ -536,13 +538,13 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
       <Dialog open={!!planSheet} onOpenChange={(o) => !o && setPlanSheet(null)}>
         <DialogContent className="max-w-[900px]">
           <DialogHeader>
-            <DialogTitle>{planSheet === "limit_reached" ? (exportStatus?.trial ? `You've used your ${TRIAL.exports} trial exports` : "You've used this month's exports") : planSheet === "payment_problem" ? "There's a problem with your payment" : "Choose a plan"}</DialogTitle>
+            <DialogTitle>{planSheet === "limit_reached" ? (exportStatus?.trial ? `You've used your ${TRIAL.exports} Free exports` : "You've used this month's exports") : planSheet === "payment_problem" ? "There's a problem with your payment" : "Choose a plan"}</DialogTitle>
             <DialogDescription>
               {planSheet === "limit_reached"
-                ? "Your monthly exports are used up. Buy a pack of 5, 10 or 20 extra exports on the Billing page — they never expire — or move up a plan."
+                ? (exportStatus?.trial ? `Your ${TRIAL.exports} Free exports are used. Choose a plan to keep exporting without a watermark.` : "Your monthly exports are used up. Move up a plan, or buy a pack of 5, 10 or 20 extra exports on the Billing page — they never expire.")
                 : planSheet === "payment_problem"
                   ? "We couldn't take your last payment. Update your card in Manage Billing to keep exporting."
-                   : `Your ${TRIAL.exports} free trial exports are used. Your ads and brand kit are saved and you can keep editing — choose a plan to keep exporting without a watermark.${preferredPlan ? ` You selected ${preferredPlan} when you joined.` : ""}`}
+                   : `Your ${TRIAL.exports} Free exports are used. Your ads and brand kit are saved and you can keep editing — choose a plan to keep exporting without a watermark.${preferredPlan ? ` You selected ${preferredPlan} when you joined.` : ""}`}
             </DialogDescription>
           </DialogHeader>
           <PlanCards compact />
