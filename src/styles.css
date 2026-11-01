@@ -1074,6 +1074,7 @@ html:has(.features-page) { scroll-behavior: smooth; }
 
 /* Showcase, contact page and gallery calls to action */
 .showcase-visit { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; color: var(--site-link); font-size: 12px; font-weight: 500; }
+.showcase-visit + .showcase-visit { margin-left: 16px; }
 .site-gallery-cta { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; padding-top: 28px; font-size: 17px; color: var(--site-secondary); }
 .site-gallery-cta a { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; color: var(--site-link); font-weight: 500; }
 .contact-section { padding-bottom: 96px; }
