@@ -1,6 +1,7 @@
 # Gravity Pants pixel
-- [ ] Add website-visit measurement with regional advertising consent, withdrawal and privacy disclosure.
-- [ ] Verify allowed transmission, rejection and host exclusions; publication requires user approval.
+- [x] Add website-visit measurement with regional advertising consent, withdrawal and privacy disclosure.
+- [x] Verify allowed transmission, rejection, saved-choice history and host exclusions; 18 tests pass and build is healthy. Browser test received a 200 response for PageView; Meta stats still empty, so provider receipt remains unverified.
+- [ ] Publish and verify the live installation — awaiting explicit publishing approval.
 
 # Photo-to-video article
 - [x] Correct 5:4/16:9 guidance, add manual Instagram posting steps and a contextual How it works link; preserve Château Méaume visuals.
