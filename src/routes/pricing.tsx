@@ -4,12 +4,12 @@ import { Check } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { CheckoutDialog, type CheckoutTarget } from "@/components/billing/CheckoutDialog";
 import { currentWorkspaceId, isPaid, useBilling, useManageBilling } from "@/lib/stillframe/billing";
-import { COMPARE, FAQ, PLANS, TRIAL, YEARLY_LABEL, priceFor, signupHref, type Billing, type PlanConfig } from "@/lib/stillframe/plans-config";
+import { COMPARE, FAQ, PACKS_LINE, PLANS, POPULAR_PLAN, REFERRAL_NOTE, TRIAL, YEARLY_LABEL, perReel, priceFor, signupHref, type Billing, type PlanConfig } from "@/lib/stillframe/plans-config";
 import { SITE_ORIGIN, siteHead } from "@/lib/site/seo";
 
 export const Route = createFileRoute("/pricing")({
   head: () => ({
-    ...siteHead({ path: "/pricing", title: "Video Ad Maker Pricing — Gravity Pants", description: "Simple, Business and Team plans for turning photos into video ads, GIFs and HTML5 banners. Make your first reel free, with no watermark and no card needed. Then 2 more exports to try." }),
+    ...siteHead({ path: "/pricing", title: "Video Ad Maker Pricing — Gravity Pants", description: "Free, Starter, Simple, Business and Team plans for turning photos into video ads and GIFs, with HTML5 on Business and Team. Free plan: first export clean, then 5 more watermarked. No card needed." }),
     scripts: [{
       type: "application/ld+json",
       children: JSON.stringify({
@@ -39,12 +39,13 @@ function CellView({ v }: { v: string | boolean }) {
 }
 
 function Pricing() {
-  const [billing, setBilling] = useState<Billing>("monthly");
+  const [billing, setBilling] = useState<Billing>("yearly");
   const [open, setOpen] = useState<number | null>(0);
   const [checkout, setCheckout] = useState<CheckoutTarget | null>(null);
   const { data: appBilling } = useBilling();
   const manage = useManageBilling();
-  const cols = ["Free trial", ...PLANS.map((p) => p.name)];
+  const cols = [TRIAL.name, ...PLANS.map((p) => p.name)];
+  const popName = PLANS.find((p) => p.id === POPULAR_PLAN)!.name;
 
   // Signed-in users pay right away and the workspace switches to the plan; visitors sign up first.
   async function choose(p: PlanConfig) {
@@ -76,47 +77,50 @@ function Pricing() {
         </section>
 
         <section className="pr-tiers">
-          <div className="pr-grid pr-grid-4">
+          <div className="pr-grid pr-grid-5">
             <article className="pr-tier">
               <div className="pr-tier-top"><h3>{TRIAL.name}</h3><p>Your first reel on us, no watermark, no time limit.</p></div>
               <div className="pr-price"><b>$0</b><span>no card needed</span></div>
               <span className="pr-note">No time limit. Your ads stay saved.</span>
+              <span className="pr-reel">&nbsp;</span>
               <Link to="/signup" data-cta="make-first-reel" className="pr-btn sec full">Make your first reel</Link>
-              <ul>{["First export with no watermark", `${TRIAL.exports - TRIAL.cleanExports} more watermarked exports`, "Vertical 9:16, Portrait 4:5, Square 1:1, Wide 5:4, Landscape 16:9 and custom", "MP4, GIF and HTML5", "Brand kits", "Templates"].map((f) => <li key={f}><Tick /><span>{f}</span></li>)}</ul>
+              <ul>{["First export with no watermark", `${TRIAL.exports - TRIAL.cleanExports} more watermarked exports`, "Vertical 9:16, Portrait 4:5, Square 1:1, Wide 5:4, Landscape 16:9 and custom", "MP4 and GIF", "Brand kits", "Templates", "No export packs"].map((f) => <li key={f}><Tick /><span>{f}</span></li>)}</ul>
             </article>
             {PLANS.map((p) => {
               const pr = priceFor(p, billing);
-              const pop = p.id === "simple";
+              const pop = p.id === POPULAR_PLAN;
               return (
                   <article key={p.id} className={`pr-tier${pop ? " pop" : ""}`}>
+                  {pop && <span className="pr-badge">Most popular</span>}
                   <div className="pr-tier-top"><h3>{p.name}</h3><p>{p.tagline}</p></div>
                   <div className="pr-price"><b>{pr.price}</b><span>{pr.per}</span></div>
                   <span className="pr-note">{pr.note}</span>
+                  <span className="pr-reel">{perReel(p)} per reel</span>
                   <button type="button" data-cta={`choose-${p.id.replace(/_yearly$/, "")}`} onClick={() => void choose(p)} className={`pr-btn ${pop ? "pri" : "sec"} full`}>Choose {p.name}</button>
                   <ul>{p.features.map((f) => <li key={f}><Tick /><span>{f}</span></li>)}</ul>
                 </article>
               );
             })}
           </div>
-          <p className="pr-fine">Prices in USD. Taxes may apply. One export is one reel, whatever the number of formats and files. Export counts reset on each billing date. Run out early? Add a pack: 5 exports for $15, 10 for $25 or 20 for $45. Packs work on any plan and never expire. Need more seats? <a href="mailto:help@gravitypants.com" data-cta="pricing-write-to-us">Write to us</a>.</p>
+          <p className="pr-fine">Prices in USD. Taxes may apply. One export is one reel, whatever the number of formats and files. Export counts reset on each billing date. Run out often? Moving up a plan costs less per reel. For a one-off busy month, paid plans can add a pack: 5 exports for $25, 10 for $45 or 20 for $80. Packs never expire. Registered nonprofits get 10% off. Need more seats? <a href="mailto:help@gravitypants.com" data-cta="pricing-write-to-us">Write to us</a>.</p>
         </section>
 
         <section className="pr-compare">
           <h2 className="site-h2">Compare plans</h2>
           <table className="pr-cmp">
-            <thead><tr><th scope="col"><span className="sr-only">Feature</span></th>{cols.map((c) => <th key={c} scope="col" className={c === "Simple" ? "simple" : undefined}>{c}</th>)}</tr></thead>
+            <thead><tr><th scope="col"><span className="sr-only">Feature</span></th>{cols.map((c) => <th key={c} scope="col" className={c === popName ? "simple" : undefined}>{c}</th>)}</tr></thead>
             <tbody>
               {COMPARE.flatMap((g) => [
-                <tr key={g.group} className="grp"><th colSpan={5} scope="colgroup">{g.group}</th></tr>,
+                <tr key={g.group} className="grp"><th colSpan={cols.length + 1} scope="colgroup">{g.group}</th></tr>,
                 ...g.rows.map((r) => (
-                  <tr key={g.group + r.label}><th scope="row">{r.href ? <a href={r.href}>{r.label}</a> : r.label}</th>{r.cells.map((c, i) => <td key={i} className={i === 1 ? "simple" : undefined}><CellView v={c} /></td>)}</tr>
+                  <tr key={g.group + r.label}><th scope="row">{r.href ? <a href={r.href}>{r.label}</a> : r.label}</th>{r.cells.map((c, i) => <td key={i} className={cols[i] === popName ? "simple" : undefined}><CellView v={c} /></td>)}</tr>
                 )),
               ])}
             </tbody>
           </table>
           <div className="pr-cmp-cards">
             {cols.map((c, i) => (
-              <div key={c} className={`pr-cmp-card${c === "Simple" ? " pop" : ""}`}>
+              <div key={c} className={`pr-cmp-card${c === popName ? " pop" : ""}`}>
                 <h3>{c}</h3>
                 {COMPARE.map((g) => (
                   <div key={g.group}>
