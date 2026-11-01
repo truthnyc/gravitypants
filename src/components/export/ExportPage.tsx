@@ -5,7 +5,7 @@ import { Link } from "@tanstack/react-router";
 import { KitAgainButton } from "@/components/templates/KitAgain";
 import { TRIAL, planById } from "@/lib/stillframe/plans-config";
 import { getSignupChoice } from "@/lib/stillframe/signup-choice";
-import { AlertCircle, Check, ChevronDown, ChevronLeft, ChevronRight, Download, Film, Image as ImageIcon, Plus, X } from "lucide-react";
+import { AlertCircle, Check, ChevronDown, ChevronLeft, ChevronRight, Code2, Download, Film, Image as ImageIcon, Plus, X } from "lucide-react";
 import { AppButton, AppSectionLabel } from "@/components/app-ui";
 import { SHOW_SHARE } from "@/lib/features";
 import { ReelCard, StepShell, StepTitle } from "@/components/app-ui/StepShell";
@@ -13,6 +13,7 @@ import { useReelPlayer } from "@/components/editor/ReelPreview";
 import { zipSync } from "fflate";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { supabase } from "@/integrations/supabase/client";
@@ -27,6 +28,8 @@ import { formatSeconds, type Format, type Frame, type Project } from "@/lib/stil
 import { FORMAT_SIZE } from "@/render/formats";
 import { loadImages } from "@/render/images";
 import { ensureFonts, layoutFrame, mediaPaths, renderAt, restTime, videoDuration, type BrandStyle } from "@/render/renderFrame";
+import { exportHtml5 } from "@/render/exportHtml5";
+import { safeClickUrl } from "@/render/html5-doc";
 import { ExportCancelled, exportGif, exportMp4, isOutOfMemory, killFFmpeg, type GifColors, type RenderInput } from "@/render/exportMedia";
 import { cn } from "@/lib/utils";
 import { fetchExportStatus, useExportStatus, useRefreshBilling } from "@/lib/stillframe/billing";
@@ -40,7 +43,7 @@ import { PlanCards } from "@/components/billing/PlanCards";
 import { DEFAULT_EXPORT_FORMATS, DEFAULT_VIDEO_FPS, DEFAULT_GIF_LOOP, DEFAULT_GIF_QUALITY, GIF_PRESETS, matchingGifPreset, estimateExportBytes, type GifSize, type GifPresetId } from "@/lib/stillframe/export-quality";
 type Target = { key: string; name: string; ratio: string; format: Format; width: number; height: number; custom?: boolean };
 type CustomRow = { id: string; w: string; h: string };
-type FileRow = { sizeName: string; ratio: string; name: string; kind: "mp4" | "gif"; job: string; width: number; height: number };
+type FileRow = { sizeName: string; ratio: string; name: string; kind: "mp4" | "gif" | "html5"; job: string; width: number; height: number };
 const num = (s: string) => (s.trim() === "" ? null : Number(s));
 const rid = () => Math.random().toString(36).slice(2, 9);
 type JobState = { progress: number; status: "waiting" | "working" | "done" | "error" | "cancelled"; blob?: Blob; note?: string };
@@ -98,6 +101,8 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
   const { canUse, isSuccess: accessReady } = usePlanAccess();
   const [gif, setGif] = useState(DEFAULT_EXPORT_FORMATS.gif);
   useEffect(() => { if (accessReady && !canUse("gif")) setGif(false); }, [accessReady]); // eslint-disable-line react-hooks/exhaustive-deps
+  const [html5, setHtml5] = useState(false);
+  const [clickUrl, setClickUrl] = useState("");
   const [fps, setFps] = useState(DEFAULT_VIDEO_FPS);
   const [gSize, setGSize] = useState<GifSize>(DEFAULT_GIF_QUALITY.size);
   const [gColors, setGColors] = useState<GifColors>(DEFAULT_GIF_QUALITY.colors);
@@ -133,7 +138,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
   const base = slugify(project.name);
   const { files, jobs } = useMemo(() => {
     const files: FileRow[] = [];
-    const jobs = new Map<string, { kind: "mp4" | "gif"; format: Format; width: number; height: number }>();
+    const jobs = new Map<string, { kind: "mp4" | "gif" | "html5"; format: Format; width: number; height: number }>();
     for (const t of targets) {
       if (mp4) {
         const job = `mp4:${t.width}x${t.height}:${t.format}`;
@@ -146,9 +151,14 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
         jobs.set(job, { kind: "gif", format: t.format, ...s });
         files.push({ sizeName: t.name, ratio: t.ratio, name: exportFileName(base, t.width, t.height, "gif"), kind: "gif", job, width: s.width, height: s.height });
       }
+      if (html5) {
+        const job = `html5:${t.width}x${t.height}:${t.format}`;
+        jobs.set(job, { kind: "html5", format: t.format, width: t.width, height: t.height });
+        files.push({ sizeName: t.name, ratio: t.ratio, name: exportFileName(base, t.width, t.height, "zip"), kind: "html5", job, width: t.width, height: t.height });
+      }
     }
     return { files, jobs };
-  }, [targets, mp4, gif, gSize, base]);
+  }, [targets, mp4, gif, html5, gSize, base]);
 
   const seconds = videoDuration(project, frames, brand);
   const videos = files.filter((f) => f.kind === "mp4").length;
@@ -262,7 +272,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
       );
     track({
       status: "running",
-      channels: [...new Set(files.map((f) => f.name.replace(/\.(mp4|gif)$/i, "")))],
+      channels: [...new Set(files.map((f) => f.name.replace(/\.(mp4|gif|zip)$/i, "")))],
       formats: [...new Set([...jobs.values()].map((j) => j.kind.toUpperCase()))],
     });
     let failure: string | null = null;
@@ -278,6 +288,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
         let blob: Blob;
         let note: string | undefined;
         if (job.kind === "mp4") blob = await exportMp4(input, fps, ac.signal, onProgress);
+        else if (job.kind === "html5") blob = await exportHtml5(input, { clickUrl: safeClickUrl(clickUrl), loops: gLoop === "once" ? 1 : 0, title: project.name, customFonts: kit?.custom_fonts ?? [] }, ac.signal, onProgress);
         else {
           const opts = { fps: gFps, colors: gColors, loop: gLoop };
           try {
@@ -320,7 +331,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
         else {
           console.error(e);
           failure = e instanceof Error ? e.message : String(e);
-          set(key, { status: "error", note: job.kind === "mp4" ? "Something went wrong making this video. Try again, or try on a computer." : "Something went wrong making this file. Try again, or pick a smaller GIF size." });
+          set(key, { status: "error", note: job.kind === "html5" ? "Something went wrong making this banner. Check your connection and try again." : job.kind === "mp4" ? "Something went wrong making this video. Try again, or try on a computer." : "Something went wrong making this file. Try again, or pick a smaller GIF size." });
         }
       }
     }
@@ -471,14 +482,22 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
           )}
 
           <AppSectionLabel className="mt-7 mb-2.5">Save as</AppSectionLabel>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             <FormatCard on={mp4} onClick={() => setMp4((v) => !v)} icon={<Film className="size-4" strokeWidth={1.7} />} title="Video MP4" sub="Motion and sound" />
             <FormatCard on={gif} onClick={() => (gif || canUse("gif") ? setGif((v) => !v) : openUpgrade("gif"))} icon={<ImageIcon className="size-4" strokeWidth={1.7} />} title="Animated GIF" sub="Plays anywhere, no sound" />
+            <FormatCard on={html5} onClick={() => setHtml5((v) => !v)} icon={<Code2 className="size-4" strokeWidth={1.7} />} title="HTML5 banner" sub="Display ads, .zip" />
           </div>
+          {html5 && (
+            <div className="mt-3">
+              <label htmlFor="html5-click" className="mb-1 block text-[13px] font-medium">Banner link</label>
+              <Input id="html5-click" type="url" inputMode="url" placeholder="https://yourshop.com" value={clickUrl} onChange={(e) => setClickUrl(e.target.value)} maxLength={500} data-cta="export-html5-link" />
+              <p className="mt-1 text-[12px] text-ap-muted">Where people go when they tap the banner. Ad platforms can replace it.</p>
+            </div>
+          )}
 
           <QualitySettings {...{ mp4, gif, fps, setFps, gSize, setGSize, gColors, setGColors, gFps, setGFps, gLoop, setGLoop, qualityOpen, setQualityOpen, advancedOpen, setAdvancedOpen, gifPreset, applyGifPreset, qualitySummary }} />
 
-          <ExportFooter files={files.map((file) => ({ ...file, estimatedBytes: estimateExportBytes(file.kind, file.width, file.height, seconds, file.kind === "mp4" ? fps : gFps, gColors) }))} sizeNames={targets.map((t) => t.name)} formats={[mp4 && "MP4", gif && "GIF"].filter((v): v is string => !!v)} seconds={seconds} remaining={remainingSummary} action={exportButton} />
+          <ExportFooter files={files.map((file) => ({ ...file, estimatedBytes: estimateExportBytes(file.kind, file.width, file.height, seconds, file.kind === "gif" ? gFps : fps, gColors) }))} sizeNames={targets.map((t) => t.name)} formats={[mp4 && "MP4", gif && "GIF", html5 && "HTML5"].filter((v): v is string => !!v)} seconds={seconds} remaining={remainingSummary} action={exportButton} />
           <div className="mt-2">
             {exportStatus?.trial && !exportStatus.watermark && <p className="mt-1 text-[13px] font-medium text-ap-blue">Your first reel is on us — no watermark.</p>}
             {exportStatus?.watermark && (

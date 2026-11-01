@@ -116,11 +116,11 @@ export function ratioLabel(w: number, h: number) {
   return `${Number((w / h).toFixed(2))}:1`;
 }
 
-export const exportFileName = (base: string, w: number, h: number, ext: "mp4" | "gif") => `${base}_${w}x${h}.${ext}`;
+export const exportFileName = (base: string, w: number, h: number, ext: "mp4" | "gif" | "zip") => `${base}_${w}x${h}.${ext}`;
 
 /** Readable size name for a saved file name, old or new style. */
 export function sizeLabelForFile(name: string): string | null {
-  const m = name.match(/_(\d+)x(\d+)\.(mp4|gif)$/i);
+  const m = name.match(/_(\d+)x(\d+)\.(mp4|gif|zip)$/i);
   if (!m) return null;
   const a = Number(m[1]), b = Number(m[2]);
   const s = EXPORT_SIZES.find((x) => (x.width === a && x.height === b) || x.id === `${a}x${b}`);
