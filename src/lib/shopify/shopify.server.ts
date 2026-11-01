@@ -68,11 +68,11 @@ const str = (v: unknown) => (typeof v === "string" && v ? v : null);
 
 function parsePair(json: Record<string, unknown>): OfflineTokenPair {
   return {
-    access_token: String(json.access_token ?? ""),
-    scope: str(json.scope),
-    refresh_token: str(json.refresh_token),
-    expires_in: num(json.expires_in),
-    refresh_token_expires_in: num(json.refresh_token_expires_in),
+    access_token: String(json["access_token"] ?? ""),
+    scope: str(json["scope"]),
+    refresh_token: str(json["refresh_token"]),
+    expires_in: num(json["expires_in"]),
+    refresh_token_expires_in: num(json["refresh_token_expires_in"]),
   };
 }
 
@@ -84,8 +84,8 @@ async function postToken(shop: string, body: Record<string, string>) {
     body: new URLSearchParams(body).toString(),
   });
   const json = (await res.json().catch(() => null)) as Record<string, unknown> | null;
-  if (!res.ok || !json?.access_token) {
-    const why = str(json?.error_description) ?? str(json?.error) ?? `HTTP ${res.status}`;
+  if (!res.ok || !json?.["access_token"]) {
+    const why = str(json?.["error_description"]) ?? str(json?.["error"]) ?? `HTTP ${res.status}`;
     throw new Error(`Token exchange failed (${res.status}): ${why.slice(0, 160)}`);
   }
   return parsePair(json);
