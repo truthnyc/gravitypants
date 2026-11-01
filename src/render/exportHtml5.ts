@@ -29,12 +29,6 @@ function fontExt(type: string | null, path: string) {
   return t.includes("woff2") ? "woff2" : t.includes("woff") ? "woff" : t.includes("otf") ? "otf" : "ttf";
 }
 
-async function fetchBytes(url: string) {
-  const r = await fetch(url);
-  if (!r.ok) throw new Error(`fetch ${r.status}`);
-  return new Uint8Array(await r.arrayBuffer());
-}
-
 /** Google css2 subset for exactly the ad's text, parsed into font files. */
 async function googleFaces(family: string, weight: number, text: string) {
   const base = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(family)}`;
