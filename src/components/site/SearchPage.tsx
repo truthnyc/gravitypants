@@ -163,6 +163,7 @@ export function SearchPage({ page, reels }: { page: Page; reels: SiteReel[] }) {
         <h2 id="related" className="text-[17px] font-semibold text-site-ink">Related</h2>
         <ul className="mt-3 space-y-2">
           {[...page.related, ...postsForPage(page.path).map((b) => `/blog/${b.slug}`)].filter((p, i, a) => a.indexOf(p) === i).map((p) => <li key={p}><a href={p} className="text-[17px] text-site-primary hover:underline">{relatedLabel(p)}</a></li>)}
+          <li><a href={aimanteLink(page.path).href} data-cta="search-aimante" className="text-[17px] text-site-primary hover:underline">{aimanteLink(page.path).label}</a></li>
         </ul>
       </nav>
     </SiteShell>
@@ -179,4 +180,19 @@ export function SearchPageLinks({ paths, className = "" }: { paths: string[]; cl
       </ul>
     </nav>
   );
+}
+
+/** Industry pages link to the matching Aimanté category; the rest to Aimanté's home. */
+const AIMANTE_CATEGORIES: Record<string, [string, string]> = {
+  "/for/jewelry": ["jewelry-watches", "jewelry"],
+  "/for/home-decor": ["home-living", "home and living"],
+  "/for/fashion": ["fashion-apparel", "fashion"],
+  "/for/food-and-drink": ["food-drink", "food and drink"],
+  "/for/beauty-and-fragrance": ["beauty-fragrance", "beauty and fragrance"],
+};
+function aimanteLink(path: string) {
+  const c = AIMANTE_CATEGORIES[path];
+  return c
+    ? { href: `https://aimante.co/c/${c[0]}`, label: `More ${c[1]} brand reels on Aimanté` }
+    : { href: "https://aimante.co", label: "Browse brand reels by mood on Aimanté" };
 }
