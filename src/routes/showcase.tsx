@@ -60,9 +60,9 @@ function BrandCard({ reel }: { reel: SiteReel }) {
           </p>
           <ConceptReelNotice brandName={reel.brand} brandSlug={reel.brandSlug} />
           {reel.brandSlug && (
-            <Link className="showcase-visit" to="/directory/$slug" params={{ slug: reel.brandSlug }} data-cta="showcase-brand-profile">
+            <a className="showcase-visit" href={`https://aimante.co/b/${reel.brandSlug}`} data-cta="showcase-brand-profile">
               About {reel.brand} <ArrowRight size={15} strokeWidth={1.7} />
-            </Link>
+            </a>
           )}
           
         </div>

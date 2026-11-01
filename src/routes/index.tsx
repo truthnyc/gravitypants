@@ -131,6 +131,7 @@ type HomeExample = {
   poster?: string | undefined;
   videoFormat?: "11" | "916" | "169";
   href?: string | undefined;
+  brandSlug?: string | undefined;
 };
 // Only real brand reels managed in /admin/reels appear in the carousel.
 function homeExamples(reels: SiteReel[]): HomeExample[] {
@@ -143,6 +144,7 @@ function homeExamples(reels: SiteReel[]): HomeExample[] {
     poster: r.poster ?? undefined,
     videoFormat: r.format,
     href: r.href ?? undefined,
+    brandSlug: r.brandSlug ?? undefined,
   }));
 }
 function HomeReelVideo({ example }: { example: HomeExample }) {
@@ -660,7 +662,7 @@ function Home() {
               media: () => <HomeExampleMedia example={ex} index={i} count={examples.length} />,
               title: ex.name,
               detail: ex.detail,
-              visit: ex.href ? { href: ex.href, label: `Visit ${ex.logo ?? ex.name}` } : undefined,
+              visit: ex.brandSlug ? { href: `https://aimante.co/b/${ex.brandSlug}`, label: `About ${ex.logo ?? ex.name}` } : undefined,
             }))}
           />
           <p className="site-gallery-cta home-section">
