@@ -31,7 +31,8 @@ export async function addVideoToProducts(shop: string, token: string, file: Blob
       productId,
       media: [{ mediaContentType: "VIDEO", originalSource: target.resourceUrl, alt: alt.slice(0, 500) }],
     });
-    if (r.productCreateMedia.mediaUserErrors.length) failed.push(r.productCreateMedia.mediaUserErrors[0].message);
+    const e = r.productCreateMedia.mediaUserErrors[0];
+    if (e) failed.push(e.message);
   }
   return { added: productIds.length - failed.length, failed };
 }
