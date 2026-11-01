@@ -17,16 +17,6 @@ export type Html5Doc = {
   fonts: { family: string; weight: number; file: string; unicodeRange?: string }[];
 };
 
-/** Common IAB display sizes offered alongside the social sizes. */
-export const BANNER_SIZES = [
-  { id: "b300x250", name: "Medium rectangle", width: 300, height: 250 },
-  { id: "b336x280", name: "Large rectangle", width: 336, height: 280 },
-  { id: "b300x600", name: "Half page", width: 300, height: 600 },
-  { id: "b160x600", name: "Wide skyscraper", width: 160, height: 600 },
-  { id: "b728x90", name: "Leaderboard", width: 728, height: 90 },
-  { id: "b320x50", name: "Mobile banner", width: 320, height: 50 },
-] as const;
-
 /** Only http(s) links are allowed as the click-through. */
 export function safeClickUrl(raw: string): string {
   const v = raw.trim();
