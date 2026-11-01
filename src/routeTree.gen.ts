@@ -93,6 +93,7 @@ import { Route as ApiPublicDirectoryDailyRouteImport } from './routes/api/public
 import { Route as ApiPublicTrialRemindersRouteImport } from './routes/api/public/trial-reminders'
 import { Route as ApiPublicWeeklyReportRouteImport } from './routes/api/public/weekly-report'
 import { Route as DirectoryCategorySlugRouteImport } from './routes/directory.category.$slug'
+import { Route as EmbedReelIdRouteImport } from './routes/embed.reel.$id'
 import { Route as ShopifyReelIdRouteImport } from './routes/shopify_.reel.$id'
 import { Route as AuthenticatedAdminClientsIdRouteImport } from './routes/_authenticated/admin/clients_.$id'
 import { Route as AuthenticatedAdminTemplatesIndexRouteImport } from './routes/_authenticated/admin/templates.index'
@@ -559,6 +560,11 @@ const DirectoryCategorySlugRoute = DirectoryCategorySlugRouteImport.update({
   path: '/directory/category/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EmbedReelIdRoute = EmbedReelIdRouteImport.update({
+  id: '/embed/reel/$id',
+  path: '/embed/reel/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ShopifyReelIdRoute = ShopifyReelIdRouteImport.update({
   id: '/shopify_/reel/$id',
   path: '/shopify/reel/$id',
@@ -818,6 +824,7 @@ export interface FileRoutesByFullPath {
   '/api/public/trial-reminders': typeof ApiPublicTrialRemindersRoute
   '/api/public/weekly-report': typeof ApiPublicWeeklyReportRoute
   '/directory/category/$slug': typeof DirectoryCategorySlugRoute
+  '/embed/reel/$id': typeof EmbedReelIdRoute
   '/shopify/reel/$id': typeof ShopifyReelIdRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/app/': typeof AuthenticatedAppIndexRoute
@@ -931,6 +938,7 @@ export interface FileRoutesByTo {
   '/api/public/trial-reminders': typeof ApiPublicTrialRemindersRoute
   '/api/public/weekly-report': typeof ApiPublicWeeklyReportRoute
   '/directory/category/$slug': typeof DirectoryCategorySlugRoute
+  '/embed/reel/$id': typeof EmbedReelIdRoute
   '/shopify/reel/$id': typeof ShopifyReelIdRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/app': typeof AuthenticatedAppIndexRoute
@@ -1049,6 +1057,7 @@ export interface FileRoutesById {
   '/api/public/trial-reminders': typeof ApiPublicTrialRemindersRoute
   '/api/public/weekly-report': typeof ApiPublicWeeklyReportRoute
   '/directory/category/$slug': typeof DirectoryCategorySlugRoute
+  '/embed/reel/$id': typeof EmbedReelIdRoute
   '/shopify_/reel/$id': typeof ShopifyReelIdRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
@@ -1167,6 +1176,7 @@ export interface FileRouteTypes {
     | '/api/public/trial-reminders'
     | '/api/public/weekly-report'
     | '/directory/category/$slug'
+    | '/embed/reel/$id'
     | '/shopify/reel/$id'
     | '/admin/'
     | '/app/'
@@ -1280,6 +1290,7 @@ export interface FileRouteTypes {
     | '/api/public/trial-reminders'
     | '/api/public/weekly-report'
     | '/directory/category/$slug'
+    | '/embed/reel/$id'
     | '/shopify/reel/$id'
     | '/admin'
     | '/app'
@@ -1397,6 +1408,7 @@ export interface FileRouteTypes {
     | '/api/public/trial-reminders'
     | '/api/public/weekly-report'
     | '/directory/category/$slug'
+    | '/embed/reel/$id'
     | '/shopify_/reel/$id'
     | '/_authenticated/admin/'
     | '/_authenticated/app/'
@@ -1483,6 +1495,7 @@ export interface RootRouteChildren {
   ApiPublicTrialRemindersRoute: typeof ApiPublicTrialRemindersRoute
   ApiPublicWeeklyReportRoute: typeof ApiPublicWeeklyReportRoute
   DirectoryCategorySlugRoute: typeof DirectoryCategorySlugRoute
+  EmbedReelIdRoute: typeof EmbedReelIdRoute
   ShopifyReelIdRoute: typeof ShopifyReelIdRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   ApiPublicShopifyAuthRoute: typeof ApiPublicShopifyAuthRoute
@@ -2087,6 +2100,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DirectoryCategorySlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/embed/reel/$id': {
+      id: '/embed/reel/$id'
+      path: '/embed/reel/$id'
+      fullPath: '/embed/reel/$id'
+      preLoaderRoute: typeof EmbedReelIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shopify_/reel/$id': {
       id: '/shopify_/reel/$id'
       path: '/shopify/reel/$id'
@@ -2550,6 +2570,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicTrialRemindersRoute: ApiPublicTrialRemindersRoute,
   ApiPublicWeeklyReportRoute: ApiPublicWeeklyReportRoute,
   DirectoryCategorySlugRoute: DirectoryCategorySlugRoute,
+  EmbedReelIdRoute: EmbedReelIdRoute,
   ShopifyReelIdRoute: ShopifyReelIdRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   ApiPublicShopifyAuthRoute: ApiPublicShopifyAuthRoute,

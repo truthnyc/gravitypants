@@ -135,30 +135,43 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  // The reel player runs inside other people's websites, where the browser blocks
+  // stored sign-in data. It needs none of the app chrome, so keep it bare.
+  const bare = pathname.startsWith("/embed/");
 
   useEffect(() => {
+    if (bare) return;
     const { data } = supabase.auth.onAuthStateChange((event) => {
       if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
       router.invalidate();
       if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
     });
     return () => data.subscription.unsubscribe();
-  }, [router, queryClient]);
+  }, [router, queryClient, bare]);
 
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
-  useEffect(() => { trackPageView(pathname); }, [pathname]);
+  useEffect(() => {
+    if (bare) return;
+    trackPageView(pathname);
+  }, [pathname, bare]);
 
   return (
     <QueryClientProvider client={queryClient}>
       <SearchProvider>
-        <div className="flex h-dvh min-h-dvh flex-col">
-          <PaymentTestModeBanner />
-          <div className="min-h-0 flex-1 bg-canvas">
-            {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-            <Outlet />
-          </div>
-        </div>
-        <Toaster />
+        {bare ? (
+          <Outlet />
+        ) : (
+          <>
+            <div className="flex h-dvh min-h-dvh flex-col">
+              <PaymentTestModeBanner />
+              <div className="min-h-0 flex-1 bg-canvas">
+                {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+                <Outlet />
+              </div>
+            </div>
+            <Toaster />
+          </>
+        )}
       </SearchProvider>
     </QueryClientProvider>
   );

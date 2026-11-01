@@ -94,7 +94,7 @@ export function ReelDetail({ card, onClose }: { card: DirectoryCard | null; onCl
   const title = card.title ?? card.brand_name;
   return <ReelPopup title={title} onClose={onClose}><ReelPopupBody
     category={card.category} title={title} brandName={card.brand_name} href={card.website_url} onVisit={() => void recordBrandClick({ data: { kind: "directory", id: card.reel_id } }).catch(() => {})}
-    download={reelDownloadUrl(card.video, title)} description={card.description} tags={[...card.moods, ...card.tags]}
+    download={reelDownloadUrl(card.video, title)} embed={{ id: card.reel_id, title, format: card.formats[0] ?? "" }} description={card.description} tags={[...card.moods, ...card.tags]}
     brand={<Link to="/directory/$slug" params={{ slug: card.brand_slug }} onClick={onClose} className="font-semibold hover:text-ap-blue">{card.brand_name}</Link>}
     favorite={<DirectoryReelHeart inline reelId={card.reel_id} name={title} />}
     media={card.video ? <video src={card.video} poster={card.poster ?? undefined} controls autoPlay loop muted playsInline /> : card.poster ? <img src={card.poster} alt={`${card.brand_name} reel`} /> : null}
