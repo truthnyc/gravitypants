@@ -27,16 +27,6 @@ async function toClipboard(text: string, fallback: HTMLTextAreaElement | null) {
   }
 }
 
-/** One-tap copy for the public reel popups: the reel at its own size. */
-export function EmbedCopyButton({ reel, className }: { reel: EmbedTarget; className?: string }) {
-  const copy = () => void toClipboard(embedCode(reel.id, embedSize(reel.format, 1), reel.title), null);
-  return (
-    <button type="button" onClick={copy} data-cta="embed-copy" className={className}>
-      Copy embed code
-    </button>
-  );
-}
-
 /** Full dialog: pick a size, then copy the line to paste into a website. */
 export function EmbedDialog({ reel, open, onClose }: { reel: EmbedTarget | null; open: boolean; onClose: () => void }) {
   const [scale, setScale] = useState(1);
