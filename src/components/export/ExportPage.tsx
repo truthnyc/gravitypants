@@ -158,7 +158,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
       }
     }
     return { files, jobs };
-  }, [targets, mp4, gif, html5, gSize, base, mainId]);
+  }, [targets, mp4, gif, html5, gSize, base, mainId, canUse]);
 
   const seconds = videoDuration(project, frames, brand);
   const videos = files.filter((f) => f.kind === "mp4").length;
