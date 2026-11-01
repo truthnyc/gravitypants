@@ -165,7 +165,7 @@ function RegularSignUp({ redirect, plan, billing, template }: { redirect?: strin
 
   if (sent) {
     return (
-      <AuthShell title="Check your email" subtitle={joining ? `We sent a link to ${email}. Open it to finish your account and join your team.` : `We sent a link to ${email}. Open it to finish your account and start your free trial.`}>
+      <AuthShell title="Check your email" subtitle={joining ? `We sent a link to ${email}. Open it to finish your account and join your team.` : `We sent a link to ${email}. Open it to finish your account and start on the Free plan.`}>
         <p className="text-[15px]">
           <Link to="/signin" className="auth-link">Back to sign in</Link>
         </p>
