@@ -30,7 +30,16 @@ async function fetchBytes(url: string) {
 
 /** Google css2 subset for exactly the ad's text, parsed into font files. */
 async function googleFaces(family: string, weight: number, text: string) {
-  const css = await (await fetch(`https://fonts.googleapis.com/css2?family=${encodeURIComponent(family)}:wght@${weight}&text=${encodeURIComponent(text)}`)).text();
+  const base = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(family)}`;
+  const t = `&text=${encodeURIComponent(text)}`;
+  let css = "";
+  // Same request as the preview's loader first; families without that exact weight fall back to their default.
+  for (const url of [`${base}:wght@${weight}${t}`, `${base}${t}`]) {
+    try {
+      const r = await fetch(url);
+      if (r.ok) { css = await r.text(); break; }
+    } catch { /* try the next form */ }
+  }
   const out: { url: string; range?: string }[] = [];
   for (const block of css.split("@font-face").slice(1)) {
     const url = block.match(/url\(([^)]+)\)/)?.[1]?.replace(/["']/g, "");
