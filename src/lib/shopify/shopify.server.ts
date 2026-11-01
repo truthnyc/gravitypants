@@ -34,7 +34,7 @@ export async function verifySessionToken(token: string, apiKey: string, secret: 
 
 async function aesKey(raw: string) {
   const digest = await crypto.subtle.digest("SHA-256", enc.encode(raw));
-  return crypto.subtle.importKey("raw", digest, "AES-GCM", false, ["encrypt", "decrypt"]);
+  return crypto.subtle.importKey("raw", digest, { name: "AES-GCM", hash: "SHA-256" }, false, ["encrypt", "decrypt"]);
 }
 /** AES-256-GCM; stored as "v1:<iv>:<ciphertext>" (base64). */
 export async function encryptToken(plain: string, keyRaw: string) {
@@ -49,21 +49,88 @@ export async function decryptToken(stored: string, keyRaw: string) {
   return new TextDecoder().decode(pt);
 }
 
-export async function exchangeOfflineToken(shop: string, sessionToken: string, apiKey: string, secret: string) {
+/** Offline token pair as returned by Shopify's token endpoint. */
+export type OfflineTokenPair = {
+  access_token: string;
+  scope: string | null;
+  refresh_token: string | null;
+  /** seconds the access token stays valid, or null when Shopify did not say */
+  expires_in: number | null;
+  /** seconds the refresh token stays valid, or null when Shopify did not say */
+  refresh_token_expires_in: number | null;
+};
+
+/** ISO timestamp `seconds` from now, or null when Shopify did not send a lifetime. */
+export const tokenExpiry = (seconds: number | null) => (seconds && seconds > 0 ? new Date(Date.now() + seconds * 1000).toISOString() : null);
+
+const num = (v: unknown) => (typeof v === "number" && Number.isFinite(v) ? v : typeof v === "string" && v !== "" && Number.isFinite(Number(v)) ? Number(v) : null);
+const str = (v: unknown) => (typeof v === "string" && v ? v : null);
+
+function parsePair(json: Record<string, unknown>): OfflineTokenPair {
+  return {
+    access_token: String(json["access_token"] ?? ""),
+    scope: str(json["scope"]),
+    refresh_token: str(json["refresh_token"]),
+    expires_in: num(json["expires_in"]),
+    refresh_token_expires_in: num(json["refresh_token_expires_in"]),
+  };
+}
+
+// Shopify's documented shape for these grants is a form-encoded POST.
+async function postToken(shop: string, body: Record<string, string>) {
   const res = await fetch(`https://${shop}/admin/oauth/access_token`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", Accept: "application/json" },
-    body: JSON.stringify({
-      client_id: apiKey,
-      client_secret: secret,
-      grant_type: "urn:ietf:params:oauth:grant-type:token-exchange",
-      subject_token: sessionToken,
-      subject_token_type: "urn:ietf:params:oauth:token-type:id_token",
-      requested_token_type: "urn:shopify:params:oauth:token-type:offline-access-token",
-    }),
+    headers: { "Content-Type": "application/x-www-form-urlencoded", Accept: "application/json" },
+    body: new URLSearchParams(body).toString(),
   });
-  if (!res.ok) throw new Error(`Token exchange failed (${res.status})`);
-  return (await res.json()) as { access_token: string; scope: string };
+  const json = (await res.json().catch(() => null)) as Record<string, unknown> | null;
+  if (!res.ok || !json?.["access_token"]) {
+    const why = str(json?.["error_description"]) ?? str(json?.["error"]) ?? `HTTP ${res.status}`;
+    throw new Error(`Token exchange failed (${res.status}): ${why.slice(0, 160)}`);
+  }
+  return parsePair(json);
+}
+
+/**
+ * Exchanges an App Bridge session token for an expiring offline token.
+ * `expiring=1` is required: Shopify rejects non-expiring offline tokens for the Admin API.
+ */
+export async function exchangeOfflineToken(shop: string, sessionToken: string, apiKey: string, secret: string) {
+  return postToken(shop, {
+    grant_type: "urn:ietf:params:oauth:grant-type:token-exchange",
+    client_id: apiKey,
+    client_secret: secret,
+    subject_token: sessionToken,
+    subject_token_type: "urn:ietf:params:oauth:token-type:id_token",
+    requested_token_type: "urn:shopify:params:oauth:token-type:offline-access-token",
+    expiring: "1",
+  });
+}
+
+/**
+ * Swaps a stored non-expiring offline token for an expiring pair.
+ * Permanently invalidates the old token, so the caller must store the result.
+ */
+export async function migrateOfflineToken(shop: string, nonExpiringToken: string, apiKey: string, secret: string) {
+  return postToken(shop, {
+    grant_type: "urn:ietf:params:oauth:grant-type:token-exchange",
+    client_id: apiKey,
+    client_secret: secret,
+    subject_token: nonExpiringToken,
+    subject_token_type: "urn:shopify:params:oauth:token-type:offline-access-token",
+    requested_token_type: "urn:shopify:params:oauth:token-type:offline-access-token",
+    expiring: "1",
+  });
+}
+
+/** Trades a refresh token for a fresh access + refresh pair (the refresh token rotates). */
+export async function refreshOfflineToken(shop: string, refreshToken: string, apiKey: string, secret: string) {
+  return postToken(shop, {
+    grant_type: "refresh_token",
+    client_id: apiKey,
+    client_secret: secret,
+    refresh_token: refreshToken,
+  });
 }
 
 export async function adminGraphql<T>(shop: string, accessToken: string, query: string, variables?: unknown): Promise<T> {
