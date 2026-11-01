@@ -1,6 +1,7 @@
 # Product-reel search metadata
-- [ ] Write unique titles, descriptions and accurate structured data for all 37 Gravity Pants sitemap entries.
-- [ ] Verify all 37 rendered pages; preserve existing video, article and pricing data. Publishing awaits approval.
+- [x] Write unique titles, descriptions and accurate structured data for all 37 Gravity Pants sitemap entries.
+- [x] Verify all 37 server-rendered pages and browser titles; preserve existing video, article and pricing data. Six tests passed and build is healthy.
+- [ ] Publish the search metadata — awaiting explicit publishing approval.
 
 # Gravity Pants pixel
 - [x] Add website-visit measurement with regional advertising consent, withdrawal and privacy disclosure.
