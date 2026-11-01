@@ -79,6 +79,7 @@ import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAppAccountRouteImport } from './routes/_authenticated/app/account'
 import { Route as AuthenticatedAppAdsRouteImport } from './routes/_authenticated/app/ads'
 import { Route as AuthenticatedAppBrandRouteImport } from './routes/_authenticated/app/brand'
+import { Route as AuthenticatedAppBrandHomeRouteImport } from './routes/_authenticated/app/brand-home'
 import { Route as AuthenticatedAppContactRouteImport } from './routes/_authenticated/app/contact'
 import { Route as AuthenticatedAppExportsRouteImport } from './routes/_authenticated/app/exports'
 import { Route as AuthenticatedAppGuideRouteImport } from './routes/_authenticated/app/guide'
@@ -484,6 +485,12 @@ const AuthenticatedAppBrandRoute = AuthenticatedAppBrandRouteImport.update({
   path: '/brand',
   getParentRoute: () => AuthenticatedAppRouteRoute,
 } as any)
+const AuthenticatedAppBrandHomeRoute =
+  AuthenticatedAppBrandHomeRouteImport.update({
+    id: '/brand-home',
+    path: '/brand-home',
+    getParentRoute: () => AuthenticatedAppRouteRoute,
+  } as any)
 const AuthenticatedAppContactRoute = AuthenticatedAppContactRouteImport.update({
   id: '/contact',
   path: '/contact',
@@ -779,6 +786,7 @@ export interface FileRoutesByFullPath {
   '/app/account': typeof AuthenticatedAppAccountRoute
   '/app/ads': typeof AuthenticatedAppAdsRoute
   '/app/brand': typeof AuthenticatedAppBrandRoute
+  '/app/brand-home': typeof AuthenticatedAppBrandHomeRoute
   '/app/contact': typeof AuthenticatedAppContactRoute
   '/app/exports': typeof AuthenticatedAppExportsRoute
   '/app/guide': typeof AuthenticatedAppGuideRoute
@@ -888,6 +896,7 @@ export interface FileRoutesByTo {
   '/app/account': typeof AuthenticatedAppAccountRoute
   '/app/ads': typeof AuthenticatedAppAdsRoute
   '/app/brand': typeof AuthenticatedAppBrandRoute
+  '/app/brand-home': typeof AuthenticatedAppBrandHomeRoute
   '/app/contact': typeof AuthenticatedAppContactRoute
   '/app/exports': typeof AuthenticatedAppExportsRoute
   '/app/guide': typeof AuthenticatedAppGuideRoute
@@ -1002,6 +1011,7 @@ export interface FileRoutesById {
   '/_authenticated/app/account': typeof AuthenticatedAppAccountRoute
   '/_authenticated/app/ads': typeof AuthenticatedAppAdsRoute
   '/_authenticated/app/brand': typeof AuthenticatedAppBrandRoute
+  '/_authenticated/app/brand-home': typeof AuthenticatedAppBrandHomeRoute
   '/_authenticated/app/contact': typeof AuthenticatedAppContactRoute
   '/_authenticated/app/exports': typeof AuthenticatedAppExportsRoute
   '/_authenticated/app/guide': typeof AuthenticatedAppGuideRoute
@@ -1116,6 +1126,7 @@ export interface FileRouteTypes {
     | '/app/account'
     | '/app/ads'
     | '/app/brand'
+    | '/app/brand-home'
     | '/app/contact'
     | '/app/exports'
     | '/app/guide'
@@ -1225,6 +1236,7 @@ export interface FileRouteTypes {
     | '/app/account'
     | '/app/ads'
     | '/app/brand'
+    | '/app/brand-home'
     | '/app/contact'
     | '/app/exports'
     | '/app/guide'
@@ -1338,6 +1350,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/account'
     | '/_authenticated/app/ads'
     | '/_authenticated/app/brand'
+    | '/_authenticated/app/brand-home'
     | '/_authenticated/app/contact'
     | '/_authenticated/app/exports'
     | '/_authenticated/app/guide'
@@ -1938,6 +1951,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppBrandRouteImport
       parentRoute: typeof AuthenticatedAppRouteRoute
     }
+    '/_authenticated/app/brand-home': {
+      id: '/_authenticated/app/brand-home'
+      path: '/brand-home'
+      fullPath: '/app/brand-home'
+      preLoaderRoute: typeof AuthenticatedAppBrandHomeRouteImport
+      parentRoute: typeof AuthenticatedAppRouteRoute
+    }
     '/_authenticated/app/contact': {
       id: '/_authenticated/app/contact'
       path: '/contact'
@@ -2303,6 +2323,7 @@ interface AuthenticatedAppRouteRouteChildren {
   AuthenticatedAppAccountRoute: typeof AuthenticatedAppAccountRoute
   AuthenticatedAppAdsRoute: typeof AuthenticatedAppAdsRoute
   AuthenticatedAppBrandRoute: typeof AuthenticatedAppBrandRoute
+  AuthenticatedAppBrandHomeRoute: typeof AuthenticatedAppBrandHomeRoute
   AuthenticatedAppContactRoute: typeof AuthenticatedAppContactRoute
   AuthenticatedAppExportsRoute: typeof AuthenticatedAppExportsRoute
   AuthenticatedAppGuideRoute: typeof AuthenticatedAppGuideRoute
@@ -2329,6 +2350,7 @@ const AuthenticatedAppRouteRouteChildren: AuthenticatedAppRouteRouteChildren = {
   AuthenticatedAppAccountRoute: AuthenticatedAppAccountRoute,
   AuthenticatedAppAdsRoute: AuthenticatedAppAdsRoute,
   AuthenticatedAppBrandRoute: AuthenticatedAppBrandRoute,
+  AuthenticatedAppBrandHomeRoute: AuthenticatedAppBrandHomeRoute,
   AuthenticatedAppContactRoute: AuthenticatedAppContactRoute,
   AuthenticatedAppExportsRoute: AuthenticatedAppExportsRoute,
   AuthenticatedAppGuideRoute: AuthenticatedAppGuideRoute,
