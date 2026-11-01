@@ -26,6 +26,7 @@ const PAGES: { path: string; priority: string; changefreq: string; lastmod: stri
   { path: "/shopify-product-videos", priority: "0.7", changefreq: "monthly", lastmod: "2026-10-31" },
   { path: "/etsy-listing-videos", priority: "0.7", changefreq: "monthly", lastmod: "2026-10-31" },
   { path: "/gif-for-email", priority: "0.7", changefreq: "monthly", lastmod: "2026-10-31" },
+  { path: "/html5-ads", priority: "0.7", changefreq: "monthly", lastmod: "2026-11-01" },
   { path: "/video-ads-for-small-business", priority: "0.7", changefreq: "monthly", lastmod: "2026-10-31" },
   { path: "/for/jewelry", priority: "0.7", changefreq: "monthly", lastmod: "2026-10-31" },
   { path: "/for/home-decor", priority: "0.7", changefreq: "monthly", lastmod: "2026-10-31" },
