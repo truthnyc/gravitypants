@@ -28,7 +28,8 @@ import { formatSeconds, type Format, type Frame, type Project } from "@/lib/stil
 import { FORMAT_SIZE } from "@/render/formats";
 import { loadImages } from "@/render/images";
 import { ensureFonts, layoutFrame, mediaPaths, renderAt, restTime, videoDuration, type BrandStyle } from "@/render/renderFrame";
-import { exportHtml5 } from "@/render/exportHtml5";
+import { exportHtml5, Html5TooLarge } from "@/render/exportHtml5";
+import { GOOGLE_ADS_STARTER, isGoogleAdsSize } from "@/render/google-ads";
 import { safeClickUrl } from "@/render/html5-doc";
 import { ExportCancelled, exportGif, exportMp4, isOutOfMemory, killFFmpeg, type GifColors, type RenderInput } from "@/render/exportMedia";
 import { cn } from "@/lib/utils";
@@ -331,7 +332,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
         else {
           console.error(e);
           failure = e instanceof Error ? e.message : String(e);
-          set(key, { status: "error", note: job.kind === "html5" ? "Something went wrong making this banner. Check your connection and try again." : job.kind === "mp4" ? "Something went wrong making this video. Try again, or try on a computer." : "Something went wrong making this file. Try again, or pick a smaller GIF size." });
+          set(key, { status: "error", note: job.kind === "html5" && e instanceof Html5TooLarge ? "This banner is over 600 KB, the Google Ads limit. Try fewer photos or a smaller size." : job.kind === "html5" ? "Something went wrong making this banner. Check your connection and try again." : job.kind === "mp4" ? "Something went wrong making this video. Try again, or try on a computer." : "Something went wrong making this file. Try again, or pick a smaller GIF size." });
         }
       }
     }
@@ -492,6 +493,16 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
               <label htmlFor="html5-click" className="mb-1 block text-[13px] font-medium">Banner link</label>
               <Input id="html5-click" type="url" inputMode="url" placeholder="https://yourshop.com" value={clickUrl} onChange={(e) => setClickUrl(e.target.value)} maxLength={500} data-cta="export-html5-link" />
               <p className="mt-1 text-[12px] text-ap-muted">Where people go when they tap the banner. Ad platforms can replace it.</p>
+              <p className="mt-3 text-[12px] text-ap-muted">Ready for Google Ads: under 600 KB, plays up to 30 seconds.</p>
+              {targets.some((t) => !isGoogleAdsSize(t.width, t.height)) && (
+                <div className="mt-2 rounded-[4px] bg-ap-panel p-3 text-[12px]">
+                  <p>Google Ads only accepts its own banner sizes, such as 300×250 or 728×90. Not accepted: <span className="tabular-nums">{targets.filter((t) => !isGoogleAdsSize(t.width, t.height)).map((t) => `${t.width}×${t.height}`).join(", ")}</span>.</p>
+                  <Button type="button" variant="outline" size="sm" className="mt-2" data-cta="export-html5-google-sizes" onClick={() => {
+                    setCustomOn(true);
+                    setCustoms((rows) => [...rows, ...GOOGLE_ADS_STARTER.filter(([w, h]) => !rows.some((r) => r.w === String(w) && r.h === String(h))).map(([w, h]) => ({ id: `g${w}x${h}`, w: String(w), h: String(h) }))]);
+                  }}>Add Google Ads sizes</Button>
+                </div>
+              )}
             </div>
           )}
 

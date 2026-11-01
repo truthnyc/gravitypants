@@ -7,11 +7,10 @@ import runtimeJs from "virtual:html5-runtime";
 import type { CustomFont } from "@/lib/stillframe/types";
 import { allFormatFrames, projectForFormat, REEL_FORMATS } from "@/lib/stillframe/format-settings";
 import { getMediaUrl } from "@/lib/stillframe/media";
-import { DEFAULT_FONT, fontFamilyOf } from "./renderFrame";
+import { DEFAULT_FONT, fontFamilyOf, videoDuration } from "./renderFrame";
 import { ExportCancelled, type RenderInput } from "./exportMedia";
 import { bannerHtml, type Html5Doc } from "./html5-doc";
 import { adLoops, GOOGLE_ADS_MAX_ZIP_BYTES } from "./google-ads";
-import { videoDuration } from "./renderFrame";
 
 /** The banner could not be made small enough for ad platforms. */
 export class Html5TooLarge extends Error {}
@@ -59,7 +58,6 @@ async function googleFaces(family: string, weight: number, text: string) {
 }
 
 export async function exportHtml5(input: RenderInput, opts: Html5Options, signal: AbortSignal, onProgress: (p: number) => void): Promise<Blob> {
-  const files: Record<string, Uint8Array> = {};
   const { project, frames, brand, images } = input;
   const all = allFormatFrames(frames);
 
