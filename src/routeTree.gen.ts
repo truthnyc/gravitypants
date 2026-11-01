@@ -103,6 +103,7 @@ import { Route as AuthenticatedAppAccountFavoritesRouteImport } from './routes/_
 import { Route as AuthenticatedAppAccountMembersRouteImport } from './routes/_authenticated/app/account_.members'
 import { Route as AuthenticatedAppAccountStatsRouteImport } from './routes/_authenticated/app/account_.stats'
 import { Route as AuthenticatedAppAdminSplatRouteImport } from './routes/_authenticated/app/admin.$'
+import { Route as AuthenticatedAppJoinWsRouteImport } from './routes/_authenticated/app/join.$ws'
 import { Route as AuthenticatedAppTemplatesIndexRouteImport } from './routes/_authenticated/app/templates.index'
 import { Route as AuthenticatedAppTemplatesSlugRouteImport } from './routes/_authenticated/app/templates.$slug'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
@@ -616,6 +617,11 @@ const AuthenticatedAppAdminSplatRoute =
     path: '/admin/$',
     getParentRoute: () => AuthenticatedAppRouteRoute,
   } as any)
+const AuthenticatedAppJoinWsRoute = AuthenticatedAppJoinWsRouteImport.update({
+  id: '/join/$ws',
+  path: '/join/$ws',
+  getParentRoute: () => AuthenticatedAppRouteRoute,
+} as any)
 const AuthenticatedAppTemplatesIndexRoute =
   AuthenticatedAppTemplatesIndexRouteImport.update({
     id: '/templates/',
@@ -811,6 +817,7 @@ export interface FileRoutesByFullPath {
   '/app/account/members': typeof AuthenticatedAppAccountMembersRoute
   '/app/account/stats': typeof AuthenticatedAppAccountStatsRoute
   '/app/admin/$': typeof AuthenticatedAppAdminSplatRoute
+  '/app/join/$ws': typeof AuthenticatedAppJoinWsRoute
   '/app/templates/$slug': typeof AuthenticatedAppTemplatesSlugRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/shopify/auth': typeof ApiPublicShopifyAuthRoute
@@ -921,6 +928,7 @@ export interface FileRoutesByTo {
   '/app/account/members': typeof AuthenticatedAppAccountMembersRoute
   '/app/account/stats': typeof AuthenticatedAppAccountStatsRoute
   '/app/admin/$': typeof AuthenticatedAppAdminSplatRoute
+  '/app/join/$ws': typeof AuthenticatedAppJoinWsRoute
   '/app/templates/$slug': typeof AuthenticatedAppTemplatesSlugRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/shopify/auth': typeof ApiPublicShopifyAuthRoute
@@ -1036,6 +1044,7 @@ export interface FileRoutesById {
   '/_authenticated/app/account_/members': typeof AuthenticatedAppAccountMembersRoute
   '/_authenticated/app/account_/stats': typeof AuthenticatedAppAccountStatsRoute
   '/_authenticated/app/admin/$': typeof AuthenticatedAppAdminSplatRoute
+  '/_authenticated/app/join/$ws': typeof AuthenticatedAppJoinWsRoute
   '/_authenticated/app/templates/$slug': typeof AuthenticatedAppTemplatesSlugRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/shopify/auth': typeof ApiPublicShopifyAuthRoute
@@ -1151,6 +1160,7 @@ export interface FileRouteTypes {
     | '/app/account/members'
     | '/app/account/stats'
     | '/app/admin/$'
+    | '/app/join/$ws'
     | '/app/templates/$slug'
     | '/api/public/payments/webhook'
     | '/api/public/shopify/auth'
@@ -1261,6 +1271,7 @@ export interface FileRouteTypes {
     | '/app/account/members'
     | '/app/account/stats'
     | '/app/admin/$'
+    | '/app/join/$ws'
     | '/app/templates/$slug'
     | '/api/public/payments/webhook'
     | '/api/public/shopify/auth'
@@ -1375,6 +1386,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/account_/members'
     | '/_authenticated/app/account_/stats'
     | '/_authenticated/app/admin/$'
+    | '/_authenticated/app/join/$ws'
     | '/_authenticated/app/templates/$slug'
     | '/api/public/payments/webhook'
     | '/api/public/shopify/auth'
@@ -2119,6 +2131,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppAdminSplatRouteImport
       parentRoute: typeof AuthenticatedAppRouteRoute
     }
+    '/_authenticated/app/join/$ws': {
+      id: '/_authenticated/app/join/$ws'
+      path: '/join/$ws'
+      fullPath: '/app/join/$ws'
+      preLoaderRoute: typeof AuthenticatedAppJoinWsRouteImport
+      parentRoute: typeof AuthenticatedAppRouteRoute
+    }
     '/_authenticated/app/templates/': {
       id: '/_authenticated/app/templates/'
       path: '/templates'
@@ -2337,6 +2356,7 @@ interface AuthenticatedAppRouteRouteChildren {
   AuthenticatedAppAccountMembersRoute: typeof AuthenticatedAppAccountMembersRoute
   AuthenticatedAppAccountStatsRoute: typeof AuthenticatedAppAccountStatsRoute
   AuthenticatedAppAdminSplatRoute: typeof AuthenticatedAppAdminSplatRoute
+  AuthenticatedAppJoinWsRoute: typeof AuthenticatedAppJoinWsRoute
   AuthenticatedAppTemplatesSlugRoute: typeof AuthenticatedAppTemplatesSlugRoute
   AuthenticatedAppTemplatesIndexRoute: typeof AuthenticatedAppTemplatesIndexRoute
   AuthenticatedAppAdIdEditRoute: typeof AuthenticatedAppAdIdEditRoute
@@ -2364,6 +2384,7 @@ const AuthenticatedAppRouteRouteChildren: AuthenticatedAppRouteRouteChildren = {
   AuthenticatedAppAccountMembersRoute: AuthenticatedAppAccountMembersRoute,
   AuthenticatedAppAccountStatsRoute: AuthenticatedAppAccountStatsRoute,
   AuthenticatedAppAdminSplatRoute: AuthenticatedAppAdminSplatRoute,
+  AuthenticatedAppJoinWsRoute: AuthenticatedAppJoinWsRoute,
   AuthenticatedAppTemplatesSlugRoute: AuthenticatedAppTemplatesSlugRoute,
   AuthenticatedAppTemplatesIndexRoute: AuthenticatedAppTemplatesIndexRoute,
   AuthenticatedAppAdIdEditRoute: AuthenticatedAppAdIdEditRoute,
