@@ -1,4 +1,3 @@
-# Photo-to-video article
 # Gravity Pants pixel
 - [ ] Add website-visit measurement with regional advertising consent, withdrawal and privacy disclosure.
 - [ ] Verify allowed transmission, rejection and host exclusions; publication requires user approval.

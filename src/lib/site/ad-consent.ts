@@ -25,7 +25,12 @@ export function parseConsent(raw: string | null): ConsentRecord | null {
 export function appendChoice(record: ConsentRecord | null, advertising: boolean, region: string | null): ConsentRecord {
   return { visitor: record?.visitor ?? crypto.randomUUID(), choices: [...(record?.choices ?? []), { advertising, region, at: new Date().toISOString(), noticeVersion: NOTICE_VERSION, notice: AD_NOTICE }] };
 }
-export async function lookupAdRegion(): Promise<string | null> {
+let regionLookup: Promise<string | null> | undefined;
+export function lookupAdRegion(): Promise<string | null> {
+  regionLookup ??= fetchAdRegion();
+  return regionLookup;
+}
+async function fetchAdRegion(): Promise<string | null> {
   try {
     const response = await fetch('/cdn-cgi/trace', { signal: AbortSignal.timeout(2000), credentials: 'same-origin' });
     if (!response.ok) return null;
