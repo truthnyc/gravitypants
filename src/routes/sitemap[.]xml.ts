@@ -39,7 +39,7 @@ const PAGES: { path: string; priority: string; changefreq: string; lastmod: stri
 
 function isoDate(value: string): string {
   const parsed = new Date(value);
-  return Number.isNaN(parsed.getTime()) ? new Date().toISOString().slice(0, 10) : parsed.toISOString().slice(0, 10);
+  return Number.isNaN(parsed.getTime()) ? "" : parsed.toISOString().slice(0, 10);
 }
 
 export const Route = createFileRoute("/sitemap.xml")({
@@ -62,20 +62,19 @@ type Entry = { loc: string; lastmod: string; changefreq: string; priority: strin
 
 /** aimante.co lists only its own pages: home, About, List your brand, every category and brand. */
 async function aimanteEntries(): Promise<Entry[]> {
-  const today = new Date().toISOString().slice(0, 10);
   const brands = await listPublicBrands();
   return [
-    { loc: `${AIMANTE_ORIGIN}/`, lastmod: today, changefreq: "daily", priority: "1.0" },
+    { loc: `${AIMANTE_ORIGIN}/`, lastmod: "", changefreq: "daily", priority: "1.0" },
     { loc: `${AIMANTE_ORIGIN}/about`, lastmod: "2026-10-07", changefreq: "yearly", priority: "0.5" },
     { loc: `${AIMANTE_ORIGIN}/join`, lastmod: "2026-10-07", changefreq: "monthly", priority: "0.6" },
-    ...CATEGORIES.map((c) => ({ loc: `${AIMANTE_ORIGIN}/c/${categorySlug(c)}`, lastmod: today, changefreq: "weekly", priority: "0.7" })),
+    ...CATEGORIES.map((c) => ({ loc: `${AIMANTE_ORIGIN}/c/${categorySlug(c)}`, lastmod: "", changefreq: "weekly", priority: "0.7" })),
     ...brands.map((b) => ({ loc: `${AIMANTE_ORIGIN}/b/${b.slug}`, lastmod: isoDate(b.updated_at), changefreq: "weekly", priority: "0.8" })),
   ];
 }
 
 function xml(entries: Entry[]) {
         const body = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries
-          .map(e => `  <url>\n    <loc>${e.loc}</loc>\n    <lastmod>${e.lastmod}</lastmod>\n    <changefreq>${e.changefreq}</changefreq>\n    <priority>${e.priority}</priority>\n  </url>`)
+          .map(e => `  <url>\n    <loc>${e.loc}</loc>\n${e.lastmod ? `    <lastmod>${e.lastmod}</lastmod>\n` : ""}    <changefreq>${e.changefreq}</changefreq>\n    <priority>${e.priority}</priority>\n  </url>`)
           .join("\n")}\n</urlset>\n`;
         return new Response(body, { headers: { "content-type": "application/xml; charset=utf-8", "cache-control": "public, max-age=3600", vary: "host" } });
 }
