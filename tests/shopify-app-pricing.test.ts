@@ -6,9 +6,9 @@ const sub = (handle: string, billingPeriod = "MONTHLY") => ({ billingPeriod, can
 
 describe("Shopify plan handles", () => {
   it("map to the same limits as gravitypants.com", () => {
-    expect(limitsFor("free")).toMatchObject({ exports: 3, total: true, watermark: "after_first", seats: 1 });
+    expect(limitsFor("free")).toMatchObject({ exports: 6, total: true, watermark: "after_first", seats: 1 });
     expect(limitsFor("simple")).toMatchObject({ exports: 10, watermark: "never", seats: 1 });
-    expect(limitsFor("business")).toMatchObject({ exports: 50, watermark: "never", seats: 1 });
+    expect(limitsFor("business")).toMatchObject({ exports: 30, watermark: "never", seats: 1 });
     expect(limitsFor("team")).toMatchObject({ exports: 150, watermark: "never", seats: 5 });
   });
   it("map to the web billing plans by period", () => {
