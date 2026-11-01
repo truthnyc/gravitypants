@@ -360,3 +360,48 @@ function ExportPanel({ project, images, beforeExport, watermarked, onDone }: { p
     </div>
   );
 }
+
+function AddToProducts({ reelId, path }: { reelId: string; path: string }) {
+  const [products, setProducts] = useState<{ id: string; title: string }[] | null>(null);
+  const [picked, setPicked] = useState<Set<string>>(new Set());
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    shopifyFetch<{ products: { id: string; title: string }[] }>("/api/public/shopify/export", { action: "products", id: reelId })
+      .then((r) => { setProducts(r.products); setPicked(new Set(r.products.map((p) => p.id))); }, () => setProducts([]));
+  }, [reelId]);
+
+  if (!products || products.length === 0) return null;
+
+  async function add() {
+    setBusy(true);
+    setMsg(null);
+    try {
+      const r = await shopifyFetch<{ added: number; failed: string[] }>("/api/public/shopify/export", { action: "add-to-products", id: reelId, path, productIds: [...picked] });
+      setMsg(r.failed.length ? `Added to ${r.added} of ${r.added + r.failed.length} products. ${r.failed[0]}` : `Added to ${r.added} product ${r.added === 1 ? "page" : "pages"}. Shopify may take a few minutes to process the video.`);
+    } catch (e) {
+      setMsg((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="mt-4 border-t border-border pt-4">
+      <p className="text-sm font-medium">Add this video to product pages</p>
+      <ul className="mt-2 space-y-1">
+        {products.map((p) => (
+          <li key={p.id}>
+            <label className="flex items-center gap-2 text-sm">
+              <input type="checkbox" checked={picked.has(p.id)} onChange={(e) => setPicked((s) => { const n = new Set(s); if (e.target.checked) n.add(p.id); else n.delete(p.id); return n; })} />
+              {p.title}
+            </label>
+          </li>
+        ))}
+      </ul>
+      <button type="button" data-cta="shopify-add-to-products" disabled={busy || picked.size === 0} onClick={add} className="mt-2 rounded-lg border border-border px-4 py-2 text-sm disabled:opacity-60">{busy ? "Adding…" : "Add to product pages"}</button>
+      {msg && <p className="mt-2 text-sm" aria-live="polite">{msg}</p>}
+    </div>
+  );
+}
