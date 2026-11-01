@@ -22,6 +22,13 @@ async function imageFile(img: HTMLImageElement, maxSide: number, keepAlpha: bool
   return { data: new Uint8Array(await blob.arrayBuffer()), ext: keepAlpha ? "png" : "jpg" };
 }
 
+function fontExt(type: string | null, path: string) {
+  const fromPath = path.split("?")[0]!.match(/\.(woff2|woff|ttf|otf)$/i)?.[1]?.toLowerCase();
+  if (fromPath) return fromPath;
+  const t = type ?? "";
+  return t.includes("woff2") ? "woff2" : t.includes("woff") ? "woff" : t.includes("otf") ? "otf" : "ttf";
+}
+
 async function fetchBytes(url: string) {
   const r = await fetch(url);
   if (!r.ok) throw new Error(`fetch ${r.status}`);
@@ -67,7 +74,7 @@ export async function exportHtml5(input: RenderInput, opts: Html5Options, signal
   const entries = [...images.entries()];
   for (const [path, img] of entries) {
     if (signal.aborted) throw new ExportCancelled();
-    const keep = alphaPaths.has(path) || /\.(png|svg|webp|gif)$/i.test(path);
+    const keep = alphaPaths.has(path);
     const { data, ext } = await imageFile(img, maxSide, keep);
     const name = `img${++i}.${ext}`;
     files[name] = data;
@@ -92,9 +99,10 @@ export async function exportHtml5(input: RenderInput, opts: Html5Options, signal
     if (custom) {
       const url = await getMediaUrl(custom.path);
       if (!url) continue;
-      const ext = custom.path.split(".").pop()?.toLowerCase() ?? "woff2";
-      const name = `font${++n}.${ext}`;
-      files[name] = await fetchBytes(url);
+      const r = await fetch(url);
+      if (!r.ok) continue;
+      const name = `font${++n}.${fontExt(r.headers.get("content-type"), custom.path)}`;
+      files[name] = new Uint8Array(await r.arrayBuffer());
       fonts.push({ family, weight, file: name });
       continue;
     }
@@ -102,7 +110,7 @@ export async function exportHtml5(input: RenderInput, opts: Html5Options, signal
       const r = await fetch(face.url);
       if (!r.ok) continue;
       const type = r.headers.get("content-type") ?? "";
-      const name = `font${++n}.${type.includes("woff2") ? "woff2" : type.includes("woff") ? "woff" : "ttf"}`;
+      const name = `font${++n}.${fontExt(type, "")}`;
       files[name] = new Uint8Array(await r.arrayBuffer());
       fonts.push({ family, weight, file: name, ...(face.range ? { unicodeRange: face.range } : {}) });
     }
