@@ -3,7 +3,7 @@ import { ReelVideo } from "@/components/site/ReelVideo";
 import { SiteReelHeart } from "@/components/site/SiteReelHeart";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
-import { ArrowRight, ArrowUpRight, Check, ChevronDown, X } from "lucide-react";
+import { ArrowRight, Check, ChevronDown, X } from "lucide-react";
 import { useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { SiteShell } from "@/components/site/SiteShell";
@@ -18,7 +18,8 @@ import { categoryLabel, type SiteReel } from "@/lib/site/reels";
 import { getHomepageContent } from "@/lib/site/homepage.functions";
 import { DEFAULT_CONTENT, featuredVideo, photoSrc } from "@/lib/site/homepage";
 
-const reelToExample = (r: SiteReel): GalleryExample => ({ id: r.id, name: r.title, category: r.category, format: r.format, photos: r.photos, seconds: r.seconds, headline: r.title, sub: r.brand, logo: r.brand, video: r.video, ...(r.videoWebm ? { videoWebm: r.videoWebm } : {}), ...(r.poster ? { poster: r.poster } : {}), ...(r.href ? { href: r.href } : {}), frames: [], ...(r.source === "client" ? { client: true } : {}) });
+type BrandExample = GalleryExample & { brandSlug: string | null };
+const reelToExample = (r: SiteReel): BrandExample => ({ brandSlug: r.brandSlug, id: r.id, name: r.title, category: r.category, format: r.format, photos: r.photos, seconds: r.seconds, headline: r.title, sub: r.brand, logo: r.brand, video: r.video, ...(r.videoWebm ? { videoWebm: r.videoWebm } : {}), ...(r.poster ? { poster: r.poster } : {}), ...(r.href ? { href: r.href } : {}), frames: [], ...(r.source === "client" ? { client: true } : {}) });
 
 const formats = [{ id: "all", label: "All formats", short: "All" }, { id: "916", label: "9:16", short: "9:16" }, { id: "11", label: "1:1", short: "1:1" }, { id: "169", label: "16:9", short: "16:9" }] as const;
 const formatLabel: Record<string, string> = { "916": "9:16", "11": "1:1", "169": "16:9" };
@@ -68,10 +69,10 @@ function GalleryReel({ example }: { example: GalleryExample }) {
   </div>;
 }
 
-function GalleryCard({ example }: { example: GalleryExample }) {
+function GalleryCard({ example }: { example: BrandExample }) {
   return <article className="examples-card">
     <div className="examples-card-media">{!example.client && <SiteReelHeart reelId={example.id} name={example.name} />}{example.href ? <a className="site-reel-link" href={example.href} target="_blank" rel="noreferrer" aria-label={example.frames?.length ? undefined : `Visit ${example.logo ?? example.name}`}><GalleryReel example={example} /></a> : <GalleryReel example={example} />}</div>
-    <div className="examples-card-info"><div><h3>{example.name}</h3><p className="examples-card-meta-desktop">{categoryLabel(example.category)} · {formatLabel[example.format]} · {example.photos} {example.photos === 1 ? "photo" : "photos"} · {example.seconds} sec</p><p className="examples-card-meta-mobile">{categoryLabel(example.category)} · {formatLabel[example.format]}</p><ConceptReelNotice brandName={example.logo ?? example.sub} />{example.href && <a className="showcase-visit" href={example.href} target="_blank" rel="noreferrer">Visit {example.logo ?? example.name} <ArrowUpRight size={13} strokeWidth={1.7} /></a>}</div>
+    <div className="examples-card-info"><div><h3>{example.name}</h3><p className="examples-card-meta-desktop">{categoryLabel(example.category)} · {formatLabel[example.format]} · {example.photos} {example.photos === 1 ? "photo" : "photos"} · {example.seconds} sec</p><p className="examples-card-meta-mobile">{categoryLabel(example.category)} · {formatLabel[example.format]}</p><ConceptReelNotice brandName={example.logo ?? example.sub} />{example.brandSlug && <Link className="showcase-visit" to="/directory/$slug" params={{ slug: example.brandSlug }} data-cta="examples-brand-profile">About {example.logo ?? example.name} <ArrowRight size={13} strokeWidth={1.7} /></Link>}</div>
     </div>
   </article>;
 }

@@ -1,6 +1,6 @@
 import { ConceptReelNotice } from "@/components/directory/ConceptReelNotice";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { ReelVideo } from "@/components/site/ReelVideo";
 import { SiteReelHeart } from "@/components/site/SiteReelHeart";
@@ -59,10 +59,10 @@ function BrandCard({ reel }: { reel: SiteReel }) {
             {reel.title} · {FORMAT_LABEL[reel.format]} · {reel.seconds} sec
           </p>
           <ConceptReelNotice brandName={reel.brand} brandSlug={reel.brandSlug} />
-          {reel.href && (
-            <a className="showcase-visit" href={reel.href} target="_blank" rel="noreferrer">
-              Visit {reel.brand} <ArrowUpRight size={15} strokeWidth={1.7} />
-            </a>
+          {reel.brandSlug && (
+            <Link className="showcase-visit" to="/directory/$slug" params={{ slug: reel.brandSlug }} data-cta="showcase-brand-profile">
+              About {reel.brand} <ArrowRight size={15} strokeWidth={1.7} />
+            </Link>
           )}
           
         </div>
