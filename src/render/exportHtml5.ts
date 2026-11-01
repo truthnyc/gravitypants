@@ -10,15 +10,23 @@ import { getMediaUrl } from "@/lib/stillframe/media";
 import { DEFAULT_FONT, fontFamilyOf } from "./renderFrame";
 import { ExportCancelled, type RenderInput } from "./exportMedia";
 import { bannerHtml, type Html5Doc } from "./html5-doc";
+import { adLoops, GOOGLE_ADS_MAX_ZIP_BYTES } from "./google-ads";
+import { videoDuration } from "./renderFrame";
+
+/** The banner could not be made small enough for ad platforms. */
+export class Html5TooLarge extends Error {}
+
+const toBase64 = (u: Uint8Array) => { let s = ""; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode(...u.subarray(i, i + 0x8000)); return btoa(s); };
+const FONT_MIME: Record<string, string> = { woff2: "font/woff2", woff: "font/woff", ttf: "font/ttf", otf: "font/otf" };
 
 export type Html5Options = { clickUrl: string; loops: number; title: string; customFonts?: CustomFont[] };
 
-async function imageFile(img: HTMLImageElement, maxSide: number, keepAlpha: boolean) {
+async function imageFile(img: HTMLImageElement, maxSide: number, keepAlpha: boolean, quality: number) {
   const s = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight));
   const w = Math.max(1, Math.round(img.naturalWidth * s)), h = Math.max(1, Math.round(img.naturalHeight * s));
   const c = new OffscreenCanvas(w, h);
   c.getContext("2d")!.drawImage(img, 0, 0, w, h);
-  const blob = await c.convertToBlob(keepAlpha ? { type: "image/png" } : { type: "image/jpeg", quality: 0.85 });
+  const blob = await c.convertToBlob(keepAlpha ? { type: "image/png" } : { type: "image/jpeg", quality });
   return { data: new Uint8Array(await blob.arrayBuffer()), ext: keepAlpha ? "png" : "jpg" };
 }
 
@@ -63,19 +71,20 @@ export async function exportHtml5(input: RenderInput, opts: Html5Options, signal
     for (const p of [l.path, l.light_path, l.dark_path]) if (p) alphaPaths.add(p);
   }
   for (const f of all) if (f.subline?.mode === "image" && f.subline.image_path) alphaPaths.add(f.subline.image_path);
-  const imageMap: Record<string, string> = {};
-  let i = 0;
   const entries = [...images.entries()];
-  for (const [path, img] of entries) {
-    if (signal.aborted) throw new ExportCancelled();
-    const keep = alphaPaths.has(path);
-    const { data, ext } = await imageFile(img, maxSide, keep);
-    const name = `img${++i}.${ext}`;
-    files[name] = data;
-    imageMap[path] = name;
-    onProgress((i / Math.max(1, entries.length)) * 0.5);
-  }
-
+  const encodeImages = async (scale: number, quality: number) => {
+    const out: Record<string, Uint8Array> = {};
+    const map: Record<string, string> = {};
+    let i = 0;
+    for (const [path, img] of entries) {
+      if (signal.aborted) throw new ExportCancelled();
+      const { data, ext } = await imageFile(img, maxSide * scale, alphaPaths.has(path), quality);
+      const name = `img${++i}.${ext}`;
+      out[name] = data;
+      map[path] = name;
+    }
+    return { out, map };
+  };
   // Fonts: the exact faces the preview uses.
   const specs = new Map<string, { family: string; weight: number }>();
   for (const f of all) {
@@ -86,7 +95,6 @@ export async function exportHtml5(input: RenderInput, opts: Html5Options, signal
   specs.set(`600|${endFam}`, { family: endFam, weight: 600 });
   const text = all.map((f) => `${f.headline?.text ?? ""} ${f.subline?.mode === "image" ? "" : f.subline?.text ?? ""}`).join(" ") + " Made with Gravity Pants " + (project.end_card?.cta_text ?? "") + " " + (brand?.endCard?.cta_text ?? "");
   const fonts: Html5Doc["fonts"] = [];
-  let n = 0;
   for (const { family, weight } of specs.values()) {
     if (signal.aborted) throw new ExportCancelled();
     const custom = opts.customFonts?.find((c) => c.family === family);
@@ -95,29 +103,39 @@ export async function exportHtml5(input: RenderInput, opts: Html5Options, signal
       if (!url) continue;
       const r = await fetch(url);
       if (!r.ok) continue;
-      const name = `font${++n}.${fontExt(r.headers.get("content-type"), custom.path)}`;
-      files[name] = new Uint8Array(await r.arrayBuffer());
-      fonts.push({ family, weight, file: name });
+      const ext = fontExt(r.headers.get("content-type"), custom.path);
+      fonts.push({ family, weight, file: `data:${FONT_MIME[ext]};base64,${toBase64(new Uint8Array(await r.arrayBuffer()))}` });
       continue;
     }
     for (const face of await googleFaces(family, weight, text)) {
       const r = await fetch(face.url);
       if (!r.ok) continue;
-      const type = r.headers.get("content-type") ?? "";
-      const name = `font${++n}.${fontExt(type, "")}`;
-      files[name] = new Uint8Array(await r.arrayBuffer());
-      fonts.push({ family, weight, file: name, ...(face.range ? { unicodeRange: face.range } : {}) });
+      const ext = fontExt(r.headers.get("content-type"), "");
+      fonts.push({ family, weight, file: `data:${FONT_MIME[ext]};base64,${toBase64(new Uint8Array(await r.arrayBuffer()))}`, ...(face.range ? { unicodeRange: face.range } : {}) });
     }
   }
-  onProgress(0.8);
+  onProgress(0.3);
 
-  const doc: Html5Doc = {
-    project, frames, brand, format: input.format, width: input.width, height: input.height,
-    watermark: !!input.watermark, loops: opts.loops, images: imageMap, fonts,
-  };
-  files["index.html"] = strToU8(bannerHtml(opts.title, input.width, input.height, opts.clickUrl, JSON.stringify(doc)));
-  files["ad.js"] = strToU8(runtimeJs);
-  const zip = zipSync(files, { level: 6 });
-  onProgress(1);
-  return new Blob([new Uint8Array(zip)], { type: "application/zip" });
+  // Google Ads: zip at most 600 KB, animation at most 30 seconds. Shrink photos until it fits.
+  const loops = adLoops(opts.loops, videoDuration(project, frames, brand));
+  const tries: [number, number][] = [[1, 0.82], [0.8, 0.75], [0.65, 0.7], [0.5, 0.65], [0.4, 0.6], [0.3, 0.55]];
+  for (let t = 0; t < tries.length; t++) {
+    const [scale, quality] = tries[t]!;
+    const { out, map } = await encodeImages(scale, quality);
+    const doc: Html5Doc = {
+      project, frames, brand, format: input.format, width: input.width, height: input.height,
+      watermark: !!input.watermark, loops, images: map, fonts,
+    };
+    const zip = zipSync({
+      ...out,
+      "index.html": strToU8(bannerHtml(opts.title, input.width, input.height, opts.clickUrl, JSON.stringify(doc))),
+      "ad.js": strToU8(runtimeJs),
+    }, { level: 9 });
+    onProgress(0.3 + ((t + 1) / tries.length) * 0.7);
+    if (zip.byteLength <= GOOGLE_ADS_MAX_ZIP_BYTES) {
+      onProgress(1);
+      return new Blob([new Uint8Array(zip)], { type: "application/zip" });
+    }
+  }
+  throw new Html5TooLarge("banner over 600 KB");
 }
