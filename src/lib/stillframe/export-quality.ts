@@ -19,7 +19,8 @@ export function exportSelectionCount(sizeCount: number, formatCount: number) {
 }
 
 /** Approximate encoded bytes, not a guarantee: photo detail and encoder fallback affect the final size. */
-export function estimateExportBytes(kind: "mp4" | "gif", width: number, height: number, seconds: number, fps: number, colors: GifColors = "balanced") {
+export function estimateExportBytes(kind: "mp4" | "gif" | "html5", width: number, height: number, seconds: number, fps: number, colors: GifColors = "balanced") {
+  if (kind === "html5") return Math.round(60_000 + width * height * 0.35);
   if (kind === "mp4") return Math.round(seconds * (fps >= 60 ? 10_000_000 : 6_000_000) / 8);
   const bytesPerPixel = colors === "best" ? 0.22 : colors === "smallest" ? 0.12 : 0.16;
   return Math.round(width * height * seconds * fps * bytesPerPixel);

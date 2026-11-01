@@ -4,7 +4,7 @@ import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import { formatSeconds } from "@/lib/stillframe/types";
 import { exportSelectionCount } from "@/lib/stillframe/export-quality";
 
-type ListedFile = { name: string; sizeName: string; ratio: string; width: number; height: number; kind: "mp4" | "gif"; estimatedBytes: number };
+type ListedFile = { name: string; sizeName: string; ratio: string; width: number; height: number; kind: "mp4" | "gif" | "html5"; estimatedBytes: number };
 export function ExportFooter({ files, sizeNames, formats, seconds, remaining, action }: {
   files: ListedFile[]; sizeNames: string[]; formats: string[]; seconds: number; remaining: string; action: ReactNode;
 }) {
@@ -24,7 +24,7 @@ export function ExportFooter({ files, sizeNames, formats, seconds, remaining, ac
       </div>
       <CollapsibleContent id="export-file-list">
         <ul aria-label="Selected export files" className="mt-3 space-y-2 rounded-lg bg-ap-panel p-3 text-[13px] nums">
-          {files.map((file) => <li key={file.name}>{file.sizeName} · {file.ratio} · {file.width} × {file.height} px · {file.kind.toUpperCase()} · <span className="text-ap-muted">Est. {(file.estimatedBytes / 1_000_000).toFixed(1)} MB</span></li>)}
+          {files.map((file) => <li key={file.name}>{file.sizeName} · {file.ratio} · {file.width} × {file.height} px · {file.kind === "html5" ? "HTML5" : file.kind.toUpperCase()} · <span className="text-ap-muted">Est. {(file.estimatedBytes / 1_000_000).toFixed(1)} MB</span></li>)}
         </ul>
       </CollapsibleContent>
     </Collapsible>
