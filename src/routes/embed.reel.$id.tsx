@@ -34,7 +34,7 @@ function EmbedReelPage() {
 
   return (
     <div className="relative grid h-dvh w-full place-items-center overflow-hidden bg-ap-ink">
-      <video ref={video} className="object-contain" style={{ width: "100%", height: "100%" }} src={reel.video} poster={reel.poster ?? undefined} controls autoPlay loop muted playsInline preload="metadata" />
+      <video ref={video} className="absolute inset-0 object-contain" style={{ width: "100%", height: "100%" }} src={reel.video} poster={reel.poster ?? undefined} controls autoPlay loop muted playsInline preload="metadata" />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 bg-gradient-to-t from-ap-ink/85 to-transparent px-3 pb-2 pt-8">
         <span className="min-w-0 truncate text-[12px] text-ap-card/90">{reel.brand}</span>
         <a href="https://gravitypants.com" target="_blank" rel="noreferrer" data-cta="embed-credit"
