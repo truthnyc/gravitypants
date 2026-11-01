@@ -163,7 +163,7 @@ export const COMPARE: CompareGroup[] = [
     group: "Brand & reuse",
     rows: [
       { label: "Brand kit", cells: all(true) },
-      ...["Duplicate with new photos", "Save as template"].map((label) => ({ label, cells: byPlan(true, (p) => p.id !== "starter") })),
+      ...["Duplicate with new photos", "Save as template"].map((label) => ({ label, cells: all(true) })),
     ],
   },
   {
