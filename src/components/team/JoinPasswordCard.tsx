@@ -19,7 +19,7 @@ export function JoinPasswordCard({ workspaceId, className }: { workspaceId: stri
     setBusy(true);
     const { data, error } = await supabase.rpc("set_join_password", { _ws: workspaceId, _password: value });
     setBusy(false);
-    if (error) return toast.error(error.message.includes("8 to 100") ? "Use 8 to 100 characters." : "Couldn't save. Try again.");
+    if (error) { toast.error(error.message.includes("8 to 100") ? "Use 8 to 100 characters." : "Couldn't save. Try again."); return; }
     setEnabled(Boolean(data));
     setPw("");
     toast.success(data ? "Join password saved" : "Joining by password is off");
