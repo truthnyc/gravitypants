@@ -112,7 +112,7 @@ function InviteClient() {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
-  const [plan, setPlan] = useState<"simple" | "business" | "team">("business");
+  const [plan, setPlan] = useState<"starter" | "simple" | "business" | "team">("business");
   const [until, setUntil] = useState(() => new Date(Date.now() + 365 * 864e5).toISOString().slice(0, 10));
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
@@ -146,7 +146,7 @@ function InviteClient() {
             <label className="block"><span className="mb-1 block text-secondary-text">Email</span><Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@brand.com" /></label>
             <label className="block"><span className="mb-1 block text-secondary-text">Name (optional)</span><Input value={name} onChange={(e) => setName(e.target.value)} /></label>
             <div className="flex flex-wrap items-center gap-2">
-              {(["simple", "business", "team"] as const).map((p) => (
+              {(["starter", "simple", "business", "team"] as const).map((p) => (
                 <Button key={p} variant={plan === p ? "default" : "plain"} size="sm" onClick={() => setPlan(p)}>{planLabel(p)}</Button>
               ))}
               <span className="text-secondary-text">until</span>

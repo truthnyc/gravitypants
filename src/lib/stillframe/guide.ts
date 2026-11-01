@@ -15,7 +15,7 @@ export type GuideSectionData = {
 export const GUIDE_SECTIONS: readonly GuideSectionData[] = [
   { id: "before-you-start", title: "Before you start", shortTitle: "Before you start", illustration: "start",
     steps: ["Gravity Pants turns still photos into short video ads (MP4) and animated GIFs. Bring your own photos; you can add words and a logo as you go.", TRIAL_ANSWER, "Choose clear photos with a little space around the subject. Three to five is a good place to start."],
-    tip: "Your reels and brand kit stay saved when your trial exports run out. You can keep editing before choosing a plan.",
+    tip: "Your reels and brand kit stay saved when your Free exports run out. You can keep editing before choosing a plan.",
     imageDescription: "Three illustrated photos become a short reel, with one clean trial export and two marked exports.", link: { label: "Start a reel", to: "/app/new" } },
   { id: "first-reel", title: "Make your first reel", shortTitle: "Your first reel", illustration: "create",
     steps: [`Open New ad. Format comes first: pick your main size from ${sizes}. Portrait 4:5 is selected to begin with.`, "Choose a template and brand kit if you want them, then choose Next: Photos.", "Add three to five photos and drag them into the order you want. Each photo becomes a frame; choose Next to open Edit."],
@@ -58,7 +58,7 @@ export const GUIDE_SECTIONS: readonly GuideSectionData[] = [
     tip: "You can make a reel here with your own photos without connecting a Shopify store.",
     imageDescription: "Product photo tiles lead into a vertical reel preview." },
   { id: "billing", title: "Plans and billing", shortTitle: "Plans & billing", illustration: "billing",
-    steps: ["Open Account → Billing to see your plan and remaining exports. The free trial has no time limit; its included exports do not reset each month.", `${PLANS.map((p) => `${p.name} includes ${p.monthlyExports}`).join(", ")} exports a month. Choose a plan when you need to keep exporting.`, `Need more exports? Top-ups come in packs of ${EXPORT_PACKS.map((p) => p.exports).join(", ")} and never expire.`, "Workspace owners and admins can change billing. If you already have a billing account, use Manage billing to update payment details or cancel."],
+    steps: ["Open Account → Billing to see your plan and remaining exports. The Free plan has no time limit; its included exports do not reset each month.", `${PLANS.map((p) => `${p.name} includes ${p.monthlyExports}`).join(", ")} exports a month. Choose a plan when you need to keep exporting.`, `Need more exports? On a paid plan, top-ups come in packs of ${EXPORT_PACKS.map((p) => p.exports).join(", ")} and never expire.`, "Workspace owners and admins can change billing. If you already have a billing account, use Manage billing to update payment details or cancel."],
     tip: "The remaining count belongs to the selected workspace and its billing coverage. Check which workspace you are in before changing a plan.",
     imageDescription: "A plan summary with an exports-used meter and separate extra-export balance.", link: { label: "Open Billing", to: "/app/account/billing" } },
   { id: "support", title: "Troubleshooting and support", shortTitle: "Support", illustration: "support", support: true,
@@ -69,7 +69,7 @@ export const GUIDE_SECTIONS: readonly GuideSectionData[] = [
 
 export const HELP_FAQ = [
   ["How do I make an ad?", "On Your Ads, start a new ad. Choose a main size, add your photos, then edit the words and logo before exporting."],
-  ["What does the free trial include?", TRIAL_ANSWER],
+  ["What does the Free plan include?", TRIAL_ANSWER],
   ["How long are my files kept?", "Finished exports stay under Previous exports for 30 days."],
   ["How do I change or cancel my plan?", "Go to Account → Billing and choose Manage billing."],
   ["Can I share with my team?", `On the Team plan, you and up to ${(team?.seats ?? 5) - 1} teammates share brand kits, templates and ${team?.monthlyExports ?? 150} exports a month.`],

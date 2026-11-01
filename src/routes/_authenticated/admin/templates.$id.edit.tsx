@@ -681,7 +681,7 @@ function PublishDialog({ open, onOpenChange, row, doc, busy, onPublish }: {
           <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.06em] text-secondary-text">Who can use it</p>
           <button type="button" onClick={() => setLimited(false)} className={cn("mb-2 flex w-full gap-3 rounded-sm p-3 text-left shadow-card", !limited && "bg-primary/5 ring-2 ring-primary")}>
             <Radio on={!limited} />
-            <span><b className="block text-[14px] font-semibold">All users</b><span className="text-[13px] text-secondary-text">Every account, including free trials. Shown under the {"\u201c"}Gravity Pants{"\u201d"} tab.</span></span>
+            <span><b className="block text-[14px] font-semibold">All users</b><span className="text-[13px] text-secondary-text">Every account, including Free plans. Shown under the {"\u201c"}Gravity Pants{"\u201d"} tab.</span></span>
           </button>
           <div className={cn("flex w-full gap-3 rounded-sm p-3 text-left shadow-card", limited && "bg-primary/5 ring-2 ring-primary")}>
             <button type="button" onClick={() => setLimited(true)} className="flex gap-3 text-left">

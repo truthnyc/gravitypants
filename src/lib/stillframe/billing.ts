@@ -9,7 +9,7 @@ import { createPortalSession } from "./billing.functions";
 export type Plan = { id: string; name: string; price_id: string; amount_cents: number; interval: string; monthly_exports: number | null; sort_order: number; seats?: number };
 export type Billing = {
   workspace_id: string;
-  plan: "trial" | "simple" | "simple_yearly" | "business" | "business_yearly" | "team" | "team_yearly" | "none";
+  plan: "trial" | "starter" | "starter_yearly" | "simple" | "simple_yearly" | "business" | "business_yearly" | "team" | "team_yearly" | "none";
   status: "trialing" | "active" | "past_due" | "canceled";
   trial_ends_at: string;
   current_period_start: string | null;
@@ -90,7 +90,11 @@ export const trialDaysLeft = (b: Billing) => Math.max(0, Math.ceil((new Date(b.t
 const shortDate = (s: string | null) => (s ? new Date(s).toLocaleDateString(undefined, { day: "numeric", month: "short" }) : "");
 
 export function planName(id: string) {
-  return id === "simple"
+  return id === "starter"
+    ? "Starter"
+    : id === "starter_yearly"
+    ? "Starter Yearly"
+    : id === "simple"
     ? "Simple"
     : id === "simple_yearly"
       ? "Simple Yearly"
@@ -103,13 +107,13 @@ export function planName(id: string) {
           : id === "team_yearly"
             ? "Team Yearly"
             : id === "trial"
-              ? "Free trial"
+              ? "Free"
               : "No plan";
 }
 
 export function statusLine(b: Billing): string {
   if (!isPaid(b)) {
-    return b.plan === "trial" && b.status === "trialing" ? "Free trial · no time limit" : "No plan · pick a plan to export";
+    return b.plan === "trial" && b.status === "trialing" ? "Free · no time limit" : "No plan · pick a plan to export";
   }
   if (b.status === "past_due") return "Payment problem — update your card";
   if (b.cancel_at_period_end || b.status === "canceled") return `Cancels on ${shortDate(b.current_period_end)}`;

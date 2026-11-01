@@ -337,7 +337,7 @@ function ExportPanel({ project, images, beforeExport, watermarked, onDone }: { p
       if (kind === "mp4") setMp4Path(start.path);
       window.open(url, "_blank");
       setLastWatermarked(start.watermark);
-      setMsg(start.watermark ? "Done. Free trial exports carry a small watermark." : "Done.");
+      setMsg(start.watermark ? "Done. Free plan exports carry a small watermark." : "Done.");
     } catch (e) {
       setMsg((e as Error).message);
     } finally {

@@ -35,7 +35,7 @@
 - Staff role: `user_roles` (enum app_role, admin) checked via `has_role()`; `is_platform_admin()` wraps it; staff area at `/admin` (`_authenticated/admin/`) 404s non-admins — roles never live on profiles.
 - Site reels/homepage photos: private `site-reels` files, signed links; home banner/Example of the week in `site_settings`, bundled defaults. Project logos: light/dark artwork, per-frame visibility, auto/light/dark; drawn by `renderAt`.
 - Brand requests use validated server inserts and shared persistent hashed-visitor limits; only admins read/update. Private approval SQL atomically creates a draft with category/mood links; SQL website uniqueness blocks races.
-- Free trial is usage-based (no time limit): SQL `export_status` returns `trial`, `watermark` (false only for the first export) and `clean_left`; the UI reads these flags, never `trial_ends_at`.
+- Free plan is usage-based (no time limit): SQL `export_status` returns `trial`, `watermark`, `clean_left` and `referral_credits`; the UI reads these flags, never `trial_ends_at`. Referral credits are awarded and spent only inside SQL `record_export`; Business grandfathering uses `workspace_billing.grandfathered_exports`. Pack checkout re-checks the paid tier server-side (`canBuyPacks`).
 
 - Folder rules: see `AGENTS.md` in src/components/editor, src/render, src/lib/stillframe (billing details), src/lib/directory and src/routes/_authenticated/admin.
 - Directory greetings use hosting geo or browser GeoJS, then server weather; no stored location or shared cache. Reduced motion removes transitions, not word rotation.

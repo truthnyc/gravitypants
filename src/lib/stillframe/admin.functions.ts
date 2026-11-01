@@ -257,7 +257,7 @@ export const adminAction = createServerFn({ method: "POST" })
       action: z.enum(["extend_trial", "comp_plan", "end_comp", "reset_exports", "suspend", "unsuspend", "delete"]),
       reason,
       days: z.number().int().min(1).max(365).optional(),
-      plan: z.enum(["simple", "business", "team"]).optional(),
+      plan: z.enum(["starter", "simple", "business", "team"]).optional(),
       until: z.string().optional(),
       confirmName: z.string().optional(),
     }).parse(d),
@@ -432,7 +432,7 @@ export const adminInviteClient = createServerFn({ method: "POST" })
     z.object({
       email: z.string().trim().toLowerCase().email(),
       name: z.string().trim().max(80).optional(),
-      plan: z.enum(["simple", "business", "team"]),
+      plan: z.enum(["starter", "simple", "business", "team"]),
       until: z.string().refine((v) => !isNaN(Date.parse(v)) && Date.parse(v) > Date.now(), "Pick a future end date"),
       reason,
     }).parse(d),

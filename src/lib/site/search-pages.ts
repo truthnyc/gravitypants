@@ -149,7 +149,7 @@ export const SEARCH_STEPS = STEPS;
 const PHOTO_FAQS: Faq[] = [
   { q: "How many photos do I need?", a: "Three is enough. You can use up to eight." },
   { q: "Do I need editing skills?", a: "No. You tap a photo, headline or logo to change it." },
-  { q: "What do I get?", a: "An MP4 or GIF in every size: 9:16, 4:5, 1:1, 5:4, 16:9 and custom. HTML5 zips for display ads are available too." },
+  { q: "What do I get?", a: "An MP4 or GIF in every size: 9:16, 4:5, 1:1, 5:4, 16:9 and custom. HTML5 zips for display ads are available too, on Business and Team." },
   { q: "Is it free?", a: "Your first video is free, with no watermark and no card." },
 ];
 
@@ -364,9 +364,9 @@ export const SEARCH_PAGES: SearchPage[] = [
   {
     slug: "html5-ads", path: "/html5-ads",
     title: "HTML5 Ads From Your Photos | Gravity Pants",
-    description: "Turn product photos into an HTML5 ad: a zip with your banner and a click-through link, in your ad's main size, ready to upload to a display ad platform. First one free.",
+    description: "Turn product photos into an HTML5 ad: a zip with your banner and a click-through link, in your ad's main size, ready to upload to a display ad platform. HTML5 on Business and Team.",
     h1: "HTML5 ads from the photos you already have",
-    subhead: "Export your reel as an HTML5 banner: a zip with the ad and a click-through link, in your ad's main size, ready to upload.",
+    subhead: "Export your reel as an HTML5 banner: a zip with the ad and a click-through link, in your ad's main size, ready to upload. HTML5 on Business and Team.",
     example: { reelId: REEL.drusus, label: "Drusus Tabor, Grand Turk Pillow" },
     why: [
       "Display ads run on millions of websites and apps, and most ad platforms ask for an HTML5 ad: a small zip with the ad inside it. That is the format they can serve and measure, and it is not held to the file size and length rules that make a GIF blurry or short.",
@@ -409,7 +409,7 @@ export const SEARCH_PAGES: SearchPage[] = [
       { q: "Does the banner link work?", a: "Yes. The link you type is written into the ad as a click tag, the standard way ad platforms read where a click should go. Most platforms let you set or replace the link when they serve the ad." },
       { q: "Will it work on Google Ads?", a: "Not yet. Google Ads asks for a much smaller file and only certain file types inside the zip, and Gravity Pants builds the banner at full quality in your ad's main size. Platforms that take a full HTML5 zip, such as Display & Video 360, work today." },
       { q: "Does it use another export?", a: "No. One export is one reel, however many files it makes, so adding HTML5 to an export you already run does not use another one." },
-      { q: "Is it free to try?", a: "Yes. HTML5 is on every plan, including your free trial exports." },
+      { q: "Which plans include HTML5?", a: "HTML5 on Business and Team. The Free, Starter and Simple plans export MP4 and GIF." },
     ],
     related: ["/gif-for-email", "/product-video-maker", "/video-ads-for-small-business"],
   },

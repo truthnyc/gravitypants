@@ -49,7 +49,9 @@ export function trackPageView(path: string) {
     const q = new URLSearchParams(window.location.search);
     const ref = document.referrer && !document.referrer.startsWith(window.location.origin) ? document.referrer : null;
     const utm = { source: q.get("utm_source"), medium: q.get("utm_medium"), campaign: q.get("utm_campaign") };
-    if (!firstTouch()) {
+    // A referral link ("?ref=r-…") always wins so the friend who shared it gets the credit.
+    const referral = /^r-[a-z0-9]{6,12}$/.test(q.get("ref") ?? "");
+    if (!firstTouch() || (referral && firstTouch()?.ref !== q.get("ref"))) {
       localStorage.setItem(TOUCH, JSON.stringify({
         ref: clip(q.get("ref"), 100), source: clip(utm.source, 100), medium: clip(utm.medium, 100), campaign: clip(utm.campaign, 100),
         referrer: ref ? clip(new URL(ref).hostname, 100) : null, landing: clip(path.split(/[?#]/)[0], 100) ?? "/", at: Date.now(),

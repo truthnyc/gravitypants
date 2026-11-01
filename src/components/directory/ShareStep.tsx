@@ -194,7 +194,7 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
           <fieldset disabled={locked} className="mt-5 border-t border-ap-hairline pt-5 disabled:opacity-40">
             {ctx.plan.tag === "trial" && (
               <Notice action={<AppButton asChild size="sm"><a href="https://gravitypants.com/pricing" target="_blank" rel="noreferrer">See plans</a></AppButton>}>
-                On the free trial your brand page shows up to 3 watermark-free reels. Upgrade for unlimited reels.
+                On the Free plan your brand page shows up to 3 watermark-free reels. Upgrade for unlimited reels.
               </Notice>
             )}
             {ctx.brandChoices.length > 0 && (

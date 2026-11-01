@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { BILLING_PLAN_VALUES, PLAN_BY_PRICE, PLAN_NAMES, PLAN_PRICE_KEYS, mapStatus } from "@/lib/stillframe/plan-map";
 import { checkoutProductCopy, planById } from "@/lib/stillframe/plans-config";
 
-const PRICES = ["simple_monthly", "simple_yearly", "business_monthly", "business_yearly", "team_monthly", "team_yearly"];
+const PRICES = ["starter_monthly", "starter_yearly", "simple_monthly", "simple_yearly", "business_monthly", "business_yearly", "team_monthly", "team_yearly"];
 
 describe("plan mapping", () => {
   it.each(PRICES)("choosing %s maps to a named plan", (price) => {
@@ -30,7 +30,7 @@ describe("plan mapping", () => {
     });
     expect(checkoutProductCopy(planById("business"))).toEqual({
       name: "Gravity Pants Business",
-      description: expect.stringContaining("50 exports a month"),
+      description: expect.stringContaining("30 exports a month"),
     });
     const team = checkoutProductCopy(planById("team"));
     expect(team.name).toBe("Gravity Pants Team");

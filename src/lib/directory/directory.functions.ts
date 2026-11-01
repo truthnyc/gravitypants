@@ -162,7 +162,7 @@ export const shareSchema = z.object({
 /** Saves the brand and the reel's listing; when shown, records the permission in the same request. */
 /** Plain wording for the database's listing rules (see reel_listing_guard). */
 export function listingError(message: string): string {
-  if (message.includes("LISTING_LIMIT")) return "Your free trial brand page shows up to 3 reels. Upgrade to show unlimited reels.";
+  if (message.includes("LISTING_LIMIT")) return "Your Free plan brand page shows up to 3 reels. Upgrade to show unlimited reels.";
   if (message.includes("LISTING_WATERMARK")) return "Only watermark-free reels can be added to your brand page. Upgrade to export without a watermark.";
   return message;
 }

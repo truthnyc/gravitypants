@@ -1,4 +1,5 @@
-import { EXPORT_PACKS } from "@/lib/stillframe/plans-config";
+import { EXPORT_PACKS, PACK_TIERS } from "@/lib/stillframe/plans-config";
+import { planTier } from "./plan";
 import { createServerFn } from "@tanstack/react-start";
 import type Stripe from "stripe";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
@@ -117,6 +118,12 @@ export const createTopUpSession = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const { data: member } = await supabase.rpc("is_workspace_admin", { _ws: data.workspaceId });
     if (!member) return { error: "Only the workspace owner or an admin can change billing." };
+    // Packs are for paid plans only; the Free plan upgrades instead.
+    const [{ data: eff }, { data: staff }] = await Promise.all([
+      supabase.rpc("effective_billing", { _ws: data.workspaceId }),
+      supabase.rpc("is_platform_admin"),
+    ]);
+    if (!canBuyPacks(eff as never, staff === true)) return { error: "Export packs are available on paid plans. Choose a plan first." };
     // Extra exports belong to the plan that covers this workspace, so the pack is shared.
     const { data: source } = await supabase.rpc("billing_source" as never, { _ws: data.workspaceId } as never);
     const payer = (source as string | null) ?? data.workspaceId;
@@ -197,4 +204,11 @@ async function resolveCustomer(stripe: Stripe, saved: string | null, workspaceId
   }
   const found = await stripe.customers.search({ query: `metadata['workspaceId']:'${workspaceId}'`, limit: 1 });
   return found.data[0]?.id ?? null;
+}
+
+/** Export packs: only workspaces covered by a live paid plan (or staff) may buy them. */
+export function canBuyPacks(b: Parameters<typeof planTier>[0], staff = false): boolean {
+  if (staff) return true;
+  const tier = planTier(b);
+  return tier != null && PACK_TIERS.includes(tier);
 }

@@ -7,6 +7,8 @@ import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { createTopUpSession } from "@/lib/stillframe/billing.functions";
 import { currentWorkspaceId } from "@/lib/stillframe/billing";
 import { EXPORT_PACKS } from "@/lib/stillframe/plans-config";
+import { usePlanAccess } from "@/lib/stillframe/plan";
+import { Link } from "@tanstack/react-router";
 
 type Pack = (typeof EXPORT_PACKS)[number];
 
@@ -46,11 +48,25 @@ function TopUpCheckout({ workspaceId, packId }: { workspaceId: string; packId: s
 /** One-time packs of extra exports that never expire, usable on any plan. */
 export function TopUpCard({ extras }: { extras?: number | undefined }) {
   const [open, setOpen] = useState<{ ws: string; pack: Pack } | null>(null);
+  const access = usePlanAccess();
+  // Free accounts upgrade instead of buying packs (the server refuses the purchase too).
+  if (access.data && !access.canUse("export_packs")) {
+    return (
+      <section className="acct-card" data-testid="packs-upgrade">
+        <h2 className="text-[17px] font-semibold">Need more exports?</h2>
+        <p className="mt-1 text-[14px] text-secondary-text">
+          Choose a plan to keep exporting without a watermark. Paid plans can also add packs of extra exports.
+          {extras != null && extras > 0 && <span className="nums"> You have {extras} extra exports left.</span>}
+        </p>
+        <Button asChild className="mt-4"><Link to="/pricing" data-cta="packs-see-plans">See plans</Link></Button>
+      </section>
+    );
+  }
   return (
     <section className="acct-card">
       <h2 className="text-[17px] font-semibold">Need more exports?</h2>
       <p className="mt-1 text-[14px] text-secondary-text">
-        Extra exports never expire and work on any plan.
+        Extra exports never expire. If you often run out, a bigger plan usually costs less per export.
         {extras != null && extras > 0 && <span className="nums"> You have {extras} left.</span>}
       </p>
       <div className="mt-4 grid grid-cols-1 gap-2.5 sm:grid-cols-3">

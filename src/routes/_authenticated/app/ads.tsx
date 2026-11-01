@@ -22,7 +22,7 @@ function TrialUnlocked({ onClose }: { onClose: () => void }) {
       <button type="button" onClick={onClose} aria-label="Close" className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full text-secondary-text">
         <X size={18} strokeWidth={1.7} />
       </button>
-      <p className="text-[13px] font-semibold uppercase tracking-[0.06em] text-link">Free trial unlocked</p>
+      <p className="text-[13px] font-semibold uppercase tracking-[0.06em] text-link">Free plan unlocked</p>
       <h2 className="mt-1 text-[22px] font-bold tracking-[-0.02em]">You've earned <span className="tabular-nums">{left}</span> free exports</h2>
       <ul className="mt-3 grid gap-1.5 text-[15px] text-secondary-text sm:grid-cols-3">
         <li className="flex items-center gap-2"><Check size={16} strokeWidth={1.7} className="text-link" />First export with no watermark</li>

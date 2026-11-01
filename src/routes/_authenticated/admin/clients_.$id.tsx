@@ -227,7 +227,7 @@ function ActionDialog({ act, name, id, onClose, onDone }: { act: Act; name: stri
   const navigate = useNavigate();
   const [reason, setReason] = useState("");
   const [days, setDays] = useState(7);
-  const [plan, setPlan] = useState<"simple" | "business" | "team">("business");
+  const [plan, setPlan] = useState<"starter" | "simple" | "business" | "team">("business");
   const [until, setUntil] = useState(() => new Date(Date.now() + 30 * 864e5).toISOString().slice(0, 10));
   const [confirmName, setConfirmName] = useState("");
   const [busy, setBusy] = useState(false);
@@ -267,7 +267,7 @@ function ActionDialog({ act, name, id, onClose, onDone }: { act: Act; name: stri
           )}
           {act === "comp_plan" && (
             <div className="flex items-center gap-2">
-              {(["simple", "business", "team"] as const).map((p) => (
+              {(["starter", "simple", "business", "team"] as const).map((p) => (
                 <Button key={p} variant={plan === p ? "default" : "plain"} size="sm" onClick={() => setPlan(p)}>{planLabel(p)}</Button>
               ))}
               <span className="text-secondary-text">until</span>

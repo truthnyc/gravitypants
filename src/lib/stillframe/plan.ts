@@ -3,10 +3,10 @@ import { useSyncExternalStore } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { peekWorkspaceId } from "./workspace";
 import { billingKey, fetchExportStatus, type ExportStatus } from "./billing";
-import { TRIAL } from "./plans-config";
+import { HTML5_TIERS, PACK_TIERS, TRIAL } from "./plans-config";
 
 /** Every plan-gated feature. Add new gates here so the whole app checks plans in one place. */
-export type Feature = "export" | "gif" | "brand_kits" | "templates" | "team_sharing" | "priority_support" | "brand_stats";
+export type Feature = "export" | "gif" | "brand_kits" | "templates" | "team_sharing" | "priority_support" | "brand_stats" | "html5" | "export_packs";
 
 /** Free trial limit, from the shared plan config (also enforced in SQL export_status). */
 export const FREE_EXPORTS = TRIAL.exports;
@@ -19,7 +19,7 @@ export function planTier(b: { plan?: string; status?: string; comp_plan?: string
   if (b.comp_plan && b.comp_until && new Date(b.comp_until) > new Date()) return b.comp_plan.replace(/_yearly$/, "");
   const live = b.status !== "canceled" || (b.current_period_end && new Date(b.current_period_end) > new Date());
   const p = (b.plan ?? "").replace(/_yearly$/, "");
-  return live && ["simple", "business", "team"].includes(p) ? p : null;
+  return live && ["starter", "simple", "business", "team"].includes(p) ? p : null;
 }
 
 /** Active free trial (no paid plan yet). */
@@ -47,7 +47,10 @@ export function canUseWith(e: Entitlements | undefined, f: Feature): boolean {
     case "priority_support":
       return e.team;
     case "brand_stats":
-      return Boolean(e.admin) || e.tier === "business" || e.tier === "team";
+    case "html5":
+      return Boolean(e.admin) || (e.tier != null && HTML5_TIERS.includes(e.tier));
+    case "export_packs":
+      return Boolean(e.admin) || (e.tier != null && PACK_TIERS.includes(e.tier));
   }
 }
 

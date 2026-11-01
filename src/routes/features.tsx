@@ -92,7 +92,7 @@ const groups = [
     points: [
       "MP4 for ads and social posts",
       "Animated GIF for email and websites",
-      "HTML5 for display ads, as a zip",
+      "HTML5 for display ads, as a zip — HTML5 on Business and Team",
       "Every size in one go",
       "Exports made in your browser, so nothing queues",
       "Finished files kept for 30 days to download again",
@@ -131,7 +131,7 @@ const allFeatures = [
   ["Brand", "Named brand kits", "Logo, colors, fonts", "Logo placement and size", "End card", "Shared kits on Team"],
   ["Motion", "Fade, slide, swipe, zoom, cut", "Rise up, fade in, typewriter", "Slow zoom and pan", "Per-frame timing"],
   ["Formats", "Vertical 9:16, Portrait 4:5, Square 1:1, Landscape 16:9, Wide 5:4 and custom", "Portrait recommended for Instagram, Facebook and LinkedIn feeds", "Switch while editing", "Layout adapts to the shape"],
-  ["Export", "MP4, GIF and HTML5", "All sizes at once", "Made in your browser", "Kept for 30 days"],
+  ["Export", "MP4, GIF and HTML5", "HTML5 on Business and Team", "All sizes at once", "Made in your browser", "Kept for 30 days"],
   ["Templates", "Ready-made templates", "Save your own", "Make another from a kit", "Duplicate and rename"],
   ["Account", "Private workspace", "Team seats and roles", "Email invites", "Billing and invoices"],
   ["Support", "Help center", "Email support", "Priority on paid plans"],

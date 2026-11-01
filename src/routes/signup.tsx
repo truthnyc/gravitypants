@@ -15,7 +15,7 @@ export const Route = createFileRoute("/signup")({
   validateSearch: z.object({
     redirect: z.string().optional(),
     template: z.string().optional(),
-    plan: z.enum(["simple", "business", "team"]).optional(),
+    plan: z.enum(["starter", "simple", "business", "team"]).optional(),
     billing: z.enum(["monthly", "yearly"]).optional(),
     invited: z.coerce.string().optional(),
     ref: z.string().optional(),
@@ -99,7 +99,7 @@ function InvitedSignUp() {
   );
 }
 
-function RegularSignUp({ redirect, plan, billing, template }: { redirect?: string | undefined; plan?: "simple" | "business" | "team" | undefined; billing?: "monthly" | "yearly" | undefined; template?: string | undefined }) {
+function RegularSignUp({ redirect, plan, billing, template }: { redirect?: string | undefined; plan?: "starter" | "simple" | "business" | "team" | undefined; billing?: "monthly" | "yearly" | undefined; template?: string | undefined }) {
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -165,7 +165,7 @@ function RegularSignUp({ redirect, plan, billing, template }: { redirect?: strin
 
   if (sent) {
     return (
-      <AuthShell title="Check your email" subtitle={joining ? `We sent a link to ${email}. Open it to finish your account and join your team.` : `We sent a link to ${email}. Open it to finish your account and start your free trial.`}>
+      <AuthShell title="Check your email" subtitle={joining ? `We sent a link to ${email}. Open it to finish your account and join your team.` : `We sent a link to ${email}. Open it to finish your account and start on the Free plan.`}>
         <p className="text-[15px]">
           <Link to="/signin" className="auth-link">Back to sign in</Link>
         </p>

@@ -34,6 +34,7 @@ import { ExportCancelled, exportGif, exportMp4, isOutOfMemory, killFFmpeg, type 
 import { cn } from "@/lib/utils";
 import { fetchExportStatus, useExportStatus, useRefreshBilling } from "@/lib/stillframe/billing";
 import { ExportFooter } from "./ExportFooter";
+import { ReferralNote } from "@/components/billing/ReferralCard";
 import { KlaviyoDisconnect, KlaviyoSend } from "./KlaviyoSend";
 import { Switch } from "@/components/ui/switch";
 import { RadioGroup } from "@/components/ui/radio-group";
@@ -151,14 +152,14 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
         jobs.set(job, { kind: "gif", format: t.format, ...s });
         files.push({ sizeName: t.name, ratio: t.ratio, name: exportFileName(base, t.width, t.height, "gif"), kind: "gif", job, width: s.width, height: s.height });
       }
-      if (html5 && t.key === mainId) {
+      if (html5 && canUse("html5") && t.key === mainId) {
         const job = `html5:${t.width}x${t.height}:${t.format}`;
         jobs.set(job, { kind: "html5", format: t.format, width: t.width, height: t.height });
         files.push({ sizeName: t.name, ratio: t.ratio, name: exportFileName(base, t.width, t.height, "zip"), kind: "html5", job, width: t.width, height: t.height });
       }
     }
     return { files, jobs };
-  }, [targets, mp4, gif, html5, gSize, base, mainId]);
+  }, [targets, mp4, gif, html5, gSize, base, mainId, canUse]);
 
   const seconds = videoDuration(project, frames, brand);
   const videos = files.filter((f) => f.kind === "mp4").length;
@@ -379,7 +380,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
   );
   const remainingSummary = [
     exportStatus?.limit != null ? exportStatus.trial
-      ? `Trial · ${Math.max(0, exportStatus.limit - (exportStatus.used ?? 0))} of ${exportStatus.limit} exports left`
+      ? `Free · ${Math.max(0, exportStatus.limit - (exportStatus.used ?? 0))} of ${exportStatus.limit} exports left`
       : `${Math.max(0, exportStatus.limit - (exportStatus.used ?? 0))} of ${exportStatus.limit} exports left this month` : null,
     exportStatus?.extras ? `Plus ${exportStatus.extras} extra ${exportStatus.extras === 1 ? "export" : "exports"} that never expire` : null,
   ].filter(Boolean).join(" · ");
@@ -437,6 +438,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
             {doneCount > 1 && <AppButton onClick={() => void zipAll(files, state, `${base}.zip`)}><Download className="size-4" strokeWidth={1.7} /> Download all</AppButton>}
             <AppButton variant="ghost" onClick={() => setOpen(false)}>Export more sizes</AppButton>
           </div>
+          <div className="mt-3"><ReferralNote /></div>
           {SHOW_SHARE && <div className="mt-6 flex flex-col gap-4 rounded-[18px] bg-ap-soft-blue p-5 sm:flex-row sm:items-center">
             <div className="flex-1">
               <b className="mb-1 block text-[17px]">Share it to the Directory</b>
@@ -485,7 +487,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             <FormatCard on={mp4} onClick={() => setMp4((v) => !v)} icon={<Film className="size-4" strokeWidth={1.7} />} title="Video MP4" sub="Motion and sound" />
             <FormatCard on={gif} onClick={() => (gif || canUse("gif") ? setGif((v) => !v) : openUpgrade("gif"))} icon={<ImageIcon className="size-4" strokeWidth={1.7} />} title="Animated GIF" sub="Plays anywhere, no sound" />
-            <FormatCard on={html5} onClick={() => setHtml5((v) => !v)} icon={<Code2 className="size-4" strokeWidth={1.7} />} title="HTML5" sub="Display ads, .zip" />
+            <FormatCard on={html5} onClick={() => (html5 || canUse("html5") ? setHtml5((v) => !v) : openUpgrade("html5"))} icon={<Code2 className="size-4" strokeWidth={1.7} />} title="HTML5" sub="Business and Team, .zip" />
           </div>
           {html5 && (
             <div className="mt-3">
@@ -536,13 +538,13 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
       <Dialog open={!!planSheet} onOpenChange={(o) => !o && setPlanSheet(null)}>
         <DialogContent className="max-w-[900px]">
           <DialogHeader>
-            <DialogTitle>{planSheet === "limit_reached" ? (exportStatus?.trial ? `You've used your ${TRIAL.exports} trial exports` : "You've used this month's exports") : planSheet === "payment_problem" ? "There's a problem with your payment" : "Choose a plan"}</DialogTitle>
+            <DialogTitle>{planSheet === "limit_reached" ? (exportStatus?.trial ? `You've used your ${TRIAL.exports} Free exports` : "You've used this month's exports") : planSheet === "payment_problem" ? "There's a problem with your payment" : "Choose a plan"}</DialogTitle>
             <DialogDescription>
               {planSheet === "limit_reached"
-                ? "Your monthly exports are used up. Buy a pack of 5, 10 or 20 extra exports on the Billing page — they never expire — or move up a plan."
+                ? (exportStatus?.trial ? `Your ${TRIAL.exports} Free exports are used. Choose a plan to keep exporting without a watermark.` : "Your monthly exports are used up. Move up a plan, or buy a pack of 5, 10 or 20 extra exports on the Billing page — they never expire.")
                 : planSheet === "payment_problem"
                   ? "We couldn't take your last payment. Update your card in Manage Billing to keep exporting."
-                   : `Your ${TRIAL.exports} free trial exports are used. Your ads and brand kit are saved and you can keep editing — choose a plan to keep exporting without a watermark.${preferredPlan ? ` You selected ${preferredPlan} when you joined.` : ""}`}
+                   : `Your ${TRIAL.exports} Free exports are used. Your ads and brand kit are saved and you can keep editing — choose a plan to keep exporting without a watermark.${preferredPlan ? ` You selected ${preferredPlan} when you joined.` : ""}`}
             </DialogDescription>
           </DialogHeader>
           <PlanCards compact />

@@ -61,7 +61,7 @@ export const Route = createFileRoute("/")({
           url: `${SITE_ORIGIN}/`,
           description: "Turns still product photos into short MP4 video ads, animated GIFs and HTML5 display ads for social media and the web.",
           publisher: { "@id": `${SITE_ORIGIN}/#org` },
-          offers: { "@type": "Offer", name: "Free trial", price: "0", priceCurrency: "USD" },
+          offers: { "@type": "Offer", name: "Free", price: "0", priceCurrency: "USD" },
         },
       ],
     };
@@ -211,7 +211,7 @@ const tabCopy: Record<Tab, { title: string; body: string }> = {
   },
   Export: {
     title: "Download every size you need.",
-    body: "Export Vertical 9:16, Portrait 4:5, Square 1:1, Wide 5:4 and Landscape 16:9 together, plus custom sizes. Choose MP4 for ads and social posts, GIF for email and websites, or HTML5 for display ads.",
+    body: "Export Vertical 9:16, Portrait 4:5, Square 1:1, Wide 5:4 and Landscape 16:9 together, plus custom sizes. Choose MP4 for ads and social posts, GIF for email and websites, or HTML5 for display ads (HTML5 on Business and Team).",
   },
 };
 function Primary({ children, to = "/signup", cta }: { children: React.ReactNode; to?: "/signup" | "/examples"; cta?: string }) {
@@ -554,7 +554,7 @@ function FeatureArt({ art }: { art: string }) {
         </span>
         <span>
           <b>HTML5</b>
-          <small>for display ads</small>
+          <small>for display ads · Business and Team</small>
         </span>
       </div>
     );
@@ -633,7 +633,7 @@ function Home() {
                 <span>16:9</span>
               </div>
               <b>
-                <Check size={14} strokeWidth={2} /> MP4, GIF + HTML5 ready
+                <Check size={14} strokeWidth={2} /> MP4, GIF + HTML5 ready (HTML5 on Business and Team)
               </b>
             </div>
           </div>

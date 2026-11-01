@@ -4,12 +4,14 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { closeUpgrade, FREE_EXPORTS, useUpgradeFeature, type Feature } from "@/lib/stillframe/plan";
 
 const COPY: Record<Feature, { title: string; body: string }> = {
-  export: { title: "You've used your exports", body: `The free trial includes ${FREE_EXPORTS} exports. Pick a plan, or add a pack of extra exports on the Billing page.` },
-  gif: { title: "Animated GIFs come with a paid plan", body: "Every plan from Simple up saves your ads as GIFs as well as videos." },
+  export: { title: "You've used your exports", body: `The Free plan includes ${FREE_EXPORTS} exports. Pick a plan to keep exporting. Paid plans can also add packs of extra exports.` },
+  gif: { title: "Animated GIFs come with a paid plan", body: "Every paid plan saves your ads as GIFs as well as videos." },
   brand_kits: { title: "Brand kits come with a paid plan", body: "Save your logos, colors and fonts once and put them on any ad in one tap." },
   templates: { title: "Templates come with a paid plan", body: "Save an ad's look as a template and reuse it with new photos." },
   team_sharing: { title: "Sharing is part of the Team plan", body: "On Team, you and up to 4 teammates share brand kits, templates and 150 exports a month." },
   brand_stats: { title: "Brand stats are part of Business and Team", body: "See views, saves and website clicks for every reel, and which moods work best." },
+  html5: { title: "HTML5 is on Business and Team", body: "Export an HTML5 version of your reel for display ads and websites." },
+  export_packs: { title: "Export packs come with a paid plan", body: "Choose a plan first. Every paid plan can add packs of 5, 10 or 20 extra exports that never expire." },
   priority_support: { title: "Priority support is part of the Team plan", body: "Team customers get a reply within 6 hours." },
 };
 

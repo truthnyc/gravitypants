@@ -18,14 +18,14 @@ interface Props {
 const Email = ({ name }: Props) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>Welcome to Gravity Pants — your free trial is ready</Preview>
+    <Preview>Welcome to Gravity Pants — your Free plan is ready</Preview>
     <Body style={brandMain}>
       <Container style={brandContainer}>
         <EmailHeader />
         <Heading style={brandH1}>Welcome to Gravity Pants</Heading>
         <Text style={brandText}>{name ? `Hi ${name}` : 'Hi there'}</Text>
         <Text style={brandText}>
-          Your free trial includes 3 exports, with no time limit and no card needed. Upload a few photos, turn them into a video ad, and
+          Your Free plan includes 6 exports: the first without a watermark, then 5 watermarked. No time limit and no card needed. Upload a few photos, turn them into a video ad, and
           preview it for every social channel — no editing experience needed.
         </Text>
         <Text style={brandText}>
