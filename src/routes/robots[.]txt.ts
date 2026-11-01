@@ -9,6 +9,7 @@ Disallow: /admin/
 Disallow: /invite/
 Disallow: /reset
 Disallow: /api/
+Disallow: /embed/
 `;
 
 const AIMANTE = `User-agent: *
