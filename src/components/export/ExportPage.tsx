@@ -151,7 +151,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
         jobs.set(job, { kind: "gif", format: t.format, ...s });
         files.push({ sizeName: t.name, ratio: t.ratio, name: exportFileName(base, t.width, t.height, "gif"), kind: "gif", job, width: s.width, height: s.height });
       }
-      if (html5 && t.id === mainId) {
+      if (html5 && t.key === mainId) {
         const job = `html5:${t.width}x${t.height}:${t.format}`;
         jobs.set(job, { kind: "html5", format: t.format, width: t.width, height: t.height });
         files.push({ sizeName: t.name, ratio: t.ratio, name: exportFileName(base, t.width, t.height, "zip"), kind: "html5", job, width: t.width, height: t.height });
