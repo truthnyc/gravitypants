@@ -65,7 +65,7 @@ function BrandCard({ reel }: { reel: SiteReel }) {
               Visit {reel.brand} <ArrowUpRight size={15} strokeWidth={1.7} />
             </a>
           )}
-          {reelDownloadUrl(reel.video, reel.title) && <a className="showcase-visit" data-cta="reel-download" href={reelDownloadUrl(reel.video, reel.title)!} download target="_blank" rel="noreferrer">Download reel <Download size={15} strokeWidth={1.7} /></a>}
+          {reelDownloadUrl(reel.video, reel.title) && <a className="showcase-visit" data-cta="reel-download" onClick={() => window.__lovableEvents?.track?.("project.reel_download_clicked", { reel_id: reel.id, reel_title: reel.title.slice(0, 80), page: "showcase" })} href={reelDownloadUrl(reel.video, reel.title)!} download target="_blank" rel="noreferrer">Download reel <Download size={15} strokeWidth={1.7} /></a>}
         </div>
       </div>
     </article>
