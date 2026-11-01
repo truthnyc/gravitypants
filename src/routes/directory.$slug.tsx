@@ -112,7 +112,7 @@ function BrandPage() {
                 </div>
                 {brand.website_url && (
                   <a href={brand.website_url} target="_blank" rel="noreferrer" onClick={() => void recordBrandClick({ data: { kind: "brand", id: brand.id } }).catch(() => {})} className="inline-flex items-center gap-1.5 text-[15px] text-ap-blue">
-                    Shop {brand.name} <ArrowUpRight className="size-4" strokeWidth={1.7} />
+                    Visit {brand.name} <ArrowUpRight className="size-4" strokeWidth={1.7} />
                   </a>
                 )}
               </div>
