@@ -11,8 +11,11 @@ export function videoObjects(reels: (SiteReel | undefined)[], path: string) {
   const seen = new Set<string>();
   return reels.flatMap((r) => {
     if (!r || seen.has(r.id)) return [];
-    const contentUrl = abs(r.video);
-    const thumbnailUrl = abs(r.poster);
+    // Signed storage links expire, so point Google at our permanent per-reel link instead.
+    const stable = (u: string | null | undefined, kind: "video" | "poster") =>
+      u && /[?&]token=/.test(u) ? `${SITE_ORIGIN}/api/public/reel/${encodeURIComponent(r.id)}/${kind}` : abs(u);
+    const contentUrl = stable(r.video, "video");
+    const thumbnailUrl = stable(r.poster, "poster");
     if (!contentUrl || !thumbnailUrl || !r.uploadDate) return [];
     seen.add(r.id);
     const name = `${r.brand} — ${r.displayTitle?.trim() || r.title} video ad`;
