@@ -4,7 +4,9 @@ import {
   encryptToken,
   exchangeOfflineToken,
   SHOP_BRAND_QUERY,
+  tokenExpiry,
   verifySessionToken,
+  type OfflineTokenPair,
 } from "@/lib/shopify/shopify.server";
 
 type ShopBasics = {
@@ -37,10 +39,9 @@ export const Route = createFileRoute("/api/public/shopify/auth")({
           return json({ error: (e as Error).message }, 401);
         }
 
-        let access_token: string;
-        let scope: string;
+        let pair: OfflineTokenPair;
         try {
-          ({ access_token, scope } = await exchangeOfflineToken(shop, sessionToken, apiKey, secret));
+          pair = await exchangeOfflineToken(shop, sessionToken, apiKey, secret);
         } catch (e) {
           console.error("shopify-auth exchange", e);
           return json({ error: (e as Error).message }, 502);
@@ -51,8 +52,11 @@ export const Route = createFileRoute("/api/public/shopify/auth")({
           const { error } = await supabaseAdmin.from("shopify_shops").upsert(
             {
               shop_domain: shop,
-              access_token: await encryptToken(access_token, tokenKey),
-              scopes: scope,
+              access_token: await encryptToken(pair.access_token, tokenKey),
+              refresh_token: pair.refresh_token ? await encryptToken(pair.refresh_token, tokenKey) : null,
+              token_expires_at: tokenExpiry(pair.expires_in),
+              refresh_token_expires_at: tokenExpiry(pair.refresh_token_expires_in),
+              scopes: pair.scope,
               uninstalled_at: null,
             },
             { onConflict: "shop_domain" },
@@ -69,7 +73,7 @@ export const Route = createFileRoute("/api/public/shopify/auth")({
         // Storefront API, not the Admin API — fetch it there in a later step.
         let name = shop;
         try {
-          const data = await adminGraphql<ShopBasics>(shop, access_token, SHOP_BRAND_QUERY);
+          const data = await adminGraphql<ShopBasics>(shop, pair.access_token, SHOP_BRAND_QUERY);
           name = data.shop.name || shop;
         } catch (e) {
           console.error("shopify-auth basics", e);
@@ -83,7 +87,7 @@ export const Route = createFileRoute("/api/public/shopify/auth")({
           if (!ws) ws = ((await supabaseAdmin.rpc("ensure_shop_workspace" as never, { _shop: shop } as never)).data as unknown as string) ?? null;
           if (ws) {
             const { syncShopBranding } = await import("@/lib/shopify/branding.server");
-            await syncShopBranding(supabaseAdmin, shop, ws, access_token, tokenKey);
+            await syncShopBranding(supabaseAdmin, shop, ws, pair.access_token, tokenKey);
           }
         } catch (e) {
           console.error("shopify-auth branding", e);
