@@ -662,7 +662,7 @@ function Home() {
               media: () => <HomeExampleMedia example={ex} index={i} count={examples.length} />,
               title: ex.name,
               detail: ex.detail,
-              visit: ex.brandSlug ? { href: `https://aimante.co/b/${ex.brandSlug}`, label: `About ${ex.logo ?? ex.name}` } : undefined,
+              visit: ex.brandSlug ? { slug: ex.brandSlug, label: `About ${ex.logo ?? ex.name}` } : undefined,
             }))}
           />
           <p className="site-gallery-cta home-section">

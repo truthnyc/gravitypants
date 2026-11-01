@@ -1,3 +1,4 @@
+import { BrandProfileLink } from "@/components/site/BrandPreview";
 import { ConceptReelNotice } from "@/components/directory/ConceptReelNotice";
 import { ReelVideo } from "@/components/site/ReelVideo";
 import { SiteReelHeart } from "@/components/site/SiteReelHeart";
@@ -72,7 +73,7 @@ function GalleryReel({ example }: { example: GalleryExample }) {
 function GalleryCard({ example }: { example: BrandExample }) {
   return <article className="examples-card">
     <div className="examples-card-media">{!example.client && <SiteReelHeart reelId={example.id} name={example.name} />}{example.href ? <a className="site-reel-link" href={example.href} target="_blank" rel="noreferrer" aria-label={example.frames?.length ? undefined : `Visit ${example.logo ?? example.name}`}><GalleryReel example={example} /></a> : <GalleryReel example={example} />}</div>
-    <div className="examples-card-info"><div><h3>{example.name}</h3><p className="examples-card-meta-desktop">{categoryLabel(example.category)} · {formatLabel[example.format]} · {example.photos} {example.photos === 1 ? "photo" : "photos"} · {example.seconds} sec</p><p className="examples-card-meta-mobile">{categoryLabel(example.category)} · {formatLabel[example.format]}</p><ConceptReelNotice brandName={example.logo ?? example.sub} />{example.brandSlug && <a className="showcase-visit" href={`https://aimante.co/b/${example.brandSlug}`} data-cta="examples-brand-profile">About {example.logo ?? example.name} <ArrowRight size={13} strokeWidth={1.7} /></a>}</div>
+    <div className="examples-card-info"><div><h3>{example.name}</h3><p className="examples-card-meta-desktop">{categoryLabel(example.category)} · {formatLabel[example.format]} · {example.photos} {example.photos === 1 ? "photo" : "photos"} · {example.seconds} sec</p><p className="examples-card-meta-mobile">{categoryLabel(example.category)} · {formatLabel[example.format]}</p><ConceptReelNotice brandName={example.logo ?? example.sub} />{example.brandSlug && <BrandProfileLink className="showcase-visit" slug={example.brandSlug} cta="examples-brand-profile">About {example.logo ?? example.name} <ArrowRight size={13} strokeWidth={1.7} /></BrandProfileLink>}</div>
     </div>
   </article>;
 }

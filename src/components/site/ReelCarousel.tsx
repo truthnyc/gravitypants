@@ -1,13 +1,14 @@
 import { ConceptReelNotice } from "@/components/directory/ConceptReelNotice";
 import type { ReactNode } from "react";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { BrandProfileLink } from "./BrandPreview";
 
 export type CarouselItem = {
   key: string;
   media: (hidden: boolean) => ReactNode;
   title: ReactNode;
   detail: ReactNode;
-  visit?: { href: string; label: string } | undefined;
+  visit?: { slug: string; label: string } | undefined;
 };
 
 /** The home page "Made with Gravity Pants" band: grey band, 250px figures, alternate ones lower, 70s loop that pauses on hover/focus. */
@@ -27,9 +28,9 @@ export function ReelCarousel({ items, label, loop = true }: { items: CarouselIte
                 <span>{it.detail}</span>
                 <ConceptReelNotice brandName={it.visit?.label ?? (typeof it.title === "string" ? it.title : undefined)} />
                 {it.visit && (
-                  <a className="showcase-visit" href={it.visit.href} tabIndex={hidden ? -1 : undefined}>
-                    {it.visit.label} <ArrowUpRight size={13} strokeWidth={1.7} />
-                  </a>
+                  <BrandProfileLink className="showcase-visit" slug={it.visit.slug} cta="carousel-brand-profile" tabIndex={hidden ? -1 : undefined}>
+                    {it.visit.label} <ArrowRight size={13} strokeWidth={1.7} />
+                  </BrandProfileLink>
                 )}
               </figcaption>
             </figure>

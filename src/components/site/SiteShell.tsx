@@ -1,3 +1,4 @@
+import { BrandPreviewHost } from "./BrandPreview";
 import { Link } from "@tanstack/react-router";
 import { Instagram, Minus, Plus, Youtube } from "lucide-react";
 import { useState, type ReactNode } from "react";
@@ -125,5 +126,5 @@ function SiteFooter() {
 export function SiteShell({ children }: { children: ReactNode }) {
   const site = useBrandSite();
   if (site === "aimante") return <AimanteShell>{children}</AimanteShell>;
-  return <div className="flex min-h-dvh flex-col bg-site-page font-site text-site-ink"><SiteHeader variant="site" /><main className="min-h-[48dvh] flex-1">{children}</main><SiteFooter /><NewsletterPopup /></div>;
+  return <div className="flex min-h-dvh flex-col bg-site-page font-site text-site-ink"><SiteHeader variant="site" /><main className="min-h-[48dvh] flex-1">{children}</main><SiteFooter /><NewsletterPopup /><BrandPreviewHost /></div>;
 }
