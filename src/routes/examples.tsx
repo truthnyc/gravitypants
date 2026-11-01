@@ -3,7 +3,7 @@ import { ReelVideo } from "@/components/site/ReelVideo";
 import { SiteReelHeart } from "@/components/site/SiteReelHeart";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
-import { ArrowRight, ArrowUpRight, Check, ChevronDown, Download, X } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Check, ChevronDown, X } from "lucide-react";
 import { useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { SiteShell } from "@/components/site/SiteShell";

@@ -1,6 +1,6 @@
 import { ConceptReelNotice } from "@/components/directory/ConceptReelNotice";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, ArrowUpRight, Download } from "lucide-react";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { ReelVideo } from "@/components/site/ReelVideo";
 import { SiteReelHeart } from "@/components/site/SiteReelHeart";
