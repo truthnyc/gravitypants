@@ -26,6 +26,7 @@ export function useBodyScrollLock(open: boolean) {
 type Item = { label: string; to: string; exact?: boolean; cta?: string };
 const work: Item[] = [
   { label: "Your Ads", to: "/app/ads", exact: true },
+  { label: "Brand home", to: "/app/brand-home" },
   { label: "Brand Kit", to: "/app/brand" },
   { label: "Previous Exports", to: "/app/exports" },
 ];

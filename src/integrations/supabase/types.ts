@@ -1394,6 +1394,7 @@ export type Database = {
           uninstalled_at: string | null
           updated_at: string
           upgrade_return_project: string | null
+          web_workspace_id: string | null
           workspace_id: string | null
         }
         Insert: {
@@ -1420,6 +1421,7 @@ export type Database = {
           uninstalled_at?: string | null
           updated_at?: string
           upgrade_return_project?: string | null
+          web_workspace_id?: string | null
           workspace_id?: string | null
         }
         Update: {
@@ -1446,6 +1448,7 @@ export type Database = {
           uninstalled_at?: string | null
           updated_at?: string
           upgrade_return_project?: string | null
+          web_workspace_id?: string | null
           workspace_id?: string | null
         }
         Relationships: [

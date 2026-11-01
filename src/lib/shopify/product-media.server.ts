@@ -11,10 +11,20 @@ export function reelProductIds(photos: unknown[]): string[] {
 type Staged = { stagedUploadsCreate: { stagedTargets: { url: string; resourceUrl: string; parameters: { name: string; value: string }[] }[]; userErrors: { message: string }[] } };
 type Created = { productCreateMedia: { mediaUserErrors: { message: string }[] } };
 
+/** Shopify media type for a file name: GIFs go in as images, MP4s as videos. */
+export const mediaKind = (filename: string) => (/\.gif$/i.test(filename) ? "IMAGE" : /\.mp4$/i.test(filename) ? "VIDEO" : null);
+
 /** Uploads an MP4 to Shopify once, then attaches it to each product's media gallery. */
-export async function addVideoToProducts(shop: string, token: string, file: Blob, filename: string, productIds: string[], alt: string) {
+export function addVideoToProducts(shop: string, token: string, file: Blob, filename: string, productIds: string[], alt: string) {
+  return addMediaToProducts(shop, token, file, filename, productIds, alt);
+}
+
+/** Uploads an MP4 or GIF once, then attaches it to each product's media gallery. */
+export async function addMediaToProducts(shop: string, token: string, file: Blob, filename: string, productIds: string[], alt: string) {
+  const kind = mediaKind(filename);
+  if (!kind) throw new Error("Only MP4 and GIF files can go on product pages.");
   const staged = await adminGraphql<Staged>(shop, token, `mutation S($input: [StagedUploadInput!]!) { stagedUploadsCreate(input: $input) { stagedTargets { url resourceUrl parameters { name value } } userErrors { message } } }`, {
-    input: [{ resource: "VIDEO", filename, mimeType: "video/mp4", fileSize: String(file.size), httpMethod: "POST" }],
+    input: [{ resource: kind, filename, mimeType: kind === "IMAGE" ? "image/gif" : "video/mp4", fileSize: String(file.size), httpMethod: "POST" }],
   });
   const err = staged.stagedUploadsCreate.userErrors[0];
   const target = staged.stagedUploadsCreate.stagedTargets[0];
@@ -29,7 +39,7 @@ export async function addVideoToProducts(shop: string, token: string, file: Blob
   for (const productId of productIds) {
     const r = await adminGraphql<Created>(shop, token, `mutation M($productId: ID!, $media: [CreateMediaInput!]!) { productCreateMedia(productId: $productId, media: $media) { mediaUserErrors { message } } }`, {
       productId,
-      media: [{ mediaContentType: "VIDEO", originalSource: target.resourceUrl, alt: alt.slice(0, 500) }],
+      media: [{ mediaContentType: kind, originalSource: target.resourceUrl, alt: alt.slice(0, 500) }],
     });
     const e = r.productCreateMedia.mediaUserErrors[0];
     if (e) failed.push(e.message);

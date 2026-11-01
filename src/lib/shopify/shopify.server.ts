@@ -148,3 +148,51 @@ export async function adminGraphql<T>(shop: string, accessToken: string, query: 
 // Admin API only. TODO: shop.brand (logo, squareLogo, colors) is a Storefront API
 // field and does not exist in the Admin schema — fetch branding there in a later step.
 export const SHOP_BRAND_QUERY = `query ShopBasics { shop { name myshopifyDomain primaryDomain { url } } }`;
+
+// ---- Website "Connect your store" (OAuth authorization code grant) ----
+export const WEB_SCOPES = "read_products,write_products,unauthenticated_read_product_listings";
+
+const hex = (b: ArrayBuffer) => [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, "0")).join("");
+const b64url = (s: string) => btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+async function hmacHex(secret: string, msg: string) {
+  const key = await crypto.subtle.importKey("raw", enc.encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+  return hex(await crypto.subtle.sign("HMAC", key, enc.encode(msg)));
+}
+const sameHex = (a: string, b: string) => a.length === b.length && [...a].reduce((d, c, i) => d | (c.charCodeAt(0) ^ b.charCodeAt(i)), 0) === 0;
+
+/** Accepts "mystore", "mystore.myshopify.com" or a store admin URL; returns the domain or null. */
+export function normalizeShop(input: string): string | null {
+  let s = input.trim().toLowerCase().replace(/^https?:\/\//, "").split(/[/?#]/)[0] ?? "";
+  const admin = input.match(/admin\.shopify\.com\/store\/([a-z0-9-]+)/i);
+  if (admin?.[1]) s = admin[1].toLowerCase();
+  if (!s.includes(".")) s = `${s}.myshopify.com`;
+  return isShopDomain(s) ? s : null;
+}
+
+export type ConnectState = { ws: string; uid: string; shop: string; exp: number };
+export async function signState(st: ConnectState, secret: string) {
+  const p = b64url(JSON.stringify(st));
+  return `${p}.${await hmacHex(secret, `state:${p}`)}`;
+}
+export async function verifyState(token: string, secret: string, now = Date.now()): Promise<ConnectState | null> {
+  const [p, sig] = token.split(".");
+  if (!p || !sig || !sameHex(sig, await hmacHex(secret, `state:${p}`))) return null;
+  try {
+    const st = JSON.parse(atob(p.replace(/-/g, "+").replace(/_/g, "/"))) as ConnectState;
+    return st.exp > now ? st : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Shopify signs OAuth callbacks: hex HMAC-SHA256 of the other query params, sorted. */
+export async function verifyOAuthHmac(params: URLSearchParams, secret: string) {
+  const given = params.get("hmac") ?? "";
+  const msg = [...params.entries()].filter(([k]) => k !== "hmac" && k !== "signature").sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)).map(([k, v]) => `${k}=${v}`).join("&");
+  return given !== "" && sameHex(given.toLowerCase(), await hmacHex(secret, msg));
+}
+
+/** Trades an OAuth code for an expiring offline token pair. */
+export async function exchangeAuthCode(shop: string, code: string, apiKey: string, secret: string) {
+  return postToken(shop, { client_id: apiKey, client_secret: secret, code, expiring: "1" });
+}

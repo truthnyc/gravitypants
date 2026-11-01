@@ -46,6 +46,40 @@ export async function shopFromRequest(request: Request) {
     ws = data as unknown as string;
   }
 
+  const accessToken = tokenGetter(supabaseAdmin, row, { apiKey, secret, tokenKey });
+
+  return { shop, ws, admin: supabaseAdmin, accessToken };
+}
+
+export async function handle(fn: () => Promise<Response>) {
+  try {
+    return await fn();
+  } catch (e) {
+    if (e instanceof ShopError) return json({ error: e.message }, e.status);
+    console.error("shopify route", e);
+    return json({ error: "Something went wrong. Please try again." }, 500);
+  }
+}
+
+/** Published Gravity Pants templates that can open in 9:16, featured first. */
+export async function listTemplates(admin: Awaited<ReturnType<typeof shopFromRequest>>["admin"]) {
+  const { data } = await admin
+    .from("templates")
+    .select("*")
+    .eq("source", "system")
+    .eq("status", "published")
+    .order("featured", { ascending: false })
+    .order("sort_order", { ascending: true });
+  return (data ?? []).filter((t) => ((t.settings as { primary_format?: string } | null)?.primary_format ?? t.format ?? "9:16") === "9:16" && ((t.settings as { frames?: unknown[] } | null)?.frames?.length ?? 0) > 0);
+}
+
+type ShopRow = { shop_domain: string; access_token: string; refresh_token: string | null; token_expires_at: string | null; refresh_token_expires_at: string | null };
+type Admin = (typeof import("@/integrations/supabase/client.server"))["supabaseAdmin"];
+
+/** Returns a function giving a usable Admin API token for this shop (stored, migrated or refreshed). Shared by the embedded app and Brand home. */
+export function tokenGetter(supabaseAdmin: Admin, row: ShopRow, creds: { apiKey: string; secret: string; tokenKey: string }) {
+  const { apiKey, secret, tokenKey } = creds;
+  const shop = row.shop_domain;
   const save = async (pair: { access_token: string; refresh_token: string | null; scope: string | null; expires_in: number | null; refresh_token_expires_in: number | null }) => {
     await supabaseAdmin
       .from("shopify_shops")
@@ -103,27 +137,5 @@ export async function shopFromRequest(request: Request) {
     return job;
   };
 
-  return { shop, ws, admin: supabaseAdmin, accessToken };
-}
-
-export async function handle(fn: () => Promise<Response>) {
-  try {
-    return await fn();
-  } catch (e) {
-    if (e instanceof ShopError) return json({ error: e.message }, e.status);
-    console.error("shopify route", e);
-    return json({ error: "Something went wrong. Please try again." }, 500);
-  }
-}
-
-/** Published Gravity Pants templates that can open in 9:16, featured first. */
-export async function listTemplates(admin: Awaited<ReturnType<typeof shopFromRequest>>["admin"]) {
-  const { data } = await admin
-    .from("templates")
-    .select("*")
-    .eq("source", "system")
-    .eq("status", "published")
-    .order("featured", { ascending: false })
-    .order("sort_order", { ascending: true });
-  return (data ?? []).filter((t) => ((t.settings as { primary_format?: string } | null)?.primary_format ?? t.format ?? "9:16") === "9:16" && ((t.settings as { frames?: unknown[] } | null)?.frames?.length ?? 0) > 0);
+  return accessToken;
 }
