@@ -2125,6 +2125,11 @@ export type Database = {
       is_platform_admin: { Args: never; Returns: boolean }
       is_workspace_admin: { Args: { _ws: string }; Returns: boolean }
       is_workspace_member: { Args: { _ws: string }; Returns: boolean }
+      join_password_info: { Args: { _ws: string }; Returns: Json }
+      join_with_password: {
+        Args: { _password: string; _ws: string }
+        Returns: string
+      }
       kit_shared: { Args: { _ws: string }; Returns: boolean }
       kit_workspaces: { Args: { _ws: string }; Returns: string[] }
       record_directory_reel_open: {
@@ -2168,6 +2173,10 @@ export type Database = {
       set_default_brand_kit: {
         Args: { _kit: string; _ws: string }
         Returns: undefined
+      }
+      set_join_password: {
+        Args: { _password: string; _ws: string }
+        Returns: boolean
       }
       slug_status: { Args: { _brand?: string; _slug: string }; Returns: string }
       workspace_is_team: { Args: { _ws: string }; Returns: boolean }
