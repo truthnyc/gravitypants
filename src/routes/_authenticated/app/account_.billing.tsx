@@ -171,7 +171,7 @@ function ExportCounts({ st, monthly }: { st: ExportStatus; monthly: boolean }) {
         </div>
       )}
       <p className="mt-1.5 text-[12px] text-secondary-text nums">
-        {st.staff ? "Gravity Pants staff accounts have no export limit. Customers on Team get 150 shared exports a month." : monthly && st.resets_at ? `Plan exports reset on ${longDate(st.resets_at)}. Extra exports are used only after those run out.` : st.trial ? (st.watermark ? "Trial exports carry a watermark." : "Your next export has no watermark.") : "Extra exports are used only after your plan exports run out."}
+        {st.staff ? "Gravity Pants staff accounts have no export limit. Customers on Team get 150 shared exports a month." : monthly && st.resets_at ? `Plan exports reset on ${longDate(st.resets_at)}. Extra exports are used only after those run out.` : st.trial ? (st.watermark ? "Free exports carry a watermark." : "Your next export has no watermark.") : "Extra exports are used only after your plan exports run out."}
       </p>
     </div>
   );

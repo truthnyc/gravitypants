@@ -380,7 +380,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
   );
   const remainingSummary = [
     exportStatus?.limit != null ? exportStatus.trial
-      ? `Trial · ${Math.max(0, exportStatus.limit - (exportStatus.used ?? 0))} of ${exportStatus.limit} exports left`
+      ? `Free · ${Math.max(0, exportStatus.limit - (exportStatus.used ?? 0))} of ${exportStatus.limit} exports left`
       : `${Math.max(0, exportStatus.limit - (exportStatus.used ?? 0))} of ${exportStatus.limit} exports left this month` : null,
     exportStatus?.extras ? `Plus ${exportStatus.extras} extra ${exportStatus.extras === 1 ? "export" : "exports"} that never expire` : null,
   ].filter(Boolean).join(" · ");

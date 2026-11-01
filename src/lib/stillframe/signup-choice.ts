@@ -20,5 +20,5 @@ export function getSignupChoice(userId: string): SignupChoice | null {
 export function trialLabel(choice: SignupChoice | null): string {
   if (!choice) return "Free";
   const plan = PLANS.find((p) => p.id === choice.plan);
-  return plan ? `${plan.name} (trial)` : "Free trial";
+  return plan ? `${plan.name} (trial)` : "Free";
 }

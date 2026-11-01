@@ -36,7 +36,7 @@ export function TrialPill() {
   const left = st?.trial && st.limit != null ? Math.max(0, st.limit - (st.used ?? 0)) : 0;
   return (
     <Link to="/pricing" className="rounded-lg bg-control-fill px-2.5 py-1 text-[12px] font-medium text-secondary-text nums hover:text-foreground">
-      {left > 0 ? `Trial · ${left} ${left === 1 ? "export" : "exports"} left` : "Trial exports used"}
+      {left > 0 ? `Free · ${left} ${left === 1 ? "export" : "exports"} left` : "Free exports used"}
     </Link>
   );
 }

@@ -15,7 +15,7 @@ export type GuideSectionData = {
 export const GUIDE_SECTIONS: readonly GuideSectionData[] = [
   { id: "before-you-start", title: "Before you start", shortTitle: "Before you start", illustration: "start",
     steps: ["Gravity Pants turns still photos into short video ads (MP4) and animated GIFs. Bring your own photos; you can add words and a logo as you go.", TRIAL_ANSWER, "Choose clear photos with a little space around the subject. Three to five is a good place to start."],
-    tip: "Your reels and brand kit stay saved when your trial exports run out. You can keep editing before choosing a plan.",
+    tip: "Your reels and brand kit stay saved when your Free exports run out. You can keep editing before choosing a plan.",
     imageDescription: "Three illustrated photos become a short reel, with one clean trial export and two marked exports.", link: { label: "Start a reel", to: "/app/new" } },
   { id: "first-reel", title: "Make your first reel", shortTitle: "Your first reel", illustration: "create",
     steps: [`Open New ad. Format comes first: pick your main size from ${sizes}. Portrait 4:5 is selected to begin with.`, "Choose a template and brand kit if you want them, then choose Next: Photos.", "Add three to five photos and drag them into the order you want. Each photo becomes a frame; choose Next to open Edit."],
