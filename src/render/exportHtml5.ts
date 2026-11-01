@@ -10,7 +10,6 @@ import { getMediaUrl } from "@/lib/stillframe/media";
 import { DEFAULT_FONT, fontFamilyOf, videoDuration } from "./renderFrame";
 import { ExportCancelled, type RenderInput } from "./exportMedia";
 import { bannerHtml, type Html5Doc } from "./html5-doc";
-import { adLoops, GOOGLE_ADS_MAX_ZIP_BYTES } from "./google-ads";
 
 /** The banner could not be made small enough for ad platforms. */
 export class Html5TooLarge extends Error {}
@@ -114,26 +113,17 @@ export async function exportHtml5(input: RenderInput, opts: Html5Options, signal
   }
   onProgress(0.3);
 
-  // Google Ads: zip at most 600 KB, animation at most 30 seconds. Shrink photos until it fits.
-  const loops = adLoops(opts.loops, videoDuration(project, frames, brand));
-  const tries: [number, number][] = [[1, 0.82], [0.8, 0.75], [0.65, 0.7], [0.5, 0.65], [0.4, 0.6], [0.3, 0.55]];
-  for (let t = 0; t < tries.length; t++) {
-    const [scale, quality] = tries[t]!;
-    const { out, map } = await encodeImages(scale, quality);
-    const doc: Html5Doc = {
-      project, frames, brand, format: input.format, width: input.width, height: input.height,
-      watermark: !!input.watermark, loops, images: map, fonts,
-    };
-    const zip = zipSync({
-      ...out,
-      "index.html": strToU8(bannerHtml(opts.title, input.width, input.height, opts.clickUrl, JSON.stringify(doc))),
-      "ad.js": strToU8(runtimeJs),
-    }, { level: 9 });
-    onProgress(0.3 + ((t + 1) / tries.length) * 0.7);
-    if (zip.byteLength <= GOOGLE_ADS_MAX_ZIP_BYTES) {
-      onProgress(1);
-      return new Blob([new Uint8Array(zip)], { type: "application/zip" });
-    }
-  }
-  throw new Html5TooLarge("banner over 600 KB");
+  // One HTML5 version of the edited reel, full quality. (Google Ads sizes/limits are skipped for now.)
+  const { out, map } = await encodeImages(1, 0.82);
+  const doc: Html5Doc = {
+    project, frames, brand, format: input.format, width: input.width, height: input.height,
+    watermark: !!input.watermark, loops: opts.loops, images: map, fonts,
+  };
+  const zip = zipSync({
+    ...out,
+    "index.html": strToU8(bannerHtml(opts.title, input.width, input.height, opts.clickUrl, JSON.stringify(doc))),
+    "ad.js": strToU8(runtimeJs),
+  }, { level: 9 });
+  onProgress(1);
+  return new Blob([new Uint8Array(zip)], { type: "application/zip" });
 }
