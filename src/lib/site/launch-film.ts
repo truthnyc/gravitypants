@@ -1,5 +1,5 @@
 import type { SiteReel } from "./reels";
-import video from "@/assets/site/photos_to_video_launch.mp4.asset.json";
+import video from "@/assets/site/photos_to_video_launch_v2.mp4.asset.json";
 import poster from "@/assets/site/photos_to_video_launch_poster.jpg.asset.json";
 
 /** The Gravity Pants launch film, shown on the pages listed in LAUNCH_FILM_PAGES.
