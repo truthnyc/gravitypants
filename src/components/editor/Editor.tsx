@@ -1,4 +1,4 @@
-import { photoScale } from "@/lib/stillframe/framing";
+import { photoScale, RESET_FRAMING } from "@/lib/stillframe/framing";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { ChevronRight } from "lucide-react";
@@ -147,7 +147,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
   const [adjusting, setAdjusting] = useState(false);
   const [fontPreview, setFontPreview] = useState<{ el: "headline" | "subline"; family: string; weight: number } | null>(null);
   const [keyframe, setKeyframe] = useState<"start" | "end" | null>(null);
-  const keyDrag = useRef<{ key: string; pan0: number } | null>(null);
+  const keyDrag = useRef<{ key: string; pan0: number; x0: number } | null>(null);
   const [styleClip, setStyleClip] = useState<FrameStyle | null>(null);
   const [sameLength, setSameLength] = useState(false);
   const [sameTransition, setSameTransition] = useState(false);
@@ -510,7 +510,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
     setUploading(true);
     try {
       const up = await uploadMedia(file, "photo");
-      updateFrame(replaceAt.current, (f) => patchPhotoForFormat(f, replaceFormat.current, { asset_id: up.assetId, path: up.path, url: up.path, name: file.name, focus: { x: 0.5, y: 0.5 }, zoom: 1 }));
+      updateFrame(replaceAt.current, (f) => patchPhotoForFormat(f, replaceFormat.current, { asset_id: up.assetId, path: up.path, url: up.path, name: file.name, ...RESET_FRAMING }));
     } catch {
       toast.error("That photo couldn't be added. Try again.");
     } finally {

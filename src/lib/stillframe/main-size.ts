@@ -49,7 +49,7 @@ export function refitForMainSize(doc: EditorDoc, format: Format, kitPositions?: 
           ...fr.format_overrides,
           [format]: {
             ...own,
-            photo: { ...own.photo, focus: { x: 0.5, y: 0.5 } },
+            photo: { ...own.photo, focus: { x: 0.5, y: 0.5 }, offset_x: 0, offset_y: 0 },
             ...(own.headline !== undefined ? { headline: snap(own.headline) } : {}),
             ...(own.subline !== undefined ? { subline: snap(own.subline) } : {}),
           },
