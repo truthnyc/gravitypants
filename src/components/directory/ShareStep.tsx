@@ -7,7 +7,10 @@ import { ChevronDown, ChevronLeft, Download, X } from "lucide-react";
 import { sizeLabel } from "@/lib/stillframe/main-size";
 import { AppButton, AppField, AppInput, AppSelect, AppSwitch, AppTag } from "@/components/app-ui";
 import { AdPills, useSaveDoc } from "@/components/app-ui/AdPills";
-import { ReelCard, StepActions, StepShell, StepTitle } from "@/components/app-ui/StepShell";
+import { AdMenu, FrameStrip, StageBar, StageChip, StudioBottom, StudioCanvas, StudioPanel, StudioShell } from "@/components/app-ui/StudioLayout";
+import { MAIN_SIZES } from "@/lib/stillframe/main-size";
+const pxOf = (f: string) => MAIN_SIZES.find((s) => s.format === f) ?? MAIN_SIZES[0]!;
+const ratioOf = (f: string) => pxOf(f).width / pxOf(f).height;
 import { useReelPlayer } from "@/components/editor/ReelPreview";
 import { supabase } from "@/integrations/supabase/client";
 import { getShareContext, shareReel } from "@/lib/directory/directory.functions";
@@ -146,34 +149,44 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
   const graceEnd = ctx.plan.endedAt ? new Date(new Date(ctx.plan.endedAt).getTime() + GRACE_DAYS * 86_400_000) : null;
 
   return (
-    <StepShell
+    <StudioShell
       adId={doc.project.id}
       step="share"
-      pills={<AdPills doc={doc} set={saveDoc} />}
       title={{ name: doc.project.name }}
-      back={{ label: "Back to Edit", to: "/app/ad/$id/edit" }}
-      left={
-        <ReelCard
-          preview={player.preview}
-          playing={player.playing}
-          onTogglePlay={player.toggle}
-          segments={player.segments}
-          time={player.time}
-          total={player.total}
-          name={doc.project.name}
-          meta={[templateName, `${doc.frames.length} ${doc.frames.length === 1 ? "photo" : "photos"}`, `${player.total.toFixed(1)} sec`].filter(Boolean).join(" · ")}
-          formats={doc.project.formats}
-          format={player.format}
-          onFormat={(f) => player.setFormat(f as Format)}
-          exported={doc.project.formats.map((f) => `${sizeLabel(f)} · MP4`)}
-        />
+      menu={<AdMenu doc={doc} set={saveDoc} />}
+      next={<AppButton asChild><Link to="/app/ads">Done</Link></AppButton>}
+      stage={
+        <>
+          <StageBar label="Exported">
+            {doc.project.formats.map((f) => <StageChip key={f} on={f === player.format} onClick={() => player.setFormat(f as Format)}><span className="text-ap-green">✓</span>{sizeLabel(f)}</StageChip>)}
+          </StageBar>
+          <StudioCanvas ratio={ratioOf(player.format)} label={`${player.format} · ${pxOf(player.format).width} × ${pxOf(player.format).height}`}
+            overlay={<span className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-lg bg-ap-card px-2.5 py-1 text-[12px] font-medium text-ap-green shadow-ap-soft">✓ Exported</span>}>
+            <div className="grid h-full w-full place-items-center">{player.preview}</div>
+          </StudioCanvas>
+        </>
       }
-    >
-      <StepTitle
-        title="Your files are ready"
-        tag={<span className={cn("rounded-md border border-ap-hairline px-2 py-0.5 text-[12px] font-semibold", locked ? "text-ap-muted" : "text-ap-badge")}>{PLAN_LABEL[ctx.plan.tag]}</span>}
-      />
-      <AppButton asChild size="lg" className="mb-6"><Link to="/app/ad/$id/export" params={{ id: doc.project.id }}><Download className="size-4" strokeWidth={1.7} /> Download files</Link></AppButton>
+      bottom={
+        <StudioBottom playing={player.playing} onTogglePlay={player.toggle} time={player.time} total={player.total}
+          right={<span>Read-only here · <Link to="/app/ad/$id/edit" params={{ id: doc.project.id }} className="text-ap-blue hover:text-ap-blue-hover">Edit frames</Link></span>}>
+          <FrameStrip doc={doc} format={player.format} images={player.images} version={player.version} current={player.frameIndex} onSelect={player.seek} />
+        </StudioBottom>
+      }
+      panel={
+    <StudioPanel step="share" title="Your files are ready"
+      tag={<>
+        <span className="rounded-md border border-ap-hairline px-2 py-0.5 text-[12px] font-semibold text-ap-muted nums">{doc.project.formats.length} {doc.project.formats.length === 1 ? "size" : "sizes"} · MP4</span>
+        <span className={cn("rounded-md border border-ap-hairline px-2 py-0.5 text-[12px] font-semibold", locked ? "text-ap-muted" : "text-ap-badge")}>{PLAN_LABEL[ctx.plan.tag]}</span>
+      </>}>
+      <AppButton asChild size="lg" className="mb-4 w-full"><Link to="/app/ad/$id/export" params={{ id: doc.project.id }}><Download className="size-4" strokeWidth={1.7} /> Download files</Link></AppButton>
+      <ul aria-label="Exported files" className="mb-6 divide-y divide-ap-hairline rounded-[4px] border border-ap-hairline text-[13px] nums">
+        {doc.project.formats.map((f) => (
+          <li key={f} className="flex items-center gap-2 px-3 py-2.5">
+            <span className="min-w-0 flex-1 truncate">{sizeLabel(f)} · MP4 · {pxOf(f).width} × {pxOf(f).height} · {player.total.toFixed(1)} sec</span>
+            <button type="button" onClick={() => { player.setFormat(f as Format); if (!player.playing) player.toggle(); }} className="shrink-0 text-ap-blue hover:text-ap-blue-hover">Play</button>
+          </li>
+        ))}
+      </ul>
 
       {ctx.plan.tag === "ended" && ctx.plan.endedAt && graceEnd && (
         <Notice tone="amber" action={<AppButton asChild size="sm"><Link to="/app/account/billing">Renew plan</Link></AppButton>}>
@@ -312,11 +325,12 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
 
       {ctx.reel && <p className="mt-4 text-[13px] text-ap-muted">Status now: <AppTag>{ctx.reel.status === "in_review" ? "In review" : ctx.reel.status === "live" ? "Live in the Directory" : ctx.reel.status === "hidden" ? "Hidden" : "Private"}</AppTag></p>}
 
-      <StepActions>
-        <AppButton asChild variant="ghost" size="lg"><Link to="/app/ad/$id/export" params={{ id: doc.project.id }}><ChevronLeft className="size-4" strokeWidth={1.7} /> Export</Link></AppButton>
-        <AppButton size="lg" disabled={!canSubmit} onClick={() => void submit()}>{busy ? "Saving…" : primaryLabel}</AppButton>
-      </StepActions>
-    </StepShell>
+      <div className="mt-6 flex justify-end border-t border-ap-hairline pt-4">
+        <AppButton disabled={!canSubmit} onClick={() => void submit()}>{busy ? "Saving…" : primaryLabel}</AppButton>
+      </div>
+    </StudioPanel>
+      }
+    />
   );
 }
 
