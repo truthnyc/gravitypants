@@ -1,4 +1,9 @@
 # Product-reel search metadata
+# Referral program page
+- [ ] Add a public referral guide and link it from the shared Pricing and Help FAQ.
+- [ ] Verify FAQ navigation, referral instructions and desktop/phone presentation.
+
+# Product-reel search metadata
 - [x] Write unique titles, descriptions and accurate structured data for all 37 Gravity Pants sitemap entries.
 - [x] Verify all 37 server-rendered pages and browser titles; preserve existing video, article and pricing data. Six tests passed and build is healthy.
 - [ ] Publish the search metadata — awaiting explicit publishing approval.
