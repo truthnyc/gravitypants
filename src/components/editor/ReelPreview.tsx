@@ -56,7 +56,8 @@ export function useReelPlayer(doc: EditorDoc) {
     <div className="text-[14px] text-ap-muted">Add photos to see your reel</div>
   );
   return {
-    preview, playing, toggle, time, total, format, setFormat, brand,
+    preview, playing, toggle, time, total, format, setFormat, brand, frameIndex: idx, images, version,
+    seek: (i: number) => { setPlaying(false); setTime(restTime(doc.frames, i)); },
     segments: [...doc.frames.map((f) => f.duration_sec), ...(endSeconds ? [endSeconds] : [])],
   };
 }
