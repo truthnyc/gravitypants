@@ -1,3 +1,4 @@
+import { clampScale, photoScale, RESET_FRAMING } from "@/lib/stillframe/framing";
 import { useRef, type ReactNode } from "react";
 import { ArrowLeftRight, Minus, Plus } from "lucide-react";
 import type { Frame, LogoSettings, TextSettings } from "@/lib/stillframe/types";
@@ -78,7 +79,7 @@ export function EditToolbar({ section, frame, frameIndex, logo, hasLogo, actions
     );
   } else if (section === "photo") {
     const p = frame.photo ?? {};
-    const zoom = p.zoom ?? 1;
+    const scale = photoScale(p);
     const fit = p.fit ?? "fill";
     body = (
       <>
@@ -86,13 +87,13 @@ export function EditToolbar({ section, frame, frameIndex, logo, hasLogo, actions
         <Sep />
         <button type="button" className={btn} onClick={actions.onReplacePhoto}>Replace</button>
         <Sep />
-        <Stepper label="photo" value={`${Math.round(zoom * 100)}%`} onMinus={() => actions.onPhoto({ zoom: Math.max(0.5, Math.round((zoom - 0.05) * 100) / 100) })} onPlus={() => actions.onPhoto({ zoom: Math.min(2.5, Math.round((zoom + 0.05) * 100) / 100) })} />
+        <Stepper label="photo" value={`${scale}%`} onMinus={() => actions.onPhoto({ scale: clampScale(scale - 5) })} onPlus={() => actions.onPhoto({ scale: clampScale(scale + 5) })} />
         <Sep />
         <button type="button" className={btn} onClick={() => actions.onPhoto({ fit: fit === "fill" ? "fit" : "fill" })} title={fit === "fill" ? "Switch to Fit" : "Switch to Fill"}>
           {fit === "fill" ? "Fill" : "Fit"} <ArrowLeftRight className="size-3.5" strokeWidth={1.7} />
         </button>
         <Sep />
-        <button type="button" className={btn} onClick={() => actions.onPhoto({ focus: { x: 0.5, y: 0.5 }, zoom: 1 })}>Reset</button>
+        <button type="button" className={btn} onClick={() => actions.onPhoto(RESET_FRAMING)}>Reset</button>
       </>
     );
   } else if (section === "logo") {

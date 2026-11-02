@@ -1,3 +1,4 @@
+import { photoOffset, photoScale } from "@/lib/stillframe/framing";
 import type {
   EndCard,
   Format,
@@ -353,8 +354,9 @@ function drawPhoto(
   ctx.fillRect(0, 0, W, H);
   const img = photo.path ? images?.get(photo.path) : undefined;
   if (!img || !img.naturalWidth) return;
-  const userZoom = Math.max(0.5, Number(photo.zoom ?? 1) || 1);
-  const uncovered = (photo.fit ?? "fill") === "fit" || userZoom < 1;
+  const userZoom = photoScale(photo) / 100;
+  const o0 = photoOffset(photo);
+  const uncovered = (photo.fit ?? "fill") === "fit" || userZoom < 1 || o0.x !== 0 || o0.y !== 0;
   if (uncovered && bgMode === "blur") drawBlurred(ctx, img, W, H);
 
   const e = easeInOut(clamp(u));
@@ -392,21 +394,13 @@ function drawPhoto(
   const ih = img.naturalHeight;
   const fill = (photo.fit ?? "fill") === "fill";
   const base = fill ? Math.max(W / iw, H / ih) : Math.min(W / iw, H / ih);
-  const sc = base * zoom * (fill ? userZoom : 1);
+  // cover/contain, then translate(offset%) scale(scale/100); movement multiplies on top.
+  const off = photoOffset(photo, { iw, ih, W, H });
+  const sc = base * zoom * userZoom;
   const dw = iw * sc;
   const dh = ih * sc;
-  let x: number;
-  let y: number;
-  if (fill) {
-    const fx = photo.focus?.x ?? 0.5;
-    const fy = photo.focus?.y ?? 0.5;
-    // Scaled below the frame: centre it so the background shows evenly.
-    x = dw < W ? (W - dw) / 2 : clamp(W / 2 - fx * dw, W - dw, 0);
-    y = dh < H ? (H - dh) / 2 : clamp(H / 2 - fy * dh, H - dh, 0);
-  } else {
-    x = (W - dw) / 2;
-    y = (H - dh) / 2;
-  }
+  const x = (W - dw) / 2 + (off.x / 100) * W;
+  const y = (H - dh) / 2 + (off.y / 100) * H;
   const b = clamp(Number(photo.brightness ?? 0) || 0, -1, 1);
   ctx.drawImage(img, x + pan, y + panV, dw, dh);
   // Brightness without ctx.filter (unsupported in Safari): result = img * (1 + b).

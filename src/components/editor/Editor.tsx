@@ -1,3 +1,4 @@
+import { photoScale, RESET_FRAMING } from "@/lib/stillframe/framing";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { ChevronRight } from "lucide-react";
@@ -146,7 +147,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
   const [adjusting, setAdjusting] = useState(false);
   const [fontPreview, setFontPreview] = useState<{ el: "headline" | "subline"; family: string; weight: number } | null>(null);
   const [keyframe, setKeyframe] = useState<"start" | "end" | null>(null);
-  const keyDrag = useRef<{ key: string; pan0: number } | null>(null);
+  const keyDrag = useRef<{ key: string; pan0: number; x0: number } | null>(null);
   const [styleClip, setStyleClip] = useState<FrameStyle | null>(null);
   const [sameLength, setSameLength] = useState(false);
   const [sameTransition, setSameTransition] = useState(false);
@@ -417,18 +418,20 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [keyframe, idx, selected, frame?.photo?.movement]);
 
-  const onStageFocus = (patch: { focus?: { x: number; y: number }; zoom?: number }, key: string) => {
-    if (!keyframe || !frame) return updatePhoto(patch, key);
+  const onStageFocus = (patch: { offset?: { x: number; y: number }; scale?: number }, key: string) => {
+    if (!keyframe || !frame) {
+      return updatePhoto(patch.scale !== undefined ? { scale: patch.scale } : patch.offset ? { offset_x: patch.offset.x, offset_y: patch.offset.y } : {}, key);
+    }
     const p = frame.photo ?? {};
-    if (patch.zoom !== undefined) {
+    if (patch.scale !== undefined) {
       const cur = keyframe === "start" ? (p.zoom_start ?? 1) : (p.zoom_end ?? 1);
-      const delta = patch.zoom - (p.zoom ?? 1);
+      const delta = (patch.scale - photoScale(p)) / 100;
       const z = Math.min(1.5, Math.max(1, cur + delta));
       return updatePhoto(keyframe === "start" ? { zoom_start: z } : { zoom_end: z }, `kf-zoom-${keyframe}`);
     }
-    if (patch.focus) {
-      if (keyDrag.current?.key !== key) keyDrag.current = { key, pan0: Number(p.pan_x ?? 0) };
-      const d = (p.focus?.x ?? 0.5) - patch.focus.x;
+    if (patch.offset) {
+      if (keyDrag.current?.key !== key) keyDrag.current = { key, pan0: Number(p.pan_x ?? 0), x0: patch.offset.x };
+      const d = (keyDrag.current.x0 - patch.offset.x) / 100;
       const px = keyDrag.current.pan0 + (keyframe === "start" ? -1 : 1) * d * 20;
       updatePhoto({ pan_x: Math.max(-1, Math.min(1, px)) }, key);
     }
@@ -507,7 +510,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
     setUploading(true);
     try {
       const up = await uploadMedia(file, "photo");
-      updateFrame(replaceAt.current, (f) => patchPhotoForFormat(f, replaceFormat.current, { asset_id: up.assetId, path: up.path, url: up.path, name: file.name, focus: { x: 0.5, y: 0.5 }, zoom: 1 }));
+      updateFrame(replaceAt.current, (f) => patchPhotoForFormat(f, replaceFormat.current, { asset_id: up.assetId, path: up.path, url: up.path, name: file.name, ...RESET_FRAMING }));
     } catch {
       toast.error("That photo couldn't be added. Try again.");
     } finally {
