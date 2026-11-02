@@ -1420,3 +1420,6 @@ p.concept-reel-notice { font-size: 10px !important; }
   background-color: var(--ap-media);
   border-radius: 24px;
 }
+
+/* Studio focus: the site's soft blue ring instead of a hard outline. */
+.ap-flow :is(a, button, [role="radio"], [role="tab"], [tabindex]):focus-visible { outline: none; box-shadow: var(--ap-focus-ring); }

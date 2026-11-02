@@ -173,7 +173,7 @@ export function EditCanvas({ ratio, label, children, notice, onEmptyClick }: { r
     return () => ro.disconnect();
   }, [ratio]);
   return (
-    <div ref={ref} className="ap-dot-grid relative min-h-0 flex-1 overflow-hidden rounded-[4px]">
+    <div ref={ref} className="ap-dot-grid relative min-h-0 flex-1 overflow-hidden">
       {notice && <div className="absolute inset-x-3 top-3 z-10 flex flex-col items-center gap-2">{notice}</div>}
       <div className="absolute inset-0 grid place-items-center" onPointerDown={(e) => { if (e.target === e.currentTarget) onEmptyClick?.(); }}>
         <div style={{ width: box.w, height: box.h }} className="transition-[width,height] duration-[280ms] ease-out motion-reduce:transition-none">{box.w > 0 && children}</div>
