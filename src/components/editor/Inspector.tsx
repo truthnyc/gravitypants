@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { normalizeHex, photoName, photoPalette } from "@/lib/stillframe/palette";
+import { gradientPresets, normalizeHex, photoName, photoPalette } from "@/lib/stillframe/palette";
 import { ChevronDown, ChevronRight, Clock, Crop, Play, Image as ImageIcon, Minus, Plus, RefreshCw, Shapes, Sparkles, TextQuote, Type } from "lucide-react";
 import type { EditorDoc } from "@/lib/stillframe/data";
 import {
@@ -672,25 +672,6 @@ function PhotoPanel({
 }
 
 const BG_NEUTRALS = ["#000000", "#1D1D1F", "#6E6E73", "#D2D2D7", "#F5F5F7", "#FFFFFF"];
-
-/** Six 160° two-stop presets from the photo's and brand's colours (darkest photo colour first). */
-export function gradientPresets(palette: string[], brand: string[]): [string, string][] {
-  const p = palette.length ? palette : ["#1D1D1F", "#6E6E73", "#D2D2D7"];
-  const b = brand.length ? brand : [];
-  const cands: [string, string][] = [
-    [p[0]!, p[p.length - 1]!],
-    [p[1] ?? p[0]!, p[0]!],
-    [p[Math.min(2, p.length - 1)]!, p[p.length - 1]!],
-    ...(b.length >= 2 ? [[b[0]!, b[1]!] as [string, string]] : []),
-    ...(b.length ? [[b[0]!, p[0]!] as [string, string]] : []),
-    [p[p.length - 1]!, "#FFFFFF"],
-    [p[0]!, "#000000"],
-    ["#1D1D1F", "#6E6E73"],
-    ["#F5F5F7", "#D2D2D7"],
-  ];
-  const seen = new Set<string>();
-  return cands.filter(([a, c]) => { const k = `${a}${c}`; if (a === c || seen.has(k)) return false; seen.add(k); return true; }).slice(0, 6);
-}
 
 function BackgroundPanel({ photo, frameIndex, frameCount, brandName, brandColors, image, actions }: {
   photo: PhotoSettings; frameIndex: number; frameCount: number; brandName: string; brandColors: string[]; image?: HTMLImageElement | undefined; actions: InspectorActions;
