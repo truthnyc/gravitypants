@@ -715,8 +715,6 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
   const here = formatIssues(format)[0];
   const elsewhere = PREVIEW_SHAPES.filter((f) => f !== format && formatIssues(f).length);
 
-  const meta = [templateName, `${frames.length} ${frames.length === 1 ? "photo" : "photos"}`, `${total.toFixed(1)} sec`].filter(Boolean).join(" · ");
-  const segments = [...frames.map((f) => f.duration_sec), ...(endSeconds ? [endSeconds] : [])];
 
   const rail: RailKey = selected === "logo" ? "logo" : selected === "headline" || selected === "subline" ? "text" : "photo";
   const pickRail = (k: RailKey) => {
