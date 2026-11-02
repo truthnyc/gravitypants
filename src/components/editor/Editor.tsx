@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { ChevronRight, MoreHorizontal, Undo2 } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { AppSegmented } from "@/components/app-ui";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Link } from "@tanstack/react-router";
 import { AppButton } from "@/components/app-ui";
 import { AdPills, useMainSizeChange } from "@/components/app-ui/AdPills";
-import { ReelCard, StepActions, StepShell } from "@/components/app-ui/StepShell";
+import { EditCanvas, EditDrawer, EditRail, EditStepStrip, EditTimeline, EditTopBar, useCompactEditor, type RailKey } from "./EditWorkspace";
+import { FORMAT_SIZE } from "@/render/formats";
 import { KitAgainButton } from "@/components/templates/KitAgain";
 import { effectiveKit, framePayloadFromPhoto, useBrandKit, useBrandKits, useTemplateName, type EditorDoc } from "@/lib/stillframe/data";
 import type { NamedBrandKit } from "@/lib/stillframe/types";
@@ -98,7 +99,22 @@ function isTyping(target: EventTarget | null) {
 const PREVIEW_SHAPES: Format[] = ["9:16", "4:5", "1:1", "5:4", "16:9"];
 
 export function Editor({ initial, readOnly = false, banner, exportDisabled = false }: { initial: EditorDoc; readOnly?: boolean; banner?: import("react").ReactNode; exportDisabled?: boolean }) {
-  const { doc, apply, undo, redo, canUndo } = useEditorDoc(initial);
+  const { doc, apply, undo, redo, canUndo, canRedo } = useEditorDoc(initial);
+  const compact = useCompactEditor();
+  const shellRef = useRef<HTMLDivElement>(null);
+  const [shellTop, setShellTop] = useState(0);
+  useEffect(() => {
+    const el = shellRef.current;
+    if (!el) return;
+    // Fill the screen below anything above the editor (e.g. a site notice) so the page never scrolls.
+    const measure = () => setShellTop(Math.max(0, Math.round(el.getBoundingClientRect().top + window.scrollY)));
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(document.body);
+    return () => ro.disconnect();
+  }, []);
+  const [drawerOpen, setDrawerOpen] = useState(true);
+  useEffect(() => { setDrawerOpen(!compact); }, [compact]);
   const status = useAutosave(doc, !readOnly);
 
   const [frameIndex, setFrameIndex] = useState(0);
@@ -711,202 +727,205 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
   const here = formatIssues(format)[0];
   const elsewhere = PREVIEW_SHAPES.filter((f) => f !== format && formatIssues(f).length);
 
-  const meta = [templateName, `${frames.length} ${frames.length === 1 ? "photo" : "photos"}`, `${total.toFixed(1)} sec`].filter(Boolean).join(" · ");
-  const segments = [...frames.map((f) => f.duration_sec), ...(endSeconds ? [endSeconds] : [])];
 
-  return (
-    <StepShell
-      adId={doc.project.id}
-      step="edit"
-      pills={<AdPills doc={doc} set={(next) => { setFormat(null); apply(() => next); }} onKit={(id) => actions.onKit(id)} readOnly={readOnly} />}
-      title={{ name: doc.project.name, onRename: (name) => apply((d) => ({ ...d, project: { ...d.project, name } })), status: readOnly ? undefined : status, readOnly }}
-      banner={banner}
-      left={
-        <ReelCard
-          preview={
-            <div className={cn("h-full w-full", readOnly && "pointer-events-none select-none")}>
-              <Stage
-                doc={stageDoc}
-                brand={brand}
-                frameIndex={idx}
-                format={format}
-                aspect={FORMAT_RATIO[format]}
-                time={time}
-                playing={playing}
-                selected={selected}
-                images={images}
-                version={version}
-                onSelect={setSelected}
-                onMove={moveElement}
-                onText={setText}
-                adjusting={(adjusting || Boolean(keyframe)) && selected === "photo"}
-                adjustHint={keyframe ? `Setting the ${keyframe} · drag to move · scroll to zoom` : undefined}
-                sizeOf={sizeOf}
-                onResize={resizeEl}
-                onFocus={onStageFocus}
-                onAdjustDone={() => { setAdjusting(false); setKeyframe(null); }}
-                overlay={format === "9:16" && safeZones ? (
-                  <>
-                    <div className="absolute inset-x-0 top-0 h-[14%] bg-ap-red/25" />
-                    <div className="absolute inset-x-0 bottom-0 h-[22%] bg-ap-red/25" />
-                  </>
-                ) : undefined}
-              />
-            </div>
-          }
-          playing={playing}
-          onTogglePlay={togglePlay}
-          segments={segments}
-          time={time}
-          total={total}
-          name={doc.project.name}
-          onRename={(name) => apply((d) => ({ ...d, project: { ...d.project, name } }))}
-          readOnly={readOnly}
-          meta={meta}
-          status={readOnly ? undefined : status}
-          formats={doc.project.formats}
-          format={format}
-          onFormat={(f) => setFormat(f as Format)}
-          onSegment={(i) => { if (i < frames.length) selectFrame(i); }}
-          topSlot={
-            <div className="mb-3.5">
-            <div className="flex items-center gap-3">
-              <span className="shrink-0 text-[12px] font-semibold tracking-[0.08em] text-ap-muted uppercase">Preview as</span>
-              <AppSegmented
-                className="grid flex-1 grid-cols-5"
-                value={format}
-                onChange={(f) => setFormat(f as Format)}
-                options={PREVIEW_SHAPES.map((f) => ({
-                  value: f,
-                  label: (
-                    <span className="inline-flex items-center gap-1.5 nums">
-                      {f}
-                      {f === doc.project.primary_format && <span className="size-1.5 rounded-full bg-ap-blue" aria-label="main size" />}
-                      {formatIssues(f).length > 0 && <span className="size-1.5 rounded-full bg-ap-amber" aria-label="has a fit problem" />}
-                    </span>
-                  ),
-                }))}
-              />
-            </div>
-            {format !== doc.project.primary_format && (
-              <div role="status" className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-[12px] bg-ap-amber-soft px-3.5 py-2.5 text-[13px] text-ap-amber">
-                <span className="nums">Previewing {format}. Your main size is {doc.project.primary_format}.</span>
-                {!readOnly && (
-                  <span className="flex gap-3">
-                    <button type="button" className="font-semibold text-ap-blue" onClick={() => changeMain(format)}>Make main size</button>
-                    <button type="button" className="font-semibold text-ap-blue" onClick={fixForSize}>Fix for this size</button>
-                  </span>
-                )}
-              </div>
-            )}
-            {format === "9:16" && (
-              <label className="mt-3 flex items-center gap-2 text-[13px]">
-                <input type="checkbox" checked={safeZones} onChange={(e) => setSafeZones(e.target.checked)} className="size-4 accent-ap-blue" />
-                Show Reels / TikTok safe zones
-              </label>
-            )}
-            </div>
-          }
-          sizesSlot={
-            <>
-            {(here || elsewhere.length > 0) && (
-              <p className="mt-2 text-[12px] leading-snug text-ap-amber" role="status">
-                {here ? (
-                  <>
-                    In {format},{" "}
-                    <button type="button" className="font-semibold underline underline-offset-2" onClick={() => selectFrame(here.frame)}>frame {here.frame + 1}</button>
-                    : {here.text}. Try a smaller size or another position.
-                  </>
-                ) : (
-                  <>Check {elsewhere.join(" and ")} — tap it to see where.</>
-                )}
-              </p>
-            )}
-            <div className={cn("mt-5", readOnly && "pointer-events-none select-none")}>
-        <FrameRail
-          horizontal
-          doc={doc}
-          format={format}
-          frameIndex={idx}
-          images={images}
-          version={version}
-          uploading={uploading}
-          onSelect={selectFrame}
-          actionsForFrame={actionsForFrame}
-          endSeconds={endSeconds}
-          onReorder={reorder}
-          onAddFiles={addFiles}
-          canPaste={Boolean(styleClip)}
-          onDuplicate={duplicateFrame}
-          onReplacePhoto={replacePhoto}
-          onCopyStyle={copyStyle}
-          onPasteStyle={pasteStyle}
-          onDelete={(i) => deleteFrame(i)}
-        />
-            </div>
-            </>
-          }
-        />
-      }
-    >
-      {!readOnly && (
-        <div className="-mt-1 mb-2 flex justify-end gap-1">
-          
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <AppButton variant="ghost" size="sm" aria-label="More actions"><MoreHorizontal className="size-4" strokeWidth={1.7} /></AppButton>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-[220px]">
-                <DropdownMenuItem asChild><Link to="/app/ad/$id/photos" params={{ id: doc.project.id }}>Replace all photos…</Link></DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <StaffMenu adId={doc.project.id} />
-          
+  const rail: RailKey = selected === "logo" ? "logo" : selected === "headline" || selected === "subline" ? "text" : "photo";
+  const pickRail = (k: RailKey) => {
+    if (k === rail && drawerOpen) { if (compact) setDrawerOpen(false); return; }
+    setDrawerOpen(true);
+    if (k !== rail) { setSelected(k === "text" ? "headline" : k); if (k !== "photo") setAdjusting(false); }
+  };
+  const px = FORMAT_SIZE[format];
+  const frameStart = frameStarts(frames)[idx] ?? 0;
+  const progress = playing && frames[idx] ? (time - frameStart) / (frames[idx]!.duration_sec || 1) : null;
+  const nextBtn = exportDisabled ? (
+    <AppButton size="sm" disabled>Next: Export <ChevronRight className="size-4" strokeWidth={1.7} /></AppButton>
+  ) : (
+    <AppButton asChild size="sm"><Link to="/app/ad/$id/export" params={{ id: doc.project.id }}><span className="hidden sm:inline">Next:</span> Export <ChevronRight className="size-4" strokeWidth={1.7} /></Link></AppButton>
+  );
+  const inspector = (
+    <div className={cn(readOnly && "pointer-events-none select-none")} aria-readonly={readOnly || undefined}>
+      <Inspector
+        embedded
+        hideKit
+        doc={displayDoc}
+        endSeconds={endSeconds}
+        frame={frame}
+        frameIndex={idx}
+        format={format}
+        selected={selected}
+        kit={kit} kits={kits ?? []} kitId={doc.project.brand_kit_id ?? null}
+        adjusting={adjusting}
+        image={frame?.photo?.path ? images.get(frame.photo.path) : undefined}
+        keyframe={keyframe}
+        onKeyframe={setKeyframe}
+        onSelect={(el) => {
+          setSelected(el);
+          if (el !== "photo") setAdjusting(false);
+        }}
+        actions={actions}
+      />
+    </div>
+  );
+  const notice = (format !== doc.project.primary_format || here || elsewhere.length > 0) ? (
+    <>
+      {format !== doc.project.primary_format && (
+        <div role="status" className="flex max-w-[560px] flex-wrap items-center justify-center gap-x-3 gap-y-1 rounded-[8px] bg-ap-amber-soft px-3.5 py-2 text-[13px] text-ap-amber shadow-ap-soft">
+          <span className="nums">Previewing {format}. Your main size is {doc.project.primary_format}.</span>
+          {!readOnly && (
+            <span className="flex gap-3">
+              <button type="button" className="font-semibold text-ap-blue" onClick={() => changeMain(format)}>Make main size</button>
+              <button type="button" className="font-semibold text-ap-blue" onClick={fixForSize}>Fix for this size</button>
+            </span>
+          )}
         </div>
       )}
-      <div className={cn(readOnly && "pointer-events-none select-none")} aria-readonly={readOnly || undefined}>
-        <input
-          ref={replaceRef}
-          type="file"
-          accept={ACCEPTED_IMAGE_TYPES.join(",")}
-          className="hidden"
-          onChange={(e) => {
-            const f = e.target.files?.[0];
-            e.target.value = "";
-            if (f) void onReplaceFile(f);
-          }}
-        />
-        <Inspector
-          embedded
-          hideKit
-          doc={displayDoc}
-          endSeconds={endSeconds}
-          frame={frame}
-          frameIndex={idx}
-          format={format}
-          selected={selected}
-          kit={kit} kits={kits ?? []} kitId={doc.project.brand_kit_id ?? null}
-          adjusting={adjusting}
-          image={frame?.photo?.path ? images.get(frame.photo.path) : undefined}
-          keyframe={keyframe}
-          onKeyframe={setKeyframe}
-          onSelect={(el) => {
-            setSelected(el);
-            if (el !== "photo") setAdjusting(false);
-          }}
-          actions={actions}
-        />
+      {(here || elsewhere.length > 0) && (
+        <p className="max-w-[560px] rounded-[8px] bg-ap-card px-3 py-1.5 text-[12px] leading-snug text-ap-amber shadow-ap-soft" role="status">
+          {here ? (
+            <>
+              In {format},{" "}
+              <button type="button" className="font-semibold underline underline-offset-2" onClick={() => selectFrame(here.frame)}>frame {here.frame + 1}</button>
+              : {here.text}. Try a smaller size or another position.
+            </>
+          ) : (
+            <>Check {elsewhere.join(" and ")} — tap it to see where.</>
+          )}
+        </p>
+      )}
+    </>
+  ) : undefined;
+
+  return (
+    <div ref={shellRef} style={{ height: `calc(100dvh - ${shellTop}px)` }} className="ap-flow flex flex-col overflow-hidden bg-ap-card">
+      <EditTopBar
+        adId={doc.project.id}
+        title={{ name: doc.project.name, onRename: (name) => apply((d) => ({ ...d, project: { ...d.project, name } })), status: readOnly ? undefined : status, readOnly }}
+        canUndo={canUndo && !readOnly}
+        canRedo={canRedo && !readOnly}
+        onUndo={undo}
+        onRedo={redo}
+        isMac={isMac}
+        next={nextBtn}
+        menu={
+          <>
+            <div className="space-y-1.5">
+              <p className="text-[12px] font-semibold tracking-[0.08em] text-ap-muted uppercase">Brand kit · Format</p>
+              <AdPills doc={doc} set={(next) => { setFormat(null); apply(() => next); }} onKit={(id) => actions.onKit(id)} readOnly={readOnly} />
+            </div>
+            {!readOnly && (
+              <div className="flex flex-wrap items-center gap-2 border-t border-ap-hairline pt-3">
+                <AppButton asChild variant="ghost" size="sm"><Link to="/app/ad/$id/photos" params={{ id: doc.project.id }}>Replace all photos…</Link></AppButton>
+                <KitAgainButton adId={doc.project.id} templateId={doc.project.template_id} />
+                <StaffMenu adId={doc.project.id} />
+              </div>
+            )}
+          </>
+        }
+      />
+      <EditStepStrip adId={doc.project.id} />
+      {banner}
+      <input
+        ref={replaceRef}
+        type="file"
+        accept={ACCEPTED_IMAGE_TYPES.join(",")}
+        className="hidden"
+        onChange={(e) => {
+          const f = e.target.files?.[0];
+          e.target.value = "";
+          if (f) void onReplaceFile(f);
+        }}
+      />
+      <div className={cn("flex min-h-0 flex-1", compact && "flex-col")}>
+        {!compact && <EditRail value={rail} onChange={pickRail} open={drawerOpen} onToggle={() => setDrawerOpen((v) => !v)} compact={false} />}
+        {!compact && <EditDrawer open={drawerOpen} compact={false} onClose={() => setDrawerOpen(false)} title={rail}>{inspector}</EditDrawer>}
+        <section aria-label="Preview" className="relative flex min-h-0 min-w-0 flex-1 flex-col bg-ap-card">
+          <div className="flex h-[52px] shrink-0 items-center gap-3 px-3 md:px-4">
+            <span className="hidden shrink-0 whitespace-nowrap text-[12px] font-semibold tracking-[0.08em] text-ap-muted uppercase md:inline">Preview as</span>
+            <AppSegmented
+              className="grid w-full max-w-[340px] grid-cols-5"
+              value={format}
+              onChange={(f) => setFormat(f as Format)}
+              options={PREVIEW_SHAPES.map((f) => ({
+                value: f,
+                label: (
+                  <span className="inline-flex items-center gap-1.5 nums">
+                    {f}
+                    {f === doc.project.primary_format && <span className="size-1.5 rounded-full bg-ap-blue" aria-label="main size" />}
+                    {formatIssues(f).length > 0 && <span className="size-1.5 rounded-full bg-ap-amber" aria-label="has a fit problem" />}
+                  </span>
+                ),
+              }))}
+            />
+            <div className="flex-1" data-slot="stage-toolbar" />
+            {format === "9:16" && (
+              <button type="button" aria-pressed={safeZones} onClick={() => setSafeZones((v) => !v)} title="Reels / TikTok safe zones"
+                className={cn("h-8 min-h-0 shrink-0 whitespace-nowrap rounded-lg border px-3 text-[12px] font-medium", safeZones ? "border-ap-blue bg-ap-soft-blue text-ap-blue" : "border-ap-hairline text-ap-muted hover:text-ap-ink")}>
+                Safe zones
+              </button>
+            )}
+          </div>
+          <div className="flex min-h-0 flex-1 flex-col px-3 pb-3 md:px-4 md:pb-4">
+            <EditCanvas ratio={FORMAT_RATIO[format]} label={`${format} · ${px.width} × ${px.height}`} notice={notice}>
+              <div className={cn("h-full w-full", readOnly && "pointer-events-none select-none")}>
+                <Stage
+                  doc={stageDoc}
+                  brand={brand}
+                  frameIndex={idx}
+                  format={format}
+                  aspect={FORMAT_RATIO[format]}
+                  time={time}
+                  playing={playing}
+                  selected={selected}
+                  images={images}
+                  version={version}
+                  onSelect={setSelected}
+                  onMove={moveElement}
+                  onText={setText}
+                  adjusting={(adjusting || Boolean(keyframe)) && selected === "photo"}
+                  adjustHint={keyframe ? `Setting the ${keyframe} · drag to move · scroll to zoom` : undefined}
+                  sizeOf={sizeOf}
+                  onResize={resizeEl}
+                  onFocus={onStageFocus}
+                  onAdjustDone={() => { setAdjusting(false); setKeyframe(null); }}
+                  overlay={format === "9:16" && safeZones ? (
+                    <>
+                      <div className="absolute inset-x-0 top-0 h-[14%] bg-ap-red/25" />
+                      <div className="absolute inset-x-0 bottom-0 h-[22%] bg-ap-red/25" />
+                    </>
+                  ) : undefined}
+                />
+              </div>
+            </EditCanvas>
+          </div>
+          {compact && <EditDrawer open={drawerOpen} compact onClose={() => setDrawerOpen(false)} title={rail === "photo" ? "Photo" : rail === "text" ? "Text" : "Logo"}>{inspector}</EditDrawer>}
+        </section>
       </div>
-      <StepActions>
-        <AppButton variant="ghost" size="sm" onClick={undo} disabled={!canUndo || readOnly} aria-label="Undo"><Undo2 className="size-4" strokeWidth={1.7} /> Undo <kbd suppressHydrationWarning className="ml-1 font-ap text-[11px] text-ap-faint">{isMac ? "⌘Z" : "Ctrl+Z"}</kbd></AppButton>
-        <KitAgainButton adId={doc.project.id} templateId={doc.project.template_id} />
-        <span className="flex-1" />
-        {exportDisabled ? (
-          <AppButton size="lg" disabled>Next: Export <ChevronRight className="size-4" strokeWidth={1.7} /></AppButton>
-        ) : (
-          <AppButton asChild size="lg"><Link to="/app/ad/$id/export" params={{ id: doc.project.id }}>Next: Export <ChevronRight className="size-4" strokeWidth={1.7} /></Link></AppButton>
-        )}
-      </StepActions>
-    </StepShell>
+      <EditTimeline playing={playing} onTogglePlay={togglePlay} time={time} total={total} frames={frames.length}>
+        <div className={cn(readOnly && "pointer-events-none select-none")}>
+          <FrameRail
+            horizontal
+            doc={doc}
+            format={format}
+            frameIndex={idx}
+            images={images}
+            version={version}
+            uploading={uploading}
+            onSelect={selectFrame}
+            actionsForFrame={actionsForFrame}
+            endSeconds={endSeconds}
+            onReorder={reorder}
+            onAddFiles={addFiles}
+            canPaste={Boolean(styleClip)}
+            onDuplicate={duplicateFrame}
+            onReplacePhoto={replacePhoto}
+            onCopyStyle={copyStyle}
+            onPasteStyle={pasteStyle}
+            onDelete={(i) => deleteFrame(i)}
+            progress={progress}
+          />
+        </div>
+      </EditTimeline>
+      {compact && <EditRail value={rail} onChange={pickRail} open={drawerOpen} onToggle={() => setDrawerOpen((v) => !v)} compact />}
+    </div>
   );
 }
