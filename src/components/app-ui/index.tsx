@@ -66,7 +66,7 @@ export function AppSegmented<T extends string>({ options, value, onChange, class
   className?: string;
 }) {
   return (
-    <div role="radiogroup" className={cn("inline-flex gap-[3px] rounded-[10px] bg-ap-panel p-[3px] font-ap", className)}>
+    <div role="radiogroup" className={cn("inline-flex gap-[3px] rounded-full bg-ap-panel p-[3px] font-ap", className)}>
       {options.map((o) => {
         const on = o.value === value;
         return (
@@ -77,7 +77,7 @@ export function AppSegmented<T extends string>({ options, value, onChange, class
             aria-checked={on}
             onClick={() => onChange(o.value)}
             className={cn(
-              "rounded-[7px] px-[11px] py-[5px] text-[13px] transition-colors outline-hidden focus-visible:shadow-ap-focus",
+              "rounded-full px-[11px] py-[5px] text-[13px] transition-colors outline-hidden focus-visible:shadow-ap-focus",
               on ? "bg-ap-card font-semibold text-ap-ink shadow-ap-soft" : "text-ap-ink",
             )}
           >
@@ -98,7 +98,7 @@ export function AppSteps({ current, steps = AD_STEPS as unknown as string[], onS
   className?: string;
 }) {
   return (
-    <nav aria-label="Steps" className={cn("inline-flex items-center gap-[3px] rounded-[10px] bg-ap-panel p-[3px] font-ap", className)}>
+    <nav aria-label="Steps" className={cn("inline-flex items-center gap-[3px] rounded-full bg-ap-panel p-[3px] font-ap", className)}>
       {steps.map((s, i) => {
         const done = i < current;
         const now = i === current;
@@ -144,7 +144,7 @@ export function AppSwitch({ checked, onCheckedChange, small = false, className, 
       aria-checked={checked}
       onClick={() => onCheckedChange(!checked)}
       className={cn(
-        "relative shrink-0 rounded-full disabled:opacity-50", small ? "h-5 w-8" : "h-8 w-[52px]", " transition-colors outline-hidden focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ap-blue/40",
+        "relative shrink-0 rounded-full disabled:opacity-50", small ? "h-5 w-8" : "h-8 w-[52px]", " transition-colors outline-hidden focus-visible:shadow-ap-focus",
         checked ? "bg-ap-blue" : "bg-ap-switch-off",
         className,
       )}
@@ -155,9 +155,9 @@ export function AppSwitch({ checked, onCheckedChange, small = false, className, 
   );
 }
 
-/* AppSectionLabel: 12-13px semibold uppercase, 0.06em tracking, body color. */
+/* AppSectionLabel: site eyebrow style — sentence case, 12px semibold, badge blue. */
 export function AppSectionLabel({ className, ...p }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("font-ap text-[12px] font-semibold tracking-[0.06em] text-ap-body uppercase sm:text-[13px]", className)} {...p} />;
+  return <div className={cn("font-ap text-[12px] font-semibold text-ap-badge", className)} {...p} />;
 }
 
 /* AppInfoBox: soft-blue bg, 18px radius. */

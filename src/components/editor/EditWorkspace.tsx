@@ -7,8 +7,17 @@ import { AdName, STEPS, StepBar, type StepTitleInfo } from "@/components/app-ui/
 import { HelpMenu } from "@/components/stillframe/HelpMenu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { GravityPantsLogo } from "@/components/GravityPantsLogo";
 
 export type RailKey = InspectorSection;
+/** Selected rail item takes its element's own colour (10% tint + colour text/icon). */
+const RAIL_ON: Record<RailKey, string> = {
+  background: "bg-ap-muted/10 text-ap-ink",
+  photo: "bg-ap-dot-photo/10 text-ap-dot-photo",
+  headline: "bg-ap-dot-text/10 text-ap-dot-text",
+  subline: "bg-ap-dot-subline/10 text-ap-dot-subline",
+  logo: "bg-ap-dot-logo/10 text-ap-dot-logo",
+};
 const RAIL: { key: RailKey; icon: typeof ImageIcon }[] = [
   { key: "background", icon: PaintBucket },
   { key: "photo", icon: ImageIcon },
@@ -39,6 +48,7 @@ export function EditTopBar({ adId, title, canUndo, canRedo, onUndo, onRedo, isMa
   const mod = isMac ? "⌘" : "Ctrl+";
   return (
     <header className="relative z-40 flex h-14 shrink-0 items-center gap-2 border-b border-ap-hairline bg-ap-card px-3 safe-top md:px-4">
+      <Link to="/" aria-label="Gravity Pants home" className="hidden shrink-0 sm:flex"><GravityPantsLogo size={26} /></Link>
       <Link to="/app/ads" className="flex min-h-0 shrink-0 items-center text-[14px] text-ap-blue hover:text-ap-blue-hover">
         <ChevronLeft className="size-4" strokeWidth={1.7} /> <span className="hidden sm:inline">Your Ads</span>
       </Link>
@@ -81,7 +91,7 @@ export function EditRail({ value, onChange, open, onToggle, compact, ownStyle }:
         const own = (key === "headline" && ownStyle.headline) || (key === "subline" && ownStyle.subline);
         return (
           <button key={key} type="button" aria-pressed={on} onClick={() => onChange(key)} aria-label={own ? `${SECTION_LABEL[key]}, this frame has its own style` : SECTION_LABEL[key]}
-            className={cn("relative flex min-h-0 min-w-0 flex-col items-center justify-center gap-1 rounded-lg text-[11px] font-medium", compact ? "flex-1" : "h-[62px] w-[62px]", on ? "bg-ap-soft-blue text-ap-blue" : "text-ap-muted hover:bg-ap-panel hover:text-ap-ink")}>
+            className={cn("relative flex min-h-0 min-w-0 flex-col items-center justify-center gap-1 rounded-lg text-[11px] font-medium", compact ? "flex-1" : "h-[62px] w-[62px]", on ? RAIL_ON[key] : "text-ap-muted hover:bg-ap-panel hover:text-ap-ink")}>
             <Icon className="size-5" strokeWidth={1.7} />{SECTION_LABEL[key]}
             {own && <span aria-hidden className={cn("absolute top-2 right-2.5 size-1.5 rounded-full", SECTION_DOT[key])} />}
           </button>
@@ -100,8 +110,8 @@ function DrawerHead({ section, eyebrow, onClose, closeIcon }: { section: RailKey
   return (
     <div className="flex h-[60px] shrink-0 items-center justify-between gap-2 border-b border-ap-hairline px-5">
       <div className="min-w-0">
-        <div className="text-[11px] font-semibold tracking-[0.08em] text-ap-muted uppercase nums">{eyebrow}</div>
-        <div className="flex items-center gap-2 text-[15px] font-semibold text-ap-ink">
+        <div className="text-[12px] font-semibold text-ap-badge nums">{eyebrow}</div>
+        <div className="flex items-center gap-2 text-[17px] font-semibold tracking-[-0.015em] text-ap-ink">
           {section && <span aria-hidden className={cn("size-2.5 rounded-full", SECTION_DOT[section])} />}
           {section ? SECTION_LABEL[section] : "Nothing selected"}
         </div>
@@ -163,7 +173,7 @@ export function EditCanvas({ ratio, label, children, notice, onEmptyClick }: { r
     return () => ro.disconnect();
   }, [ratio]);
   return (
-    <div ref={ref} className="ap-dot-grid relative min-h-0 flex-1 overflow-hidden rounded-[4px]">
+    <div ref={ref} className="ap-dot-grid relative min-h-0 flex-1 overflow-hidden">
       {notice && <div className="absolute inset-x-3 top-3 z-10 flex flex-col items-center gap-2">{notice}</div>}
       <div className="absolute inset-0 grid place-items-center" onPointerDown={(e) => { if (e.target === e.currentTarget) onEmptyClick?.(); }}>
         <div style={{ width: box.w, height: box.h }} className="transition-[width,height] duration-[280ms] ease-out motion-reduce:transition-none">{box.w > 0 && children}</div>

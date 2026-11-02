@@ -84,7 +84,7 @@
   --ap-dot-photo: #3b6fd8;
   --ap-dot-text: #6a3fd0;
   --ap-dot-logo: #9a4a1c;
-  --ap-dot-subline: #2f8a4c;
+  --ap-dot-subline: #0f7b6c;
   --ap-gold: #d4a017;
   --ap-switch-off: #d1d1d6;
   --ap-card: #ffffff;
@@ -1415,8 +1415,11 @@ p.concept-reel-notice { font-size: 10px !important; }
 .stage-el:hover, .stage-el:focus-visible { outline-color: color-mix(in srgb, var(--accent-blue) 55%, transparent); }
 .stage-el.is-active { outline: 2px solid var(--accent-blue); }
 
+/* Canvas area: flat media surface with large corners, like the site's illustration panels. */
 @utility ap-dot-grid {
-  background-color: var(--ap-canvas);
-  background-image: radial-gradient(var(--ap-canvas-dot) 1px, transparent 1px);
-  background-size: 16px 16px;
+  background-color: var(--ap-media);
+  border-radius: 24px;
 }
+
+/* Studio focus: the site's soft blue ring instead of a hard outline. */
+.ap-flow :is(a, button, [role="radio"], [role="tab"], [tabindex]):focus-visible { outline: none; box-shadow: var(--ap-focus-ring); }

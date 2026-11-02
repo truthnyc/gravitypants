@@ -28,7 +28,7 @@ Components (`@/components/app-ui`):
 - `AppSegmented` - panel bg, 10px radius, 4px padding; selected item white with soft shadow.
 - `AppSteps` - Photos, Edit, Export, Share. Done shows a green check, current is a white pill with a blue number.
 - `AppSwitch` - 52x32, blue when on.
-- `AppSectionLabel` - uppercase, semibold, 0.06em tracking, body color.
+- `AppSectionLabel` - sentence case, 12px semibold, badge blue (site eyebrow).
 - `AppInfoBox` - soft-blue, 18px radius.
 - `AppThumb` - 8px radius, inner ring and soft shadow.
 - `AppTag` - plain blue text, or `chip` for a white chip with a hairline border (`selected` turns border and text blue). Never a tinted blue box.

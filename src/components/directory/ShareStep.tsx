@@ -3,7 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { ChevronDown, Download, X } from "lucide-react";
+import { ChevronDown, CircleCheck, Download, X } from "lucide-react";
 import { AppButton, AppField, AppInput, AppSelect, AppSwitch, AppTag } from "@/components/app-ui";
 import { useSaveDoc } from "@/components/app-ui/AdPills";
 import { AdMenu, FrameStrip, StageBar, StageChip, StudioBottom, StudioCanvas, StudioPanel, StudioShell } from "@/components/app-ui/StudioLayout";
@@ -157,10 +157,10 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
       stage={
         <>
           <StageBar label="Exported">
-            {doc.project.formats.map((f) => <StageChip key={f} on={f === player.format} onClick={() => player.setFormat(f as Format)}><span className="text-ap-green">✓</span>{sizeLabel(f)}</StageChip>)}
+            {doc.project.formats.map((f) => <StageChip key={f} on={f === player.format} onClick={() => player.setFormat(f as Format)}><CircleCheck className="size-3.5 text-ap-blue" strokeWidth={1.7} />{sizeLabel(f)}</StageChip>)}
           </StageBar>
           <StudioCanvas ratio={ratioOf(player.format)} label={`${player.format} · ${pxOf(player.format).width} × ${pxOf(player.format).height}`}
-            overlay={<span className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-lg bg-ap-card px-2.5 py-1 text-[12px] font-medium text-ap-green shadow-ap-soft">✓ Exported</span>}>
+            overlay={<span className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-lg bg-ap-card px-2.5 py-1 text-[12px] font-medium text-ap-ink shadow-ap-soft inline-flex items-center gap-1.5"><CircleCheck className="size-4 text-ap-blue" strokeWidth={1.7} />Exported</span>}>
             <div className="grid h-full w-full place-items-center">{player.preview}</div>
           </StudioCanvas>
         </>
@@ -181,7 +181,7 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
       <ul aria-label="Exported files" className="mb-6 divide-y divide-ap-hairline rounded-[4px] border border-ap-hairline text-[13px] nums">
         {doc.project.formats.map((f) => (
           <li key={f} className="flex items-center gap-2 px-3 py-2.5">
-            <span className="min-w-0 flex-1 truncate">{sizeLabel(f)} · MP4 · {pxOf(f).width} × {pxOf(f).height} · {player.total.toFixed(1)} sec</span>
+            <CircleCheck className="size-4 shrink-0 text-ap-blue" strokeWidth={1.7} /><span className="min-w-0 flex-1 truncate">{sizeLabel(f)} · MP4 · {pxOf(f).width} × {pxOf(f).height} · {player.total.toFixed(1)} sec</span>
             <button type="button" onClick={() => { player.setFormat(f as Format); if (!player.playing) player.toggle(); }} className="shrink-0 text-ap-blue hover:text-ap-blue-hover">Play</button>
           </li>
         ))}

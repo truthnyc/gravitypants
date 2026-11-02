@@ -268,7 +268,7 @@ function BrandKitRow({ kits, kitId, onKit, embedded }: { kits: NamedBrandKit[]; 
 export function Field({ label, value, children }: { label: string; value?: React.ReactNode; children: React.ReactNode }) {
   return (
     <div className="space-y-1.5">
-      <div className="flex items-baseline justify-between text-[12px] font-medium text-secondary-text">
+      <div className="flex items-baseline justify-between text-[12px] font-semibold text-ap-muted">
         <span>{label}</span>
         {value !== undefined && <span className="text-foreground nums">{value}</span>}
       </div>
@@ -287,7 +287,7 @@ export function Segmented<T extends string>({
   onChange: (v: T) => void;
 }) {
   return (
-    <div className="flex rounded-lg bg-control-fill p-0.5" role="radiogroup">
+    <div className="flex rounded-full bg-control-fill p-0.5" role="radiogroup">
       {options.map((o) => (
         <button
           key={o.value}
@@ -295,7 +295,7 @@ export function Segmented<T extends string>({
           role="radio"
           aria-checked={value === o.value}
           onClick={() => onChange(o.value)}
-          className={cn("h-7 flex-1 rounded-lg px-1 text-[12px] font-medium", value === o.value && "bg-card shadow-segment")}
+          className={cn("h-7 flex-1 rounded-full px-1 text-[12px] font-medium outline-hidden focus-visible:shadow-ap-focus", value === o.value && "bg-card shadow-segment")}
         >
           {o.label}
         </button>

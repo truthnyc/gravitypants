@@ -5,6 +5,8 @@ import { AdName, STEPS, StepBar, type StepKey, type StepTitleInfo } from "./Step
 import { HelpMenu } from "@/components/stillframe/HelpMenu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { FrameThumb } from "@/components/editor/FrameThumb";
+import { frameWidth } from "@/components/editor/FrameRail";
+import { GravityPantsLogo } from "@/components/GravityPantsLogo";
 import type { EditorDoc } from "@/lib/stillframe/data";
 import type { Format } from "@/lib/stillframe/types";
 import { cn } from "@/lib/utils";
@@ -32,6 +34,7 @@ export function StudioTopBar({ adId, step, title, undo, menu, next }: { adId: st
   const mod = isMac ? "⌘" : "Ctrl+";
   return (
     <header className="relative z-40 flex h-14 shrink-0 items-center gap-2 border-b border-ap-hairline bg-ap-card px-3 safe-top md:px-4">
+      <Link to="/" aria-label="Gravity Pants home" className="hidden shrink-0 sm:flex"><GravityPantsLogo size={26} /></Link>
       <Link to="/app/ads" className="flex min-h-0 shrink-0 items-center text-[14px] text-ap-blue hover:text-ap-blue-hover">
         <ChevronLeft className="size-4" strokeWidth={1.7} /> <span className="hidden sm:inline">Your Ads</span>
       </Link>
@@ -105,7 +108,7 @@ export function StudioCanvas({ ratio, label, children, notice, overlay, onEmptyC
     return () => ro.disconnect();
   }, [ratio]);
   return (
-    <div ref={ref} className="ap-dot-grid relative min-h-0 flex-1 overflow-hidden rounded-[4px]">
+    <div ref={ref} className="ap-dot-grid relative min-h-0 flex-1 overflow-hidden">
       {notice && <div className="absolute inset-x-3 top-3 z-10 flex flex-col items-center gap-2">{notice}</div>}
       <div className="absolute inset-0 grid place-items-center" onPointerDown={(e) => { if (e.target === e.currentTarget) onEmptyClick?.(); }}>
         <div style={{ width: box.w, height: box.h }} className="relative transition-[width,height] duration-[280ms] ease-out motion-reduce:transition-none">
@@ -122,14 +125,14 @@ export function StudioCanvas({ ratio, label, children, notice, overlay, onEmptyC
 export function StageBar({ label, children }: { label?: string; children?: ReactNode }) {
   return (
     <div className="flex h-[52px] shrink-0 items-center gap-3 overflow-x-auto">
-      {label && <span className="shrink-0 text-[11px] font-semibold tracking-[0.08em] text-ap-muted uppercase">{label}</span>}
+      {label && <span className="shrink-0 text-[12px] font-semibold text-ap-badge">{label}</span>}
       {children}
     </div>
   );
 }
 
 export function StageChip({ on, onClick, children }: { on?: boolean; onClick?: () => void; children: ReactNode }) {
-  const cls = cn("inline-flex h-8 shrink-0 items-center gap-1.5 rounded-lg px-3 text-[13px] font-medium nums", on ? "bg-ap-card text-ap-ink shadow-ap-soft ring-1 ring-ap-blue" : "bg-ap-panel text-ap-body");
+  const cls = cn("inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full px-3 text-[13px] font-medium nums outline-hidden focus-visible:shadow-ap-focus", on ? "bg-ap-soft-blue text-ap-blue" : "bg-ap-panel text-ap-body");
   return onClick ? <button type="button" aria-pressed={on} onClick={onClick} className={cn(cls, !on && "hover:text-ap-ink")}>{children}</button> : <span className={cls}>{children}</span>;
 }
 
@@ -168,8 +171,8 @@ export function FrameStrip({ doc, format, images, version, current, onSelect, on
     <nav aria-label="Frames" className="-mx-1 flex items-start gap-2 overflow-x-auto px-1 pt-1 pb-2">
       {doc.frames.map((f, i) => (
         <div key={f.id} className="flex shrink-0 items-start gap-2">
-          {i > 0 && <span className="mt-5 text-[10px] font-medium text-ap-muted">{TR[f.transition_in?.type ?? "cut"] ?? "Cut"}</span>}
-          <div className="flex w-16 flex-col items-center">
+          {i > 0 && <span className="mt-6 rounded-full bg-ap-panel px-2 py-0.5 text-[10px] font-medium text-ap-body">{TR[f.transition_in?.type ?? "cut"] ?? "Cut"}</span>}
+          <div className="flex flex-col items-center" style={{ width: frameWidth(f.duration_sec) }}>
             <button
               type="button"
               aria-label={`Frame ${i + 1}`}
@@ -181,7 +184,7 @@ export function FrameStrip({ doc, format, images, version, current, onSelect, on
               onDrop={(e) => { e.preventDefault(); if (onReorder && from !== null && from !== i) onReorder(from, i); setFrom(null); setOver(null); }}
               onDragEnd={() => { setFrom(null); setOver(null); }}
               onClick={() => onSelect?.(i)}
-              className={cn("relative size-16 min-h-0 min-w-0 overflow-hidden rounded-[10px] bg-control-fill p-0", current === i && "ring-2 ring-primary ring-offset-2 ring-offset-card", over === i && from !== i && "ring-2 ring-primary/40", from === i && "opacity-50", onReorder && "cursor-grab")}
+              className={cn("relative h-16 w-full min-h-0 min-w-0 overflow-hidden rounded-[10px] bg-control-fill p-0", current === i && "ring-2 ring-primary ring-offset-2 ring-offset-card", over === i && from !== i && "ring-2 ring-primary/40", from === i && "opacity-50", onReorder && "cursor-grab")}
             >
               <FrameThumb doc={doc} index={i} format={format} images={images} version={version} width={112} className="pointer-events-none h-full w-full" />
               <span className="absolute left-1 top-1 flex size-4 items-center justify-center rounded-full bg-foreground/70 text-[10px] font-semibold text-background tabular-nums">{i + 1}</span>
@@ -213,8 +216,8 @@ export function StudioPanel({ step, title, tag, children, footer }: { step: Step
   return (
     <>
       <div className="flex h-[60px] shrink-0 flex-col justify-center border-b border-ap-hairline px-6">
-        <div className="text-[11px] font-semibold tracking-[0.08em] text-ap-muted uppercase nums">Step {n} of {STEPS.length}</div>
-        <h1 className="flex items-center gap-2 text-[15px] font-semibold text-ap-ink">{title}{tag}</h1>
+        <div className="text-[12px] font-semibold text-ap-badge nums">Step {n} of {STEPS.length}</div>
+        <h1 className="flex items-center gap-2 text-[17px] font-semibold tracking-[-0.015em] text-ap-ink">{title}{tag}</h1>
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto px-6 pt-5 pb-8">{children}</div>
       {footer && <div className="shrink-0 border-t border-ap-hairline px-6 py-3 text-[12px] text-ap-muted">{footer}</div>}
@@ -258,7 +261,7 @@ export function AdMenu({ doc, set, readOnly, exports, extra }: { doc: EditorDoc;
   return (
     <>
       <div className="space-y-1.5">
-        <p className="text-[12px] font-semibold tracking-[0.08em] text-ap-muted uppercase">Brand kit · Format</p>
+        <p className="text-[12px] font-semibold text-ap-badge">Brand kit · Format</p>
         <AdPills doc={doc} set={set} readOnly={readOnly} />
       </div>
       {extra}

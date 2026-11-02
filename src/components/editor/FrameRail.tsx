@@ -14,10 +14,13 @@ import { cn } from "@/lib/utils";
 const LABEL: Record<string, string> = { cut: "Cut", fade: "Fade", slide: "Slide", zoom: "Zoom", wipe: "Wipe", dip_black: "Dip" };
 export const TransitionChip = forwardRef<HTMLButtonElement, Omit<ComponentPropsWithoutRef<typeof Button>, "onClick"> & { frame: Frame; compact?: boolean; onClick?: () => void }>(function TransitionChip({ frame, compact, onClick, className, ...props }, ref) {
   const label = LABEL[frame.transition_in?.type ?? "cut"] ?? "Cut";
-  return <Button ref={ref} type="button" variant="plain" size="sm" {...props} onClick={(e) => { e.stopPropagation(); onClick?.(); }} onPointerDown={(e) => e.stopPropagation()} className={cn("gap-0.5 bg-card font-medium text-el-timing shadow-segment", compact ? "h-4 px-1 text-[9px]" : "h-6 px-1.5 text-[10px]", className)} aria-label={props["aria-label"] ?? `Transition: ${label}`}>
+  return <Button ref={ref} type="button" variant="plain" size="sm" {...props} onClick={(e) => { e.stopPropagation(); onClick?.(); }} onPointerDown={(e) => e.stopPropagation()} className={cn("gap-0.5 rounded-full bg-card font-medium text-el-timing shadow-segment", compact ? "h-4 px-1 text-[9px]" : "h-6 px-1.5 text-[10px]", className)} aria-label={props["aria-label"] ?? `Transition: ${label}`}>
     {!compact && <ArrowDown className="size-2.5" strokeWidth={1.7} />}{label}
   </Button>;
 });
+
+/** Timeline thumbnails are 22px per second of screen time, so timing reads at a glance. */
+export const frameWidth = (sec: number) => Math.max(40, Math.round(sec * 22));
 
 type Props = {
   horizontal?: boolean; doc: EditorDoc; format: Format; frameIndex: number; images: Map<string, HTMLImageElement>; version: number; uploading: boolean;
@@ -51,13 +54,13 @@ export function FrameRail({ doc, format, frameIndex, images, version, uploading,
           <TransitionPanel frames={doc.frames} frame={frame} first={false} actions={actionsForFrame(i)} />
         </PopoverContent>
       </Popover></div>}
-      <div className="flex w-16 flex-col items-center">
-        <div className="group relative size-16">
+      <div className="flex flex-col items-center" style={{ width: frameWidth(frame.duration_sec) }}>
+        <div className="group relative h-16 w-full">
           <ContextMenu><ContextMenuTrigger asChild>
             <Button type="button" variant="ghost" data-select-frame={i} draggable aria-label={`Frame ${i + 1}`} aria-pressed={i === frameIndex}
               onDragStart={() => setDragFrom(i)} onDragOver={(e) => { e.preventDefault(); setOver(i); }} onDragLeave={() => setOver(null)}
               onDrop={(e) => { e.preventDefault(); if (dragFrom !== null && dragFrom !== i) onReorder(dragFrom, i); setDragFrom(null); setOver(null); }} onDragEnd={() => { setDragFrom(null); setOver(null); }}
-              onClick={() => onSelect(i)} className={cn("relative size-16 overflow-hidden rounded-[10px] bg-control-fill p-0", i === frameIndex && "ring-2 ring-primary ring-offset-2 ring-offset-card", over === i && dragFrom !== i && "ring-2 ring-primary/40", dragFrom === i && "opacity-50")}>
+              onClick={() => onSelect(i)} className={cn("relative h-16 w-full overflow-hidden rounded-[10px] bg-control-fill p-0", i === frameIndex && "ring-2 ring-primary ring-offset-2 ring-offset-card", over === i && dragFrom !== i && "ring-2 ring-primary/40", dragFrom === i && "opacity-50")}>
               <FrameThumb doc={doc} index={i} format={format} images={images} version={version} width={112} className="h-full w-full" />
               <span className="absolute left-1 top-1 flex size-4 items-center justify-center rounded-full bg-foreground/70 text-[10px] font-semibold text-background tabular-nums">{i + 1}</span>
               {(doc.frames[i]?.headline?.same_on_all === false || doc.frames[i]?.subline?.same_on_all === false) && (
@@ -67,7 +70,7 @@ export function FrameRail({ doc, format, frameIndex, images, version, uploading,
                   {doc.frames[i]?.subline?.same_on_all === false && <span className="size-2 rounded-full bg-ap-dot-subline ring-1 ring-background" />}
                 </span>
               )}
-              {progress != null && i === frameIndex && <span className="absolute inset-x-0 bottom-0 h-[3px] bg-foreground/15"><span className="block h-full bg-ap-blue" style={{ width: `${Math.max(0, Math.min(1, progress)) * 100}%` }} /></span>}
+              {progress != null && i === frameIndex && <span aria-hidden className="absolute inset-y-0 w-[2px] -translate-x-1/2 bg-ap-blue" style={{ left: `${Math.max(0, Math.min(1, progress)) * 100}%` }} />}
             </Button>
           </ContextMenuTrigger><ContextMenuContent className="w-44">
             <ContextMenuItem onSelect={() => onDuplicate(i)}>Duplicate</ContextMenuItem>
