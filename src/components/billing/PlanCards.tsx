@@ -48,8 +48,8 @@ export function PlanCards({ compact = false }: { compact?: boolean }) {
 
   return (
     <>
-      <div className={cn("grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4", compact ? "gap-3" : "gap-5")}>
-        {(plans ?? []).map((p) => {
+      <div className={cn("grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3", compact ? "gap-3" : "gap-5")}>
+        {(plans ?? []).filter((p) => !p.id.startsWith("simple") || (paid && billing?.plan === p.id)).map((p) => {
           const current = paid && billing?.plan === p.id;
           const cta = CTA[p.id] ?? { label: `Choose ${p.name}`, variant: "plain" as const };
           return (
