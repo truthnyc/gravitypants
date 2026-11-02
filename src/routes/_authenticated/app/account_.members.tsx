@@ -192,7 +192,7 @@ function MembersPage() {
   async function deleteWorkspace() {
     if (!current) return;
     const typed = window.prompt(
-      `This permanently deletes “${current.name}” with all its ads, photos, brand kits and templates, for everyone in it. Type the workspace name to confirm.`,
+      `This permanently deletes “${current.name}” with all its ads, photos, brand kits and templates, for everyone in it. Reels already published on Gravity Pants or Aimanté stay live. Type the workspace name to confirm.`,
     );
     if (typed?.trim() !== current.name) {
       if (typed != null) toast.error("The name didn't match, so nothing was deleted.");
