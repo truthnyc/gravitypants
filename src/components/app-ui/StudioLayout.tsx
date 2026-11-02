@@ -8,6 +8,7 @@ import { FrameThumb } from "@/components/editor/FrameThumb";
 import type { EditorDoc } from "@/lib/stillframe/data";
 import type { Format } from "@/lib/stillframe/types";
 import { cn } from "@/lib/utils";
+import { AdPills } from "./AdPills";
 
 /** True below 1000px wide, where every step stacks (same breakpoint as Edit). */
 export function useCompactStudio() {
@@ -249,6 +250,23 @@ export function StudioShell({ adId, step, title, undo, menu, next, banner, panel
         </>
       )}
     </div>
+  );
+}
+
+/** The ⋯ menu shared by every step: Brand kit, Format and Previous exports (Help is added by the top bar). */
+export function AdMenu({ doc, set, readOnly, exports, extra }: { doc: EditorDoc; set: (next: EditorDoc) => void; readOnly?: boolean | undefined; exports?: ReactNode; extra?: ReactNode }) {
+  return (
+    <>
+      <div className="space-y-1.5">
+        <p className="text-[12px] font-semibold tracking-[0.08em] text-ap-muted uppercase">Brand kit · Format</p>
+        <AdPills doc={doc} set={set} readOnly={readOnly} />
+      </div>
+      {extra}
+      <div className="flex items-center justify-between border-t border-ap-hairline pt-3 text-[13px] text-ap-muted">
+        Previous exports
+        {exports ?? <Link to="/app/exports" className="text-ap-blue hover:text-ap-blue-hover">See the list</Link>}
+      </div>
+    </>
   );
 }
 
