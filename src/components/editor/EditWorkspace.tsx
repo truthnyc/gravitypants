@@ -41,7 +41,7 @@ export function EditTopBar({ adId, title, canUndo, canRedo, onUndo, onRedo, isMa
       <span className="hidden text-ap-faint sm:inline" aria-hidden>·</span>
       <AdName title={title} />
       <div className="flex-1" />
-      <StepBar adId={adId} current={current} className="absolute left-1/2 hidden -translate-x-1/2 xl:inline-flex" />
+      <StepBar adId={adId} current={current} className="absolute left-1/2 hidden -translate-x-1/2 min-[1360px]:inline-flex" />
       <div className="flex shrink-0 items-center gap-1">
         <button type="button" onClick={onUndo} disabled={!canUndo} aria-label="Undo" title={`Undo (${mod}Z)`} className="grid size-9 min-h-0 min-w-0 place-items-center rounded-lg text-ap-ink hover:bg-ap-panel disabled:opacity-35 disabled:hover:bg-transparent"><Undo2 className="size-[18px]" strokeWidth={1.7} /></button>
         <button type="button" onClick={onRedo} disabled={!canRedo} aria-label="Redo" title={`Redo (${isMac ? "⇧⌘Z" : "Ctrl+Shift+Z"})`} className="grid size-9 min-h-0 min-w-0 place-items-center rounded-lg text-ap-ink hover:bg-ap-panel disabled:opacity-35 disabled:hover:bg-transparent"><Redo2 className="size-[18px]" strokeWidth={1.7} /></button>
@@ -63,7 +63,7 @@ export function EditTopBar({ adId, title, canUndo, canRedo, onUndo, onRedo, isMa
 /** Steps on screens too narrow for the centred step bar. */
 export function EditStepStrip({ adId }: { adId: string }) {
   return (
-    <div className="shrink-0 overflow-x-auto border-b border-ap-hairline bg-ap-card px-3 py-1.5 xl:hidden">
+    <div className="shrink-0 overflow-x-auto border-b border-ap-hairline bg-ap-card px-3 py-1.5 min-[1360px]:hidden">
       <StepBar adId={adId} current={STEPS.findIndex((s) => s.key === "edit")} className="flex w-max" />
     </div>
   );
