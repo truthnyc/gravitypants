@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { COMPARE, EXPORT_PACKS, PLANS, TRIAL, perReel, planById, priceFor } from "@/lib/stillframe/plans-config";
+import { COMPARE, EXPORT_PACKS, PLANS, SALE_PLANS, TRIAL, perReel, planById, priceFor } from "@/lib/stillframe/plans-config";
 import { PLAN_BY_PRICE } from "@/lib/stillframe/plan-map";
 import { canUseWith, planTier, type Entitlements } from "@/lib/stillframe/plan";
 import { canBuyPacks } from "@/lib/stillframe/billing.functions";
