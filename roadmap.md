@@ -1,4 +1,3 @@
-# Product-reel search metadata
 # Referral program page
 - [ ] Add a public referral guide and link it from the shared Pricing and Help FAQ.
 - [ ] Verify FAQ navigation, referral instructions and desktop/phone presentation.
