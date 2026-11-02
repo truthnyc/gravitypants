@@ -1,3 +1,4 @@
+import { clampOffset, clampScale, photoOffset, photoScale, SCALE_MAX, SCALE_MIN } from "@/lib/stillframe/framing";
 import { useEffect, useLayoutEffect, useRef, useState, type PointerEvent as RPointerEvent, type ReactNode } from "react";
 import type { EditorDoc } from "@/lib/stillframe/data";
 import type { Format, Frame, LogoPosition, TextSettings } from "@/lib/stillframe/types";
@@ -61,7 +62,7 @@ export function Stage({
   adjusting?: boolean;
   sizeOf: (el: DragEl) => number;
   onResize: (el: DragEl, value: number, key: string) => void;
-  onFocus: (patch: { focus?: { x: number; y: number }; zoom?: number }, key: string) => void;
+  onFocus: (patch: { offset?: { x: number; y: number }; scale?: number }, key: string) => void;
   onAdjustDone: () => void;
   adjustHint?: string | undefined;
   interactive?: boolean;
@@ -159,14 +160,20 @@ export function Stage({
   const showTags = interactive && !playing && layout;
   const photoMode = interactive && !playing && (selected === "photo" || adjusting);
 
-  // Wheel / trackpad pinch zoom (1x-2.5x); native non-passive listener so the page doesn't scroll.
+  // Wheel / trackpad pinch scale (50-200%); native non-passive listener so the page doesn't scroll.
+  // One burst of wheel events (until 350ms idle) is one undo step.
   const wheelRef = useRef<(e: WheelEvent) => void>(() => {});
+  const burst = useRef<{ id: number; value: number; timer: ReturnType<typeof setTimeout> | null }>({ id: 0, value: 0, timer: null });
   wheelRef.current = (e: WheelEvent) => {
     if (!photoMode || !frame) return;
     e.preventDefault();
     const dy = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? 100 : 1);
-    const z = frame.photo?.zoom ?? 1;
-    onFocus({ zoom: Math.min(2.5, Math.max(1, z * Math.exp(-dy * 0.0015))) }, "zoom-wheel");
+    const b = burst.current;
+    if (!b.timer) { b.id = ++sessions.current; b.value = photoScale(frame.photo); }
+    else clearTimeout(b.timer);
+    b.timer = setTimeout(() => { b.timer = null; }, 350);
+    b.value = Math.min(SCALE_MAX, Math.max(SCALE_MIN, b.value * Math.exp(-dy * 0.0015)));
+    onFocus({ scale: clampScale(b.value) }, `drag:scale-wheel:${b.id}`);
   };
   useEffect(() => {
     const el = surfaceRef.current;
@@ -299,16 +306,16 @@ export function Stage({
           onSelect("photo");
           if (!interactive || playing || !frame) return;
           (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-          const f = frame.photo?.focus ?? { x: 0.5, y: 0.5 };
+          const img = frame.photo?.path ? images.get(frame.photo.path) : undefined;
+          const f = photoOffset(frame.photo, img?.naturalWidth && W && H ? { iw: img.naturalWidth, ih: img.naturalHeight, W, H } : undefined);
           setPan({ x: e.clientX, y: e.clientY, fx: f.x, fy: f.y, id: ++sessions.current });
         }}
         onPointerMove={(e) => {
           if (!pan || !frame) return;
           if (Math.hypot(e.clientX - pan.x, e.clientY - pan.y) < 3) return;
-          const z = frame.photo?.zoom ?? 1;
-          const x = Math.min(1, Math.max(0, pan.fx - (e.clientX - pan.x) / (box.w * z * 1.4)));
-          const y = Math.min(1, Math.max(0, pan.fy - (e.clientY - pan.y) / (box.h * z * 1.4)));
-          onFocus({ focus: { x, y } }, `drag:focus:${pan.id}`);
+          const x = clampOffset(pan.fx + ((e.clientX - pan.x) / box.w) * 100);
+          const y = clampOffset(pan.fy + ((e.clientY - pan.y) / box.h) * 100);
+          onFocus({ offset: { x, y } }, `drag:offset:${pan.id}`);
         }}
         onPointerUp={() => setPan(null)}
         onPointerCancel={() => setPan(null)}
