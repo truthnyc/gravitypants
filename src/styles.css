@@ -73,6 +73,8 @@
   --ap-soft-blue: #eef4fb;
   --ap-panel: #f5f5f7;
   --ap-media: #ededf0;
+  --ap-canvas: #ececf0;
+  --ap-canvas-dot: #d8d8de;
   --ap-segment-hover: #eaeaee;
   --ap-hairline: #e5e5ea;
   --ap-inner: #e8e8ed;
@@ -119,6 +121,8 @@
   --color-ap-soft-blue: var(--ap-soft-blue);
   --color-ap-panel: var(--ap-panel);
   --color-ap-media: var(--ap-media);
+  --color-ap-canvas: var(--ap-canvas);
+  --color-ap-canvas-dot: var(--ap-canvas-dot);
   --color-ap-hairline: var(--ap-hairline);
   --color-ap-inner: var(--ap-inner);
   --color-ap-green: var(--ap-green);
@@ -1407,3 +1411,9 @@ p.concept-reel-notice { font-size: 10px !important; }
 .stage-el { outline: 2px dashed transparent; }
 .stage-el:hover, .stage-el:focus-visible { outline-color: color-mix(in srgb, var(--accent-blue) 55%, transparent); }
 .stage-el.is-active { outline: 2px solid var(--accent-blue); }
+
+@utility ap-dot-grid {
+  background-color: var(--ap-canvas);
+  background-image: radial-gradient(var(--ap-canvas-dot) 1px, transparent 1px);
+  background-size: 16px 16px;
+}

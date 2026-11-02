@@ -24,9 +24,11 @@ type Props = {
   onSelect: (i: number) => void; onReorder: (from: number, to: number) => void; onAddFiles: (files: File[]) => void;
   canPaste: boolean; onDuplicate: (i: number) => void; onReplacePhoto: (i: number) => void; onCopyStyle: (i: number) => void; onPasteStyle: (i: number) => void; onDelete: (i: number) => void;
   actionsForFrame: (i: number) => InspectorActions; endSeconds: number;
+  /** 0–1 playback progress through the current frame; shown as a thin bar while playing. */
+  progress?: number | null;
 };
 
-export function FrameRail({ doc, format, frameIndex, images, version, uploading, onSelect, onReorder, onAddFiles, canPaste, onDuplicate, onReplacePhoto, onCopyStyle, onPasteStyle, onDelete, actionsForFrame, endSeconds }: Props) {
+export function FrameRail({ doc, format, frameIndex, images, version, uploading, onSelect, onReorder, onAddFiles, canPaste, onDuplicate, onReplacePhoto, onCopyStyle, onPasteStyle, onDelete, actionsForFrame, endSeconds, progress }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const navRef = useRef<HTMLElement>(null);
   const [dragFrom, setDragFrom] = useState<number | null>(null);
@@ -42,22 +44,23 @@ export function FrameRail({ doc, format, frameIndex, images, version, uploading,
     onSelect(next); navRef.current?.querySelector<HTMLButtonElement>(`[data-select-frame="${next}"]`)?.focus();
   }}>
     {doc.frames.map((frame, i) => <div key={frame.id} className="flex shrink-0 items-start gap-2">
-      {i > 0 && <div className="mt-4"><Popover open={popup === `transition:${frame.id}`} onOpenChange={(open) => { setPopup(open ? `transition:${frame.id}` : null); if (open) onSelect(i); }}>
+      {i > 0 && <div className="mt-5"><Popover open={popup === `transition:${frame.id}`} onOpenChange={(open) => { setPopup(open ? `transition:${frame.id}` : null); if (open) onSelect(i); }}>
         <PopoverTrigger asChild><TransitionChip frame={frame} aria-label={`Transition into frame ${i + 1}: ${LABEL[frame.transition_in?.type ?? "cut"]}`} /></PopoverTrigger>
         <PopoverContent side="bottom" align="center" collisionPadding={12} className="w-[320px] max-w-[calc(100vw-24px)] space-y-4" aria-label={`Transition into frame ${i + 1}`}>
           <h2 className="text-[12px] font-semibold text-ap-muted">TRANSITION INTO FRAME {i + 1}</h2>
           <TransitionPanel frames={doc.frames} frame={frame} first={false} actions={actionsForFrame(i)} />
         </PopoverContent>
       </Popover></div>}
-      <div className="flex w-14 flex-col items-center">
-        <div className="group relative size-14">
+      <div className="flex w-16 flex-col items-center">
+        <div className="group relative size-16">
           <ContextMenu><ContextMenuTrigger asChild>
             <Button type="button" variant="ghost" data-select-frame={i} draggable aria-label={`Frame ${i + 1}`} aria-pressed={i === frameIndex}
               onDragStart={() => setDragFrom(i)} onDragOver={(e) => { e.preventDefault(); setOver(i); }} onDragLeave={() => setOver(null)}
               onDrop={(e) => { e.preventDefault(); if (dragFrom !== null && dragFrom !== i) onReorder(dragFrom, i); setDragFrom(null); setOver(null); }} onDragEnd={() => { setDragFrom(null); setOver(null); }}
-              onClick={() => onSelect(i)} className={cn("relative size-14 overflow-hidden rounded-[10px] bg-control-fill p-0", i === frameIndex && "ring-2 ring-primary ring-offset-2 ring-offset-card", over === i && dragFrom !== i && "ring-2 ring-primary/40", dragFrom === i && "opacity-50")}>
+              onClick={() => onSelect(i)} className={cn("relative size-16 overflow-hidden rounded-[10px] bg-control-fill p-0", i === frameIndex && "ring-2 ring-primary ring-offset-2 ring-offset-card", over === i && dragFrom !== i && "ring-2 ring-primary/40", dragFrom === i && "opacity-50")}>
               <FrameThumb doc={doc} index={i} format={format} images={images} version={version} width={112} className="h-full w-full" />
               <span className="absolute left-1 top-1 flex size-4 items-center justify-center rounded-full bg-foreground/70 text-[10px] font-semibold text-background tabular-nums">{i + 1}</span>
+              {progress != null && i === frameIndex && <span className="absolute inset-x-0 bottom-0 h-[3px] bg-foreground/15"><span className="block h-full bg-ap-blue" style={{ width: `${Math.max(0, Math.min(1, progress)) * 100}%` }} /></span>}
             </Button>
           </ContextMenuTrigger><ContextMenuContent className="w-44">
             <ContextMenuItem onSelect={() => onDuplicate(i)}>Duplicate</ContextMenuItem>
@@ -80,7 +83,7 @@ export function FrameRail({ doc, format, frameIndex, images, version, uploading,
         </Popover>
       </div>
     </div>)}
-    <Button type="button" variant="ghost" onClick={() => inputRef.current?.click()} disabled={uploading} aria-label="Add frame" className="ml-2 size-14 shrink-0 rounded-[10px] border border-dashed border-placeholder-border p-0 text-icon"><Plus className={cn("size-5", uploading && "animate-pulse")} strokeWidth={1.7} /></Button>
+    <Button type="button" variant="ghost" onClick={() => inputRef.current?.click()} disabled={uploading} aria-label="Add frame" className="ml-2 size-16 shrink-0 rounded-[10px] border border-dashed border-placeholder-border p-0 text-icon"><Plus className={cn("size-5", uploading && "animate-pulse")} strokeWidth={1.7} /></Button>
     <input ref={inputRef} type="file" accept={ACCEPTED_IMAGE_TYPES.join(",")} multiple className="hidden" onChange={(e) => { const files = Array.from(e.target.files ?? []); e.target.value = ""; if (files.length) onAddFiles(files); }} />
   </nav>;
 }

@@ -44,11 +44,11 @@ const STEPS_ALL: { key: StepKey; label: string; to: "/app/ad/$id/format" | "/app
   { key: "export", label: "Export", to: "/app/ad/$id/export" },
   { key: "share", label: "Share (optional)", to: "/app/ad/$id/share" },
 ];
-const STEPS = STEPS_ALL.filter((s) => SHOW_SHARE || s.key !== "share");
+export const STEPS = STEPS_ALL.filter((s) => SHOW_SHARE || s.key !== "share");
 
 export type StepTitleInfo = { name: string; onRename?: ((name: string) => void) | undefined; status?: "saving" | "saved" | "error" | undefined; readOnly?: boolean | undefined };
 
-function AdName({ title }: { title: StepTitleInfo }) {
+export function AdName({ title }: { title: StepTitleInfo }) {
   const { name, onRename, status, readOnly } = title;
   return (
     <div className="flex min-w-0 items-center gap-2">
@@ -73,7 +73,7 @@ function AdName({ title }: { title: StepTitleInfo }) {
   );
 }
 
-function StepBar({ adId, current, className }: { adId: string; current: number; className?: string }) {
+export function StepBar({ adId, current, className }: { adId: string; current: number; className?: string }) {
   return (
     <nav aria-label="Steps" className={cn("inline-flex shrink-0 gap-[3px] rounded-[10px] bg-ap-panel p-[3px]", className)}>
       {STEPS.map((s, i) => {
