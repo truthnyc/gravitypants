@@ -7,6 +7,7 @@ import { listSiteReels } from "@/lib/site/reels.functions";
 import type { SiteReel } from "@/lib/site/reels";
 import { siteHead } from "@/lib/site/seo";
 import { videoObjects } from "@/lib/site/video-schema";
+import { LAUNCH_FILM, hasLaunchFilm } from "@/lib/site/launch-film";
 import { POSTS, postsForPage } from "@/lib/site/blog";
 import { SEARCH_PAGES, SEARCH_STEPS, sourcePhotos, type SearchPage as Page } from "@/lib/site/search-pages";
 
@@ -30,7 +31,7 @@ export function searchPageRoute(page: Page) {
       };
       const byId = new Map((loaderData?.reels ?? []).map((r) => [r.id, r]));
       const shown = [page.example.reelId, ...("grid" in page.section ? page.section.grid : [])].map((id) => byId.get(id));
-      const videos = videoObjects(shown, page.path);
+      const videos = videoObjects([...(hasLaunchFilm(page.path) ? [LAUNCH_FILM] : []), ...shown], page.path);
       return { ...head, scripts: [...head.scripts, ...[faq, ...videos].map((d) => ({ type: "application/ld+json", children: JSON.stringify(d) }))] };
     },
   };
@@ -77,6 +78,14 @@ export function SearchPage({ page, reels }: { page: Page; reels: SiteReel[] }) {
         </div>
         <p className="mt-4 text-[15px] text-site-muted">Your first reel is free, with no watermark and no card.</p>
       </section>
+
+      {hasLaunchFilm(page.path) && (
+        <section className={`${wrap} pb-20`} aria-labelledby="launch-film">
+          <h2 id="launch-film" className={h2}>See it in 19 seconds</h2>
+          <video className="mt-8 aspect-video w-full rounded-lg bg-site-panel" src={LAUNCH_FILM.video} poster={LAUNCH_FILM.poster ?? undefined}
+            controls playsInline preload="metadata" aria-label="Gravity Pants product video maker demo" />
+        </section>
+      )}
 
       {example && (
         <section className={`${wrap} pb-20`} aria-labelledby="before-after">
