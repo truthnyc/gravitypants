@@ -1043,7 +1043,7 @@ function TextPanel({ el, frameIndex, headline, subline, brandColors, brandName, 
       <ColorField el={el} t={t} brandColors={brandColors} onChange={set} />
       <Field label="Align">
         <Segmented value={align} options={[{ value: "auto", label: "Auto" }, { value: "left", label: "Left" }, { value: "center", label: "Centre" }, { value: "right", label: "Right" }]}
-          onChange={(v) => set({ align: v === "auto" ? undefined : (v as "left" | "center" | "right") })} />
+          onChange={(v) => set({ align: v === "auto" ? null : (v as "left" | "center" | "right") })} />
       </Field>
       {isHead ? (
         <Field label="Position">
