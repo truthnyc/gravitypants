@@ -4,7 +4,7 @@ import { Check } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { CheckoutDialog, type CheckoutTarget } from "@/components/billing/CheckoutDialog";
 import { currentWorkspaceId, isPaid, useBilling, useManageBilling } from "@/lib/stillframe/billing";
-import { COMPARE, FAQ, PLANS, POPULAR_PLAN, REFERRAL_NOTE, TRIAL, YEARLY_LABEL, perReel, priceFor, signupHref, type Billing, type PlanConfig } from "@/lib/stillframe/plans-config";
+import { COMPARE, FAQ, SALE_PLANS, POPULAR_PLAN, REFERRAL_NOTE, TRIAL, YEARLY_LABEL, perReel, priceFor, signupHref, type Billing, type PlanConfig } from "@/lib/stillframe/plans-config";
 import { SITE_ORIGIN, siteHead } from "@/lib/site/seo";
 
 export const Route = createFileRoute("/pricing")({
@@ -24,7 +24,7 @@ export const Route = createFileRoute("/pricing")({
         url: `${SITE_ORIGIN}/pricing`,
         offers: [
           { "@type": "Offer", name: TRIAL.name, price: "0", priceCurrency: "USD" },
-          ...PLANS.map((p) => ({ "@type": "Offer", name: `${p.name} plan`, price: String(p.monthly), priceCurrency: "USD", url: `${SITE_ORIGIN}/pricing`, priceSpecification: { "@type": "UnitPriceSpecification", price: String(p.monthly), priceCurrency: "USD", unitCode: "MON" } })),
+          ...SALE_PLANS.map((p) => ({ "@type": "Offer", name: `${p.name} plan`, price: String(p.monthly), priceCurrency: "USD", url: `${SITE_ORIGIN}/pricing`, priceSpecification: { "@type": "UnitPriceSpecification", price: String(p.monthly), priceCurrency: "USD", unitCode: "MON" } })),
         ],
       }),
     }],
@@ -48,8 +48,8 @@ function Pricing() {
   const [checkout, setCheckout] = useState<CheckoutTarget | null>(null);
   const { data: appBilling } = useBilling();
   const manage = useManageBilling();
-  const cols = [TRIAL.name, ...PLANS.map((p) => p.name)];
-  const popName = PLANS.find((p) => p.id === POPULAR_PLAN)!.name;
+  const cols = [TRIAL.name, ...SALE_PLANS.map((p) => p.name)];
+  const popName = SALE_PLANS.find((p) => p.id === POPULAR_PLAN)!.name;
 
   // Signed-in users pay right away and the workspace switches to the plan; visitors sign up first.
   async function choose(p: PlanConfig) {
@@ -90,7 +90,7 @@ function Pricing() {
               <Link to="/signup" data-cta="make-first-reel" className="pr-btn sec full">Make your first reel</Link>
               <ul>{["First export with no watermark", `${TRIAL.exports - TRIAL.cleanExports} more watermarked exports`, "Vertical 9:16, Portrait 4:5, Square 1:1, Wide 5:4, Landscape 16:9 and custom", "MP4 and GIF", "Brand kits", "Templates"].map((f) => <li key={f}><Tick /><span>{f}</span></li>)}</ul>
             </article>
-            {PLANS.map((p) => {
+            {SALE_PLANS.map((p) => {
               const pr = priceFor(p, billing);
               const pop = p.id === POPULAR_PLAN;
               return (

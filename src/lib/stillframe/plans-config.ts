@@ -45,6 +45,8 @@ export type PlanConfig = {
   features: string[];
   /** Feature rows in the compare table this plan includes. */
   team: boolean;
+  /** No longer sold to new customers; kept so existing subscribers keep their plan. */
+  retired?: boolean;
 };
 
 export const PLANS: PlanConfig[] = [
@@ -70,6 +72,7 @@ export const PLANS: PlanConfig[] = [
     monthly: 35,
     yearly: 350,
     team: false,
+    retired: true,
     features: ["1 seat", "10 exports a month", "Vertical 9:16, Portrait 4:5, Square 1:1, Wide 5:4, Landscape 16:9 and custom", "MP4 and GIF", "Every Google Font", "Brand kit: logo, colors, fonts", "Duplicate with new photos", "Save as template", "No watermark", "Need more? Packs of 5, 10 or 20 extra exports"],
   },
   {
@@ -82,7 +85,7 @@ export const PLANS: PlanConfig[] = [
     monthly: 79,
     yearly: 790,
     team: false,
-    features: ["Everything in Simple", "30 exports a month", "HTML5 export", "Aimanté insights"],
+    features: ["Everything in Starter", "30 exports a month", "HTML5 export", "Aimanté insights"],
   },
   {
     id: "team",
@@ -109,6 +112,9 @@ export function checkoutProductCopy(p: PlanConfig) {
   };
 }
 
+/** Plans offered to new customers (Simple is retired; existing Simple subscribers are grandfathered). */
+export const SALE_PLANS: PlanConfig[] = PLANS.filter((p) => !p.retired);
+
 export const planById = (id: PlanId) => PLANS.find((p) => p.id === id)!;
 
 const usd = (n: number) => `$${n.toLocaleString("en-US")}`;
@@ -132,12 +138,12 @@ export function signupHref(p: PlanConfig, billing: Billing) {
 }
 
 type Cell = string | boolean;
-export type CompareRow = { label: string; href?: string; cells: Cell[] }; // free, then each plan in PLANS order
+export type CompareRow = { label: string; href?: string; cells: Cell[] }; // free, then each plan in SALE_PLANS order
 export type CompareGroup = { group: string; rows: CompareRow[] };
 
 const priceCell = (p: PlanConfig) => (p.yearly ? `${usd(p.monthly)} / month|or ${usd(p.yearly)} / year` : `${usd(p.monthly)} / month`);
-const all = (v: Cell) => [v, ...PLANS.map(() => v)];
-const byPlan = (free: Cell, f: (p: PlanConfig) => Cell) => [free, ...PLANS.map(f)];
+const all = (v: Cell) => [v, ...SALE_PLANS.map(() => v)];
+const byPlan = (free: Cell, f: (p: PlanConfig) => Cell) => [free, ...SALE_PLANS.map(f)];
 
 export const COMPARE: CompareGroup[] = [
   {
@@ -174,7 +180,7 @@ export const COMPARE: CompareGroup[] = [
 
 export const FAQ: { q: string; a: string; href?: "/referrals" }[] = [
   { q: "Can I try it before paying?", a: "Yes. Every account starts on the Free plan, with no time limit and no card. Your first export has no watermark, and you get 5 more exports with a small Gravity Pants mark. Your reels and brand kit stay saved, and a reel on Aimanté stays live." },
-  { q: "What if I need more than 10 exports on Simple?", a: "Upgrading is usually the better deal: Business gives you 30 exports a month for $79. For a one-off busy month, buy a pack from Account → Billing: 5 exports for $25, 10 for $45 or 20 for $80. Packs never expire and are available on every paid plan." },
+  { q: "What if I need more than 5 exports on Starter?", a: "For a busy month, buy a pack from Account → Billing: 5 exports for $25, 10 for $45 or 20 for $80. Packs never expire and are available on every paid plan. If you regularly need 20 or more, Business is the better deal: 30 exports a month for $79, about $2.63 a reel." },
   { q: "How does the referral program work?", a: `${REFERRAL_NOTE} Your link, your credits and the friends who joined are all in Account → Billing. The reward lands when your friend's first export finishes — signing up alone doesn't trigger it.`, href: "/referrals" },
   { q: "What kind of photos work best?", a: "Clear product photos with some space around the product work best. Phone photos are fine: three to five of them make a good reel." },
   { q: "Which formats can I export?", a: "Choose Vertical 9:16 for Reels, Stories and TikTok; Portrait 4:5, recommended for Instagram, Facebook and LinkedIn feeds; Square 1:1 for square posts; Wide 5:4 for websites, Facebook and LinkedIn feeds; or Landscape 16:9 for banners and YouTube. Custom sizes are available too. Each selected shape exports as MP4, GIF or both. HTML5 is on Business and Team." },
