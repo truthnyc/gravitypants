@@ -70,6 +70,8 @@ export type InspectorActions = {
   onKit: (id: string | null) => void;
   onPhoto: (patch: Partial<PhotoSettings>, key?: string) => void;
   onText: (el: "headline" | "subline", patch: Partial<TextSettings>, key?: string) => void;
+  /** Drop the current frame's own headline/subline style and use the shared one again. */
+  onMatchText?: (el: "headline" | "subline") => void;
   onLogo: (patch: Partial<LogoSettings>, key?: string) => void;
   onLogoVisible: (visible: boolean) => void;
   onLogoVariant: (variant: "auto" | "light" | "dark") => void;
@@ -175,7 +177,7 @@ export function Inspector({
             <PhotoPanel part={section} onEditBackground={onEditBackground} photo={frame.photo ?? {}} frameIndex={frameIndex} brandName={brandName} brandColors={brandColors} image={image} keyframe={keyframe} onKeyframe={onKeyframe} actions={actions} />
           )}
           {(section === "headline" || section === "subline") && (
-            <TextTab lockPart={section} selected={section} headline={frame.headline} subline={frame.subline} brandColors={brandColors} brandName={brandName} actions={actions} />
+            <TextPanel el={section} frameIndex={frameIndex} headline={frame.headline} subline={frame.subline} brandColors={brandColors} brandName={brandName} actions={actions} />
           )}
           {section === "logo" && (
             <LogoPanel logo={doc.project.logo} format={format} frame={frame} frameIndex={frameIndex} hasLogo={hasLogo} actions={actions} kitName={kits.find((k) => k.id === kitId)?.name ?? null} kitPosition={kit?.default_logo_positions?.[format] ?? null} />

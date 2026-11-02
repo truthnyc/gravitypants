@@ -184,7 +184,7 @@ function measure(
   ctx.font = font;
   setSpacing(ctx, spacingPx);
   const maxW = Math.min(W * 0.84, safe.w);
-  const lines = wrap(ctx, t.text ?? "", maxW);
+  const lines = wrap(ctx, t.all_caps ? (t.text ?? "").toUpperCase() : (t.text ?? ""), maxW);
   // measureText includes trailing tracking after the last glyph; drop it.
   const width = Math.min(maxW, Math.max(1, ...lines.map((l) => ctx.measureText(l).width - spacingPx)));
   setSpacing(ctx, 0);
@@ -265,7 +265,7 @@ export function layoutFrame(
     lineH: m.lineH,
     font: m.font,
     spacingPx: m.spacingPx,
-    align: ALIGN[col] ?? "center",
+    align: t.align ?? ALIGN[col] ?? "center",
     color: t.color ?? "#FFFFFF",
     animation: t.animation ?? "none",
     ...(t === s && subImage ? { image: subImage } : {}),
