@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useServerFn } from '@tanstack/react-start'
 import { Check, LayoutTemplate, Sparkles, Users, BadgeCheck } from 'lucide-react'
+import { FeaturedAdVideo } from '@/components/site/FeaturedAdVideo'
 import { AimanteShell } from '@/components/site/AimanteShell'
 import { Button } from '@/components/ui/button'
 import { categorySlug, CATEGORIES, BRAND_DESCRIPTION_MAX, BRAND_MOODS_MAX, type Category } from '@/lib/directory/directory'
@@ -129,7 +130,7 @@ const STEPS = [
 ]
 const PLANS = [
   { eyebrow: 'Brand page', price: 'Complimentary', note: 'With any Gravity Pants account', items: ['Your brand page with logo, description and website link', 'One category and up to three moods', 'Up to 3 reels'] },
-  { eyebrow: 'Full brand page', price: 'With Simple', note: 'from $35 a month', items: ['Everything in Brand page', 'Unlimited reels on your page', 'Every reel shown in mood and category search'], highlight: true },
+  { eyebrow: 'Full brand page', price: 'With Starter', note: 'from $19 a month', items: ['Everything in Brand page', 'Unlimited reels on your page', 'Every reel shown in mood and category search'], highlight: true },
   { eyebrow: 'Brand insights', price: 'Included', note: 'With Business and Team', items: ['Everything in Full brand page', 'Views, saves and clicks to your website', 'See which reels and moods work best'] },
 ]
 const WHO: [string, string][] = [['Fashion', 'Fashion & Apparel'], ['Beauty', 'Beauty & Fragrance'], ['Food & Drink', 'Food & Drink'], ['Home', 'Home & Living'], ['Travel', 'Travel & Hospitality'], ['Crafts', 'Crafts & Hobbies'], ['Photography', 'Photography & Visual Arts'], ['Nonprofits', 'Nonprofit & Causes']]
@@ -156,12 +157,12 @@ function ForBrands() {
         <div className="rounded-[12px] bg-ap-panel p-6 sm:p-8">
           <div className="rounded-[12px] bg-ap-card p-6 shadow-ap-soft">
             <div className="flex items-center gap-3">
-              <span className="size-11 shrink-0 rounded-full bg-ap-hairline" aria-hidden />
-              <div className="min-w-0 flex-1"><p className="text-[17px] font-semibold">[Your brand]</p><p className="text-[13px] text-ap-muted">Home & Living · cozy · warm · natural</p></div>
-              <span className="text-[14px] font-medium text-ap-blue">Visit →</span>
+              <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-ap-panel text-[15px] font-semibold" aria-hidden>P</span>
+              <div className="min-w-0 flex-1"><p className="text-[17px] font-semibold">Purl Soho</p><p className="text-[13px] text-ap-muted">Crafts & Hobbies · cozy · natural</p></div>
+              <a href="/b/purl-soho" className="text-[14px] font-medium text-ap-blue">See page →</a>
             </div>
-            <p className="mt-4 text-[14px] leading-[1.5] text-ap-body">Handmade pieces for slow mornings and long evenings. Made in small batches from natural materials.</p>
-            <div className="mt-5 grid grid-cols-3 gap-3">{[0, 1, 2].map((i) => <div key={i} className="aspect-[9/16] rounded-[6px] bg-ap-media" />)}</div>
+            <p className="mt-4 text-[14px] leading-[1.5] text-ap-body">Beautiful yarns and fabrics for knitting, sewing and quilting, with patterns made in New York.</p>
+            <div className="mx-auto mt-5 max-w-[200px] [&_.site-phone]:!w-full [&_.site-phone]:!max-w-none"><FeaturedAdVideo tapToggle /></div>
             <p className="mt-4 text-center text-[12px] text-ap-muted">Reels made with Gravity Pants</p>
           </div>
         </div>
