@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { clampScale, isReframed, photoScale, RESET_FRAMING, SCALE_MAX, SCALE_MIN } from "@/lib/stillframe/framing";
 import { gradientPresets, normalizeHex, photoName, photoPalette } from "@/lib/stillframe/palette";
 import { ChevronDown, ChevronRight, Clock, Crop, Play, Image as ImageIcon, Minus, Plus, RefreshCw, Shapes, Sparkles, TextQuote, Type } from "lucide-react";
 import type { EditorDoc } from "@/lib/stillframe/data";
@@ -486,7 +487,7 @@ function PhotoPanel({
   // Photo and movement default to this frame only.
   const [scope, setScope] = useState<"frame" | "all">("frame");
   const all = scope === "all";
-  const [adjust, setAdjust] = useState(move === "custom");
+  const [adjust, setAdjust] = useState(false);
   const [recent, setRecent] = useState<string[]>([]);
   const [hex, setHex] = useState(bg);
   const [hexBad, setHexBad] = useState(false);
@@ -495,7 +496,8 @@ function PhotoPanel({
   }, []);
   useEffect(() => { setHex(bg); setHexBad(false); }, [bg]);
   const palette = useMemo(() => photoPalette(photo.path, image), [photo.path, image]);
-  const moved = Boolean((photo.zoom ?? 1) !== 1 || (photo.focus && (photo.focus.x !== 0.5 || photo.focus.y !== 0.5)));
+  const moved = isReframed(photo);
+  const scale = photoScale(photo);
 
   const send = (patch: Partial<PhotoSettings>, key?: string) =>
     all && actions.onPhotoAll ? actions.onPhotoAll(patch, key) : actions.onPhoto(patch, key);
@@ -537,18 +539,31 @@ function PhotoPanel({
         </div>
         <div className="min-w-0 flex-1">
           <div className="text-[14px] font-semibold nums">Photo {frameIndex + 1}</div>
-          <div className="mt-0.5 text-[12px] leading-snug text-secondary-text">Drag on the preview to reposition · scroll to zoom</div>
-          {moved && (
-            <button type="button" className="mt-1 text-[12px] font-medium text-link" onClick={() => actions.onPhoto({ focus: { x: 0.5, y: 0.5 }, zoom: 1 })}>
-              Reset framing
-            </button>
-          )}
+          <div className="mt-0.5 text-[12px] leading-snug text-secondary-text">Drag on the preview to move · scroll to scale</div>
         </div>
         <Button variant="default" size="sm" onClick={actions.onReplacePhoto}>Replace</Button>
       </div>
 
-      <Field label="Fit">
-        <Segmented value={fit} options={[{ value: "fill", label: "Fill" }, { value: "fit", label: "Fit" }]} onChange={(v) => send({ fit: v })} />
+      <Field label="Fill the frame">
+        <Segmented value={fit} options={[{ value: "fill", label: "Fill (crop)" }, { value: "fit", label: "Fit (whole photo)" }]} onChange={(v) => send({ fit: v })} />
+      </Field>
+      <Field label="Scale" value={`${scale}%`}>
+        <ElementSlider
+          name="Scale"
+          color="var(--el-photo)"
+          min={SCALE_MIN}
+          max={SCALE_MAX}
+          value={scale}
+          onChange={(v, k) => actions.onPhoto({ scale: clampScale(v) }, k)}
+          left={<button type="button" aria-label="Scale down" className="grid size-7 place-items-center rounded-lg bg-ap-panel text-ap-ink hover:bg-ap-segment-hover" onClick={() => actions.onPhoto({ scale: clampScale(scale - 5) })}><Minus className="size-3.5" strokeWidth={1.7} /></button>}
+          right={<button type="button" aria-label="Scale up" className="grid size-7 place-items-center rounded-lg bg-ap-panel text-ap-ink hover:bg-ap-segment-hover" onClick={() => actions.onPhoto({ scale: clampScale(scale + 5) })}><Plus className="size-3.5" strokeWidth={1.7} /></button>}
+        />
+        <p className="text-[12px] leading-snug text-secondary-text">Below 100% the background shows around the photo.</p>
+        {moved && (
+          <button type="button" className="text-[12px] font-medium text-link" onClick={() => actions.onPhoto(RESET_FRAMING)}>
+            Reset framing
+          </button>
+        )}
       </Field>
       </>)}
 
@@ -607,7 +622,7 @@ function PhotoPanel({
       {showPhoto && (<>
       <Field label="Movement">
         <div className="flex flex-wrap gap-1.5">
-          {MOVEMENTS.filter((m) => m.value !== "custom").map((m) => (
+          {MOVEMENTS.map((m) => (
             <button
               key={m.value}
               type="button"
@@ -618,7 +633,6 @@ function PhotoPanel({
               {m.label}
             </button>
           ))}
-          {move === "custom" && <span className="inline-flex h-9 items-center rounded-lg bg-ap-blue px-4 text-[14px] font-medium text-ap-card">Custom</span>}
         </div>
         <Reveal open={move !== "none" && move !== "custom"}>
           <div className="pt-2">
@@ -630,12 +644,7 @@ function PhotoPanel({
       </Field>
 
 
-      <Collapse label="Adjust" open={adjust} onToggle={() => setAdjust((v) => !v)}>
-        <Field label="Custom movement">
-          <Button variant={move === "custom" ? "default" : "plain"} size="sm" onClick={() => chooseMove("custom")} aria-pressed={move === "custom"}>
-            {move === "custom" ? "Custom movement on" : "Set a custom movement"}
-          </Button>
-          <Reveal open={move === "custom"}>
+      <Reveal open={move === "custom"}>
             <div className="space-y-2 pt-2">
               <Segmented value={keyframe ?? "start"} options={[{ value: "start", label: "Start framing" }, { value: "end", label: "End framing" }]} onChange={(v) => onKeyframe(v)} />
               <p className="text-[12px] leading-snug text-secondary-text">Drag and zoom the photo on the preview to set where the movement starts and where it ends.</p>
@@ -644,7 +653,7 @@ function PhotoPanel({
               </Button>
             </div>
           </Reveal>
-        </Field>
+      <Collapse label="Look: brightness ›" open={adjust} onToggle={() => setAdjust((v) => !v)}>
         <Field label="Brightness" value={brightness > 0 ? `+${brightness}` : brightness}>
           <ElementSlider
             name="Brightness"
@@ -684,10 +693,10 @@ function BackgroundPanel({ photo, frameIndex, frameCount, brandName, brandColors
   const [hex, setHex] = useState(bg);
   const [hexBad, setHexBad] = useState(false);
   useEffect(() => { setHex(bg); setHexBad(false); }, [bg]);
-  const covered = (photo.fit ?? "fill") === "fill" && (photo.zoom ?? 1) >= 1;
+  const covered = (photo.fit ?? "fill") === "fill" && photoScale(photo) >= 100;
   const pick = (c: string, key?: string) => actions.onPhoto({ background: "solid", background_color: c }, key);
   const showBackground = () => {
-    const patch: Partial<PhotoSettings> = { zoom: 0.85 };
+    const patch: Partial<PhotoSettings> = { scale: 85 };
     if (mode === "blur") Object.assign(patch, { background: "solid", background_color: palette[0] ?? "#1D1D1F" });
     actions.onPhoto(patch);
     toast(`Photo ${frameIndex + 1} scaled to 85% so the background shows.`);
