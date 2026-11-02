@@ -988,6 +988,112 @@ function TextTab({ selected, headline, subline, brandColors, brandName, actions,
 }
 
 
+/** Headline or Subline drawer panel: scope box, then the same controls for each. */
+function TextPanel({ el, frameIndex, headline, subline, brandColors, brandName, actions }: {
+  el: "headline" | "subline"; frameIndex: number; headline: TextSettings | null; subline: TextSettings | null; brandColors: string[]; brandName: string; actions: InspectorActions;
+}) {
+  const isHead = el === "headline";
+  const h = headline ?? {};
+  const raw = (isHead ? headline : subline) ?? {};
+  // A subline inherits the headline's font and colour until it has its own.
+  const t: TextSettings = isHead ? raw : { ...raw, font_family: raw.font_family ?? h.font_family ?? null, color: raw.color ?? h.color ?? "#FFFFFF" };
+  const label = isHead ? "headline" : "subline";
+  const tint = isHead ? "var(--ap-dot-text)" : "var(--ap-dot-subline)";
+  const set = (p: Partial<TextSettings>, k?: string) =>
+    actions.onText(el, isHead || subline ? p : { font_family: h.font_family ?? DEFAULT_FONT, color: h.color ?? "#FFFFFF", ...p }, k);
+  const own = raw.same_on_all === false;
+  const [more, setMore] = useState(false);
+  const family = t.font_family ?? DEFAULT_FONT;
+  const weight = t.font_weight ?? (isHead ? 700 : 500);
+  const { data: fontList } = useFontList();
+  const weights = weightChoices(weightsOf(fontList?.fonts.find((f) => f.family === family)));
+  const spacing = t.letter_spacing ?? 0;
+  const lineHeight = t.line_height ?? (isHead ? 1.08 : 1.25);
+  const under = raw.keep_under_headline ?? true;
+  const align = t.align ?? "auto";
+  const undo = actions.onUndo ? { action: { label: "Undo", onClick: actions.onUndo } } : undefined;
+  const setScope = (v: "all" | "frame") => {
+    if (v === "frame" && !own) {
+      set({ same_on_all: false });
+      toast(`Frame ${frameIndex + 1} now has its own ${label} style. Other frames are unchanged.`, undo);
+    } else if (v === "all" && own) match();
+  };
+  const match = () => {
+    actions.onMatchText?.(el);
+    toast(`Frame ${frameIndex + 1} matches the other frames again.`, undo);
+  };
+  return (
+    <>
+      <div className={cn("space-y-2 rounded-[4px] p-3", own ? "" : "bg-ap-panel")} style={own ? { background: `color-mix(in srgb, ${tint} 10%, transparent)` } : undefined}>
+        <div className="text-[13px] font-medium text-ap-ink">{isHead ? "Headline" : "Subline"} style applies to</div>
+        <Segmented value={own ? "frame" : "all"} options={[{ value: "all", label: "All frames" }, { value: "frame", label: `Only frame ${frameIndex + 1}` }]} onChange={setScope} />
+        {own ? (
+          <p className="text-[12px] leading-snug text-ap-body">
+            <span className="mr-1.5 inline-block size-2 rounded-full align-middle" style={{ background: tint }} />
+            Frame {frameIndex + 1} has its own {label} style.{" "}
+            <button type="button" className="font-medium text-link" onClick={match}>Match other frames</button>
+          </p>
+        ) : (
+          <p className="text-[12px] leading-snug text-secondary-text">Style changes apply to every frame that doesn't have its own. Words always stay per frame.</p>
+        )}
+      </div>
+      {!isHead && <p className="text-[13px] text-ap-muted">Optional</p>}
+      <Textarea value={raw.text ?? ""} placeholder={isHead ? "Add a headline" : "Add a line under the headline"} aria-label={isHead ? "Headline" : "Subline"} onChange={(e) => set({ text: e.target.value }, `${el}-text`)} className={cn("rounded-sm text-[15px]", isHead ? "min-h-[72px]" : "min-h-[56px]")} />
+      <FontField el={el} t={t} brandName={brandName} actions={actions} onChange={set} />
+      {weights.length > 1 && (
+        <Field label="Weight">
+          <Segmented
+            value={String(closestWeight(weights, weight))}
+            options={weights.map((w) => ({ value: String(w), label: WEIGHT_NAMES[w] ?? String(w) }))}
+            onChange={(v) => { const w = Number(v); void loadFont(family, w).then(() => set({ font_weight: w })); set({ font_weight: w }); }}
+          />
+        </Field>
+      )}
+      <SizeField el={el} t={t} onChange={set} />
+      <ColorField el={el} t={t} brandColors={brandColors} onChange={set} />
+      <Field label="Align">
+        <Segmented value={align} options={[{ value: "auto", label: "Auto" }, { value: "left", label: "Left" }, { value: "center", label: "Centre" }, { value: "right", label: "Right" }]}
+          onChange={(v) => set({ align: v === "auto" ? undefined : (v as "left" | "center" | "right") })} />
+      </Field>
+      {isHead ? (
+        <Field label="Position">
+          <div className="flex items-center gap-3">
+            <PositionGrid value={t.position ?? "center"} color={tint} onChange={(a) => set({ position: a })} />
+            <p className="text-[12px] leading-snug text-secondary-text">Or drag it on the preview. It snaps into place.</p>
+          </div>
+        </Field>
+      ) : (
+        <>
+          <label className="flex items-center justify-between gap-3">
+            <span className="text-[13px]">Keep under headline</span>
+            <Switch checked={under} onCheckedChange={(v) => set({ keep_under_headline: v })} className="data-[state=checked]:bg-toggle-on" />
+          </label>
+          {under ? (
+            <p className="text-[12px] leading-snug text-secondary-text">Sits under the headline and moves with it.</p>
+          ) : (
+            <Field label="Position"><PositionGrid value={t.position ?? "bottom-center"} color={tint} onChange={(a) => set({ position: a })} /></Field>
+          )}
+        </>
+      )}
+      <AnimationField value={isHead || subline ? t.animation ?? "none" : "fade"} onPick={(a) => { set({ animation: a }); if (a !== "none") actions.onPlayFrame?.(); }} />
+      <Collapse label="More text options" open={more} onToggle={() => setMore((v) => !v)}>
+        <Field label="Letter spacing" value={`${spacing > 0 ? "+" : ""}${spacing}`}>
+          <ElementSlider name={`${isHead ? "Headline" : "Subline"} letter spacing`} color={tint} min={-10} max={50} value={spacing} snap={(v) => (Math.abs(v) <= 1 ? 0 : v)} onChange={(v, k) => set({ letter_spacing: v }, k)} />
+        </Field>
+        <Field label="Line height" value={lineHeight.toFixed(2)}>
+          <ElementSlider name={`${isHead ? "Headline" : "Subline"} line height`} color={tint} min={80} max={200} value={Math.round(lineHeight * 100)} onChange={(v, k) => set({ line_height: v / 100 }, k)} />
+        </Field>
+        {!isHead && (
+          <label className="flex items-center justify-between gap-3">
+            <span className="text-[13px]">All capitals</span>
+            <Switch checked={Boolean(t.all_caps)} onCheckedChange={(v) => set({ all_caps: v })} className="data-[state=checked]:bg-toggle-on" />
+          </label>
+        )}
+      </Collapse>
+    </>
+  );
+}
+
 /* ---------------- Logo */
 
 function LogoPanel({
