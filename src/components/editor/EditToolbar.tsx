@@ -86,7 +86,7 @@ export function EditToolbar({ section, frame, frameIndex, logo, hasLogo, actions
         <Sep />
         <button type="button" className={btn} onClick={actions.onReplacePhoto}>Replace</button>
         <Sep />
-        <Stepper label="photo" value={`${Math.round(zoom * 100)}%`} onMinus={() => actions.onPhoto({ zoom: Math.max(1, Math.round((zoom - 0.1) * 100) / 100) })} onPlus={() => actions.onPhoto({ zoom: Math.min(2.5, Math.round((zoom + 0.1) * 100) / 100) })} />
+        <Stepper label="photo" value={`${Math.round(zoom * 100)}%`} onMinus={() => actions.onPhoto({ zoom: Math.max(0.5, Math.round((zoom - 0.05) * 100) / 100) })} onPlus={() => actions.onPhoto({ zoom: Math.min(2.5, Math.round((zoom + 0.05) * 100) / 100) })} />
         <Sep />
         <button type="button" className={btn} onClick={() => actions.onPhoto({ fit: fit === "fill" ? "fit" : "fill" })} title={fit === "fill" ? "Switch to Fit" : "Switch to Fill"}>
           {fit === "fill" ? "Fill" : "Fit"} <ArrowLeftRight className="size-3.5" strokeWidth={1.7} />
@@ -115,10 +115,10 @@ export function EditToolbar({ section, frame, frameIndex, logo, hasLogo, actions
         <Tag section="background" />
         <Sep />
         <button type="button" className={btn} onClick={onOpen}>
-          {mode === "solid" && c ? (<><span className="size-4 rounded-full border border-ap-hairline" style={{ background: c }} /><span className="nums">{c}</span></>) : "Blurred photo"}
+          {mode === "solid" && c ? (<><span className="size-4 rounded-full border border-ap-hairline" style={{ background: c }} /><span className="nums">{c}</span></>) : mode === "gradient" ? "Gradient" : "Blurred photo"}
         </button>
         <Sep />
-        <button type="button" className={btn} onClick={() => actions.onPhotoAll?.({ background: mode, background_color: p.background_color ?? null })}>Apply to all</button>
+        <button type="button" className={btn} onClick={() => actions.onPhotoAll?.({ background: mode, background_color: p.background_color ?? null, background_gradient: p.background_gradient ?? null })}>Apply to all</button>
       </>
     );
   }

@@ -114,7 +114,10 @@ export function Inspector({
   keyframe = null,
   onKeyframe = () => {},
   section,
+  onEditBackground,
 }: {
+  /** Photo panel footer: jump to the Background panel. */
+  onEditBackground?: (() => void) | undefined;
   /** Drawer mode: show only this element's panel, without the tab bar. */
   section?: InspectorSection | undefined;
   image?: HTMLImageElement | undefined;
@@ -164,8 +167,11 @@ export function Inspector({
       {!hideKit && <BrandKitRow embedded={embedded} kits={kits} kitId={kitId} onKit={actions.onKit} />}
       {section ? (
         <div className="space-y-4">
-          {(section === "photo" || section === "background") && (
-            <PhotoPanel part={section} photo={frame.photo ?? {}} frameIndex={frameIndex} brandName={brandName} brandColors={brandColors} image={image} keyframe={keyframe} onKeyframe={onKeyframe} actions={actions} />
+          {section === "background" && (
+            <BackgroundPanel photo={frame.photo ?? {}} frameIndex={frameIndex} frameCount={doc.frames.length} brandName={brandName} brandColors={brandColors} image={image} actions={actions} />
+          )}
+          {section === "photo" && (
+            <PhotoPanel part={section} onEditBackground={onEditBackground} photo={frame.photo ?? {}} frameIndex={frameIndex} brandName={brandName} brandColors={brandColors} image={image} keyframe={keyframe} onKeyframe={onKeyframe} actions={actions} />
           )}
           {(section === "headline" || section === "subline") && (
             <TextTab lockPart={section} selected={section} headline={frame.headline} subline={frame.subline} brandColors={brandColors} brandName={brandName} actions={actions} />
@@ -449,6 +455,7 @@ function Collapse({ label, open, onToggle, children }: { label: string; open: bo
 
 function PhotoPanel({
   part,
+  onEditBackground,
   photo,
   frameIndex,
   brandName,
@@ -466,6 +473,7 @@ function PhotoPanel({
   keyframe: "start" | "end" | null;
   onKeyframe: (k: "start" | "end" | null) => void;
   part?: "photo" | "background" | undefined;
+  onEditBackground?: (() => void) | undefined;
   actions: InspectorActions;
 }) {
   const showPhoto = part !== "background";
@@ -649,7 +657,127 @@ function PhotoPanel({
           />
         </Field>
       </Collapse>
+      {onEditBackground && (
+        <div className="flex items-center justify-between gap-3 border-t border-ap-hairline pt-4">
+          <div className="min-w-0">
+            <div className="text-[13px] font-medium text-ap-ink">Background colour</div>
+            <div className="text-[12px] leading-snug text-ap-muted">Shows around a scaled or fitted photo.</div>
+          </div>
+          <Button variant="plain" size="sm" onClick={onEditBackground}>Edit <ChevronRight className="size-3.5" strokeWidth={1.7} /></Button>
+        </div>
+      )}
       </>)}
+    </>
+  );
+}
+
+const BG_NEUTRALS = ["#000000", "#1D1D1F", "#6E6E73", "#D2D2D7", "#F5F5F7", "#FFFFFF"];
+
+/** Six 160° two-stop presets from the photo's and brand's colours (darkest photo colour first). */
+export function gradientPresets(palette: string[], brand: string[]): [string, string][] {
+  const p = palette.length ? palette : ["#1D1D1F", "#6E6E73", "#D2D2D7"];
+  const b = brand.length ? brand : [];
+  const cands: [string, string][] = [
+    [p[0]!, p[p.length - 1]!],
+    [p[1] ?? p[0]!, p[0]!],
+    [p[Math.min(2, p.length - 1)]!, p[p.length - 1]!],
+    ...(b.length >= 2 ? [[b[0]!, b[1]!] as [string, string]] : []),
+    ...(b.length ? [[b[0]!, p[0]!] as [string, string]] : []),
+    [p[p.length - 1]!, "#FFFFFF"],
+    [p[0]!, "#000000"],
+    ["#1D1D1F", "#6E6E73"],
+    ["#F5F5F7", "#D2D2D7"],
+  ];
+  const seen = new Set<string>();
+  return cands.filter(([a, c]) => { const k = `${a}${c}`; if (a === c || seen.has(k)) return false; seen.add(k); return true; }).slice(0, 6);
+}
+
+function BackgroundPanel({ photo, frameIndex, frameCount, brandName, brandColors, image, actions }: {
+  photo: PhotoSettings; frameIndex: number; frameCount: number; brandName: string; brandColors: string[]; image?: HTMLImageElement | undefined; actions: InspectorActions;
+}) {
+  const mode = photo.background ?? (photo.background_color ? "solid" : "blur");
+  const bg = (photo.background_color ?? "").toUpperCase();
+  const grad = photo.background_gradient ?? null;
+  const palette = useMemo(() => photoPalette(photo.path, image), [photo.path, image]);
+  const presets = useMemo(() => gradientPresets(palette, brandColors), [palette, brandColors]);
+  const [hex, setHex] = useState(bg);
+  const [hexBad, setHexBad] = useState(false);
+  useEffect(() => { setHex(bg); setHexBad(false); }, [bg]);
+  const covered = (photo.fit ?? "fill") === "fill" && (photo.zoom ?? 1) >= 1;
+  const pick = (c: string, key?: string) => actions.onPhoto({ background: "solid", background_color: c }, key);
+  const showBackground = () => {
+    const patch: Partial<PhotoSettings> = { zoom: 0.85 };
+    if (mode === "blur") Object.assign(patch, { background: "solid", background_color: palette[0] ?? "#1D1D1F" });
+    actions.onPhoto(patch);
+    toast(`Photo ${frameIndex + 1} scaled to 85% so the background shows.`);
+  };
+  const setMode = (m: "solid" | "gradient" | "blur") => {
+    if (m === "solid") actions.onPhoto({ background: "solid", background_color: photo.background_color || palette[0] || "#1D1D1F" });
+    else if (m === "gradient") actions.onPhoto({ background: "gradient", background_gradient: grad ?? presets[0] ?? ["#1D1D1F", "#6E6E73"] });
+    else actions.onPhoto({ background: "blur" });
+  };
+  const group = (label: string, colors: string[], extra?: React.ReactNode) => (
+    <div className="space-y-1.5">
+      <div className="text-[12px] text-ap-muted">{label}</div>
+      <div className="flex flex-wrap items-center gap-2">{colors.map((c) => <Swatch key={c} c={c} active={mode === "solid" && bg === c} onPick={(v) => pick(v)} />)}{extra}</div>
+    </div>
+  );
+  return (
+    <>
+      {covered && (
+        <div role="status" className="rounded-[4px] bg-ap-amber-soft px-3 py-2.5 text-[13px] leading-snug text-ap-amber">
+          The photo covers this whole frame, so the background isn't visible yet.{" "}
+          <button type="button" className="font-semibold text-ap-blue" onClick={showBackground}>Scale photo to 85% to show it</button>
+        </div>
+      )}
+      <Field label="Type">
+        <Segmented value={mode} options={[{ value: "solid", label: "Solid colour" }, { value: "gradient", label: "Gradient" }, { value: "blur", label: "Blurred photo" }]} onChange={setMode} />
+      </Field>
+      {mode === "solid" && (
+        <div className="space-y-3">
+          {palette.length > 0 && group("From this photo", palette)}
+          {brandColors.length > 0 && group(`${brandName} brand colours`, brandColors)}
+          {group("Neutrals", BG_NEUTRALS, <CustomColor onPick={(c) => pick(c, "drag:photo-bg")} />)}
+          <label className="flex items-center gap-2 text-[12px] text-ap-muted">
+            Hex
+            <input
+              aria-label="Hex colour"
+              aria-invalid={hexBad}
+              value={hex}
+              onChange={(e) => {
+                setHex(e.target.value);
+                const n = normalizeHex(e.target.value);
+                setHexBad(!n && e.target.value.trim() !== "");
+                if (n) pick(n, "drag:photo-hex");
+              }}
+              placeholder="#1D1D1F"
+              className={cn("h-8 w-[100px] rounded-[4px] border bg-card px-2 text-[13px] text-ap-ink uppercase nums", hexBad ? "border-destructive" : "border-ap-hairline")}
+            />
+          </label>
+        </div>
+      )}
+      {mode === "gradient" && (
+        <div className="grid grid-cols-3 gap-2">
+          {presets.map(([a, c]) => {
+            const on = grad?.[0] === a && grad?.[1] === c;
+            return (
+              <button key={`${a}${c}`} type="button" aria-pressed={on} aria-label={`Gradient ${a} to ${c}`} onClick={() => actions.onPhoto({ background: "gradient", background_gradient: [a, c] })}
+                className={cn("h-14 rounded-[4px] border border-ap-hairline", on && "ring-2 ring-ap-blue ring-offset-2")} style={{ background: `linear-gradient(160deg, ${a}, ${c})` }} />
+            );
+          })}
+        </div>
+      )}
+      {mode === "blur" && <p className="text-[13px] leading-snug text-ap-muted">A soft, blurred copy of this frame's photo fills the space around it.</p>}
+      <div className="flex items-center justify-between gap-3 border-t border-ap-hairline pt-4">
+        <div className="min-w-0">
+          <div className="text-[13px] font-medium text-ap-ink">Use on every frame</div>
+          <div className="text-[12px] leading-snug text-ap-muted nums">Copies this background to all {frameCount} frames.</div>
+        </div>
+        <Button variant="plain" size="sm" onClick={() => {
+          actions.onPhotoAll?.({ background: mode, background_color: photo.background_color ?? null, background_gradient: grad });
+          toast(`Background applied to all ${frameCount} frames.`, actions.onUndo ? { action: { label: "Undo", onClick: actions.onUndo } } : undefined);
+        }}>Apply to all</Button>
+      </div>
     </>
   );
 }

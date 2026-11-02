@@ -336,12 +336,26 @@ function drawPhoto(
   images?: Map<string, HTMLImageElement>,
 ) {
   const photo = frame.photo ?? {};
-  ctx.fillStyle = photo.background_color || "#2C2C2E";
+  const bgMode = photo.background ?? (photo.background_color ? "solid" : "blur");
+  const grad = bgMode === "gradient" ? photo.background_gradient : null;
+  if (grad && grad.length === 2) {
+    // CSS-style 160° linear gradient across the whole frame.
+    const a = (160 * Math.PI) / 180;
+    const dx = Math.sin(a), dy = -Math.cos(a);
+    const half = (Math.abs(W * dx) + Math.abs(H * dy)) / 2;
+    const g = ctx.createLinearGradient(W / 2 - dx * half, H / 2 - dy * half, W / 2 + dx * half, H / 2 + dy * half);
+    g.addColorStop(0, grad[0]);
+    g.addColorStop(1, grad[1]);
+    ctx.fillStyle = g;
+  } else {
+    ctx.fillStyle = photo.background_color || "#2C2C2E";
+  }
   ctx.fillRect(0, 0, W, H);
   const img = photo.path ? images?.get(photo.path) : undefined;
   if (!img || !img.naturalWidth) return;
-  const bgMode = photo.background ?? (photo.background_color ? "solid" : "blur");
-  if ((photo.fit ?? "fill") === "fit" && bgMode === "blur") drawBlurred(ctx, img, W, H);
+  const userZoom = Math.max(0.5, Number(photo.zoom ?? 1) || 1);
+  const uncovered = (photo.fit ?? "fill") === "fit" || userZoom < 1;
+  if (uncovered && bgMode === "blur") drawBlurred(ctx, img, W, H);
 
   const e = easeInOut(clamp(u));
   const mv = photo.movement ?? "none";
@@ -378,7 +392,7 @@ function drawPhoto(
   const ih = img.naturalHeight;
   const fill = (photo.fit ?? "fill") === "fill";
   const base = fill ? Math.max(W / iw, H / ih) : Math.min(W / iw, H / ih);
-  const sc = base * zoom * (fill ? Math.max(1, photo.zoom ?? 1) : 1);
+  const sc = base * zoom * (fill ? userZoom : 1);
   const dw = iw * sc;
   const dh = ih * sc;
   let x: number;
@@ -386,8 +400,9 @@ function drawPhoto(
   if (fill) {
     const fx = photo.focus?.x ?? 0.5;
     const fy = photo.focus?.y ?? 0.5;
-    x = clamp(W / 2 - fx * dw, W - dw, 0);
-    y = clamp(H / 2 - fy * dh, H - dh, 0);
+    // Scaled below the frame: centre it so the background shows evenly.
+    x = dw < W ? (W - dw) / 2 : clamp(W / 2 - fx * dw, W - dw, 0);
+    y = dh < H ? (H - dh) / 2 : clamp(H / 2 - fy * dh, H - dh, 0);
   } else {
     x = (W - dw) / 2;
     y = (H - dh) / 2;

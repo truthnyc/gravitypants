@@ -787,6 +787,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
         keyframe={keyframe}
         onKeyframe={setKeyframe}
         section={section ?? undefined}
+        onEditBackground={() => { setDrawerOpen(true); setOverride("background"); setAdjusting(false); }}
         onSelect={selectEl}
         actions={actions}
       />
