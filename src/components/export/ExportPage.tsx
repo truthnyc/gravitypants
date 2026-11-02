@@ -5,7 +5,7 @@ import { Link } from "@tanstack/react-router";
 import { KitAgainButton } from "@/components/templates/KitAgain";
 import { TRIAL, planById } from "@/lib/stillframe/plans-config";
 import { getSignupChoice } from "@/lib/stillframe/signup-choice";
-import { AlertCircle, Check, ChevronDown, ChevronLeft, ChevronRight, Code2, Download, Film, Image as ImageIcon, Plus, X } from "lucide-react";
+import { AlertCircle, Check, CircleCheck, ChevronDown, ChevronLeft, ChevronRight, Code2, Download, Film, Image as ImageIcon, Plus, X } from "lucide-react";
 import { AppButton, AppSectionLabel } from "@/components/app-ui";
 import { SHOW_SHARE } from "@/lib/features";
 import { ReelCard } from "@/components/app-ui/StepShell";
@@ -413,7 +413,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
             ))}
           </StageBar>
           <StudioCanvas ratio={ratioOf(previewT)} label={`${previewT.ratio} · ${previewT.width} × ${previewT.height}`}
-            overlay={ready ? <span className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-lg bg-ap-card px-2.5 py-1 text-[12px] font-medium text-ap-green shadow-ap-soft">✓ Exported</span> : undefined}>
+            overlay={ready ? <span className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-lg bg-ap-card px-2.5 py-1 text-[12px] font-medium text-ap-ink shadow-ap-soft inline-flex items-center gap-1.5"><CircleCheck className="size-4 text-ap-blue" strokeWidth={1.7} />Exported</span> : undefined}>
             <ExportStage target={previewT} time={player.time} project={project} frames={frames} brand={brand} images={images} />
           </StudioCanvas>
         </>
@@ -765,7 +765,7 @@ function PreviewPanel(props: ComponentProps<typeof ReelCard>) {
 function PlatformPills({ selected, onChange }: { selected: Set<SizeId>; onChange: (sizes: Set<SizeId>) => void }) {
   return (
           <div className="-mt-2 mb-4 flex flex-wrap items-center gap-2">
-            <span className="mr-1 text-[13px] text-ap-muted">Posting to</span>
+            <span className="mr-1 text-[12px] font-semibold text-ap-muted">Posting to</span>
             {PLATFORMS.map((p) => {
               const st = platformState(p.id, selected);
               return (
