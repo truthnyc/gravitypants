@@ -1,6 +1,6 @@
 # Launch video correction
-- [ ] Replace the launch film’s Aro segment with its corrected reel, preserve the rest of the film, and provide a versioned download.
-- [ ] Update the website video asset and verify the corrected 19-second output.
+- [x] Replace the launch film’s Aro segment with its corrected reel, preserve the rest of the film, and provide a versioned download.
+- [x] Update the website preview video asset; verified corrected AW 26-27 wording, all scenes, 19-second 1080p output and three video schema/sitemap tests. Not published.
 
 # Referral program page
 - [x] Add a public referral guide and link it from the shared Pricing and Help FAQ.
