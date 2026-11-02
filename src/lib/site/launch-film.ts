@@ -8,7 +8,7 @@ export const LAUNCH_FILM: SiteReel = {
   id: "launch-film",
   brand: "Gravity Pants",
   brandSlug: null,
-  title: "Product video maker: turn photos into video",
+  title: "Product video maker, from photos to",
   description: "See how Gravity Pants turns a few product photos into a short, on-brand product video for your store, social and ads, in under 20 seconds.",
   href: null,
   category: "other" as SiteReel["category"],
