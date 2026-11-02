@@ -84,6 +84,7 @@
   --ap-dot-photo: #3b6fd8;
   --ap-dot-text: #6a3fd0;
   --ap-dot-logo: #9a4a1c;
+  --ap-dot-subline: #2f8a4c;
   --ap-gold: #d4a017;
   --ap-switch-off: #d1d1d6;
   --ap-card: #ffffff;
@@ -116,6 +117,7 @@
   --color-ap-dot-photo: var(--ap-dot-photo);
   --color-ap-dot-text: var(--ap-dot-text);
   --color-ap-dot-logo: var(--ap-dot-logo);
+  --color-ap-dot-subline: var(--ap-dot-subline);
   --color-ap-blue-hover: var(--ap-blue-hover);
   --color-ap-badge: var(--ap-badge);
   --color-ap-soft-blue: var(--ap-soft-blue);
