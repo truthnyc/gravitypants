@@ -31,7 +31,7 @@ describe("plans", () => {
   });
   it("HTML5 row: only Business and Team", () => {
     const row = COMPARE.flatMap((g) => g.rows).find((r) => r.label === "HTML5")!;
-    expect(row.cells).toEqual([false, false, false, true, true]);
+    expect(row.cells).toEqual([false, false, true, true]);
   });
   it("Starter prices map to the starter plan", () => {
     expect(PLAN_BY_PRICE.starter_monthly).toBe("starter");
@@ -55,5 +55,9 @@ describe("gates", () => {
     expect(canUseWith(ent("simple"), "html5")).toBe(false);
     expect(canUseWith(ent("business"), "html5")).toBe(true);
     expect(canUseWith(ent("team"), "html5")).toBe(true);
+  });
+  it("Simple is no longer sold but still exists for existing subscribers", () => {
+    expect(SALE_PLANS.map((p) => p.id)).toEqual(["starter", "business", "team"]);
+    expect(planById("simple").monthlyExports).toBe(10);
   });
 });
