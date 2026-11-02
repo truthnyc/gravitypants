@@ -160,7 +160,7 @@ const TR: Record<string, string> = { cut: "Cut", fade: "Fade", slide: "Slide", z
 /** Frame strip for steps other than Edit. Read-only unless onReorder is given. */
 export function FrameStrip({ doc, format, images, version, current, onSelect, onReorder, onAdd, addLabel = "Add photos" }: {
   doc: EditorDoc; format: Format; images: Map<string, HTMLImageElement>; version: number; current?: number;
-  onSelect?: (i: number) => void; onReorder?: (from: number, to: number) => void; onAdd?: () => void; addLabel?: string;
+  onSelect?: (i: number) => void; onReorder?: (from: number, to: number) => void; onAdd?: (() => void) | undefined; addLabel?: string;
 }) {
   const [from, setFrom] = useState<number | null>(null);
   const [over, setOver] = useState<number | null>(null);
@@ -224,7 +224,7 @@ export function StudioPanel({ step, title, tag, children, footer }: { step: Step
 
 /** One layout for Format, Photos, Export and Share (Edit composes the same parts with its rail + drawer). */
 export function StudioShell({ adId, step, title, undo, menu, next, banner, panel, stage, bottom, className }: {
-  adId: string; step: StepKey; title: StepTitleInfo; undo?: UndoControls; menu?: ReactNode; next: ReactNode; banner?: ReactNode;
+  adId: string; step: StepKey; title: StepTitleInfo; undo?: UndoControls | undefined; menu?: ReactNode; next: ReactNode; banner?: ReactNode;
   panel: ReactNode; stage: ReactNode; bottom: ReactNode; className?: string;
 }) {
   const compact = useCompactStudio();
