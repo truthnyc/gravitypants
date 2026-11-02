@@ -1425,7 +1425,7 @@ p.concept-reel-notice { font-size: 10px !important; }
 .ap-flow :is(a, button, [role="radio"], [role="tab"], [tabindex]):focus-visible { outline: none; box-shadow: var(--ap-focus-ring); }
 
 /* How it works › Edit: the editor's side bar + panel. */
-.features-rail-art { display: flex; width: 100%; max-width: 420px; height: 100%; min-height: 320px; background: var(--ap-card); border: 1px solid var(--ap-hairline); border-radius: 12px; overflow: hidden; font-size: 12px; }
+.features-rail-art { display: flex; width: 100%; max-width: 420px; height: auto; align-self: center; background: var(--ap-card); border: 1px solid var(--ap-hairline); border-radius: 12px; overflow: hidden; font-size: 12px; }
 .features-rail { display: flex; flex-direction: column; gap: 4px; width: 72px; padding: 10px 5px; border-right: 1px solid var(--ap-hairline); }
 .features-rail span { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 9px 0; border-radius: 8px; font-size: 10.5px; font-weight: 500; color: var(--ap-muted); }
 .features-rail span.on { background: color-mix(in srgb, var(--ap-dot-text) 10%, transparent); color: var(--ap-dot-text); }
