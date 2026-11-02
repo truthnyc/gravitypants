@@ -146,7 +146,7 @@ function Pricing() {
                 <button aria-expanded={open === i} onClick={() => setOpen(open === i ? null : i)}>
                   <span>{f.q}</span><span className={`pr-pl${open === i ? " open" : ""}`} aria-hidden="true">+</span>
                 </button>
-                {open === i && <p>{f.a}</p>}
+                {open === i && <p>{f.a}{f.href && <><br /><Link to={f.href} className="mt-3 inline-block font-semibold text-site-primary underline underline-offset-4">Read the referral guide →</Link></>}</p>}
               </div>
             ))}
           </div>

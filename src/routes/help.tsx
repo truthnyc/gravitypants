@@ -77,6 +77,7 @@ function HelpPage() {
             <details key={item.q} className="group rounded-[16px] bg-site-panel px-6 py-5">
               <summary className="cursor-pointer list-none text-[17px] font-semibold text-site-ink">{item.q}</summary>
               <p className="mt-3 text-[15px] leading-[1.5] text-site-secondary">{item.a}</p>
+              {item.href && <Link to={item.href} className="mt-3 inline-block text-[15px] font-semibold text-site-primary underline underline-offset-4">Read the referral guide →</Link>}
             </details>
           ))}
         </div>
