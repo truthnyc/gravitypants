@@ -6,6 +6,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Link } from "@tanstack/react-router";
 import { AppButton } from "@/components/app-ui";
 import { AdPills, useMainSizeChange } from "@/components/app-ui/AdPills";
+import { EditToolbar } from "./EditToolbar";
 import { EditCanvas, EditDrawer, EditRail, EditStepStrip, EditTimeline, EditTopBar, useCompactEditor, type RailKey } from "./EditWorkspace";
 import { FORMAT_SIZE } from "@/render/formats";
 import { KitAgainButton } from "@/components/templates/KitAgain";
@@ -98,6 +99,8 @@ function isTyping(target: EventTarget | null) {
 
 const PREVIEW_SHAPES: Format[] = ["9:16", "4:5", "1:1", "5:4", "16:9"];
 
+const DRAWER_KEY = "gp.editDrawer";
+
 export function Editor({ initial, readOnly = false, banner, exportDisabled = false }: { initial: EditorDoc; readOnly?: boolean; banner?: import("react").ReactNode; exportDisabled?: boolean }) {
   const { doc, apply, undo, redo, canUndo, canRedo } = useEditorDoc(initial);
   const compact = useCompactEditor();
@@ -113,8 +116,21 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
     ro.observe(document.body);
     return () => ro.disconnect();
   }, []);
-  const [drawerOpen, setDrawerOpen] = useState(true);
-  useEffect(() => { setDrawerOpen(!compact); }, [compact]);
+  const [drawerOpen, setDrawerOpenRaw] = useState(true);
+  // Open/closed is remembered per browser on wide screens; the phone sheet starts closed.
+  useEffect(() => {
+    if (compact) { setDrawerOpenRaw(false); return; }
+    try { setDrawerOpenRaw(localStorage.getItem(DRAWER_KEY) !== "0"); } catch { setDrawerOpenRaw(true); }
+  }, [compact]);
+  const setDrawerOpen = useCallback((v: boolean | ((o: boolean) => boolean)) => {
+    setDrawerOpenRaw((o) => {
+      const n = typeof v === "function" ? v(o) : v;
+      if (!window.matchMedia("(max-width: 999px)").matches) { try { localStorage.setItem(DRAWER_KEY, n ? "1" : "0"); } catch { /* ignore */ } }
+      return n;
+    });
+  }, []);
+  /** "background" and "none" are drawer-only selections the preview doesn't highlight. */
+  const [override, setOverride] = useState<"background" | "none" | null>(null);
   const status = useAutosave(doc, !readOnly);
 
   const [frameIndex, setFrameIndex] = useState(0);
@@ -675,6 +691,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
         return;
       }
       if (isTyping(e.target) || mod) return;
+      if (e.key === "\\" && !e.altKey) { e.preventDefault(); setDrawerOpen((o) => !o); return; }
       if ((e.target as HTMLElement | null)?.closest('[role="dialog"], [role="menu"], [role="slider"], [role="switch"], [role="radiogroup"]')) return;
       if (e.altKey && (e.key === "ArrowUp" || e.key === "ArrowDown")) {
         if (selected === "headline" || selected === "subline") {
@@ -728,12 +745,23 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
   const elsewhere = PREVIEW_SHAPES.filter((f) => f !== format && formatIssues(f).length);
 
 
-  const rail: RailKey = selected === "logo" ? "logo" : selected === "headline" || selected === "subline" ? "text" : "photo";
-  const pickRail = (k: RailKey) => {
-    if (k === rail && drawerOpen) { if (compact) setDrawerOpen(false); return; }
-    setDrawerOpen(true);
-    if (k !== rail) { setSelected(k === "text" ? "headline" : k); if (k !== "photo") setAdjusting(false); }
+  const section: RailKey | null = override === "background" ? "background" : override === "none" ? null
+    : selected === "photo" || selected === "headline" || selected === "subline" || selected === "logo" ? selected : null;
+  const selectEl = (el: ElementKey) => {
+    setOverride(null);
+    setSelected(el);
+    if (el !== "photo") setAdjusting(false);
+    if (el === "photo" || el === "headline" || el === "subline" || el === "logo") setDrawerOpen(true);
   };
+  const pickRail = (k: RailKey) => {
+    if (k === section && drawerOpen) { setDrawerOpen(false); return; }
+    setDrawerOpen(true);
+    if (k === "background") { setOverride("background"); setAdjusting(false); }
+    else selectEl(k);
+  };
+  const clearSelection = () => { setOverride("none"); setAdjusting(false); setKeyframe(null); };
+  const ownStyle = { headline: frame?.headline?.same_on_all === false, subline: frame?.subline?.same_on_all === false };
+  const eyebrow = section === "logo" ? "Whole video" : `Frame ${idx + 1} of ${frames.length}`;
   const px = FORMAT_SIZE[format];
   const frameStart = frameStarts(frames)[idx] ?? 0;
   const progress = playing && frames[idx] ? (time - frameStart) / (frames[idx]!.duration_sec || 1) : null;
@@ -758,10 +786,8 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
         image={frame?.photo?.path ? images.get(frame.photo.path) : undefined}
         keyframe={keyframe}
         onKeyframe={setKeyframe}
-        onSelect={(el) => {
-          setSelected(el);
-          if (el !== "photo") setAdjusting(false);
-        }}
+        section={section ?? undefined}
+        onSelect={selectEl}
         actions={actions}
       />
     </div>
@@ -836,8 +862,8 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
         }}
       />
       <div className={cn("flex min-h-0 flex-1", compact && "flex-col")}>
-        {!compact && <EditRail value={rail} onChange={pickRail} open={drawerOpen} onToggle={() => setDrawerOpen((v) => !v)} compact={false} />}
-        {!compact && <EditDrawer open={drawerOpen} compact={false} onClose={() => setDrawerOpen(false)} title={rail}>{inspector}</EditDrawer>}
+        {!compact && <EditRail value={section} onChange={pickRail} open={drawerOpen} onToggle={() => setDrawerOpen((v) => !v)} compact={false} ownStyle={ownStyle} />}
+        {!compact && <EditDrawer open={drawerOpen} compact={false} onClose={() => setDrawerOpen(false)} section={section} eyebrow={eyebrow}>{inspector}</EditDrawer>}
         <section aria-label="Preview" className="relative flex min-h-0 min-w-0 flex-1 flex-col bg-ap-card">
           <div className="flex h-[52px] shrink-0 items-center gap-3 px-3 md:px-4">
             <span className="hidden shrink-0 whitespace-nowrap text-[12px] font-semibold tracking-[0.08em] text-ap-muted uppercase md:inline">Preview as</span>
@@ -856,7 +882,9 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
                 ),
               }))}
             />
-            <div className="flex-1" data-slot="stage-toolbar" />
+            <div className="flex min-w-0 flex-1 justify-center">
+              <EditToolbar section={section} frame={frame} frameIndex={idx} logo={displayDoc.project.logo} hasLogo={Boolean(doc.project.logo.path || doc.project.logo.light_path || doc.project.logo.dark_path)} actions={actions} onOpen={() => setDrawerOpen(true)} />
+            </div>
             {format === "9:16" && (
               <button type="button" aria-pressed={safeZones} onClick={() => setSafeZones((v) => !v)} title="Reels / TikTok safe zones"
                 className={cn("h-8 min-h-0 shrink-0 whitespace-nowrap rounded-lg border px-3 text-[12px] font-medium", safeZones ? "border-ap-blue bg-ap-soft-blue text-ap-blue" : "border-ap-hairline text-ap-muted hover:text-ap-ink")}>
@@ -865,7 +893,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
             )}
           </div>
           <div className="flex min-h-0 flex-1 flex-col px-3 pb-3 md:px-4 md:pb-4">
-            <EditCanvas ratio={FORMAT_RATIO[format]} label={`${format} · ${px.width} × ${px.height}`} notice={notice}>
+            <EditCanvas ratio={FORMAT_RATIO[format]} label={`${format} · ${px.width} × ${px.height}`} notice={notice} onEmptyClick={clearSelection}>
               <div className={cn("h-full w-full", readOnly && "pointer-events-none select-none")}>
                 <Stage
                   doc={stageDoc}
@@ -875,10 +903,10 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
                   aspect={FORMAT_RATIO[format]}
                   time={time}
                   playing={playing}
-                  selected={selected}
+                  selected={override ? "timing" : selected}
                   images={images}
                   version={version}
-                  onSelect={setSelected}
+                  onSelect={selectEl}
                   onMove={moveElement}
                   onText={setText}
                   adjusting={(adjusting || Boolean(keyframe)) && selected === "photo"}
@@ -897,7 +925,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
               </div>
             </EditCanvas>
           </div>
-          {compact && <EditDrawer open={drawerOpen} compact onClose={() => setDrawerOpen(false)} title={rail === "photo" ? "Photo" : rail === "text" ? "Text" : "Logo"}>{inspector}</EditDrawer>}
+          {compact && <EditDrawer open={drawerOpen} compact onClose={() => setDrawerOpen(false)} section={section} eyebrow={eyebrow}>{inspector}</EditDrawer>}
         </section>
       </div>
       <EditTimeline playing={playing} onTogglePlay={togglePlay} time={time} total={total} frames={frames.length}>
@@ -925,7 +953,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
           />
         </div>
       </EditTimeline>
-      {compact && <EditRail value={rail} onChange={pickRail} open={drawerOpen} onToggle={() => setDrawerOpen((v) => !v)} compact />}
+      {compact && <EditRail value={drawerOpen ? section : null} onChange={pickRail} open={drawerOpen} onToggle={() => setDrawerOpen((v) => !v)} compact ownStyle={ownStyle} />}
     </div>
   );
 }

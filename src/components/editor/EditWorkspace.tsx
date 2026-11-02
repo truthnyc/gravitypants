@@ -1,16 +1,20 @@
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import { ChevronLeft, ChevronRight, Image as ImageIcon, MoreHorizontal, PanelLeftClose, PanelLeftOpen, Pause, Play, Redo2, Stamp, Type, Undo2, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Image as ImageIcon, MoreHorizontal, PaintBucket, PanelLeftClose, PanelLeftOpen, Pause, Play, Redo2, Shapes, TextQuote, Type, Undo2, X } from "lucide-react";
+import type { InspectorSection } from "./Inspector";
+import { SECTION_DOT, SECTION_LABEL } from "./EditToolbar";
 import { AdName, STEPS, StepBar, type StepTitleInfo } from "@/components/app-ui/StepShell";
 import { HelpMenu } from "@/components/stillframe/HelpMenu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
-export type RailKey = "photo" | "text" | "logo";
-const RAIL: { key: RailKey; label: string; icon: typeof ImageIcon }[] = [
-  { key: "photo", label: "Photo", icon: ImageIcon },
-  { key: "text", label: "Text", icon: Type },
-  { key: "logo", label: "Logo", icon: Stamp },
+export type RailKey = InspectorSection;
+const RAIL: { key: RailKey; icon: typeof ImageIcon }[] = [
+  { key: "background", icon: PaintBucket },
+  { key: "photo", icon: ImageIcon },
+  { key: "headline", icon: Type },
+  { key: "subline", icon: TextQuote },
+  { key: "logo", icon: Shapes },
 ];
 
 /** True below 1000px wide, where the drawer becomes a bottom sheet. */
@@ -69,20 +73,22 @@ export function EditStepStrip({ adId }: { adId: string }) {
   );
 }
 
-export function EditRail({ value, onChange, open, onToggle, compact }: { value: RailKey; onChange: (k: RailKey) => void; open: boolean; onToggle: () => void; compact: boolean }) {
+export function EditRail({ value, onChange, open, onToggle, compact, ownStyle }: { value: RailKey | null; onChange: (k: RailKey) => void; open: boolean; onToggle: () => void; compact: boolean; ownStyle: { headline: boolean; subline: boolean } }) {
   return (
     <nav aria-label="Edit panels" className={cn("flex shrink-0 bg-ap-card", compact ? "h-14 flex-row justify-around border-t border-ap-hairline" : "w-[76px] flex-col items-center gap-1 border-r border-ap-hairline py-3")}>
-      {RAIL.map(({ key, label, icon: Icon }) => {
-        const on = value === key && open;
+      {RAIL.map(({ key, icon: Icon }) => {
+        const on = value === key;
+        const own = (key === "headline" && ownStyle.headline) || (key === "subline" && ownStyle.subline);
         return (
           <button key={key} type="button" aria-pressed={on} onClick={() => onChange(key)}
-            className={cn("flex min-h-0 min-w-0 flex-col items-center justify-center gap-1 rounded-lg text-[11px] font-medium", compact ? "flex-1" : "h-[60px] w-[60px]", on ? "bg-ap-soft-blue text-ap-blue" : "text-ap-muted hover:bg-ap-panel hover:text-ap-ink")}>
-            <Icon className="size-5" strokeWidth={1.7} />{label}
+            className={cn("relative flex min-h-0 min-w-0 flex-col items-center justify-center gap-1 rounded-lg text-[11px] font-medium", compact ? "flex-1" : "h-[62px] w-[62px]", on ? "bg-ap-soft-blue text-ap-blue" : "text-ap-muted hover:bg-ap-panel hover:text-ap-ink")}>
+            <Icon className="size-5" strokeWidth={1.7} />{SECTION_LABEL[key]}
+            {own && <span aria-label="This frame has its own style" className={cn("absolute top-2 right-2.5 size-1.5 rounded-full", SECTION_DOT[key])} />}
           </button>
         );
       })}
       {!compact && (
-        <button type="button" onClick={onToggle} aria-label={open ? "Hide settings" : "Show settings"} className="mt-auto grid size-10 min-h-0 min-w-0 place-items-center rounded-lg text-ap-muted hover:bg-ap-panel hover:text-ap-ink">
+        <button type="button" onClick={onToggle} aria-label={open ? "Hide panel" : "Show panel"} title={`${open ? "Hide panel" : "Show panel"} (\\)`} className="mt-auto grid size-10 min-h-0 min-w-0 place-items-center rounded-lg text-ap-muted hover:bg-ap-panel hover:text-ap-ink">
           {open ? <PanelLeftClose className="size-[18px]" strokeWidth={1.7} /> : <PanelLeftOpen className="size-[18px]" strokeWidth={1.7} />}
         </button>
       )}
@@ -90,28 +96,56 @@ export function EditRail({ value, onChange, open, onToggle, compact }: { value: 
   );
 }
 
-export function EditDrawer({ open, compact, onClose, title, children }: { open: boolean; compact: boolean; onClose: () => void; title: string; children: ReactNode }) {
+function DrawerHead({ section, eyebrow, onClose, closeIcon }: { section: RailKey | null; eyebrow: string; onClose: () => void; closeIcon: ReactNode }) {
+  return (
+    <div className="flex h-[60px] shrink-0 items-center justify-between gap-2 border-b border-ap-hairline px-5">
+      <div className="min-w-0">
+        <div className="text-[11px] font-semibold tracking-[0.08em] text-ap-muted uppercase nums">{eyebrow}</div>
+        <div className="flex items-center gap-2 text-[15px] font-semibold text-ap-ink">
+          {section && <span aria-hidden className={cn("size-2.5 rounded-full", SECTION_DOT[section])} />}
+          {section ? SECTION_LABEL[section] : "Nothing selected"}
+        </div>
+      </div>
+      <button type="button" onClick={onClose} aria-label="Hide panel" className="grid size-9 min-h-0 min-w-0 place-items-center rounded-lg text-ap-muted hover:bg-ap-panel hover:text-ap-ink">{closeIcon}</button>
+    </div>
+  );
+}
+
+export function EditDrawer({ open, compact, onClose, section, eyebrow, children }: { open: boolean; compact: boolean; onClose: () => void; section: RailKey | null; eyebrow: string; children: ReactNode }) {
+  // Each panel keeps its own scroll position.
+  const scroll = useRef<HTMLDivElement>(null);
+  const saved = useRef<Record<string, number>>({});
+  const key = section ?? "none";
+  useLayoutEffect(() => {
+    const el = scroll.current;
+    if (el) el.scrollTop = saved.current[key] ?? 0;
+  }, [key, open]);
+  const body = (
+    <div ref={scroll} onScroll={(e) => { saved.current[key] = e.currentTarget.scrollTop; }} className={cn("min-h-0 flex-1 overflow-y-auto", compact ? "px-4 pt-3 pb-5" : "px-5 pt-4 pb-8")}>
+      {section ? children : <p className="text-[13px] text-ap-muted">Click anything on the preview, or pick an item on the left, to edit it.</p>}
+    </div>
+  );
   if (compact) {
     if (!open) return null;
     return (
-      <div role="dialog" aria-label={`${title} settings`} className="absolute inset-x-0 bottom-0 z-30 flex max-h-[60%] flex-col rounded-t-[12px] border-t border-ap-hairline bg-ap-card shadow-ap-soft">
-        <div className="flex shrink-0 items-center justify-between px-4 pt-3 pb-1">
-          <span className="text-[13px] font-semibold text-ap-ink">{title}</span>
-          <button type="button" onClick={onClose} aria-label="Close settings" className="grid size-9 min-h-0 min-w-0 place-items-center rounded-lg text-ap-muted hover:bg-ap-panel"><X className="size-[18px]" strokeWidth={1.7} /></button>
-        </div>
-        <div className="min-h-0 overflow-y-auto px-4 pb-5">{children}</div>
+      <div role="dialog" aria-label="Settings" className="absolute inset-x-0 bottom-0 z-30 flex max-h-[60%] flex-col rounded-t-[12px] border-t border-ap-hairline bg-ap-card shadow-ap-soft">
+        <DrawerHead section={section} eyebrow={eyebrow} onClose={onClose} closeIcon={<X className="size-[18px]" strokeWidth={1.7} />} />
+        {body}
       </div>
     );
   }
   return (
     <aside aria-label="Settings" aria-hidden={!open} className={cn("shrink-0 overflow-hidden border-ap-hairline bg-ap-card transition-[width] duration-[280ms] ease-out motion-reduce:transition-none", open ? "w-[352px] border-r" : "w-0")}>
-      <div className="h-full w-[352px] overflow-y-auto px-5 pt-4 pb-8" inert={!open || undefined}>{children}</div>
+      <div className="flex h-full w-[352px] flex-col" inert={!open || undefined}>
+        <DrawerHead section={section} eyebrow={eyebrow} onClose={onClose} closeIcon={<ChevronLeft className="size-[18px]" strokeWidth={1.7} />} />
+        {body}
+      </div>
     </aside>
   );
 }
 
 /** Canvas area: grey dot-grid panel; the preview is the largest box of the ratio that fits, centred, gliding on resize. */
-export function EditCanvas({ ratio, label, children, notice }: { ratio: number; label: string; children: ReactNode; notice?: ReactNode }) {
+export function EditCanvas({ ratio, label, children, notice, onEmptyClick }: { ratio: number; label: string; children: ReactNode; notice?: ReactNode; onEmptyClick?: () => void }) {
   const ref = useRef<HTMLDivElement>(null);
   const [box, setBox] = useState({ w: 0, h: 0 });
   useLayoutEffect(() => {
@@ -131,7 +165,7 @@ export function EditCanvas({ ratio, label, children, notice }: { ratio: number; 
   return (
     <div ref={ref} className="ap-dot-grid relative min-h-0 flex-1 overflow-hidden rounded-[4px]">
       {notice && <div className="absolute inset-x-3 top-3 z-10 flex flex-col items-center gap-2">{notice}</div>}
-      <div className="absolute inset-0 grid place-items-center">
+      <div className="absolute inset-0 grid place-items-center" onPointerDown={(e) => { if (e.target === e.currentTarget) onEmptyClick?.(); }}>
         <div style={{ width: box.w, height: box.h }} className="transition-[width,height] duration-[280ms] ease-out motion-reduce:transition-none">{box.w > 0 && children}</div>
       </div>
       <span className="pointer-events-none absolute bottom-2.5 left-3 text-[12px] text-ap-muted nums">{label}</span>
