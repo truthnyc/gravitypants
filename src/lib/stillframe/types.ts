@@ -55,8 +55,10 @@ export type PhotoSettings = {
   pan_y?: number;
   brightness?: number;
   background_color?: string | null;
-  /** What shows around a Fit photo; defaults to blur unless a colour was set. */
-  background?: "blur" | "solid";
+  /** What shows wherever the photo doesn't cover the frame; defaults to blur unless a colour was set. */
+  background?: "blur" | "solid" | "gradient";
+  /** Two-stop 160° gradient used when background is "gradient". */
+  background_gradient?: [string, string] | null;
   /** Friendly photo name from the uploaded file. */
   name?: string | null;
 };
