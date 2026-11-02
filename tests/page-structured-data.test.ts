@@ -4,8 +4,8 @@ import { PAGE_METADATA, pageStructuredData } from "@/lib/site/page-metadata";
 const origin = "https://gravitypants.com";
 
 describe("public page structured-data identities", () => {
-  it("describes the software rather than clothing products on all 37 pages", () => {
-    expect(Object.keys(PAGE_METADATA)).toHaveLength(37);
+  it("describes the software rather than clothing products on all 38 pages", () => {
+    expect(Object.keys(PAGE_METADATA)).toHaveLength(38);
     for (const [path, metadata] of Object.entries(PAGE_METADATA)) {
       const schema = pageStructuredData(path, metadata, origin);
       expect(schema.url).toBe(`${origin}${path}`);

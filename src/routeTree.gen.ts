@@ -29,6 +29,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ProductRouteImport } from './routes/product'
 import { Route as ProductCategoryRouteImport } from './routes/product-category'
 import { Route as ProductVideoMakerRouteImport } from './routes/product-video-maker'
+import { Route as ReferralsRouteImport } from './routes/referrals'
 import { Route as ResetRouteImport } from './routes/reset'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as ShopifyRouteImport } from './routes/shopify'
@@ -224,6 +225,11 @@ const ProductCategoryRoute = ProductCategoryRouteImport.update({
 const ProductVideoMakerRoute = ProductVideoMakerRouteImport.update({
   id: '/product-video-maker',
   path: '/product-video-maker',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReferralsRoute = ReferralsRouteImport.update({
+  id: '/referrals',
+  path: '/referrals',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetRoute = ResetRouteImport.update({
@@ -762,6 +768,7 @@ export interface FileRoutesByFullPath {
   '/product': typeof ProductRouteWithChildren
   '/product-category': typeof ProductCategoryRouteWithChildren
   '/product-video-maker': typeof ProductVideoMakerRoute
+  '/referrals': typeof ReferralsRoute
   '/reset': typeof ResetRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/shopify': typeof ShopifyRoute
@@ -878,6 +885,7 @@ export interface FileRoutesByTo {
   '/product': typeof ProductRouteWithChildren
   '/product-category': typeof ProductCategoryRouteWithChildren
   '/product-video-maker': typeof ProductVideoMakerRoute
+  '/referrals': typeof ReferralsRoute
   '/reset': typeof ResetRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/shopify': typeof ShopifyRoute
@@ -995,6 +1003,7 @@ export interface FileRoutesById {
   '/product': typeof ProductRouteWithChildren
   '/product-category': typeof ProductCategoryRouteWithChildren
   '/product-video-maker': typeof ProductVideoMakerRoute
+  '/referrals': typeof ReferralsRoute
   '/reset': typeof ResetRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/shopify': typeof ShopifyRoute
@@ -1114,6 +1123,7 @@ export interface FileRouteTypes {
     | '/product'
     | '/product-category'
     | '/product-video-maker'
+    | '/referrals'
     | '/reset'
     | '/robots.txt'
     | '/shopify'
@@ -1230,6 +1240,7 @@ export interface FileRouteTypes {
     | '/product'
     | '/product-category'
     | '/product-video-maker'
+    | '/referrals'
     | '/reset'
     | '/robots.txt'
     | '/shopify'
@@ -1346,6 +1357,7 @@ export interface FileRouteTypes {
     | '/product'
     | '/product-category'
     | '/product-video-maker'
+    | '/referrals'
     | '/reset'
     | '/robots.txt'
     | '/shopify'
@@ -1465,6 +1477,7 @@ export interface RootRouteChildren {
   ProductRoute: typeof ProductRouteWithChildren
   ProductCategoryRoute: typeof ProductCategoryRouteWithChildren
   ProductVideoMakerRoute: typeof ProductVideoMakerRoute
+  ReferralsRoute: typeof ReferralsRoute
   ResetRoute: typeof ResetRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   ShopifyRoute: typeof ShopifyRoute
@@ -1650,6 +1663,13 @@ declare module '@tanstack/react-router' {
       path: '/product-video-maker'
       fullPath: '/product-video-maker'
       preLoaderRoute: typeof ProductVideoMakerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/referrals': {
+      id: '/referrals'
+      path: '/referrals'
+      fullPath: '/referrals'
+      preLoaderRoute: typeof ReferralsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset': {
@@ -2540,6 +2560,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProductRoute: ProductRouteWithChildren,
   ProductCategoryRoute: ProductCategoryRouteWithChildren,
   ProductVideoMakerRoute: ProductVideoMakerRoute,
+  ReferralsRoute: ReferralsRoute,
   ResetRoute: ResetRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   ShopifyRoute: ShopifyRoute,
