@@ -44,6 +44,11 @@ export type PhotoSettings = {
   focus?: { x: number; y: number };
   /** extra crop zoom for Fill, 1..3 */
   zoom?: number;
+  /** photo scale in percent, 50..200 (replaces zoom) */
+  scale?: number;
+  /** photo centre offset from frame centre, % of frame width / height, -60..60 (replaces focus) */
+  offset_x?: number;
+  offset_y?: number;
   movement?: "none" | "slow_zoom_in" | "slow_zoom_out" | "pan_left" | "pan_right" | "pan_up" | "pan_down" | "custom";
   /** how much the preset movement travels */
   movement_intensity?: "subtle" | "standard" | "dramatic";
