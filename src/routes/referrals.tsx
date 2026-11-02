@@ -57,7 +57,7 @@ function ReferralPage() {
             <p>One credit covers one reel export, even if you choose several sizes or both MP4 and GIF. It doesn’t unlock paid-only features: HTML5 remains on Business and Team.</p>
           </div>
           <figure className="mt-8 overflow-hidden rounded-sm border border-site-hairline">
-            <img src={exportScreenshot.url} alt="Gravity Pants Export screen with a reel preview, export sizes and MP4 and GIF choices." width={1132} height={820} loading="lazy" className="block h-auto w-full" />
+            <img src={exportScreenshot.url} alt="Gravity Pants Export screen with a reel preview, export sizes and MP4 and GIF choices." width={1440} height={870} loading="lazy" className="block h-auto w-full" />
           </figure>
           <p className="mt-4 text-[14px] leading-relaxed text-site-secondary">Finished files are in Previous exports and remain available to download for 30 days.</p>
         </section>
