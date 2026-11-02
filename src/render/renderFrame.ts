@@ -355,7 +355,8 @@ function drawPhoto(
   const img = photo.path ? images?.get(photo.path) : undefined;
   if (!img || !img.naturalWidth) return;
   const userZoom = photoScale(photo) / 100;
-  const uncovered = (photo.fit ?? "fill") === "fit" || userZoom < 1;
+  const o0 = photoOffset(photo);
+  const uncovered = (photo.fit ?? "fill") === "fit" || userZoom < 1 || o0.x !== 0 || o0.y !== 0;
   if (uncovered && bgMode === "blur") drawBlurred(ctx, img, W, H);
 
   const e = easeInOut(clamp(u));
