@@ -653,7 +653,7 @@ function PhotoPanel({
               </Button>
             </div>
           </Reveal>
-      <Collapse label="Look: brightness ›" open={adjust} onToggle={() => setAdjust((v) => !v)}>
+      <Collapse label="Look: brightness" open={adjust} onToggle={() => setAdjust((v) => !v)}>
         <Field label="Brightness" value={brightness > 0 ? `+${brightness}` : brightness}>
           <ElementSlider
             name="Brightness"
