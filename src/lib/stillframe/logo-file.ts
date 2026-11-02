@@ -7,8 +7,8 @@ export const LOGO_MAX_BYTES = 5 * 1024 * 1024;
 /** Returns an error message, or null when the file may be uploaded. */
 export function logoFileError(file: { type: string; size: number; name: string }): string | null {
   const typeOk = LOGO_TYPES.includes(file.type) || /\.(png|svg|jpe?g|webp)$/i.test(file.name);
-  if (!typeOk) return "Use a PNG, SVG, JPG or WebP file.";
-  if (file.size > LOGO_MAX_BYTES) return "That file is over 5 MB. Try a smaller one.";
+  if (!typeOk) return "That file type isn't supported. Use a PNG, SVG, JPG or WebP.";
+  if (file.size > LOGO_MAX_BYTES) return "That file is over 5 MB. Try a smaller PNG or SVG.";
   return null;
 }
 

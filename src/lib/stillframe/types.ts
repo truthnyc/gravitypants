@@ -18,6 +18,11 @@ export type LogoSettings = {
   path?: string | null;
   light_path?: string | null;
   dark_path?: string | null;
+  /** This ad's own logo files (replaced in the editor); effective logo = override ?? brand kit logo. */
+  override_light_path?: string | null;
+  override_dark_path?: string | null;
+  /** File name of the last logo uploaded in the editor. */
+  file_name?: string | null;
   version?: "auto" | "light" | "dark";
   size_pct?: number;
   opacity?: "solid" | "soft";

@@ -85,7 +85,7 @@ export type InspectorActions = {
   onSameTransition: (on: boolean) => void;
   onReplacePhoto: () => void;
   onAdjust: () => void;
-  onAddLogo: (file: File, variant: "light" | "dark" | "auto") => void;
+  onAddLogo: (file: File, variant: "light" | "dark" | "auto", saveToKit?: boolean) => void;
   /** Builds the missing logo version from the other one. */
   onMakeLogo?: (variant: "light" | "dark") => void;
   /** Live font preview on the frame while browsing the picker; null restores. */

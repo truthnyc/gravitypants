@@ -11,7 +11,7 @@ import { EditToolbar } from "./EditToolbar";
 import { EditCanvas, EditDrawer, EditRail, EditStepStrip, EditTimeline, EditTopBar, useCompactEditor, type RailKey } from "./EditWorkspace";
 import { FORMAT_SIZE } from "@/render/formats";
 import { KitAgainButton } from "@/components/templates/KitAgain";
-import { effectiveKit, framePayloadFromPhoto, useBrandKit, useBrandKits, useTemplateName, type EditorDoc } from "@/lib/stillframe/data";
+import { effectiveKit, framePayloadFromPhoto, useBrandKit, useBrandKits, useSaveBrandKit, useTemplateName, type EditorDoc } from "@/lib/stillframe/data";
 import type { NamedBrandKit } from "@/lib/stillframe/types";
 import { ACCEPTED_IMAGE_TYPES, uploadMedia } from "@/lib/stillframe/media";
 import { registerCustomFonts } from "@/lib/stillframe/fonts";
@@ -171,6 +171,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
   const replaceFormat = useRef<Format>(format);
   const { data: settings } = useBrandKit();
   const { data: kits } = useBrandKits();
+  const saveKit = useSaveBrandKit();
   const templateName = useTemplateName(initial.project.template_id);
   const named = kits?.find((k) => k.id === doc.project.brand_kit_id) ?? null;
   const kit = useMemo(() => (settings ? effectiveKit(settings, named) : settings), [settings, named]);
@@ -184,6 +185,9 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
         const logo = {
           ...d.project.logo,
           ...(hasLogo ? { path: k.logo_url ?? k.logo_dark_url, dark_path: k.logo_url ?? null, light_path: k.logo_dark_url ?? null } : {}),
+          // The ad's own replaced logo wins over the kit's.
+          ...(d.project.logo.override_dark_path ? { dark_path: d.project.logo.override_dark_path, path: d.project.logo.override_dark_path } : {}),
+          ...(d.project.logo.override_light_path ? { light_path: d.project.logo.override_light_path, ...(d.project.logo.override_dark_path || hasLogo ? {} : { path: d.project.logo.override_light_path }) } : {}),
           kit_stamp: k.updated_at,
         };
         const font = (t: TextSettings | null, family: string | null) => (t && family ? { ...t, font_family: family } : t);
@@ -532,17 +536,27 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
     }
   };
 
-  const addLogo = async (raw: File, wanted: "light" | "dark" | "auto") => {
+  const addLogo = async (raw: File, wanted: "light" | "dark" | "auto", saveToKit = false) => {
     try {
-      const { prepareLogo } = await import("@/lib/stillframe/logo-file");
+      const { prepareLogo, logoFileError } = await import("@/lib/stillframe/logo-file");
+      const bad = logoFileError(raw);
+      if (bad) { toast.error(bad); return; }
       const prep = await prepareLogo(raw);
       const variant = wanted === "auto" ? (prep.light ? "light" : "dark") : wanted;
       if (prep.warning) toast.warning(prep.warning);
       const up = await uploadMedia(prep.file, "logo");
       updateLogo(variant === "light"
-        ? { path: displayDoc.project.logo.path ?? up.path, light_path: up.path }
-        : { path: displayDoc.project.logo.path ?? up.path, dark_path: up.path });
-      toast(wanted === "auto" ? `Added as your ${variant === "light" ? "Light logo (for dark photos)" : "Dark logo (for light photos)"}` : `${variant === "light" ? "Light" : "Dark"} logo added`);
+        ? { path: displayDoc.project.logo.path ?? up.path, light_path: up.path, override_light_path: up.path, file_name: raw.name }
+        : { path: up.path, dark_path: up.path, override_dark_path: up.path, file_name: raw.name });
+      if (saveToKit && named) {
+        await saveKit.mutateAsync({ id: named.id, draft: {
+          name: named.name, colors: named.colors, headline_font: named.headline_font, subline_font: named.subline_font,
+          logo_url: variant === "dark" ? up.path : named.logo_url, logo_dark_url: variant === "light" ? up.path : named.logo_dark_url,
+        } });
+        toast("Logo replaced on this video and saved to your Brand Kit.");
+      } else {
+        toast("Logo replaced on this video. Your Brand Kit is unchanged.");
+      }
     } catch {
       toast.error("That logo couldn't be uploaded. Try again.");
     }
@@ -675,7 +689,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
       setSelected("photo");
       setAdjusting((a) => !a);
     },
-    onAddLogo: (file, variant) => void addLogo(file, variant),
+    onAddLogo: (file, variant, saveToKit) => void addLogo(file, variant, saveToKit),
   };
 
   const actionsForFrame = (i: number): InspectorActions => ({
