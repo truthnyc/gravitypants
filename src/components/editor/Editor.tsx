@@ -868,7 +868,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
         menu={
           <>
             <div className="space-y-1.5">
-              <p className="text-[12px] font-semibold tracking-[0.08em] text-ap-muted uppercase">Brand kit · Format</p>
+              <p className="text-[12px] font-semibold text-ap-badge">Brand kit · Format</p>
               <AdPills doc={doc} set={(next) => { setFormat(null); apply(() => next); }} onKit={(id) => actions.onKit(id)} readOnly={readOnly} />
             </div>
             {!readOnly && (
@@ -899,7 +899,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
         {!compact && <EditDrawer open={drawerOpen} compact={false} onClose={() => setDrawerOpen(false)} section={section} eyebrow={eyebrow}>{inspector}</EditDrawer>}
         <section aria-label="Preview" className="relative flex min-h-0 min-w-0 flex-1 flex-col bg-ap-card">
           <div className="flex h-[52px] shrink-0 items-center gap-3 px-3 md:px-4">
-            <span className="hidden shrink-0 whitespace-nowrap text-[12px] font-semibold tracking-[0.08em] text-ap-muted uppercase md:inline">Preview as</span>
+            <span className="hidden shrink-0 whitespace-nowrap text-[12px] font-semibold text-ap-badge md:inline">Preview as</span>
             <AppSegmented
               className="grid w-full max-w-[340px] grid-cols-5"
               value={format}
@@ -920,7 +920,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
             </div>
             {format === "9:16" && (
               <button type="button" aria-pressed={safeZones} onClick={() => setSafeZones((v) => !v)} title="Reels / TikTok safe zones"
-                className={cn("h-8 min-h-0 shrink-0 whitespace-nowrap rounded-lg border px-3 text-[12px] font-medium", safeZones ? "border-ap-blue bg-ap-soft-blue text-ap-blue" : "border-ap-hairline text-ap-muted hover:text-ap-ink")}>
+                className={cn("h-8 min-h-0 shrink-0 whitespace-nowrap rounded-full border px-3 text-[12px] font-medium", safeZones ? "border-ap-blue bg-ap-soft-blue text-ap-blue" : "border-ap-hairline text-ap-muted hover:text-ap-ink")}>
                 Safe zones
               </button>
             )}

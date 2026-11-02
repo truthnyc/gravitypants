@@ -122,14 +122,14 @@ export function StudioCanvas({ ratio, label, children, notice, overlay, onEmptyC
 export function StageBar({ label, children }: { label?: string; children?: ReactNode }) {
   return (
     <div className="flex h-[52px] shrink-0 items-center gap-3 overflow-x-auto">
-      {label && <span className="shrink-0 text-[11px] font-semibold tracking-[0.08em] text-ap-muted uppercase">{label}</span>}
+      {label && <span className="shrink-0 text-[12px] font-semibold text-ap-badge">{label}</span>}
       {children}
     </div>
   );
 }
 
 export function StageChip({ on, onClick, children }: { on?: boolean; onClick?: () => void; children: ReactNode }) {
-  const cls = cn("inline-flex h-8 shrink-0 items-center gap-1.5 rounded-lg px-3 text-[13px] font-medium nums", on ? "bg-ap-card text-ap-ink shadow-ap-soft ring-1 ring-ap-blue" : "bg-ap-panel text-ap-body");
+  const cls = cn("inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full px-3 text-[13px] font-medium nums outline-hidden focus-visible:shadow-ap-focus", on ? "bg-ap-soft-blue text-ap-blue" : "bg-ap-panel text-ap-body");
   return onClick ? <button type="button" aria-pressed={on} onClick={onClick} className={cn(cls, !on && "hover:text-ap-ink")}>{children}</button> : <span className={cls}>{children}</span>;
 }
 
@@ -168,7 +168,7 @@ export function FrameStrip({ doc, format, images, version, current, onSelect, on
     <nav aria-label="Frames" className="-mx-1 flex items-start gap-2 overflow-x-auto px-1 pt-1 pb-2">
       {doc.frames.map((f, i) => (
         <div key={f.id} className="flex shrink-0 items-start gap-2">
-          {i > 0 && <span className="mt-5 text-[10px] font-medium text-ap-muted">{TR[f.transition_in?.type ?? "cut"] ?? "Cut"}</span>}
+          {i > 0 && <span className="mt-6 rounded-full bg-ap-panel px-2 py-0.5 text-[10px] font-medium text-ap-body">{TR[f.transition_in?.type ?? "cut"] ?? "Cut"}</span>}
           <div className="flex w-16 flex-col items-center">
             <button
               type="button"
@@ -213,8 +213,8 @@ export function StudioPanel({ step, title, tag, children, footer }: { step: Step
   return (
     <>
       <div className="flex h-[60px] shrink-0 flex-col justify-center border-b border-ap-hairline px-6">
-        <div className="text-[11px] font-semibold tracking-[0.08em] text-ap-muted uppercase nums">Step {n} of {STEPS.length}</div>
-        <h1 className="flex items-center gap-2 text-[15px] font-semibold text-ap-ink">{title}{tag}</h1>
+        <div className="text-[12px] font-semibold text-ap-badge nums">Step {n} of {STEPS.length}</div>
+        <h1 className="flex items-center gap-2 text-[17px] font-semibold tracking-[-0.015em] text-ap-ink">{title}{tag}</h1>
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto px-6 pt-5 pb-8">{children}</div>
       {footer && <div className="shrink-0 border-t border-ap-hairline px-6 py-3 text-[12px] text-ap-muted">{footer}</div>}
@@ -258,7 +258,7 @@ export function AdMenu({ doc, set, readOnly, exports, extra }: { doc: EditorDoc;
   return (
     <>
       <div className="space-y-1.5">
-        <p className="text-[12px] font-semibold tracking-[0.08em] text-ap-muted uppercase">Brand kit · Format</p>
+        <p className="text-[12px] font-semibold text-ap-badge">Brand kit · Format</p>
         <AdPills doc={doc} set={set} readOnly={readOnly} />
       </div>
       {extra}

@@ -450,7 +450,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
             {EXPORT_SIZES.filter((s) => s.id === mainId).map((s) => (
               <SizeCard key={s.id} size={s} selected main pulse={false} onClick={() => undefined} project={project} frames={frames} brand={brand} images={images} />
             ))}
-            <p className="mt-3 mb-0.5 text-[12px] font-semibold tracking-[0.06em] text-ap-body"><span className="uppercase">Also export</span> · auto-adapted from {sizeLabel(project.primary_format)}</p>
+            <p className="mt-3 mb-0.5 text-[12px] font-semibold text-ap-badge"><span>Also export</span> · auto-adapted from {sizeLabel(project.primary_format)}</p>
             {[...EXPORT_SIZES.filter((s) => s.id !== "5x4"), ...EXPORT_SIZES.filter((s) => s.id === "5x4")].filter((s) => s.id !== mainId).map((s) => (
               <SizeCard key={s.id} size={s} selected={selected.has(s.id)} warn={selected.has(s.id) && cropWarn.has(s.layout)} pulse={pulse.has(s.id)} onClick={() => toggleSize(s.id)} project={project} frames={frames} brand={brand} images={images} />
             ))}

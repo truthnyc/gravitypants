@@ -51,7 +51,7 @@ export function FormatChooser({ format, onFormat, kitId, onKit, template, onTemp
   return (
     <div className={cn(readOnly && "pointer-events-none opacity-60")}>
       <div className="mb-3.5 flex flex-wrap items-center gap-2">
-        <span className="mr-1 text-[13px] text-ap-muted">Posting to</span>
+        <span className="mr-1 text-[12px] font-semibold text-ap-muted">Posting to</span>
         {FORMAT_PLATFORMS.map((p) => {
           const on = platform === p.name;
           return (

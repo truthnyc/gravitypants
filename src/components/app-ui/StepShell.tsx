@@ -75,12 +75,12 @@ export function AdName({ title }: { title: StepTitleInfo }) {
 
 export function StepBar({ adId, current, className }: { adId: string; current: number; className?: string }) {
   return (
-    <nav aria-label="Steps" className={cn("inline-flex shrink-0 gap-[3px] rounded-[10px] bg-ap-panel p-[3px]", className)}>
+    <nav aria-label="Steps" className={cn("inline-flex shrink-0 gap-[3px] rounded-full bg-ap-panel p-[3px]", className)}>
       {STEPS.map((s, i) => {
         const done = i < current;
         const on = i === current;
         if (!adId) return (
-          <span key={s.key} aria-current={on ? "step" : undefined} className={cn("inline-flex min-h-0 min-w-0 items-center gap-1.5 whitespace-nowrap rounded-[7px] px-3 py-1.5 text-[13px]", on ? "bg-ap-card font-semibold text-ap-ink shadow-ap-soft" : "text-ap-muted")}>
+          <span key={s.key} aria-current={on ? "step" : undefined} className={cn("inline-flex min-h-0 min-w-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-[13px]", on ? "bg-ap-soft-blue font-semibold text-ap-blue" : "text-ap-muted")}>
             <span className={cn("grid size-[18px] place-items-center rounded-full text-[11px] font-semibold nums", on ? "bg-ap-blue text-ap-card" : "bg-ap-media text-ap-muted")}>{i + 1}</span>
             {s.label}
           </span>
@@ -92,8 +92,8 @@ export function StepBar({ adId, current, className }: { adId: string; current: n
             params={{ id: adId }}
             aria-current={on ? "step" : undefined}
             className={cn(
-              "inline-flex min-h-0 min-w-0 items-center gap-1.5 whitespace-nowrap rounded-[7px] px-3 py-1.5 text-[13px]",
-              on ? "bg-ap-card font-semibold text-ap-ink shadow-ap-soft" : "text-ap-muted hover:text-ap-ink",
+              "inline-flex min-h-0 min-w-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-[13px] outline-hidden focus-visible:shadow-ap-focus",
+              on ? "bg-ap-soft-blue font-semibold text-ap-blue" : "text-ap-muted hover:text-ap-ink",
             )}
           >
             <span className={cn("grid size-[18px] place-items-center rounded-full text-[11px] font-semibold nums", done ? "bg-ap-green text-ap-card" : on ? "bg-ap-blue text-ap-card" : "bg-ap-media text-ap-muted")}>
