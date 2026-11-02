@@ -170,7 +170,7 @@ function ForBrands() {
               {['inspiring', 'natural', 'cozy'].map((m) => <span key={m} className="rounded-[8px] bg-ap-soft-blue px-2.5 py-1 font-medium text-ap-blue">{m}</span>)}
               <span className="text-ap-muted tabular-nums">· 2 reels · 1 size</span>
             </div>
-            <div className="mx-auto mt-5 max-w-[200px] [&_.site-phone]:!w-full [&_.site-phone]:!max-w-none"><FeaturedAdVideo tapToggle /></div>
+            <div className="mx-auto mt-5 max-w-[200px] [&_.site-phone]:!w-full [&_.site-phone]:!max-w-none [&_.site-phone]:!h-auto [&_.site-phone]:!aspect-[9/16] [&_.site-phone]:!p-0 [&_.site-phone]:!shadow-none"><FeaturedAdVideo tapToggle /></div>
             <p className="mt-3 text-center text-[14px] font-semibold">Japanese Denim Cotton</p>
             <p className="text-center text-[12px] text-ap-muted tabular-nums">7.8 sec · 9:16</p>
           </div>
