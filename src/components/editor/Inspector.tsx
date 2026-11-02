@@ -622,7 +622,7 @@ function PhotoPanel({
       {showPhoto && (<>
       <Field label="Movement">
         <div className="flex flex-wrap gap-1.5">
-          {MOVEMENTS.map((m) => (
+          {MOVEMENTS.filter((m) => (m.value !== "pan_up" && m.value !== "pan_down") || move === m.value).map((m) => (
             <button
               key={m.value}
               type="button"
