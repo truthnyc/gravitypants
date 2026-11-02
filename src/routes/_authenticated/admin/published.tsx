@@ -60,7 +60,7 @@ function Editor({ item }: { item: PublishedItem }) {
   const detail = useServerFn(adminPublishedDetail);
   const save = useServerFn(adminPublishedSave);
   const slot = useServerFn(adminPublishedUploadSlot);
-  const useFile = useServerFn(adminPublishedUseFile);
+  const applyFile = useServerFn(adminPublishedUseFile);
   const qc = useQueryClient();
   const key = ["admin", "published", item.projectId];
   const d = useQuery({ queryKey: key, queryFn: () => detail({ data: { projectId: item.projectId } }) });
@@ -83,7 +83,7 @@ function Editor({ item }: { item: PublishedItem }) {
       const s = await slot({ data: { projectId: item.projectId, target, frameId, fileName: file.name, contentType: file.type } });
       const { error } = await supabase.storage.from(s.bucket).uploadToSignedUrl(s.path, s.token, file, { contentType: file.type });
       if (error) throw error;
-      await useFile({ data: { projectId: item.projectId, target, frameId, fileName: file.name, path: s.path } });
+      await applyFile({ data: { projectId: item.projectId, target, frameId, fileName: file.name, path: s.path } });
       await qc.invalidateQueries({ queryKey: key });
       toast.success(target === "photo" ? "Photo replaced." : "Logo replaced.", { id: t });
     } catch (e) { toast.error(e instanceof Error ? e.message : "Upload failed", { id: t }); }
