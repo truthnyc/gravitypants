@@ -94,6 +94,8 @@ export type InspectorActions = {
   onUndo?: () => void;
 };
 
+export type InspectorSection = "background" | "photo" | "headline" | "subline" | "logo";
+
 export function Inspector({
   doc,
   frame,
@@ -111,7 +113,10 @@ export function Inspector({
   image,
   keyframe = null,
   onKeyframe = () => {},
+  section,
 }: {
+  /** Drawer mode: show only this element's panel, without the tab bar. */
+  section?: InspectorSection | undefined;
   image?: HTMLImageElement | undefined;
   keyframe?: "start" | "end" | null;
   onKeyframe?: (k: "start" | "end" | null) => void;
@@ -157,6 +162,19 @@ export function Inspector({
   return (
     <aside className={cn("flex shrink-0 flex-col", embedded ? "w-full" : "overflow-y-auto bg-inspector p-4")}>
       {!hideKit && <BrandKitRow embedded={embedded} kits={kits} kitId={kitId} onKit={actions.onKit} />}
+      {section ? (
+        <div className="space-y-4">
+          {(section === "photo" || section === "background") && (
+            <PhotoPanel part={section} photo={frame.photo ?? {}} frameIndex={frameIndex} brandName={brandName} brandColors={brandColors} image={image} keyframe={keyframe} onKeyframe={onKeyframe} actions={actions} />
+          )}
+          {(section === "headline" || section === "subline") && (
+            <TextTab lockPart={section} selected={section} headline={frame.headline} subline={frame.subline} brandColors={brandColors} brandName={brandName} actions={actions} />
+          )}
+          {section === "logo" && (
+            <LogoPanel logo={doc.project.logo} format={format} frame={frame} frameIndex={frameIndex} hasLogo={hasLogo} actions={actions} kitName={kits.find((k) => k.id === kitId)?.name ?? null} kitPosition={kit?.default_logo_positions?.[format] ?? null} />
+          )}
+        </div>
+      ) : (<>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="text-[15px] font-semibold nums">Frame {frameIndex + 1} of {doc.frames.length}</div>
         <div className="flex gap-1 rounded-lg bg-ap-panel p-1" role="tablist" aria-label="What to edit">
@@ -205,6 +223,7 @@ export function Inspector({
           />
         )}
       </div>
+      </>)}
     </aside>
   );
 }
@@ -429,6 +448,7 @@ function Collapse({ label, open, onToggle, children }: { label: string; open: bo
 
 
 function PhotoPanel({
+  part,
   photo,
   frameIndex,
   brandName,
@@ -445,8 +465,11 @@ function PhotoPanel({
   image?: HTMLImageElement | undefined;
   keyframe: "start" | "end" | null;
   onKeyframe: (k: "start" | "end" | null) => void;
+  part?: "photo" | "background" | undefined;
   actions: InspectorActions;
 }) {
+  const showPhoto = part !== "background";
+  const showBg = part === "background" || (!part && (photo.fit ?? "fill") === "fit");
   const brightness = Math.round(Number(photo.brightness ?? 0) * 200);
   const fit = photo.fit ?? "fill";
   const move = photo.movement ?? "none";
@@ -499,6 +522,7 @@ function PhotoPanel({
           if (v === "all") actions.onPhotoAll?.({ fit, background: bgMode, background_color: photo.background_color ?? null, movement: move, movement_intensity: photo.movement_intensity ?? "standard", zoom_start: photo.zoom_start ?? 1, zoom_end: photo.zoom_end ?? 1, pan_x: photo.pan_x ?? 0, pan_y: photo.pan_y ?? 0 });
         }}
       />
+      {showPhoto && (<>
       <div className="flex items-center gap-3">
         <div className="size-16 shrink-0 overflow-hidden rounded-sm bg-control-fill">
           {photo.path && <MediaImage path={photo.path} className="size-full object-cover" alt="" />}
@@ -518,8 +542,15 @@ function PhotoPanel({
       <Field label="Fit">
         <Segmented value={fit} options={[{ value: "fill", label: "Fill" }, { value: "fit", label: "Fit" }]} onChange={(v) => send({ fit: v })} />
       </Field>
+      </>)}
 
-      {fit === "fit" && (
+      {part === "background" && fit === "fill" && (
+        <div className="rounded-[4px] bg-ap-panel px-3 py-2.5 text-[13px] leading-snug text-ap-body">
+          The photo fills the frame, so the background is hidden.{" "}
+          <button type="button" className="font-semibold text-ap-blue" onClick={() => send({ fit: "fit" })}>Fit the photo</button> to show it.
+        </div>
+      )}
+      {showBg && (
         <Field label="Background">
           <Segmented
             value={bgMode}
@@ -565,6 +596,7 @@ function PhotoPanel({
         </Field>
       )}
 
+      {showPhoto && (<>
       <Field label="Movement">
         <div className="flex flex-wrap gap-1.5">
           {MOVEMENTS.filter((m) => m.value !== "custom").map((m) => (
@@ -617,6 +649,7 @@ function PhotoPanel({
           />
         </Field>
       </Collapse>
+      </>)}
     </>
   );
 }
@@ -746,7 +779,7 @@ export function AnimationField({ value, onPick }: { value: NonNullable<TextSetti
 }
 
 /** Text tab: headline and subline together, with one scope control at the bottom. */
-function TextTab({ selected, headline, subline, brandColors, brandName, actions }: { selected: ElementKey; headline: TextSettings | null; subline: TextSettings | null; brandColors: string[]; brandName: string; actions: InspectorActions }) {
+function TextTab({ selected, headline, subline, brandColors, brandName, actions, lockPart }: { lockPart?: "headline" | "subline"; selected: ElementKey; headline: TextSettings | null; subline: TextSettings | null; brandColors: string[]; brandName: string; actions: InspectorActions }) {
   const h = headline ?? {};
   const s = subline ?? {};
   const [moreHead, setMoreHead] = useState(false);
@@ -780,7 +813,7 @@ function TextTab({ selected, headline, subline, brandColors, brandName, actions 
           if (on) toast("Text style copied to every frame", actions.onUndo ? { action: { label: "Undo", onClick: actions.onUndo } } : undefined);
         }}
       />
-      <Segmented value={part} options={[{ value: "headline", label: "Headline" }, { value: "subline", label: "Subline" }]} onChange={setPart} />
+      {!lockPart && <Segmented value={part} options={[{ value: "headline", label: "Headline" }, { value: "subline", label: "Subline" }]} onChange={setPart} />}
       {part === "headline" && (<>
       <Textarea value={h.text ?? ""} placeholder="Add a headline" aria-label="Headline" onChange={(e) => setH({ text: e.target.value }, "headline-text")} className="min-h-[72px] rounded-sm text-[15px]" />
       <FontField el="headline" t={h} brandName={brandName} actions={actions} onChange={setH} />
