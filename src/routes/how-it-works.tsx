@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Check, Play } from "lucide-react";
+import { ArrowRight, Check, Image as ImageIcon, PaintBucket, Play, Shapes, TextQuote, Type } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { Button } from "@/components/ui/button";
 import { siteHead } from "@/lib/site/seo";
