@@ -10,6 +10,7 @@ import { useMoodCatalog } from '@/lib/directory/moods'
 import { brandApplicationInput, submitBrandApplication } from '@/lib/directory/applications.functions'
 import { aimanteHead } from '@/lib/site/brand-site'
 import { cn } from '@/lib/utils'
+import purlLogo from '@/assets/purl-soho-logo.png.asset.json'
 
 export const Route = createFileRoute('/aimante/join')({
   head: () => aimanteHead({ path: '/join', title: 'List your brand on Aimanté', description: 'Join a curated collection where people discover brands by mood. Your page is complimentary with any Gravity Pants account.' }),
@@ -156,14 +157,22 @@ function ForBrands() {
         </div>
         <div className="rounded-[12px] bg-ap-panel p-6 sm:p-8">
           <div className="rounded-[12px] bg-ap-card p-6 shadow-ap-soft">
-            <div className="flex items-center gap-3">
-              <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-ap-panel text-[15px] font-semibold" aria-hidden>P</span>
-              <div className="min-w-0 flex-1"><p className="text-[17px] font-semibold">Purl Soho</p><p className="text-[13px] text-ap-muted">Crafts & Hobbies · cozy · natural</p></div>
-              <a href="/b/purl-soho" className="text-[14px] font-medium text-ap-blue">See page →</a>
+            <div className="flex items-center gap-4">
+              <img src={purlLogo.url} alt="Purl Soho logo" className="size-16 shrink-0 rounded-[12px] border border-ap-hairline bg-ap-card object-contain" />
+              <div className="min-w-0">
+                <p className="text-[13px] font-semibold text-ap-blue">Home & Living</p>
+                <p className="text-[24px] font-semibold leading-tight tracking-[-0.02em]">Purl Soho</p>
+                <a href="/b/purl-soho" className="text-[14px] text-ap-blue">See brand page →</a>
+              </div>
             </div>
-            <p className="mt-4 text-[14px] leading-[1.5] text-ap-body">Beautiful yarns and fabrics for knitting, sewing and quilting, with patterns made in New York.</p>
+            <p className="mt-4 text-[14px] leading-[1.5] text-ap-body">Founded in New York's SoHo in 2002, Purl Soho is a beloved destination for makers, with natural-fiber yarns, fabrics, kits and free patterns.</p>
+            <div className="mt-3 flex flex-wrap items-center gap-2 text-[13px]">
+              {['inspiring', 'natural', 'cozy'].map((m) => <span key={m} className="rounded-[8px] bg-ap-soft-blue px-2.5 py-1 font-medium text-ap-blue">{m}</span>)}
+              <span className="text-ap-muted tabular-nums">· 2 reels · 1 size</span>
+            </div>
             <div className="mx-auto mt-5 max-w-[200px] [&_.site-phone]:!w-full [&_.site-phone]:!max-w-none"><FeaturedAdVideo tapToggle /></div>
-            <p className="mt-4 text-center text-[12px] text-ap-muted">Reels made with Gravity Pants</p>
+            <p className="mt-3 text-center text-[14px] font-semibold">Japanese Denim Cotton</p>
+            <p className="text-center text-[12px] text-ap-muted tabular-nums">7.8 sec · 9:16</p>
           </div>
         </div>
       </section>
