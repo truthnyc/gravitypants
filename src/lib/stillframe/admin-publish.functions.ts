@@ -164,8 +164,8 @@ export const adminPublishedSave = createServerFn({ method: "POST" })
       const cur: any = own.get(f.id);
       if (!cur) continue;
       const patch: Record<string, unknown> = {};
-      if (cur.headline && f.headline !== null && f.headline !== cur.headline.text) patch.headline = { ...cur.headline, text: f.headline };
-      if (cur.subline && f.subline !== null && f.subline !== cur.subline.text) patch.subline = { ...cur.subline, text: f.subline };
+      if (cur.headline && f.headline !== null && f.headline !== cur.headline.text) patch["headline"] = { ...cur.headline, text: f.headline };
+      if (cur.subline && f.subline !== null && f.subline !== cur.subline.text) patch["subline"] = { ...cur.subline, text: f.subline };
       if (Object.keys(patch).length) await db.from("frames").update(patch).eq("id", f.id);
     }
     if (data.kit) {

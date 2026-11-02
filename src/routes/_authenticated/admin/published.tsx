@@ -77,7 +77,7 @@ function Editor({ item }: { item: PublishedItem }) {
   }, [d.data]);
 
   const upload = async (target: "photo" | "logo" | "logo_dark", frameId: string | null, file: File) => {
-    if (file.size > 10 * 1024 * 1024) return toast.error("Choose an image under 10 MB.");
+    if (file.size > 10 * 1024 * 1024) { toast.error("Choose an image under 10 MB."); return; }
     const t = toast.loading("Uploading…");
     try {
       const s = await slot({ data: { projectId: item.projectId, target, frameId, fileName: file.name, contentType: file.type } });
@@ -91,7 +91,7 @@ function Editor({ item }: { item: PublishedItem }) {
 
   const onSave = async () => {
     const colors = kit ? kit.colors.split(",").map((c) => c.trim()).filter(Boolean) : [];
-    if (colors.some((c) => !/^#[0-9a-fA-F]{6}$/.test(c))) return toast.error("Colours must look like #1A2B3C.");
+    if (colors.some((c) => !/^#[0-9a-fA-F]{6}$/.test(c))) { toast.error("Colours must look like #1A2B3C."); return; }
     setBusy(true);
     try {
       await save({ data: {
