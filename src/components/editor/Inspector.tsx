@@ -1111,7 +1111,6 @@ function LogoPanel({
   const show = logo.show_on ?? "all";
   const light = logo.light_path;
   const dark = logo.dark_path ?? (logo.path && logo.path !== light ? logo.path : null);
-  const files = light && dark ? "Light + Dark" : dark ? "Dark only" : light ? "Light only" : "No logo yet";
   const clearFormat = () => Object.fromEntries(Object.entries(logo.frame_positions ?? {}).map(([k, v]) => { const { [format]: _x, ...rest } = v; return [k, rest]; }));
   const [toKit, setToKit] = useState(false);
   const [error, setError] = useState<string | null>(null);

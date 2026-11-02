@@ -1407,6 +1407,7 @@ p.concept-reel-notice { font-size: 10px !important; }
 
 /* Checkerboard behind logo/badge previews, split dark/light behind Auto logo */
 .checker { background-color: var(--card); background-image: conic-gradient(var(--control-fill) 25%, transparent 0 50%, var(--control-fill) 0 75%, transparent 0); background-size: 12px 12px; }
+.checker-dark { background-color: var(--ap-ink); background-image: conic-gradient(color-mix(in srgb, var(--ap-card) 14%, transparent) 25%, transparent 0 50%, color-mix(in srgb, var(--ap-card) 14%, transparent) 0 75%, transparent 0); background-size: 12px 12px; }
 .logo-split { background: linear-gradient(90deg, var(--foreground) 50%, var(--background) 50%); }
 
 /* Preview editing: faint dashed outline on hover, solid blue when selected */
