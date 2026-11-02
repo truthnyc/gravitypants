@@ -70,6 +70,8 @@ const STYLE_KEYS = [
   "keep_under_headline",
   "letter_spacing",
   "line_height",
+  "align",
+  "all_caps",
   "mode",
   "image_path",
   "image_size_pct",
@@ -363,6 +365,18 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
       };
     }, key ? `${key}:${format}` : undefined);
   };
+  // Drop this frame's own style: take the shared style from a frame that still uses it.
+  const matchText = (el: "headline" | "subline") => {
+    apply((d) => {
+      const target = d.frames[idx];
+      if (!target) return d;
+      const donor = d.frames.find((f, j) => j !== idx && f[el] && f[el]?.same_on_all !== false);
+      const ds = donor ? frameForFormat(donor, format)[el] : null;
+      const style = ds ? Object.fromEntries(STYLE_KEYS.filter((k) => ds[k] !== undefined).map((k) => [k, ds[k]])) : {};
+      const cur = frameForFormat(target, format)[el] ?? {};
+      return { ...d, frames: d.frames.map((f, j) => (j === idx ? patchTextForFormat(f, format, el, { ...cur, ...style, same_on_all: true }) : f)) };
+    });
+  };
   const updateHeadline = (patch: Partial<TextSettings>, key?: string) => updateText("headline", patch, key);
   const updateLogo = (patch: Partial<LogoSettings>, key?: string) =>
     apply((d) => ({ ...d, project: patchLogoForFormat(d.project, format, patch) }), key ? `${key}:${format}` : undefined);
@@ -613,6 +627,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
     onKit: (id) => applyKit(kits?.find((k) => k.id === id) ?? null),
     onPhoto: updatePhoto,
     onText: updateText,
+    onMatchText: matchText,
     onLogo: updateLogo,
     onLogoVisible: (v) => updateFrame(idx, (f) => patchFrameVisual(f, format, { logo_visible: v })),
     onLogoVariant: (v) => updateFrame(idx, (f) => patchFrameVisual(f, format, { logo_variant: v })),

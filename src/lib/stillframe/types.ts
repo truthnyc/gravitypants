@@ -83,6 +83,10 @@ export type TextSettings = {
   position?: string;
   same_on_all?: boolean;
   keep_under_headline?: boolean;
+  /** Text alignment inside the block; defaults to the position column. */
+  align?: "left" | "center" | "right" | null;
+  /** Show the words in capitals. */
+  all_caps?: boolean;
   /** Tracking in 1/100 em (e.g. 10 = 0.1em). */
   letter_spacing?: number;
   /** Line height multiplier of font size. */
