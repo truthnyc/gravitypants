@@ -235,7 +235,7 @@ export function StudioShell({ adId, step, title, undo, menu, next, banner, panel
       {banner}
       {compact ? (
         <>
-          <section aria-label="Preview" className="flex h-[52vh] min-h-[320px] shrink-0 flex-col bg-ap-canvas px-3 pb-3">{stage}</section>
+          <section aria-label="Preview" className="flex h-[52vh] min-h-[320px] shrink-0 flex-col bg-ap-card px-3 pb-3">{stage}</section>
           {bottom}
           <aside aria-label="Settings" className="flex flex-col border-t border-ap-hairline bg-ap-card">{panel}</aside>
         </>
@@ -243,7 +243,7 @@ export function StudioShell({ adId, step, title, undo, menu, next, banner, panel
         <>
           <div className="flex min-h-0 flex-1">
             <aside aria-label="Settings" className="flex w-[428px] shrink-0 flex-col border-r border-ap-hairline bg-ap-card">{panel}</aside>
-            <section aria-label="Preview" className="flex min-w-0 flex-1 flex-col bg-ap-canvas px-4 pb-4">{stage}</section>
+            <section aria-label="Preview" className="flex min-w-0 flex-1 flex-col bg-ap-card px-4 pb-4">{stage}</section>
           </div>
           {bottom}
         </>
