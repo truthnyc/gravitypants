@@ -101,6 +101,18 @@ const PREVIEW_SHAPES: Format[] = ["9:16", "4:5", "1:1", "5:4", "16:9"];
 export function Editor({ initial, readOnly = false, banner, exportDisabled = false }: { initial: EditorDoc; readOnly?: boolean; banner?: import("react").ReactNode; exportDisabled?: boolean }) {
   const { doc, apply, undo, redo, canUndo, canRedo } = useEditorDoc(initial);
   const compact = useCompactEditor();
+  const shellRef = useRef<HTMLDivElement>(null);
+  const [shellTop, setShellTop] = useState(0);
+  useEffect(() => {
+    const el = shellRef.current;
+    if (!el) return;
+    // Fill the screen below anything above the editor (e.g. a site notice) so the page never scrolls.
+    const measure = () => setShellTop(Math.max(0, Math.round(el.getBoundingClientRect().top + window.scrollY)));
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(document.body);
+    return () => ro.disconnect();
+  }, []);
   const [drawerOpen, setDrawerOpen] = useState(true);
   useEffect(() => { setDrawerOpen(!compact); }, [compact]);
   const status = useAutosave(doc, !readOnly);
@@ -784,7 +796,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
   ) : undefined;
 
   return (
-    <div className="ap-flow flex h-dvh flex-col overflow-hidden bg-ap-card">
+    <div ref={shellRef} style={{ height: `calc(100dvh - ${shellTop}px)` }} className="ap-flow flex flex-col overflow-hidden bg-ap-card">
       <EditTopBar
         adId={doc.project.id}
         title={{ name: doc.project.name, onRename: (name) => apply((d) => ({ ...d, project: { ...d.project, name } })), status: readOnly ? undefined : status, readOnly }}
