@@ -2,11 +2,16 @@
 // creates the subscription; we only read it. Each handle maps to the same app plan as gravitypants.com.
 import { PLANS, TRIAL, type PlanId } from "@/lib/stillframe/plans-config";
 
-export const SHOPIFY_PLAN_HANDLES = ["free", "simple", "business", "team"] as const;
-export type ShopifyPlanHandle = (typeof SHOPIFY_PLAN_HANDLES)[number];
+/** Handles the app sells: the same plans gravitypants.com sells, plus the free plan. */
+export const SHOPIFY_PLAN_HANDLES = ["free", "business", "team"] as const;
+/** No longer sold; kept so shops already on it keep their plan and limits. */
+export const RETIRED_SHOPIFY_HANDLES = ["simple"] as const;
+export type ShopifyPlanHandle = (typeof SHOPIFY_PLAN_HANDLES)[number] | (typeof RETIRED_SHOPIFY_HANDLES)[number];
 export const CACHE_MS = 5 * 60 * 1000;
 
-export const isPlanHandle = (h: unknown): h is ShopifyPlanHandle => typeof h === "string" && (SHOPIFY_PLAN_HANDLES as readonly string[]).includes(h);
+/** A handle we still honour, offered or grandfathered. */
+export const isPlanHandle = (h: unknown): h is ShopifyPlanHandle =>
+  typeof h === "string" && ([...SHOPIFY_PLAN_HANDLES, ...RETIRED_SHOPIFY_HANDLES] as readonly string[]).includes(h);
 export const isYearly = (period: string | null | undefined) => /ANNUAL|YEAR/i.test(period ?? "");
 
 /** workspace_billing.plan for a handle + billing period ('trial' = the web free trial). */

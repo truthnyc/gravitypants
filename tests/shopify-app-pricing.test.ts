@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { appPlanFor, limitsFor, planFromSubscription, pricingPlansUrl, resolveShopPlan, type StoredPlan } from "@/lib/shopify/app-pricing";
+import { SHOPIFY_PLAN_HANDLES, appPlanFor, isPlanHandle, limitsFor, planFromSubscription, pricingPlansUrl, resolveShopPlan, type StoredPlan } from "@/lib/shopify/app-pricing";
 
 const free: StoredPlan = { handle: "free", period: null, checkedAt: null, cycleStart: null, cycleEnd: null, cancelAtEnd: false };
 const sub = (handle: string, billingPeriod = "MONTHLY") => ({ billingPeriod, cancelAtEndOfCycle: false, trialEndsAt: null, currentBillingCycle: { startTime: "2026-10-01T00:00:00Z", endTime: "2026-11-01T00:00:00Z" }, items: [{ handle }] });
@@ -10,6 +10,13 @@ describe("Shopify plan handles", () => {
     expect(limitsFor("simple")).toMatchObject({ exports: 10, watermark: "never", seats: 1 });
     expect(limitsFor("business")).toMatchObject({ exports: 30, watermark: "never", seats: 1 });
     expect(limitsFor("team")).toMatchObject({ exports: 150, watermark: "never", seats: 5 });
+  });
+  it("Simple is retired there too: not sold, but existing shops keep it", () => {
+    expect(SHOPIFY_PLAN_HANDLES).toEqual(["free", "business", "team"]);
+    expect(isPlanHandle("simple")).toBe(true);
+    expect(isPlanHandle("nope")).toBe(false);
+    expect(planFromSubscription(sub("simple")).handle).toBe("simple");
+    expect(appPlanFor("simple", "MONTHLY")).toBe("simple");
   });
   it("map to the web billing plans by period", () => {
     expect(appPlanFor("free")).toBe("trial");
