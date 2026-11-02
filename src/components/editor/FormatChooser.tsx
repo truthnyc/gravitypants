@@ -132,7 +132,7 @@ export function FormatChooser({ format, onFormat, kitId, onKit, template, onTemp
           className={cn("min-h-9 rounded-full border px-3.5 text-[14px]", kitId === null ? "border-ap-blue bg-ap-soft-blue text-ap-blue" : "border-transparent bg-ap-panel")}>None</button>
         <Link to="/app/brand" className="inline-flex min-h-9 items-center rounded-full px-3.5 text-[14px] text-ap-blue hover:bg-ap-panel">+ New kit</Link>
       </div>
-      <p className="mt-2 text-[13px] text-ap-muted">Sets your logo, fonts and colors. Change it any time from the header.</p>
+      <p className="mt-2 text-[13px] text-ap-muted">Sets your logo, fonts and colors. Change it any time from ⋯.</p>
     </div>
   );
 }

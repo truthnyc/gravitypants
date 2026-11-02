@@ -8,7 +8,8 @@ import { getSignupChoice } from "@/lib/stillframe/signup-choice";
 import { AlertCircle, Check, ChevronDown, ChevronLeft, ChevronRight, Code2, Download, Film, Image as ImageIcon, Plus, X } from "lucide-react";
 import { AppButton, AppSectionLabel } from "@/components/app-ui";
 import { SHOW_SHARE } from "@/lib/features";
-import { ReelCard, StepShell, StepTitle } from "@/components/app-ui/StepShell";
+import { ReelCard } from "@/components/app-ui/StepShell";
+import { AdMenu, FrameStrip, StageBar, StageChip, StudioBottom, StudioCanvas, StudioPanel, StudioShell } from "@/components/app-ui/StudioLayout";
 import { useReelPlayer } from "@/components/editor/ReelPreview";
 import { zipSync } from "fflate";
 import { toast } from "sonner";
@@ -22,7 +23,7 @@ import { MEDIA_BUCKET } from "@/lib/stillframe/media";
 import { FontLoadError, registerCustomFonts } from "@/lib/stillframe/fonts";
 import { nearestFormat, slugify } from "@/lib/stillframe/channels";
 import { sizeIdOf, sizeLabel } from "@/lib/stillframe/main-size";
-import { AdPills, useSaveDoc } from "@/components/app-ui/AdPills";
+import { useSaveDoc } from "@/components/app-ui/AdPills";
 import { CUSTOM_MAX, CUSTOM_MIN, CUSTOM_PRESETS, EXPORT_SIZES, PLATFORMS, customError, exportFileName, platformState, ratioLabel, sizeLabelForFile, togglePlatform, type SizeId } from "@/lib/stillframe/export-sizes";
 import { formatSeconds, type Format, type Frame, type Project } from "@/lib/stillframe/types";
 import { FORMAT_SIZE } from "@/render/formats";
@@ -385,54 +386,49 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
     exportStatus?.extras ? `Plus ${exportStatus.extras} extra ${exportStatus.extras === 1 ? "export" : "exports"} that never expire` : null,
   ].filter(Boolean).join(" · ");
 
+  const doc = { project, frames };
+  const ratioOf = (t: { width: number; height: number }) => t.width / t.height;
+  const nextButton = ready
+    ? (SHOW_SHARE
+      ? <AppButton asChild><Link to="/app/ad/$id/share" params={{ id: project.id }}>Next: Share <ChevronRight className="size-4" strokeWidth={1.7} /></Link></AppButton>
+      : <AppButton asChild><Link to="/app/ads">Done</Link></AppButton>)
+    : exportButton;
+  const footer = ready ? undefined : (
+    <ExportFooter files={files.map((file) => ({ ...file, estimatedBytes: estimateExportBytes(file.kind, file.width, file.height, seconds, file.kind === "gif" ? gFps : fps, gColors) }))} sizeNames={targets.map((t) => t.name)} formats={[mp4 && "MP4", gif && "GIF", html5 && "HTML5"].filter((v): v is string => !!v)} seconds={seconds} remaining={remainingSummary} action={null} />
+  );
+
   return (
-    <StepShell
+    <StudioShell
       className="ap-export"
       adId={project.id}
       step="export"
-      pills={<AdPills doc={{ project, frames }} set={saveDoc} />}
       title={{ name: project.name, status: "saved" }}
-      left={
-        <PreviewPanel
-          preview={previewT ? (
+      menu={<AdMenu doc={doc} set={saveDoc} exports={<PreviousExports projectId={project.id} version={historyVersion} />} />}
+      next={nextButton}
+      stage={
+        <>
+          <StageBar label={ready ? "Exported" : "Previewing"}>
+            {targets.map((t) => (
+              <StageChip key={t.key} on={t.key === previewT.key} onClick={() => setPreviewKey(t.key)}>{ready && <Check className="size-3.5 text-ap-green" strokeWidth={2} />}{t.name} {t.ratio}</StageChip>
+            ))}
+          </StageBar>
+          <StudioCanvas ratio={ratioOf(previewT)} label={`${previewT.ratio} · ${previewT.width} × ${previewT.height}`}
+            overlay={ready ? <span className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-lg bg-ap-card px-2.5 py-1 text-[12px] font-medium text-ap-green shadow-ap-soft">✓ Exported</span> : undefined}>
             <ExportStage target={previewT} time={player.time} project={project} frames={frames} brand={brand} images={images} />
-          ) : (
-            <p className="text-center text-[14px] text-ap-muted">Pick a size on the right to preview it.</p>
-          )}
-          playing={player.playing}
-          onTogglePlay={player.toggle}
-          segments={player.segments}
-          time={player.time}
-          total={player.total}
-          name={project.name}
-          meta={[`${frames.length} ${frames.length === 1 ? "photo" : "photos"}`, `${formatSeconds(seconds)} sec`].filter(Boolean).join(" · ")}
-          status="saved"
-          formats={project.formats}
-          format={player.format}
-          onFormat={(f) => player.setFormat(f as Format)}
-          sizesSlot={targets.length >= 2 ? (
-            <div role="tablist" aria-label="Preview size" className="mt-4 flex flex-wrap gap-1.5">
-              {targets.map((t) => (
-                <Button key={t.key} variant="ghost" role="tab" aria-selected={t.key === previewT.key}
-                  onClick={() => setPreviewKey(t.key)}
-                  className={cn("h-7 rounded-lg px-2.5 text-[13px] nums", t.key === previewT.key ? "bg-ap-blue text-ap-card hover:bg-ap-blue-hover" : "bg-ap-soft-blue text-ap-blue")}>
-                  {t.ratio}
-                </Button>
-              ))}
-            </div>
-          ) : null}
-        />
+          </StudioCanvas>
+        </>
       }
-    >
-      <div className="mb-4 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
-        <Link to="/app/ad/$id/edit" params={{ id: project.id }} data-cta="export-back-edit" className="inline-flex min-w-0 items-center text-[14px] text-ap-muted hover:text-ap-ink">
-          <ChevronLeft className="size-4 shrink-0" strokeWidth={1.7} /> Back to edit
-        </Link>
-        <PreviousExports projectId={project.id} version={historyVersion} />
-      </div>
+      bottom={
+        <StudioBottom playing={player.playing} onTogglePlay={player.toggle} time={player.time} total={player.total}
+          right={<span>Read-only here · <Link to="/app/ad/$id/edit" params={{ id: project.id }} className="text-ap-blue hover:text-ap-blue-hover">Edit frames</Link></span>}>
+          <FrameStrip doc={doc} format={previewT.format} images={player.images} version={player.version} current={player.frameIndex} onSelect={player.seek} />
+        </StudioBottom>
+      }
+      panel={
+    <StudioPanel step="export" title={ready ? "Your files are ready" : "Where will this ad play?"} footer={footer}>
       {ready ? (
         <>
-          <StepTitle title="Your files are ready" lead="Download them one by one or all together. Files stay in Previous exports for 30 days, where GIFs can also be sent to Klaviyo." />
+          <p className="mb-4 text-[14px] leading-normal text-ap-body">Download them one by one or all together. Files stay in Previous exports for 30 days, where GIFs can also be sent to Klaviyo.</p>
           <FileList files={files} state={state} />
           <div className="mt-4 flex flex-wrap gap-2">
             {doneCount > 1 && <AppButton onClick={() => void zipAll(files, state, `${base}.zip`)}><Download className="size-4" strokeWidth={1.7} /> Download all</AppButton>}
@@ -444,13 +440,11 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
               <b className="mb-1 block text-[17px]">Share it to the Directory</b>
               <p className="text-[14px] leading-normal text-ap-body">Let people find this reel in Gravity Pants search and on your brand page. It's optional and takes a minute.</p>
             </div>
-            <AppButton asChild size="lg"><Link to="/app/ad/$id/share" params={{ id: project.id }}>Next: Share <ChevronRight className="size-4" strokeWidth={1.7} /></Link></AppButton>
           </div>}
         </>
       ) : (
         <>
-          <h1 className="mb-1.5 text-[30px] font-bold leading-tight">Where will this ad play?</h1>
-          <p className="mb-5 text-[15px] text-ap-body">Your main size is ready. Add other sizes if you need them.</p>
+          <p className="mb-5 text-[14px] text-ap-body">Your main size is ready. Add other sizes if you need them.</p>
           <PlatformPills selected={selected} onChange={changeSizes} />
           <div className="flex flex-col gap-2">
             {EXPORT_SIZES.filter((s) => s.id === mainId).map((s) => (
@@ -500,7 +494,6 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
 
           <QualitySettings {...{ mp4, gif, fps, setFps, gSize, setGSize, gColors, setGColors, gFps, setGFps, gLoop, setGLoop, qualityOpen, setQualityOpen, advancedOpen, setAdvancedOpen, gifPreset, applyGifPreset, qualitySummary }} />
 
-          <ExportFooter files={files.map((file) => ({ ...file, estimatedBytes: estimateExportBytes(file.kind, file.width, file.height, seconds, file.kind === "gif" ? gFps : fps, gColors) }))} sizeNames={targets.map((t) => t.name)} formats={[mp4 && "MP4", gif && "GIF", html5 && "HTML5"].filter((v): v is string => !!v)} seconds={seconds} remaining={remainingSummary} action={exportButton} />
           <div className="mt-2">
             {exportStatus?.trial && !exportStatus.watermark && <p className="mt-1 text-[13px] font-medium text-ap-blue">Your first reel is on us — no watermark.</p>}
             {exportStatus?.watermark && (
@@ -553,7 +546,9 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
           </p>
         </DialogContent>
       </Dialog>
-    </StepShell>
+    </StudioPanel>
+      }
+    />
   );
 }
 
@@ -595,9 +590,6 @@ function ExportStage({ target, time, project, frames, brand, images }: { target:
           style={{ aspectRatio: `${target.width} / ${target.height}`, width: wide ? "100%" : "auto", height: wide ? "auto" : "100%", maxWidth: "100%", maxHeight: "100%" }}
         />
       </div>
-      <span className="absolute bottom-2.5 left-2.5 rounded-full bg-ap-card px-2 py-0.5 text-[11px] text-ap-muted shadow-ap-soft nums">
-        {target.width.toLocaleString()} × {target.height.toLocaleString()}
-      </span>
     </>
   );
 }
