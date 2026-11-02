@@ -1,3 +1,7 @@
+# Launch video correction
+- [ ] Replace the launch film’s Aro segment with its corrected reel, preserve the rest of the film, and provide a versioned download.
+- [ ] Update the website video asset and verify the corrected 19-second output.
+
 # Referral program page
 - [x] Add a public referral guide and link it from the shared Pricing and Help FAQ.
 - [x] Verify both FAQ links, export illustration, sign-in destination and desktop/phone presentation; 24 pricing/search tests pass and build is healthy.
