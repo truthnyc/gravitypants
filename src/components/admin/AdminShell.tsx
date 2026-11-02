@@ -11,6 +11,7 @@ const NAV = [
   { to: "/admin/clients", label: "Clients", icon: Users },
   { to: "/admin/onboarding", label: "Client onboarding", icon: Users },
   { to: "/admin/templates", label: "Templates", icon: LayoutTemplate },
+  { to: "/admin/published", label: "Published reels", icon: Clapperboard },
   { to: "/admin/reels", label: "Website Reels", icon: Clapperboard },
   { to: "/admin/directory", label: "Directory", icon: Search },
   { to: "/admin/brand-applications", label: "Brand requests", icon: Inbox },

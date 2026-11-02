@@ -75,6 +75,7 @@ import { Route as AuthenticatedAdminHomepageRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminMoodsRouteImport } from './routes/_authenticated/admin/moods'
 import { Route as AuthenticatedAdminNewsletterRouteImport } from './routes/_authenticated/admin/newsletter'
 import { Route as AuthenticatedAdminOnboardingRouteImport } from './routes/_authenticated/admin/onboarding'
+import { Route as AuthenticatedAdminPublishedRouteImport } from './routes/_authenticated/admin/published'
 import { Route as AuthenticatedAdminReelsRouteImport } from './routes/_authenticated/admin/reels'
 import { Route as AuthenticatedAdminSupportRouteImport } from './routes/_authenticated/admin/support'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app/index'
@@ -469,6 +470,12 @@ const AuthenticatedAdminOnboardingRoute =
     path: '/onboarding',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminPublishedRoute =
+  AuthenticatedAdminPublishedRouteImport.update({
+    id: '/published',
+    path: '/published',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminReelsRoute = AuthenticatedAdminReelsRouteImport.update({
   id: '/reels',
   path: '/reels',
@@ -813,6 +820,7 @@ export interface FileRoutesByFullPath {
   '/admin/moods': typeof AuthenticatedAdminMoodsRoute
   '/admin/newsletter': typeof AuthenticatedAdminNewsletterRoute
   '/admin/onboarding': typeof AuthenticatedAdminOnboardingRoute
+  '/admin/published': typeof AuthenticatedAdminPublishedRoute
   '/admin/reels': typeof AuthenticatedAdminReelsRoute
   '/admin/support': typeof AuthenticatedAdminSupportRoute
   '/app/account': typeof AuthenticatedAppAccountRoute
@@ -928,6 +936,7 @@ export interface FileRoutesByTo {
   '/admin/moods': typeof AuthenticatedAdminMoodsRoute
   '/admin/newsletter': typeof AuthenticatedAdminNewsletterRoute
   '/admin/onboarding': typeof AuthenticatedAdminOnboardingRoute
+  '/admin/published': typeof AuthenticatedAdminPublishedRoute
   '/admin/reels': typeof AuthenticatedAdminReelsRoute
   '/admin/support': typeof AuthenticatedAdminSupportRoute
   '/app/account': typeof AuthenticatedAppAccountRoute
@@ -1048,6 +1057,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/moods': typeof AuthenticatedAdminMoodsRoute
   '/_authenticated/admin/newsletter': typeof AuthenticatedAdminNewsletterRoute
   '/_authenticated/admin/onboarding': typeof AuthenticatedAdminOnboardingRoute
+  '/_authenticated/admin/published': typeof AuthenticatedAdminPublishedRoute
   '/_authenticated/admin/reels': typeof AuthenticatedAdminReelsRoute
   '/_authenticated/admin/support': typeof AuthenticatedAdminSupportRoute
   '/_authenticated/app/account': typeof AuthenticatedAppAccountRoute
@@ -1168,6 +1178,7 @@ export interface FileRouteTypes {
     | '/admin/moods'
     | '/admin/newsletter'
     | '/admin/onboarding'
+    | '/admin/published'
     | '/admin/reels'
     | '/admin/support'
     | '/app/account'
@@ -1283,6 +1294,7 @@ export interface FileRouteTypes {
     | '/admin/moods'
     | '/admin/newsletter'
     | '/admin/onboarding'
+    | '/admin/published'
     | '/admin/reels'
     | '/admin/support'
     | '/app/account'
@@ -1402,6 +1414,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/moods'
     | '/_authenticated/admin/newsletter'
     | '/_authenticated/admin/onboarding'
+    | '/_authenticated/admin/published'
     | '/_authenticated/admin/reels'
     | '/_authenticated/admin/support'
     | '/_authenticated/app/account'
@@ -1987,6 +2000,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminOnboardingRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/published': {
+      id: '/_authenticated/admin/published'
+      path: '/published'
+      fullPath: '/admin/published'
+      preLoaderRoute: typeof AuthenticatedAdminPublishedRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/reels': {
       id: '/_authenticated/admin/reels'
       path: '/reels'
@@ -2376,6 +2396,7 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminMoodsRoute: typeof AuthenticatedAdminMoodsRoute
   AuthenticatedAdminNewsletterRoute: typeof AuthenticatedAdminNewsletterRoute
   AuthenticatedAdminOnboardingRoute: typeof AuthenticatedAdminOnboardingRoute
+  AuthenticatedAdminPublishedRoute: typeof AuthenticatedAdminPublishedRoute
   AuthenticatedAdminReelsRoute: typeof AuthenticatedAdminReelsRoute
   AuthenticatedAdminSupportRoute: typeof AuthenticatedAdminSupportRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
@@ -2402,6 +2423,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminMoodsRoute: AuthenticatedAdminMoodsRoute,
     AuthenticatedAdminNewsletterRoute: AuthenticatedAdminNewsletterRoute,
     AuthenticatedAdminOnboardingRoute: AuthenticatedAdminOnboardingRoute,
+    AuthenticatedAdminPublishedRoute: AuthenticatedAdminPublishedRoute,
     AuthenticatedAdminReelsRoute: AuthenticatedAdminReelsRoute,
     AuthenticatedAdminSupportRoute: AuthenticatedAdminSupportRoute,
     AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,

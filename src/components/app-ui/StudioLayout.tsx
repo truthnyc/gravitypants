@@ -11,6 +11,7 @@ import type { EditorDoc } from "@/lib/stillframe/data";
 import type { Format } from "@/lib/stillframe/types";
 import { cn } from "@/lib/utils";
 import { AdPills } from "./AdPills";
+import { PublishToGravityPants } from "@/components/admin/PublishToGravityPants";
 
 /** True below 1000px wide, where every step stacks (same breakpoint as Edit). */
 export function useCompactStudio() {
@@ -265,6 +266,7 @@ export function AdMenu({ doc, set, readOnly, exports, extra }: { doc: EditorDoc;
         <AdPills doc={doc} set={set} readOnly={readOnly} />
       </div>
       {extra}
+      <PublishToGravityPants projectId={doc.project.id} />
       <div className="flex items-center justify-between border-t border-ap-hairline pt-3 text-[13px] text-ap-muted">
         Previous exports
         {exports ?? <Link to="/app/exports" className="text-ap-blue hover:text-ap-blue-hover">See the list</Link>}
