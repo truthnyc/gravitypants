@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { appPlanFor, limitsFor, planFromSubscription, pricingPlansUrl, resolveShopPlan, type StoredPlan } from "@/lib/shopify/app-pricing";
+import { SHOPIFY_PLAN_HANDLES, appPlanFor, isPlanHandle, limitsFor, planFromSubscription, pricingPlansUrl, resolveShopPlan, type StoredPlan } from "@/lib/shopify/app-pricing";
 
 const free: StoredPlan = { handle: "free", period: null, checkedAt: null, cycleStart: null, cycleEnd: null, cancelAtEnd: false };
 const sub = (handle: string, billingPeriod = "MONTHLY") => ({ billingPeriod, cancelAtEndOfCycle: false, trialEndsAt: null, currentBillingCycle: { startTime: "2026-10-01T00:00:00Z", endTime: "2026-11-01T00:00:00Z" }, items: [{ handle }] });

@@ -9,9 +9,6 @@ export const RETIRED_SHOPIFY_HANDLES = ["simple"] as const;
 export type ShopifyPlanHandle = (typeof SHOPIFY_PLAN_HANDLES)[number] | (typeof RETIRED_SHOPIFY_HANDLES)[number];
 export const CACHE_MS = 5 * 60 * 1000;
 
-/** Offered to a shop now? */
-export const isOfferedHandle = (h: unknown): h is (typeof SHOPIFY_PLAN_HANDLES)[number] =>
-  typeof h === "string" && (SHOPIFY_PLAN_HANDLES as readonly string[]).includes(h);
 /** A handle we still honour, offered or grandfathered. */
 export const isPlanHandle = (h: unknown): h is ShopifyPlanHandle =>
   typeof h === "string" && ([...SHOPIFY_PLAN_HANDLES, ...RETIRED_SHOPIFY_HANDLES] as readonly string[]).includes(h);
