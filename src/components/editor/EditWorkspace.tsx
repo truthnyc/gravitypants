@@ -80,10 +80,10 @@ export function EditRail({ value, onChange, open, onToggle, compact, ownStyle }:
         const on = value === key;
         const own = (key === "headline" && ownStyle.headline) || (key === "subline" && ownStyle.subline);
         return (
-          <button key={key} type="button" aria-pressed={on} onClick={() => onChange(key)}
+          <button key={key} type="button" aria-pressed={on} onClick={() => onChange(key)} aria-label={own ? `${SECTION_LABEL[key]}, this frame has its own style` : SECTION_LABEL[key]}
             className={cn("relative flex min-h-0 min-w-0 flex-col items-center justify-center gap-1 rounded-lg text-[11px] font-medium", compact ? "flex-1" : "h-[62px] w-[62px]", on ? "bg-ap-soft-blue text-ap-blue" : "text-ap-muted hover:bg-ap-panel hover:text-ap-ink")}>
             <Icon className="size-5" strokeWidth={1.7} />{SECTION_LABEL[key]}
-            {own && <span aria-label="This frame has its own style" className={cn("absolute top-2 right-2.5 size-1.5 rounded-full", SECTION_DOT[key])} />}
+            {own && <span aria-hidden className={cn("absolute top-2 right-2.5 size-1.5 rounded-full", SECTION_DOT[key])} />}
           </button>
         );
       })}
@@ -135,7 +135,7 @@ export function EditDrawer({ open, compact, onClose, section, eyebrow, children 
     );
   }
   return (
-    <aside aria-label="Settings" aria-hidden={!open} className={cn("shrink-0 overflow-hidden border-ap-hairline bg-ap-card transition-[width] duration-[280ms] ease-out motion-reduce:transition-none", open ? "w-[352px] border-r" : "w-0")}>
+    <aside aria-label="Settings" aria-hidden={!open} inert={!open} className={cn("shrink-0 overflow-hidden border-ap-hairline bg-ap-card transition-[width] duration-[280ms] ease-out motion-reduce:transition-none", open ? "w-[352px] border-r" : "w-0")}>
       <div className="flex h-full w-[352px] flex-col" inert={!open || undefined}>
         <DrawerHead section={section} eyebrow={eyebrow} onClose={onClose} closeIcon={<ChevronLeft className="size-[18px]" strokeWidth={1.7} />} />
         {body}
