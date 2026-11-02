@@ -412,7 +412,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
               <StageChip key={t.key} on={t.key === previewT.key} onClick={() => setPreviewKey(t.key)}>{ready && <Check className="size-3.5 text-ap-green" strokeWidth={2} />}{t.name} {t.ratio}</StageChip>
             ))}
           </StageBar>
-          <StudioCanvas ratio={ratioOf(previewT)}
+          <StudioCanvas ratio={ratioOf(previewT)} label={`${previewT.ratio} · ${previewT.width} × ${previewT.height}`}
             overlay={ready ? <span className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-lg bg-ap-card px-2.5 py-1 text-[12px] font-medium text-ap-green shadow-ap-soft">✓ Exported</span> : undefined}>
             <ExportStage target={previewT} time={player.time} project={project} frames={frames} brand={brand} images={images} />
           </StudioCanvas>
@@ -590,9 +590,6 @@ function ExportStage({ target, time, project, frames, brand, images }: { target:
           style={{ aspectRatio: `${target.width} / ${target.height}`, width: wide ? "100%" : "auto", height: wide ? "auto" : "100%", maxWidth: "100%", maxHeight: "100%" }}
         />
       </div>
-      <span className="absolute bottom-2.5 left-2.5 rounded-full bg-ap-card px-2 py-0.5 text-[11px] text-ap-muted shadow-ap-soft nums">
-        {target.width.toLocaleString()} × {target.height.toLocaleString()}
-      </span>
     </>
   );
 }
