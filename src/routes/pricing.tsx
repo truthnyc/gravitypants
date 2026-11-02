@@ -81,7 +81,7 @@ function Pricing() {
         </section>
 
         <section className="pr-tiers">
-          <div className="pr-grid pr-grid-5">
+          <div className="pr-grid pr-grid-4">
             <article className="pr-tier">
               <div className="pr-tier-top"><h3>{TRIAL.name}</h3><p>Your first reel on us, no watermark, no time limit.</p></div>
               <div className="pr-price"><b>$0</b><span>no card needed</span></div>
