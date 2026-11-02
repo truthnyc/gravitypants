@@ -60,6 +60,12 @@ export function FrameRail({ doc, format, frameIndex, images, version, uploading,
               onClick={() => onSelect(i)} className={cn("relative size-16 overflow-hidden rounded-[10px] bg-control-fill p-0", i === frameIndex && "ring-2 ring-primary ring-offset-2 ring-offset-card", over === i && dragFrom !== i && "ring-2 ring-primary/40", dragFrom === i && "opacity-50")}>
               <FrameThumb doc={doc} index={i} format={format} images={images} version={version} width={112} className="h-full w-full" />
               <span className="absolute left-1 top-1 flex size-4 items-center justify-center rounded-full bg-foreground/70 text-[10px] font-semibold text-background tabular-nums">{i + 1}</span>
+              {(doc.frames[i]?.headline?.same_on_all === false || doc.frames[i]?.subline?.same_on_all === false) && (
+                <span className="absolute right-1 top-1 flex gap-0.5" aria-hidden>
+                  {doc.frames[i]?.headline?.same_on_all === false && <span className="size-2 rounded-full bg-ap-dot-text ring-1 ring-background" />}
+                  {doc.frames[i]?.subline?.same_on_all === false && <span className="size-2 rounded-full bg-ap-dot-subline ring-1 ring-background" />}
+                </span>
+              )}
               {progress != null && i === frameIndex && <span className="absolute inset-x-0 bottom-0 h-[3px] bg-foreground/15"><span className="block h-full bg-ap-blue" style={{ width: `${Math.max(0, Math.min(1, progress)) * 100}%` }} /></span>}
             </Button>
           </ContextMenuTrigger><ContextMenuContent className="w-44">

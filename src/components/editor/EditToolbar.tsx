@@ -70,7 +70,7 @@ export function EditToolbar({ section, frame, frameIndex, logo, hasLogo, actions
           <span className="size-4 rounded-full border border-ap-hairline" style={{ background: color }} />
         </button>
         <Sep />
-        <button type="button" aria-pressed={own} onClick={() => set({ same_on_all: own })}
+        <button type="button" aria-pressed={own} onClick={() => (own ? actions.onMatchText?.(section) : set({ same_on_all: false }))}
           title={own ? "This frame has its own style. Click to use it on all frames." : "Click to give this frame its own style."}
           className={cn("inline-flex h-7 min-h-0 items-center rounded-lg px-2.5 text-[12px] font-medium nums", own ? "bg-ap-dot-text/12 text-ap-dot-text" : "bg-ap-panel text-ap-body hover:text-ap-ink")}>
           {own ? `Only frame ${frameIndex + 1}` : "All frames"}

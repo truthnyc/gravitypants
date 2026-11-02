@@ -186,7 +186,13 @@ export function EditTimeline({ playing, onTogglePlay, time, total, frames, child
         </div>
       </div>
       <div className="min-w-0 flex-1">{children}</div>
-      <div className="hidden shrink-0 text-[12px] text-ap-muted nums md:block">{frames} {frames === 1 ? "frame" : "frames"} · {total.toFixed(1)} sec</div>
+      <div className="hidden shrink-0 flex-col items-end gap-1 text-[12px] text-ap-muted nums md:flex">
+        <span>{frames} {frames === 1 ? "frame" : "frames"} · {total.toFixed(1)} sec</span>
+        <span className="flex items-center gap-2 text-[11px] text-ap-faint">
+          <span className="inline-flex items-center gap-1"><span className="size-1.5 rounded-full bg-ap-dot-text" />Own headline style</span>
+          <span className="inline-flex items-center gap-1"><span className="size-1.5 rounded-full bg-ap-dot-subline" />Own subline style</span>
+        </span>
+      </div>
     </footer>
   );
 }

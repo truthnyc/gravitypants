@@ -921,18 +921,8 @@ function TextTab({ selected, headline, subline, brandColors, brandName, actions,
   const spacing = h.letter_spacing ?? 0;
   const lineHeight = h.line_height ?? 1.08;
   const under = s.keep_under_headline ?? true;
-  const shared = (headline?.same_on_all ?? true) && (!subline || (subline.same_on_all ?? true));
   return (
     <>
-      <ScopeControl
-        value={shared ? "all" : "frame"}
-        onChange={(v) => {
-          const on = v === "all";
-          if (headline) actions.onText("headline", { same_on_all: on });
-          if (subline) actions.onText("subline", { same_on_all: on });
-          if (on) toast("Text style copied to every frame", actions.onUndo ? { action: { label: "Undo", onClick: actions.onUndo } } : undefined);
-        }}
-      />
       {!lockPart && <Segmented value={part} options={[{ value: "headline", label: "Headline" }, { value: "subline", label: "Subline" }]} onChange={setPart} />}
       {part === "headline" && (<>
       <Textarea value={h.text ?? ""} placeholder="Add a headline" aria-label="Headline" onChange={(e) => setH({ text: e.target.value }, "headline-text")} className="min-h-[72px] rounded-sm text-[15px]" />
