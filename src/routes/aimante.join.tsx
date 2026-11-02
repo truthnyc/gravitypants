@@ -162,7 +162,7 @@ function ForBrands() {
               <a href="/b/purl-soho" className="text-[14px] font-medium text-ap-blue">See page →</a>
             </div>
             <p className="mt-4 text-[14px] leading-[1.5] text-ap-body">Beautiful yarns and fabrics for knitting, sewing and quilting, with patterns made in New York.</p>
-            <div className="mx-auto mt-5 max-w-[260px] [&_.site-phone]:!w-full [&_.site-phone]:!max-w-none"><FeaturedAdVideo tapToggle /></div>
+            <div className="mx-auto mt-5 max-w-[200px] [&_.site-phone]:!w-full [&_.site-phone]:!max-w-none"><FeaturedAdVideo tapToggle /></div>
             <p className="mt-4 text-center text-[12px] text-ap-muted">Reels made with Gravity Pants</p>
           </div>
         </div>
