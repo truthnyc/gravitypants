@@ -7,6 +7,7 @@ import { AdName, STEPS, StepBar, type StepTitleInfo } from "@/components/app-ui/
 import { HelpMenu } from "@/components/stillframe/HelpMenu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { GravityPantsLogo } from "@/components/GravityPantsLogo";
 
 export type RailKey = InspectorSection;
 /** Selected rail item takes its element's own colour (10% tint + colour text/icon). */
@@ -47,6 +48,7 @@ export function EditTopBar({ adId, title, canUndo, canRedo, onUndo, onRedo, isMa
   const mod = isMac ? "⌘" : "Ctrl+";
   return (
     <header className="relative z-40 flex h-14 shrink-0 items-center gap-2 border-b border-ap-hairline bg-ap-card px-3 safe-top md:px-4">
+      <Link to="/" aria-label="Gravity Pants home" className="hidden shrink-0 sm:flex"><GravityPantsLogo size={26} /></Link>
       <Link to="/app/ads" className="flex min-h-0 shrink-0 items-center text-[14px] text-ap-blue hover:text-ap-blue-hover">
         <ChevronLeft className="size-4" strokeWidth={1.7} /> <span className="hidden sm:inline">Your Ads</span>
       </Link>
