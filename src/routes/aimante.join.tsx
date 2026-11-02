@@ -130,7 +130,7 @@ const STEPS = [
 ]
 const PLANS = [
   { eyebrow: 'Brand page', price: 'Complimentary', note: 'With any Gravity Pants account', items: ['Your brand page with logo, description and website link', 'One category and up to three moods', 'Up to 3 reels'] },
-  { eyebrow: 'Full brand page', price: 'With Simple', note: 'from $35 a month', items: ['Everything in Brand page', 'Unlimited reels on your page', 'Every reel shown in mood and category search'], highlight: true },
+  { eyebrow: 'Full brand page', price: 'With Starter', note: 'from $19 a month', items: ['Everything in Brand page', 'Unlimited reels on your page', 'Every reel shown in mood and category search'], highlight: true },
   { eyebrow: 'Brand insights', price: 'Included', note: 'With Business and Team', items: ['Everything in Full brand page', 'Views, saves and clicks to your website', 'See which reels and moods work best'] },
 ]
 const WHO: [string, string][] = [['Fashion', 'Fashion & Apparel'], ['Beauty', 'Beauty & Fragrance'], ['Food & Drink', 'Food & Drink'], ['Home', 'Home & Living'], ['Travel', 'Travel & Hospitality'], ['Crafts', 'Crafts & Hobbies'], ['Photography', 'Photography & Visual Arts'], ['Nonprofits', 'Nonprofit & Causes']]
