@@ -5,6 +5,7 @@ import type { InspectorSection } from "./Inspector";
 import { SECTION_DOT, SECTION_LABEL } from "./EditToolbar";
 import { AdName, STEPS, StepBar, type StepTitleInfo } from "@/components/app-ui/StepShell";
 import { HelpMenu } from "@/components/stillframe/HelpMenu";
+import { PublishToGravityPants } from "@/components/admin/PublishToGravityPants";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { GravityPantsLogo } from "@/components/GravityPantsLogo";
@@ -65,6 +66,7 @@ export function EditTopBar({ adId, title, canUndo, canRedo, onUndo, onRedo, isMa
           </PopoverTrigger>
           <PopoverContent align="end" className="w-[300px] space-y-3 p-3">
             {menu}
+            <PublishToGravityPants projectId={adId} />
             <div className="flex items-center justify-between border-t border-ap-hairline pt-3 text-[13px] text-ap-muted">Help <HelpMenu /></div>
           </PopoverContent>
         </Popover>
