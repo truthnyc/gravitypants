@@ -197,6 +197,13 @@
       "when": 1793629261755,
       "tag": "0027_delete_workspace_keeps_published_reels",
       "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1793629523777,
+      "tag": "0028_delete_workspace_keeps_review_reels",
+      "breakpoints": true
     }
   ]
 }
