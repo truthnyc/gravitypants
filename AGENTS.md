@@ -43,6 +43,7 @@
 - Advertising uses one browser-only Pixel behind shared regional consent on exact Gravity Pants public hosts; preserve consent history, cross-tab withdrawal and private/Shopify/embed exclusions so visit measurement cannot expose customer content.
 - Shared `SiteHeader` (site|app) delegates Aimanté to `AimanteHeader` regardless of session; `AimanteShell` shares its logo/footer with auth. Directory links use `SHOW_DIRECTORY`.
 - Website reel favorites use own `site_reel_favorites` rows via `SiteReelHeart`/`useSiteReelFavorites`; Favorites includes Directory reels.
+- Gravity Pants brand popups share `BrandReelThumbnail`, with metadata-preloaded, intrinsic video dimensions for both thumbnails and playback so original reel proportions are never cropped to a square.
 - App/SSR failures share dependency-free `ServiceUnavailable`.
 - Search landing pages: content in `src/lib/site/search-pages.ts`, one `SearchPage` layout and route factory; add pages via data plus a thin route file so copy, SEO and FAQ data stay in one place.
 - Gravity Pants sitemap metadata is authoritative in `src/lib/site/page-metadata.ts`, applied by `siteHead`; preserve its page schema when adding route-specific article, pricing or video scripts so every listed page has consistent search metadata without replacing specialised data.

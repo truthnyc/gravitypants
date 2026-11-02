@@ -1,7 +1,8 @@
-import { useEffect, useState, useSyncExternalStore, type ReactNode } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowUpRight, Play } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { getBrandPage } from "@/lib/directory/directory.functions";
 import { categoryLabel } from "@/lib/site/reels";
 import { useBrandSite } from "./AimanteShell";
@@ -33,6 +34,25 @@ export function BrandProfileLink({ slug, className, children, cta, tabIndex }: {
 }
 
 type Reel = { id: string; title: string; poster: string | null; video: string | null };
+
+/** Metadata gives the paused thumbnail and player the same intrinsic dimensions. */
+function BrandReelThumbnail({ reel, playing, onPlay }: { reel: Reel; playing: boolean; onPlay: () => void }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (playing) void video.play().catch(() => {});
+    else video.pause();
+  }, [playing]);
+  return <div className="relative overflow-hidden rounded-[4px] bg-ap-card">
+    {reel.video
+      ? <video ref={videoRef} src={reel.video} poster={reel.poster ?? undefined} preload="metadata" controls={playing} loop muted playsInline aria-label={reel.title} className="block h-auto w-full" />
+      : reel.poster && <img src={reel.poster} alt="" className="block h-auto w-full" />}
+    {!playing && reel.video && <Button type="button" variant="ghost" onClick={onPlay} className="absolute inset-0 h-full w-full rounded-none p-0 hover:bg-transparent" aria-label={`Play ${reel.title}`}>
+      <span className="grid size-10 place-items-center rounded-full bg-background/85 text-ap-ink"><Play className="size-4" strokeWidth={1.7} /></span>
+    </Button>}
+  </div>;
+}
 
 /** Mounted once in the Gravity Pants site shell. */
 export function BrandPreviewHost() {
@@ -69,16 +89,9 @@ function BrandPreviewBody({ slug }: { slug: string }) {
     <DialogDescription className="mt-4 text-[15px] leading-relaxed text-ap-ink">{brand.description || `Reels by ${brand.name}, made with Gravity Pants.`}</DialogDescription>
     {reels.length > 0 && <>
       <h3 className="mt-6 text-[15px] font-semibold">Reels <span className="font-normal tabular-nums text-secondary-text">{reels.length}</span></h3>
-      <ul className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
+      <ul className="mt-3 grid grid-cols-2 items-start gap-3 sm:grid-cols-3">
         {reels.map((r) => <li key={r.id}>
-          <div className="relative aspect-square overflow-hidden rounded-[4px] bg-ap-card">
-            {playing === r.id && r.video
-              ? <video src={r.video} poster={r.poster ?? undefined} controls autoPlay loop muted playsInline className="size-full object-contain" />
-              : <button type="button" onClick={() => setPlaying(r.id)} disabled={!r.video} className="absolute inset-0 block" aria-label={`Play ${r.title}`}>
-                  {r.poster && <img src={r.poster} alt="" className="absolute inset-0 size-full object-cover" />}
-                  {r.video && <span className="absolute inset-0 grid place-items-center"><span className="grid size-10 place-items-center rounded-full bg-background/85 text-ap-ink"><Play className="size-4" strokeWidth={1.7} /></span></span>}
-                </button>}
-          </div>
+          <BrandReelThumbnail reel={r} playing={playing === r.id} onPlay={() => setPlaying(r.id)} />
           <p className="mt-1.5 truncate text-[13px]">{r.title}</p>
         </li>)}
       </ul>
