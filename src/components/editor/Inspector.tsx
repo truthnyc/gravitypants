@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { clampScale, isReframed, photoScale, RESET_FRAMING, SCALE_MAX, SCALE_MIN } from "@/lib/stillframe/framing";
 import { gradientPresets, normalizeHex, photoName, photoPalette } from "@/lib/stillframe/palette";
-import { ChevronDown, ChevronRight, Clock, Crop, Play, Image as ImageIcon, Minus, Plus, RefreshCw, Shapes, Sparkles, TextQuote, Type } from "lucide-react";
+import { ArrowUpRight, ChevronDown, ChevronRight, Clock, Crop, Play, Image as ImageIcon, Minus, Plus, RefreshCw, Shapes, Sparkles, TextQuote, Type } from "lucide-react";
 import type { EditorDoc } from "@/lib/stillframe/data";
 import {
   PACE_SECONDS,
@@ -1113,79 +1113,106 @@ function LogoPanel({
   const dark = logo.dark_path ?? (logo.path && logo.path !== light ? logo.path : null);
   const files = light && dark ? "Light + Dark" : dark ? "Dark only" : light ? "Light only" : "No logo yet";
   const clearFormat = () => Object.fromEntries(Object.entries(logo.frame_positions ?? {}).map(([k, v]) => { const { [format]: _x, ...rest } = v; return [k, rest]; }));
+  const [toKit, setToKit] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const mainInput = useRef<HTMLInputElement>(null);
+  const variantInput = useRef<HTMLInputElement>(null);
+  const wanted = useRef<"light" | "dark">("light");
+  const pick = (f: File | undefined, v: "light" | "dark" | "auto") => {
+    if (!f) return;
+    const bad = logoFileError(f);
+    setError(bad);
+    if (!bad) actions.onAddLogo(f, v, toKit);
+  };
+  const main = dark ?? light;
+  const mainIsLight = !dark && Boolean(light);
+  const fileName = logo.file_name ?? (main ? main.split("/").pop() : null);
+  const own = Boolean(logo.override_light_path || logo.override_dark_path);
+  const versionCard = (v: "light" | "dark", path: string | null | undefined, label: string) => (
+    <div className="flex min-w-0 flex-1 flex-col gap-1.5 rounded-[4px] border border-ap-hairline p-2">
+      <span className={cn("flex h-10 items-center justify-center rounded-[4px]", v === "light" ? "checker-dark" : "checker")}>
+        {path ? <MediaImage path={path} alt="" className="max-h-8 max-w-[85%] object-contain" /> : <span className="text-[11px] text-ap-faint">None yet</span>}
+      </span>
+      <span className="text-[11px] text-ap-body">{label}</span>
+      <button type="button" className="self-start text-[12px] font-medium text-link" onClick={() => { wanted.current = v; variantInput.current?.click(); }}>Replace</button>
+    </div>
+  );
   return (
     <>
+      <input ref={mainInput} type="file" accept={LOGO_TYPES.join(",")} className="hidden" onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; pick(f, "auto"); }} />
+      <input ref={variantInput} type="file" accept={LOGO_TYPES.join(",")} className="hidden" onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; pick(f, wanted.current); }} />
+      <div className="rounded-[4px] border border-ap-hairline p-3">
+        <div className="flex items-center gap-3">
+          <span className={cn("flex h-12 w-16 shrink-0 items-center justify-center rounded-[4px]", mainIsLight ? "checker-dark" : "checker")}>
+            {main && <MediaImage path={main} alt="" className="max-h-10 max-w-[90%] object-contain" />}
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-[13px] font-medium">{fileName ?? "No logo yet"}</span>
+            <span className="block text-[12px] text-secondary-text">{main ? (own ? "Used on this video" : `Used on this video · from ${kitName ?? "your Brand Kit"}`) : "Add a PNG, SVG, JPG or WebP"}</span>
+          </span>
+          <Button variant="primary" size="sm" onClick={() => mainInput.current?.click()}>{main ? "Replace" : "Add logo"}</Button>
+        </div>
+        {error && <p role="alert" className="mt-2 text-[12px] text-destructive">{error}</p>}
+        <label className="mt-3 flex items-start gap-2">
+          <input type="checkbox" checked={toKit} onChange={(e) => setToKit(e.target.checked)} disabled={!kitName} className="mt-0.5 size-4 accent-[var(--ap-blue)]" />
+          <span>
+            <span className="block text-[13px]">Also update my Brand Kit</span>
+            <span className="block text-[12px] text-secondary-text">{kitName ? "Off: the new logo is used on this video only." : "This ad has no Brand Kit applied."}</span>
+          </span>
+        </label>
+      </div>
       <label className="flex items-center justify-between gap-3">
-        <span>
-          <span className="block text-[14px] font-semibold">Show logo</span>
-          <span className="block text-[12px] text-secondary-text">Applies to the whole video. Logo files live in your Brand Kit.</span>
-        </span>
+        <span className="block text-[14px] font-semibold">Show logo</span>
         <Switch checked={on} onCheckedChange={(v) => actions.onLogo({ enabled: v })} className="data-[state=checked]:bg-toggle-on" />
       </label>
-      {on && (
+      {on && hasLogo && (
         <>
-          {hasLogo && (
-            <>
-              <Field label={`Position on ${format}`}>
-                <PositionGrid
-                  value={logo.frame_positions?.[frame.id]?.[format] ?? logo.positions?.[format] ?? kitPosition ?? "top-right"}
-                  color={ACCENT}
-                  onChange={(a) => actions.onLogo({ positions: { ...logo.positions, [format]: a }, frame_positions: clearFormat() })}
-                />
-              </Field>
-              <Field label="Size" value={`${size}% of width`}>
-                <div className="flex items-center gap-3">
-                  <div className="flex-1">
-                    <ElementSlider name="Logo size" color={ACCENT} min={5} max={100} value={size} onChange={(v, k) => actions.onLogo({ size_pct: v }, k)} />
-                  </div>
-                </div>
-              </Field>
-              <Field label="See-through">
-                <Segmented value={logo.opacity ?? "solid"} options={[{ value: "solid", label: "Solid" }, { value: "soft", label: "Soft" }]} onChange={(v) => actions.onLogo({ opacity: v })} />
-              </Field>
-              <Field label="Show on">
-                <Segmented
-                  value={show}
-                  options={[{ value: "all", label: "All frames" }, { value: "first_last", label: "First & last" }, { value: "selected", label: "Choose frames" }]}
-                  onChange={(v) => actions.onLogoScope(v)}
-                />
-                <Reveal open={show === "selected"}>
-                  <div className="pt-2"><ToggleRow label={`Show on frame ${frameIndex + 1}`} checked={frame.logo_visible} onChange={actions.onLogoVisible} /></div>
-                </Reveal>
-              </Field>
-            </>
-          )}
-          <Field label="Logo file">
-            <div className="rounded-sm border border-ap-hairline p-3">
-              <div className="flex items-center gap-3">
-                <span className="checker flex h-11 w-16 shrink-0 items-center justify-center rounded-sm">
-                  {(dark ?? light) && <MediaImage path={(dark ?? light)!} alt="" className="max-h-9 max-w-[90%] object-contain" />}
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate text-[13px] font-medium">{kitName ?? "No brand kit"}</span>
-                  <span className="block text-[12px] text-secondary-text">{files}</span>
-                </span>
-                <Link to="/app/brand" className="shrink-0 text-[13px] font-medium text-ap-blue">{hasLogo ? "Edit in Brand Kit ›" : "Add one in Brand Kit"}</Link>
-              </div>
-              {hasLogo && (
-                <div className="mt-3 space-y-2">
-                  <Segmented
-                    value={version}
-                    options={[{ value: "auto", label: "Auto" }, { value: "light", label: "Light" }, { value: "dark", label: "Dark" }]}
-                    onChange={(v) => {
-                      if ((v === "light" && !light) || (v === "dark" && !dark)) return;
-                      actions.onLogoVariant(v);
-                    }}
-                  />
-                  {!light && dark && (
-                    <button type="button" className="text-[12px] font-medium text-link" onClick={() => actions.onMakeLogo?.("light")}>Make from dark logo</button>
-                  )}
-                </div>
-              )}
+          <Field label="Versions">
+            <div className="flex gap-2">
+              {versionCard("light", light, "Light · dark photos")}
+              {versionCard("dark", dark, "Dark · light photos")}
             </div>
+            <Segmented
+              value={version}
+              options={[{ value: "auto", label: "Auto (best contrast)" }, { value: "light", label: "Light" }, { value: "dark", label: "Dark" }]}
+              onChange={(v) => {
+                if ((v === "light" && !light) || (v === "dark" && !dark)) return;
+                actions.onLogoVariant(v);
+              }}
+            />
+            {!light && dark && (
+              <button type="button" className="text-[12px] font-medium text-link" onClick={() => actions.onMakeLogo?.("light")}>Make from dark logo</button>
+            )}
+          </Field>
+          <Field label="Size" value={`${size}% of width`}>
+            <ElementSlider name="Logo size" color={ACCENT} min={5} max={100} value={size} onChange={(v, k) => actions.onLogo({ size_pct: v }, k)} />
+          </Field>
+          <Field label="See-through">
+            <Segmented value={logo.opacity ?? "solid"} options={[{ value: "solid", label: "Solid" }, { value: "soft", label: "Soft" }]} onChange={(v) => actions.onLogo({ opacity: v })} />
+          </Field>
+          <Field label="Show on">
+            <Segmented
+              value={show}
+              options={[{ value: "all", label: "All" }, { value: "first_last", label: "First & last" }, { value: "selected", label: `Frame ${frameIndex + 1}` }]}
+              onChange={(v) => actions.onLogoScope(v)}
+            />
+            <Reveal open={show === "selected"}>
+              <div className="pt-2"><ToggleRow label={`Show on frame ${frameIndex + 1}`} checked={frame.logo_visible} onChange={actions.onLogoVisible} /></div>
+            </Reveal>
+          </Field>
+          <Field label={`Position on ${format}`}>
+            <PositionGrid
+              value={logo.frame_positions?.[frame.id]?.[format] ?? logo.positions?.[format] ?? kitPosition ?? "top-right"}
+              color={ACCENT}
+              onChange={(a) => actions.onLogo({ positions: { ...logo.positions, [format]: a }, frame_positions: clearFormat() })}
+            />
           </Field>
         </>
       )}
+      <div className="flex items-center justify-between gap-3 border-t border-ap-hairline pt-4">
+        <p className="text-[12px] leading-snug text-ap-muted">Fonts, colours and logos for every ad live in your Brand Kit.</p>
+        <a href="/app/brand" target="_blank" rel="noreferrer" className="inline-flex shrink-0 items-center gap-1 text-[13px] font-medium text-ap-blue">Open Brand Kit <ArrowUpRight className="size-3.5" strokeWidth={1.7} /></a>
+      </div>
     </>
   );
 }

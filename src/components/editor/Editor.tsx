@@ -572,7 +572,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
       if (!url) throw new Error("no url");
       const file = await monoLogo(url, variant === "light" ? "white" : "black", "logo");
       const up = await uploadMedia(file, "logo");
-      updateLogo(variant === "light" ? { light_path: up.path } : { dark_path: up.path });
+      updateLogo(variant === "light" ? { light_path: up.path, override_light_path: up.path } : { dark_path: up.path, override_dark_path: up.path });
       toast(`${variant === "light" ? "Light" : "Dark"} logo made`, { action: { label: "Undo", onClick: () => undo() } });
     } catch {
       toast.error("That version couldn't be made. Try uploading one instead.");
