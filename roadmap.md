@@ -1,6 +1,6 @@
 # Referral program page
-- [ ] Add a public referral guide and link it from the shared Pricing and Help FAQ.
-- [ ] Verify FAQ navigation, referral instructions and desktop/phone presentation.
+- [x] Add a public referral guide and link it from the shared Pricing and Help FAQ.
+- [x] Verify both FAQ links, export illustration, sign-in destination and desktop/phone presentation; 24 pricing/search tests pass and build is healthy.
 
 # Product-reel search metadata
 - [x] Write unique titles, descriptions and accurate structured data for all 37 Gravity Pants sitemap entries.
