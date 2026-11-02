@@ -61,7 +61,8 @@ export function FrameRail({ doc, format, frameIndex, images, version, uploading,
               <FrameThumb doc={doc} index={i} format={format} images={images} version={version} width={112} className="h-full w-full" />
               <span className="absolute left-1 top-1 flex size-4 items-center justify-center rounded-full bg-foreground/70 text-[10px] font-semibold text-background tabular-nums">{i + 1}</span>
               {(doc.frames[i]?.headline?.same_on_all === false || doc.frames[i]?.subline?.same_on_all === false) && (
-                <span className="absolute right-1 top-1 flex gap-0.5" aria-hidden>
+                <span className="absolute right-1 top-1 flex gap-0.5">
+                  <span className="sr-only">{[doc.frames[i]?.headline?.same_on_all === false && "own headline style", doc.frames[i]?.subline?.same_on_all === false && "own subline style"].filter(Boolean).join(", ")}</span>
                   {doc.frames[i]?.headline?.same_on_all === false && <span className="size-2 rounded-full bg-ap-dot-text ring-1 ring-background" />}
                   {doc.frames[i]?.subline?.same_on_all === false && <span className="size-2 rounded-full bg-ap-dot-subline ring-1 ring-background" />}
                 </span>
