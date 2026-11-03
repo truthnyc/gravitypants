@@ -178,24 +178,26 @@ function MoodBody({ families, selected, counts, onChange }: { families: Family[]
       <div className="grid gap-3">
         {rows.map((f) => {
           const c = famColor(f.family);
-          const all = f.moods.every((m) => selected.includes(m));
+          const usable = f.moods.filter((m) => (counts[m] ?? 0) > 0);
+          const all = usable.length > 0 && usable.every((m) => selected.includes(m));
           return (
             <div key={f.family} className="grid gap-2 sm:grid-cols-[120px_1fr]">
-              <button type="button" aria-pressed={all} aria-label={`${all ? "Deselect" : "Select"} all ${f.family} moods`}
-                onClick={() => onChange(all ? selected.filter((m) => !f.moods.includes(m)) : [...new Set([...selected, ...f.moods])])}
-                className="group flex h-8 items-center gap-2 self-start text-[14px] font-semibold text-ap-ink">
+              <button type="button" aria-pressed={all} aria-label={`${all ? "Deselect" : "Select"} all ${f.family} moods`} disabled={usable.length === 0}
+                onClick={() => onChange(all ? selected.filter((m) => !f.moods.includes(m)) : [...new Set([...selected, ...usable])])}
+                className="group flex h-8 items-center gap-2 self-start text-[14px] font-semibold text-ap-ink disabled:cursor-not-allowed disabled:opacity-45">
                 <span aria-hidden className="size-2.5 rounded-full" style={{ background: c?.bg }} />
                 {f.family}
-                <span className="text-[12px] font-normal text-ap-muted opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">{all ? "none" : "all"}</span>
+                <span className="text-[12px] font-normal text-ap-muted opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100 group-disabled:hidden">{all ? "none" : "all"}</span>
               </button>
               <div className="flex flex-wrap gap-1.5">
                 {f.shown.map((m) => {
                   const on = selected.includes(m);
                   const n = counts[m] ?? 0;
+                  const off = !on && n === 0;
                   return (
-                    <button key={m} type="button" aria-pressed={on} aria-label={`${cap(m)}, ${n} ${n === 1 ? "reel" : "reels"}`} onClick={() => onChange(toggleIn(selected, m))}
+                    <button key={m} type="button" aria-pressed={on} disabled={off} aria-label={`${cap(m)}, ${n} ${n === 1 ? "reel" : "reels"}`} onClick={() => onChange(toggleIn(selected, m))}
                       className={cn("inline-flex h-8 items-center gap-1 rounded-full px-3 text-[14px] transition-[background,box-shadow]",
-                        on ? (c?.ink === "dark" ? "text-ap-ink" : "text-ap-card") : "bg-ap-panel text-ap-ink hover:bg-ap-media", !on && n === 0 && "opacity-45")}
+                        on ? (c?.ink === "dark" ? "text-ap-ink" : "text-ap-card") : "bg-ap-panel text-ap-ink", !on && !off && "hover:bg-ap-media", off && "cursor-not-allowed opacity-45")}
                       style={on ? { background: c?.bg, boxShadow: `0 4px 14px -4px ${c?.bg}` } : undefined}>
                       {on && <Check aria-hidden className="size-3.5" strokeWidth={2} />}
                       <Mark text={cap(m)} q={q} />
