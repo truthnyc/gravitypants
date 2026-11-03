@@ -89,6 +89,8 @@ import { Route as AuthenticatedAppGuideRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAppHelpRouteImport } from './routes/_authenticated/app/help'
 import { Route as AuthenticatedAppNewRouteImport } from './routes/_authenticated/app/new'
 import { Route as AuthenticatedAppStatsRouteImport } from './routes/_authenticated/app/stats'
+import { Route as AimanteGuidesIndexRouteImport } from './routes/aimante.guides.index'
+import { Route as AimanteGuidesSlugRouteImport } from './routes/aimante.guides.$slug'
 import { Route as ApiPublicCleanupExportsRouteImport } from './routes/api/public/cleanup-exports'
 import { Route as ApiPublicClientErrorRouteImport } from './routes/api/public/client-error'
 import { Route as ApiPublicDirectoryDailyRouteImport } from './routes/api/public/directory-daily'
@@ -544,6 +546,16 @@ const AuthenticatedAppStatsRoute = AuthenticatedAppStatsRouteImport.update({
   path: '/stats',
   getParentRoute: () => AuthenticatedAppRouteRoute,
 } as any)
+const AimanteGuidesIndexRoute = AimanteGuidesIndexRouteImport.update({
+  id: '/aimante/guides/',
+  path: '/aimante/guides/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AimanteGuidesSlugRoute = AimanteGuidesSlugRouteImport.update({
+  id: '/aimante/guides/$slug',
+  path: '/aimante/guides/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicCleanupExportsRoute = ApiPublicCleanupExportsRouteImport.update({
   id: '/api/public/cleanup-exports',
   path: '/api/public/cleanup-exports',
@@ -839,6 +851,7 @@ export interface FileRoutesByFullPath {
   '/app/help': typeof AuthenticatedAppHelpRoute
   '/app/new': typeof AuthenticatedAppNewRoute
   '/app/stats': typeof AuthenticatedAppStatsRoute
+  '/aimante/guides/$slug': typeof AimanteGuidesSlugRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
   '/api/public/client-error': typeof ApiPublicClientErrorRoute
   '/api/public/directory-daily': typeof ApiPublicDirectoryDailyRoute
@@ -849,6 +862,7 @@ export interface FileRoutesByFullPath {
   '/shopify/reel/$id': typeof ShopifyReelIdRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/app/': typeof AuthenticatedAppIndexRoute
+  '/aimante/guides/': typeof AimanteGuidesIndexRoute
   '/admin/clients/$id': typeof AuthenticatedAdminClientsIdRoute
   '/admin/templates/$id': typeof AuthenticatedAdminTemplatesIdRouteWithChildren
   '/admin/templates/new': typeof AuthenticatedAdminTemplatesNewRoute
@@ -956,6 +970,7 @@ export interface FileRoutesByTo {
   '/app/help': typeof AuthenticatedAppHelpRoute
   '/app/new': typeof AuthenticatedAppNewRoute
   '/app/stats': typeof AuthenticatedAppStatsRoute
+  '/aimante/guides/$slug': typeof AimanteGuidesSlugRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
   '/api/public/client-error': typeof ApiPublicClientErrorRoute
   '/api/public/directory-daily': typeof ApiPublicDirectoryDailyRoute
@@ -966,6 +981,7 @@ export interface FileRoutesByTo {
   '/shopify/reel/$id': typeof ShopifyReelIdRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/app': typeof AuthenticatedAppIndexRoute
+  '/aimante/guides': typeof AimanteGuidesIndexRoute
   '/admin/clients/$id': typeof AuthenticatedAdminClientsIdRoute
   '/admin/templates/$id': typeof AuthenticatedAdminTemplatesIdRouteWithChildren
   '/admin/templates/new': typeof AuthenticatedAdminTemplatesNewRoute
@@ -1078,6 +1094,7 @@ export interface FileRoutesById {
   '/_authenticated/app/help': typeof AuthenticatedAppHelpRoute
   '/_authenticated/app/new': typeof AuthenticatedAppNewRoute
   '/_authenticated/app/stats': typeof AuthenticatedAppStatsRoute
+  '/aimante/guides/$slug': typeof AimanteGuidesSlugRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
   '/api/public/client-error': typeof ApiPublicClientErrorRoute
   '/api/public/directory-daily': typeof ApiPublicDirectoryDailyRoute
@@ -1088,6 +1105,7 @@ export interface FileRoutesById {
   '/shopify_/reel/$id': typeof ShopifyReelIdRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
+  '/aimante/guides/': typeof AimanteGuidesIndexRoute
   '/_authenticated/admin/clients_/$id': typeof AuthenticatedAdminClientsIdRoute
   '/_authenticated/admin/templates/$id': typeof AuthenticatedAdminTemplatesIdRouteWithChildren
   '/_authenticated/admin/templates/new': typeof AuthenticatedAdminTemplatesNewRoute
@@ -1200,6 +1218,7 @@ export interface FileRouteTypes {
     | '/app/help'
     | '/app/new'
     | '/app/stats'
+    | '/aimante/guides/$slug'
     | '/api/public/cleanup-exports'
     | '/api/public/client-error'
     | '/api/public/directory-daily'
@@ -1210,6 +1229,7 @@ export interface FileRouteTypes {
     | '/shopify/reel/$id'
     | '/admin/'
     | '/app/'
+    | '/aimante/guides/'
     | '/admin/clients/$id'
     | '/admin/templates/$id'
     | '/admin/templates/new'
@@ -1317,6 +1337,7 @@ export interface FileRouteTypes {
     | '/app/help'
     | '/app/new'
     | '/app/stats'
+    | '/aimante/guides/$slug'
     | '/api/public/cleanup-exports'
     | '/api/public/client-error'
     | '/api/public/directory-daily'
@@ -1327,6 +1348,7 @@ export interface FileRouteTypes {
     | '/shopify/reel/$id'
     | '/admin'
     | '/app'
+    | '/aimante/guides'
     | '/admin/clients/$id'
     | '/admin/templates/$id'
     | '/admin/templates/new'
@@ -1438,6 +1460,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/help'
     | '/_authenticated/app/new'
     | '/_authenticated/app/stats'
+    | '/aimante/guides/$slug'
     | '/api/public/cleanup-exports'
     | '/api/public/client-error'
     | '/api/public/directory-daily'
@@ -1448,6 +1471,7 @@ export interface FileRouteTypes {
     | '/shopify_/reel/$id'
     | '/_authenticated/admin/'
     | '/_authenticated/app/'
+    | '/aimante/guides/'
     | '/_authenticated/admin/clients_/$id'
     | '/_authenticated/admin/templates/$id'
     | '/_authenticated/admin/templates/new'
@@ -1527,6 +1551,7 @@ export interface RootRouteChildren {
   InviteTokenRoute: typeof InviteTokenRoute
   ShopifyWelcomeRoute: typeof ShopifyWelcomeRoute
   DirectoryIndexRoute: typeof DirectoryIndexRoute
+  AimanteGuidesSlugRoute: typeof AimanteGuidesSlugRoute
   ApiPublicCleanupExportsRoute: typeof ApiPublicCleanupExportsRoute
   ApiPublicClientErrorRoute: typeof ApiPublicClientErrorRoute
   ApiPublicDirectoryDailyRoute: typeof ApiPublicDirectoryDailyRoute
@@ -1535,6 +1560,7 @@ export interface RootRouteChildren {
   DirectoryCategorySlugRoute: typeof DirectoryCategorySlugRoute
   EmbedReelIdRoute: typeof EmbedReelIdRoute
   ShopifyReelIdRoute: typeof ShopifyReelIdRoute
+  AimanteGuidesIndexRoute: typeof AimanteGuidesIndexRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   ApiPublicShopifyAuthRoute: typeof ApiPublicShopifyAuthRoute
   ApiPublicShopifyConnectRoute: typeof ApiPublicShopifyConnectRoute
@@ -2110,6 +2136,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppStatsRouteImport
       parentRoute: typeof AuthenticatedAppRouteRoute
     }
+    '/aimante/guides/': {
+      id: '/aimante/guides/'
+      path: '/aimante/guides'
+      fullPath: '/aimante/guides/'
+      preLoaderRoute: typeof AimanteGuidesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/aimante/guides/$slug': {
+      id: '/aimante/guides/$slug'
+      path: '/aimante/guides/$slug'
+      fullPath: '/aimante/guides/$slug'
+      preLoaderRoute: typeof AimanteGuidesSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/cleanup-exports': {
       id: '/api/public/cleanup-exports'
       path: '/api/public/cleanup-exports'
@@ -2628,6 +2668,7 @@ const rootRouteChildren: RootRouteChildren = {
   InviteTokenRoute: InviteTokenRoute,
   ShopifyWelcomeRoute: ShopifyWelcomeRoute,
   DirectoryIndexRoute: DirectoryIndexRoute,
+  AimanteGuidesSlugRoute: AimanteGuidesSlugRoute,
   ApiPublicCleanupExportsRoute: ApiPublicCleanupExportsRoute,
   ApiPublicClientErrorRoute: ApiPublicClientErrorRoute,
   ApiPublicDirectoryDailyRoute: ApiPublicDirectoryDailyRoute,
@@ -2636,6 +2677,7 @@ const rootRouteChildren: RootRouteChildren = {
   DirectoryCategorySlugRoute: DirectoryCategorySlugRoute,
   EmbedReelIdRoute: EmbedReelIdRoute,
   ShopifyReelIdRoute: ShopifyReelIdRoute,
+  AimanteGuidesIndexRoute: AimanteGuidesIndexRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   ApiPublicShopifyAuthRoute: ApiPublicShopifyAuthRoute,
   ApiPublicShopifyConnectRoute: ApiPublicShopifyConnectRoute,
