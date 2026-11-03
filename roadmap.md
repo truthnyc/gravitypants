@@ -45,3 +45,10 @@
 - [x] Add a Tutorial link next to Templates on the Your Ads home screen; verified desktop/phone display and that it opens /app/guide.
 # Reel description length
 - [x] Raise the reel description limit from 120 to 300 characters everywhere it is used; verified the admin Directory box accepts 300 and the share validator rejects 301.
+
+# Google services
+- [x] Tag Manager loader on public Gravity Pants pages (off until container ID supplied).
+- [ ] Google Analytics browser tracking using saved Measurement ID.
+- [ ] Analytics report reading in admin — needs the Analytics connection.
+- [ ] Merchant Center product feed.
+- [ ] Google Business Profile — check eligibility (online-only businesses can't list).
