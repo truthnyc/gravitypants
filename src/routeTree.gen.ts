@@ -108,6 +108,7 @@ import { Route as AuthenticatedAppAccountMembersRouteImport } from './routes/_au
 import { Route as AuthenticatedAppAccountStatsRouteImport } from './routes/_authenticated/app/account_.stats'
 import { Route as AuthenticatedAppAdminSplatRouteImport } from './routes/_authenticated/app/admin.$'
 import { Route as AuthenticatedAppJoinWsRouteImport } from './routes/_authenticated/app/join.$ws'
+import { Route as AuthenticatedAppReelKeyRouteImport } from './routes/_authenticated/app/reel.$key'
 import { Route as AuthenticatedAppTemplatesIndexRouteImport } from './routes/_authenticated/app/templates.index'
 import { Route as AuthenticatedAppTemplatesSlugRouteImport } from './routes/_authenticated/app/templates.$slug'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
@@ -648,6 +649,11 @@ const AuthenticatedAppJoinWsRoute = AuthenticatedAppJoinWsRouteImport.update({
   path: '/join/$ws',
   getParentRoute: () => AuthenticatedAppRouteRoute,
 } as any)
+const AuthenticatedAppReelKeyRoute = AuthenticatedAppReelKeyRouteImport.update({
+  id: '/reel/$key',
+  path: '/reel/$key',
+  getParentRoute: () => AuthenticatedAppRouteRoute,
+} as any)
 const AuthenticatedAppTemplatesIndexRoute =
   AuthenticatedAppTemplatesIndexRouteImport.update({
     id: '/templates/',
@@ -853,6 +859,7 @@ export interface FileRoutesByFullPath {
   '/app/account/stats': typeof AuthenticatedAppAccountStatsRoute
   '/app/admin/$': typeof AuthenticatedAppAdminSplatRoute
   '/app/join/$ws': typeof AuthenticatedAppJoinWsRoute
+  '/app/reel/$key': typeof AuthenticatedAppReelKeyRoute
   '/app/templates/$slug': typeof AuthenticatedAppTemplatesSlugRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/shopify/auth': typeof ApiPublicShopifyAuthRoute
@@ -969,6 +976,7 @@ export interface FileRoutesByTo {
   '/app/account/stats': typeof AuthenticatedAppAccountStatsRoute
   '/app/admin/$': typeof AuthenticatedAppAdminSplatRoute
   '/app/join/$ws': typeof AuthenticatedAppJoinWsRoute
+  '/app/reel/$key': typeof AuthenticatedAppReelKeyRoute
   '/app/templates/$slug': typeof AuthenticatedAppTemplatesSlugRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/shopify/auth': typeof ApiPublicShopifyAuthRoute
@@ -1090,6 +1098,7 @@ export interface FileRoutesById {
   '/_authenticated/app/account_/stats': typeof AuthenticatedAppAccountStatsRoute
   '/_authenticated/app/admin/$': typeof AuthenticatedAppAdminSplatRoute
   '/_authenticated/app/join/$ws': typeof AuthenticatedAppJoinWsRoute
+  '/_authenticated/app/reel/$key': typeof AuthenticatedAppReelKeyRoute
   '/_authenticated/app/templates/$slug': typeof AuthenticatedAppTemplatesSlugRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/shopify/auth': typeof ApiPublicShopifyAuthRoute
@@ -1211,6 +1220,7 @@ export interface FileRouteTypes {
     | '/app/account/stats'
     | '/app/admin/$'
     | '/app/join/$ws'
+    | '/app/reel/$key'
     | '/app/templates/$slug'
     | '/api/public/payments/webhook'
     | '/api/public/shopify/auth'
@@ -1327,6 +1337,7 @@ export interface FileRouteTypes {
     | '/app/account/stats'
     | '/app/admin/$'
     | '/app/join/$ws'
+    | '/app/reel/$key'
     | '/app/templates/$slug'
     | '/api/public/payments/webhook'
     | '/api/public/shopify/auth'
@@ -1447,6 +1458,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/account_/stats'
     | '/_authenticated/app/admin/$'
     | '/_authenticated/app/join/$ws'
+    | '/_authenticated/app/reel/$key'
     | '/_authenticated/app/templates/$slug'
     | '/api/public/payments/webhook'
     | '/api/public/shopify/auth'
@@ -2231,6 +2243,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppJoinWsRouteImport
       parentRoute: typeof AuthenticatedAppRouteRoute
     }
+    '/_authenticated/app/reel/$key': {
+      id: '/_authenticated/app/reel/$key'
+      path: '/reel/$key'
+      fullPath: '/app/reel/$key'
+      preLoaderRoute: typeof AuthenticatedAppReelKeyRouteImport
+      parentRoute: typeof AuthenticatedAppRouteRoute
+    }
     '/_authenticated/app/templates/': {
       id: '/_authenticated/app/templates/'
       path: '/templates'
@@ -2459,6 +2478,7 @@ interface AuthenticatedAppRouteRouteChildren {
   AuthenticatedAppAccountStatsRoute: typeof AuthenticatedAppAccountStatsRoute
   AuthenticatedAppAdminSplatRoute: typeof AuthenticatedAppAdminSplatRoute
   AuthenticatedAppJoinWsRoute: typeof AuthenticatedAppJoinWsRoute
+  AuthenticatedAppReelKeyRoute: typeof AuthenticatedAppReelKeyRoute
   AuthenticatedAppTemplatesSlugRoute: typeof AuthenticatedAppTemplatesSlugRoute
   AuthenticatedAppTemplatesIndexRoute: typeof AuthenticatedAppTemplatesIndexRoute
   AuthenticatedAppAdIdEditRoute: typeof AuthenticatedAppAdIdEditRoute
@@ -2487,6 +2507,7 @@ const AuthenticatedAppRouteRouteChildren: AuthenticatedAppRouteRouteChildren = {
   AuthenticatedAppAccountStatsRoute: AuthenticatedAppAccountStatsRoute,
   AuthenticatedAppAdminSplatRoute: AuthenticatedAppAdminSplatRoute,
   AuthenticatedAppJoinWsRoute: AuthenticatedAppJoinWsRoute,
+  AuthenticatedAppReelKeyRoute: AuthenticatedAppReelKeyRoute,
   AuthenticatedAppTemplatesSlugRoute: AuthenticatedAppTemplatesSlugRoute,
   AuthenticatedAppTemplatesIndexRoute: AuthenticatedAppTemplatesIndexRoute,
   AuthenticatedAppAdIdEditRoute: AuthenticatedAppAdIdEditRoute,

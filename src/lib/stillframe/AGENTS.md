@@ -11,3 +11,4 @@
 - Plan gates: every feature check goes through `usePlanAccess().canUse(feature)` in `src/lib/stillframe/plan.ts`; blocked features call `openUpgrade()` (one shared dialog) instead of hiding — one place for plan rules.
 - Templates are photo-less styles; examples reuse `insertCopy`; imported system templates preserve per-slide overrides and logo visibility.
 - Klaviyo: each workspace's own private key is stored AES-GCM encrypted (KLAVIYO_TOKEN_KEY) in service-only `klaviyo_connections`; `klaviyo.functions.ts` verifies membership and sends GIFs via Klaviyo import_from_url with a user-signed storage link, so keys never reach the browser.
+- Client reel page `/app/reel/$key` (keys from Brand home) is served by `client-reel.functions.ts`: membership check, then brand-ownership check before any service read, so clients only see and download their own reels; movement wording comes from `movement-label.ts`.
