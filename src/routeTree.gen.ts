@@ -46,6 +46,7 @@ import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAppRouteRouteImport } from './routes/_authenticated/app/route'
 import { Route as AimanteAboutRouteImport } from './routes/aimante.about'
 import { Route as AimanteJoinRouteImport } from './routes/aimante.join'
+import { Route as BadgeFileRouteImport } from './routes/badge.$file'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as DirectoryIndexRouteImport } from './routes/directory.index'
@@ -316,6 +317,11 @@ const AimanteAboutRoute = AimanteAboutRouteImport.update({
 const AimanteJoinRoute = AimanteJoinRouteImport.update({
   id: '/aimante/join',
   path: '/aimante/join',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BadgeFileRoute = BadgeFileRouteImport.update({
+  id: '/badge/$file',
+  path: '/badge/$file',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BlogIndexRoute = BlogIndexRouteImport.update({
@@ -817,6 +823,7 @@ export interface FileRoutesByFullPath {
   '/app': typeof AuthenticatedAppRouteRouteWithChildren
   '/aimante/about': typeof AimanteAboutRoute
   '/aimante/join': typeof AimanteJoinRoute
+  '/badge/$file': typeof BadgeFileRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/directory/$slug': typeof DirectorySlugRoute
   '/favorites/$slug': typeof FavoritesSlugRoute
@@ -937,6 +944,7 @@ export interface FileRoutesByTo {
   '/video-ads-for-small-business': typeof VideoAdsForSmallBusinessRoute
   '/aimante/about': typeof AimanteAboutRoute
   '/aimante/join': typeof AimanteJoinRoute
+  '/badge/$file': typeof BadgeFileRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/directory/$slug': typeof DirectorySlugRoute
   '/favorites/$slug': typeof FavoritesSlugRoute
@@ -1062,6 +1070,7 @@ export interface FileRoutesById {
   '/_authenticated/app': typeof AuthenticatedAppRouteRouteWithChildren
   '/aimante/about': typeof AimanteAboutRoute
   '/aimante/join': typeof AimanteJoinRoute
+  '/badge/$file': typeof BadgeFileRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/directory/$slug': typeof DirectorySlugRoute
   '/favorites/$slug': typeof FavoritesSlugRoute
@@ -1187,6 +1196,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/aimante/about'
     | '/aimante/join'
+    | '/badge/$file'
     | '/blog/$slug'
     | '/directory/$slug'
     | '/favorites/$slug'
@@ -1307,6 +1317,7 @@ export interface FileRouteTypes {
     | '/video-ads-for-small-business'
     | '/aimante/about'
     | '/aimante/join'
+    | '/badge/$file'
     | '/blog/$slug'
     | '/directory/$slug'
     | '/favorites/$slug'
@@ -1431,6 +1442,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app'
     | '/aimante/about'
     | '/aimante/join'
+    | '/badge/$file'
     | '/blog/$slug'
     | '/directory/$slug'
     | '/favorites/$slug'
@@ -1554,6 +1566,7 @@ export interface RootRouteChildren {
   VideoAdsForSmallBusinessRoute: typeof VideoAdsForSmallBusinessRoute
   AimanteAboutRoute: typeof AimanteAboutRoute
   AimanteJoinRoute: typeof AimanteJoinRoute
+  BadgeFileRoute: typeof BadgeFileRoute
   DirectorySlugRoute: typeof DirectorySlugRoute
   FavoritesSlugRoute: typeof FavoritesSlugRoute
   ForBeautyAndFragranceRoute: typeof ForBeautyAndFragranceRoute
@@ -1846,6 +1859,13 @@ declare module '@tanstack/react-router' {
       path: '/aimante/join'
       fullPath: '/aimante/join'
       preLoaderRoute: typeof AimanteJoinRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/badge/$file': {
+      id: '/badge/$file'
+      path: '/badge/$file'
+      fullPath: '/badge/$file'
+      preLoaderRoute: typeof BadgeFileRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/blog/': {
@@ -2680,6 +2700,7 @@ const rootRouteChildren: RootRouteChildren = {
   VideoAdsForSmallBusinessRoute: VideoAdsForSmallBusinessRoute,
   AimanteAboutRoute: AimanteAboutRoute,
   AimanteJoinRoute: AimanteJoinRoute,
+  BadgeFileRoute: BadgeFileRoute,
   DirectorySlugRoute: DirectorySlugRoute,
   FavoritesSlugRoute: FavoritesSlugRoute,
   ForBeautyAndFragranceRoute: ForBeautyAndFragranceRoute,
