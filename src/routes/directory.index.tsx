@@ -32,6 +32,8 @@ import { useGreeting, logGreeting } from "@/components/directory/useGreeting";
 import { rememberVisit } from "@/lib/directory/greeting";
 import { recordDirectoryReelOpen } from "@/lib/directory/views.functions";
 import { getListingIntro } from "@/lib/directory/categories.functions";
+import { listGuides } from "@/lib/directory/guides.functions";
+import { guideForEvent, guidesMatching } from "@/lib/directory/guides";
 import { brandCount, MIN_LISTING_BRANDS, list } from "@/lib/directory/listing";
 import { AIMANTE_ORIGIN } from "@/lib/site/brand-site";
 
@@ -61,15 +63,17 @@ export const Route = createFileRoute("/directory/")({
     const initialP = dirP.then((d) => searchDirectory({ data: { q: deps.q, ...filters, page: 1, pageSize: d.settings.pageSize } })).catch(() => null);
     const single = !deps.q && !deps.brand ? (deps.category && !deps.category.includes(",") && !deps.mood ? { kind: "category" as const, slug: deps.category } : deps.mood && !deps.mood.includes(",") && !deps.category ? { kind: "mood" as const, slug: deps.mood } : null) : null;
     const introP = single ? getListingIntro({ data: single }).catch(() => null) : Promise.resolve(null);
-    const [dir, initial, listing, cards, reels, brands] = await Promise.all([
+    const [dir, initial, listing, cards, reels, brands, guides] = await Promise.all([
       dirP, initialP, introP,
       searchDirectoryLegacy({ data: { q: "", size: null } }).catch(() => [] as DirectoryCard[]),
       listSiteReels().then((rs) => rs.filter((r) => r.source !== "client").map((r) => ({ ...r, title: aimanteTitle(r) }))).catch(() => [] as SiteReel[]),
       listPublicBrands().catch(() => []),
+      (context as { site?: string }).site === "aimante" ? listGuides().catch(() => []) : Promise.resolve([]),
     ]);
     return {
       q: deps.q, category: deps.category, mood: deps.mood, site: (context as { site?: string }).site, cards, reels, brands, settings: dir.settings, featuredReels: dir.featured,
       initial, initialKey: `${deps.q}|${JSON.stringify(filters)}`, listing: single && listing ? { ...single, ...listing } : null, brandCount: brandCount(initial?.facets),
+      guides: guides.map((g) => ({ slug: g.slug, title: g.title, moods: g.moods, categories: g.categories, season: g.season })),
     };
   },
   head: ({ loaderData }) => {
@@ -163,7 +167,7 @@ function withLd(head: HeadOut, { noindex, ld }: { noindex: boolean; ld: object[]
 type Tag = { key: keyof FilterValue; value: string; label: string };
 
 function DirectoryPage() {
-  const { cards: allCards, reels, brands, settings, featuredReels: featuredSet, initial, initialKey, listing } = Route.useLoaderData();
+  const { cards: allCards, reels, brands, settings, featuredReels: featuredSet, initial, initialKey, listing, guides } = Route.useLoaderData();
   const PAGE = settings.pageSize;
   const isAim = useBrandSite() === "aimante";
   const search = Route.useSearch();
@@ -343,6 +347,15 @@ function DirectoryPage() {
             {listing ? (listing.kind === "category" ? `${listing.name} brands` : `${cap(listing.name)} brands and gift ideas`) : "Discover brands by mood"}
           </h1>
           {listing?.intro && <p className="dir-page-intro mx-auto mb-6 max-w-[620px] text-[16px] leading-[1.5] text-ap-body">{listing.intro}</p>}
+          {listing && (() => {
+            const related = guidesMatching(guides, listing.kind, listing.name);
+            return related.length > 0 && (
+              <nav aria-label="Related guides" className="mx-auto -mt-2 mb-6 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[14px]">
+                <span className="text-ap-muted">Guides:</span>
+                {related.map((g) => <Link key={g.slug} to="/aimante/guides/$slug" params={{ slug: g.slug }} className="font-medium text-ap-blue hover:underline">{g.title}</Link>)}
+              </nav>
+            );
+          })()}
           <div className="dir-headline mb-8 font-semibold text-ap-muted">
             <b className={cn("dir-headline-greeting font-semibold text-ap-ink", isAim && "aimante-desktop-greeting")}>
               <span>
