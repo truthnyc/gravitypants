@@ -23,6 +23,7 @@ import { Route as HelpRouteImport } from './routes/help'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as Html5AdsRouteImport } from './routes/html5-ads'
 import { Route as InstagramReelsFromPhotosRouteImport } from './routes/instagram-reels-from-photos'
+import { Route as MerchantFeedDotxmlRouteImport } from './routes/merchant-feed[.]xml'
 import { Route as PhotoToVideoRouteImport } from './routes/photo-to-video'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PrivacyRouteImport } from './routes/privacy'
@@ -199,6 +200,11 @@ const InstagramReelsFromPhotosRoute =
     path: '/instagram-reels-from-photos',
     getParentRoute: () => rootRouteImport,
   } as any)
+const MerchantFeedDotxmlRoute = MerchantFeedDotxmlRouteImport.update({
+  id: '/merchant-feed.xml',
+  path: '/merchant-feed.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PhotoToVideoRoute = PhotoToVideoRouteImport.update({
   id: '/photo-to-video',
   path: '/photo-to-video',
@@ -775,6 +781,7 @@ export interface FileRoutesByFullPath {
   '/how-it-works': typeof HowItWorksRoute
   '/html5-ads': typeof Html5AdsRoute
   '/instagram-reels-from-photos': typeof InstagramReelsFromPhotosRoute
+  '/merchant-feed.xml': typeof MerchantFeedDotxmlRoute
   '/photo-to-video': typeof PhotoToVideoRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -894,6 +901,7 @@ export interface FileRoutesByTo {
   '/how-it-works': typeof HowItWorksRoute
   '/html5-ads': typeof Html5AdsRoute
   '/instagram-reels-from-photos': typeof InstagramReelsFromPhotosRoute
+  '/merchant-feed.xml': typeof MerchantFeedDotxmlRoute
   '/photo-to-video': typeof PhotoToVideoRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -1014,6 +1022,7 @@ export interface FileRoutesById {
   '/how-it-works': typeof HowItWorksRoute
   '/html5-ads': typeof Html5AdsRoute
   '/instagram-reels-from-photos': typeof InstagramReelsFromPhotosRoute
+  '/merchant-feed.xml': typeof MerchantFeedDotxmlRoute
   '/photo-to-video': typeof PhotoToVideoRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -1136,6 +1145,7 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/html5-ads'
     | '/instagram-reels-from-photos'
+    | '/merchant-feed.xml'
     | '/photo-to-video'
     | '/pricing'
     | '/privacy'
@@ -1255,6 +1265,7 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/html5-ads'
     | '/instagram-reels-from-photos'
+    | '/merchant-feed.xml'
     | '/photo-to-video'
     | '/pricing'
     | '/privacy'
@@ -1374,6 +1385,7 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/html5-ads'
     | '/instagram-reels-from-photos'
+    | '/merchant-feed.xml'
     | '/photo-to-video'
     | '/pricing'
     | '/privacy'
@@ -1496,6 +1508,7 @@ export interface RootRouteChildren {
   HowItWorksRoute: typeof HowItWorksRoute
   Html5AdsRoute: typeof Html5AdsRoute
   InstagramReelsFromPhotosRoute: typeof InstagramReelsFromPhotosRoute
+  MerchantFeedDotxmlRoute: typeof MerchantFeedDotxmlRoute
   PhotoToVideoRoute: typeof PhotoToVideoRoute
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -1646,6 +1659,13 @@ declare module '@tanstack/react-router' {
       path: '/instagram-reels-from-photos'
       fullPath: '/instagram-reels-from-photos'
       preLoaderRoute: typeof InstagramReelsFromPhotosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/merchant-feed.xml': {
+      id: '/merchant-feed.xml'
+      path: '/merchant-feed.xml'
+      fullPath: '/merchant-feed.xml'
+      preLoaderRoute: typeof MerchantFeedDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/photo-to-video': {
@@ -2597,6 +2617,7 @@ const rootRouteChildren: RootRouteChildren = {
   HowItWorksRoute: HowItWorksRoute,
   Html5AdsRoute: Html5AdsRoute,
   InstagramReelsFromPhotosRoute: InstagramReelsFromPhotosRoute,
+  MerchantFeedDotxmlRoute: MerchantFeedDotxmlRoute,
   PhotoToVideoRoute: PhotoToVideoRoute,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
