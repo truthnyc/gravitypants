@@ -329,6 +329,9 @@ export type Database = {
           created_at: string
           hint: string
           id: string
+          intro_draft: string | null
+          meta_description: string
+          meta_description_draft: string | null
           name: string
           page_intro: string
           slug: string
@@ -338,6 +341,9 @@ export type Database = {
           created_at?: string
           hint?: string
           id?: string
+          intro_draft?: string | null
+          meta_description?: string
+          meta_description_draft?: string | null
           name: string
           page_intro?: string
           slug: string
@@ -347,6 +353,9 @@ export type Database = {
           created_at?: string
           hint?: string
           id?: string
+          intro_draft?: string | null
+          meta_description?: string
+          meta_description_draft?: string | null
           name?: string
           page_intro?: string
           slug?: string
@@ -1164,6 +1173,9 @@ export type Database = {
           family: string
           family_id: string | null
           id: string
+          intro_draft: string | null
+          meta_description: string
+          meta_description_draft: string | null
           name: string
           page_intro: string
           sort_order: number
@@ -1173,6 +1185,9 @@ export type Database = {
           family: string
           family_id?: string | null
           id?: string
+          intro_draft?: string | null
+          meta_description?: string
+          meta_description_draft?: string | null
           name: string
           page_intro?: string
           sort_order?: number
@@ -1182,6 +1197,9 @@ export type Database = {
           family?: string
           family_id?: string | null
           id?: string
+          intro_draft?: string | null
+          meta_description?: string
+          meta_description_draft?: string | null
           name?: string
           page_intro?: string
           sort_order?: number
