@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { categoryHintInput } from "./admin-fields";
 
@@ -21,4 +22,15 @@ export const saveCategoryHint = createServerFn({ method: "POST" })
     const { error: auditError } = await supabaseAdmin.from("admin_audit_log").insert({ admin_user_id: context.userId, action: "category.hint.update", target: row.name });
     if (auditError) throw new Error(auditError.message);
     return { ok: true };
+  });
+/** Public: the name and editable intro shown under a /c/ or /mood/ page heading. */
+export const getListingIntro = createServerFn({ method: "GET" })
+  .inputValidator((d: unknown) => z.object({ kind: z.enum(["category", "mood"]), slug: z.string().trim().toLowerCase().max(60) }).parse(d))
+  .handler(async ({ data }) => {
+    const { publicClient } = await import("@/lib/site/reels.server");
+    const pc = publicClient() as any;
+    const { data: row } = data.kind === "category"
+      ? await pc.from("categories").select("name, page_intro").eq("slug", data.slug).maybeSingle()
+      : await pc.from("moods").select("name, page_intro").ilike("name", data.slug).maybeSingle();
+    return row ? { name: row.name as string, intro: (row.page_intro as string) || "" } : null;
   });
