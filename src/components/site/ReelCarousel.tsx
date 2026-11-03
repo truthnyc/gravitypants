@@ -21,7 +21,7 @@ export function ReelCarousel({ items, label, loop = true }: { items: CarouselIte
         {list.map((it, i) => {
           const hidden = i >= items.length;
           return (
-            <figure key={`${it.key}-${i}`} className="home-example-figure" inert={hidden}>
+            <figure key={`${it.key}-${i}`} className="home-example-figure" inert={hidden} aria-hidden={hidden || undefined}>
               {it.media(hidden)}
               <figcaption>
                 <b>{it.title}</b>

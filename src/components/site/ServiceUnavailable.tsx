@@ -34,7 +34,7 @@ export function ServiceUnavailable({ onRetry }: { onRetry: () => void }) {
             <Button type="button" size="large" onClick={onRetry}><RefreshCw className="size-4" strokeWidth={1.7} />Try again</Button>
             <Button asChild variant="outline" size="large"><Link to="/">Go home</Link></Button>
           </div>
-          <a href={STATUS_URL} target="_blank" rel="noreferrer" className="mt-10 inline-flex text-[14px] text-ap-blue hover:underline">Check service status →</a>
+          <a href={STATUS_URL} target="_blank" rel="noopener noreferrer" className="mt-10 inline-flex text-[14px] text-ap-blue hover:underline">Check service status →</a>
         </div>
       </section>
       <footer className="border-t border-ap-hairline px-5 py-5 text-[12px] text-ap-muted sm:px-8">

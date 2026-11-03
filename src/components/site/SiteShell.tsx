@@ -1,7 +1,7 @@
 import { BrandPreviewHost } from "./BrandPreview";
 import { Link } from "@tanstack/react-router";
 import { Instagram, Minus, Plus, Youtube } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { GravityPantsLogo } from "@/components/GravityPantsLogo";
 import { FooterNewsletter, NewsletterPopup } from "@/components/site/Newsletter";
@@ -40,7 +40,7 @@ function FooterLinkItem({ link }: { link: FooterLink }) {
     </>
   );
   return link.external ? (
-    <a href={link.to} target="_blank" rel="noreferrer" className={linkCls}>{inner}</a>
+    <a href={link.to} target="_blank" rel="noopener noreferrer" className={linkCls}>{inner}</a>
   ) : (
     <Link to={link.to as "/"} {...(link.search ? { search: link.search as never } : {})} className={linkCls}>{inner}</Link>
   );
@@ -54,7 +54,7 @@ function Brand() {
       {SOCIAL_LINKS.some((s) => s.url) && (
         <div className="mt-4 flex gap-2">
           {SOCIAL_LINKS.filter((s) => s.url).map((s) => (
-            <a key={s.name} href={s.url} target="_blank" rel="noreferrer" aria-label={s.name} className="grid size-[34px] min-h-0 min-w-0 place-items-center rounded-lg border border-ap-hairline bg-ap-card text-ap-ink hover:text-ap-blue">
+            <a key={s.name} href={s.url} target="_blank" rel="noopener noreferrer" aria-label={s.name} className="grid size-[34px] min-h-0 min-w-0 place-items-center rounded-lg border border-ap-hairline bg-ap-card text-ap-ink hover:text-ap-blue">
               {s.name === "YouTube" ? <Youtube size={17} strokeWidth={1.7} /> : <Instagram size={17} strokeWidth={1.7} />}
             </a>
           ))}
@@ -74,7 +74,9 @@ function Column({ column }: { column: (typeof columns)[number] }) {
 }
 
 function Collapsible({ column, defaultOpen }: { column: (typeof columns)[number]; defaultOpen: boolean }) {
-  const [open, setOpen] = useState(defaultOpen);
+  // Opens after load so the server page holds only one copy of each footer link.
+  const [open, setOpen] = useState(false);
+  useEffect(() => { if (defaultOpen) setOpen(true); }, [defaultOpen]);
   const id = `footer-${column.label.toLowerCase().replace(/\s+/g, "-")}`;
   return (
     <div className="border-b border-ap-hairline">
@@ -91,29 +93,19 @@ function SiteFooter() {
   return (
     <footer className="mt-auto border-t border-ap-hairline bg-ap-panel font-ap text-ap-ink">
       <div className="mx-auto max-w-[1280px] px-6 pb-7 pt-12">
-        {/* Desktop */}
-        <div className="hidden gap-7 lg:grid lg:grid-cols-[1.3fr_1fr_1fr_1.2fr_1fr_1fr_1.6fr]">
+        {/* One copy of every link for all sizes, so crawlers and screen readers see each once. */}
+        <div className="grid gap-7 md:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_1.2fr_1fr_1fr_1.6fr]">
           <Brand />
-          {columns.map((c) => <Column key={c.label} column={c} />)}
-          <div className="self-start"><FooterNewsletter /></div>
-        </div>
-        {/* Tablet */}
-        <div className="hidden md:block lg:hidden">
-          <div className="grid grid-cols-2 gap-7"><Brand /><FooterNewsletter /></div>
-          <div className="mt-10 grid grid-cols-5 gap-7">{columns.map((c) => <Column key={c.label} column={c} />)}</div>
-        </div>
-        {/* Phone */}
-        <div className="md:hidden">
-          <Brand />
-          <div className="mt-6"><FooterNewsletter /></div>
-          <div className="mt-6 border-t border-ap-hairline">{columns.map((c, i) => <Collapsible key={c.label} column={c} defaultOpen={i === 0} />)}</div>
+          <div className="self-start lg:order-last"><FooterNewsletter /></div>
+          <div className="hidden md:col-span-2 md:mt-3 md:grid md:grid-cols-5 md:gap-7 lg:contents">{columns.map((c) => <Column key={c.label} column={c} />)}</div>
+          <div className="border-t border-ap-hairline md:hidden">{columns.map((c, i) => <Collapsible key={c.label} column={c} defaultOpen={i === 0} />)}</div>
         </div>
 
         <div className="mt-10 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-ap-hairline pt-5 text-[13px] text-ap-muted">
           <span>© {new Date().getFullYear()} Gravity Pants</span>
           <Link to="/privacy" className="min-h-0 min-w-0 hover:text-ap-blue">Privacy</Link>
           <Link to="/terms" className="min-h-0 min-w-0 hover:text-ap-blue">Terms</Link>
-          <a href={STATUS_URL} target="_blank" rel="noreferrer" className="ml-auto inline-flex min-h-0 items-center gap-1.5 hover:text-ap-blue">
+          <a href={STATUS_URL} target="_blank" rel="noopener noreferrer" className="ml-auto inline-flex min-h-0 items-center gap-1.5 hover:text-ap-blue">
             <span className="size-2 rounded-full bg-ap-green" aria-hidden /> Status
           </a>
           <p className="w-full pt-1 text-[12px] text-ap-muted">Gravity Pants and Aimanté are trademarks of Truth NYC LLC.</p>

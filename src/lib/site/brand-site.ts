@@ -158,3 +158,10 @@ export function aimanteHead({ path, title, description, image = `${AIMANTE_ORIGI
     links: [{ rel: "canonical", href: url }],
   };
 }
+
+/** Only the real brand domains may be indexed; lovable.app and previews get noindex so search sees one copy. */
+export const isIndexedHost = createIsomorphicFn()
+  .server(() => {
+    try { const h = getRequestHost({ xForwardedHost: true }); return isGravityPantsHost(h) || isAimanteHost(h); } catch { return false; }
+  })
+  .client(() => isGravityPantsHost(window.location.hostname) || isAimanteHost(window.location.hostname));

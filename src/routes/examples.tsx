@@ -14,6 +14,7 @@ import { GravityPantsLogo } from "@/components/GravityPantsLogo";
 import { Button } from "@/components/ui/button";
 import type { GalleryExample } from "@/lib/site/examples";
 import { EXAMPLES_OG_IMAGE, siteHead } from "@/lib/site/seo";
+import { videoObjects } from "@/lib/site/video-schema";
 import { listSiteReels } from "@/lib/site/reels.functions";
 import { categoryLabel, ratioToFormat, type SiteReel } from "@/lib/site/reels";
 import { getHomepageContent } from "@/lib/site/homepage.functions";
@@ -74,7 +75,7 @@ function GalleryReel({ example }: { example: GalleryExample }) {
 
 function GalleryCard({ example }: { example: BrandExample }) {
   return <article className="examples-card">
-    <div className="examples-card-media">{!example.client && <SiteReelHeart reelId={example.id} name={example.name} />}{example.href ? <a className="site-reel-link" href={example.href} target="_blank" rel="noreferrer" aria-label={example.frames?.length ? undefined : `Visit ${example.logo ?? example.name}`}><GalleryReel example={example} /></a> : <GalleryReel example={example} />}</div>
+    <div className="examples-card-media">{!example.client && <SiteReelHeart reelId={example.id} name={example.name} />}{example.href ? <a className="site-reel-link" href={example.href} target="_blank" rel="noopener noreferrer" aria-label={example.frames?.length ? undefined : `Visit ${example.logo ?? example.name}`}><GalleryReel example={example} /></a> : <GalleryReel example={example} />}</div>
     <div className="examples-card-info"><div><h3>{example.name}</h3><p className="examples-card-meta-desktop">{categoryLabel(example.category)} · {formatLabel[example.format]} · {example.photos} {example.photos === 1 ? "photo" : "photos"} · {example.seconds} sec</p><p className="examples-card-meta-mobile">{categoryLabel(example.category)} · {formatLabel[example.format]}</p><ConceptReelNotice brandName={example.logo ?? example.sub} />{example.brandSlug && <BrandProfileLink className="showcase-visit" slug={example.brandSlug} cta="examples-brand-profile">About {example.logo ?? example.name} <ArrowRight size={13} strokeWidth={1.7} /></BrandProfileLink>}</div>
     </div>
   </article>;
@@ -82,7 +83,10 @@ function GalleryCard({ example }: { example: BrandExample }) {
 
 export const Route = createFileRoute("/examples")({
   validateSearch: z.object({ cat: z.string().optional(), format: z.coerce.number().optional() }),
-  head: () => siteHead({ path: "/examples", title: "Video Ad Examples Made from Product Photos — Gravity Pants", description: "Browse Gravity Pants video ad examples across fashion, food, beauty, and home. Find a style for your photos.", image: EXAMPLES_OG_IMAGE }),
+  head: ({ loaderData }) => {
+    const head = siteHead({ path: "/examples", title: "Video Ad Examples Made from Product Photos — Gravity Pants", description: "Browse Gravity Pants video ad examples across fashion, food, beauty, and home. Find a style for your photos.", image: EXAMPLES_OG_IMAGE });
+    return { ...head, scripts: [...head.scripts, ...videoObjects(loaderData?.reels ?? [], "/examples").map((v) => ({ type: "application/ld+json", children: JSON.stringify(v) }))] };
+  },
   loader: async () => {
     const [reels, content] = await Promise.all([listSiteReels().catch(() => [] as SiteReel[]), getHomepageContent().catch(() => DEFAULT_CONTENT)]);
     return { reels, content };

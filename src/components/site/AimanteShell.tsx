@@ -111,7 +111,7 @@ function AccountMenu({ me }: { me: Me }) {
         <DropdownMenuSeparator className="bg-aimante-divider" />
         {ACCOUNT_LINKS(saved, statsOk, admin).map((l) => (
           <DropdownMenuItem key={l.label} asChild className="h-10 cursor-pointer rounded-lg px-3 text-[14px] text-ap-ink">
-            {"href" in l ? <a href={l.href} target="_blank" rel="noreferrer">{l.label}</a> : <Link to={l.to} className="flex justify-between">{l.label}{"count" in l && <span className="text-ap-muted tabular-nums">{l.count}</span>}</Link>}
+            {"href" in l ? <a href={l.href} target="_blank" rel="noopener noreferrer">{l.label}</a> : <Link to={l.to} className="flex justify-between">{l.label}{"count" in l && <span className="text-ap-muted tabular-nums">{l.count}</span>}</Link>}
           </DropdownMenuItem>
         ))}
         <DropdownMenuSeparator className="bg-aimante-divider" />
@@ -193,7 +193,7 @@ export function AimanteHeader() {
           {me ? <>
             <div className="mt-5 flex items-center gap-3 rounded-[12px] bg-ap-panel p-3"><Avatar me={me} /><div className="min-w-0"><p className="truncate text-[15px] font-semibold text-ap-ink">{me.displayName || me.email}</p>{me.displayName && <p className="truncate text-[13px] text-ap-muted">{me.email}</p>}</div></div>
             {ACCOUNT_LINKS(saved, statsOk, admin).map((l) => "href" in l
-              ? <a key={l.label} href={l.href} target="_blank" rel="noreferrer" onClick={close} className="flex h-12 items-center border-b border-aimante-divider text-[16px] text-site-nav hover:text-ap-ink">{l.label}</a>
+              ? <a key={l.label} href={l.href} target="_blank" rel="noopener noreferrer" onClick={close} className="flex h-12 items-center border-b border-aimante-divider text-[16px] text-site-nav hover:text-ap-ink">{l.label}</a>
               : <Link key={l.label} to={l.to} onClick={close} className="flex h-12 items-center justify-between border-b border-aimante-divider text-[16px] text-site-nav hover:text-ap-ink">{l.label}{"count" in l && <span className="text-ap-muted tabular-nums">{l.count}</span>}</Link>)}
             <a href="#" onClick={(e) => { e.preventDefault(); close(); void signOut(); }} className="flex h-12 items-center text-[16px] text-site-nav hover:text-ap-ink">Sign out</a>
           </> : <>

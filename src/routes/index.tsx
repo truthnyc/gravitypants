@@ -23,6 +23,7 @@ import jewelryFrame1 from "@/assets/site/fine-jewelry-frame-1.webp.asset.json";
 import jewelryFrame2 from "@/assets/site/fine-jewelry-frame-2.webp.asset.json";
 import jewelryFrame3 from "@/assets/site/fine-jewelry-frame-3.webp.asset.json";
 import { SITE_ORIGIN, siteHead } from "@/lib/site/seo";
+import { videoObjects } from "@/lib/site/video-schema";
 import { listSiteReels } from "@/lib/site/reels.functions";
 import { FORMAT_LABEL, ratioToFormat, type SiteReel } from "@/lib/site/reels";
 import { getHomepageContent } from "@/lib/site/homepage.functions";
@@ -78,7 +79,11 @@ export const Route = createFileRoute("/")({
           href: loaderData ? pickVideo(loaderData.content.hero.reelId, loaderData.allReels, 3).poster : heroPoster.url,
         },
       ],
-      scripts: [...head.scripts, { type: "application/ld+json", children: JSON.stringify(jsonLd) }],
+      scripts: [
+        ...head.scripts,
+        { type: "application/ld+json", children: JSON.stringify(jsonLd) },
+        ...videoObjects(loaderData?.reels ?? [], "/").map((v) => ({ type: "application/ld+json", children: JSON.stringify(v) })),
+      ],
     };
   },
   loader: async () => {
@@ -111,12 +116,12 @@ const exampleColors = [
 function frames(name: string, palette: string[]): ReelFrame[] {
   return palette.map((background, i) => ({
     background,
-    artwork: <img src={`/site-art/${name}-${i + 1}.svg`} alt="" />,
+    artwork: <img src={`/site-art/${name}-${i + 1}.svg`} alt="" aria-hidden="true" />,
   }));
 }
 const purlFrames: ReelFrame[] = [photo1, photo2, photo3].map((photo) => ({
   background: "#1D2A3A",
-  artwork: <img src={photo.url} alt="" />,
+  artwork: <img src={photo.url} alt="" aria-hidden="true" />,
 }));
 type HomeExample = {
   name: string;
@@ -163,7 +168,7 @@ function HomeReelVideo({ example }: { example: HomeExample }) {
   );
 }
 
-function HomeExampleMedia({ example, index, count }: { example: HomeExample; index: number; count: number }) {
+function HomeExampleMedia({ example, index, count, hidden }: { example: HomeExample; index: number; count: number; hidden: boolean }) {
   const media = example.video ? (
     <HomeReelVideo example={example} />
   ) : example.frames ? (
@@ -187,9 +192,10 @@ function HomeExampleMedia({ example, index, count }: { example: HomeExample; ind
       className="site-reel-link"
       href={example.href}
       target="_blank"
-      rel="noreferrer"
-      tabIndex={index >= count ? -1 : undefined}
-      aria-label={`Visit ${example.logo ?? example.name}`}
+      rel="noopener noreferrer"
+      tabIndex={hidden ? -1 : undefined}
+      aria-hidden={hidden || undefined}
+      aria-label={`${example.logo ?? example.name} website`}
     >
       {media}
     </a>
@@ -289,6 +295,7 @@ function BeforeAfter({
   poster,
   format = "916",
   imageLabel = "Original photos",
+  alts,
 }: {
   stills: string[];
   title: string;
@@ -298,6 +305,8 @@ function BeforeAfter({
   poster?: string | undefined;
   format?: "916" | "169";
   imageLabel?: string;
+  /** Descriptive alt text per still, naming the product and brand. */
+  alts: string[];
 }) {
   return (
     <article className="site-card home-before-card">
@@ -308,7 +317,7 @@ function BeforeAfter({
             <img
               key={src}
               src={src}
-              alt={`${title} ${imageLabel === "Video frames" ? "video frame" : "original photo"} ${i + 1}`}
+              alt={alts[i] ?? `${title}, ${imageLabel === "Video frames" ? "video frame" : "original product photo"}`}
               loading="lazy"
             />
           ))}
@@ -602,6 +611,8 @@ function Home() {
                   <span>{hero.line2}</span>
                 </>
               )}
+              <br />
+              <span className="home-h1-sub">The product video maker for online stores.</span>
             </h1>
             <p className="site-lede home-hero-lede">{hero.lede}</p>
             <div className="home-actions">
@@ -617,7 +628,13 @@ function Home() {
           <div className="home-hero-visual" aria-hidden="true">
             {hero.photos.slice(0, 3).map((p, i) => (
               <div key={i} className={`home-drop home-drop-${["one", "two", "three"][i]}`}>
-                <img src={photoSrc(p)} alt={p.alt} />
+                <img
+                  src={photoSrc(p)}
+                  alt={p.alt}
+                  width={300}
+                  height={400}
+                  {...(i === 0 ? { fetchPriority: "high" as const, loading: "eager" as const } : { loading: "lazy" as const })}
+                />
               </div>
             ))}
             <div className="home-hero-phone">
@@ -662,7 +679,7 @@ function Home() {
             label="Example reels made with Gravity Pants"
             items={examples.map((ex, i) => ({
               key: ex.name,
-              media: () => <HomeExampleMedia example={ex} index={i} count={examples.length} />,
+              media: (hidden) => <HomeExampleMedia example={ex} index={i} count={examples.length} hidden={hidden} />,
               title: ex.name,
               detail: ex.detail,
               visit: ex.brandSlug ? { slug: ex.brandSlug, label: `About ${ex.logo ?? ex.name}` } : undefined,
@@ -755,6 +772,11 @@ function Home() {
             <BeforeAfter
               stills={[photo1.url, photo2.url, photo3.url]}
               title="Launch Kit"
+              alts={[
+                "Purl Soho Japanese Denim Cotton yarn skeins, original product photo",
+                "Purl Soho denim cotton yarn in blue shades, original product photo",
+                "Purl Soho denim cotton yarn detail, original product photo",
+              ]}
               detail="3 photos → 7.8 sec reel · Purl Soho"
               video={featuredVideo.url}
               videoWebm={featuredWebm.url}
@@ -764,6 +786,11 @@ function Home() {
               stills={[jewelryFrame1.url, jewelryFrame2.url, jewelryFrame3.url]}
               imageLabel="Video frames"
               title="Gift Guide"
+              alts={[
+                "Katherine Grover Fine Jewellery gold jewelry, frame from the gift guide video",
+                "Katherine Grover Fine Jewellery gift piece close-up, frame from the gift guide video",
+                "Katherine Grover Fine Jewellery collection, frame from the gift guide video",
+              ]}
               detail="8 sec reel · Katherine Grover Fine Jewellery"
               video={jewelryVideo.url}
               videoWebm={jewelryWebm.url}

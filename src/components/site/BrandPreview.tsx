@@ -97,8 +97,8 @@ function BrandPreviewBody({ slug }: { slug: string }) {
       </ul>
     </>}
     <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3 border-t border-ap-hairline pt-5">
-      {brand.website_url && <a href={brand.website_url} target="_blank" rel="noreferrer" data-cta="brand-preview-visit" onClick={() => void recordBrandClick({ data: { kind: "brand", id: brand.id } }).catch(() => {})} className="inline-flex items-center gap-1.5 text-[15px] text-ap-blue">Visit {brand.name} <ArrowUpRight className="size-4" strokeWidth={1.7} /></a>}
-      <a href={`${AIMANTE}/b/${brand.slug}`} target="_blank" rel="noreferrer" data-cta="brand-preview-aimante" className="ml-auto inline-flex items-center gap-1 text-[13px] text-secondary-text hover:text-ap-ink">Curated on Aimanté <ArrowUpRight className="size-3.5" strokeWidth={1.7} /></a>
+      {brand.website_url && <a href={brand.website_url} target="_blank" rel="noopener noreferrer" data-cta="brand-preview-visit" onClick={() => void recordBrandClick({ data: { kind: "brand", id: brand.id } }).catch(() => {})} className="inline-flex items-center gap-1.5 text-[15px] text-ap-blue">Visit {brand.name} <ArrowUpRight className="size-4" strokeWidth={1.7} /></a>}
+      <a href={`${AIMANTE}/b/${brand.slug}`} target="_blank" rel="noopener noreferrer" data-cta="brand-preview-aimante" className="ml-auto inline-flex items-center gap-1 text-[13px] text-secondary-text hover:text-ap-ink">Curated on Aimanté <ArrowUpRight className="size-3.5" strokeWidth={1.7} /></a>
     </div>
   </div>;
 }
