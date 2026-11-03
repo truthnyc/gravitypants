@@ -62,13 +62,16 @@ type Entry = { loc: string; lastmod: string; changefreq: string; priority: strin
 /** aimante.co lists only its own pages: home, About, List your brand, every category and brand. */
 async function aimanteEntries(): Promise<Entry[]> {
   const { listingStats, MIN_LISTING_BRANDS } = await import("@/lib/directory/listing-stats.server");
-  const [brands, listings] = await Promise.all([listPublicBrands(), listingStats()]);
+  const { publishedGuides } = await import("@/lib/directory/guides.server");
+  const [brands, listings, guides] = await Promise.all([listPublicBrands(), listingStats(), publishedGuides()]);
   // Category and mood pages need at least MIN_LISTING_BRANDS brands; thinner ones carry noindex instead.
   const shown = listings.filter((l) => l.brands >= MIN_LISTING_BRANDS);
   return [
     { loc: `${AIMANTE_ORIGIN}/`, lastmod: "", changefreq: "daily", priority: "1.0" },
     { loc: `${AIMANTE_ORIGIN}/about`, lastmod: "2026-10-07", changefreq: "yearly", priority: "0.5" },
     { loc: `${AIMANTE_ORIGIN}/join`, lastmod: "2026-10-07", changefreq: "monthly", priority: "0.6" },
+    ...(guides.length ? [{ loc: `${AIMANTE_ORIGIN}/guides`, lastmod: isoDate(guides[0]!.updated_at), changefreq: "weekly", priority: "0.6" }] : []),
+    ...guides.map((g) => ({ loc: `${AIMANTE_ORIGIN}/guides/${g.slug}`, lastmod: isoDate(g.updated_at), changefreq: "monthly", priority: "0.6" })),
     ...shown.map((l) => ({ loc: `${AIMANTE_ORIGIN}/${l.kind === "category" ? "c" : "mood"}/${encodeURIComponent(l.slug)}`, lastmod: l.lastmod, changefreq: "weekly", priority: l.kind === "category" ? "0.7" : "0.6" })),
     ...brands.map((b) => ({ loc: `${AIMANTE_ORIGIN}/b/${b.slug}`, lastmod: isoDate(b.updated_at), changefreq: "weekly", priority: "0.8" })),
   ];
