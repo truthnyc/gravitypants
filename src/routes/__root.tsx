@@ -19,7 +19,7 @@ import { PaymentTestModeBanner } from "@/components/billing/BillingNotices";
 import { trackPageView } from "@/lib/site/track";
 import { trackGtmPage } from "@/lib/site/gtm";
 import { trackGaPage } from "@/lib/site/ga";
-import { currentSite } from "@/lib/site/brand-site";
+import { currentSite, isIndexedHost } from "@/lib/site/brand-site";
 import { ServiceUnavailable } from "@/components/site/ServiceUnavailable";
 import { AdvertisingConsent } from "@/components/site/AdvertisingConsent";
 import favicon from "@/assets/site/favicon.svg.asset.json";
@@ -85,6 +85,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
+      // Duplicate hosts (gravitypants.lovable.app, previews) stay out of search; canonicals still point at gravitypants.com.
+      ...(isIndexedHost() ? [] : [{ name: "robots", content: "noindex, follow" }]),
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { title: "Gravity Pants" },
       {

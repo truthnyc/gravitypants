@@ -74,7 +74,9 @@ function Column({ column }: { column: (typeof columns)[number] }) {
 }
 
 function Collapsible({ column, defaultOpen }: { column: (typeof columns)[number]; defaultOpen: boolean }) {
-  const [open, setOpen] = useState(defaultOpen);
+  // Opens after load so the server page holds only one copy of each footer link.
+  const [open, setOpen] = useState(false);
+  useEffect(() => { if (defaultOpen) setOpen(true); }, [defaultOpen]);
   const id = `footer-${column.label.toLowerCase().replace(/\s+/g, "-")}`;
   return (
     <div className="border-b border-ap-hairline">
@@ -91,22 +93,12 @@ function SiteFooter() {
   return (
     <footer className="mt-auto border-t border-ap-hairline bg-ap-panel font-ap text-ap-ink">
       <div className="mx-auto max-w-[1280px] px-6 pb-7 pt-12">
-        {/* Desktop */}
-        <div className="hidden gap-7 lg:grid lg:grid-cols-[1.3fr_1fr_1fr_1.2fr_1fr_1fr_1.6fr]">
+        {/* One copy of every link for all sizes, so crawlers and screen readers see each once. */}
+        <div className="grid gap-7 md:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_1.2fr_1fr_1fr_1.6fr]">
           <Brand />
-          {columns.map((c) => <Column key={c.label} column={c} />)}
-          <div className="self-start"><FooterNewsletter /></div>
-        </div>
-        {/* Tablet */}
-        <div className="hidden md:block lg:hidden">
-          <div className="grid grid-cols-2 gap-7"><Brand /><FooterNewsletter /></div>
-          <div className="mt-10 grid grid-cols-5 gap-7">{columns.map((c) => <Column key={c.label} column={c} />)}</div>
-        </div>
-        {/* Phone */}
-        <div className="md:hidden">
-          <Brand />
-          <div className="mt-6"><FooterNewsletter /></div>
-          <div className="mt-6 border-t border-ap-hairline">{columns.map((c, i) => <Collapsible key={c.label} column={c} defaultOpen={i === 0} />)}</div>
+          <div className="self-start max-md:-mt-1 lg:order-last"><FooterNewsletter /></div>
+          <div className="hidden md:col-span-2 md:mt-3 md:grid md:grid-cols-5 md:gap-7 lg:contents">{columns.map((c) => <Column key={c.label} column={c} />)}</div>
+          <div className="-mt-1 border-t border-ap-hairline md:hidden">{columns.map((c, i) => <Collapsible key={c.label} column={c} defaultOpen={i === 0} />)}</div>
         </div>
 
         <div className="mt-10 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-ap-hairline pt-5 text-[13px] text-ap-muted">

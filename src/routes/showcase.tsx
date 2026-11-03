@@ -7,19 +7,22 @@ import { ReelVideo } from "@/components/site/ReelVideo";
 import { SiteReelHeart } from "@/components/site/SiteReelHeart";
 import { Button } from "@/components/ui/button";
 import { SHOWCASE_OG_IMAGE, siteHead } from "@/lib/site/seo";
+import { videoObjects } from "@/lib/site/video-schema";
 import { listSiteReels } from "@/lib/site/reels.functions";
 import { FORMAT_LABEL, ratioToFormat, type SiteReel } from "@/lib/site/reels";
 import { useState } from "react";
 
 export const Route = createFileRoute("/showcase")({
-  head: () =>
-    siteHead({
+  head: ({ loaderData }) => {
+    const head = siteHead({
       path: "/showcase",
       title: "Showcase — Brands on Gravity Pants",
       description:
         "Real video ads made with Gravity Pants by brands like Purl Soho, Aro, Agnona, Sachajuan and Katherine Grover.",
       image: SHOWCASE_OG_IMAGE,
-    }),
+    });
+    return { ...head, scripts: [...head.scripts, ...videoObjects(loaderData ?? [], "/showcase").map((v) => ({ type: "application/ld+json", children: JSON.stringify(v) }))] };
+  },
   loader: () => listSiteReels().catch(() => [] as SiteReel[]),
   component: Showcase,
 });
