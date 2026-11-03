@@ -1,8 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { gtmScriptUrl } from "@/lib/site/gtm";
 
-// The real container ID is filled in by hand, so these checks pass one explicitly:
-// what matters is which pages the container is allowed to load on.
+// Placement checks pass an explicit ID; the last check pins the real container.
 const ID = "GTM-TEST01";
 
 describe("Tag Manager container placement", () => {
@@ -24,7 +23,7 @@ describe("Tag Manager container placement", () => {
     expect(gtmScriptUrl("id-preview--abc.lovable.app", "/", ID)).toBeNull();
   });
 
-  it("stays off entirely while the container ID is empty", () => {
-    expect(gtmScriptUrl("gravitypants.com", "/")).toBeNull();
+  it("uses the real container on the public homepage by default", () => {
+    expect(gtmScriptUrl("gravitypants.com", "/")).toBe("https://www.googletagmanager.com/gtm.js?id=GTM-P66HK9ZR");
   });
 });
