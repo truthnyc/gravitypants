@@ -52,3 +52,5 @@
 - [ ] Analytics report reading in admin — needs the Analytics connection.
 - [ ] Merchant Center product feed.
 - [ ] Google Business Profile — check eligibility (online-only businesses can't list).
+
+- [ ] Publish so GA4/GTM send visits; confirm in admin dashboard (GA report reading needs Analytics "Read insights" connection)
