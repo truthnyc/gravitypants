@@ -80,6 +80,7 @@ function DirectoryAccount() {
           <LogoBox brandId={d.brand.id} name={d.brand.name} logo={d.brand.logo} onSaved={() => void qc.invalidateQueries({ queryKey: ["directory-account", ws] })} />
           <DescriptionBox brand={d.brand} onSaved={() => void qc.invalidateQueries({ queryKey: ["directory-account", ws] })} />
           <SlugBox brandId={d.brand.id} slug={d.brand.slug} live={d.brand.live} onSaved={() => void qc.invalidateQueries({ queryKey: ["directory-account", ws] })} />
+          <p className="mt-4 text-[14px] text-ap-body">Optional: link to your page from your own site. <Link to="/app/account/brand-kit" data-cta="account-directory-badge" className="text-ap-blue">Get your badge</Link></p>
         </section>
 
         {d.siteReels.length > 0 && (

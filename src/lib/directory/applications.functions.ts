@@ -129,7 +129,7 @@ export const approveBrandApplication = createServerFn({ method: 'POST' })
     if (request) {
       try {
         const { sendTemplateEmail } = await import('@/lib/email-templates/send-email')
-        await sendTemplateEmail('brand-application', request.email, { templateData: { subject: `${request.brand}'s Aimanté application was approved`, heading: 'Your application was approved', paragraphs: [`We created a draft Aimanté page for ${request.brand}. Our team will review its reels and publish the page when it is ready.`] }, idempotencyKey: `aimante-application-approved-${data.id}` })
+        await sendTemplateEmail('brand-application', request.email, { templateData: { subject: `${request.brand}'s Aimanté application was approved`, heading: 'Your application was approved', paragraphs: [`We created a draft Aimanté page for ${request.brand}. Our team will review its reels and publish the page when it is ready.`, 'Once your page is live, you can get an optional "As seen on Aimanté" badge for your website from your brand kit: https://aimante.co/brand-kit'] }, idempotencyKey: `aimante-application-approved-${data.id}` })
       } catch (emailError) { console.error('brand approval email failed', emailError) }
     }
     return { brandId: String(brandId) }
