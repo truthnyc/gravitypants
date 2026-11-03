@@ -26,7 +26,6 @@ export function watchPages(reels: SiteReel[]): WatchPage[] {
       `      <video:title>${esc(v.name)}</video:title>`,
       `      <video:description>${esc(v.description.slice(0, 2048))}</video:description>`,
       `      <video:content_loc>${esc(v.contentUrl)}</video:content_loc>`,
-      `      <video:player_loc>${esc(v.url)}</video:player_loc>`,
       ...(v.duration ? [`      <video:duration>${v.duration.replace(/\D/g, "")}</video:duration>`] : []),
       `      <video:publication_date>${esc(v.uploadDate!)}</video:publication_date>`,
       "      <video:family_friendly>yes</video:family_friendly>",
