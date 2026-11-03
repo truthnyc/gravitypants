@@ -61,7 +61,7 @@ export const Route = createFileRoute("/sitemap.xml")({
   },
 });
 
-type Entry = { loc: string; lastmod: string; changefreq: string; priority: string; video?: string };
+type Entry = { loc: string; lastmod: string; changefreq: string; priority: string; video?: string | undefined };
 
 /** aimante.co lists only its own pages: home, About, List your brand, every category and brand. */
 async function aimanteEntries(): Promise<Entry[]> {
