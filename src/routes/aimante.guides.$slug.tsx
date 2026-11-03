@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { AIMANTE_ORIGIN, aimanteHead } from "@/lib/site/brand-site";
-import { AimanteShell, AimanteNotFound } from "@/components/site/AimanteShell";
+import { AimanteShell } from "@/components/site/AimanteShell";
 import { getGuide } from "@/lib/directory/guides.functions";
 import { seasonNote } from "@/lib/directory/guides";
 
@@ -24,7 +24,7 @@ export const Route = createFileRoute("/aimante/guides/$slug")({
     return { ...head, meta: [...(head.meta ?? []).filter((m: { property?: string }) => m.property !== "og:type"), { property: "og:type", content: "article" }], scripts: ld.map((x) => ({ type: "application/ld+json", children: JSON.stringify(x) })) };
   },
   errorComponent: () => <AimanteShell><p className="py-20 text-center font-ap">This guide couldn't load. Try again.</p></AimanteShell>,
-  notFoundComponent: () => <AimanteNotFound />,
+  notFoundComponent: () => <AimanteShell><div className="py-24 text-center font-ap"><h1 className="text-[28px] font-semibold">Guide not found</h1><p className="mt-4"><Link to="/aimante/guides" className="text-ap-blue hover:underline">See all guides →</Link></p></div></AimanteShell>,
   component: Guide,
 });
 
