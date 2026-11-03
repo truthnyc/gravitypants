@@ -11,8 +11,12 @@ export function advertisingAllowed(region: string | null, choice: Choice | undef
   if (optOut || choice?.advertising === false) return false;
   return choice?.advertising === true || !requiresConsent(region);
 }
-export function pixelPageAllowed(host: string, path: string) {
+/** Public Gravity Pants marketing pages only: never the app, staff tools, Aimanté or embedded players. */
+export function measurementPageAllowed(host: string, path: string) {
   return ['gravitypants.com', 'www.gravitypants.com'].includes(host) && !/^\/(app|admin|shopify|embed|api|signin|signup|reset|auth|directory|aimante)(\/|$)/.test(path);
+}
+export function pixelPageAllowed(host: string, path: string) {
+  return measurementPageAllowed(host, path);
 }
 export function parseConsent(raw: string | null): ConsentRecord | null {
   try {
