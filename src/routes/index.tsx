@@ -23,7 +23,7 @@ import jewelryFrame1 from "@/assets/site/fine-jewelry-frame-1.webp.asset.json";
 import jewelryFrame2 from "@/assets/site/fine-jewelry-frame-2.webp.asset.json";
 import jewelryFrame3 from "@/assets/site/fine-jewelry-frame-3.webp.asset.json";
 import { SITE_ORIGIN, siteHead } from "@/lib/site/seo";
-import { videoObjects } from "@/lib/site/video-schema";
+import { siteWatchSlugs } from "@/lib/site/watch";
 import { listSiteReels } from "@/lib/site/reels.functions";
 import { FORMAT_LABEL, ratioToFormat, type SiteReel } from "@/lib/site/reels";
 import { getHomepageContent } from "@/lib/site/homepage.functions";
@@ -82,7 +82,6 @@ export const Route = createFileRoute("/")({
       scripts: [
         ...head.scripts,
         { type: "application/ld+json", children: JSON.stringify(jsonLd) },
-        ...videoObjects(loaderData?.reels ?? [], "/").map((v) => ({ type: "application/ld+json", children: JSON.stringify(v) })),
       ],
     };
   },
@@ -124,6 +123,7 @@ const purlFrames: ReelFrame[] = [photo1, photo2, photo3].map((photo) => ({
   artwork: <img src={photo.url} alt="" aria-hidden="true" />,
 }));
 type HomeExample = {
+  id?: string;
   name: string;
   headline?: string;
   subline?: string;
@@ -141,6 +141,7 @@ type HomeExample = {
 // Only real brand reels managed in /admin/reels appear in the carousel.
 function homeExamples(reels: SiteReel[]): HomeExample[] {
   return reels.map((r) => ({
+    id: r.id,
     name: r.title,
     logo: r.brand,
     detail: `${r.photos} photos · ${r.seconds} sec · ${FORMAT_LABEL[r.format]} · ${r.brand}`,
@@ -595,6 +596,7 @@ function FeatureArt({ art }: { art: string }) {
 function Home() {
   const { reels, allReels, content } = Route.useLoaderData();
   const examples = homeExamples(reels);
+  const slugs = siteWatchSlugs(allReels);
   const hero = content.hero;
   const heroVideo = pickVideo(hero.reelId, allReels, 3);
   return (
@@ -684,6 +686,7 @@ function Home() {
               media: (hidden) => <HomeExampleMedia example={ex} index={i} count={examples.length} hidden={hidden} />,
               title: ex.name,
               detail: ex.detail,
+              watch: ex.id ? slugs.get(ex.id) : undefined,
               visit: ex.brandSlug ? { slug: ex.brandSlug, label: `About ${ex.logo ?? ex.name}` } : undefined,
             }))}
           />

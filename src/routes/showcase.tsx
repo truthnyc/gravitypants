@@ -6,13 +6,13 @@ import { SiteShell } from "@/components/site/SiteShell";
 import { ReelVideo } from "@/components/site/ReelVideo";
 import { Button } from "@/components/ui/button";
 import { SHOWCASE_OG_IMAGE, siteHead } from "@/lib/site/seo";
-import { videoObjects } from "@/lib/site/video-schema";
+import { siteWatchSlugs } from "@/lib/site/watch";
 import { listSiteReels } from "@/lib/site/reels.functions";
 import { FORMAT_LABEL, ratioToFormat, type SiteReel } from "@/lib/site/reels";
 import { useState } from "react";
 
 export const Route = createFileRoute("/showcase")({
-  head: ({ loaderData }) => {
+  head: () => {
     const head = siteHead({
       path: "/showcase",
       title: "Showcase — Brands on Gravity Pants",
@@ -20,13 +20,13 @@ export const Route = createFileRoute("/showcase")({
         "Real video ads made with Gravity Pants by brands like Purl Soho, Aro, Agnona, Sachajuan and Katherine Grover.",
       image: SHOWCASE_OG_IMAGE,
     });
-    return { ...head, scripts: [...head.scripts, ...videoObjects(loaderData ?? [], "/showcase").map((v) => ({ type: "application/ld+json", children: JSON.stringify(v) }))] };
+    return head;
   },
   loader: () => listSiteReels().catch(() => [] as SiteReel[]),
   component: Showcase,
 });
 
-function BrandCard({ reel }: { reel: SiteReel }) {
+function BrandCard({ reel, watch }: { reel: SiteReel; watch?: string | undefined }) {
   const [ratio, setRatio] = useState<number | null>(null);
   const thumb = ratio ? ratioToFormat(ratio) : reel.format;
   const media = (
@@ -66,6 +66,11 @@ function BrandCard({ reel }: { reel: SiteReel }) {
             {reel.title} · {FORMAT_LABEL[reel.format]} · {reel.seconds} sec
           </p>
           <ConceptReelNotice brandName={reel.brand} brandSlug={reel.brandSlug} />
+          {watch && (
+            <Link className="showcase-visit" to="/reels/$slug" params={{ slug: watch }}>
+              Watch <ArrowRight size={15} strokeWidth={1.7} />
+            </Link>
+          )}
           {reel.brandSlug && (
             <BrandProfileLink className="showcase-visit" slug={reel.brandSlug} cta="showcase-brand-profile">
               About {reel.brand} <ArrowRight size={15} strokeWidth={1.7} />
@@ -80,6 +85,7 @@ function BrandCard({ reel }: { reel: SiteReel }) {
 
 function Showcase() {
   const reels = Route.useLoaderData();
+  const slugs = siteWatchSlugs(reels);
   return (
     <SiteShell>
       <div className="examples-page">
@@ -98,7 +104,7 @@ function Showcase() {
           {reels.length > 0 ? (
             <div className="examples-grid">
               {reels.map((r) => (
-                <BrandCard key={r.id} reel={r} />
+                <BrandCard key={r.id} reel={r} watch={slugs.get(r.id)} />
               ))}
             </div>
           ) : (

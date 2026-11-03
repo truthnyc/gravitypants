@@ -2,12 +2,15 @@ import { ConceptReelNotice } from "@/components/directory/ConceptReelNotice";
 import type { ReactNode } from "react";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { BrandProfileLink } from "./BrandPreview";
+import { Link } from "@tanstack/react-router";
 
 export type CarouselItem = {
   key: string;
   media: (hidden: boolean) => ReactNode;
   title: ReactNode;
   detail: ReactNode;
+  /** Watch page slug (/reels/<slug>). */
+  watch?: string | undefined;
   visit?: { slug: string; label: string } | { href: string; label: string } | undefined;
 };
 
@@ -26,6 +29,11 @@ export function ReelCarousel({ items, label, loop = true }: { items: CarouselIte
               <figcaption>
                 <b>{it.title}</b>
                 <span>{it.detail}</span>
+                {it.watch && (
+                  <Link className="showcase-visit" to="/reels/$slug" params={{ slug: it.watch }} tabIndex={hidden ? -1 : undefined}>
+                    Watch <ArrowRight size={13} strokeWidth={1.7} />
+                  </Link>
+                )}
                 <ConceptReelNotice brandName={it.visit?.label ?? (typeof it.title === "string" ? it.title : undefined)} />
                 {it.visit && "href" in it.visit && (
                   <a className="showcase-visit" href={it.visit.href} tabIndex={hidden ? -1 : undefined}>

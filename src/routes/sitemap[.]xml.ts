@@ -51,11 +51,15 @@ export const Route = createFileRoute("/sitemap.xml")({
           ...PAGES.map(page => ({ loc: `${SITE_ORIGIN}${page.path}`, lastmod: page.lastmod, changefreq: page.changefreq, priority: page.priority })),
           ...POSTS.map(post => ({ loc: `${SITE_ORIGIN}/blog/${post.slug}`, lastmod: isoDate(post.date), changefreq: "yearly", priority: "0.5" })),
         ];
-        // Pages with reels carry the same video data as their VideoObject JSON-LD.
-        const { reelPages, videoBlocks } = await import("@/lib/site/video-sitemap");
-        const { pages, reels } = await reelPages();
-        const blocks = videoBlocks(pages, reels);
-        return xml(entries.map((e) => ({ ...e, video: blocks.get(e.loc.slice(SITE_ORIGIN.length)) })));
+        // Each reel's video is listed once, on its own watch page; galleries carry no video entries.
+        const { watchPages, watchReels } = await import("@/lib/site/video-sitemap");
+        const watch = watchPages(await watchReels());
+        const latest = watch.map((w) => w.lastmod).sort().at(-1) ?? "";
+        return xml([
+          ...entries,
+          { loc: `${SITE_ORIGIN}/reels`, lastmod: latest, changefreq: "weekly", priority: "0.7" },
+          ...watch.map((w) => ({ loc: `${SITE_ORIGIN}${w.path}`, lastmod: w.lastmod, changefreq: "monthly", priority: "0.6", video: w.video })),
+        ]);
       },
     },
   },

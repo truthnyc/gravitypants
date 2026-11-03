@@ -61,6 +61,8 @@ import { Route as GalleryPatternsSplatRouteImport } from './routes/gallery-patte
 import { Route as InviteTokenRouteImport } from './routes/invite.$token'
 import { Route as ProductCategorySplatRouteImport } from './routes/product-category.$'
 import { Route as ProductSplatRouteImport } from './routes/product.$'
+import { Route as ReelsIndexRouteImport } from './routes/reels.index'
+import { Route as ReelsSlugRouteImport } from './routes/reels.$slug'
 import { Route as ShopifyWelcomeRouteImport } from './routes/shopify_.welcome'
 import { Route as SitePhotoSplatRouteImport } from './routes/site-photo.$'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
@@ -395,6 +397,16 @@ const ProductSplatRoute = ProductSplatRouteImport.update({
   id: '/$',
   path: '/$',
   getParentRoute: () => ProductRoute,
+} as any)
+const ReelsIndexRoute = ReelsIndexRouteImport.update({
+  id: '/reels/',
+  path: '/reels/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReelsSlugRoute = ReelsSlugRouteImport.update({
+  id: '/reels/$slug',
+  path: '/reels/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ShopifyWelcomeRoute = ShopifyWelcomeRouteImport.update({
   id: '/shopify_/welcome',
@@ -849,10 +861,12 @@ export interface FileRoutesByFullPath {
   '/invite/$token': typeof InviteTokenRoute
   '/product-category/$': typeof ProductCategorySplatRoute
   '/product/$': typeof ProductSplatRoute
+  '/reels/$slug': typeof ReelsSlugRoute
   '/shopify/welcome': typeof ShopifyWelcomeRoute
   '/site-photo/$': typeof SitePhotoSplatRoute
   '/blog/': typeof BlogIndexRoute
   '/directory/': typeof DirectoryIndexRoute
+  '/reels/': typeof ReelsIndexRoute
   '/admin/admins': typeof AuthenticatedAdminAdminsRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
@@ -972,10 +986,12 @@ export interface FileRoutesByTo {
   '/invite/$token': typeof InviteTokenRoute
   '/product-category/$': typeof ProductCategorySplatRoute
   '/product/$': typeof ProductSplatRoute
+  '/reels/$slug': typeof ReelsSlugRoute
   '/shopify/welcome': typeof ShopifyWelcomeRoute
   '/site-photo/$': typeof SitePhotoSplatRoute
   '/blog': typeof BlogIndexRoute
   '/directory': typeof DirectoryIndexRoute
+  '/reels': typeof ReelsIndexRoute
   '/admin/admins': typeof AuthenticatedAdminAdminsRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
@@ -1100,10 +1116,12 @@ export interface FileRoutesById {
   '/invite/$token': typeof InviteTokenRoute
   '/product-category/$': typeof ProductCategorySplatRoute
   '/product/$': typeof ProductSplatRoute
+  '/reels/$slug': typeof ReelsSlugRoute
   '/shopify_/welcome': typeof ShopifyWelcomeRoute
   '/site-photo/$': typeof SitePhotoSplatRoute
   '/blog/': typeof BlogIndexRoute
   '/directory/': typeof DirectoryIndexRoute
+  '/reels/': typeof ReelsIndexRoute
   '/_authenticated/admin/admins': typeof AuthenticatedAdminAdminsRoute
   '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
@@ -1228,10 +1246,12 @@ export interface FileRouteTypes {
     | '/invite/$token'
     | '/product-category/$'
     | '/product/$'
+    | '/reels/$slug'
     | '/shopify/welcome'
     | '/site-photo/$'
     | '/blog/'
     | '/directory/'
+    | '/reels/'
     | '/admin/admins'
     | '/admin/analytics'
     | '/admin/audit'
@@ -1351,10 +1371,12 @@ export interface FileRouteTypes {
     | '/invite/$token'
     | '/product-category/$'
     | '/product/$'
+    | '/reels/$slug'
     | '/shopify/welcome'
     | '/site-photo/$'
     | '/blog'
     | '/directory'
+    | '/reels'
     | '/admin/admins'
     | '/admin/analytics'
     | '/admin/audit'
@@ -1478,10 +1500,12 @@ export interface FileRouteTypes {
     | '/invite/$token'
     | '/product-category/$'
     | '/product/$'
+    | '/reels/$slug'
     | '/shopify_/welcome'
     | '/site-photo/$'
     | '/blog/'
     | '/directory/'
+    | '/reels/'
     | '/_authenticated/admin/admins'
     | '/_authenticated/admin/analytics'
     | '/_authenticated/admin/audit'
@@ -1600,9 +1624,11 @@ export interface RootRouteChildren {
   ForHomeDecorRoute: typeof ForHomeDecorRoute
   ForJewelryRoute: typeof ForJewelryRoute
   InviteTokenRoute: typeof InviteTokenRoute
+  ReelsSlugRoute: typeof ReelsSlugRoute
   ShopifyWelcomeRoute: typeof ShopifyWelcomeRoute
   SitePhotoSplatRoute: typeof SitePhotoSplatRoute
   DirectoryIndexRoute: typeof DirectoryIndexRoute
+  ReelsIndexRoute: typeof ReelsIndexRoute
   AimanteGuidesSlugRoute: typeof AimanteGuidesSlugRoute
   ApiPublicCleanupExportsRoute: typeof ApiPublicCleanupExportsRoute
   ApiPublicClientErrorRoute: typeof ApiPublicClientErrorRoute
@@ -1991,6 +2017,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/product/$'
       preLoaderRoute: typeof ProductSplatRouteImport
       parentRoute: typeof ProductRoute
+    }
+    '/reels/': {
+      id: '/reels/'
+      path: '/reels'
+      fullPath: '/reels/'
+      preLoaderRoute: typeof ReelsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reels/$slug': {
+      id: '/reels/$slug'
+      path: '/reels/$slug'
+      fullPath: '/reels/$slug'
+      preLoaderRoute: typeof ReelsSlugRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/shopify_/welcome': {
       id: '/shopify_/welcome'
@@ -2751,9 +2791,11 @@ const rootRouteChildren: RootRouteChildren = {
   ForHomeDecorRoute: ForHomeDecorRoute,
   ForJewelryRoute: ForJewelryRoute,
   InviteTokenRoute: InviteTokenRoute,
+  ReelsSlugRoute: ReelsSlugRoute,
   ShopifyWelcomeRoute: ShopifyWelcomeRoute,
   SitePhotoSplatRoute: SitePhotoSplatRoute,
   DirectoryIndexRoute: DirectoryIndexRoute,
+  ReelsIndexRoute: ReelsIndexRoute,
   AimanteGuidesSlugRoute: AimanteGuidesSlugRoute,
   ApiPublicCleanupExportsRoute: ApiPublicCleanupExportsRoute,
   ApiPublicClientErrorRoute: ApiPublicClientErrorRoute,
