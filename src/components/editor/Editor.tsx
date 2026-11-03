@@ -150,6 +150,7 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
   const [fontPreview, setFontPreview] = useState<{ el: "headline" | "subline"; family: string; weight: number } | null>(null);
   const [keyframe, setKeyframe] = useState<"start" | "end" | null>(null);
   const keyDrag = useRef<{ key: string; pan0: number; x0: number } | null>(null);
+  const keyZoom = useRef<{ key: string; z0: number } | null>(null);
   const [styleClip, setStyleClip] = useState<FrameStyle | null>(null);
   const [sameLength, setSameLength] = useState(false);
   const [sameTransition, setSameTransition] = useState(false);
