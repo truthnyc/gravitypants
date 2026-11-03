@@ -14,7 +14,7 @@ export function ReelPoster({ card, className = "" }: { card: DirectoryCard; clas
   return (
     <div className={`grid place-items-center bg-ap-panel p-[10%] ${className}`}>
       {card.poster
-        ? <img src={card.poster} alt={`${card.brand_name} reel`} loading="lazy" className={`max-h-full max-w-full rounded-lg object-contain shadow-ap-soft ${shape(card.formats[0])}`} />
+        ? <img src={card.poster} alt={`${card.brand_name} reel thumbnail`} loading="lazy" className={`max-h-full max-w-full rounded-lg object-contain shadow-ap-soft ${shape(card.formats[0])}`} />
         : <div className={`rounded-lg bg-ap-media ${shape(card.formats[0])}`} />}
     </div>
   );
@@ -28,7 +28,7 @@ function ReelThumb({ card }: { card: DirectoryCard }) {
       {card.video ? (
         <ReelVideo noFullscreen video={card.video} poster={card.poster ?? undefined} label={`${card.brand_name} reel`} className="dir-reel-media" />
       ) : card.poster ? (
-        <img src={card.poster} alt={`${card.brand_name} reel`} loading="lazy" />
+        <img src={card.poster} alt={`${card.brand_name} reel thumbnail`} loading="lazy" />
       ) : null}
     </div>
   );
@@ -97,6 +97,6 @@ export function ReelDetail({ card, onClose }: { card: DirectoryCard | null; onCl
     brand={<Link to="/directory/$slug" params={{ slug: card.brand_slug }} onClick={onClose} className="font-semibold text-ap-blue hover:underline">{card.brand_name}</Link>}
     profile={<Link to="/directory/$slug" params={{ slug: card.brand_slug }} onClick={onClose} data-cta="reel-popup-brand-page" className="reel-popup-shop">About {card.brand_name} →</Link>}
     favorite={<DirectoryReelHeart inline reelId={card.reel_id} name={title} />}
-    media={card.video ? <video src={card.video} poster={card.poster ?? undefined} controls autoPlay loop muted playsInline /> : card.poster ? <img src={card.poster} alt={`${card.brand_name} reel`} /> : null}
+    media={card.video ? <video src={card.video} poster={card.poster ?? undefined} controls autoPlay loop muted playsInline /> : card.poster ? <img src={card.poster} alt={`${card.brand_name} reel thumbnail`} /> : null}
   /></ReelPopup>;
 }

@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 
 /** Silent, on-demand playback; the surrounding thumbnail still opens the reel. */
-export function HoverReelPreview({ video, poster, className }: {
-  video: string | null; poster: string | null; className: string;
+export function HoverReelPreview({ video, poster, className, alt = "" }: {
+  video: string | null; poster: string | null; className: string; alt?: string;
 }) {
   const ref = useRef<HTMLVideoElement>(null);
   const [active, setActive] = useState(false);
@@ -41,7 +41,7 @@ export function HoverReelPreview({ video, poster, className }: {
     {video && loaded && <video ref={ref} src={video} poster={poster ?? undefined}
       className={className} muted loop playsInline preload="none" aria-hidden
       onPlaying={() => setPlaying(active)} onError={() => setPlaying(false)} />}
-    {poster && <img src={poster} alt="" loading="lazy"
+    {poster && <img src={poster} alt={alt} aria-hidden={alt ? undefined : true} loading="lazy"
       className={`${className}${active && playing ? " invisible" : ""}`} />}
   </div>;
 }

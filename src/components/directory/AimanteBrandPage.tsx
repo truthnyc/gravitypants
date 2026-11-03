@@ -45,7 +45,7 @@ export function AimanteBrandPage({ brand, reels, siteReels, more, onOpen, onOpen
       <div className="grid items-start gap-5 md:grid-cols-2">
         {cards.map((r) => <article key={r.id} className="overflow-hidden rounded-[12px] bg-ap-panel p-3">
           <Button variant="ghost" onClick={r.open} aria-label={`Play ${r.title}`} className="relative block h-auto w-full overflow-hidden rounded-lg p-0" style={{ aspectRatio: r.format.replace(":", "/") }}>
-            {r.poster ? <img src={r.poster} alt="" loading="lazy" className="size-full object-contain" /> : <video src={r.video ?? undefined} preload="metadata" muted playsInline className="size-full object-cover" />}
+            {r.video ? <video src={r.video} poster={r.poster ?? undefined} preload="none" muted playsInline aria-label={`${brand.name} reel`} className="size-full object-contain" /> : r.poster ? <img src={r.poster} alt={`${brand.name} reel thumbnail`} loading="lazy" className="size-full object-contain" /> : null}
             <span className="absolute top-1/2 left-1/2 grid size-12 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-ap-card text-ap-ink shadow-ap-soft"><Play aria-hidden className="ml-0.5 size-5" strokeWidth={1.7} /></span>
           </Button>
           <h3 className="mt-3 px-1 text-[16px] font-semibold">{r.title}</h3>
@@ -55,11 +55,11 @@ export function AimanteBrandPage({ brand, reels, siteReels, more, onOpen, onOpen
       {total === 0 && <p className="py-8 text-ap-muted">No reels yet. Check back soon.</p>}
     </section>
     {more.length > 0 && <section className="mt-8" aria-labelledby="related-brands-title">
-      <h2 id="related-brands-title" className="mb-4 text-[22px] font-semibold tracking-[-0.02em]">More like this</h2>
+      <h2 id="related-brands-title" className="mb-4 text-[22px] font-semibold tracking-[-0.02em]">Similar brands</h2>
       <ul className="flex gap-10 overflow-x-auto pb-3">
-        {more.map((m) => <li key={m.slug} className="w-[150px] shrink-0">
+        {more.slice(0, 4).map((m) => <li key={m.slug} className="w-[150px] shrink-0">
           <Link to="/directory/$slug" params={{ slug: m.slug }} className="block">
-            <div className="aspect-[4/5] overflow-hidden rounded-[8px] bg-ap-panel">{m.poster && <img src={m.poster} alt={`${m.name} reel`} loading="lazy" className="size-full object-cover" />}</div>
+            <div className="aspect-[4/5] overflow-hidden rounded-[8px] bg-ap-panel">{m.poster && <img src={m.poster} alt={`${m.name} reel thumbnail`} loading="lazy" className="size-full object-cover" />}</div>
             <p className="mt-2 text-[14px] font-semibold">{m.name}</p><p className="mt-0.5 text-[12px] text-ap-muted">{m.category}</p>
           </Link>
         </li>)}

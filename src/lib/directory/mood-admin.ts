@@ -5,6 +5,7 @@ export const moodInput = z.object({
   id: z.string().uuid().optional(),
   name: z.string().trim().toLowerCase().min(2).max(30),
   family: z.enum(MOOD_FAMILIES),
+  page_intro: z.string().trim().max(600).optional(),
 });
 export type MoodFamily = (typeof MOOD_FAMILIES)[number];
 /** One colour per mood family, shared by the site and admin. `ink` is the readable text colour on it. */

@@ -256,7 +256,7 @@ function BrandBody({ brands, selected, counts, onChange }: { brands: Brand[]; se
               <button type="button" aria-pressed={on} onClick={() => onChange(toggleIn(selected, b.slug))}
                 className="flex w-full items-center gap-3 rounded-lg p-2 text-left hover:bg-ap-panel">
                 {b.logo_url?.startsWith("https://") ? (
-                  <img src={b.logo_url} alt="" className={cn("size-10 shrink-0 rounded-sm border border-ap-hairline bg-ap-card object-contain", on && "ring-2 ring-ap-blue")} />
+                  <img src={b.logo_url} alt="" aria-hidden="true" className={cn("size-10 shrink-0 rounded-sm border border-ap-hairline bg-ap-card object-contain", on && "ring-2 ring-ap-blue")} />
                 ) : (
                   <span className={cn("grid size-10 shrink-0 place-items-center rounded-sm border border-ap-hairline bg-ap-card text-[14px] font-semibold", on && "ring-2 ring-ap-blue")}>
                     {b.name.split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase()}

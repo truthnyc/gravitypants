@@ -14,7 +14,7 @@ export const listAdminMoods = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const db = await adminClient(context);
-    const { data, error } = await db.from("moods").select("id,name,family,sort_order").order("sort_order");
+    const { data, error } = await db.from("moods").select("id,name,family,page_intro,sort_order").order("sort_order");
     if (error) throw new Error(error.message);
     return data ?? [];
   });
@@ -24,7 +24,7 @@ export const saveAdminMood = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => moodInput.parse(data))
   .handler(async ({ data, context }) => {
     const db = await adminClient(context);
-    const fields = { name: data.name, family: data.family };
+    const fields = { name: data.name, family: data.family, ...(data.page_intro !== undefined ? { page_intro: data.page_intro } : {}) };
     const result = data.id
       ? await db.from("moods").update(fields).eq("id", data.id).select("id").single()
       : await db.from("moods").insert(fields).select("id").single();

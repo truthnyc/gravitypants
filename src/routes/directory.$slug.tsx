@@ -143,7 +143,7 @@ function BrandPage() {
               {siteReels.map((r) => (
                 <li key={r.id} className="relative">
                   <button type="button" onClick={() => openSiteReel(r)} aria-label={`Open ${r.title}`} className="relative block aspect-square w-full overflow-hidden rounded-[8px] bg-ap-panel">
-                    {r.poster && <img src={r.poster} alt="" loading="lazy" className={posterFor(r.format)} />}
+                    {r.poster && <img src={r.poster} alt={`${r.brand} reel thumbnail`} loading="lazy" className={posterFor(r.format)} />}
                   </button>
                   <SiteReelHeart reelId={r.id} name={r.title} />
                   <p className="mt-2.5 truncate text-[14px] font-semibold">{r.title}</p>
@@ -163,7 +163,7 @@ function BrandPage() {
                 key: m.slug,
                 media: (hidden) => (
                   <Link to="/directory" search={{ brand: m.slug }} tabIndex={hidden ? -1 : undefined} className="grid aspect-[9/16] place-items-center overflow-hidden rounded-[14px] bg-ap-panel">
-                    {m.poster ? <img src={m.poster} alt={`${m.name} reel`} className="max-h-full max-w-full object-contain" /> : null}
+                    {m.poster ? <img src={m.poster} alt={`${m.name} reel thumbnail`} className="max-h-full max-w-full object-contain" /> : null}
                   </Link>
                 ),
                 title: m.name,

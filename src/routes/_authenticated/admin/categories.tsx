@@ -5,6 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { PageTitle } from "@/components/admin/AdminShell";
 import { listCategories, saveCategoryHint } from "@/lib/directory/categories.functions";
 
@@ -19,17 +20,18 @@ export const Route = createFileRoute("/_authenticated/admin/categories")({
 
 function Categories() {
   const { data } = useSuspenseQuery(options);
-  return <><PageTitle title="Categories" /><div className="divide-y divide-border">{data.map((c) => <CategoryRow key={`${c.id}:${c.hint}`} category={c} />)}</div></>;
+  return <><PageTitle title="Categories" /><div className="divide-y divide-border">{data.map((c) => <CategoryRow key={`${c.id}:${c.hint}:${c.page_intro}`} category={c} />)}</div></>;
 }
 function CategoryRow({ category }: { category: Awaited<ReturnType<typeof listCategories>>[number] }) {
   const [hint, setHint] = useState(category.hint);
+  const [intro, setIntro] = useState(category.page_intro);
   const [busy, setBusy] = useState(false);
   const save = useServerFn(saveCategoryHint);
   const qc = useQueryClient();
   return <form className="grid gap-3 py-4 sm:grid-cols-[220px_minmax(0,1fr)_auto] sm:items-center" onSubmit={async (e) => {
     e.preventDefault(); setBusy(true);
-    try { await save({ data: { id: category.id, hint } }); await qc.invalidateQueries({ queryKey: ["category-catalog"] }); toast.success("Category saved"); }
+    try { await save({ data: { id: category.id, hint, page_intro: intro } }); await qc.invalidateQueries({ queryKey: ["category-catalog"] }); toast.success("Category saved"); }
     catch (error) { toast.error(error instanceof Error ? error.message : "Couldn't save category."); }
     finally { setBusy(false); }
-  }}><label htmlFor={`hint-${category.id}`} className="text-[14px] font-medium">{category.name}</label><Input id={`hint-${category.id}`} aria-label={`${category.name} description`} value={hint} onChange={(e) => setHint(e.target.value)} /><Button type="submit" size="sm" disabled={busy || hint.trim() === category.hint}>{busy ? "Saving…" : "Save"}</Button></form>;
+  }}><label htmlFor={`hint-${category.id}`} className="text-[14px] font-medium">{category.name}</label><Input id={`hint-${category.id}`} aria-label={`${category.name} description`} value={hint} onChange={(e) => setHint(e.target.value)} /><Button type="submit" size="sm" disabled={busy || (hint.trim() === category.hint && intro.trim() === category.page_intro)}>{busy ? "Saving…" : "Save"}</Button><label htmlFor={`intro-${category.id}`} className="text-[13px] text-secondary-text sm:col-start-1">Page intro on aimante.co</label><Textarea id={`intro-${category.id}`} rows={3} maxLength={600} value={intro} onChange={(e) => setIntro(e.target.value)} className="sm:col-span-2" /></form>;
 }

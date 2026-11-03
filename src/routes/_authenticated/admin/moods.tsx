@@ -6,6 +6,7 @@ import { Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { PageTitle } from "@/components/admin/AdminShell";
 import { MOOD_FAMILIES } from "@/lib/directory/mood-admin";
@@ -27,7 +28,7 @@ export const Route = createFileRoute("/_authenticated/admin/moods")({
   component: Moods,
 });
 
-type Draft = { id?: string; name: string; family: typeof MOOD_FAMILIES[number] };
+type Draft = { id?: string; name: string; family: typeof MOOD_FAMILIES[number]; page_intro?: string };
 function Moods() {
   const { data } = useSuspenseQuery(options);
   const qc = useQueryClient();
@@ -62,7 +63,7 @@ function Moods() {
           <div className="mb-3 flex items-center justify-between"><h2 className="text-[17px] font-semibold">{family} <span className="ml-2 text-[13px] font-normal tabular-nums text-secondary-text">{moods.length}</span></h2><Button variant="plain" size="icon" aria-label={`Add mood to ${family}`} title={`Add mood to ${family}`} onClick={() => setDraft({ name: "", family })}><Plus className="size-4" strokeWidth={1.7} /></Button></div>
           <ul className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">{moods.map((m) => <li key={m.id} className="flex min-w-0 items-center gap-1 rounded-sm border border-border bg-card py-2 pl-3 pr-1">
             <span className="min-w-0 flex-1 break-words text-[14px] capitalize">{m.name}</span>
-            <Button variant="plain" size="icon" aria-label={`Edit ${m.name}`} title={`Edit ${m.name}`} onClick={() => setDraft({ id: m.id, name: m.name, family })}><Pencil className="size-4" strokeWidth={1.7} /></Button>
+            <Button variant="plain" size="icon" aria-label={`Edit ${m.name}`} title={`Edit ${m.name}`} onClick={() => setDraft({ id: m.id, name: m.name, family, page_intro: m.page_intro })}><Pencil className="size-4" strokeWidth={1.7} /></Button>
             <Button variant="destructive-plain" size="icon" aria-label={`Delete ${m.name}`} title={`Delete ${m.name}`} onClick={() => setDeleting(m)}><Trash2 className="size-4" strokeWidth={1.7} /></Button>
           </li>)}</ul>
           {!moods.length && <p className="text-[14px] text-secondary-text">No moods</p>}
@@ -74,6 +75,7 @@ function Moods() {
         {draft && <form className="grid gap-4" onSubmit={(e) => { e.preventDefault(); void submit(); }}>
           <label className="grid gap-1.5 text-[14px]">Mood name<Input autoFocus required minLength={2} maxLength={30} value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} /></label>
           <label className="grid gap-1.5 text-[14px]">Family<select aria-label="Family" value={draft.family} onChange={(e) => { const family = MOOD_FAMILIES.find((f) => f === e.target.value); if (family) setDraft({ ...draft, family }); }} className="h-11 rounded-sm border border-input bg-card px-3">{MOOD_FAMILIES.map((f) => <option key={f}>{f}</option>)}</select></label>
+          <label className="grid gap-1.5 text-[14px]">Page intro on aimante.co<Textarea rows={3} maxLength={600} value={draft.page_intro ?? ""} onChange={(e) => setDraft({ ...draft, page_intro: e.target.value })} /></label>
           <div className="flex justify-end gap-2"><Button type="button" variant="plain" disabled={busy} onClick={() => setDraft(null)}>Cancel</Button><Button type="submit" disabled={busy || draft.name.trim().length < 2}>{busy ? "Saving…" : "Save mood"}</Button></div>
         </form>}
       </DialogContent>
