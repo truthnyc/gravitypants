@@ -51,13 +51,17 @@ export const Route = createFileRoute("/sitemap.xml")({
           ...PAGES.map(page => ({ loc: `${SITE_ORIGIN}${page.path}`, lastmod: page.lastmod, changefreq: page.changefreq, priority: page.priority })),
           ...POSTS.map(post => ({ loc: `${SITE_ORIGIN}/blog/${post.slug}`, lastmod: isoDate(post.date), changefreq: "yearly", priority: "0.5" })),
         ];
-        return xml(entries);
+        // Pages with reels carry the same video data as their VideoObject JSON-LD.
+        const { reelPages, videoBlocks } = await import("@/lib/site/video-sitemap");
+        const { pages, reels } = await reelPages();
+        const blocks = videoBlocks(pages, reels);
+        return xml(entries.map((e) => ({ ...e, video: blocks.get(e.loc.slice(SITE_ORIGIN.length)) })));
       },
     },
   },
 });
 
-type Entry = { loc: string; lastmod: string; changefreq: string; priority: string };
+type Entry = { loc: string; lastmod: string; changefreq: string; priority: string; video?: string };
 
 /** aimante.co lists only its own pages: home, About, List your brand, every category and brand. */
 async function aimanteEntries(): Promise<Entry[]> {
@@ -78,8 +82,8 @@ async function aimanteEntries(): Promise<Entry[]> {
 }
 
 function xml(entries: Entry[]) {
-        const body = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries
-          .map(e => `  <url>\n    <loc>${e.loc}</loc>\n${e.lastmod ? `    <lastmod>${e.lastmod}</lastmod>\n` : ""}    <changefreq>${e.changefreq}</changefreq>\n    <priority>${e.priority}</priority>\n  </url>`)
+        const body = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">\n${entries
+          .map(e => `  <url>\n    <loc>${e.loc}</loc>\n${e.lastmod ? `    <lastmod>${e.lastmod}</lastmod>\n` : ""}    <changefreq>${e.changefreq}</changefreq>\n    <priority>${e.priority}</priority>\n${e.video ? `${e.video}\n` : ""}  </url>`)
           .join("\n")}\n</urlset>\n`;
         return new Response(body, { headers: { "content-type": "application/xml; charset=utf-8", "cache-control": "public, max-age=3600", vary: "host" } });
 }

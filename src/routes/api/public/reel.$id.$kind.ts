@@ -2,11 +2,11 @@ import { createFileRoute } from "@tanstack/react-router";
 
 // Permanent public link for a published reel's video or poster, used in Google video results.
 // Public by design: it only resolves reels already shown on the public site (published site reels
-// and live Showcase reels), then redirects to a fresh short-lived file link so it never expires.
+// and live Showcase reels), then serves the file from a fresh short-lived link so this address never expires.
 export const Route = createFileRoute("/api/public/reel/$id/$kind")({
   server: {
     handlers: {
-      GET: async ({ params }) => {
+      GET: async ({ params, request }) => {
         if (params.kind !== "video" && params.kind !== "poster") return new Response("Not found", { status: 404 });
         const { listSiteReels } = await import("@/lib/site/reels.functions");
         const reels = await listSiteReels().catch(() => []);
@@ -23,10 +23,20 @@ export const Route = createFileRoute("/api/public/reel/$id/$kind")({
           }
         }
         if (!src?.startsWith("https://")) return new Response("Not found", { status: 404 });
-        return new Response(null, {
-          status: 302,
-          headers: { location: src, "cache-control": "public, max-age=3600, s-maxage=3600" },
+        // Serve the file itself (200) so crawlers get the media directly; pass Range through for video seeking.
+        const range = request.headers.get("range");
+        const upstream = await fetch(src, range ? { headers: { range } } : undefined);
+        if (!upstream.ok && upstream.status !== 206) return new Response("Not found", { status: 404 });
+        const headers = new Headers({
+          "content-type": upstream.headers.get("content-type") ?? (params.kind === "video" ? "video/mp4" : "image/jpeg"),
+          "cache-control": "public, max-age=3600, s-maxage=3600",
+          "accept-ranges": "bytes",
         });
+        for (const h of ["content-length", "content-range", "etag", "last-modified"]) {
+          const v = upstream.headers.get(h);
+          if (v) headers.set(h, v);
+        }
+        return new Response(upstream.body, { status: upstream.status, headers });
       },
     },
   },
