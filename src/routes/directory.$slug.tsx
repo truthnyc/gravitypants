@@ -91,7 +91,7 @@ export const Route = createFileRoute("/directory/$slug")({
 });
 
 function BrandPage() {
-  const { brand, reels, siteReels, more } = Route.useLoaderData();
+  const { brand, reels, siteReels, more, linkedMoods } = Route.useLoaderData();
   const [open, setOpen] = useState<DirectoryCard | null>(null);
   const [openSite, setOpenSite] = useState<SiteReel | null>(null);
   const recordOpen = useServerFn(recordDirectoryReelOpen);
@@ -106,7 +106,7 @@ function BrandPage() {
   const sizes = new Set([...reels.flatMap((r) => r.formats), ...siteReels.map((r) => r.format)]);
   const initials = brand.name.split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase();
   if (site === "aimante") return <SiteShell>
-    <AimanteBrandPage brand={brand} reels={reels} siteReels={siteReels} more={more} onOpen={openDirectoryReel} onOpenSite={openSiteReel} />
+    <AimanteBrandPage linkedMoods={linkedMoods} brand={brand} reels={reels} siteReels={siteReels} more={more} onOpen={openDirectoryReel} onOpenSite={openSiteReel} />
     <ReelDetail card={open} onClose={() => setOpen(null)} />
     <SiteReelModal reel={openSite} onClose={() => setOpenSite(null)} />
   </SiteShell>;

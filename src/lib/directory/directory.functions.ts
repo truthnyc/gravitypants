@@ -406,7 +406,7 @@ export const getBrandPage = createServerFn({ method: "GET" })
     const { publicClient } = await import("@/lib/site/reels.server");
     const { toCards } = await import("./directory.server");
     const pc = publicClient() as any;
-    const empty = { redirect: null as string | null, brand: null, reels: [] as DirectoryCard[], siteReels: [] as import("@/lib/site/reels").SiteReel[], more: [] as { name: string; slug: string; poster: string | null; category: string }[] };
+    const empty = { redirect: null as string | null, linkedMoods: [] as string[], brand: null, reels: [] as DirectoryCard[], siteReels: [] as import("@/lib/site/reels").SiteReel[], more: [] as { name: string; slug: string; poster: string | null; category: string }[] };
     const { data: b } = await pc.from("directory_brands").select("id, name, website_url, category, description, slug, logo_url, moods, affiliated, status, updated_at").eq("slug", data.slug).eq("status", "live").maybeSingle();
     if (!b) {
       const { data: h } = await pc.from("directory_slug_history").select("brand_id").eq("old_slug", data.slug).order("changed_at", { ascending: false }).limit(1).maybeSingle();
@@ -429,8 +429,13 @@ export const getBrandPage = createServerFn({ method: "GET" })
     const { relatedBrandReason } = await import("./brand-page");
     const { data: relatedBrands } = await pc.from("directory_brands").select("name, slug, category, moods, logo_url").eq("status", "live").neq("id", b.id).order("name");
     const related = (relatedBrands ?? []).map((other: any) => ({ ...other, reason: relatedBrandReason({ category: b.category, moods: b.moods ?? [] }, { category: other.category, moods: other.moods ?? [] }) })).filter((other: any) => other.reason).slice(0, 12);
+    // Same server search the /mood/ pages use, so a mood links only when its page has brands.
+    const { data: facets } = await pc.rpc("directory_faceted_search", { q: "", f_moods: [], f_categories: [], f_brands: [], page: 1, page_size: 1 });
+    const moodCounts = ((facets as any)?.moods ?? {}) as Record<string, number>;
+    const linkedMoods = ((b.moods ?? []) as string[]).filter((m) => (moodCounts[m.toLowerCase()] ?? 0) > 0);
     return {
       redirect: null,
+      linkedMoods,
        brand: { id: b.id as string, name: b.name as string, website_url: b.website_url as string | null, category: b.category as string, description: b.description as string | null, slug: b.slug as string, logo_url: await signLogo(b.logo_url), moods: (b.moods ?? []) as string[], affiliated: b.affiliated as boolean, featured: !!featured, updated_at: b.updated_at as string },
       // Stored publish date per reel, for VideoObject uploadDate.
       reels: cards.map((c) => ({ ...c, uploadDate: ((reels ?? []) as any[]).find((r) => r.id === c.reel_id)?.published_at as string | null ?? null })),
