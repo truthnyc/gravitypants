@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { guideForEvent, seasonNote } from "./guides";
+import { guideForEvent, seasonNote } from "@/lib/directory/guides";
 
 const sd = { season: "singles-day", season_label: "Singles' Day", start_date: "2026-10-28", end_date: "2026-11-11" };
 
