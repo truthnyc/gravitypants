@@ -13,7 +13,9 @@ async function sign(content: HomepageContent): Promise<HomepageContent> {
   const { data } = await supabaseAdmin.storage.from("site-reels").createSignedUrls(paths, 60 * 60 * 24 * 7);
   const m = new Map<string, string>();
   for (const x of data ?? []) if (x.path && x.signedUrl) m.set(x.path, x.signedUrl);
-  const fix = (ps: SitePhoto[]) => ps.map((p) => (p.ref.startsWith(REEL_PREFIX) ? { ...p, src: m.get(p.ref.slice(REEL_PREFIX.length)) ?? "" } : p)).filter((p) => p.src !== "");
+  // Homepage photos get a permanent site address (served by /site-photo/*); others stay signed.
+  const link = (path: string) => (/^homepage\/[0-9a-zA-Z_-]+\.(png|jpe?g|webp|gif)$/.test(path) ? `/site-photo/${path.slice(9)}` : m.get(path) ?? "");
+  const fix = (ps: SitePhoto[]) => ps.map((p) => (p.ref.startsWith(REEL_PREFIX) ? { ...p, src: link(p.ref.slice(REEL_PREFIX.length)) } : p)).filter((p) => p.src !== "");
   const fixOne = (p: SitePhoto | null) => (p ? fix([p])[0] ?? null : null);
   return { hero: { ...content.hero, photos: fix(content.hero.photos) }, example: { ...content.example, photos: fix(content.example.photos) }, quote: { ...content.quote, photo: fixOne(content.quote.photo) } };
 }

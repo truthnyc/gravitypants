@@ -4,6 +4,7 @@ import { SITE_ORIGIN } from "@/lib/site/seo";
 
 const GP = `User-agent: *
 Allow: /
+Allow: /api/public/reel/
 Disallow: /app/
 Disallow: /admin/
 Disallow: /invite/
