@@ -48,7 +48,7 @@
 
 # Google services
 - [x] Tag Manager loader on public Gravity Pants pages (off until container ID supplied).
-- [ ] Google Analytics browser tracking using saved Measurement ID.
+- [x] Google Analytics browser tracking using saved Measurement ID (live on gravitypants.com after publish).
 - [ ] Analytics report reading in admin — needs the Analytics connection.
 - [ ] Merchant Center product feed.
 - [ ] Google Business Profile — check eligibility (online-only businesses can't list).
