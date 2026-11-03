@@ -374,6 +374,10 @@ function DirectoryPage() {
               <span className="font-light text-ap-headline-bracket"> ]</span>
             </span>
           </div>
+          {(() => {
+            const sg = greeting?.rule === "countdown" ? guideForEvent(guides, greeting.eventId) : undefined;
+            return sg && <p className="-mt-5 mb-6 text-[14px]"><Link to="/aimante/guides/$slug" params={{ slug: sg.slug }} className="font-medium text-ap-blue hover:underline">{sg.title} →</Link></p>;
+          })()}
           <form role="search" onSubmit={(e) => { e.preventDefault(); go(value); }}
              className="dir-search-bar mx-auto flex h-[60px] max-w-[680px] items-center gap-2.5 rounded-[12px] border border-transparent bg-ap-panel pr-2 pl-5 transition-[background,border-color,box-shadow] motion-reduce:transition-none focus-within:border-ap-hairline focus-within:bg-ap-card focus-within:shadow-[0_10px_30px_rgba(20,30,50,.10)]">
             <input ref={input} value={value} onChange={(e) => setValue(e.target.value)} placeholder="Try: cozy knitwear, square, Purl Soho"
