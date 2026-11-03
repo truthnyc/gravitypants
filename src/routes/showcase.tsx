@@ -44,8 +44,8 @@ function BrandCard({ reel }: { reel: SiteReel }) {
   return (
     <article className="examples-card showcase-card">
       <div className="examples-card-media">
-
         {reel.href ? (
+
           <a
             className="site-reel-link"
             href={reel.href}
