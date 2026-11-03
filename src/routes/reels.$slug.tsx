@@ -61,6 +61,8 @@ function WatchPage() {
   const size = FORMAT_SIZE[reel.format];
   const tall = reel.format === "916";
   const seconds = Math.round(reel.seconds);
+  // Permanent same-site links, so the server-rendered page never carries an expiring storage link.
+  const media = (u: string | null, kind: "video" | "poster") => (u && /[?&]token=/.test(u) ? `/api/public/reel/${encodeURIComponent(reel.id)}/${kind}` : u ?? undefined);
   return (
     <SiteShell>
       <article className={`${wrap} pb-20 pt-6 md:pt-10`}>
@@ -68,8 +70,8 @@ function WatchPage() {
           <video
             className={`block rounded-lg bg-site-panel ${tall ? "h-[min(72svh,760px)] w-auto" : "w-full"}`}
             style={{ aspectRatio: `${size.width} / ${size.height}` }}
-            src={reel.video}
-            poster={reel.poster ?? undefined}
+            src={media(reel.video, "video")}
+            poster={media(reel.poster, "poster")}
             width={size.width}
             height={size.height}
             controls
@@ -78,7 +80,7 @@ function WatchPage() {
             aria-label={reelName(reel)}
           >
             {reel.videoWebm && <source src={reel.videoWebm} type="video/webm" />}
-            <source src={reel.video} type="video/mp4" />
+            <source src={media(reel.video, "video")} type="video/mp4" />
           </video>
         </div>
 
