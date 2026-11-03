@@ -129,7 +129,7 @@ function ReelRow({ reel, shop, klaviyo, onKlaviyo }: { reel: HomeReel; shop: str
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <Link to="/app/reel/$key" params={{ key: reel.key.replace(/^own:/, "own:") }} className="text-[15px] font-semibold hover:underline">{reel.title}</Link>
+          <Link to="/app/reel/$key" params={{ key: reel.key }} className="text-[15px] font-semibold hover:underline">{reel.title}</Link>
           <span className="text-[12px] text-secondary-text">{ORIGIN[reel.origin]}{reel.live && reel.origin === "own" ? " · On Aimanté" : ""}</span>
         </div>
         {visible.length === 0 ? (
