@@ -3,6 +3,8 @@
  * (same server search the page uses) and when its reels last changed. Pages with fewer
  * than MIN_LISTING_BRANDS brands are left out of the sitemap and carry noindex.
  */
+import { categorySlug as toSlug } from "./directory";
+
 export const MIN_LISTING_BRANDS = 3;
 
 export function brandCount(facets: { brands: Record<string, number> } | undefined): number {
@@ -20,7 +22,6 @@ export async function listingStats(): Promise<Listing[]> {
     pc.from("directory_reels").select("published_at, updated_at, moods, directory_brands!inner(category, moods, status)").eq("status", "live"),
     pc.from("site_reels").select("updated_at, created_at, category, moods").eq("published", true),
   ]);
-  const toSlug = (s: string) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/&/g, " ").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
   const dated: { cat: string; moods: string[]; at: string }[] = [
     ...((dreels ?? []) as any[]).map((r) => ({ cat: toSlug(r.directory_brands?.category ?? ""), moods: [...(r.moods ?? []), ...(r.directory_brands?.moods ?? [])].map((m: string) => m.toLowerCase()), at: r.published_at ?? r.updated_at })),
     ...((sreels ?? []) as any[]).map((r) => ({ cat: toSlug(r.category ?? ""), moods: (r.moods ?? []).map((m: string) => m.toLowerCase()), at: r.updated_at ?? r.created_at })),
