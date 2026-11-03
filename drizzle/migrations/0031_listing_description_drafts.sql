@@ -1,0 +1,4 @@
+ALTER TABLE public.categories ADD COLUMN IF NOT EXISTS intro_draft text, ADD COLUMN IF NOT EXISTS meta_description text NOT NULL DEFAULT '', ADD COLUMN IF NOT EXISTS meta_description_draft text;
+ALTER TABLE public.moods ADD COLUMN IF NOT EXISTS intro_draft text, ADD COLUMN IF NOT EXISTS meta_description text NOT NULL DEFAULT '', ADD COLUMN IF NOT EXISTS meta_description_draft text;
+COMMENT ON COLUMN public.categories.intro_draft IS 'Unpublished page intro awaiting review; copied to page_intro when approved.';
+COMMENT ON COLUMN public.moods.intro_draft IS 'Unpublished page intro awaiting review; copied to page_intro when approved.';

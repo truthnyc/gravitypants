@@ -30,7 +30,7 @@ export const getListingIntro = createServerFn({ method: "GET" })
     const { publicClient } = await import("@/lib/site/reels.server");
     const pc = publicClient() as any;
     const { data: row } = data.kind === "category"
-      ? await pc.from("categories").select("name, page_intro").eq("slug", data.slug).maybeSingle()
-      : await pc.from("moods").select("name, page_intro").ilike("name", data.slug).maybeSingle();
-    return row ? { name: row.name as string, intro: (row.page_intro as string) || "" } : null;
+      ? await pc.from("categories").select("name, page_intro, meta_description").eq("slug", data.slug).maybeSingle()
+      : await pc.from("moods").select("name, page_intro, meta_description").ilike("name", data.slug).maybeSingle();
+    return row ? { name: row.name as string, intro: (row.page_intro as string) || "", meta: ((row as { meta_description?: string }).meta_description) || "" } : null;
   });
