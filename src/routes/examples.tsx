@@ -13,7 +13,7 @@ import { GravityPantsLogo } from "@/components/GravityPantsLogo";
 import { Button } from "@/components/ui/button";
 import type { GalleryExample } from "@/lib/site/examples";
 import { EXAMPLES_OG_IMAGE, siteHead } from "@/lib/site/seo";
-import { watchSlugs } from "@/lib/site/watch";
+import { siteWatchSlugs } from "@/lib/site/watch";
 import { listSiteReels } from "@/lib/site/reels.functions";
 import { categoryLabel, ratioToFormat, type SiteReel } from "@/lib/site/reels";
 import { getHomepageContent } from "@/lib/site/homepage.functions";
@@ -72,10 +72,10 @@ function GalleryReel({ example }: { example: GalleryExample }) {
   </div>;
 }
 
-function GalleryCard({ example }: { example: BrandExample }) {
+function GalleryCard({ example, watch }: { example: BrandExample; watch?: string | undefined }) {
   return <article className="examples-card">
     <div className="examples-card-media">{example.href ? <a className="site-reel-link" href={example.href} target="_blank" rel="noopener noreferrer" aria-label={example.frames?.length ? undefined : `Visit ${example.logo ?? example.name}`}><GalleryReel example={example} /></a> : <GalleryReel example={example} />}</div>
-    <div className="examples-card-info"><div><h3>{example.name}</h3><p className="examples-card-meta-desktop">{categoryLabel(example.category)} · {formatLabel[example.format]} · {example.photos} {example.photos === 1 ? "photo" : "photos"} · {example.seconds} sec</p><p className="examples-card-meta-mobile">{categoryLabel(example.category)} · {formatLabel[example.format]}</p><ConceptReelNotice brandName={example.logo ?? example.sub} />{example.brandSlug && <BrandProfileLink className="showcase-visit" slug={example.brandSlug} cta="examples-brand-profile">About {example.logo ?? example.name} <ArrowRight size={13} strokeWidth={1.7} /></BrandProfileLink>}</div>
+    <div className="examples-card-info"><div><h3>{example.name}</h3><p className="examples-card-meta-desktop">{categoryLabel(example.category)} · {formatLabel[example.format]} · {example.photos} {example.photos === 1 ? "photo" : "photos"} · {example.seconds} sec</p><p className="examples-card-meta-mobile">{categoryLabel(example.category)} · {formatLabel[example.format]}</p><ConceptReelNotice brandName={example.logo ?? example.sub} />{watch && <Link className="showcase-visit" to="/reels/$slug" params={{ slug: watch }}>Watch <ArrowRight size={13} strokeWidth={1.7} /></Link>}{example.brandSlug && <BrandProfileLink className="showcase-visit" slug={example.brandSlug} cta="examples-brand-profile">About {example.logo ?? example.name} <ArrowRight size={13} strokeWidth={1.7} /></BrandProfileLink>}</div>
     </div>
   </article>;
 }
@@ -102,6 +102,7 @@ function ExamplesPage() {
   const weekVideo = featuredVideo(week.reelId, reels, week.photos.length);
   // Only real brand reels from /admin/reels are shown.
   const all = reels.map(reelToExample);
+  const slugs = siteWatchSlugs(reels);
   // Category filters come from the reels themselves, so new admin categories appear here.
   const categories = [{ id: "all", label: "All" }, ...[...new Set(all.map((e) => e.category))].map((c) => ({ id: c, label: categoryLabel(c) }))];
   const cat = categories.some(c => c.id === search.cat) ? search.cat : undefined;
@@ -116,7 +117,7 @@ function ExamplesPage() {
       </div>
       <span className="examples-count self-end tabular-nums" aria-live="polite">{visible.length} {visible.length === 1 ? "example" : "examples"}</span>
     </div>
-      {visible.length > 0 ? <div className="examples-grid">{visible.map(example => <GalleryCard key={example.id} example={example} />)}</div> : <div className="site-card examples-empty"><h2>No examples in this combination yet.</h2><Button variant="siteSecondary" size="site" onClick={() => navigate({ search: { cat: undefined, format: undefined }, hash: "gallery", replace: true })}>Show all examples</Button></div>}
+      {visible.length > 0 ? <div className="examples-grid">{visible.map(example => <GalleryCard key={example.id} example={example} watch={slugs.get(example.id)} />)}</div> : <div className="site-card examples-empty"><h2>No examples in this combination yet.</h2><Button variant="siteSecondary" size="site" onClick={() => navigate({ search: { cat: undefined, format: undefined }, hash: "gallery", replace: true })}>Show all examples</Button></div>}
     </section>
     <section className="examples-submit examples-container"><span>Want a reel like these for your brand?</span><Link to="/contact">Tell us about it <ArrowRight size={16} strokeWidth={1.7} /></Link></section>
     <SearchPageLinks className="examples-container pt-12" paths={["/for/jewelry", "/for/home-decor", "/for/fashion", "/for/food-and-drink", "/for/beauty-and-fragrance", "/photo-to-video"]} />

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { listSiteReels } from "@/lib/site/reels.functions";
 import type { SiteReel } from "@/lib/site/reels";
 import { siteHead } from "@/lib/site/seo";
-import { watchSlugs } from "@/lib/site/watch";
+import { siteWatchSlugs } from "@/lib/site/watch";
 import { LAUNCH_FILM, hasLaunchFilm } from "@/lib/site/launch-film";
 import { POSTS, postsForPage } from "@/lib/site/blog";
 import { SEARCH_PAGES, SEARCH_STEPS, sourcePhotos, type SearchPage as Page } from "@/lib/site/search-pages";
@@ -60,6 +60,7 @@ function Cta({ slug }: { slug: string }) {
 
 export function SearchPage({ page, reels }: { page: Page; reels: SiteReel[] }) {
   const byId = new Map(reels.map((r) => [r.id, r]));
+  const slugs = siteWatchSlugs(reels);
   const example = byId.get(page.example.reelId);
   const stills = sourcePhotos(page.example.reelId);
   const exampleLabel = page.example.label || (example ? `${example.brand}, ${example.title}` : "");
@@ -96,7 +97,7 @@ export function SearchPage({ page, reels }: { page: Page; reels: SiteReel[] }) {
             </>}
             <ReelTile reel={example} />
           </div>
-          {exampleLabel && <p className="mt-4 text-[15px] text-site-muted">Example: {exampleLabel}</p>}
+          {exampleLabel && <p className="mt-4 text-[15px] text-site-muted">Example: {exampleLabel}{slugs.get(example.id) && <> · <Link to="/reels/$slug" params={{ slug: slugs.get(example.id)! }} className="text-site-link">Watch</Link></>}</p>}
         </section>
       )}
 
@@ -123,7 +124,7 @@ export function SearchPage({ page, reels }: { page: Page; reels: SiteReel[] }) {
             {section.grid.map((id) => byId.get(id)).filter((r): r is SiteReel => !!r).map((r) => (
               <figure key={r.id}>
                 <ReelTile reel={r} />
-                <figcaption className="mt-3 text-[15px] text-site-ink">{r.brand}<span className="text-site-muted"> · {r.title}</span></figcaption>
+                <figcaption className="mt-3 text-[15px] text-site-ink">{r.brand}<span className="text-site-muted"> · {r.title}</span>{slugs.get(r.id) && <> · <Link to="/reels/$slug" params={{ slug: slugs.get(r.id)! }} className="text-site-link">Watch</Link></>}</figcaption>
               </figure>
             ))}
           </div>

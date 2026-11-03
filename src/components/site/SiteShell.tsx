@@ -21,6 +21,7 @@ const columns: { label: string; links: FooterLink[] }[] = [
       ...(SHOW_DIRECTORY ? [{ label: "Directory", to: "/directory", badge: "New" }] : []),
       { label: "Examples", to: "/examples" },
       { label: "Showcase", to: "/showcase" },
+      { label: "Reels", to: "/reels" },
       { label: "Blog", to: "/blog" },
       { label: "Aimanté directory", to: "https://aimante.co", external: true },
     ],
