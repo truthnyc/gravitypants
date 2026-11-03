@@ -5,11 +5,8 @@
  */
 import { categorySlug as toSlug } from "./directory";
 
-export const MIN_LISTING_BRANDS = 3;
-
-export function brandCount(facets: { brands: Record<string, number> } | undefined): number {
-  return Object.values(facets?.brands ?? {}).filter((n) => n > 0).length;
-}
+import { brandCount } from "./listing";
+export { MIN_LISTING_BRANDS } from "./listing";
 
 type Listing = { kind: "category" | "mood"; slug: string; brands: number; lastmod: string };
 
