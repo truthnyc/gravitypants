@@ -32,7 +32,7 @@ import { useGreeting, logGreeting } from "@/components/directory/useGreeting";
 import { rememberVisit } from "@/lib/directory/greeting";
 import { recordDirectoryReelOpen } from "@/lib/directory/views.functions";
 import { getListingIntro } from "@/lib/directory/categories.functions";
-import { brandCount, MIN_LISTING_BRANDS } from "@/lib/directory/listing";
+import { brandCount, MIN_LISTING_BRANDS, list } from "@/lib/directory/listing";
 import { AIMANTE_ORIGIN } from "@/lib/site/brand-site";
 
 const POSTER_RING = "rounded-[6px] shadow-[0_0_0_1px_var(--ap-inner),0_18px_34px_-16px_rgba(29,29,31,.28)]";
@@ -133,7 +133,6 @@ function useWeekdayMood(picked: string | undefined, pool: string[], lead?: strin
   return { day, mood: picked ?? (lead && leadOn ? lead : words[i % words.length] ?? "soothing") };
 }
 
-const list = (v?: string) => (v ? v.split(",").map((x) => x.trim().toLowerCase()).filter(Boolean).slice(0, 60) : []);
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 type HeadOut = { meta?: any[]; links?: any[]; scripts?: any[] }; // eslint-disable-line @typescript-eslint/no-explicit-any
