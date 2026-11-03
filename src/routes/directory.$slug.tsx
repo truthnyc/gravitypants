@@ -55,13 +55,24 @@ export const Route = createFileRoute("/directory/$slug")({
       "@context": "https://schema.org",
       "@graph": [
         { "@type": "Organization", name: b.name, url: b.website_url ?? (aim ? `${AIMANTE_ORIGIN}/b/${b.slug}` : `${ORIGIN}/directory/${b.slug}`), ...(b.description ? { description: b.description } : {}) },
-        ...loaderData.reels.map((r) => ({
+        // Permanent per-reel links: the stored files are private and signed links expire.
+        ...loaderData.reels.filter((r) => r.uploadDate && (r.video || r.poster)).map((r) => ({
           "@type": "VideoObject",
-          name: r.title ?? b.name,
-          description: [b.description, ...r.moods, ...r.tags].filter(Boolean).join(", ") || `${b.name} reel`,
-          ...(r.poster ? { thumbnailUrl: r.poster } : {}),
-          duration: `PT${Math.max(1, Math.round(r.seconds))}S`,
-          uploadDate: new Date().toISOString().slice(0, 10),
+          name: `${b.name} reel`,
+          description: r.description || b.description || `A short reel from ${b.name} on Aimanté.`,
+          thumbnailUrl: `${ORIGIN}/api/public/reel/${r.reel_id}/poster`,
+          contentUrl: `${ORIGIN}/api/public/reel/${r.reel_id}/video`,
+          uploadDate: r.uploadDate,
+          ...(r.seconds ? { duration: `PT${Math.max(1, Math.round(r.seconds))}S` } : {}),
+        })),
+        ...loaderData.siteReels.filter((r) => r.uploadDate).map((r) => ({
+          "@type": "VideoObject",
+          name: `${b.name} reel`,
+          description: r.description || b.description || `A short reel from ${b.name} on Aimanté.`,
+          thumbnailUrl: `${ORIGIN}/api/public/reel/${r.id}/poster`,
+          contentUrl: `${ORIGIN}/api/public/reel/${r.id}/video`,
+          uploadDate: r.uploadDate,
+          ...(r.seconds ? { duration: `PT${Math.max(1, Math.round(r.seconds))}S` } : {}),
         })),
       ],
     };
