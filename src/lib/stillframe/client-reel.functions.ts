@@ -56,11 +56,9 @@ export const getClientReel = createServerFn({ method: "POST" })
     }
 
     // Brand-page reels: confirm the reel's brand belongs to this workspace before reading.
-    const table = kind === "dir" ? "directory_reels" : "site_reels";
     const { data: r } = kind === "dir"
       ? await supabaseAdmin.from("directory_reels").select("brand_id,ad_id,display_title,title,video_url,status").eq("id", id).eq("status", "live").maybeSingle()
       : await supabaseAdmin.from("site_reels").select("brand_id,display_title,title,video_url,published").eq("id", id).eq("published", true).maybeSingle();
-    void table;
     if (!r?.brand_id) return null;
     const { data: brand } = await supabaseAdmin.from("directory_brands").select("workspace_id").eq("id", r.brand_id).maybeSingle();
     if (brand?.workspace_id !== data.workspaceId) return null;
