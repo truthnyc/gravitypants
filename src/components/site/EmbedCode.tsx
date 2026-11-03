@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 /** The reel's own page, so a client can check it before pasting the code. */
 export function EmbedPreviewLink({ reel }: { reel: EmbedTarget }) {
   return (
-    <a href={embedUrl(reel.id)} target="_blank" rel="noreferrer" data-cta="embed-preview" className="inline-flex items-center gap-1 text-[14px] text-ap-blue">
+    <a href={embedUrl(reel.id)} target="_blank" rel="noopener noreferrer" data-cta="embed-preview" className="inline-flex items-center gap-1 text-[14px] text-ap-blue">
       Preview reel <ArrowUpRight className="size-3.5" strokeWidth={1.7} />
     </a>
   );

@@ -483,6 +483,7 @@
 .home-announcement span { border-radius: 18px; background: color-mix(in srgb,var(--site-primary) 10%,transparent); padding: 4px 10px; color: var(--site-eyebrow); font-size: 13px; }
 .home-hero h1 { font-size: 116px; line-height: .96; font-weight: 600; letter-spacing: -.045em; white-space: nowrap; }
 .home-hero h1 span { color: var(--site-primary); }
+.home-hero h1 .home-h1-sub { display: inline-block; margin-top: 18px; font-size: 21px; line-height: 1.45; font-weight: 400; letter-spacing: 0; white-space: normal; color: var(--site-muted, currentColor); }
 .home-hero-lede { max-width: 560px; font-size: 23px; }
 .home-actions { display: flex; align-items: center; gap: 12px; }
 .home-actions .home-button { height: 56px; padding-inline: 30px; font-size: 18px; }

@@ -48,7 +48,7 @@ function BrandCard({ reel }: { reel: SiteReel }) {
             className="site-reel-link"
             href={reel.href}
             target="_blank"
-            rel="noreferrer"
+            rel="noopener noreferrer"
             aria-label={`Visit ${reel.brand}`}
           >
             {media}

@@ -40,7 +40,7 @@ function FooterLinkItem({ link }: { link: FooterLink }) {
     </>
   );
   return link.external ? (
-    <a href={link.to} target="_blank" rel="noreferrer" className={linkCls}>{inner}</a>
+    <a href={link.to} target="_blank" rel="noopener noreferrer" className={linkCls}>{inner}</a>
   ) : (
     <Link to={link.to as "/"} {...(link.search ? { search: link.search as never } : {})} className={linkCls}>{inner}</Link>
   );
@@ -54,7 +54,7 @@ function Brand() {
       {SOCIAL_LINKS.some((s) => s.url) && (
         <div className="mt-4 flex gap-2">
           {SOCIAL_LINKS.filter((s) => s.url).map((s) => (
-            <a key={s.name} href={s.url} target="_blank" rel="noreferrer" aria-label={s.name} className="grid size-[34px] min-h-0 min-w-0 place-items-center rounded-lg border border-ap-hairline bg-ap-card text-ap-ink hover:text-ap-blue">
+            <a key={s.name} href={s.url} target="_blank" rel="noopener noreferrer" aria-label={s.name} className="grid size-[34px] min-h-0 min-w-0 place-items-center rounded-lg border border-ap-hairline bg-ap-card text-ap-ink hover:text-ap-blue">
               {s.name === "YouTube" ? <Youtube size={17} strokeWidth={1.7} /> : <Instagram size={17} strokeWidth={1.7} />}
             </a>
           ))}
@@ -113,7 +113,7 @@ function SiteFooter() {
           <span>© {new Date().getFullYear()} Gravity Pants</span>
           <Link to="/privacy" className="min-h-0 min-w-0 hover:text-ap-blue">Privacy</Link>
           <Link to="/terms" className="min-h-0 min-w-0 hover:text-ap-blue">Terms</Link>
-          <a href={STATUS_URL} target="_blank" rel="noreferrer" className="ml-auto inline-flex min-h-0 items-center gap-1.5 hover:text-ap-blue">
+          <a href={STATUS_URL} target="_blank" rel="noopener noreferrer" className="ml-auto inline-flex min-h-0 items-center gap-1.5 hover:text-ap-blue">
             <span className="size-2 rounded-full bg-ap-green" aria-hidden /> Status
           </a>
           <p className="w-full pt-1 text-[12px] text-ap-muted">Gravity Pants and Aimanté are trademarks of Truth NYC LLC.</p>
