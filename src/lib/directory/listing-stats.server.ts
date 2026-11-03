@@ -26,7 +26,7 @@ export async function listingStats(): Promise<Listing[]> {
   const latest = (rows: typeof dated) => rows.reduce((m, r) => (r.at && r.at > m ? r.at : m), "").slice(0, 10);
   const count = async (f: { f_categories: string[]; f_moods: string[] }) => {
     const { data } = await pc.rpc("directory_faceted_search", { q: "", f_brands: [], page: 1, page_size: 1, ...f });
-    return brandCount((data as any)?.facets);
+    return brandCount({ brands: (data as any)?.brands ?? (data as any)?.facets?.brands ?? {} });
   };
   const out: Listing[] = [];
   for (const c of (cats ?? []) as { slug: string }[]) {
