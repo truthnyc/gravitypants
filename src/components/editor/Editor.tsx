@@ -443,8 +443,11 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
     const p = frame.photo ?? {};
     if (patch.scale !== undefined) {
       const cur = keyframe === "start" ? (p.zoom_start ?? 1) : (p.zoom_end ?? 1);
+      // Stage sends the burst's running total; anchor to the zoom at burst start.
+      const zKey = `${key}:${keyframe}`;
+      if (keyZoom.current?.key !== zKey) keyZoom.current = { key: zKey, z0: cur };
       const delta = (patch.scale - photoScale(p)) / 100;
-      const z = Math.min(1.5, Math.max(1, cur + delta));
+      const z = Math.min(1.5, Math.max(1, keyZoom.current.z0 + delta));
       return updatePhoto(keyframe === "start" ? { zoom_start: z } : { zoom_end: z }, `kf-zoom-${keyframe}`);
     }
     if (patch.offset) {
