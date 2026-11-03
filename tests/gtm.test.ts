@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { gtmNoScriptUrl, gtmScriptUrl } from "@/lib/site/gtm";
+import { gtmScriptUrl } from "@/lib/site/gtm";
 
 // The real container ID is filled in by hand, so these checks pass one explicitly:
 // what matters is which pages the container is allowed to load on.
@@ -26,13 +26,5 @@ describe("Tag Manager container placement", () => {
 
   it("stays off entirely while the container ID is empty", () => {
     expect(gtmScriptUrl("gravitypants.com", "/")).toBeNull();
-    expect(gtmNoScriptUrl("gravitypants.com", "/")).toBeNull();
-  });
-
-  it("offers the no-JavaScript fallback on the same pages", () => {
-    expect(gtmNoScriptUrl("gravitypants.com", "/pricing", ID)).toBe(
-      "https://www.googletagmanager.com/ns.html?id=GTM-TEST01",
-    );
-    expect(gtmNoScriptUrl("gravitypants.com", "/app/ads", ID)).toBeNull();
   });
 });

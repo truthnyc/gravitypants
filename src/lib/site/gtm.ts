@@ -12,11 +12,6 @@ export function gtmScriptUrl(host: string, path: string, id = GTM_CONTAINER_ID) 
   return `https://www.googletagmanager.com/gtm.js?id=${encodeURIComponent(id)}`;
 }
 
-/** Fallback frame for visitors with JavaScript switched off. */
-export function gtmNoScriptUrl(host: string, path: string, id = GTM_CONTAINER_ID) {
-  const url = gtmScriptUrl(host, path, id);
-  return url ? url.replace('/gtm.js?', '/ns.html?') : null;
-}
 
 declare global { interface Window { dataLayer?: unknown[] } }
 
