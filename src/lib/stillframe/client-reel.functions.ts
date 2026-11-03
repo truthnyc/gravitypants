@@ -24,15 +24,15 @@ export const getClientReel = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     type FrameRow = { id: string; duration_sec: number; photo: unknown; sort_order: number };
-    const thumb = async (u: string | undefined) => {
+    const thumb = async (u: string | null | undefined) => {
       if (!u) return null;
       if (/^https?:|^\//.test(u)) return u;
-      const { data: t } = await supabaseAdmin.storage.from("media").createSignedUrl(u.replace(/^media:/, ""), 3600, { transform: { width: 240, quality: 70 } });
+      const { data: t } = await supabaseAdmin.storage.from("media").createSignedUrl(u.replace(/^media:/, ""), 3600);
       return t?.signedUrl ?? null;
     };
     const mapFrames = (rows: FrameRow[] | null) =>
       Promise.all((rows ?? []).sort((a, b) => a.sort_order - b.sort_order).map(async (f) => {
-        const p = (f.photo ?? {}) as { url?: string; movement?: string };
+        const p = (f.photo ?? {}) as { url?: string | null; movement?: string };
         const m = movementLabel(p);
         return { id: f.id, photoUrl: await thumb(p.url), seconds: Number(f.duration_sec), custom: m.custom, movement: m.text };
       }));
