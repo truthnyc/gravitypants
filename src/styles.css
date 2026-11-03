@@ -212,6 +212,7 @@
   --color-site-muted: var(--site-muted);
   --color-site-nav: var(--site-nav);
   --color-site-panel: var(--site-panel);
+  --color-site-link: var(--site-link);
   --color-site-inner: var(--site-inner);
   --color-site-soft-blue: var(--site-soft-blue);
   --color-site-eyebrow: var(--site-eyebrow);
