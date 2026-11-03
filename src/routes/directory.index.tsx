@@ -81,8 +81,8 @@ export const Route = createFileRoute("/directory/")({
       const cat = loaderData.category && !loaderData.category.includes(",") ? CATEGORIES.find((c) => categorySlug(c) === loaderData.category) : undefined;
       const mood = !cat && loaderData.mood && !loaderData.mood.includes(",") ? loaderData.mood : undefined;
       const listing = cat || mood ? listingHead(loaderData, cat ? `/c/${loaderData.category}` : `/mood/${encodeURIComponent(mood!)}`, cat ? `${cat} brands` : `${cap(mood!)} brands and gift ideas`) : null;
-      if (cat) return withLd(aimanteHead({ path: `/c/${loaderData.category}`, title: `${cat} video ads — Aimanté`, description: `Short video ads and Reels from ${cat} brands. Browse by mood and brand on Aimanté.` }), listing!);
-      if (mood) return withLd(aimanteHead({ path: `/mood/${encodeURIComponent(mood)}`, title: `${cap(mood)} video ads — Aimanté`, description: `Video ads and Reels that feel ${mood}, from independent brands on Aimanté.` }), listing!);
+      if (cat) return withLd(aimanteHead({ path: `/c/${loaderData.category}`, title: `${cat} video ads — Aimanté`, description: loaderData.listing?.meta || `Short video ads and Reels from ${cat} brands. Browse by mood and brand on Aimanté.` }), listing!);
+      if (mood) return withLd(aimanteHead({ path: `/mood/${encodeURIComponent(mood)}`, title: `${cap(mood)} video ads — Aimanté`, description: loaderData.listing?.meta || `Video ads and Reels that feel ${mood}, from independent brands on Aimanté.` }), listing!);
       return withLd(aimanteHead({ path: "/", title: "Aimanté — Discover brands by mood", description: "Tell us how you'd like to feel and we'll show you something. Short reels from independent makers and well-known houses, by mood, category or brand." }), {
         noindex: false,
         ld: [
