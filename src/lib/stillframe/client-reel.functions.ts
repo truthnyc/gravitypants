@@ -7,7 +7,7 @@ import { movementLabel } from "./movement-label";
 // One client reel: the final video (signed, downloadable) and each photo's movement.
 // Keys match Brand home: own:<projectId>, dir:<directoryReelId>, site:<siteReelId>.
 
-export type ClientReelFrame = { id: string; photoRef: string | null; seconds: number; custom: boolean; movement: string };
+export type ClientReelFrame = { id: string; photoUrl: string | null; seconds: number; custom: boolean; movement: string };
 export type ClientReel = { title: string; videoUrl: string | null; downloadUrl: string | null; fileName: string; frames: ClientReelFrame[] };
 
 const input = z.object({ workspaceId: z.string().uuid(), key: z.string().regex(/^(own|dir|site):[0-9a-f-]{36}$/) });
@@ -24,12 +24,18 @@ export const getClientReel = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     type FrameRow = { id: string; duration_sec: number; photo: unknown; sort_order: number };
+    const thumb = async (u: string | undefined) => {
+      if (!u) return null;
+      if (/^https?:|^\//.test(u)) return u;
+      const { data: t } = await supabaseAdmin.storage.from("media").createSignedUrl(u.replace(/^media:/, ""), 3600, { transform: { width: 240, quality: 70 } });
+      return t?.signedUrl ?? null;
+    };
     const mapFrames = (rows: FrameRow[] | null) =>
-      (rows ?? []).sort((a, b) => a.sort_order - b.sort_order).map((f) => {
+      Promise.all((rows ?? []).sort((a, b) => a.sort_order - b.sort_order).map(async (f) => {
         const p = (f.photo ?? {}) as { url?: string; movement?: string };
         const m = movementLabel(p);
-        return { id: f.id, photoRef: p.url ?? null, seconds: Number(f.duration_sec), custom: m.custom, movement: m.text };
-      });
+        return { id: f.id, photoUrl: await thumb(p.url), seconds: Number(f.duration_sec), custom: m.custom, movement: m.text };
+      }));
     const sign = async (bucket: "media" | "site-reels", path: string, name: string) => {
       const [{ data: v }, { data: d }] = await Promise.all([
         supabaseAdmin.storage.from(bucket).createSignedUrl(path, 3600),
@@ -52,7 +58,7 @@ export const getClientReel = createServerFn({ method: "POST" })
         const mp4 = (files ?? []).find((f) => f.id && /\.mp4$/i.test(f.name));
         if (mp4) { video = await sign("media", `${root}/${s}/${mp4.name}`, name); break; }
       }
-      return { title: p.name || "Untitled ad", fileName: name, frames: mapFrames(frames as FrameRow[]), ...video };
+      return { title: p.name || "Untitled ad", fileName: name, frames: await mapFrames(frames as FrameRow[]), ...video };
     }
 
     // Brand-page reels: confirm the reel's brand belongs to this workspace before reading.
@@ -68,7 +74,7 @@ export const getClientReel = createServerFn({ method: "POST" })
     let frames: ClientReelFrame[] = [];
     if (kind === "dir" && "ad_id" in r && r.ad_id) {
       const { data: rows } = await supabaseAdmin.from("frames").select("id,duration_sec,photo,sort_order").eq("project_id", r.ad_id);
-      frames = mapFrames(rows as FrameRow[]);
+      frames = await mapFrames(rows as FrameRow[]);
     }
     return { title, fileName: safeName(title), frames, ...video };
   });
