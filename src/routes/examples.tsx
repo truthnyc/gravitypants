@@ -13,7 +13,7 @@ import { GravityPantsLogo } from "@/components/GravityPantsLogo";
 import { Button } from "@/components/ui/button";
 import type { GalleryExample } from "@/lib/site/examples";
 import { EXAMPLES_OG_IMAGE, siteHead } from "@/lib/site/seo";
-import { videoObjects } from "@/lib/site/video-schema";
+import { watchSlugs } from "@/lib/site/watch";
 import { listSiteReels } from "@/lib/site/reels.functions";
 import { categoryLabel, ratioToFormat, type SiteReel } from "@/lib/site/reels";
 import { getHomepageContent } from "@/lib/site/homepage.functions";
@@ -82,9 +82,9 @@ function GalleryCard({ example }: { example: BrandExample }) {
 
 export const Route = createFileRoute("/examples")({
   validateSearch: z.object({ cat: z.string().optional(), format: z.coerce.number().optional() }),
-  head: ({ loaderData }) => {
+  head: () => {
     const head = siteHead({ path: "/examples", title: "Video Ad Examples Made from Product Photos — Gravity Pants", description: "Browse Gravity Pants video ad examples across fashion, food, beauty, and home. Find a style for your photos.", image: EXAMPLES_OG_IMAGE });
-    return { ...head, scripts: [...head.scripts, ...videoObjects(loaderData?.reels ?? [], "/examples").map((v) => ({ type: "application/ld+json", children: JSON.stringify(v) }))] };
+    return head;
   },
   loader: async () => {
     const [reels, content] = await Promise.all([listSiteReels().catch(() => [] as SiteReel[]), getHomepageContent().catch(() => DEFAULT_CONTENT)]);

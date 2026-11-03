@@ -106,7 +106,7 @@ function WatchPage() {
             ))}
           </dl>
           <p className="mt-4 text-[15px] leading-[1.6] text-site-secondary">
-            Made in Gravity Pants from {reel.photos || "a few"} still {reel.photos === 1 ? "photo" : "photos"}, with {reel.brand}'s fonts, colours and logo from its brand kit and gentle photo movement between frames.
+            Made in Gravity Pants from {reel.photos || "a few"} still {reel.photos === 1 ? "photo" : "photos"}.
           </p>
           <Button asChild variant="site" size="site" className="mt-6">
             <a href="/signup?ref=watch" data-cta="watch-signup">Make a reel like this</a>

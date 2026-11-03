@@ -23,7 +23,7 @@ import jewelryFrame1 from "@/assets/site/fine-jewelry-frame-1.webp.asset.json";
 import jewelryFrame2 from "@/assets/site/fine-jewelry-frame-2.webp.asset.json";
 import jewelryFrame3 from "@/assets/site/fine-jewelry-frame-3.webp.asset.json";
 import { SITE_ORIGIN, siteHead } from "@/lib/site/seo";
-import { videoObjects } from "@/lib/site/video-schema";
+import { watchSlugs } from "@/lib/site/watch";
 import { listSiteReels } from "@/lib/site/reels.functions";
 import { FORMAT_LABEL, ratioToFormat, type SiteReel } from "@/lib/site/reels";
 import { getHomepageContent } from "@/lib/site/homepage.functions";
@@ -82,7 +82,6 @@ export const Route = createFileRoute("/")({
       scripts: [
         ...head.scripts,
         { type: "application/ld+json", children: JSON.stringify(jsonLd) },
-        ...videoObjects(loaderData?.reels ?? [], "/").map((v) => ({ type: "application/ld+json", children: JSON.stringify(v) })),
       ],
     };
   },
