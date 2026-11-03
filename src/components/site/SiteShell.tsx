@@ -1,7 +1,7 @@
 import { BrandPreviewHost } from "./BrandPreview";
 import { Link } from "@tanstack/react-router";
 import { Instagram, Minus, Plus, Youtube } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { GravityPantsLogo } from "@/components/GravityPantsLogo";
 import { FooterNewsletter, NewsletterPopup } from "@/components/site/Newsletter";
@@ -96,9 +96,9 @@ function SiteFooter() {
         {/* One copy of every link for all sizes, so crawlers and screen readers see each once. */}
         <div className="grid gap-7 md:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_1.2fr_1fr_1fr_1.6fr]">
           <Brand />
-          <div className="self-start max-md:-mt-1 lg:order-last"><FooterNewsletter /></div>
+          <div className="self-start lg:order-last"><FooterNewsletter /></div>
           <div className="hidden md:col-span-2 md:mt-3 md:grid md:grid-cols-5 md:gap-7 lg:contents">{columns.map((c) => <Column key={c.label} column={c} />)}</div>
-          <div className="-mt-1 border-t border-ap-hairline md:hidden">{columns.map((c, i) => <Collapsible key={c.label} column={c} defaultOpen={i === 0} />)}</div>
+          <div className="border-t border-ap-hairline md:hidden">{columns.map((c, i) => <Collapsible key={c.label} column={c} defaultOpen={i === 0} />)}</div>
         </div>
 
         <div className="mt-10 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-ap-hairline pt-5 text-[13px] text-ap-muted">
