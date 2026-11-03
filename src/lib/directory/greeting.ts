@@ -222,7 +222,7 @@ export type GreetingCtx = {
   fallbackMood: string;
   count?: number;
 };
-export type Chosen = { rule: RuleType; source: string; filled: string; segments: Segment[]; mood: string; category: string | null; brand: string | null };
+export type Chosen = { rule: RuleType; source: string; filled: string; segments: Segment[]; mood: string; category: string | null; brand: string | null; eventId?: string | undefined };
 
 const inRegion = (e: GEvent, country: string | null) => e.regions.includes("GLOBAL") || (!!country && e.regions.includes(country));
 
@@ -276,7 +276,7 @@ export function chooseGreeting(cfg: GreetingConfig, ctx: GreetingCtx): Chosen {
           const days = daysBetween(ctx.now, d);
           if (days >= 0 && days <= e.leadDays && (!best || days < best.days)) best = { e, days };
         }
-        if (best) return make("countdown", `Countdown — ${best.e.name}`, best.e.template, best.e.mood, { days: best.days, event: best.e.name }, best.e.category, best.e.brand);
+        if (best) return { ...make("countdown", `Countdown — ${best.e.name}`, best.e.template, best.e.mood, { days: best.days, event: best.e.name }, best.e.category, best.e.brand), eventId: best.e.id };
         break;
       }
       case "fun_day": {

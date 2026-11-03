@@ -71,6 +71,7 @@ import { Route as AuthenticatedAdminClientsRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminDirectoryRouteImport } from './routes/_authenticated/admin/directory'
 import { Route as AuthenticatedAdminDirectorySettingsRouteImport } from './routes/_authenticated/admin/directory-settings'
 import { Route as AuthenticatedAdminExportsRouteImport } from './routes/_authenticated/admin/exports'
+import { Route as AuthenticatedAdminGuidesRouteImport } from './routes/_authenticated/admin/guides'
 import { Route as AuthenticatedAdminHomepageRouteImport } from './routes/_authenticated/admin/homepage'
 import { Route as AuthenticatedAdminMoodsRouteImport } from './routes/_authenticated/admin/moods'
 import { Route as AuthenticatedAdminNewsletterRouteImport } from './routes/_authenticated/admin/newsletter'
@@ -89,6 +90,8 @@ import { Route as AuthenticatedAppGuideRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAppHelpRouteImport } from './routes/_authenticated/app/help'
 import { Route as AuthenticatedAppNewRouteImport } from './routes/_authenticated/app/new'
 import { Route as AuthenticatedAppStatsRouteImport } from './routes/_authenticated/app/stats'
+import { Route as AimanteGuidesIndexRouteImport } from './routes/aimante.guides.index'
+import { Route as AimanteGuidesSlugRouteImport } from './routes/aimante.guides.$slug'
 import { Route as ApiPublicCleanupExportsRouteImport } from './routes/api/public/cleanup-exports'
 import { Route as ApiPublicClientErrorRouteImport } from './routes/api/public/client-error'
 import { Route as ApiPublicDirectoryDailyRouteImport } from './routes/api/public/directory-daily'
@@ -448,6 +451,12 @@ const AuthenticatedAdminExportsRoute =
     path: '/exports',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminGuidesRoute =
+  AuthenticatedAdminGuidesRouteImport.update({
+    id: '/guides',
+    path: '/guides',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminHomepageRoute =
   AuthenticatedAdminHomepageRouteImport.update({
     id: '/homepage',
@@ -543,6 +552,16 @@ const AuthenticatedAppStatsRoute = AuthenticatedAppStatsRouteImport.update({
   id: '/stats',
   path: '/stats',
   getParentRoute: () => AuthenticatedAppRouteRoute,
+} as any)
+const AimanteGuidesIndexRoute = AimanteGuidesIndexRouteImport.update({
+  id: '/aimante/guides/',
+  path: '/aimante/guides/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AimanteGuidesSlugRoute = AimanteGuidesSlugRouteImport.update({
+  id: '/aimante/guides/$slug',
+  path: '/aimante/guides/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicCleanupExportsRoute = ApiPublicCleanupExportsRouteImport.update({
   id: '/api/public/cleanup-exports',
@@ -822,6 +841,7 @@ export interface FileRoutesByFullPath {
   '/admin/directory': typeof AuthenticatedAdminDirectoryRoute
   '/admin/directory-settings': typeof AuthenticatedAdminDirectorySettingsRoute
   '/admin/exports': typeof AuthenticatedAdminExportsRoute
+  '/admin/guides': typeof AuthenticatedAdminGuidesRoute
   '/admin/homepage': typeof AuthenticatedAdminHomepageRoute
   '/admin/moods': typeof AuthenticatedAdminMoodsRoute
   '/admin/newsletter': typeof AuthenticatedAdminNewsletterRoute
@@ -839,6 +859,7 @@ export interface FileRoutesByFullPath {
   '/app/help': typeof AuthenticatedAppHelpRoute
   '/app/new': typeof AuthenticatedAppNewRoute
   '/app/stats': typeof AuthenticatedAppStatsRoute
+  '/aimante/guides/$slug': typeof AimanteGuidesSlugRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
   '/api/public/client-error': typeof ApiPublicClientErrorRoute
   '/api/public/directory-daily': typeof ApiPublicDirectoryDailyRoute
@@ -849,6 +870,7 @@ export interface FileRoutesByFullPath {
   '/shopify/reel/$id': typeof ShopifyReelIdRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/app/': typeof AuthenticatedAppIndexRoute
+  '/aimante/guides/': typeof AimanteGuidesIndexRoute
   '/admin/clients/$id': typeof AuthenticatedAdminClientsIdRoute
   '/admin/templates/$id': typeof AuthenticatedAdminTemplatesIdRouteWithChildren
   '/admin/templates/new': typeof AuthenticatedAdminTemplatesNewRoute
@@ -939,6 +961,7 @@ export interface FileRoutesByTo {
   '/admin/directory': typeof AuthenticatedAdminDirectoryRoute
   '/admin/directory-settings': typeof AuthenticatedAdminDirectorySettingsRoute
   '/admin/exports': typeof AuthenticatedAdminExportsRoute
+  '/admin/guides': typeof AuthenticatedAdminGuidesRoute
   '/admin/homepage': typeof AuthenticatedAdminHomepageRoute
   '/admin/moods': typeof AuthenticatedAdminMoodsRoute
   '/admin/newsletter': typeof AuthenticatedAdminNewsletterRoute
@@ -956,6 +979,7 @@ export interface FileRoutesByTo {
   '/app/help': typeof AuthenticatedAppHelpRoute
   '/app/new': typeof AuthenticatedAppNewRoute
   '/app/stats': typeof AuthenticatedAppStatsRoute
+  '/aimante/guides/$slug': typeof AimanteGuidesSlugRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
   '/api/public/client-error': typeof ApiPublicClientErrorRoute
   '/api/public/directory-daily': typeof ApiPublicDirectoryDailyRoute
@@ -966,6 +990,7 @@ export interface FileRoutesByTo {
   '/shopify/reel/$id': typeof ShopifyReelIdRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/app': typeof AuthenticatedAppIndexRoute
+  '/aimante/guides': typeof AimanteGuidesIndexRoute
   '/admin/clients/$id': typeof AuthenticatedAdminClientsIdRoute
   '/admin/templates/$id': typeof AuthenticatedAdminTemplatesIdRouteWithChildren
   '/admin/templates/new': typeof AuthenticatedAdminTemplatesNewRoute
@@ -1061,6 +1086,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/directory': typeof AuthenticatedAdminDirectoryRoute
   '/_authenticated/admin/directory-settings': typeof AuthenticatedAdminDirectorySettingsRoute
   '/_authenticated/admin/exports': typeof AuthenticatedAdminExportsRoute
+  '/_authenticated/admin/guides': typeof AuthenticatedAdminGuidesRoute
   '/_authenticated/admin/homepage': typeof AuthenticatedAdminHomepageRoute
   '/_authenticated/admin/moods': typeof AuthenticatedAdminMoodsRoute
   '/_authenticated/admin/newsletter': typeof AuthenticatedAdminNewsletterRoute
@@ -1078,6 +1104,7 @@ export interface FileRoutesById {
   '/_authenticated/app/help': typeof AuthenticatedAppHelpRoute
   '/_authenticated/app/new': typeof AuthenticatedAppNewRoute
   '/_authenticated/app/stats': typeof AuthenticatedAppStatsRoute
+  '/aimante/guides/$slug': typeof AimanteGuidesSlugRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
   '/api/public/client-error': typeof ApiPublicClientErrorRoute
   '/api/public/directory-daily': typeof ApiPublicDirectoryDailyRoute
@@ -1088,6 +1115,7 @@ export interface FileRoutesById {
   '/shopify_/reel/$id': typeof ShopifyReelIdRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
+  '/aimante/guides/': typeof AimanteGuidesIndexRoute
   '/_authenticated/admin/clients_/$id': typeof AuthenticatedAdminClientsIdRoute
   '/_authenticated/admin/templates/$id': typeof AuthenticatedAdminTemplatesIdRouteWithChildren
   '/_authenticated/admin/templates/new': typeof AuthenticatedAdminTemplatesNewRoute
@@ -1183,6 +1211,7 @@ export interface FileRouteTypes {
     | '/admin/directory'
     | '/admin/directory-settings'
     | '/admin/exports'
+    | '/admin/guides'
     | '/admin/homepage'
     | '/admin/moods'
     | '/admin/newsletter'
@@ -1200,6 +1229,7 @@ export interface FileRouteTypes {
     | '/app/help'
     | '/app/new'
     | '/app/stats'
+    | '/aimante/guides/$slug'
     | '/api/public/cleanup-exports'
     | '/api/public/client-error'
     | '/api/public/directory-daily'
@@ -1210,6 +1240,7 @@ export interface FileRouteTypes {
     | '/shopify/reel/$id'
     | '/admin/'
     | '/app/'
+    | '/aimante/guides/'
     | '/admin/clients/$id'
     | '/admin/templates/$id'
     | '/admin/templates/new'
@@ -1300,6 +1331,7 @@ export interface FileRouteTypes {
     | '/admin/directory'
     | '/admin/directory-settings'
     | '/admin/exports'
+    | '/admin/guides'
     | '/admin/homepage'
     | '/admin/moods'
     | '/admin/newsletter'
@@ -1317,6 +1349,7 @@ export interface FileRouteTypes {
     | '/app/help'
     | '/app/new'
     | '/app/stats'
+    | '/aimante/guides/$slug'
     | '/api/public/cleanup-exports'
     | '/api/public/client-error'
     | '/api/public/directory-daily'
@@ -1327,6 +1360,7 @@ export interface FileRouteTypes {
     | '/shopify/reel/$id'
     | '/admin'
     | '/app'
+    | '/aimante/guides'
     | '/admin/clients/$id'
     | '/admin/templates/$id'
     | '/admin/templates/new'
@@ -1421,6 +1455,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/directory'
     | '/_authenticated/admin/directory-settings'
     | '/_authenticated/admin/exports'
+    | '/_authenticated/admin/guides'
     | '/_authenticated/admin/homepage'
     | '/_authenticated/admin/moods'
     | '/_authenticated/admin/newsletter'
@@ -1438,6 +1473,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/help'
     | '/_authenticated/app/new'
     | '/_authenticated/app/stats'
+    | '/aimante/guides/$slug'
     | '/api/public/cleanup-exports'
     | '/api/public/client-error'
     | '/api/public/directory-daily'
@@ -1448,6 +1484,7 @@ export interface FileRouteTypes {
     | '/shopify_/reel/$id'
     | '/_authenticated/admin/'
     | '/_authenticated/app/'
+    | '/aimante/guides/'
     | '/_authenticated/admin/clients_/$id'
     | '/_authenticated/admin/templates/$id'
     | '/_authenticated/admin/templates/new'
@@ -1527,6 +1564,7 @@ export interface RootRouteChildren {
   InviteTokenRoute: typeof InviteTokenRoute
   ShopifyWelcomeRoute: typeof ShopifyWelcomeRoute
   DirectoryIndexRoute: typeof DirectoryIndexRoute
+  AimanteGuidesSlugRoute: typeof AimanteGuidesSlugRoute
   ApiPublicCleanupExportsRoute: typeof ApiPublicCleanupExportsRoute
   ApiPublicClientErrorRoute: typeof ApiPublicClientErrorRoute
   ApiPublicDirectoryDailyRoute: typeof ApiPublicDirectoryDailyRoute
@@ -1535,6 +1573,7 @@ export interface RootRouteChildren {
   DirectoryCategorySlugRoute: typeof DirectoryCategorySlugRoute
   EmbedReelIdRoute: typeof EmbedReelIdRoute
   ShopifyReelIdRoute: typeof ShopifyReelIdRoute
+  AimanteGuidesIndexRoute: typeof AimanteGuidesIndexRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   ApiPublicShopifyAuthRoute: typeof ApiPublicShopifyAuthRoute
   ApiPublicShopifyConnectRoute: typeof ApiPublicShopifyConnectRoute
@@ -1984,6 +2023,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminExportsRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/guides': {
+      id: '/_authenticated/admin/guides'
+      path: '/guides'
+      fullPath: '/admin/guides'
+      preLoaderRoute: typeof AuthenticatedAdminGuidesRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/homepage': {
       id: '/_authenticated/admin/homepage'
       path: '/homepage'
@@ -2109,6 +2155,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/stats'
       preLoaderRoute: typeof AuthenticatedAppStatsRouteImport
       parentRoute: typeof AuthenticatedAppRouteRoute
+    }
+    '/aimante/guides/': {
+      id: '/aimante/guides/'
+      path: '/aimante/guides'
+      fullPath: '/aimante/guides/'
+      preLoaderRoute: typeof AimanteGuidesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/aimante/guides/$slug': {
+      id: '/aimante/guides/$slug'
+      path: '/aimante/guides/$slug'
+      fullPath: '/aimante/guides/$slug'
+      preLoaderRoute: typeof AimanteGuidesSlugRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/public/cleanup-exports': {
       id: '/api/public/cleanup-exports'
@@ -2411,6 +2471,7 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminDirectoryRoute: typeof AuthenticatedAdminDirectoryRoute
   AuthenticatedAdminDirectorySettingsRoute: typeof AuthenticatedAdminDirectorySettingsRoute
   AuthenticatedAdminExportsRoute: typeof AuthenticatedAdminExportsRoute
+  AuthenticatedAdminGuidesRoute: typeof AuthenticatedAdminGuidesRoute
   AuthenticatedAdminHomepageRoute: typeof AuthenticatedAdminHomepageRoute
   AuthenticatedAdminMoodsRoute: typeof AuthenticatedAdminMoodsRoute
   AuthenticatedAdminNewsletterRoute: typeof AuthenticatedAdminNewsletterRoute
@@ -2438,6 +2499,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminDirectorySettingsRoute:
       AuthenticatedAdminDirectorySettingsRoute,
     AuthenticatedAdminExportsRoute: AuthenticatedAdminExportsRoute,
+    AuthenticatedAdminGuidesRoute: AuthenticatedAdminGuidesRoute,
     AuthenticatedAdminHomepageRoute: AuthenticatedAdminHomepageRoute,
     AuthenticatedAdminMoodsRoute: AuthenticatedAdminMoodsRoute,
     AuthenticatedAdminNewsletterRoute: AuthenticatedAdminNewsletterRoute,
@@ -2628,6 +2690,7 @@ const rootRouteChildren: RootRouteChildren = {
   InviteTokenRoute: InviteTokenRoute,
   ShopifyWelcomeRoute: ShopifyWelcomeRoute,
   DirectoryIndexRoute: DirectoryIndexRoute,
+  AimanteGuidesSlugRoute: AimanteGuidesSlugRoute,
   ApiPublicCleanupExportsRoute: ApiPublicCleanupExportsRoute,
   ApiPublicClientErrorRoute: ApiPublicClientErrorRoute,
   ApiPublicDirectoryDailyRoute: ApiPublicDirectoryDailyRoute,
@@ -2636,6 +2699,7 @@ const rootRouteChildren: RootRouteChildren = {
   DirectoryCategorySlugRoute: DirectoryCategorySlugRoute,
   EmbedReelIdRoute: EmbedReelIdRoute,
   ShopifyReelIdRoute: ShopifyReelIdRoute,
+  AimanteGuidesIndexRoute: AimanteGuidesIndexRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   ApiPublicShopifyAuthRoute: ApiPublicShopifyAuthRoute,
   ApiPublicShopifyConnectRoute: ApiPublicShopifyConnectRoute,

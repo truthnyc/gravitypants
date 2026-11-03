@@ -166,6 +166,7 @@ export function AimanteHeader() {
       <div className="mx-auto grid h-[55px] max-w-[1280px] grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 md:h-[63px] md:px-10">
         <Link to="/directory" onClick={close} aria-label="Aimanté home" className="min-w-0 w-fit"><AimanteLogo /></Link>
         <nav aria-label="Main" className="hidden shrink-0 items-center gap-7 md:flex">
+          <Link to="/aimante/guides" className={navLink} activeProps={navActive}>Guides</Link>
           <Link to="/aimante/about" className={navLink} activeProps={navActive}>About</Link>
           <Link to="/aimante/join" className={navLink} activeProps={navActive} activeOptions={{ includeHash: false }}>For brands</Link>
           {!me && <Link to="/signin" search={signInSearch} className={navLink} activeProps={navActive}>Sign in</Link>}
@@ -187,6 +188,7 @@ export function AimanteHeader() {
         <div className="absolute inset-x-0 top-full h-dvh bg-aimante-dim md:hidden" onClick={() => { close(); menuButton.current?.focus(); }} aria-hidden="true" />
         <nav ref={panel} id="aimante-mobile-menu" aria-label="Mobile navigation" className="absolute inset-x-0 top-full max-h-[calc(100dvh-56px)] overflow-y-auto rounded-b-[12px] bg-ap-card px-6 pb-6 shadow-aimante-menu md:hidden">
           <Link to="/directory" onClick={close} className={row}>Browse{chevron}</Link>
+          <Link to="/aimante/guides" onClick={close} className={row}>Guides{chevron}</Link>
           <Link to="/aimante/about" onClick={close} className={row}>About{chevron}</Link>
           <Link to="/aimante/join" onClick={close} className={row}>For brands{chevron}</Link>
           {!me && <Link to="/aimante/join" hash="apply" data-cta="apply-to-join" onClick={close} className={cn(row, "text-ap-blue")}>Apply to join{chevron}</Link>}
@@ -216,6 +218,7 @@ export function AimanteFooter() {
         </div>
         <nav aria-label="Footer" className="grid min-w-0 grid-cols-2 gap-x-6 gap-y-2.5 md:flex md:flex-wrap md:items-center md:justify-end md:gap-x-5 md:gap-y-3">
           <Link to="/aimante/join" hash="apply" data-cta="apply-to-join" className="hover:text-ap-ink">Apply to join</Link>
+          <Link to="/aimante/guides" className="hover:text-ap-ink">Guides</Link>
           <Link to="/aimante/about" className="hover:text-ap-ink">About</Link>
           <Link to="/privacy" className="hover:text-ap-ink">Privacy</Link>
           <Link to="/terms" className="hover:text-ap-ink">Terms</Link>

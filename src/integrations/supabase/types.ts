@@ -1047,6 +1047,72 @@ export type Database = {
           },
         ]
       }
+      guides: {
+        Row: {
+          categories: string[]
+          cover_image: string | null
+          created_at: string
+          end_date: string | null
+          id: string
+          intro: string
+          meta_description: string
+          moods: string[]
+          published_at: string | null
+          season: string | null
+          season_label: string | null
+          sections: Json
+          seo_title: string
+          slug: string
+          start_date: string | null
+          status: string
+          title: string
+          updated_at: string
+          workspace_id: string | null
+        }
+        Insert: {
+          categories?: string[]
+          cover_image?: string | null
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          intro?: string
+          meta_description?: string
+          moods?: string[]
+          published_at?: string | null
+          season?: string | null
+          season_label?: string | null
+          sections?: Json
+          seo_title?: string
+          slug: string
+          start_date?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          workspace_id?: string | null
+        }
+        Update: {
+          categories?: string[]
+          cover_image?: string | null
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          intro?: string
+          meta_description?: string
+          moods?: string[]
+          published_at?: string | null
+          season?: string | null
+          season_label?: string | null
+          sections?: Json
+          seo_title?: string
+          slug?: string
+          start_date?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          workspace_id?: string | null
+        }
+        Relationships: []
+      }
       klaviyo_connections: {
         Row: {
           account_name: string | null

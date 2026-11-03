@@ -3,7 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { useQuery } from '@tanstack/react-query';
 import { useServerFn } from '@tanstack/react-start';
 import { pendingBrandRequestCount } from '@/lib/directory/applications.functions';
-import { BarChart3, ChevronLeft, Clapperboard, FileClock, Home, Inbox, LayoutDashboard, LayoutTemplate, Mail, ShieldCheck, Users, Video , Search, Tags, LayoutGrid } from "lucide-react";
+import { BookOpen, BarChart3, ChevronLeft, Clapperboard, FileClock, Home, Inbox, LayoutDashboard, LayoutTemplate, Mail, ShieldCheck, Users, Video , Search, Tags, LayoutGrid } from "lucide-react";
 
 const NAV = [
   { to: "/admin", label: "Overview", icon: LayoutDashboard, exact: true },
@@ -19,6 +19,7 @@ const NAV = [
   { to: "/admin/directory-settings", label: "Directory settings", icon: LayoutGrid },
   { to: "/admin/moods", label: "Moods", icon: Tags },
   { to: "/admin/categories", label: "Categories", icon: LayoutGrid },
+  { to: "/admin/guides", label: "Guides", icon: BookOpen },
   { to: "/admin/homepage", label: "Homepage", icon: Home },
   { to: "/admin/newsletter", label: "Newsletter", icon: Mail },
   { to: "/admin/exports", label: "Exports", icon: Video },
