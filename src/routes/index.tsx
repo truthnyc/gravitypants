@@ -319,8 +319,8 @@ function BeforeAfter({
               src={src}
               alt={alts[i] ?? `${title}, ${imageLabel === "Video frames" ? "video frame" : "original product photo"}`}
               loading="lazy"
-              width={1080}
-              height={1350}
+              width={format === "169" ? 480 : 514}
+              height={format === "169" ? 270 : 720}
             />
           ))}
         </div>
@@ -835,7 +835,7 @@ function Home() {
             <p>"{content.quote.quote}"</p>
             <div className="home-person">
               {content.quote.photo ? (
-                <img src={photoSrc(content.quote.photo)} alt={content.quote.photo.alt || `${[content.quote.name, content.quote.role].filter(Boolean).join(", ")} logo`} width={52} height={52} loading="lazy" />
+                <img src={photoSrc(content.quote.photo)} alt={content.quote.photo.alt || `${[content.quote.name, content.quote.role].filter(Boolean).join(", ")} logo`} width={238} height={238} loading="lazy" />
               ) : (
                 <span> </span>
               )}
