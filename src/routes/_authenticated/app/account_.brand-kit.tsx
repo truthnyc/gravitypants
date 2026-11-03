@@ -33,7 +33,7 @@ function CopyBox({ label, text }: { label: string; text: string }) {
     <div className="mt-3">
       <div className="flex items-center justify-between gap-3">
         <span className="text-[13px] text-ap-muted">{label}</span>
-        <AppButton variant="secondary" size="sm" onClick={() => void copy(text)}><Copy className="size-4" strokeWidth={1.7} />Copy</AppButton>
+        <AppButton variant="ghost" size="sm" onClick={() => void copy(text)}><Copy className="size-4" strokeWidth={1.7} />Copy</AppButton>
       </div>
       <pre className="mt-2 overflow-x-auto whitespace-pre-wrap break-all rounded-[4px] border border-ap-hairline bg-ap-panel p-3 font-mono text-[12px] leading-[1.5] text-ap-ink">{text}</pre>
     </div>
