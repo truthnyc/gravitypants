@@ -22,10 +22,13 @@ import { trackGaPage } from "@/lib/site/ga";
 import { currentSite, isIndexedHost } from "@/lib/site/brand-site";
 import { ServiceUnavailable } from "@/components/site/ServiceUnavailable";
 import { AdvertisingConsent } from "@/components/site/AdvertisingConsent";
+import { useBrandSite } from "@/components/site/AimanteShell";
+import { CATEGORIES, categorySlug } from "@/lib/directory/directory";
 import favicon from "@/assets/site/favicon.svg.asset.json";
 import touchIcon from "@/assets/site/apple-touch-icon.png.asset.json";
 
 function NotFoundComponent() {
+  if (useBrandSite() === "aimante") return <AimanteNotFound />;
   return (
     <div className="flex min-h-dvh items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
@@ -44,6 +47,25 @@ function NotFoundComponent() {
         </div>
       </div>
     </div>
+  );
+}
+
+/** aimante.co 404: back to the collection or straight into a category. */
+function AimanteNotFound() {
+  return (
+    <main className="mx-auto flex min-h-dvh max-w-[720px] flex-col items-center justify-center px-6 py-20 text-center font-ap text-ap-ink">
+      <h1 className="text-[32px] font-semibold tracking-[-0.03em]">Page not found</h1>
+      <p className="mt-3 text-[16px] text-ap-body">This page isn't on Aimanté. Start from the collection, or pick a category.</p>
+      <Link to="/directory" className="mt-6 inline-flex h-11 items-center rounded-lg bg-ap-blue px-5 text-[15px] font-medium text-ap-card hover:bg-ap-blue-hover">Back to Aimanté</Link>
+      <nav aria-label="Categories" className="mt-10">
+        <h2 className="text-[15px] font-semibold">Browse by category</h2>
+        <ul className="mt-3 flex flex-wrap justify-center gap-2">
+          {CATEGORIES.map((c) => (
+            <li key={c}><Link to="/directory" search={{ category: categorySlug(c) }} className="inline-flex h-9 items-center rounded-lg bg-ap-panel px-3 text-[14px] hover:bg-ap-media">{c}</Link></li>
+          ))}
+        </ul>
+      </nav>
+    </main>
   );
 }
 
@@ -82,21 +104,24 @@ function ErrorComponent({ error, reset }: { error: unknown; reset: () => void })
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  head: () => ({
+  head: () => {
+    // Every page sets its own title; these defaults only show on a not-found page.
+    const aim = currentSite() === "aimante";
+    return {
     meta: [
       { charSet: "utf-8" },
       // Duplicate hosts (gravitypants.lovable.app, previews) stay out of search; canonicals still point at gravitypants.com.
       ...(isIndexedHost() ? [] : [{ name: "robots", content: "noindex, follow" }]),
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
-      { title: "Gravity Pants" },
+      { title: aim ? "Page not found — Aimanté" : "Gravity Pants" },
       {
         name: "description",
-        content: "Turn still photos into short video ads and animated GIFs.",
+        content: aim ? "Aimanté is a collection of independent brands you can browse by mood, category or brand." : "Turn still photos into short video ads and animated GIFs.",
       },
-      { property: "og:title", content: "Gravity Pants" },
+      { property: "og:title", content: aim ? "Page not found — Aimanté" : "Gravity Pants" },
       {
         property: "og:description",
-        content: "Turn still photos into short video ads and animated GIFs.",
+        content: aim ? "Aimanté is a collection of independent brands you can browse by mood, category or brand." : "Turn still photos into short video ads and animated GIFs.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -115,7 +140,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "icon", type: "image/svg+xml", href: favicon.url },
       { rel: "apple-touch-icon", href: touchIcon.url },
     ],
-  }),
+    };
+  },
   beforeLoad: () => ({ site: currentSite() }),
   shellComponent: RootShell,
   component: RootComponent,
