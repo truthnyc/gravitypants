@@ -89,7 +89,7 @@ function WatchPage() {
 
         <div className="mt-5 flex flex-wrap gap-x-6 gap-y-1">
           {reel.href && <a className="showcase-visit" href={reel.href} target="_blank" rel="noopener noreferrer">Visit {reel.brand} <ArrowUpRight size={13} strokeWidth={1.7} /></a>}
-          {reel.brandSlug && <a className="showcase-visit" href={`${AIMANTE_ORIGIN}/b/${reel.brandSlug}`}>{reel.brand} on Aimanté <ArrowRight size={13} strokeWidth={1.7} /></a>}
+          {reel.brandSlug && <a className="showcase-visit !ml-0" href={`${AIMANTE_ORIGIN}/b/${reel.brandSlug}`}>{reel.brand} on Aimanté <ArrowRight size={13} strokeWidth={1.7} /></a>}
         </div>
 
         <section className="mt-12 max-w-[720px]" aria-labelledby="made">
