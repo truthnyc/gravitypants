@@ -4,7 +4,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { ReelVideo } from "@/components/site/ReelVideo";
-import { SiteReelHeart } from "@/components/site/SiteReelHeart";
 import { Button } from "@/components/ui/button";
 import { SHOWCASE_OG_IMAGE, siteHead } from "@/lib/site/seo";
 import { videoObjects } from "@/lib/site/video-schema";
@@ -45,8 +44,8 @@ function BrandCard({ reel }: { reel: SiteReel }) {
   return (
     <article className="examples-card showcase-card">
       <div className="examples-card-media">
-        {reel.source !== "client" && <SiteReelHeart reelId={reel.id} name={`${reel.brand} reel`} />}
         {reel.href ? (
+
           <a
             className="site-reel-link"
             href={reel.href}
