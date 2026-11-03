@@ -9,7 +9,7 @@ import { FORMAT_SIZE, watchSlugs } from "@/lib/site/watch";
 export const Route = createFileRoute("/reels/")({
   loader: async () => {
     const all = [...(await listSiteReels().catch(() => [] as SiteReel[])), LAUNCH_FILM];
-    const slugs = watchSlugs(all);
+    const slugs = watchSlugs(all); // same set as siteWatchSlugs
     return all.map((reel) => ({ reel, slug: slugs.get(reel.id)! }));
   },
   head: () => siteHead({ path: "/reels", title: "Video ad reels made from product photos | Gravity Pants", description: "Watch every reel made with Gravity Pants: short video ads that brands made from a few still product photos." }),

@@ -15,7 +15,7 @@ const wrap = "mx-auto w-full max-w-[1080px] px-5 md:px-8";
 export const Route = createFileRoute("/reels/$slug")({
   loader: async ({ params }) => {
     const all = [...(await listSiteReels().catch(() => [] as SiteReel[])), LAUNCH_FILM];
-    const slugs = watchSlugs(all);
+    const slugs = watchSlugs(all); // same set as siteWatchSlugs
     const reel = all.find((r) => slugs.get(r.id) === params.slug);
     if (!reel) throw notFound();
     const related = relatedReels(reel, all).map((r) => ({ reel: r, slug: slugs.get(r.id)! }));

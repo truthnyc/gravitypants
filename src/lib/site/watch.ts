@@ -1,4 +1,5 @@
 import type { SiteReel } from "./reels";
+import { LAUNCH_FILM } from "./launch-film";
 
 /** Watch pages: one /reels/<slug> page per public reel, the only place its video markup lives. */
 export const reelName = (r: Pick<SiteReel, "brand" | "displayTitle" | "title">) => `${r.brand} — ${r.displayTitle?.trim() || r.title} video ad`;
@@ -28,3 +29,6 @@ export function relatedReels(reel: SiteReel, all: SiteReel[], n = 4): SiteReel[]
   const others = all.filter((r) => r.id !== reel.id);
   return [...others.filter((r) => r.category === reel.category), ...others.filter((r) => r.category !== reel.category)].slice(0, n);
 }
+
+/** Slugs for the public reel list plus the launch film — the exact set /reels pages use. */
+export const siteWatchSlugs = (reels: SiteReel[]) => watchSlugs([...reels, LAUNCH_FILM]);
