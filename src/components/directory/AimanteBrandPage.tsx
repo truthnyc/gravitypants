@@ -10,8 +10,8 @@ import { recordBrandClick } from "@/lib/directory/brand-stats.functions";
 type Brand = { id: string; name: string; slug: string; category: string; logo_url: string | null; website_url: string | null; description: string | null; moods: string[]; affiliated: boolean };
 type Related = { name: string; slug: string; poster: string | null; category: string };
 
-export function AimanteBrandPage({ brand, reels, siteReels, more, onOpen, onOpenSite }: {
-  brand: Brand; reels: DirectoryCard[]; siteReels: SiteReel[]; more: Related[]; onOpen: (r: DirectoryCard) => void; onOpenSite: (r: SiteReel) => void;
+export function AimanteBrandPage({ brand, reels, siteReels, more, onOpen, onOpenSite, linkedMoods }: {
+  linkedMoods: string[]; brand: Brand; reels: DirectoryCard[]; siteReels: SiteReel[]; more: Related[]; onOpen: (r: DirectoryCard) => void; onOpenSite: (r: SiteReel) => void;
 }) {
   const total = reels.length + siteReels.length;
   const sizes = new Set([...reels.flatMap((r) => r.formats.map(ratio)), ...siteReels.map((r) => FORMAT_LABEL[r.format])]);
@@ -36,7 +36,7 @@ export function AimanteBrandPage({ brand, reels, siteReels, more, onOpen, onOpen
       {brand.description && <p className="mt-4 text-[17px] leading-[1.45] text-ap-body">{brand.description}</p>}
       {showBrandConceptNotice(brand.affiliated) && <p className="mt-2 text-[11px] leading-[1.5] text-ap-muted">Concept reels by Gravity Pants. Not affiliated with or endorsed by the brand.</p>}
       <div className="mt-4 flex flex-wrap items-center gap-2 text-[13px]" aria-label="Moods and reel counts">
-        {brand.moods.map((m) => <Link key={m} to="/directory" search={{ mood: m }} className="inline-flex h-7 !min-h-0 items-center rounded-lg bg-ap-soft-blue px-3 text-[13px] font-medium text-ap-badge hover:underline">{m.toLowerCase()}</Link>)}
+        {brand.moods.map((m) => linkedMoods.includes(m) ? <Link key={m} to="/directory" search={{ mood: m.toLowerCase() }} className="inline-flex h-7 !min-h-0 items-center rounded-lg bg-ap-soft-blue px-3 text-[13px] font-medium text-ap-badge hover:underline">{m.toLowerCase()}</Link> : <span key={m} className="inline-flex h-7 items-center rounded-lg bg-ap-soft-blue px-3 text-[13px] font-medium text-ap-badge">{m.toLowerCase()}</span>)}
         <span className="text-ap-muted tabular-nums">· {total} {total === 1 ? "reel" : "reels"} · {sizes.size} {sizes.size === 1 ? "size" : "sizes"}</span>
       </div>
     </header>
