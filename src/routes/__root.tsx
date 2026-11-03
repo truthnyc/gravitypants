@@ -18,6 +18,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { PaymentTestModeBanner } from "@/components/billing/BillingNotices";
 import { trackPageView } from "@/lib/site/track";
 import { trackGtmPage } from "@/lib/site/gtm";
+import { trackGaPage } from "@/lib/site/ga";
 import { currentSite } from "@/lib/site/brand-site";
 import { ServiceUnavailable } from "@/components/site/ServiceUnavailable";
 import { AdvertisingConsent } from "@/components/site/AdvertisingConsent";
@@ -155,9 +156,10 @@ function RootComponent() {
   useEffect(() => {
     if (bare) return;
     trackPageView(pathname);
-    // Google Analytics is loaded by the Tag Manager container; sending it
-    // directly as well would double-count page views.
+    // Google Analytics is sent directly (the GTM container must NOT also hold a
+    // GA tag, or page views double-count).
     trackGtmPage(window.location.hostname, pathname);
+    void trackGaPage(window.location.hostname, pathname);
   }, [pathname, bare]);
 
   return (
