@@ -235,6 +235,15 @@ function ForBrands() {
         </p>
       </section>
 
+      <section className="mx-auto max-w-[760px] px-6 pb-20 text-center">
+        <h2 className={h2}>A badge for your website</h2>
+        <p className="mx-auto mt-4 max-w-[560px] text-[17px] leading-[1.5] text-ap-body">Once your page is live, you can add a small “As seen on Aimanté” badge to your site, press page or bio. It links straight to your brand page. It's optional, and never a condition of being listed.</p>
+        <div className="mt-8 flex flex-wrap justify-center gap-4">
+          <span className="inline-flex rounded-[4px] border border-ap-hairline bg-ap-card p-4"><img src="/badge/light.svg" alt="As seen on Aimanté badge, light" width={160} height={40} loading="lazy" /></span>
+          <span className="inline-flex rounded-[4px] bg-ap-ink p-4"><img src="/badge/dark.svg" alt="As seen on Aimanté badge, dark" width={160} height={40} loading="lazy" /></span>
+        </div>
+      </section>
+
       <section className="mx-auto max-w-[1200px] px-6 pb-20 text-center">
         <h2 className={h2}>Who it's for</h2>
         <div className="mx-auto mt-8 flex max-w-[760px] flex-wrap justify-center gap-3">
