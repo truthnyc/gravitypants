@@ -51,7 +51,7 @@ function About() {
               {reels.map((r) => (
                 <Link key={r.id} to="/directory/$slug" params={{ slug: r.brand_slug }} aria-label={`${r.title} by ${r.brand_name}`}
                   className={`${SHAPE[r.formats[0] ?? "9x16"] ?? SHAPE["9x16"]} shrink-0 overflow-hidden rounded-[8px] bg-ap-card shadow-ap-soft`}>
-                  <img src={r.poster!} alt="" loading="lazy" className="size-full object-cover" />
+                  <img src={r.poster!} alt={`${r.brand_name} reel thumbnail`} loading="lazy" className="size-full object-cover" />
                 </Link>
               ))}
             </div>

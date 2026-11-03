@@ -330,6 +330,7 @@ export type Database = {
           hint: string
           id: string
           name: string
+          page_intro: string
           slug: string
           sort_order: number
         }
@@ -338,6 +339,7 @@ export type Database = {
           hint?: string
           id?: string
           name: string
+          page_intro?: string
           slug: string
           sort_order?: number
         }
@@ -346,6 +348,7 @@ export type Database = {
           hint?: string
           id?: string
           name?: string
+          page_intro?: string
           slug?: string
           sort_order?: number
         }
@@ -1096,6 +1099,7 @@ export type Database = {
           family_id: string | null
           id: string
           name: string
+          page_intro: string
           sort_order: number
         }
         Insert: {
@@ -1104,6 +1108,7 @@ export type Database = {
           family_id?: string | null
           id?: string
           name: string
+          page_intro?: string
           sort_order?: number
         }
         Update: {
@@ -1112,6 +1117,7 @@ export type Database = {
           family_id?: string | null
           id?: string
           name?: string
+          page_intro?: string
           sort_order?: number
         }
         Relationships: [

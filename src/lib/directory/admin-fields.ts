@@ -15,7 +15,7 @@ export const createBrandInput = z.object({
   moods: z.array(z.string().trim().toLowerCase().max(30)).max(BRAND_MOODS_MAX).default([]),
   affiliated: brandPublicationFields.affiliated.default(false), status: brandPublicationFields.status.default("live"),
 });
-export const categoryHintInput = z.object({ id: z.string().uuid(), hint: z.string().trim().min(1).max(120) });
+export const categoryHintInput = z.object({ id: z.string().uuid(), hint: z.string().trim().min(1).max(120), page_intro: z.string().trim().max(600).optional() });
 export const greetingEventInput = z.object({
   session_id: z.string().regex(/^[a-zA-Z0-9_-]{1,64}$/),
   rule: z.enum(["campaign", "countdown", "fun_day", "weather", "season", "returning", "time_of_day", "day_of_week", "fallback"]),

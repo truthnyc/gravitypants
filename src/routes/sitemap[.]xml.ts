@@ -2,7 +2,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { POSTS } from "@/lib/site/blog";
 import { SITE_ORIGIN } from "@/lib/site/seo";
 import { AIMANTE_ORIGIN, siteForUrl } from "@/lib/site/brand-site";
-import { CATEGORIES, categorySlug } from "@/lib/directory/directory";
 import { listPublicBrands } from "@/lib/directory/directory.functions";
 
 /** Public website pages only — the signed-in app under /app is never listed. */
@@ -62,12 +61,15 @@ type Entry = { loc: string; lastmod: string; changefreq: string; priority: strin
 
 /** aimante.co lists only its own pages: home, About, List your brand, every category and brand. */
 async function aimanteEntries(): Promise<Entry[]> {
-  const brands = await listPublicBrands();
+  const { listingStats, MIN_LISTING_BRANDS } = await import("@/lib/directory/listing-stats.server");
+  const [brands, listings] = await Promise.all([listPublicBrands(), listingStats()]);
+  // Category and mood pages need at least MIN_LISTING_BRANDS brands; thinner ones carry noindex instead.
+  const shown = listings.filter((l) => l.brands >= MIN_LISTING_BRANDS);
   return [
     { loc: `${AIMANTE_ORIGIN}/`, lastmod: "", changefreq: "daily", priority: "1.0" },
     { loc: `${AIMANTE_ORIGIN}/about`, lastmod: "2026-10-07", changefreq: "yearly", priority: "0.5" },
     { loc: `${AIMANTE_ORIGIN}/join`, lastmod: "2026-10-07", changefreq: "monthly", priority: "0.6" },
-    ...CATEGORIES.map((c) => ({ loc: `${AIMANTE_ORIGIN}/c/${categorySlug(c)}`, lastmod: "", changefreq: "weekly", priority: "0.7" })),
+    ...shown.map((l) => ({ loc: `${AIMANTE_ORIGIN}/${l.kind === "category" ? "c" : "mood"}/${encodeURIComponent(l.slug)}`, lastmod: l.lastmod, changefreq: "weekly", priority: l.kind === "category" ? "0.7" : "0.6" })),
     ...brands.map((b) => ({ loc: `${AIMANTE_ORIGIN}/b/${b.slug}`, lastmod: isoDate(b.updated_at), changefreq: "weekly", priority: "0.8" })),
   ];
 }

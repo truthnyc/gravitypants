@@ -55,13 +55,24 @@ export const Route = createFileRoute("/directory/$slug")({
       "@context": "https://schema.org",
       "@graph": [
         { "@type": "Organization", name: b.name, url: b.website_url ?? (aim ? `${AIMANTE_ORIGIN}/b/${b.slug}` : `${ORIGIN}/directory/${b.slug}`), ...(b.description ? { description: b.description } : {}) },
-        ...loaderData.reels.map((r) => ({
+        // Permanent per-reel links: the stored files are private and signed links expire.
+        ...loaderData.reels.filter((r) => r.uploadDate && (r.video || r.poster)).map((r) => ({
           "@type": "VideoObject",
-          name: r.title ?? b.name,
-          description: [b.description, ...r.moods, ...r.tags].filter(Boolean).join(", ") || `${b.name} reel`,
-          ...(r.poster ? { thumbnailUrl: r.poster } : {}),
-          duration: `PT${Math.max(1, Math.round(r.seconds))}S`,
-          uploadDate: new Date().toISOString().slice(0, 10),
+          name: `${b.name} reel`,
+          description: r.description || b.description || `A short reel from ${b.name} on Aimanté.`,
+          thumbnailUrl: `${ORIGIN}/api/public/reel/${r.reel_id}/poster`,
+          contentUrl: `${ORIGIN}/api/public/reel/${r.reel_id}/video`,
+          uploadDate: r.uploadDate,
+          ...(r.seconds ? { duration: `PT${Math.max(1, Math.round(r.seconds))}S` } : {}),
+        })),
+        ...loaderData.siteReels.filter((r) => r.uploadDate).map((r) => ({
+          "@type": "VideoObject",
+          name: `${b.name} reel`,
+          description: r.description || b.description || `A short reel from ${b.name} on Aimanté.`,
+          thumbnailUrl: `${ORIGIN}/api/public/reel/${r.id}/poster`,
+          contentUrl: `${ORIGIN}/api/public/reel/${r.id}/video`,
+          uploadDate: r.uploadDate,
+          ...(r.seconds ? { duration: `PT${Math.max(1, Math.round(r.seconds))}S` } : {}),
         })),
       ],
     };
@@ -143,7 +154,7 @@ function BrandPage() {
               {siteReels.map((r) => (
                 <li key={r.id} className="relative">
                   <button type="button" onClick={() => openSiteReel(r)} aria-label={`Open ${r.title}`} className="relative block aspect-square w-full overflow-hidden rounded-[8px] bg-ap-panel">
-                    {r.poster && <img src={r.poster} alt="" loading="lazy" className={posterFor(r.format)} />}
+                    {r.poster && <img src={r.poster} alt={`${r.brand} reel thumbnail`} loading="lazy" className={posterFor(r.format)} />}
                   </button>
                   <SiteReelHeart reelId={r.id} name={r.title} />
                   <p className="mt-2.5 truncate text-[14px] font-semibold">{r.title}</p>
@@ -163,7 +174,7 @@ function BrandPage() {
                 key: m.slug,
                 media: (hidden) => (
                   <Link to="/directory" search={{ brand: m.slug }} tabIndex={hidden ? -1 : undefined} className="grid aspect-[9/16] place-items-center overflow-hidden rounded-[14px] bg-ap-panel">
-                    {m.poster ? <img src={m.poster} alt={`${m.name} reel`} className="max-h-full max-w-full object-contain" /> : null}
+                    {m.poster ? <img src={m.poster} alt={`${m.name} reel thumbnail`} className="max-h-full max-w-full object-contain" /> : null}
                   </Link>
                 ),
                 title: m.name,

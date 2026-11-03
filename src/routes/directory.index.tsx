@@ -31,6 +31,9 @@ import { getDirectoryPublic } from "@/lib/directory/settings.functions";
 import { useGreeting, logGreeting } from "@/components/directory/useGreeting";
 import { rememberVisit } from "@/lib/directory/greeting";
 import { recordDirectoryReelOpen } from "@/lib/directory/views.functions";
+import { getListingIntro } from "@/lib/directory/categories.functions";
+import { brandCount, MIN_LISTING_BRANDS, list } from "@/lib/directory/listing";
+import { AIMANTE_ORIGIN } from "@/lib/site/brand-site";
 
 const POSTER_RING = "rounded-[6px] shadow-[0_0_0_1px_var(--ap-inner),0_18px_34px_-16px_rgba(29,29,31,.28)]";
 /** The poster box takes the reel's own shape, so the ring fits the image on every size. */
@@ -49,24 +52,40 @@ export const Route = createFileRoute("/directory/")({
     category: z.string().optional(), brand: z.string().optional(),
     page: z.union([z.number(), z.string()]).optional(),
   }),
-  loaderDeps: ({ search }) => ({ q: (search.q ?? "").slice(0, 200), category: search.category, mood: search.mood }),
+  loaderDeps: ({ search }) => ({ q: (search.q ?? "").slice(0, 200), category: search.category, mood: search.mood, brand: search.brand }),
   loader: async ({ deps, context }) => {
     // Lookups for the carousel, brand panel and reel pop-ups; the grid itself is filtered and paged on the server.
-    const [dir, cards, reels, brands] = await Promise.all([
-      getDirectoryPublic().catch(() => ({ settings: DEFAULT_DIRECTORY_SETTINGS, featured: [] as FacetedReel[] })),
+    const dirP = getDirectoryPublic().catch(() => ({ settings: DEFAULT_DIRECTORY_SETTINGS, featured: [] as FacetedReel[] }));
+    const filters = { moods: list(deps.mood), categories: list(deps.category), brands: list(deps.brand) };
+    // First page of results is server-rendered so crawlers see every card before JavaScript runs.
+    const initialP = dirP.then((d) => searchDirectory({ data: { q: deps.q, ...filters, page: 1, pageSize: d.settings.pageSize } })).catch(() => null);
+    const single = !deps.q && !deps.brand ? (deps.category && !deps.category.includes(",") && !deps.mood ? { kind: "category" as const, slug: deps.category } : deps.mood && !deps.mood.includes(",") && !deps.category ? { kind: "mood" as const, slug: deps.mood } : null) : null;
+    const introP = single ? getListingIntro({ data: single }).catch(() => null) : Promise.resolve(null);
+    const [dir, initial, listing, cards, reels, brands] = await Promise.all([
+      dirP, initialP, introP,
       searchDirectoryLegacy({ data: { q: "", size: null } }).catch(() => [] as DirectoryCard[]),
       listSiteReels().then((rs) => rs.filter((r) => r.source !== "client").map((r) => ({ ...r, title: aimanteTitle(r) }))).catch(() => [] as SiteReel[]),
       listPublicBrands().catch(() => []),
     ]);
-    return { q: deps.q, category: deps.category, mood: deps.mood, site: (context as { site?: string }).site, cards, reels, brands, settings: dir.settings, featuredReels: dir.featured };
+    return {
+      q: deps.q, category: deps.category, mood: deps.mood, site: (context as { site?: string }).site, cards, reels, brands, settings: dir.settings, featuredReels: dir.featured,
+      initial, initialKey: `${deps.q}|${JSON.stringify(filters)}`, listing: single && listing ? { ...single, ...listing } : null, brandCount: brandCount(initial?.facets),
+    };
   },
   head: ({ loaderData }) => {
     if (loaderData?.site === "aimante") {
       const cat = loaderData.category && !loaderData.category.includes(",") ? CATEGORIES.find((c) => categorySlug(c) === loaderData.category) : undefined;
       const mood = !cat && loaderData.mood && !loaderData.mood.includes(",") ? loaderData.mood : undefined;
-      if (cat) return aimanteHead({ path: `/c/${loaderData.category}`, title: `${cat} video ads — Aimanté`, description: `Short video ads and Reels from ${cat} brands. Browse by mood and brand on Aimanté.` });
-      if (mood) return aimanteHead({ path: `/mood/${encodeURIComponent(mood)}`, title: `${cap(mood)} video ads — Aimanté`, description: `Video ads and Reels that feel ${mood}, from independent brands on Aimanté.` });
-      return aimanteHead({ path: "/", title: "Aimanté — Discover brands by mood", description: "Tell us how you'd like to feel and we'll show you something. Short reels from independent makers and well-known houses, by mood, category or brand." });
+      const listing = cat || mood ? listingHead(loaderData, cat ? `/c/${loaderData.category}` : `/mood/${encodeURIComponent(mood!)}`, cat ? `${cat} brands` : `${cap(mood!)} brands and gift ideas`) : null;
+      if (cat) return withLd(aimanteHead({ path: `/c/${loaderData.category}`, title: `${cat} video ads — Aimanté`, description: `Short video ads and Reels from ${cat} brands. Browse by mood and brand on Aimanté.` }), listing!);
+      if (mood) return withLd(aimanteHead({ path: `/mood/${encodeURIComponent(mood)}`, title: `${cap(mood)} video ads — Aimanté`, description: `Video ads and Reels that feel ${mood}, from independent brands on Aimanté.` }), listing!);
+      return withLd(aimanteHead({ path: "/", title: "Aimanté — Discover brands by mood", description: "Tell us how you'd like to feel and we'll show you something. Short reels from independent makers and well-known houses, by mood, category or brand." }), {
+        noindex: false,
+        ld: [
+          { "@context": "https://schema.org", "@type": "WebSite", "@id": `${AIMANTE_ORIGIN}/#website`, name: "Aimanté", url: `${AIMANTE_ORIGIN}/` },
+          { "@context": "https://schema.org", "@type": "Organization", "@id": `${AIMANTE_ORIGIN}/#org`, name: "Aimanté", url: `${AIMANTE_ORIGIN}/`, logo: `${AIMANTE_ORIGIN}/apple-touch-icon.png` },
+        ],
+      });
     }
     const base = siteHead({
       path: "/directory",
@@ -114,12 +133,37 @@ function useWeekdayMood(picked: string | undefined, pool: string[], lead?: strin
   return { day, mood: picked ?? (lead && leadOn ? lead : words[i % words.length] ?? "soothing") };
 }
 
-const list = (v?: string) => (v ? v.split(",").map((x) => x.trim().toLowerCase()).filter(Boolean).slice(0, 60) : []);
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
+type HeadOut = { meta?: any[]; links?: any[]; scripts?: any[] }; // eslint-disable-line @typescript-eslint/no-explicit-any
+/** Distinct brands on a listing, in the order their reels appear. */
+function brandsInOrder(reels: FacetedReel[] | undefined) {
+  const seen = new Set<string>();
+  return (reels ?? []).filter((r) => r.brand_slug && !seen.has(r.brand_slug) && seen.add(r.brand_slug)).map((r) => ({ name: r.brand_name, slug: r.brand_slug }));
+}
+/** CollectionPage + ItemList of brand pages, and noindex while a listing has too few brands. */
+function listingHead(d: { initial: { reels: FacetedReel[] } | null; brandCount: number; listing: { intro: string } | null }, path: string, name: string) {
+  const items = brandsInOrder(d.initial?.reels);
+  return {
+    noindex: d.brandCount < MIN_LISTING_BRANDS,
+    ld: [{
+      "@context": "https://schema.org", "@type": "CollectionPage", name, url: `${AIMANTE_ORIGIN}${path}`,
+      ...(d.listing?.intro ? { description: d.listing.intro } : {}),
+      mainEntity: { "@type": "ItemList", numberOfItems: items.length, itemListElement: items.map((b, i) => ({ "@type": "ListItem", position: i + 1, name: b.name, url: `${AIMANTE_ORIGIN}/b/${b.slug}` })) },
+    }],
+  };
+}
+function withLd(head: HeadOut, { noindex, ld }: { noindex: boolean; ld: object[] }): HeadOut {
+  return {
+    ...head,
+    meta: [...(head.meta ?? []).filter((m) => m?.name !== "robots"), ...(noindex ? [{ name: "robots", content: "noindex, follow" }] : [])],
+    scripts: [...(head.scripts ?? []), ...ld.map((x) => ({ type: "application/ld+json", children: JSON.stringify(x) }))],
+  };
+}
 type Tag = { key: keyof FilterValue; value: string; label: string };
 
 function DirectoryPage() {
-  const { cards: allCards, reels, brands, settings, featuredReels: featuredSet } = Route.useLoaderData();
+  const { cards: allCards, reels, brands, settings, featuredReels: featuredSet, initial, initialKey, listing } = Route.useLoaderData();
   const PAGE = settings.pageSize;
   const isAim = useBrandSite() === "aimante";
   const search = Route.useSearch();
@@ -184,6 +228,8 @@ function DirectoryPage() {
   const results = useInfiniteQuery({
     queryKey: ["directory-search", q, fKey],
     placeholderData: keepPreviousData,
+    // The loader already fetched page 1 on the server, so cards are in the first HTML.
+    ...(initial && startPage.current === 1 && initialKey === `${q}|${fKey}` ? { initialData: { pages: [initial], pageParams: [1] } } : {}),
     initialPageParam: startPage.current,
     queryFn: ({ pageParam }) => pageParam === startPage.current
       ? searchFn({ data: { q, ...filters, page: 1, pageSize: PAGE * pageParam } })
@@ -293,8 +339,11 @@ function DirectoryPage() {
     <SiteShell>
       <div className={cn("font-ap text-ap-ink", isAim && "aimante-home")}>
         <section className="dir-intro mx-auto max-w-[900px] px-6 pt-20 pb-6 text-center">
-          <h1 className="dir-headline mb-8 font-semibold text-ap-muted">
-            {isAim && <span className="aimante-phone-greeting"><span>Happy <span className="text-ap-ink">{day}</span>.</span><span>Show me something:</span></span>}
+          <h1 className="dir-page-title mb-3 text-[13px] font-semibold tracking-[0.06em] text-ap-muted uppercase">
+            {listing ? (listing.kind === "category" ? `${listing.name} brands` : `${cap(listing.name)} brands and gift ideas`) : "Discover brands by mood"}
+          </h1>
+          {listing?.intro && <p className="dir-page-intro mx-auto mb-6 max-w-[620px] text-[16px] leading-[1.5] text-ap-body">{listing.intro}</p>}
+          <div className="dir-headline mb-8 font-semibold text-ap-muted">
             <b className={cn("dir-headline-greeting font-semibold text-ap-ink", isAim && "aimante-desktop-greeting")}>
               <span>
               <span key={greeting?.filled ?? "ssr"} className={greeting ? "animate-[dir-fade_.4s_ease] motion-reduce:animate-none" : undefined}>
@@ -311,7 +360,7 @@ function DirectoryPage() {
               </Button>
               <span className="font-light text-ap-headline-bracket"> ]</span>
             </span>
-          </h1>
+          </div>
           <form role="search" onSubmit={(e) => { e.preventDefault(); go(value); }}
              className="dir-search-bar mx-auto flex h-[60px] max-w-[680px] items-center gap-2.5 rounded-[12px] border border-transparent bg-ap-panel pr-2 pl-5 transition-[background,border-color,box-shadow] motion-reduce:transition-none focus-within:border-ap-hairline focus-within:bg-ap-card focus-within:shadow-[0_10px_30px_rgba(20,30,50,.10)]">
             <input ref={input} value={value} onChange={(e) => setValue(e.target.value)} placeholder="Try: cozy knitwear, square, Purl Soho"
@@ -366,12 +415,12 @@ function DirectoryPage() {
                 <li key={`${r.kind}-${r.id}`} data-reel-idx={i} className="dir-card-in relative" style={{ animationDelay: `${(i % PAGE) * 40}ms` }}>
                   <button type="button" onClick={() => openReel(r)} aria-label={`Open ${r.title}`}
                     className="dir-result-tile relative block aspect-square w-full overflow-hidden rounded-[8px] bg-ap-panel">
-                    <HoverReelPreview video={r.video_url ?? r.preview_url} poster={r.poster} className={posterFor(r.formats[0])} />
+                    <HoverReelPreview video={r.video_url ?? r.preview_url} poster={r.poster} alt={`${r.brand_name} reel thumbnail`} className={posterFor(r.formats[0])} />
                   </button>
                   {r.kind === "site" ? <SiteReelHeart reelId={r.id} name={r.title} /> : <DirectoryReelHeart reelId={r.id} name={`${r.brand_name} reel`} />}
                   <p className="dir-result-title mt-2.5 truncate text-[14px] font-semibold">{r.title}</p>
                   <p className="dir-result-meta truncate text-[12px] text-ap-muted"><BrandLink name={r.brand_name} slug={r.brand_slug} /> · {r.category}</p><ConceptReelNotice brandName={r.brand_name} brandSlug={r.brand_slug} />
-                  {filters.moods.length > 0 && r.moods.length > 0 && (
+                  {(filters.moods.length > 0 || filters.categories.length > 0) && r.moods.length > 0 && (
                     <ul className="mt-1.5 flex flex-wrap gap-1" aria-label="Moods">
                       {r.moods.map((m) => {
                         const hit = filters.moods.includes(m);
