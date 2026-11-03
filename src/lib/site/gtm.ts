@@ -4,7 +4,7 @@ import { measurementPageAllowed } from './ad-consent';
  * Google Tag Manager container. The ID is public — it ships inside the page — so it lives
  * here rather than in a secret. Empty means Tag Manager stays off everywhere.
  */
-export const GTM_CONTAINER_ID = '';
+export const GTM_CONTAINER_ID = 'GTM-P66HK9ZR';
 
 /** Where the container comes from, or null when it must stay off for this page. */
 export function gtmScriptUrl(host: string, path: string, id = GTM_CONTAINER_ID) {
