@@ -106,6 +106,7 @@ import { Route as AuthenticatedAdminTemplatesIndexRouteImport } from './routes/_
 import { Route as AuthenticatedAdminTemplatesIdRouteImport } from './routes/_authenticated/admin/templates.$id'
 import { Route as AuthenticatedAdminTemplatesNewRouteImport } from './routes/_authenticated/admin/templates.new'
 import { Route as AuthenticatedAppAccountBillingRouteImport } from './routes/_authenticated/app/account_.billing'
+import { Route as AuthenticatedAppAccountBrandKitRouteImport } from './routes/_authenticated/app/account_.brand-kit'
 import { Route as AuthenticatedAppAccountDirectoryRouteImport } from './routes/_authenticated/app/account_.directory'
 import { Route as AuthenticatedAppAccountFavoritesRouteImport } from './routes/_authenticated/app/account_.favorites'
 import { Route as AuthenticatedAppAccountMembersRouteImport } from './routes/_authenticated/app/account_.members'
@@ -639,6 +640,12 @@ const AuthenticatedAppAccountBillingRoute =
     path: '/account/billing',
     getParentRoute: () => AuthenticatedAppRouteRoute,
   } as any)
+const AuthenticatedAppAccountBrandKitRoute =
+  AuthenticatedAppAccountBrandKitRouteImport.update({
+    id: '/account_/brand-kit',
+    path: '/account/brand-kit',
+    getParentRoute: () => AuthenticatedAppRouteRoute,
+  } as any)
 const AuthenticatedAppAccountDirectoryRoute =
   AuthenticatedAppAccountDirectoryRouteImport.update({
     id: '/account_/directory',
@@ -882,6 +889,7 @@ export interface FileRoutesByFullPath {
   '/admin/templates/$id': typeof AuthenticatedAdminTemplatesIdRouteWithChildren
   '/admin/templates/new': typeof AuthenticatedAdminTemplatesNewRoute
   '/app/account/billing': typeof AuthenticatedAppAccountBillingRoute
+  '/app/account/brand-kit': typeof AuthenticatedAppAccountBrandKitRoute
   '/app/account/directory': typeof AuthenticatedAppAccountDirectoryRoute
   '/app/account/favorites': typeof AuthenticatedAppAccountFavoritesRoute
   '/app/account/members': typeof AuthenticatedAppAccountMembersRoute
@@ -1003,6 +1011,7 @@ export interface FileRoutesByTo {
   '/admin/templates/$id': typeof AuthenticatedAdminTemplatesIdRouteWithChildren
   '/admin/templates/new': typeof AuthenticatedAdminTemplatesNewRoute
   '/app/account/billing': typeof AuthenticatedAppAccountBillingRoute
+  '/app/account/brand-kit': typeof AuthenticatedAppAccountBrandKitRoute
   '/app/account/directory': typeof AuthenticatedAppAccountDirectoryRoute
   '/app/account/favorites': typeof AuthenticatedAppAccountFavoritesRoute
   '/app/account/members': typeof AuthenticatedAppAccountMembersRoute
@@ -1129,6 +1138,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/templates/$id': typeof AuthenticatedAdminTemplatesIdRouteWithChildren
   '/_authenticated/admin/templates/new': typeof AuthenticatedAdminTemplatesNewRoute
   '/_authenticated/app/account_/billing': typeof AuthenticatedAppAccountBillingRoute
+  '/_authenticated/app/account_/brand-kit': typeof AuthenticatedAppAccountBrandKitRoute
   '/_authenticated/app/account_/directory': typeof AuthenticatedAppAccountDirectoryRoute
   '/_authenticated/app/account_/favorites': typeof AuthenticatedAppAccountFavoritesRoute
   '/_authenticated/app/account_/members': typeof AuthenticatedAppAccountMembersRoute
@@ -1255,6 +1265,7 @@ export interface FileRouteTypes {
     | '/admin/templates/$id'
     | '/admin/templates/new'
     | '/app/account/billing'
+    | '/app/account/brand-kit'
     | '/app/account/directory'
     | '/app/account/favorites'
     | '/app/account/members'
@@ -1376,6 +1387,7 @@ export interface FileRouteTypes {
     | '/admin/templates/$id'
     | '/admin/templates/new'
     | '/app/account/billing'
+    | '/app/account/brand-kit'
     | '/app/account/directory'
     | '/app/account/favorites'
     | '/app/account/members'
@@ -1501,6 +1513,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/templates/$id'
     | '/_authenticated/admin/templates/new'
     | '/_authenticated/app/account_/billing'
+    | '/_authenticated/app/account_/brand-kit'
     | '/_authenticated/app/account_/directory'
     | '/_authenticated/app/account_/favorites'
     | '/_authenticated/app/account_/members'
@@ -2281,6 +2294,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppAccountBillingRouteImport
       parentRoute: typeof AuthenticatedAppRouteRoute
     }
+    '/_authenticated/app/account_/brand-kit': {
+      id: '/_authenticated/app/account_/brand-kit'
+      path: '/account/brand-kit'
+      fullPath: '/app/account/brand-kit'
+      preLoaderRoute: typeof AuthenticatedAppAccountBrandKitRouteImport
+      parentRoute: typeof AuthenticatedAppRouteRoute
+    }
     '/_authenticated/app/account_/directory': {
       id: '/_authenticated/app/account_/directory'
       path: '/account/directory'
@@ -2554,6 +2574,7 @@ interface AuthenticatedAppRouteRouteChildren {
   AuthenticatedAppStatsRoute: typeof AuthenticatedAppStatsRoute
   AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
   AuthenticatedAppAccountBillingRoute: typeof AuthenticatedAppAccountBillingRoute
+  AuthenticatedAppAccountBrandKitRoute: typeof AuthenticatedAppAccountBrandKitRoute
   AuthenticatedAppAccountDirectoryRoute: typeof AuthenticatedAppAccountDirectoryRoute
   AuthenticatedAppAccountFavoritesRoute: typeof AuthenticatedAppAccountFavoritesRoute
   AuthenticatedAppAccountMembersRoute: typeof AuthenticatedAppAccountMembersRoute
@@ -2583,6 +2604,7 @@ const AuthenticatedAppRouteRouteChildren: AuthenticatedAppRouteRouteChildren = {
   AuthenticatedAppStatsRoute: AuthenticatedAppStatsRoute,
   AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
   AuthenticatedAppAccountBillingRoute: AuthenticatedAppAccountBillingRoute,
+  AuthenticatedAppAccountBrandKitRoute: AuthenticatedAppAccountBrandKitRoute,
   AuthenticatedAppAccountDirectoryRoute: AuthenticatedAppAccountDirectoryRoute,
   AuthenticatedAppAccountFavoritesRoute: AuthenticatedAppAccountFavoritesRoute,
   AuthenticatedAppAccountMembersRoute: AuthenticatedAppAccountMembersRoute,
