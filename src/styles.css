@@ -1257,9 +1257,8 @@ html:has(.acct), body:has(.acct), body:has(.acct) .bg-canvas { background: var(-
 @media (max-width: 767px) {
   .aimante-home .dir-intro { padding: 40px 16px 20px; }
   .aimante-home .dir-headline { font-size: 32px; line-height: 1.1; letter-spacing: -0.035em; margin-bottom: 24px; }
-  .aimante-home .aimante-desktop-greeting { display: none; }
-  .aimante-home .aimante-phone-greeting { display: block; color: var(--ap-muted); }
-  .aimante-phone-greeting > span { display: block; }
+  .aimante-home .aimante-desktop-greeting { display: block; }
+  .aimante-home .aimante-desktop-greeting > span > span { display: block; }
   .aimante-home .dir-headline-mood { display: inline-flex; width: auto; gap: .12em; align-items: center; margin-top: 0; height: 1.1lh; }
   .aimante-home .dir-mood-button { font-size: inherit; line-height: inherit; }
   .aimante-home .dir-search-bar { height: 52px; padding-left: 12px; gap: 6px; background: var(--ap-panel); }
