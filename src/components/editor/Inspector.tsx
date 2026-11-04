@@ -1082,7 +1082,58 @@ function TextPanel({ el, frameIndex, headline, subline, brandColors, brandName, 
             <Switch checked={Boolean(t.all_caps)} onCheckedChange={(v) => set({ all_caps: v })} className="data-[state=checked]:bg-toggle-on" />
           </label>
         )}
-      </Collapse>
+      </Collapse>}
+    </>
+  );
+}
+
+const SUBLINE_IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp", "image/svg+xml"];
+
+/** Subline as words or as an uploaded image (badge, second logo). */
+function SublineImageField({ t, tint, onChange }: { t: TextSettings; tint: string; onChange: (p: Partial<TextSettings>, k?: string) => void }) {
+  const mode = t.mode === "image" ? "image" : "text";
+  const input = useRef<HTMLInputElement>(null);
+  const [busy, setBusy] = useState(false);
+  const size = t.image_size_pct ?? 30;
+  const pick = async (f: File | undefined) => {
+    if (!f) return;
+    if (!SUBLINE_IMAGE_TYPES.includes(f.type)) { toast.error("Use a PNG, JPG, WebP or SVG image."); return; }
+    if (f.size > 10 * 1024 * 1024) { toast.error("That image is over 10 MB. Try a smaller one."); return; }
+    setBusy(true);
+    try {
+      let file = f;
+      if (f.type === "image/svg+xml") {
+        const { sanitizeSvgFile } = await import("@/lib/stillframe/svg-safety");
+        file = await sanitizeSvgFile(f);
+      }
+      const up = await uploadMedia(file, "logo");
+      onChange({ mode: "image", image_path: up.path });
+    } catch {
+      toast.error("That image couldn't be uploaded. Try again.");
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <>
+      <Segmented value={mode} options={[{ value: "text", label: "Text" }, { value: "image", label: "Image" }]} onChange={(v) => onChange({ mode: v as "text" | "image" })} />
+      {mode === "image" && (
+        <>
+          <input ref={input} type="file" accept={SUBLINE_IMAGE_TYPES.join(",")} className="hidden" onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; void pick(f); }} />
+          <div className="flex items-center gap-3 rounded-[4px] border border-ap-hairline p-3">
+            <span className="checker flex h-12 w-16 shrink-0 items-center justify-center rounded-[4px]">
+              {t.image_path && <MediaImage path={t.image_path} alt="" className="max-h-10 max-w-[90%] object-contain" />}
+            </span>
+            <span className="min-w-0 flex-1 text-[12px] text-secondary-text">{t.image_path ? fileName(t.image_path) : "Add a PNG, JPG, WebP or SVG"}</span>
+            <Button variant="primary" size="sm" disabled={busy} onClick={() => input.current?.click()}>{busy ? "Adding…" : t.image_path ? "Replace" : "Add image"}</Button>
+          </div>
+          {t.image_path && (
+            <Field label="Image size" value={`${size}%`}>
+              <ElementSlider name="Subline image size" color={tint} min={5} max={100} value={size} onChange={(v, k) => onChange({ image_size_pct: v }, k)} />
+            </Field>
+          )}
+        </>
+      )}
     </>
   );
 }
