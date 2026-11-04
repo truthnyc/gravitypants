@@ -1028,6 +1028,8 @@ function TextPanel({ el, frameIndex, headline, subline, brandColors, brandName, 
         )}
       </div>
       {!isHead && <p className="text-[13px] text-ap-muted">Optional</p>}
+      {!isHead && <SublineImageField t={raw} tint={tint} onChange={set} />}
+      {(isHead || raw.mode !== "image") && (<>
       <Textarea value={raw.text ?? ""} placeholder={isHead ? "Add a headline" : "Add a line under the headline"} aria-label={isHead ? "Headline" : "Subline"} onChange={(e) => set({ text: e.target.value }, `${el}-text`)} className={cn("rounded-sm text-[15px]", isHead ? "min-h-[72px]" : "min-h-[56px]")} />
       <FontField el={el} t={t} brandName={brandName} actions={actions} onChange={set} />
       {weights.length > 1 && (
@@ -1045,6 +1047,7 @@ function TextPanel({ el, frameIndex, headline, subline, brandColors, brandName, 
         <Segmented value={align} options={[{ value: "auto", label: "Auto" }, { value: "left", label: "Left" }, { value: "center", label: "Centre" }, { value: "right", label: "Right" }]}
           onChange={(v) => set({ align: v === "auto" ? null : (v as "left" | "center" | "right") })} />
       </Field>
+      </>)}
       {isHead ? (
         <Field label="Position">
           <div className="flex items-center gap-3">
@@ -1066,7 +1069,7 @@ function TextPanel({ el, frameIndex, headline, subline, brandColors, brandName, 
         </>
       )}
       <AnimationField value={isHead || subline ? t.animation ?? "none" : "fade"} onPick={(a) => { set({ animation: a }); if (a !== "none") actions.onPlayFrame?.(); }} />
-      <Collapse label="More text options" open={more} onToggle={() => setMore((v) => !v)}>
+      {(isHead || raw.mode !== "image") && <Collapse label="More text options" open={more} onToggle={() => setMore((v) => !v)}>
         <Field label="Letter spacing" value={`${spacing > 0 ? "+" : ""}${spacing}`}>
           <ElementSlider name={`${isHead ? "Headline" : "Subline"} letter spacing`} color={tint} min={-10} max={50} value={spacing} snap={(v) => (Math.abs(v) <= 1 ? 0 : v)} onChange={(v, k) => set({ letter_spacing: v }, k)} />
         </Field>
