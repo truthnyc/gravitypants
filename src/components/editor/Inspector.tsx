@@ -1103,8 +1103,8 @@ function SublineImageField({ t, tint, onChange }: { t: TextSettings; tint: strin
     try {
       let file = f;
       if (f.type === "image/svg+xml") {
-        const { sanitizeSvgFile } = await import("@/lib/stillframe/svg-safety");
-        file = await sanitizeSvgFile(f);
+        const { sanitizeLogoFile } = await import("@/lib/stillframe/svg-safety");
+        file = await sanitizeLogoFile(f);
       }
       const up = await uploadMedia(file, "logo");
       onChange({ mode: "image", image_path: up.path });
