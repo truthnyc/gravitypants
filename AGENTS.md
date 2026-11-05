@@ -17,6 +17,7 @@
 - Share `ReelPopup`, `HoverReelPreview` and `ConceptReelNotice` for consistent reel UI.
 - Preview/export share `renderAt()` in `src/render/renderFrame.ts` to match.
 - Exports: private media storage, listed from storage; GIF limit 500MB.
+- Export frame validation lives in `export-validation.ts`; explicit solid or configured gradient backgrounds are valid without a photo, while incomplete photo frames remain blocked.
 - Export: finished files are kept 30 days; daily 03:00 UTC cleanup via /api/public/cleanup-exports (only removes expired files, so no caller secret).
 - Accounts: authenticated routes call `ensure_workspace()`; the gate verifies membership before restoring a per-user workspace preference. Data reads `getWorkspaceId()`, not a constant — reloads preserve the selection safely.
 - Privacy: every table uses RLS via `is_workspace_member()`; media paths start with `<workspace_id>/`, exports add `exports/<project>/<stamp>/`; storage policies check the first folder.
