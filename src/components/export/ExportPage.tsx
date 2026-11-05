@@ -27,6 +27,7 @@ import { useSaveDoc } from "@/components/app-ui/AdPills";
 import { CUSTOM_MAX, CUSTOM_MIN, CUSTOM_PRESETS, EXPORT_SIZES, PLATFORMS, customError, exportFileName, platformState, ratioLabel, sizeLabelForFile, togglePlatform, type SizeId } from "@/lib/stillframe/export-sizes";
 import { formatSeconds, type Format, type Frame, type Project } from "@/lib/stillframe/types";
 import { FORMAT_SIZE } from "@/render/formats";
+import { hasExportableBackground } from "@/lib/stillframe/export-validation";
 import { loadImages } from "@/render/images";
 import { ensureFonts, layoutFrame, mediaPaths, renderAt, restTime, videoDuration, type BrandStyle } from "@/render/renderFrame";
 import { exportHtml5 } from "@/render/exportHtml5";
@@ -170,7 +171,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
   const issues = useMemo(() => {
     const out: { frame: number; text: string; blocking: boolean; format?: Format; text_off?: boolean }[] = [];
     frames.forEach((f, i) => {
-      if (!f.photo?.path) out.push({ frame: i, text: "This frame has no photo yet.", blocking: true });
+      if (!hasExportableBackground(f.photo)) out.push({ frame: i, text: "Add a photo or choose a background colour for this frame.", blocking: true });
     });
     if (!images || typeof OffscreenCanvas === "undefined") return out;
     const formats = [...new Set(targets.map((t) => t.format))];
@@ -519,7 +520,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
           {running && <div className="mt-3"><FileList files={files} state={state} /></div>}
           {open && !running && !doneCount && <p className="mt-3 text-[13px] text-destructive">No files were made. Try again, or pick a smaller GIF size.</p>}
           {fontError && <div role="alert" className="mt-3 text-[13px] text-destructive"><p>{fontError}</p><Button variant="plain" className="mt-2" onClick={() => setFontRetry((v) => v + 1)}>Retry loading fonts</Button></div>}
-          {blocked && <p className="mt-3 text-[12px] text-destructive">Add a photo to every frame to export.</p>}
+          {blocked && <p className="mt-3 text-[12px] text-destructive">Every frame needs a photo or a background colour to export.</p>}
 
           <div className="mt-4 flex items-center justify-between gap-3">
             <KitAgainButton adId={project.id} templateId={project.template_id} />
