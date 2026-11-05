@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Copy } from "lucide-react";
+import { Copy, Download } from "lucide-react";
 import { AccountTabs } from "@/components/billing/AccountTabs";
 import { AppButton } from "@/components/app-ui";
 import { getDirectoryAccount } from "@/lib/directory/directory.functions";
@@ -66,6 +66,9 @@ function BrandKit() {
                 <h3 className="text-[15px] font-semibold capitalize">{v}</h3>
                 <div className={v === "dark" ? "mt-2 inline-flex rounded-[4px] bg-ap-ink p-4" : "mt-2 inline-flex rounded-[4px] border border-ap-hairline bg-ap-card p-4"}>
                   <img src={`/badge/${v}.svg`} alt="As seen on Aimanté" width={160} height={40} />
+                </div>
+                <div className="mt-2">
+                  <AppButton asChild variant="ghost" size="sm"><a href={`/badge/${v}.svg`} download={`as-seen-on-aimante-${v}.svg`}><Download className="size-4" strokeWidth={1.7} />Download SVG</a></AppButton>
                 </div>
                 <CopyBox label="HTML for your website" text={badgeSnippet(d.brand.slug, v)} />
               </div>
