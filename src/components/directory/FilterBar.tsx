@@ -227,13 +227,13 @@ function CategoryBody({ selected, counts, narrow, onChange, comingSoon }: { comi
         <fieldset key={g.title}>
           <legend className="mb-1.5 text-[11px] font-semibold tracking-[.06em] text-ap-muted uppercase">{g.title}</legend>
           <div className={cn("grid gap-x-4", !narrow && "grid-cols-2")}>
-            {g.items.map((c) => (
-              <label key={c.slug} className={cn("flex min-h-12 cursor-pointer items-center gap-2.5 rounded-sm py-2 text-[14px]", g.title === "Coming soon" && "text-ap-muted")}>
-                <input type="checkbox" checked={selected.includes(c.slug)} onChange={() => onChange(toggleIn(selected, c.slug))} className="size-4 accent-ap-blue" />
+            {g.items.map((c) => { const off = c.n === 0 && !selected.includes(c.slug); return (
+              <label key={c.slug} className={cn("flex min-h-12 items-center gap-2.5 rounded-sm py-2 text-[14px]", off ? "cursor-not-allowed text-ap-muted opacity-60" : "cursor-pointer")}>
+                <input type="checkbox" disabled={off} checked={selected.includes(c.slug)} onChange={() => onChange(toggleIn(selected, c.slug))} className="size-4 accent-ap-blue disabled:cursor-not-allowed" />
                 <span className="min-w-0 flex-1"><span className="block break-words">{c.name}</span>{hints.get(c.name) && <span className="block text-[12px] leading-4 text-ap-muted">{hints.get(c.name)}</span>}</span>
                 <span className="text-[13px] text-ap-muted nums">{c.n}</span>
               </label>
-            ))}
+            ); })}
           </div>
         </fieldset>
       ))}

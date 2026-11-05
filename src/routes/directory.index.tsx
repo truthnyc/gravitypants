@@ -263,7 +263,14 @@ function DirectoryPage() {
     return (!c || (allFacets?.categories[categorySlug(c)] ?? 0) > 0) && (!b || (!!bs && (allFacets?.brands[bs] ?? 0) > 0));
   };
   const greeting = useGreeting(hasReels, (settings.headlineMoods[0] ?? ROTATING[0])!, !!everything.data || everything.isError);
-  const { day, mood } = useWeekdayMood(filters.moods.at(-1), settings.headlineMoods, greeting?.rule === "fallback" ? undefined : greeting?.mood);
+  // Only rotate/suggest moods that currently have live reels, so clicking never opens an empty grid.
+  const liveMood = (m: string | undefined) => !!m && (allFacets?.moods[m.toLowerCase()] ?? 0) > 0;
+  const configured = settings.headlineMoods.length ? settings.headlineMoods : ROTATING;
+  const livePool = allFacets ? configured.filter(liveMood) : configured;
+  const fallbackPool = allFacets && !livePool.length ? Object.entries(allFacets.moods).filter(([, n]) => n > 0).sort((a, b) => b[1] - a[1]).map(([m]) => m).slice(0, 7) : [];
+  const pool = livePool.length ? livePool : fallbackPool.length ? fallbackPool : configured;
+  const leadMood = greeting && greeting.rule !== "fallback" && (!allFacets || liveMood(greeting.mood)) ? greeting.mood : undefined;
+  const { day, mood } = useWeekdayMood(filters.moods.at(-1), pool, leadMood);
   const moodClicked = useRef(false);
   const filterLogged = useRef(false);
   const anyFilter = !!q || filters.moods.length + filters.categories.length + filters.brands.length > 0;
