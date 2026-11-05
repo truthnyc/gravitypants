@@ -54,6 +54,16 @@ function BrandKit() {
           <h2 className="text-[20px] font-semibold">No brand page yet</h2>
           <p className="mt-1 text-[14px] text-ap-body">Once your brand has an Aimanté page, its badge and link appear here.</p>
           <AppButton asChild className="mt-4"><Link to="/app/account/directory">Your brand page</Link></AppButton>
+          <div className="mt-6 flex flex-wrap gap-6">
+            {BADGE_VARIANTS.map((v) => (
+              <div key={v} className="flex flex-col items-start gap-2">
+                <div className={v === "dark" ? "inline-flex rounded-[4px] bg-ap-ink p-4" : "inline-flex rounded-[4px] border border-ap-hairline bg-ap-card p-4"}>
+                  <img src={`/badge/${v}.svg`} alt="As seen on Aimanté" width={160} height={40} />
+                </div>
+                <AppButton asChild variant="ghost" size="sm"><a href={`/badge/${v}.svg`} download={`as-seen-on-aimante-${v}.svg`}><Download className="size-4" strokeWidth={1.7} />Download {v} SVG</a></AppButton>
+              </div>
+            ))}
+          </div>
         </section>
       ) : (
         <>
