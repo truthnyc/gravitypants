@@ -2,7 +2,8 @@ import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { queryOptions, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Pencil, Plus, Sparkles, Trash2 } from "lucide-react";
+import { autoTagAllMoods } from "@/lib/directory/mood-tagging.functions";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -47,6 +48,17 @@ function Moods() {
     catch (e) { toast.error(e instanceof Error ? e.message : "Couldn't save that mood."); }
     finally { setBusy(false); }
   }
+  const autoTag = useServerFn(autoTagAllMoods);
+  const [tagging, setTagging] = useState(false);
+  async function runAutoTag() {
+    setTagging(true);
+    try {
+      const r = await autoTag();
+      await qc.invalidateQueries();
+      toast(`Added moods to ${r.reels} reels and ${r.brands} brands.${r.failed ? ` ${r.failed} couldn't be tagged.` : ""}`);
+    } catch (e) { toast.error(e instanceof Error ? e.message : "Couldn't auto-tag right now."); }
+    finally { setTagging(false); }
+  }
   async function confirmDelete() {
     if (!deleting) return;
     setBusy(true);
@@ -55,7 +67,10 @@ function Moods() {
     finally { setBusy(false); }
   }
   return <>
-    <PageTitle title="Moods" right={<Button onClick={() => setDraft({ name: "", family: "Calm" })}><Plus className="size-4" strokeWidth={1.7} />Add mood</Button>} />
+    <PageTitle title="Moods" right={<div className="flex gap-2">
+      <Button variant="outline" disabled={tagging} onClick={() => void runAutoTag()}><Sparkles className="size-4" strokeWidth={1.7} />{tagging ? "Tagging…" : "Auto-tag all reels"}</Button>
+      <Button onClick={() => setDraft({ name: "", family: "Calm" })}><Plus className="size-4" strokeWidth={1.7} />Add mood</Button>
+    </div>} />
     <div className="divide-y divide-border">
       {MOOD_FAMILIES.map((family) => {
         const moods = data.filter((m) => m.family === family);

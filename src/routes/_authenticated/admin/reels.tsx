@@ -33,20 +33,20 @@ import { CATEGORIES, normalizeCategory } from "@/lib/directory/directory";
 import { useMoodCatalog } from "@/lib/directory/moods";
 import { MOOD_FAMILY_COLORS, type MoodFamily } from "@/lib/directory/mood-admin";
 
-/** Up to 3 moods from the master list, grouped by family. Empty = the reel uses its brand's moods. */
+/** Any number of moods from the master list, grouped by family. Empty = the reel uses its brand's moods. */
 function MoodPicker({ value, onChange }: { value: string[]; onChange: (v: string[]) => void }) {
   const { families } = useMoodCatalog();
-  const toggle = (m: string) => onChange(value.includes(m) ? value.filter((x) => x !== m) : value.length >= 3 ? value : [...value, m]);
+  const toggle = (m: string) => onChange(value.includes(m) ? value.filter((x) => x !== m) : [...value, m]);
   return (
     <fieldset className="grid gap-2 text-[13px] text-secondary-text sm:col-span-2">
-      <legend className="mb-1">Moods <span className="nums">({value.length}/3)</span> — leave empty to use the brand's moods</legend>
+      <legend className="mb-1">Moods <span className="nums">({value.length})</span> — leave empty to use the brand's moods</legend>
       {families.map((f) => (
         <div key={f.family} role="group" aria-label={`${f.family} moods`} className="flex flex-wrap items-center gap-1.5">
           <span className="flex w-24 items-center gap-1.5 text-foreground"><span aria-hidden className="size-2.5 rounded-full" style={{ background: MOOD_FAMILY_COLORS[f.family as MoodFamily]?.bg }} />{f.family}</span>
           {f.moods.map((m) => {
             const on = value.includes(m);
             return (
-              <button key={m} type="button" aria-pressed={on} disabled={!on && value.length >= 3} onClick={() => toggle(m)}
+              <button key={m} type="button" aria-pressed={on} onClick={() => toggle(m)}
                 className={`h-8 rounded-lg border px-2.5 text-[13px] capitalize disabled:opacity-40 ${on ? "border-primary bg-primary text-primary-foreground" : "border-input bg-card text-foreground"}`}>
                 {m}
               </button>
