@@ -15,6 +15,7 @@ Disallow: /embed/
 
 const AIMANTE = `User-agent: *
 Allow: /
+Allow: /api/public/reel/
 Disallow: /api/
 `;
 
