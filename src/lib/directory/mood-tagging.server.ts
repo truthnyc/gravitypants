@@ -7,6 +7,7 @@ export async function pickMoods(subject: MoodSubject, catalog: string[], count: 
   const system = [
     "You tag short product video ads with moods for a brand discovery site.",
     `Choose between ${count.min} and ${count.max} moods that genuinely fit, using ONLY names from this list: ${catalog.join(", ")}.`,
+    "Base your choice mainly on the title and description: what the product or place actually is and how it feels. Tags can be wrong or copied from another reel; ignore any tag that contradicts the description. Only pick a mood a shopper would clearly recognise in this reel; fewer accurate moods are better than many loose ones.",
     'Reply with JSON only, like {"moods":["cozy","elegant"]}. No other text.',
   ].join("\n");
   const lines = [
