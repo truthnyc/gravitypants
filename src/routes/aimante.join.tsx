@@ -239,8 +239,12 @@ function ForBrands() {
         <h2 className={h2}>A badge for your website</h2>
         <p className="mx-auto mt-4 max-w-[560px] text-[17px] leading-[1.5] text-ap-body">Once your page is live, you can add a small “As seen on Aimanté” badge to your site, press page or bio. It links straight to your brand page. It's optional, and never a condition of being listed.</p>
         <div className="mt-8 flex flex-wrap justify-center gap-4">
-          <span className="inline-flex rounded-[4px] border border-ap-hairline bg-ap-card p-4"><img src="/badge/light.svg" alt="As seen on Aimanté badge, light" width={160} height={40} loading="lazy" /></span>
-          <span className="inline-flex rounded-[4px] bg-ap-ink p-4"><img src="/badge/dark.svg" alt="As seen on Aimanté badge, dark" width={160} height={40} loading="lazy" /></span>
+          {(["light", "dark"] as const).map((v) => (
+            <div key={v} className="flex flex-col items-center gap-2">
+              <span className={v === "dark" ? "inline-flex rounded-[4px] bg-ap-ink p-4" : "inline-flex rounded-[4px] border border-ap-hairline bg-ap-card p-4"}><img src={`/badge/${v}.svg`} alt={`As seen on Aimanté badge, ${v}`} width={160} height={40} loading="lazy" /></span>
+              <a href={`/badge/${v}.svg`} download={`as-seen-on-aimante-${v}.svg`} className="text-[14px] font-medium text-ap-blue hover:underline">Download {v} SVG</a>
+            </div>
+          ))}
         </div>
       </section>
 
