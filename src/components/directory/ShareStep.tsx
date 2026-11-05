@@ -21,6 +21,7 @@ import { FORMAT_SIZE } from "@/render/formats";
 import { loadImages } from "@/render/images";
 import { ensureFonts, mediaPaths, renderAt, restTime, type BrandStyle } from "@/render/renderFrame";
 import { useMoodCatalog } from "@/lib/directory/moods";
+import { suggestReelMoods } from "@/lib/directory/mood-tagging.functions";
 import { cn } from "@/lib/utils";
 
 const PLAN_LABEL = { business: "Business plan", simple: "Simple plan", trial: "Trial", ended: "Plan ended" } as const;
@@ -89,6 +90,18 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
   const [terms, setTerms] = useState(false);
   const [thumbFrame, setThumbFrame] = useState(0);
   const { forCategory } = useMoodCatalog();
+  const suggestFn = useServerFn(suggestReelMoods);
+  const [suggesting, setSuggesting] = useState(false);
+  const suggestMoods = async (replace: boolean) => {
+    setSuggesting(true);
+    try {
+      const res = await suggestFn({ data: { adId: doc.project.id, brand: targetBrand?.name ?? name.trim(), category: targetBrand?.category ?? category, title: aimTitle.trim() || undefined, description: desc.trim() || undefined, tags } });
+      if (res.moods.length) setMoods((cur) => (replace ? res.moods : [...new Set([...cur, ...res.moods])]));
+      else if (replace) toast("No mood suggestions right now.");
+    } catch { if (replace) toast.error("Couldn't suggest moods right now."); }
+    finally { setSuggesting(false); }
+  };
+  useEffect(() => { if (!ctx.prefill.moods.length) void suggestMoods(false); }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const suggestions = useMemo(() => suggestionsFrom(doc).filter((s) => !tags.includes(s)), [doc, tags]);
   const brandName = targetBrand?.name ?? (name.trim() || "your brand");
   const nameOk = validFullName(fullName);
@@ -255,6 +268,9 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
                         </button>
                       );
                     })}
+                    <button type="button" disabled={suggesting} onClick={() => void suggestMoods(true)} className="px-2 py-[7px] text-[14px] text-ap-blue disabled:opacity-50">
+                      {suggesting ? "Suggesting…" : "Suggest moods"}
+                    </button>
                     {all.length > 6 && (
                       <button type="button" aria-expanded={moreMoods} onClick={() => setMoreMoods(!moreMoods)} className="inline-flex items-center gap-0.5 px-2 py-[7px] text-[14px] text-ap-blue">
                         {moreMoods ? "Fewer moods" : "More moods"} <ChevronDown className={cn("size-4 transition-transform", moreMoods && "rotate-180")} strokeWidth={1.7} />
