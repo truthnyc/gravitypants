@@ -148,7 +148,7 @@ export const shareSchema = z.object({
   }),
   description: z.string().trim().max(REEL_DESCRIPTION_MAX),
   tags: z.array(z.string().trim().min(1).max(40)).max(20),
-  moods: z.array(z.string().trim().toLowerCase().max(30)).max(3),
+  moods: z.array(z.string().trim().toLowerCase().max(30)).max(60),
   show: z.boolean(),
   fullName: z.string().trim().max(120),
   jobTitle: z.string().trim().max(120),
@@ -504,7 +504,7 @@ export const reviewDirectoryReel = createServerFn({ method: "POST" })
     action: z.enum(["approve", "reject", "hide", "review", "edit"]),
     reason: z.string().trim().max(500).optional(),
     tags: z.array(z.string().trim().min(1).max(40)).max(20).optional(),
-    moods: z.array(z.string().trim().toLowerCase().max(30)).max(3).optional(),
+    moods: z.array(z.string().trim().toLowerCase().max(30)).max(60).optional(),
     description: z.string().trim().max(REEL_DESCRIPTION_MAX).optional(),
     category: z.enum(CATEGORIES).optional(),
   }).parse(d))

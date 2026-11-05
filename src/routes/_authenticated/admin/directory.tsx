@@ -249,7 +249,7 @@ function ReviewCard({ r, act }: { r: Row; act: (a: Act, msg: string) => Promise<
         <div className="flex flex-wrap gap-1">
           {[...new Set([...forCategory(category), ...moods])].map((m) => {
             const on = moods.includes(m);
-            return <button key={m} type="button" disabled={!on && moods.length >= 3} onClick={() => setMoods(on ? moods.filter((x) => x !== m) : [...moods, m])} className={cn("rounded-lg border px-2 py-0.5 text-[12px] disabled:opacity-40", on ? "border-primary text-primary" : "border-border")}>{moodLabel(m)}</button>;
+            return <button key={m} type="button" onClick={() => setMoods(on ? moods.filter((x) => x !== m) : [...moods, m])} className={cn("rounded-lg border px-2 py-0.5 text-[12px] disabled:opacity-40", on ? "border-primary text-primary" : "border-border")}>{moodLabel(m)}</button>;
           })}
         </div>
         <div className="rounded-sm bg-control-fill px-3 py-2 text-[12px] text-secondary-text">
@@ -403,7 +403,7 @@ function AdminReel({ r, brandId, onChanged, siteReels }: { r: Detail["reels"][nu
         <div className="flex flex-wrap gap-1">
           {moodCatalog.all.map((m) => {
             const on = moods.includes(m);
-            return <button key={m} type="button" disabled={!on && moods.length >= 3} onClick={() => setMoods(on ? moods.filter((x) => x !== m) : [...moods, m])} className={cn("rounded-lg border px-2 py-0.5 text-[12px] disabled:opacity-40", on ? "border-primary text-primary" : "border-border")}>{moodLabel(m)}</button>;
+            return <button key={m} type="button" onClick={() => setMoods(on ? moods.filter((x) => x !== m) : [...moods, m])} className={cn("rounded-lg border px-2 py-0.5 text-[12px] disabled:opacity-40", on ? "border-primary text-primary" : "border-border")}>{moodLabel(m)}</button>;
           })}
         </div>
         <div className="flex flex-wrap gap-2">

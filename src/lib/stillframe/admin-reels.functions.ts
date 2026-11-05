@@ -55,7 +55,7 @@ const reelSchema = z.object({
   poster_url: fileRef.nullable().optional(),
   published: z.boolean(),
   brand_id: z.string().uuid().nullable().optional(),
-  moods: z.array(z.string().trim().toLowerCase().max(30)).max(3).optional(),
+  moods: z.array(z.string().trim().toLowerCase().max(30)).max(60).optional(),
 });
 
 export const saveSiteReel = createServerFn({ method: "POST" })

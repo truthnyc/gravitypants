@@ -248,7 +248,7 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
                     {list.map((m) => {
                       const on = moods.includes(m);
                       return (
-                        <button key={m} type="button" aria-pressed={on} disabled={!on && moods.length >= 3}
+                        <button key={m} type="button" aria-pressed={on}
                           onClick={() => setMoods(on ? moods.filter((x) => x !== m) : [...moods, m])}
                           className={cn("rounded-lg border bg-ap-card px-[13px] py-[7px] text-[14px] disabled:opacity-40", on ? "border-ap-blue font-semibold text-ap-blue" : "border-ap-hairline")}>
                           {moodLabel(m)}
