@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
-import { Plus, Trash2, X } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Download, Plus, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
@@ -81,6 +81,19 @@ function BrandKitEditor({ kit }: { kit: BrandKit }) {
       <h2 className="pt-4 text-[17px] font-semibold">Every ad</h2>
       <PlacementCard kit={kit} save={save} />
       <EndCardCard kit={kit} save={save} />
+      <Card title="“As seen on Aimanté” badge" hint="Optional badge for your website, press page or bio.">
+        <div className="flex flex-wrap gap-6">
+          {(["light", "dark"] as const).map((v) => (
+            <div key={v} className="flex flex-col items-start gap-2">
+              <div className={v === "dark" ? "inline-flex rounded-sm bg-ap-ink p-4" : "inline-flex rounded-sm border border-ap-hairline bg-card p-4"}>
+                <img src={`/badge/${v}.svg`} alt="As seen on Aimanté" width={160} height={40} />
+              </div>
+              <a href={`/badge/${v}.svg`} download={`as-seen-on-aimante-${v}.svg`} className="inline-flex items-center gap-1.5 text-[13px] font-medium text-ap-blue hover:underline"><Download className="size-4" strokeWidth={1.7} />Download {v} SVG</a>
+            </div>
+          ))}
+        </div>
+        <Link to="/app/account/brand-kit" className="mt-4 inline-block text-[13px] text-ap-blue hover:underline">Get the code linked to your brand page</Link>
+      </Card>
     </main>
   );
 }
