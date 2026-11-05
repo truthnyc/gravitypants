@@ -604,6 +604,23 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
     setFrameIndex(to);
   };
 
+  const addColorFrame = () => {
+    const base = framePayloadFromPhoto({ assetId: null, path: null, name: null } as unknown as Parameters<typeof framePayloadFromPhoto>[0], 1);
+    const frame = {
+      ...(base as unknown as Frame),
+      id: crypto.randomUUID(),
+      project_id: doc.project.id,
+      photo: { ...base.photo, asset_id: null, path: null, url: null, name: null, background: "solid", background_color: "#0071E3" } as Frame["photo"],
+      headline: null,
+    };
+    const at = frames.length;
+    apply((d) => ({ ...d, frames: [...d.frames, frame] }));
+    setFrameIndex(at);
+  };
+  const removePhoto = (at: number) => {
+    updateFrame(at, (f) => ({ ...f, photo: { ...f.photo, asset_id: null, path: null, url: null, name: null, background: "solid", background_color: f.photo?.background_color || "#0071E3" } }));
+  };
+
   const addFiles = async (files: File[]) => {
     setUploading(true);
     try {
@@ -983,6 +1000,8 @@ export function Editor({ initial, readOnly = false, banner, exportDisabled = fal
             canPaste={Boolean(styleClip)}
             onDuplicate={duplicateFrame}
             onReplacePhoto={replacePhoto}
+            onAddColorFrame={addColorFrame}
+            onRemovePhoto={removePhoto}
             onCopyStyle={copyStyle}
             onPasteStyle={pasteStyle}
             onDelete={(i) => deleteFrame(i)}

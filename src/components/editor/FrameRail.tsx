@@ -25,13 +25,13 @@ export const frameWidth = (sec: number) => Math.max(40, Math.round(sec * 22));
 type Props = {
   horizontal?: boolean; doc: EditorDoc; format: Format; frameIndex: number; images: Map<string, HTMLImageElement>; version: number; uploading: boolean;
   onSelect: (i: number) => void; onReorder: (from: number, to: number) => void; onAddFiles: (files: File[]) => void;
-  canPaste: boolean; onDuplicate: (i: number) => void; onReplacePhoto: (i: number) => void; onCopyStyle: (i: number) => void; onPasteStyle: (i: number) => void; onDelete: (i: number) => void;
+  canPaste: boolean; onDuplicate: (i: number) => void; onReplacePhoto: (i: number) => void; onAddColorFrame: () => void; onRemovePhoto: (i: number) => void; onCopyStyle: (i: number) => void; onPasteStyle: (i: number) => void; onDelete: (i: number) => void;
   actionsForFrame: (i: number) => InspectorActions; endSeconds: number;
   /** 0–1 playback progress through the current frame; shown as a thin bar while playing. */
   progress?: number | null;
 };
 
-export function FrameRail({ doc, format, frameIndex, images, version, uploading, onSelect, onReorder, onAddFiles, canPaste, onDuplicate, onReplacePhoto, onCopyStyle, onPasteStyle, onDelete, actionsForFrame, endSeconds, progress }: Props) {
+export function FrameRail({ doc, format, frameIndex, images, version, uploading, onSelect, onReorder, onAddFiles, canPaste, onDuplicate, onReplacePhoto, onAddColorFrame, onRemovePhoto, onCopyStyle, onPasteStyle, onDelete, actionsForFrame, endSeconds, progress }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const navRef = useRef<HTMLElement>(null);
   const [dragFrom, setDragFrom] = useState<number | null>(null);
@@ -77,11 +77,12 @@ export function FrameRail({ doc, format, frameIndex, images, version, uploading,
             <ContextMenuItem disabled={i === 0} onSelect={() => onReorder(i, i - 1)}>Move left</ContextMenuItem>
             <ContextMenuItem disabled={i === doc.frames.length - 1} onSelect={() => onReorder(i, i + 1)}>Move right</ContextMenuItem>
             <ContextMenuSeparator /><ContextMenuItem onSelect={() => onReplacePhoto(i)}>Replace Photo…</ContextMenuItem>
+            <ContextMenuItem disabled={!frame.photo?.path} onSelect={() => onRemovePhoto(i)}>Remove Photo</ContextMenuItem>
             <ContextMenuItem onSelect={() => onCopyStyle(i)}>Copy Style</ContextMenuItem><ContextMenuItem disabled={!canPaste} onSelect={() => onPasteStyle(i)}>Paste Style</ContextMenuItem>
             <ContextMenuSeparator /><ContextMenuItem className="text-destructive focus:text-destructive" disabled={doc.frames.length <= 1} onSelect={() => onDelete(i)}>Delete frame</ContextMenuItem>
           </ContextMenuContent></ContextMenu>
           <DropdownMenu><DropdownMenuTrigger asChild><Button type="button" variant="plain" size="icon" aria-label={`Frame ${i + 1} actions`} className={cn("absolute right-0.5 top-0.5 size-5 gap-0 rounded-sm bg-card/90 p-0 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100 data-[state=open]:opacity-100", i === frameIndex ? "opacity-100" : "opacity-0")}><MoreHorizontal className="size-3.5" strokeWidth={1.7} /></Button></DropdownMenuTrigger>
-            <DropdownMenuContent align="start"><DropdownMenuItem onSelect={() => onDuplicate(i)}>Duplicate</DropdownMenuItem><DropdownMenuItem disabled={i === 0} onSelect={() => onReorder(i, i - 1)}>Move left</DropdownMenuItem><DropdownMenuItem disabled={i === doc.frames.length - 1} onSelect={() => onReorder(i, i + 1)}>Move right</DropdownMenuItem><DropdownMenuSeparator /><DropdownMenuItem disabled={doc.frames.length <= 1} className="text-destructive focus:text-destructive" onSelect={() => onDelete(i)}>Delete frame</DropdownMenuItem></DropdownMenuContent>
+            <DropdownMenuContent align="start"><DropdownMenuItem onSelect={() => onDuplicate(i)}>Duplicate</DropdownMenuItem><DropdownMenuItem disabled={i === 0} onSelect={() => onReorder(i, i - 1)}>Move left</DropdownMenuItem><DropdownMenuItem disabled={i === doc.frames.length - 1} onSelect={() => onReorder(i, i + 1)}>Move right</DropdownMenuItem><DropdownMenuSeparator /><DropdownMenuItem onSelect={() => onReplacePhoto(i)}>{frame.photo?.path ? "Replace photo…" : "Add photo…"}</DropdownMenuItem><DropdownMenuItem disabled={!frame.photo?.path} onSelect={() => onRemovePhoto(i)}>Remove photo</DropdownMenuItem><DropdownMenuSeparator /><DropdownMenuItem disabled={doc.frames.length <= 1} className="text-destructive focus:text-destructive" onSelect={() => onDelete(i)}>Delete frame</DropdownMenuItem></DropdownMenuContent>
           </DropdownMenu>
         </div>
         <Popover open={popup === `timing:${frame.id}`} onOpenChange={(open) => { setPopup(open ? `timing:${frame.id}` : null); if (open) onSelect(i); }}>
@@ -93,7 +94,9 @@ export function FrameRail({ doc, format, frameIndex, images, version, uploading,
         </Popover>
       </div>
     </div>)}
-    <Button type="button" variant="ghost" onClick={() => inputRef.current?.click()} disabled={uploading} aria-label="Add frame" className="ml-2 size-16 shrink-0 rounded-[10px] border border-dashed border-placeholder-border p-0 text-icon"><Plus className={cn("size-5", uploading && "animate-pulse")} strokeWidth={1.7} /></Button>
+    <DropdownMenu><DropdownMenuTrigger asChild><Button type="button" variant="ghost" disabled={uploading} aria-label="Add frame" className="ml-2 size-16 shrink-0 rounded-[10px] border border-dashed border-placeholder-border p-0 text-icon"><Plus className={cn("size-5", uploading && "animate-pulse")} strokeWidth={1.7} /></Button></DropdownMenuTrigger>
+      <DropdownMenuContent align="end"><DropdownMenuItem onSelect={() => inputRef.current?.click()}>Photo…</DropdownMenuItem><DropdownMenuItem onSelect={onAddColorFrame}>Colour only</DropdownMenuItem></DropdownMenuContent>
+    </DropdownMenu>
     <input ref={inputRef} type="file" accept={ACCEPTED_IMAGE_TYPES.join(",")} multiple className="hidden" onChange={(e) => { const files = Array.from(e.target.files ?? []); e.target.value = ""; if (files.length) onAddFiles(files); }} />
   </nav>;
 }
