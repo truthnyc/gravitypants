@@ -85,7 +85,7 @@ export const PLANS: PlanConfig[] = [
     monthly: 79,
     yearly: 790,
     team: false,
-    features: ["Everything in Starter", "30 exports a month", "HTML5 export", "Aimanté insights"],
+    features: ["Everything in Starter", "30 exports a month", "AI headline and subline suggestions", "HTML5 export", "Aimanté insights"],
   },
   {
     id: "team",
@@ -97,7 +97,7 @@ export const PLANS: PlanConfig[] = [
     monthly: 175,
     yearly: 1750,
     team: true,
-    features: ["Everything in Business", "HTML5 export", "You + 4 teammates", "150 exports a month, shared", "Shared brand kits", "Shared templates", "Priority support"],
+    features: ["Everything in Business", "AI headline and subline suggestions", "HTML5 export", "You + 4 teammates", "150 exports a month, shared", "Shared brand kits", "Shared templates", "Priority support"],
   },
 ];
 
