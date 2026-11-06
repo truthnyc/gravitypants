@@ -1,7 +1,7 @@
 import { EXPORT_PACKS, PLANS, REFERRAL_NOTE, TRIAL } from "./plans-config";
 import { MAIN_SIZES } from "./main-size";
 
-export const TRIAL_ANSWER = `No time limit and no card. You get ${TRIAL.exports} exports: the first without a watermark, then ${TRIAL.exports - TRIAL.cleanExports} more with a small Gravity Pants mark.`;
+export const TRIAL_ANSWER = `No time limit and no card. You get ${TRIAL.exports} exports: the first without a watermark, then ${TRIAL.exports - TRIAL.cleanExports} more with a small Gravity Pants mark. AI headline and subline suggestions need a paid plan.`;
 const team = PLANS.find((p) => p.id === "team");
 const sizes = MAIN_SIZES.map((s) => s.format).join(", ");
 
