@@ -30,6 +30,7 @@ import { ELEMENT_META, type ElementKey } from "./use-editor";
 import { cn } from "@/lib/utils";
 import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
+import { CopySuggest } from "./CopySuggest";
 import { uploadMedia } from "@/lib/stillframe/media";
 import { clampFrameSeconds, matchingPace, FRAME_MIN_SECONDS, FRAME_MAX_SECONDS } from "./frame-timing";
 
@@ -177,7 +178,7 @@ export function Inspector({
             <PhotoPanel part={section} onEditBackground={onEditBackground} photo={frame.photo ?? {}} frameIndex={frameIndex} brandName={brandName} brandColors={brandColors} image={image} keyframe={keyframe} onKeyframe={onKeyframe} actions={actions} />
           )}
           {(section === "headline" || section === "subline") && (
-            <TextPanel el={section} frameIndex={frameIndex} headline={frame.headline} subline={frame.subline} brandColors={brandColors} brandName={brandName} actions={actions} />
+            <TextPanel el={section} ai={{ projectId: doc.project.id, format: String(format), photoPath: frame.photo?.path ?? null, others: doc.frames.filter((f) => f !== frame).map((f) => [f.headline?.text, f.subline?.text].filter(Boolean).join(" — ")) }} frameIndex={frameIndex} headline={frame.headline} subline={frame.subline} brandColors={brandColors} brandName={brandName} actions={actions} />
           )}
           {section === "logo" && (
             <LogoPanel logo={doc.project.logo} format={format} frame={frame} frameIndex={frameIndex} hasLogo={hasLogo} actions={actions} kitName={kits.find((k) => k.id === kitId)?.name ?? null} kitPosition={kit?.default_logo_positions?.[format] ?? null} />
@@ -979,8 +980,8 @@ function TextTab({ selected, headline, subline, brandColors, brandName, actions,
 
 
 /** Headline or Subline drawer panel: scope box, then the same controls for each. */
-function TextPanel({ el, frameIndex, headline, subline, brandColors, brandName, actions }: {
-  el: "headline" | "subline"; frameIndex: number; headline: TextSettings | null; subline: TextSettings | null; brandColors: string[]; brandName: string; actions: InspectorActions;
+function TextPanel({ el, ai, frameIndex, headline, subline, brandColors, brandName, actions }: {
+  el: "headline" | "subline"; ai: { projectId: string; format: string; photoPath: string | null; others: string[] }; frameIndex: number; headline: TextSettings | null; subline: TextSettings | null; brandColors: string[]; brandName: string; actions: InspectorActions;
 }) {
   const isHead = el === "headline";
   const h = headline ?? {};
@@ -1031,6 +1032,7 @@ function TextPanel({ el, frameIndex, headline, subline, brandColors, brandName, 
       {!isHead && <SublineImageField t={raw} tint={tint} onChange={set} />}
       {(isHead || raw.mode !== "image") && (<>
       <Textarea value={raw.text ?? ""} placeholder={isHead ? "Add a headline" : "Add a line under the headline"} aria-label={isHead ? "Headline" : "Subline"} onChange={(e) => set({ text: e.target.value }, `${el}-text`)} className={cn("rounded-sm text-[15px]", isHead ? "min-h-[72px]" : "min-h-[56px]")} />
+      <CopySuggest part={el} {...ai} brand={brandName} headline={h.text ?? undefined} current={raw.text ?? undefined} onPick={(text) => set({ text }, `${el}-ai`)} />
       <FontField el={el} t={t} brandName={brandName} actions={actions} onChange={set} />
       {weights.length > 1 && (
         <Field label="Weight">
