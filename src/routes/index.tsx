@@ -4,7 +4,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { ReelVideo } from "@/components/site/ReelVideo";
 
-import { ArrowRight, ArrowUpRight, Check, Play } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Check, Play, Sparkles } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { ReelPhone, type ReelFrame } from "@/components/site/ReelPhone";
 import { FeaturedAdVideo } from "@/components/site/FeaturedAdVideo";
@@ -523,6 +523,19 @@ const features = [
   },
 ];
 function FeatureArt({ art }: { art: string }) {
+  if (art === "ai")
+    return (
+      <div className="home-feature-art home-ai-art">
+        <b>
+          <Sparkles size={14} strokeWidth={1.7} /> Suggest headline
+        </b>
+        <span>Winter starts with a stitch</span>
+        <span className="home-ai-pick">
+          Softness for short days <Check size={15} strokeWidth={1.7} />
+        </span>
+        <span>Come in from the cold</span>
+      </div>
+    );
   if (art === "kit")
     return (
       <div className="home-feature-art home-feature-kit">
@@ -830,6 +843,16 @@ function Home() {
                 </div>
               </article>
             ))}
+            <article className="site-card home-feature home-feature-full">
+              <div>
+                <h3>AI writes your headlines</h3>
+                <p>
+                  On every paid plan, click Suggest under a headline or subline and pick one of three short options
+                  written from your photo and your brand. Nothing changes until you click one.
+                </p>
+              </div>
+              <FeatureArt art="ai" />
+            </article>
           </div>
         </section>
         <section className="home-section home-proof">
