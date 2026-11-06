@@ -11,8 +11,8 @@ type Props = {
   brand: string;
   format: string;
   photoPath: string | null;
-  headline?: string;
-  current?: string;
+  headline?: string | undefined;
+  current?: string | undefined;
   others: string[];
   onPick: (text: string) => void;
 };

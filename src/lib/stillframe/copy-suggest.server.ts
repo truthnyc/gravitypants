@@ -5,10 +5,10 @@ export type CopySubject = {
   brand: string;
   format: string;
   imageUrl: string | null;
-  headline?: string;
-  current?: string;
+  headline?: string | undefined;
+  current?: string | undefined;
   others: string[];
-  hint?: string;
+  hint?: string | undefined;
 };
 
 /** Word limits per part, kept short so lines fit square and portrait frames. */
