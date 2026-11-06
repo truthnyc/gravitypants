@@ -1,10 +1,14 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { aimanteHead } from "@/lib/site/brand-site";
 import { AimanteShell } from "@/components/site/AimanteShell";
 import { listGuides } from "@/lib/directory/guides.functions";
 
 export const Route = createFileRoute("/aimante/guides/")({
-  loader: async () => ({ guides: await listGuides().catch(() => []) }),
+  loader: async () => {
+    const guides = await listGuides().catch(() => []);
+    if (!guides.length) throw notFound();
+    return { guides };
+  },
   head: () => aimanteHead({ path: "/guides", title: "Gift guides by mood — Aimanté", description: "Gift and mood guides from Aimanté. Cozy, playful and seasonal ideas from independent makers and well-known houses, shown in short reels." }),
   errorComponent: () => <AimanteShell><p className="py-20 text-center font-ap">Guides couldn't load. Try again.</p></AimanteShell>,
   notFoundComponent: () => <AimanteShell><p className="py-20 text-center font-ap">No guides yet.</p></AimanteShell>,

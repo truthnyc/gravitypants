@@ -12,6 +12,13 @@ import { cn } from "@/lib/utils";
 import type { BrandSite } from "@/lib/site/brand-site";
 import { usePlanAccess } from "@/lib/stillframe/plan";
 import { peekWorkspaceId } from "@/lib/stillframe/workspace";
+import { listGuides } from "@/lib/directory/guides.functions";
+
+/** Guides links show only once at least one guide is published. */
+function useHasGuides() {
+  const { data } = useQuery({ queryKey: ["aimante-guides"], queryFn: () => listGuides(), staleTime: 5 * 60_000 });
+  return (data?.length ?? 0) > 0;
+}
 
 /** Which brand this visit is on (decided once per request by hostname). */
 export function useBrandSite(): BrandSite {
@@ -159,6 +166,7 @@ export function AimanteHeader() {
     media.addEventListener("change", resize);
     return () => { document.body.style.overflow = previous; document.removeEventListener("keydown", key); media.removeEventListener("change", resize); };
   }, [open]);
+  const hasGuides = useHasGuides();
   const row = "flex h-14 items-center justify-between border-b border-aimante-divider text-[20px] font-semibold text-ap-ink hover:bg-ap-panel";
   const chevron = <ChevronRight size={20} strokeWidth={1.7} className="shrink-0 text-ap-headline-bracket" aria-hidden="true" />;
   return (
@@ -166,7 +174,7 @@ export function AimanteHeader() {
       <div className="mx-auto grid h-[55px] max-w-[1280px] grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 md:h-[63px] md:px-10">
         <Link to="/directory" onClick={close} aria-label="Aimanté home" className="min-w-0 w-fit"><AimanteLogo /></Link>
         <nav aria-label="Main" className="hidden shrink-0 items-center gap-7 md:flex">
-          <Link to="/aimante/guides" className={navLink} activeProps={navActive}>Guides</Link>
+          {hasGuides && <Link to="/aimante/guides" className={navLink} activeProps={navActive}>Guides</Link>}
           <Link to="/aimante/about" className={navLink} activeProps={navActive}>About</Link>
           <Link to="/aimante/join" className={navLink} activeProps={navActive} activeOptions={{ includeHash: false }}>For brands</Link>
           {!me && <Link to="/signin" search={signInSearch} className={navLink} activeProps={navActive}>Sign in</Link>}
@@ -188,7 +196,7 @@ export function AimanteHeader() {
         <div className="absolute inset-x-0 top-full h-dvh bg-aimante-dim md:hidden" onClick={() => { close(); menuButton.current?.focus(); }} aria-hidden="true" />
         <nav ref={panel} id="aimante-mobile-menu" aria-label="Mobile navigation" className="absolute inset-x-0 top-full max-h-[calc(100dvh-56px)] overflow-y-auto rounded-b-[12px] bg-ap-card px-6 pb-6 shadow-aimante-menu md:hidden">
           <Link to="/directory" onClick={close} className={row}>Browse{chevron}</Link>
-          <Link to="/aimante/guides" onClick={close} className={row}>Guides{chevron}</Link>
+          {hasGuides && <Link to="/aimante/guides" onClick={close} className={row}>Guides{chevron}</Link>}
           <Link to="/aimante/about" onClick={close} className={row}>About{chevron}</Link>
           <Link to="/aimante/join" onClick={close} className={row}>For brands{chevron}</Link>
           {!me && <Link to="/aimante/join" hash="apply" data-cta="apply-to-join" onClick={close} className={cn(row, "text-ap-blue")}>Apply to join{chevron}</Link>}
@@ -209,6 +217,7 @@ export function AimanteHeader() {
 }
 
 export function AimanteFooter() {
+  const hasGuides = useHasGuides();
   return (
     <footer className="mt-auto border-t border-aimante-divider bg-ap-card font-ap">
       <div className="mx-auto grid max-w-[1280px] gap-y-4 px-4 py-8 text-[14px] leading-[1.3] text-ap-muted md:px-10 md:grid-cols-[auto_minmax(0,1fr)] md:items-center md:gap-x-8 md:gap-y-6 md:py-12">
@@ -218,7 +227,7 @@ export function AimanteFooter() {
         </div>
         <nav aria-label="Footer" className="grid min-w-0 grid-cols-2 gap-x-6 gap-y-2.5 md:flex md:flex-wrap md:items-center md:justify-end md:gap-x-5 md:gap-y-3">
           <Link to="/aimante/join" hash="apply" data-cta="apply-to-join" className="hover:text-ap-ink">Apply to join</Link>
-          <Link to="/aimante/guides" className="hover:text-ap-ink">Guides</Link>
+          {hasGuides && <Link to="/aimante/guides" className="hover:text-ap-ink">Guides</Link>}
           <Link to="/aimante/about" className="hover:text-ap-ink">About</Link>
           <Link to="/privacy" className="hover:text-ap-ink">Privacy</Link>
           <Link to="/terms" className="hover:text-ap-ink">Terms</Link>
