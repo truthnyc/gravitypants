@@ -44,7 +44,7 @@ const docSchema = z.object({
   slug: z.string().trim().max(60),
   description: z.string().max(120),
   ad_title: z.string().trim().max(60).optional(),
-  format: z.enum(["9:16", "4:5", "1:1", "16:9"]),
+  format: z.enum(["9:16", "4:5", "1:1", "5:4", "16:9"]),
   is_reusable: z.boolean(),
   featured: z.boolean(),
   thumbnail_url: z.string().max(300).nullable(),
@@ -287,7 +287,7 @@ export const adminTemplateFromAd = createServerFn({ method: "POST" })
     const hex = (c: any, d: string) => (typeof c === "string" && /^#[0-9a-fA-F]{6}$/.test(c) ? c.toUpperCase() : d);
     const h0 = frames.find((f) => f.headline)?.headline ?? {};
     const s0 = frames.find((f) => f.subline)?.subline ?? {};
-    const format = (["9:16", "4:5", "1:1", "16:9"].includes(p.primary_format) ? p.primary_format : "9:16") as TemplateDoc["format"];
+    const format = (["9:16", "4:5", "1:1", "5:4", "16:9"].includes(p.primary_format) ? p.primary_format : "9:16") as TemplateDoc["format"];
     const baseName = `${p.name || "Untitled"} template`.slice(0, 60);
     const doc: TemplateDoc = {
       name: baseName,
