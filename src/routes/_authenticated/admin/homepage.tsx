@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -86,6 +86,7 @@ function Photos({ photos, max, onChange }: { photos: SitePhoto[]; max: number; o
 
 function HomepageAdmin() {
   const qc = useQueryClient();
+  const router = useRouter();
   const load = useServerFn(getHomepageAdmin);
   const loadReels = useServerFn(listAdminReels);
   const save = useServerFn(saveHomepageSection);
@@ -106,6 +107,8 @@ function HomepageAdmin() {
       await save({ data: { key, value } as never });
       toast.success(msg);
       await qc.invalidateQueries({ queryKey: ["admin", "homepage"] });
+      // Drop the cached homepage so the banner and phone reel show the new choice right away.
+      await router.invalidate();
     } catch (e) { toast.error(e instanceof Error ? e.message : "Couldn't save"); } finally { setSaving(null); }
   }
   const h = (k: keyof HomeHero) => (e: { target: { value: string } }) => setHero({ ...hero, [k]: e.target.value });
