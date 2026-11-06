@@ -39,6 +39,7 @@ const groups = [
     eyebrow: "Text & fonts",
     title: "Words that look designed.",
     points: [
+      "AI suggests headlines and sublines from your photo and brand (paid plans)",
       "Search and preview the whole Google Fonts library",
       "Upload your own font file",
       "Size, weight and color for headline and subline",

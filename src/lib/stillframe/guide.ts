@@ -22,7 +22,7 @@ export const GUIDE_SECTIONS: readonly GuideSectionData[] = [
     tip: "Your main size is the shape you design in. You can add other shapes, including custom dimensions, when you export.",
     imageDescription: "Five format choices lead to an ordered strip of three photos.", link: { label: "Start a reel", to: "/app/new" } },
   { id: "edit", title: "Edit your reel", shortTitle: "Edit", illustration: "edit",
-    steps: ["Choose a frame in the rail, then select the photo, headline, subline or logo in the preview. The Inspector opens the matching controls.", "Use Photo, Text and Logo to adjust framing, movement, words, fonts, colours and logo placement. Check whether your change applies to one frame or all frames.", "Use the frame’s timing and transition controls to change its length and how it leads into the next frame. Play the reel to check the pace.", "Use Undo if a change does not work. Changes save automatically. On your phone, choose a frame and open its controls below the preview."],
+    steps: ["Choose a frame in the rail, then select the photo, headline, subline or logo in the preview. The Inspector opens the matching controls.", "Use Photo, Text and Logo to adjust framing, movement, words, fonts, colours and logo placement. Check whether your change applies to one frame or all frames.", "On a paid plan, click Suggest headline or Suggest subline under the text box to get three short options written from the photo and your brand. Add a direction such as holiday or playful if you like, then click an option to use it, or More options for a new set. Undo works as usual.", "Use the frame’s timing and transition controls to change its length and how it leads into the next frame. Play the reel to check the pace.", "Use Undo if a change does not work. Changes save automatically. On your phone, choose a frame and open its controls below the preview."],
     tip: "Preview as only changes what you are looking at. Make main size changes the reel’s main shape; Fix for this size lets you adjust that shape without changing the others.",
     imageDescription: "A reel preview beside Photo, Text and Logo controls, with a frame rail and timing marks below.", link: { label: "Open Your Ads", to: "/app/ads" } },
   { id: "templates", title: "Start from a template", shortTitle: "Templates", illustration: "templates",
@@ -70,6 +70,7 @@ export const GUIDE_SECTIONS: readonly GuideSectionData[] = [
 export const HELP_FAQ = [
   ["How do I make an ad?", "On Your Ads, start a new ad. Choose a main size, add your photos, then edit the words and logo before exporting."],
   ["What does the Free plan include?", TRIAL_ANSWER],
+  ["Can the AI write my words?", "Yes, on paid plans. In Headline or Subline, click Suggest and pick one of three options. The Free plan does not include AI suggestions."],
   ["How long are my files kept?", "Finished exports stay under Previous exports for 30 days."],
   ["How do I change or cancel my plan?", "Go to Account → Billing and choose Manage billing."],
   ["Can I share with my team?", `On the Team plan, you and up to ${(team?.seats ?? 5) - 1} teammates share brand kits, templates and ${team?.monthlyExports ?? 150} exports a month.`],
