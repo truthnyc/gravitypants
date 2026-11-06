@@ -565,7 +565,9 @@
   .dir-carousel .home-example-video.home-example-video-916 video { width:162px; height:306px; }
   .dir-carousel .home-example-video.home-example-video-169 video { width:162px; height:91px; }
 }
-.home-example-figure figcaption { display:flex; flex-direction:column; gap:2px; }
+.home-example-figure figcaption { display:flex; flex-direction:column; align-items:flex-start; gap:2px; }
+.home-example-figure figcaption .showcase-visit { min-height:28px; }
+.home-example-figure figcaption .showcase-visit + .showcase-visit { margin-left:0; }
 .home-example-figure figcaption b { font-size:15px; }.home-example-figure figcaption span { color:var(--site-secondary); font-size:13px; }
 .home-before { min-height:880px; padding-top:120px; display:flex; flex-direction:column; gap:56px; }
 .home-before-top { display:flex; align-items:flex-end; justify-content:space-between; gap:40px; }
