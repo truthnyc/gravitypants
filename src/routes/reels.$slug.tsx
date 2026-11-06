@@ -66,9 +66,9 @@ function WatchPage() {
   return (
     <SiteShell>
       <article className={`${wrap} pb-20 pt-6 md:pt-10`}>
-        <div className="grid w-full place-items-center rounded-lg bg-site-panel">
+        <div className="grid w-full place-items-center rounded-lg">
           <video
-            className={`block rounded-lg bg-site-panel ${tall ? "h-[min(72svh,760px)] w-auto" : "w-full"}`}
+            className={`block rounded-lg ${tall ? "h-[min(72svh,760px)] w-auto" : "w-full"}`}
             style={{ aspectRatio: `${size.width} / ${size.height}` }}
             src={media(reel.video, "video")}
             poster={media(reel.poster, "poster")}
