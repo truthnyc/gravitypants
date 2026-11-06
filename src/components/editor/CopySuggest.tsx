@@ -4,6 +4,7 @@ import { RefreshCw, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { suggestFrameCopy } from "@/lib/stillframe/copy-suggest.functions";
+import { openUpgrade, usePlanAccess } from "@/lib/stillframe/plan";
 
 type Props = {
   part: "headline" | "subline";
@@ -20,6 +21,8 @@ type Props = {
 /** "Suggest" under the headline/subline box: three AI options, click one to use it. Nothing changes until a click. */
 export function CopySuggest(p: Props) {
   const run = useServerFn(suggestFrameCopy);
+  const access = usePlanAccess();
+  const locked = !access.canUse("ai_copy");
   const [open, setOpen] = useState(false);
   const [hint, setHint] = useState("");
   const [busy, setBusy] = useState(false);
@@ -34,6 +37,7 @@ export function CopySuggest(p: Props) {
         headline: p.headline || undefined, current: p.current || undefined,
         others: p.others.filter(Boolean).slice(0, 20), hint: hint.trim() || undefined,
       } });
+      if ("locked" in res && res.locked) { setOpen(false); openUpgrade("ai_copy"); return; }
       setOptions(res.options);
       if ("error" in res && res.error) setError(res.error);
       else if (!res.options.length) setError("No suggestions this time. Try again.");
@@ -44,8 +48,8 @@ export function CopySuggest(p: Props) {
 
   if (!open) {
     return (
-      <Button type="button" variant="outline" size="sm" className="rounded-lg" onClick={ask}>
-        <Sparkles strokeWidth={1.7} className="size-4" /> Suggest {p.part}
+      <Button type="button" variant="outline" size="sm" className="rounded-lg" onClick={locked ? () => openUpgrade("ai_copy") : ask}>
+        <Sparkles strokeWidth={1.7} className="size-4" /> Suggest {p.part}{locked && <span className="text-[12px] text-ap-muted">· Paid plans</span>}
       </Button>
     );
   }

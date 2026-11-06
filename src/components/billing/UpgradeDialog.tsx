@@ -12,6 +12,7 @@ const COPY: Record<Feature, { title: string; body: string }> = {
   brand_stats: { title: "Brand stats are part of Business and Team", body: "See views, saves and website clicks for every reel, and which moods work best." },
   html5: { title: "HTML5 is on Business and Team", body: "Export an HTML5 version of your reel for display ads and websites." },
   export_packs: { title: "Export packs come with a paid plan", body: "Choose a plan first. Every paid plan can add packs of 5, 10 or 20 extra exports that never expire." },
+  ai_copy: { title: "AI writing comes with a paid plan", body: "On every paid plan, Suggest headline and Suggest subline write three options for each frame from your photo and brand." },
   priority_support: { title: "Priority support is part of the Team plan", body: "Team customers get a reply within 6 hours." },
 };
 

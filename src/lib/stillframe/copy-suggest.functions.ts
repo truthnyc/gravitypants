@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { planTier } from "./plan";
 
 /** Signed-in: suggest three headline or subline options for one frame. Access is checked by reading the ad and photo through RLS. */
 export const suggestFrameCopy = createServerFn({ method: "POST" })
@@ -17,8 +18,14 @@ export const suggestFrameCopy = createServerFn({ method: "POST" })
     hint: z.string().trim().max(200).optional(),
   }).parse(d))
   .handler(async ({ data, context }) => {
-    const { data: project } = await context.supabase.from("projects").select("id").eq("id", data.projectId).maybeSingle();
+    const { data: project } = await context.supabase.from("projects").select("id, workspace_id").eq("id", data.projectId).maybeSingle();
     if (!project) throw new Error("Not authorized");
+    // Free plan has no AI writing: check the paying plan on the server, never trust the browser.
+    const [{ data: billing }, { data: admin }] = await Promise.all([
+      context.supabase.rpc("effective_billing", { _ws: project.workspace_id }),
+      context.supabase.rpc("is_platform_admin"),
+    ]);
+    if (!admin && planTier(billing as never) == null) return { options: [] as string[], locked: true as const };
     let imageUrl: string | null = null;
     if (data.photoPath && !data.photoPath.startsWith("brand-assets:")) {
       const { data: signed } = await context.supabase.storage.from("media").createSignedUrl(data.photoPath, 600);

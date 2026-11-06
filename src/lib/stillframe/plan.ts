@@ -6,7 +6,7 @@ import { billingKey, fetchExportStatus, type ExportStatus } from "./billing";
 import { HTML5_TIERS, PACK_TIERS, TRIAL } from "./plans-config";
 
 /** Every plan-gated feature. Add new gates here so the whole app checks plans in one place. */
-export type Feature = "export" | "gif" | "brand_kits" | "templates" | "team_sharing" | "priority_support" | "brand_stats" | "html5" | "export_packs";
+export type Feature = "export" | "gif" | "brand_kits" | "templates" | "team_sharing" | "priority_support" | "brand_stats" | "html5" | "export_packs" | "ai_copy";
 
 /** Free trial limit, from the shared plan config (also enforced in SQL export_status). */
 export const FREE_EXPORTS = TRIAL.exports;
@@ -49,6 +49,8 @@ export function canUseWith(e: Entitlements | undefined, f: Feature): boolean {
     case "brand_stats":
     case "html5":
       return Boolean(e.admin) || (e.tier != null && HTML5_TIERS.includes(e.tier));
+    case "ai_copy":
+      return Boolean(e.admin) || e.tier != null; // paid plans only; the free plan does not include AI writing
     case "export_packs":
       return Boolean(e.admin) || (e.tier != null && PACK_TIERS.includes(e.tier));
   }
