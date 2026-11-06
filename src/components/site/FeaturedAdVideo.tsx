@@ -6,8 +6,10 @@ import videoAsset from "@/assets/site/example-of-the-week.mp4.asset.json";
 import webmAsset from "@/assets/site/example-of-the-week.webm.asset.json";
 import posterAsset from "@/assets/site/example-of-the-week-poster.webp.asset.json";
 
-export function FeaturedAdVideo({ controls = false, video = videoAsset.url, videoWebm = webmAsset.url, poster = posterAsset.url, label = "Purl Soho Japanese Denim Cotton video ad", format = "916", tapToggle = false }: { tapToggle?: boolean; controls?: boolean; video?: string; videoWebm?: string | undefined; poster?: string | undefined; label?: string; format?: "916" | "169" }) {
+export function FeaturedAdVideo({ controls = false, video = videoAsset.url, videoWebm, poster = posterAsset.url, label = "Purl Soho Japanese Denim Cotton video ad", format = "916", tapToggle = false }: { tapToggle?: boolean; controls?: boolean; video?: string; videoWebm?: string | undefined; poster?: string | undefined; label?: string; format?: "916" | "169" }) {
   const [playing, setPlaying] = useState(false);
+  // The bundled WebM only belongs with the bundled MP4; a chosen reel without its own WebM plays its MP4.
+  const webm = videoWebm ?? (video === videoAsset.url ? webmAsset.url : undefined);
   const phoneRef = useRef<HTMLDivElement>(null);
 
   const toggle = () => {
@@ -22,7 +24,7 @@ export function FeaturedAdVideo({ controls = false, video = videoAsset.url, vide
     <div className="site-phone-screen" style={tapToggle ? { cursor: "pointer" } : undefined} onClick={tapToggle ? event => { event.preventDefault(); event.stopPropagation(); toggle(); } : undefined}>
       <ReelVideo
          video={video}
-         videoWebm={videoWebm}
+         videoWebm={webm}
          poster={poster}
          label={label}
         noFullscreen={tapToggle || controls}
