@@ -90,8 +90,8 @@ export const Route = createFileRoute("/")({
       listSiteReels().catch(() => [] as SiteReel[]),
       getHomepageContent().catch(() => DEFAULT_CONTENT),
     ]);
-    // allReels lets the banner use a featured Directory reel; the carousel stays studio-only.
-    return { reels: reels.filter((r) => r.source !== "client"), allReels: reels, content };
+    // The carousel follows Admin → Website Reels exactly, including featured Directory reels.
+    return { reels, allReels: reels, content };
   },
   component: Home,
 });
