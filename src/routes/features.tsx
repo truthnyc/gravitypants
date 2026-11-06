@@ -41,7 +41,6 @@ const groups = [
     points: [
       "Search and preview the whole Google Fonts library",
       "Upload your own font file",
-      "Headline and subline suggestions written for each frame",
       "Size, weight and color for headline and subline",
       "Nine fixed positions, no nudging",
       "Apply one text style to every frame at once",
@@ -127,7 +126,7 @@ const groups = [
 
 const allFeatures = [
   ["Photos", "Drag-and-drop photos", "Automatic frames and timing", "Move and zoom inside a frame", "Add, duplicate, delete frames"],
-  ["Editing", "Photo, headline, subline, logo", "Tap to select", "Suggested headlines", "Undo and redo", "Saves as you work"],
+  ["Editing", "Photo, headline, subline, logo", "Tap to select", "Undo and redo", "Saves as you work"],
   ["Text", "Google Fonts picker", "Upload your own font", "Size, weight, color", "Nine-point position", "Same on all frames"],
   ["Brand", "Named brand kits", "Logo, colors, fonts", "Logo placement and size", "End card", "Shared kits on Team"],
   ["Motion", "Fade, slide, swipe, zoom, cut", "Rise up, fade in, typewriter", "Slow zoom and pan", "Per-frame timing"],
