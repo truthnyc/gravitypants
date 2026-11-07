@@ -40,7 +40,7 @@ export async function sendCampaign(input: CampaignInput, requestId: string, cont
   const receivedHtml = await content.text();
   const approvedBody = campaignHtml(input).match(/<body>([\s\S]*)<\/body>/i)?.[1];
   const receivedBody = receivedHtml.match(/<body>([\s\S]*)<\/body>/i)?.[1];
-  if (!content.ok || !content.headers.get("content-type")?.includes("text/html") || !approvedBody || receivedBody !== approvedBody) {
+  if (!content.ok || !/text\/(html|plain)/.test(content.headers.get("content-type") ?? "") || !approvedBody || receivedBody !== approvedBody || /<script\b/i.test(receivedHtml)) {
     console.error(`Campaign content preflight failed: ${content.status}, ${content.headers.get("content-type") ?? "no content type"}`);
     throw new Error("Campaign email content is unavailable on this site. No Campaign Monitor draft was created or sent.");
   }
