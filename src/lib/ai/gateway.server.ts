@@ -1,5 +1,6 @@
 import { createOpenAI } from "@ai-sdk/openai";
 import { streamText, type ModelMessage } from "ai";
+import { GatewayError, streamResponse } from "@lovable.dev/ai-gateway";
 
 const RUN_ID = "X-Lovable-AIG-Run-ID";
 export const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1";
@@ -55,4 +56,26 @@ export function gatewayErrorMessage(e: unknown): string {
   if (status === 429) return "The billing helper is busy. Please wait a minute and try again.";
   if (status === 403) return "The billing helper isn't available for this workspace.";
   return "The billing helper couldn't answer right now. Please try again later.";
+}
+
+/** New marketing calls use the native Gateway SDK; existing AI flows stay unchanged. */
+export async function gatewayMarketingText(system: string, input: string): Promise<string> {
+  try {
+    const stream = await streamResponse({ model: "openai/gpt-6-astra", instructions: system, input, reasoning: { effort: "low" }, text: { format: { type: "json_object" } } });
+    let text = "";
+    for await (const event of stream) {
+      if (event.type === "response.output_text.delta") text += event.delta;
+      if (event.type === "response.refusal.delta" || event.type === "response.incomplete") throw new Error("The Marketing Hub couldn't complete this draft.");
+    }
+    if (!text.trim()) throw new Error("The Marketing Hub didn't return a draft.");
+    return text;
+  } catch (error) {
+    if (error instanceof GatewayError) {
+      console.error("Marketing AI", error.code, error.httpStatus, error.ids);
+      if (error.httpStatus === 402) throw new Error("The Marketing Hub needs more Lovable AI credits.");
+      if (error.httpStatus === 429) throw new Error("The Marketing Hub is busy. Wait a minute before trying again.");
+      if (error.httpStatus === 403) throw new Error("AI access is restricted for this workspace.");
+    }
+    throw new Error("Couldn't finish the draft. Your input is unchanged; you can try again.");
+  }
 }

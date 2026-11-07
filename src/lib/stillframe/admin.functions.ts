@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { deliverSupportReply, supportReplyInput, type ReplyDelivery } from "./support-reply";
+import { marketingPeriod, outreachInput, requireMarketingAdmin } from "./marketing";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type Ctx = { supabase: any; userId: string };
@@ -83,6 +84,39 @@ async function clientRows(db: any) {
     };
   });
 }
+
+export const adminMarketingSnapshot = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => marketingPeriod.parse(input))
+  .handler(async ({ data, context }) => {
+    requireMarketingAdmin(await context.supabase.rpc("is_platform_admin"));
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { marketingSnapshot } = await import("./marketing.server");
+    await log(supabaseAdmin, context.userId, "marketing_view", null, `${data.days} days`);
+    return marketingSnapshot(supabaseAdmin, data.days);
+  });
+
+export const adminDraftOutreach = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => outreachInput.parse(input))
+  .handler(async ({ data, context }) => {
+    requireMarketingAdmin(await context.supabase.rpc("is_platform_admin"));
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { draftOutreach } = await import("./marketing.server");
+    await log(supabaseAdmin, context.userId, "marketing_outreach_draft", null, data.brand);
+    return draftOutreach(data);
+  });
+
+export const adminDiagnoseMarketing = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => marketingPeriod.parse(input))
+  .handler(async ({ data, context }) => {
+    requireMarketingAdmin(await context.supabase.rpc("is_platform_admin"));
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { diagnoseMarketing } = await import("./marketing.server");
+    await log(supabaseAdmin, context.userId, "marketing_diagnosis", null, `${data.days} days`);
+    return diagnoseMarketing(supabaseAdmin, data.days);
+  });
 export type AdminClient = Awaited<ReturnType<typeof clientRows>>[number];
 
 export const checkAdmin = createServerFn({ method: "GET" })
