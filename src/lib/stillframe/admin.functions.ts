@@ -1,10 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { deliverSupportReply, supportReplyInput, type ReplyDelivery } from "./support-reply";
 import { marketingPeriod, outreachInput, requireMarketingAdmin } from "./marketing";
 import { deliverMarketingEmail, marketingSendInput } from "./marketing-send";
-import { campaignInput, campaignApprovalInput, checkCampaignAudience, deliverCampaign, type CampaignReview } from "./marketing-campaign";
+import { campaignInput, campaignApprovalInput, campaignContentUrl, checkCampaignAudience, deliverCampaign, type CampaignReview } from "./marketing-campaign";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type Ctx = { supabase: any; userId: string };
@@ -177,7 +178,7 @@ export const adminSendCampaign = createServerFn({ method: "POST" })
         if (claimError) throw new Error("Couldn't record your approval. Nothing was sent.");
         return !!claimed?.length;
       },
-      send: () => sendCampaign(input, data.requestId, `https://gravitypants.com/api/public/marketing-campaign/${data.requestId}?token=${token}`, async (id) => {
+      send: () => sendCampaign(input, data.requestId, campaignContentUrl(getRequest().url, data.requestId, token), async (id) => {
         campaignId = id;
         const { error: saved } = await supabaseAdmin.from("admin_audit_log").update({ reason: reason("created") })
           .eq("id", data.requestId).eq("admin_user_id", context.userId).eq("action", "marketing_campaign_send");

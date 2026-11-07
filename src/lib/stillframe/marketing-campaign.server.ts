@@ -35,6 +35,12 @@ export async function campaignAudience(input: CampaignInput) {
   return { clientName: client.name, listName: list.name, recipients: stats.TotalActiveSubscribers };
 }
 export async function sendCampaign(input: CampaignInput, requestId: string, contentUrl: string, onCreated: (id: string) => Promise<void>) {
+  // Confirm the exact approved HTML is public before asking Campaign Monitor to import it.
+  const content = await fetch(contentUrl, { signal: AbortSignal.timeout(15000), redirect: "error" });
+  if (!content.ok || !content.headers.get("content-type")?.includes("text/html") || await content.text() !== campaignHtml(input)) {
+    console.error(`Campaign content preflight failed: ${content.status}, ${content.headers.get("content-type") ?? "no content type"}`);
+    throw new Error("Campaign email content is unavailable on this site. No Campaign Monitor draft was created or sent.");
+  }
   const id = await cm<string>(`/campaigns/${input.clientId}.json`, {
     Name: `Marketing Hub ${requestId}`, Subject: input.subject, FromName: input.fromName, FromEmail: input.fromEmail,
     ReplyTo: input.replyTo, HtmlUrl: contentUrl, ListIDs: [input.listId], InlineCss: true,

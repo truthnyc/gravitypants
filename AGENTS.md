@@ -25,6 +25,7 @@
 - Billing: per-workspace in `workspace_billing` (synced only by /api/public/payments/webhook), plans in `plans`; export gating via SQL `export_status`/`record_export` plus a restrictive storage policy on `<ws>/exports/` — the browser is never trusted for plan status.
 - AI calls go through `src/lib/ai/gateway.server.ts`; the billing helper is `diagnoseBilling` in `billing-help.functions.ts`, owners/admins only.
 - Marketing Hub actions live in `admin.functions.ts`, verify staff before privileged reads, audit requests, and use fixed Firecrawl extraction plus the native Gateway SDK; Gmail and Campaign Monitor sends require final approval and an atomic audit claim to block duplicates. Campaign Monitor uses server-stored list reviews and short-lived hashed-token content URLs; no subscriber imports, while DMs stay manual.
+- Campaign Monitor content URLs use the matching stable preview/production deployment, never a hardcoded custom domain; fetch and compare approved HTML before creating a campaign so unpublished content cannot trigger provider rejection.
 - Brand kits: `brand_kits` (logos in private `brand-assets` bucket, `brand-assets:` path prefix for `getMediaUrl`); ads link via `projects.brand_kit_id`; `effectiveKit()` merges over the legacy `brand_kit` row (workspace ad settings only). Gated by SQL `brand_kits_enabled()` in RLS.
 
 - Support: tickets in `support_tickets` via `submitTicket` server fn; priority set by SQL trigger from the plan (never the browser); each ticket emails help@gravitypants.com.
