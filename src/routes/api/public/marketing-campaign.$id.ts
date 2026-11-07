@@ -12,7 +12,7 @@ export const Route = createFileRoute("/api/public/marketing-campaign/$id")({
     try {
       const saved = JSON.parse(data.reason);
       if (Date.parse(saved.expiresAt) <= Date.now() || saved.tokenHash !== await hashCampaignToken(token)) return unavailable();
-      return new Response(campaignHtml(saved.input), { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store", "X-Robots-Tag": "noindex, nofollow", "Referrer-Policy": "no-referrer", "Content-Security-Policy": "default-src 'none'; style-src 'none'; frame-ancestors 'none'" } });
+      return new Response(campaignHtml(saved.input), { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store, no-transform", "X-Robots-Tag": "noindex, nofollow", "Referrer-Policy": "no-referrer", "Content-Security-Policy": "default-src 'none'; style-src 'none'; frame-ancestors 'none'" } });
     } catch { return unavailable(); }
   } } },
 });
