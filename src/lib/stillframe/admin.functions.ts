@@ -4,6 +4,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { deliverSupportReply, supportReplyInput, type ReplyDelivery } from "./support-reply";
 import { marketingPeriod, outreachInput, requireMarketingAdmin } from "./marketing";
 import { deliverMarketingEmail, marketingSendInput } from "./marketing-send";
+import { campaignInput, campaignApprovalInput, checkCampaignAudience, deliverCampaign, type CampaignReview } from "./marketing-campaign";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type Ctx = { supabase: any; userId: string };
@@ -125,6 +126,69 @@ export const adminMarketingSender = createServerFn({ method: "GET" })
     requireMarketingAdmin(await context.supabase.rpc("is_platform_admin"));
     const { marketingSender } = await import("./marketing-send.server");
     return marketingSender();
+  });
+
+export const adminCampaignOptions = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    requireMarketingAdmin(await context.supabase.rpc("is_platform_admin"));
+    const { campaignOptions } = await import("./marketing-campaign.server");
+    return campaignOptions();
+  });
+
+export const adminReviewCampaign = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => campaignInput.parse(input))
+  .handler(async ({ data, context }): Promise<CampaignReview> => {
+    requireMarketingAdmin(await context.supabase.rpc("is_platform_admin"));
+    const { campaignAudience } = await import("./marketing-campaign.server");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const audience = await campaignAudience(data);
+    const review = { requestId: crypto.randomUUID(), input: data, ...audience, expiresAt: new Date(Date.now() + 10 * 60000).toISOString() };
+    const { error } = await supabaseAdmin.from("admin_audit_log").insert({ id: review.requestId, admin_user_id: context.userId,
+      action: "marketing_campaign_review", workspace_id: null, target: data.listId, reason: JSON.stringify(review) });
+    if (error) throw new Error("Couldn't save this review. Nothing was sent.");
+    return review;
+  });
+
+export const adminSendCampaign = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => campaignApprovalInput.parse(input))
+  .handler(async ({ data, context }) => {
+    requireMarketingAdmin(await context.supabase.rpc("is_platform_admin"));
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { campaignAudience, sendCampaign, hashCampaignToken } = await import("./marketing-campaign.server");
+    const { data: row, error } = await supabaseAdmin.from("admin_audit_log").select("reason")
+      .eq("id", data.requestId).eq("admin_user_id", context.userId).eq("action", "marketing_campaign_review").maybeSingle();
+    if (error || !row?.reason) throw new Error("This review is unavailable or was already attempted. Nothing new was sent.");
+    const stored = JSON.parse(row.reason) as CampaignReview;
+    const input = campaignInput.parse(stored.input);
+    const audience = await campaignAudience(input);
+    checkCampaignAudience(stored, audience.listName, audience.recipients);
+    const token = `${crypto.randomUUID()}${crypto.randomUUID()}`;
+    const tokenHash = await hashCampaignToken(token);
+    let campaignId: string | undefined;
+    const reason = (status: string) => JSON.stringify({ ...stored, status, approvedAt: new Date().toISOString(), tokenHash, campaignId });
+    return deliverCampaign(data, {
+      claim: async () => {
+        const { data: claimed, error: claimError } = await supabaseAdmin.from("admin_audit_log")
+          .update({ action: "marketing_campaign_send", reason: reason("attempted") }).eq("id", data.requestId)
+          .eq("admin_user_id", context.userId).eq("action", "marketing_campaign_review").select("id");
+        if (claimError) throw new Error("Couldn't record your approval. Nothing was sent.");
+        return !!claimed?.length;
+      },
+      send: () => sendCampaign(input, data.requestId, `https://gravitypants.com/api/public/marketing-campaign/${data.requestId}?token=${token}`, async (id) => {
+        campaignId = id;
+        const { error: saved } = await supabaseAdmin.from("admin_audit_log").update({ reason: reason("created") })
+          .eq("id", data.requestId).eq("admin_user_id", context.userId).eq("action", "marketing_campaign_send");
+        if (saved) throw new Error("Draft created, but its receipt could not be saved. Sending was stopped.");
+      }),
+      finish: async (status) => {
+        const { error: finished } = await supabaseAdmin.from("admin_audit_log").update({ reason: reason(status) })
+          .eq("id", data.requestId).eq("admin_user_id", context.userId).eq("action", "marketing_campaign_send");
+        if (finished) throw new Error("Couldn't save the campaign result.");
+      },
+    });
   });
 
 export const adminSendMarketingEmail = createServerFn({ method: "POST" })
