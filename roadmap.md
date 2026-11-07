@@ -56,7 +56,8 @@
 - [ ] Publish so GA4/GTM send visits; confirm in admin dashboard (GA report reading needs Analytics "Read insights" connection)
 
 # Admin Marketing Hub
-- [ ] Fix unavailable Campaign Monitor HTML content, verify the content fetch, and send the previously approved one-recipient Invitation test.
+- [x] Correct Campaign Monitor content URL deployment selection and add exact-HTML preflight; 20 tests pass and build OK. Signed-in original one-recipient Invitation attempt safely stopped before provider creation because hosted content remains unavailable.
+- [ ] Publish the email-content page and send the approved Invitation test to info@ippawards.com — needs explicit publishing approval; no new campaign or email was sent.
 - [x] Add Campaign Monitor list delivery alongside Gmail with staff checks, stored final approval and atomic duplicate protection; 16 tests pass. Verified real Brands list (36 active subscribers), desktop/phone review and cancellation, and unsigned content 404; no email sent.
 - [ ] Publish Campaign Monitor integration and verify an approved real campaign — awaits publishing and explicit final email approval; provider sending-domain read permission is unavailable, so sender readiness is unverified.
 - [x] Add staff-only brand outreach drafts with website context, editable email/DM outputs and copy/download controls; never send automatically.
