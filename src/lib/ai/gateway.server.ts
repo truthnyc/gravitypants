@@ -61,7 +61,7 @@ export function gatewayErrorMessage(e: unknown): string {
 /** New marketing calls use the native Gateway SDK; existing AI flows stay unchanged. */
 export async function gatewayMarketingText(system: string, input: string): Promise<string> {
   try {
-    const stream = await streamResponse({ model: "openai/gpt-6-astra", instructions: system, input, reasoning: { effort: "low" }, text: { format: { type: "json_object" } } });
+    const stream = await streamResponse({ model: "openai/gpt-6-astra", instructions: system, input: `Return JSON.\n${input}`, reasoning: { effort: "low" }, text: { format: { type: "json_object" } } });
     let text = "";
     for await (const event of stream) {
       if (event.type === "response.output_text.delta") text += event.delta;
