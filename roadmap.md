@@ -56,6 +56,7 @@
 - [ ] Publish so GA4/GTM send visits; confirm in admin dashboard (GA report reading needs Analytics "Read insights" connection)
 
 # Admin Marketing Hub
+- [ ] Add Campaign Monitor delivery alongside Gmail with final approval and duplicate protection; verify connection and safe review/cancel flow without sending outreach.
 - [x] Add staff-only brand outreach drafts with website context, editable email/DM outputs and copy/download controls; never send automatically.
 - [x] Add real traffic/signup/export diagnostics with prioritized experiments and explicit attribution limitations.
 - [x] Verify staff access, real generation, analytics read-back and desktop/phone presentation; tested as info@gravitypants.com, non-admin access denied, draft editing/download confirmed. Not published.
