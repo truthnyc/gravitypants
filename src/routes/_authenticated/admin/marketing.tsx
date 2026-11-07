@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { PageTitle } from "@/components/admin/AdminShell";
+import { MarketingEmailSend } from "@/components/admin/MarketingEmailSend";
 import { adminMarketingSnapshot, adminDraftOutreach, adminDiagnoseMarketing } from "@/lib/stillframe/admin.functions";
 import { outreachInput, type OutreachDraft, type OutreachInput } from "@/lib/stillframe/marketing";
 
@@ -69,7 +70,7 @@ function Outreach() {
       <label className="block text-sm font-medium">Personal notes <span className="font-normal text-secondary-text">· optional</span><Textarea className="mt-2 min-h-24 bg-card" value={input.notes} maxLength={2000} onChange={(e) => set("notes", e.target.value)} /></label>
       {(validation || mutation.error) && <p role="alert" className="text-sm text-destructive">{validation || errorMessage(mutation.error)}</p>}
       <Button type="submit" disabled={mutation.isPending} className="w-full">{mutation.isPending ? <Loader2 className="size-4 animate-spin" /> : <Sparkles className="size-4" strokeWidth={1.7} />}{mutation.isPending ? "Reading & drafting…" : "Create invitation draft"}</Button>
-      <p className="text-xs text-secondary-text">Draft only · Nothing is sent. Website reading and AI use Lovable credits.</p>
+      <p className="text-xs text-secondary-text">Website reading and AI use Lovable credits.</p>
     </form>
     <section className="min-w-0 border-t border-border pt-6 xl:border-l xl:border-t-0 xl:pl-8 xl:pt-0" aria-label="Invitation draft">
       {!draft ? <div className="flex min-h-64 flex-col items-center justify-center gap-3 text-secondary-text"><Mail className="size-8" strokeWidth={1.7} /><h2 className="text-base font-medium">Your invitation draft</h2>{mutation.isPending && <p role="status" className="text-sm">Reading the brand’s website…</p>}</div> : <div className="space-y-5">
@@ -77,6 +78,7 @@ function Outreach() {
         <label className="block text-sm font-medium">Subject<Input aria-label="Draft subject" className="mt-2 bg-card" value={draft.subject} maxLength={200} onChange={(e) => setDraft({ ...draft, subject: e.target.value })} /></label>
         <label className="block text-sm font-medium">Email draft<Textarea aria-label="Email draft" className="mt-2 min-h-72 bg-card leading-relaxed" value={draft.email} maxLength={5000} onChange={(e) => setDraft({ ...draft, email: e.target.value })} /></label>
         <Button variant="plain" size="sm" onClick={() => copy(`Subject: ${draft.subject}\n\n${draft.email}`)}><Copy className="size-4" strokeWidth={1.7} />Copy email</Button>
+        <MarketingEmailSend key={draft.readAt} subject={draft.subject} body={draft.email} />
         <label className="block text-sm font-medium">DM draft<Textarea aria-label="DM draft" className="mt-2 min-h-36 bg-card leading-relaxed" value={draft.dm} maxLength={1500} onChange={(e) => setDraft({ ...draft, dm: e.target.value })} /></label>
         <div className="flex flex-wrap gap-2"><Button variant="plain" size="sm" onClick={() => copy(draft.dm)}><Copy className="size-4" strokeWidth={1.7} />Copy DM</Button><Button variant="outline" size="sm" onClick={() => download("brand-invitation.txt", `Source: ${draft.source}\n\nSubject: ${draft.subject}\n\n${draft.email}\n\nDM\n${draft.dm}`)}><Download className="size-4" strokeWidth={1.7} />Download draft</Button></div>
       </div>}

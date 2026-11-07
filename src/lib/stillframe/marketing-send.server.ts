@@ -1,8 +1,8 @@
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/google_mail/gmail/v1";
 
 async function gmail(path: string, body?: object): Promise<Record<string, unknown>> {
-  const key = process.env.LOVABLE_API_KEY;
-  const connection = process.env.GOOGLE_MAIL_API_KEY;
+  const key = process.env['LOVABLE_API_KEY'];
+  const connection = process.env['GOOGLE_MAIL_API_KEY'];
   if (!key || !connection) throw new Error("Connect Gmail before sending invitations.");
   const response = await fetch(`${GATEWAY_URL}${path}`, {
     method: body ? "POST" : "GET",
@@ -13,6 +13,7 @@ async function gmail(path: string, body?: object): Promise<Record<string, unknow
   if (!response.ok) {
     const detail = await response.text();
     console.error(`Gmail request failed [${response.status}]: ${detail}`);
+    if (detail.includes("Mail service not enabled")) throw new Error("Gmail is not enabled for the connected Google account. Enable Gmail for that account or connect an account with an active Gmail inbox.");
     throw new Error(`Gmail request failed [${response.status}]: ${detail}`);
   }
   return response.json();
@@ -20,12 +21,12 @@ async function gmail(path: string, body?: object): Promise<Record<string, unknow
 
 export async function marketingSender() {
   const profile = await gmail("/users/me/profile");
-  if (typeof profile.emailAddress !== "string") throw new Error("Gmail did not return a sender address.");
-  return { email: profile.emailAddress };
+  if (typeof profile['emailAddress'] !== "string") throw new Error("Gmail did not return a sender address.");
+  return { email: profile['emailAddress'] };
 }
 
 export async function sendMarketingRaw(raw: string) {
   const result = await gmail("/users/me/messages/send", { raw });
-  if (typeof result.id !== "string") throw new Error("Gmail did not confirm the message.");
-  return result.id;
+  if (typeof result['id'] !== "string") throw new Error("Gmail did not confirm the message.");
+  return result['id'];
 }
