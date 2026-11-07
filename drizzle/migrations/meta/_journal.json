@@ -232,6 +232,13 @@
       "when": 1793724678936,
       "tag": "0032_mood_pages_use_brand_moods",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1794066539829,
+      "tag": "0033_allow_all_formats_on_templates",
+      "breakpoints": true
     }
   ]
 }

@@ -1,0 +1,2 @@
+ALTER TABLE public.templates DROP CONSTRAINT templates_format_check;
+ALTER TABLE public.templates ADD CONSTRAINT templates_format_check CHECK (format = ANY (ARRAY['9:16'::text, '4:5'::text, '1:1'::text, '5:4'::text, '16:9'::text]));
