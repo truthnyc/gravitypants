@@ -12,6 +12,14 @@ export type CampaignInput = z.infer<typeof campaignInput>;
 export const campaignApprovalInput = z.object({ requestId: z.string().uuid(), approved: z.literal(true) });
 export type CampaignReview = { requestId: string; input: CampaignInput; clientName: string; listName: string; recipients: number; expiresAt: string };
 export type CampaignResult = { status: "accepted" | "blocked" | "unknown"; message: string; campaignId?: string };
+export function campaignContentUrl(requestOrigin: string, requestId: string, token: string) {
+  const host = new URL(requestOrigin).hostname;
+  const productionHosts = ["gravitypants.com", "www.gravitypants.com", "gravitypants.lovable.app", "aimante.co", "www.aimante.co", "project--4f242291-4ce3-4b10-9afe-98cd7661d4c7.lovable.app"];
+  const origin = productionHosts.includes(host)
+    ? "https://project--4f242291-4ce3-4b10-9afe-98cd7661d4c7.lovable.app"
+    : "https://project--4f242291-4ce3-4b10-9afe-98cd7661d4c7-dev.lovable.app";
+  return `${origin}/api/public/marketing-campaign/${requestId}?token=${encodeURIComponent(token)}`;
+}
 const escape = (text: string) => text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 export function campaignHtml(input: CampaignInput) {
   const safe = campaignInput.parse(input);
