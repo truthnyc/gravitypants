@@ -8,6 +8,7 @@ import { BookOpen, BarChart3, ChevronLeft, Clapperboard, FileClock, Home, Inbox,
 const NAV = [
   { to: "/admin", label: "Overview", icon: LayoutDashboard, exact: true },
   { to: "/admin/analytics", label: "Analytics", icon: BarChart3 },
+  { to: "/admin/marketing", label: "Marketing Hub", icon: Mail },
   { to: "/admin/clients", label: "Clients", icon: Users },
   { to: "/admin/onboarding", label: "Client onboarding", icon: Users },
   { to: "/admin/templates", label: "Templates", icon: LayoutTemplate },
