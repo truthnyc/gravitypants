@@ -120,6 +120,7 @@ import { Route as AuthenticatedAppJoinWsRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAppReelKeyRouteImport } from './routes/_authenticated/app/reel.$key'
 import { Route as AuthenticatedAppTemplatesIndexRouteImport } from './routes/_authenticated/app/templates.index'
 import { Route as AuthenticatedAppTemplatesSlugRouteImport } from './routes/_authenticated/app/templates.$slug'
+import { Route as ApiPublicMarketingCampaignIdRouteImport } from './routes/api/public/marketing-campaign.$id'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as ApiPublicShopifyAuthRouteImport } from './routes/api/public/shopify/auth'
 import { Route as ApiPublicShopifyConnectRouteImport } from './routes/api/public/shopify/connect'
@@ -723,6 +724,12 @@ const AuthenticatedAppTemplatesSlugRoute =
     path: '/templates/$slug',
     getParentRoute: () => AuthenticatedAppRouteRoute,
   } as any)
+const ApiPublicMarketingCampaignIdRoute =
+  ApiPublicMarketingCampaignIdRouteImport.update({
+    id: '/api/public/marketing-campaign/$id',
+    path: '/api/public/marketing-campaign/$id',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicPaymentsWebhookRoute =
   ApiPublicPaymentsWebhookRouteImport.update({
     id: '/api/public/payments/webhook',
@@ -927,6 +934,7 @@ export interface FileRoutesByFullPath {
   '/app/join/$ws': typeof AuthenticatedAppJoinWsRoute
   '/app/reel/$key': typeof AuthenticatedAppReelKeyRoute
   '/app/templates/$slug': typeof AuthenticatedAppTemplatesSlugRoute
+  '/api/public/marketing-campaign/$id': typeof ApiPublicMarketingCampaignIdRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/shopify/auth': typeof ApiPublicShopifyAuthRoute
   '/api/public/shopify/connect': typeof ApiPublicShopifyConnectRoute
@@ -1053,6 +1061,7 @@ export interface FileRoutesByTo {
   '/app/join/$ws': typeof AuthenticatedAppJoinWsRoute
   '/app/reel/$key': typeof AuthenticatedAppReelKeyRoute
   '/app/templates/$slug': typeof AuthenticatedAppTemplatesSlugRoute
+  '/api/public/marketing-campaign/$id': typeof ApiPublicMarketingCampaignIdRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/shopify/auth': typeof ApiPublicShopifyAuthRoute
   '/api/public/shopify/connect': typeof ApiPublicShopifyConnectRoute
@@ -1184,6 +1193,7 @@ export interface FileRoutesById {
   '/_authenticated/app/join/$ws': typeof AuthenticatedAppJoinWsRoute
   '/_authenticated/app/reel/$key': typeof AuthenticatedAppReelKeyRoute
   '/_authenticated/app/templates/$slug': typeof AuthenticatedAppTemplatesSlugRoute
+  '/api/public/marketing-campaign/$id': typeof ApiPublicMarketingCampaignIdRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/shopify/auth': typeof ApiPublicShopifyAuthRoute
   '/api/public/shopify/connect': typeof ApiPublicShopifyConnectRoute
@@ -1315,6 +1325,7 @@ export interface FileRouteTypes {
     | '/app/join/$ws'
     | '/app/reel/$key'
     | '/app/templates/$slug'
+    | '/api/public/marketing-campaign/$id'
     | '/api/public/payments/webhook'
     | '/api/public/shopify/auth'
     | '/api/public/shopify/connect'
@@ -1441,6 +1452,7 @@ export interface FileRouteTypes {
     | '/app/join/$ws'
     | '/app/reel/$key'
     | '/app/templates/$slug'
+    | '/api/public/marketing-campaign/$id'
     | '/api/public/payments/webhook'
     | '/api/public/shopify/auth'
     | '/api/public/shopify/connect'
@@ -1571,6 +1583,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/join/$ws'
     | '/_authenticated/app/reel/$key'
     | '/_authenticated/app/templates/$slug'
+    | '/api/public/marketing-campaign/$id'
     | '/api/public/payments/webhook'
     | '/api/public/shopify/auth'
     | '/api/public/shopify/connect'
@@ -1652,6 +1665,7 @@ export interface RootRouteChildren {
   EmbedReelIdRoute: typeof EmbedReelIdRoute
   ShopifyReelIdRoute: typeof ShopifyReelIdRoute
   AimanteGuidesIndexRoute: typeof AimanteGuidesIndexRoute
+  ApiPublicMarketingCampaignIdRoute: typeof ApiPublicMarketingCampaignIdRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   ApiPublicShopifyAuthRoute: typeof ApiPublicShopifyAuthRoute
   ApiPublicShopifyConnectRoute: typeof ApiPublicShopifyConnectRoute
@@ -2444,6 +2458,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppTemplatesSlugRouteImport
       parentRoute: typeof AuthenticatedAppRouteRoute
     }
+    '/api/public/marketing-campaign/$id': {
+      id: '/api/public/marketing-campaign/$id'
+      path: '/api/public/marketing-campaign/$id'
+      fullPath: '/api/public/marketing-campaign/$id'
+      preLoaderRoute: typeof ApiPublicMarketingCampaignIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/payments/webhook': {
       id: '/api/public/payments/webhook'
       path: '/api/public/payments/webhook'
@@ -2828,6 +2849,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmbedReelIdRoute: EmbedReelIdRoute,
   ShopifyReelIdRoute: ShopifyReelIdRoute,
   AimanteGuidesIndexRoute: AimanteGuidesIndexRoute,
+  ApiPublicMarketingCampaignIdRoute: ApiPublicMarketingCampaignIdRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   ApiPublicShopifyAuthRoute: ApiPublicShopifyAuthRoute,
   ApiPublicShopifyConnectRoute: ApiPublicShopifyConnectRoute,

@@ -7,8 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { adminMarketingSender, adminSendMarketingEmail } from "@/lib/stillframe/admin.functions";
 import { marketingSendInput, type MarketingSendInput } from "@/lib/stillframe/marketing-send";
+import { MarketingCampaignSend } from "./MarketingCampaignSend";
 
 export function MarketingEmailSend({ subject, body }: { subject: string; body: string }) {
+  const [provider, setProvider] = useState<"gmail" | "campaign-monitor">("gmail");
   const senderFn = useServerFn(adminMarketingSender);
   const sendFn = useServerFn(adminSendMarketingEmail);
   const sender = useQuery({ queryKey: ["admin", "marketing-sender"], queryFn: () => senderFn(), retry: false, staleTime: 60000 });
@@ -21,6 +23,12 @@ export function MarketingEmailSend({ subject, body }: { subject: string; body: s
   });
   const attempted = sending.isPending || sending.isSuccess || sending.isError;
   return <div className="space-y-3 border-y border-border py-4">
+    <div role="tablist" aria-label="Email delivery" className="flex w-fit max-w-full gap-1 rounded-lg bg-control-fill p-1">
+      <Button role="tab" aria-selected={provider === "gmail"} variant={provider === "gmail" ? "outline" : "ghost"} size="sm" disabled={sending.isPending} onClick={() => setProvider("gmail")}>Gmail</Button>
+      <Button role="tab" aria-selected={provider === "campaign-monitor"} variant={provider === "campaign-monitor" ? "outline" : "ghost"} size="sm" disabled={sending.isPending} onClick={() => setProvider("campaign-monitor")}>Campaign Monitor</Button>
+    </div>
+    <div hidden={provider !== "campaign-monitor"}><MarketingCampaignSend subject={subject} body={body} /></div>
+    <div hidden={provider !== "gmail"} className="space-y-3">
     <label className="block text-sm font-medium">Recipient email<Input type="email" className="mt-2 bg-card" value={to} maxLength={254} disabled={attempted} onChange={(e) => setTo(e.target.value)} /></label>
     {sender.data && <p className="break-all text-xs text-secondary-text">From: {sender.data.email}</p>}
     {sender.isPending && <p role="status" className="text-xs text-secondary-text">Checking Gmail…</p>}
@@ -41,5 +49,6 @@ export function MarketingEmailSend({ subject, body }: { subject: string; body: s
         <DialogFooter className="gap-2"><Button variant="outline" disabled={sending.isPending} onClick={() => setApproval(null)}>Cancel</Button><Button disabled={sending.isPending || !approval} onClick={() => { if (approval && !attempted) sending.mutate(approval); }}>{sending.isPending ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" strokeWidth={1.7} />}{sending.isPending ? "Sending…" : "Approve & send"}</Button></DialogFooter>
       </DialogContent>
     </Dialog>
+    </div>
   </div>;
 }
