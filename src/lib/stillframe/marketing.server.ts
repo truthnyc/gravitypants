@@ -7,8 +7,11 @@ import { diagnosisOutput, marketingRange, outreachOutput, parseMarketingJson, ty
 export async function marketingSnapshot(db: SupabaseClient<Database>, days: number) {
   const range = marketingRange(days);
   // Check each data source before aggregation: unavailable data must not read as zero.
-  const checks = await Promise.all(["page_views", "workspaces", "export_usage", "workspace_billing", "plans"].map((table) => db.from(table as "page_views").select("*", { head: true, count: "exact" })));
+  const tables = ["page_views", "workspaces", "export_usage", "workspace_billing", "plans"] as const;
+  const checks = await Promise.all(tables.map((table) => db.from(table).select("*", { head: true, count: "exact" })));
   if (checks.some((r) => r.error)) throw new Error("Couldn't read marketing figures. Please try again later.");
+  const users = await db.auth.admin.listUsers({ page: 1, perPage: 1 });
+  if (users.error) throw new Error("Couldn't read signup figures. Please try again later.");
   const report = await computeAnalytics(db, range.from, range.to);
   return {
     days, from: range.from.slice(0, 10), to: new Date(new Date(range.to).getTime() - 86400000).toISOString().slice(0, 10),
