@@ -36,7 +36,7 @@ export async function campaignAudience(input: CampaignInput) {
 }
 export async function sendCampaign(input: CampaignInput, requestId: string, contentUrl: string, onCreated: (id: string) => Promise<void>) {
   // Confirm the exact approved HTML is public before asking Campaign Monitor to import it.
-  const content = await fetch(contentUrl, { signal: AbortSignal.timeout(15000), redirect: "error" });
+  const content = await fetch(contentUrl, { signal: AbortSignal.timeout(15000), redirect: "manual" });
   if (!content.ok || !content.headers.get("content-type")?.includes("text/html") || await content.text() !== campaignHtml(input)) {
     console.error(`Campaign content preflight failed: ${content.status}, ${content.headers.get("content-type") ?? "no content type"}`);
     throw new Error("Campaign email content is unavailable on this site. No Campaign Monitor draft was created or sent.");
