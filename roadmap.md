@@ -59,3 +59,6 @@
 - [x] Add staff-only brand outreach drafts with website context, editable email/DM outputs and copy/download controls; never send automatically.
 - [x] Add real traffic/signup/export diagnostics with prioritized experiments and explicit attribution limitations.
 - [x] Verify staff access, real generation, analytics read-back and desktop/phone presentation; tested as info@gravitypants.com, non-admin access denied, draft editing/download confirmed. Not published.
+- [x] Add single-recipient Gmail sending with final approval, audit-backed duplicate protection and sender visibility; keep DMs manual. Nine safeguard tests pass; build OK.
+- [x] Verify real signed-in draft generation, blocked Gmail state and desktop/phone layout; no outreach sent.
+- [ ] Verify live approval/cancellation and Gmail send/read-back — connected Google account reports “Mail service not enabled”; requires an active Gmail inbox. Preview only.
