@@ -83,6 +83,7 @@ async function clientRows(db: any) {
       environment: (b.environment ?? "sandbox") as string,
     };
   });
+}
 
 export const adminMarketingSnapshot = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -116,7 +117,6 @@ export const adminDiagnoseMarketing = createServerFn({ method: "POST" })
     await log(supabaseAdmin, context.userId, "marketing_diagnosis", null, `${data.days} days`);
     return diagnoseMarketing(supabaseAdmin, data.days);
   });
-}
 export type AdminClient = Awaited<ReturnType<typeof clientRows>>[number];
 
 export const checkAdmin = createServerFn({ method: "GET" })
