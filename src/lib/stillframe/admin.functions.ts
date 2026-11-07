@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { deliverSupportReply, supportReplyInput, type ReplyDelivery } from "./support-reply";
 import { marketingPeriod, outreachInput, requireMarketingAdmin } from "./marketing";
+import { deliverMarketingEmail, marketingSendInput } from "./marketing-send";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type Ctx = { supabase: any; userId: string };
@@ -116,6 +117,42 @@ export const adminDiagnoseMarketing = createServerFn({ method: "POST" })
     const { diagnoseMarketing } = await import("./marketing.server");
     await log(supabaseAdmin, context.userId, "marketing_diagnosis", null, `${data.days} days`);
     return diagnoseMarketing(supabaseAdmin, data.days);
+  });
+
+export const adminMarketingSender = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    requireMarketingAdmin(await context.supabase.rpc("is_platform_admin"));
+    const { marketingSender } = await import("./marketing-send.server");
+    return marketingSender();
+  });
+
+export const adminSendMarketingEmail = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => marketingSendInput.parse(input))
+  .handler(async ({ data, context }) => {
+    requireMarketingAdmin(await context.supabase.rpc("is_platform_admin"));
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { marketingSender, sendMarketingRaw } = await import("./marketing-send.server");
+    const sender = await marketingSender();
+    return deliverMarketingEmail(data, {
+      claim: async () => {
+        const { error } = await supabaseAdmin.from("admin_audit_log").insert({
+          id: data.requestId, admin_user_id: context.userId, action: "marketing_email_send", workspace_id: null,
+          target: data.to, reason: JSON.stringify({ status: "attempted", from: sender.email, subject: data.subject }),
+        });
+        if (error?.code === "23505") return false;
+        if (error) throw new Error("Couldn't record your approval. Nothing was sent.");
+        return true;
+      },
+      send: sendMarketingRaw,
+      finish: async (status, messageId) => {
+        const { error } = await supabaseAdmin.from("admin_audit_log").update({
+          reason: JSON.stringify({ status, from: sender.email, subject: data.subject, messageId }),
+        }).eq("id", data.requestId).eq("admin_user_id", context.userId).eq("action", "marketing_email_send");
+        if (error) throw new Error("Couldn't record the sending result.");
+      },
+    });
   });
 export type AdminClient = Awaited<ReturnType<typeof clientRows>>[number];
 
