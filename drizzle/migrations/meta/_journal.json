@@ -239,6 +239,13 @@
       "when": 1794066539829,
       "tag": "0033_allow_all_formats_on_templates",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1794159906603,
+      "tag": "0034_mood_filter_includes_reel_tags",
+      "breakpoints": true
     }
   ]
 }
