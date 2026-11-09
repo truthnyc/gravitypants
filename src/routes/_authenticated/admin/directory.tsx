@@ -5,7 +5,7 @@ import { Fragment, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { decideReelUpdate, listReelUpdates, setReelFeatured, adminSetAimanteTitle, pinAllDirectoryVideos, adminDeleteReel, adminMoveReel, adminBrandDetail, adminRenameReel, adminSaveBrand, adminSaveBrandSlug, setBrandLogo, listDirectoryBrands, listDirectoryReview, resolveReport, reviewDirectoryReel } from "@/lib/directory/directory.functions";
-import { BRAND_DESCRIPTION_MAX, BRAND_NAME_MAX, CATEGORIES, SLUG_MAX, BRAND_MOODS_MAX, REEL_DESCRIPTION_MAX, moodLabel, STATUS_LABEL, nearLimit, type Category } from "@/lib/directory/directory";
+import { BRAND_DESCRIPTION_MAX, BRAND_NAME_MAX, CATEGORIES, SLUG_MAX, REEL_DESCRIPTION_MAX, moodLabel, STATUS_LABEL, nearLimit, type Category } from "@/lib/directory/directory";
 import { useMoodCatalog } from "@/lib/directory/moods";
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
@@ -350,10 +350,10 @@ function BrandForm({ b, onSaved }: { b: Detail["brand"]; onSaved: () => void }) 
         <label className="space-y-1"><span className="text-[12px] text-secondary-text">Publication</span><select aria-label="Brand publication" value={f.status} onChange={(e) => setF({ ...f, status: e.target.value === "draft" ? "draft" : "live" })} className={field}><option value="draft">Draft</option><option value="live">Live</option></select></label>
         <label className="flex items-center gap-2 text-[13px]"><input type="checkbox" checked={f.affiliated} onChange={(e) => setF({ ...f, affiliated: e.target.checked })} />Affiliated</label>
         <div className="space-y-1 sm:col-span-2">
-          <span className="text-[12px] text-secondary-text">Moods (up to {BRAND_MOODS_MAX}, from the {f.category} list)</span>
+          <span className="text-[12px] text-secondary-text">Moods (from the {f.category} list)</span>
           <div className="flex flex-wrap gap-1.5">
             {[...new Set([...forCategory(f.category), ...f.moods])].map((m) => { const on = f.moods.includes(m); return (
-              <button key={m} type="button" aria-pressed={on} disabled={!on && f.moods.length >= BRAND_MOODS_MAX} onClick={() => setF({ ...f, moods: on ? f.moods.filter((x) => x !== m) : [...f.moods, m] })}
+              <button key={m} type="button" aria-pressed={on} onClick={() => setF({ ...f, moods: on ? f.moods.filter((x) => x !== m) : [...f.moods, m] })}
                 className={cn("h-7 rounded-lg px-2.5 text-[12px]", on ? "bg-primary text-primary-foreground" : "bg-control-fill", "disabled:opacity-40")}>{moodLabel(m)}</button>
             ); })}
           </div>

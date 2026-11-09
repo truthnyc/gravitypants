@@ -5,7 +5,7 @@ import { Check, LayoutTemplate, Sparkles, Users, BadgeCheck } from 'lucide-react
 import { FeaturedAdVideo } from '@/components/site/FeaturedAdVideo'
 import { AimanteShell } from '@/components/site/AimanteShell'
 import { Button } from '@/components/ui/button'
-import { categorySlug, CATEGORIES, BRAND_DESCRIPTION_MAX, BRAND_MOODS_MAX, type Category } from '@/lib/directory/directory'
+import { categorySlug, CATEGORIES, BRAND_DESCRIPTION_MAX, type Category } from '@/lib/directory/directory'
 import { useMoodCatalog } from '@/lib/directory/moods'
 import { brandApplicationInput, submitBrandApplication } from '@/lib/directory/applications.functions'
 import { aimanteHead } from '@/lib/site/brand-site'
@@ -91,9 +91,9 @@ function Join() {
               </Field>
               <Field wide label="About your brand" note={`${form.description.length} / ${BRAND_DESCRIPTION_MAX}`}><textarea className={cn(input, 'h-auto min-h-28 py-3')} required minLength={20} maxLength={BRAND_DESCRIPTION_MAX} value={form.description} onChange={(event) => set('description', event.target.value)} /></Field>
               <fieldset className="sm:col-span-2">
-                <legend className="text-[14px] font-medium">Moods <span className="font-normal text-ap-muted">· choose 1–{BRAND_MOODS_MAX}</span></legend>
+                <legend className="text-[14px] font-medium">Moods <span className="font-normal text-ap-muted">· choose at least one</span></legend>
                 <div className="mt-2 flex flex-wrap gap-2">
-                  {available.map((mood) => { const selected = form.moods.includes(mood); return <Button key={mood} type="button" size="sm" variant={selected ? 'primary' : 'outline'} aria-pressed={selected} disabled={!selected && form.moods.length >= BRAND_MOODS_MAX} onClick={() => set('moods', selected ? form.moods.filter((item) => item !== mood) : [...form.moods, mood])}>{mood.charAt(0).toUpperCase() + mood.slice(1)}</Button> })}
+                  {available.map((mood) => { const selected = form.moods.includes(mood); return <Button key={mood} type="button" size="sm" variant={selected ? 'primary' : 'outline'} aria-pressed={selected} onClick={() => set('moods', selected ? form.moods.filter((item) => item !== mood) : [...form.moods, mood])}>{mood.charAt(0).toUpperCase() + mood.slice(1)}</Button> })}
                 </div>
               </fieldset>
               <Field wide label="Anything else?" optional><textarea className={cn(input, 'h-auto min-h-24 py-3')} maxLength={2000} value={form.message} onChange={(event) => set('message', event.target.value)} /></Field>

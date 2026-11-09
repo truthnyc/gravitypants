@@ -31,7 +31,8 @@ export const categorySlug = (c: string) =>
 export const categoryFromSlug = (s: string): Category | null => CATEGORIES.find((c) => categorySlug(c) === s) ?? null;
 /** Moods live in the database (moods + category_moods); see src/lib/directory/moods.ts. Stored lowercase. */
 export type Mood = string;
-export const BRAND_MOODS_MAX = 3;
+/** Safety ceiling only — brands may pick as many moods as fit; the whole catalog is ~60. */
+export const BRAND_MOODS_MAX = 60;
 export const moodLabel = (m: string) => m.charAt(0).toUpperCase() + m.slice(1);
 export const RESERVED_SLUGS = ["directory", "admin", "category", "search", "new", "edit", "api", "app"];
 export const WORDING_VERSION = "v1.1";

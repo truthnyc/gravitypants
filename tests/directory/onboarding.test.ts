@@ -14,9 +14,10 @@ describe("Admin shop onboarding", () => {
     expect(createBrandInput.parse({ ...input, status: "draft" })).toMatchObject({ status: "draft", affiliated: false });
     expect(createBrandInput.safeParse({ ...input, status: "approved" }).success).toBe(false);
   });
-  it("enforces the existing three-mood maximum", () => {
+  it("accepts any number of moods up to the safety ceiling", () => {
     expect(createBrandInput.parse({ ...input, moods: ["Cozy", "Warm", "Calm"] }).moods).toEqual(["cozy", "warm", "calm"]);
-    expect(createBrandInput.safeParse({ ...input, moods: ["cozy", "warm", "calm", "bright"] }).success).toBe(false);
+    expect(createBrandInput.parse({ ...input, moods: ["cozy", "warm", "calm", "bright", "bold", "clean"] }).moods).toHaveLength(6);
+    expect(createBrandInput.safeParse({ ...input, moods: Array.from({ length: 61 }, (_, i) => `mood-${i}`) }).success).toBe(false);
   });
   it("recognizes duplicate website variants", () => {
     expect(normalizeWebsite("https://example.com").key).toBe(normalizeWebsite("http://www.example.com/shop").key);
