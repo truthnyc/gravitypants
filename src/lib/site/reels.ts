@@ -1,6 +1,6 @@
 import { CATEGORIES, normalizeCategory } from "@/lib/directory/directory";
 
-export type ReelFormat = "916" | "11" | "169";
+export type ReelFormat = "916" | "45" | "11" | "54" | "169";
 /** Display-only formats a measured video can fall into beyond the stored ones. */
 export type ThumbFormat = ReelFormat | "45" | "54";
 /** Nearest display format for a measured video ratio (width / height). */

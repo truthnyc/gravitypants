@@ -20,7 +20,9 @@ export const watchPath = (slug: string) => `/reels/${slug}`;
 /** Pixel size for OG video tags, from the reel's stored shape. */
 export const FORMAT_SIZE: Record<SiteReel["format"], { width: number; height: number; label: string }> = {
   "916": { width: 1080, height: 1920, label: "Vertical 9:16" },
+  "45": { width: 1080, height: 1350, label: "Portrait 4:5" },
   "11": { width: 1080, height: 1080, label: "Square 1:1" },
+  "54": { width: 1350, height: 1080, label: "Landscape 5:4" },
   "169": { width: 1920, height: 1080, label: "Wide 16:9" },
 };
 
