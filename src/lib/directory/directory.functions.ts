@@ -4,6 +4,7 @@ import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { brandPublicationFields, createBrandInput } from "./admin-fields";
+import { reelMoodsInput } from "./mood-admin";
 import { sanitizeSvg } from "@/lib/stillframe/svg-safety";
 import { normalizeWebsite } from "./application-security";
 import {
