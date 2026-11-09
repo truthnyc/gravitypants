@@ -1,4 +1,4 @@
-// TODO before launch: replace the reference placeholders [LOGO], [Your product line], [Customer logo], [Roaster name], [A customer quote about how fast they made their first reel, and what it did for their sales.], [Photo], [Customer name], [Role, Company], [X], [X] min, [X]%, [Result metric], [One-line result, e.g. how many ads they shipped for a launch], [One-line result, e.g. time saved each week], and [One-line result, e.g. lift in click-through].
+// TODO before launch: replace the reference placeholders [LOGO], [Customer logo], [Roaster name], [A customer quote about how fast they made their first reel, and what it did for their sales.], [Photo], [Customer name], [Role, Company], [X], [X] min, [X]%, [Result metric], [One-line result, e.g. how many ads they shipped for a launch], [One-line result, e.g. time saved each week], and [One-line result, e.g. lift in click-through].
 import { ReelCarousel } from "@/components/site/ReelCarousel";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
@@ -409,7 +409,7 @@ function SpotlightArt({ active }: { active: Tab }) {
           <br />
           New color.
         </strong>
-        <small>[Your product line]</small>
+        <small>The fall collection</small>
         <span className="home-edit-label">Headline</span>
       </div>
       <div className="home-edit-panel">
@@ -742,7 +742,7 @@ function Home() {
               <div className="home-step-art" aria-hidden="true">
                 <div className="home-step-edit">
                   <b>New season.</b>
-                  <small>[Your product line]</small>
+                  <small>The fall collection</small>
                   <i>Headline</i>
                 </div>
               </div>
