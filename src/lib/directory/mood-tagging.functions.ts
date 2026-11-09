@@ -27,7 +27,7 @@ export const suggestReelMoods = createServerFn({ method: "POST" })
     }
   });
 
-/** Staff only: tag every published reel and fill each brand up to its mood limit. Adds moods, never removes them. */
+/** Staff only: tag every published reel and add a few moods to brands that have none. Adds moods, never removes them. */
 export const autoTagAllMoods = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {

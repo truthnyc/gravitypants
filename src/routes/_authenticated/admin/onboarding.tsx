@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { PageTitle } from "@/components/admin/AdminShell";
 import { adminBrandWorkspaces, adminCreateBrand, setBrandLogo } from "@/lib/directory/directory.functions";
 import { listSiteReels } from "@/lib/site/reels.functions";
-import { BRAND_NAME_MAX, BRAND_DESCRIPTION_MAX, BRAND_MOODS_MAX, CATEGORIES, SLUG_MAX, toSlug, moodLabel, type Category } from "@/lib/directory/directory";
+import { BRAND_NAME_MAX, BRAND_DESCRIPTION_MAX, CATEGORIES, SLUG_MAX, toSlug, moodLabel, type Category } from "@/lib/directory/directory";
 import { useMoodCatalog } from "@/lib/directory/moods";
 import { normalizeWebsite } from "@/lib/directory/application-security";
 

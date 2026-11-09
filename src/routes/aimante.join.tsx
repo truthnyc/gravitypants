@@ -5,7 +5,7 @@ import { Check, LayoutTemplate, Sparkles, Users, BadgeCheck } from 'lucide-react
 import { FeaturedAdVideo } from '@/components/site/FeaturedAdVideo'
 import { AimanteShell } from '@/components/site/AimanteShell'
 import { Button } from '@/components/ui/button'
-import { categorySlug, CATEGORIES, BRAND_DESCRIPTION_MAX, BRAND_MOODS_MAX, type Category } from '@/lib/directory/directory'
+import { categorySlug, CATEGORIES, BRAND_DESCRIPTION_MAX, type Category } from '@/lib/directory/directory'
 import { useMoodCatalog } from '@/lib/directory/moods'
 import { brandApplicationInput, submitBrandApplication } from '@/lib/directory/applications.functions'
 import { aimanteHead } from '@/lib/site/brand-site'

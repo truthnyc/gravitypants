@@ -13,7 +13,7 @@ import { STATUS_LABEL, type DirStatus } from "@/lib/directory/directory";
 import { getWorkspaceId } from "@/lib/stillframe/workspace";
 import { useMoodCatalog } from "@/lib/directory/moods";
 import { cn } from "@/lib/utils";
-import { BRAND_DESCRIPTION_MAX, BRAND_NAME_MAX, CATEGORIES, GRACE_DAYS, SLUG_MAX, BRAND_MOODS_MAX, moodLabel, nearLimit } from "@/lib/directory/directory";
+import { BRAND_DESCRIPTION_MAX, BRAND_NAME_MAX, CATEGORIES, GRACE_DAYS, SLUG_MAX, moodLabel, nearLimit } from "@/lib/directory/directory";
 
 export const Route = createFileRoute("/_authenticated/app/account_/directory")({
   head: () => ({

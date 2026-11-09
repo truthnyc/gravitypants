@@ -5,7 +5,7 @@ import { Fragment, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { decideReelUpdate, listReelUpdates, setReelFeatured, adminSetAimanteTitle, pinAllDirectoryVideos, adminDeleteReel, adminMoveReel, adminBrandDetail, adminRenameReel, adminSaveBrand, adminSaveBrandSlug, setBrandLogo, listDirectoryBrands, listDirectoryReview, resolveReport, reviewDirectoryReel } from "@/lib/directory/directory.functions";
-import { BRAND_DESCRIPTION_MAX, BRAND_NAME_MAX, CATEGORIES, SLUG_MAX, BRAND_MOODS_MAX, REEL_DESCRIPTION_MAX, moodLabel, STATUS_LABEL, nearLimit, type Category } from "@/lib/directory/directory";
+import { BRAND_DESCRIPTION_MAX, BRAND_NAME_MAX, CATEGORIES, SLUG_MAX, REEL_DESCRIPTION_MAX, moodLabel, STATUS_LABEL, nearLimit, type Category } from "@/lib/directory/directory";
 import { useMoodCatalog } from "@/lib/directory/moods";
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
