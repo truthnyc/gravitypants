@@ -1,5 +1,5 @@
 export type ExampleCategory = string;
-export type ExampleFormat = "916" | "11" | "169";
+export type ExampleFormat = "916" | "45" | "11" | "54" | "169";
 export type GalleryExample = {
   id: string; name: string; category: ExampleCategory; format: ExampleFormat;
   photos: number; seconds: number; headline: string; sub: string; frames: string[];

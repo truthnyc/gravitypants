@@ -25,7 +25,7 @@ import jewelryFrame3 from "@/assets/site/fine-jewelry-frame-3.webp.asset.json";
 import { SITE_ORIGIN, siteHead } from "@/lib/site/seo";
 import { siteWatchSlugs } from "@/lib/site/watch";
 import { listSiteReels } from "@/lib/site/reels.functions";
-import { FORMAT_LABEL, ratioToFormat, type SiteReel } from "@/lib/site/reels";
+import { FORMAT_LABEL, ratioToFormat, type ReelFormat, type SiteReel } from "@/lib/site/reels";
 import { getHomepageContent } from "@/lib/site/homepage.functions";
 import { DEFAULT_CONTENT, featuredVideo as pickVideo, photoSrc } from "@/lib/site/homepage";
 
@@ -134,7 +134,7 @@ type HomeExample = {
   video?: string;
   videoWebm?: string | undefined;
   poster?: string | undefined;
-  videoFormat?: "11" | "916" | "169";
+  videoFormat?: ReelFormat;
   href?: string | undefined;
   brandSlug?: string | undefined;
 };

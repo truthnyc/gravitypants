@@ -1,7 +1,7 @@
 import type { SiteReel } from "./reels";
 
 /** Directory formats ("9x16") to site reel formats ("916"). */
-export const DIR_FORMAT: Record<string, SiteReel["format"]> = { "9x16": "916", "1x1": "11", "16x9": "169" };
+export const DIR_FORMAT: Record<string, SiteReel["format"]> = { "9x16": "916", "4x5": "45", "1x1": "11", "5x4": "54", "16x9": "169" };
 
 export type FeaturedDirRow = {
   id: string; title: string | null; display_title: string | null; description: string | null;

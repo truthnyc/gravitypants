@@ -6,7 +6,7 @@ import type { Template } from "@/lib/stillframe/data";
 export function templateForExample(id: string): Template | null {
   const example = galleryExamples.find((item) => item.id === id);
   if (!example) return null;
-  const format: Format = example.format === "916" ? "9:16" : example.format === "11" ? "1:1" : "16:9";
+  const format: Format = ({ "916": "9:16", "45": "4:5", "11": "1:1", "54": "5:4", "169": "16:9" } as const)[example.format];
   return {
     id: `example-${example.id}`, workspace_id: "", created_by: "", name: example.name,
     thumbnail_url: null, visibility: "private", updated_at: "",
