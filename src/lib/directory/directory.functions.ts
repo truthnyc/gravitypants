@@ -272,10 +272,7 @@ export const hideReel = createServerFn({ method: "POST" })
 /** Brands can change a reel's moods at any time; only names from the master list are kept. */
 export const saveReelMoods = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({
-    adId: z.string().uuid(),
-    moods: z.array(z.string().trim().toLowerCase().max(30)).max(60),
-  }).parse(d))
+  .inputValidator((d: unknown) => reelMoodsInput.parse(d))
   .handler(async ({ data, context }) => {
     const sb = context.supabase as any;
     const { data: reel } = await sb.from("directory_reels").select("id, ad_id").eq("ad_id", data.adId).maybeSingle();

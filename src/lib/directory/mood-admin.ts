@@ -12,6 +12,11 @@ export const moodRequestInput = z.object({
   name: z.string().trim().min(2).max(30),
   workspaceId: z.string().uuid().optional(),
 });
+/** A brand owner setting one of their reels' moods by hand: any number of names, capped only as a safety ceiling. */
+export const reelMoodsInput = z.object({
+  adId: z.string().uuid(),
+  moods: z.array(z.string().trim().toLowerCase().max(30)).max(60),
+});
 /**
  * Browsers send free text, so clean it the same way the master list stores names:
  * lowercase, single spaces, letters/numbers/spaces/hyphen/apostrophe/ampersand only.
