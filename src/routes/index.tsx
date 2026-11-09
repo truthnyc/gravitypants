@@ -409,7 +409,7 @@ function SpotlightArt({ active }: { active: Tab }) {
           <br />
           New color.
         </strong>
-        <small>[Your product line]</small>
+        <small>The fall collection</small>
         <span className="home-edit-label">Headline</span>
       </div>
       <div className="home-edit-panel">
@@ -742,7 +742,7 @@ function Home() {
               <div className="home-step-art" aria-hidden="true">
                 <div className="home-step-edit">
                   <b>New season.</b>
-                  <small>[Your product line]</small>
+                  <small>The fall collection</small>
                   <i>Headline</i>
                 </div>
               </div>
