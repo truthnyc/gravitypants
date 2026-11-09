@@ -7,6 +7,25 @@ export const moodInput = z.object({
   family: z.enum(MOOD_FAMILIES),
   page_intro: z.string().trim().max(600).optional(),
 });
+/** A signed-in person asking for a mood the master list doesn't have yet. */
+export const moodRequestInput = z.object({
+  name: z.string().trim().min(2).max(30),
+  workspaceId: z.string().uuid().optional(),
+});
+/** A brand owner setting one of their reels' moods by hand: any number of names, capped only as a safety ceiling. */
+export const reelMoodsInput = z.object({
+  adId: z.string().uuid(),
+  moods: z.array(z.string().trim().toLowerCase().max(30)).max(60),
+});
+/**
+ * Browsers send free text, so clean it the same way the master list stores names:
+ * lowercase, single spaces, letters/numbers/spaces/hyphen/apostrophe/ampersand only.
+ * Returns null when the result isn't a usable mood name.
+ */
+export function normalizeMoodName(raw: string): string | null {
+  const name = raw.trim().toLowerCase().replace(/\s+/g, " ").replace(/[^\p{L}\p{N} '&-]/gu, "");
+  return name.length >= 2 && name.length <= 30 ? name : null;
+}
 export type MoodFamily = (typeof MOOD_FAMILIES)[number];
 /** One colour per mood family, shared by the site and admin. `ink` is the readable text colour on it. */
 export const MOOD_FAMILY_COLORS: Record<MoodFamily, { bg: string; ink: "light" | "dark" }> = {

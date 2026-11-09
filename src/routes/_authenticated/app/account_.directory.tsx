@@ -8,10 +8,12 @@ import { toast } from "sonner";
 import { ArrowUpRight, Pencil } from "lucide-react";
 import { AccountTabs } from "@/components/billing/AccountTabs";
 import { AppButton } from "@/components/app-ui";
-import { cancelReelUpdate, checkSlug, getDirectoryAccount, hideReel, renameDirectoryReel, saveBrandDescription, saveSlug, setBrandLogo, submitReelUpdate, type PendingStatus } from "@/lib/directory/directory.functions";
+import { cancelReelUpdate, checkSlug, getDirectoryAccount, hideReel, renameDirectoryReel, saveBrandDescription, saveReelMoods, saveSlug, setBrandLogo, submitReelUpdate, type PendingStatus } from "@/lib/directory/directory.functions";
 import { STATUS_LABEL, type DirStatus } from "@/lib/directory/directory";
 import { getWorkspaceId } from "@/lib/stillframe/workspace";
 import { useMoodCatalog } from "@/lib/directory/moods";
+import { MoodChips } from "@/components/directory/MoodChips";
+import { MoodRequestBox } from "@/components/directory/MoodRequestBox";
 import { cn } from "@/lib/utils";
 import { BRAND_DESCRIPTION_MAX, BRAND_NAME_MAX, CATEGORIES, GRACE_DAYS, SLUG_MAX, moodLabel, nearLimit } from "@/lib/directory/directory";
 
@@ -120,6 +122,7 @@ function DirectoryAccount() {
                     </div>
                     {r.pending === "in_review" && <p className="mt-1 text-[13px] text-ap-amber">Update in review. The current version stays live until it's approved.</p>}
                     {r.pending === "declined" && <p className="mt-1 text-[13px] text-destructive">Update not approved{r.pendingNote ? `: ${r.pendingNote}` : "."} The live version is unchanged.</p>}
+                    <ReelMoods adId={r.adId} moods={r.moods} category={d.brand.category} onSaved={refresh} />
                   </div>
                   <ReelActions adId={r.adId} title={r.name} format={r.size} status={r.status} pending={r.pending} onDone={refresh} />
                 </li>
@@ -203,6 +206,47 @@ function ReelActions({ adId, title, format, status, pending, onDone }: { adId: s
   );
 }
 
+/** Each published reel carries its own moods; owners can change them any time. */
+function ReelMoods({ adId, moods, category, onSaved }: { adId: string; moods: string[]; category: string; onSaved: () => void }) {
+  const save = useServerFn(saveReelMoods);
+  const { forCategory } = useMoodCatalog();
+  const [open, setOpen] = useState(false);
+  const [picked, setPicked] = useState<string[]>(moods);
+  const [busy, setBusy] = useState(false);
+  const options = [...new Set([...forCategory(category), ...moods])];
+  const commit = async () => {
+    setBusy(true);
+    try {
+      await save({ data: { adId, moods: picked } });
+      toast.success("Moods saved.");
+      setOpen(false);
+      onSaved();
+    } catch (e) { toast.error(e instanceof Error ? e.message : "Couldn't save those moods."); }
+    finally { setBusy(false); }
+  };
+  if (!open) {
+    return (
+      <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px]">
+        <span className="text-ap-muted">{moods.length ? `Moods: ${moods.map(moodLabel).join(", ")}` : "No moods of its own yet."}</span>
+        <button type="button" onClick={() => { setPicked(moods); setOpen(true); }} className="text-ap-blue">Edit moods</button>
+      </div>
+    );
+  }
+  return (
+    <div className="mt-2 rounded-[8px] bg-ap-panel p-3">
+      <MoodChips value={picked} options={options} onChange={setPicked} disabled={busy} />
+      <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+        <small className="text-[12px] text-ap-muted">Pick as many as fit this reel.</small>
+        <div className="flex gap-2">
+          <AppButton variant="ghost" size="sm" disabled={busy} onClick={() => setOpen(false)}>Cancel</AppButton>
+          <AppButton size="sm" disabled={busy || picked.join() === moods.join()} onClick={() => void commit()}>{busy ? "Saving..." : "Save moods"}</AppButton>
+        </div>
+      </div>
+      <MoodRequestBox />
+    </div>
+  );
+}
+
 type BrandInfo = { id: string; name: string; description: string; website: string; category: string; moods: string[] };
 const fieldCls = "w-full text-[14px]";
 function Counter({ n, max }: { n: number; max: number }) {
@@ -248,6 +292,7 @@ function DescriptionBox({ brand, onSaved }: { brand: BrandInfo; onSaved: () => v
           ); })}
         </div>
         <small className="mt-1.5 block text-[12px] text-ap-muted">Pick as many moods as fit your brand. The list matches your category.</small>
+        <MoodRequestBox />
       </div>
       <label htmlFor="brand-description" className={cn(lbl, "mt-4")}>Brand description <Counter n={value.length} max={BRAND_DESCRIPTION_MAX} /></label>
       <textarea id="brand-description" value={value} maxLength={BRAND_DESCRIPTION_MAX} rows={3} onChange={(e) => setValue(e.target.value)} className="w-full resize-y bg-ap-card px-3.5 py-2.5 text-[14px] leading-[1.5]" />

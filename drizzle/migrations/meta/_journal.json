@@ -253,6 +253,13 @@
       "when": 1794252175372,
       "tag": "0035_brand_requests_moods_no_limit",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1794252462517,
+      "tag": "0036_create_mood_requests",
+      "breakpoints": true
     }
   ]
 }

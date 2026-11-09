@@ -10,12 +10,16 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { PageTitle } from "@/components/admin/AdminShell";
-import { MOOD_FAMILIES } from "@/lib/directory/mood-admin";
-import { listAdminMoods, saveAdminMood, deleteAdminMood } from "@/lib/directory/moods.functions";
+import { MOOD_FAMILIES, type MoodFamily } from "@/lib/directory/mood-admin";
+import { listAdminMoods, saveAdminMood, deleteAdminMood, listMoodRequests, decideMoodRequest } from "@/lib/directory/moods.functions";
 
 const options = queryOptions({ queryKey: ["admin", "moods"], queryFn: () => listAdminMoods() });
+const requestOptions = queryOptions({ queryKey: ["admin", "mood-requests"], queryFn: () => listMoodRequests() });
 export const Route = createFileRoute("/_authenticated/admin/moods")({
-  loader: ({ context }) => context.queryClient.ensureQueryData(options),
+  loader: ({ context }) => Promise.all([
+    context.queryClient.ensureQueryData(options),
+    context.queryClient.ensureQueryData(requestOptions),
+  ]),
   head: () => ({ meta: [
     { title: "Moods — Gravity Pants Admin" },
     { name: "description", content: "Manage the Gravity Pants master mood list by family." },
@@ -32,6 +36,7 @@ export const Route = createFileRoute("/_authenticated/admin/moods")({
 type Draft = { id?: string; name: string; family: typeof MOOD_FAMILIES[number]; page_intro?: string };
 function Moods() {
   const { data } = useSuspenseQuery(options);
+  const { data: requests } = useSuspenseQuery(requestOptions);
   const qc = useQueryClient();
   const save = useServerFn(saveAdminMood);
   const remove = useServerFn(deleteAdminMood);
@@ -39,7 +44,7 @@ function Moods() {
   const [deleting, setDeleting] = useState<{ id: string; name: string } | null>(null);
   const [busy, setBusy] = useState(false);
   const refresh = async () => {
-    await Promise.all([qc.invalidateQueries({ queryKey: ["admin", "moods"] }), qc.invalidateQueries({ queryKey: ["mood-catalog"] }), qc.invalidateQueries({ queryKey: ["admin", "directory"] })]);
+    await Promise.all([qc.invalidateQueries({ queryKey: ["admin", "moods"] }), qc.invalidateQueries({ queryKey: ["mood-catalog"] }), qc.invalidateQueries({ queryKey: ["admin", "directory"] }), qc.invalidateQueries({ queryKey: ["admin", "mood-requests"] })]);
   };
   async function submit() {
     if (!draft) return;
@@ -71,6 +76,7 @@ function Moods() {
       <Button variant="outline" disabled={tagging} onClick={() => void runAutoTag()}><Sparkles className="size-4" strokeWidth={1.7} />{tagging ? "Tagging…" : "Auto-tag all reels"}</Button>
       <Button onClick={() => setDraft({ name: "", family: "Calm" })}><Plus className="size-4" strokeWidth={1.7} />Add mood</Button>
     </div>} />
+    <MoodRequests requests={requests} onDone={() => void refresh()} />
     <div className="divide-y divide-border">
       {MOOD_FAMILIES.map((family) => {
         const moods = data.filter((m) => m.family === family);
@@ -97,4 +103,59 @@ function Moods() {
     </Dialog>
     <Dialog open={!!deleting} onOpenChange={(open) => { if (!open && !busy) setDeleting(null); }}><DialogContent><DialogHeader><DialogTitle>Delete {deleting?.name}?</DialogTitle><DialogDescription>This removes the mood from category lists and existing brand and reel selections. This cannot be undone.</DialogDescription></DialogHeader><div className="flex justify-end gap-2"><Button variant="plain" disabled={busy} onClick={() => setDeleting(null)}>Cancel</Button><Button variant="destructive" disabled={busy} onClick={() => void confirmDelete()}>{busy ? "Deleting…" : "Delete mood"}</Button></div></DialogContent></Dialog>
   </>;
+}
+
+type RequestRow = { id: string; name: string; status: string; note: string | null; created_at: string; decided_at: string | null };
+
+/** Brands ask for moods the master list doesn't have; staff add the good ones here. */
+function MoodRequests({ requests, onDone }: { requests: RequestRow[]; onDone: () => void }) {
+  const decide = useServerFn(decideMoodRequest);
+  const [family, setFamily] = useState<Record<string, MoodFamily>>({});
+  const [busy, setBusy] = useState<string | null>(null);
+  const run = async (id: string, decision: "approve" | "deny") => {
+    setBusy(id);
+    try {
+      await decide({ data: { id, decision, ...(decision === "approve" && family[id] ? { family: family[id] } : {}) } });
+      toast(decision === "approve" ? "Mood added to the list." : "Request denied.");
+      onDone();
+    } catch (e) { toast.error(e instanceof Error ? e.message : "Couldn't decide that request."); }
+    finally { setBusy(null); }
+  };
+  const pending = requests.filter((r) => r.status === "pending");
+  const decided = requests.filter((r) => r.status !== "pending");
+  return (
+    <section className="mb-6 rounded-sm border border-border bg-card p-4">
+      <h2 className="text-[17px] font-semibold">Requests <span className="ml-2 text-[13px] font-normal tabular-nums text-secondary-text">{pending.length}</span></h2>
+      <p className="mt-1 text-[13px] text-secondary-text">Moods brands asked for that the list doesn't have yet. Approving adds the mood to the master list.</p>
+      {!pending.length && <p className="mt-3 text-[14px] text-secondary-text">Nothing waiting.</p>}
+      <ul className="mt-3 grid gap-2">
+        {pending.map((r) => (
+          <li key={r.id} className="flex flex-wrap items-center gap-2 rounded-sm border border-border bg-background px-3 py-2">
+            <span className="min-w-0 flex-1 text-[14px] capitalize">{r.name}</span>
+            <span className="text-[12px] tabular-nums text-secondary-text">{new Date(r.created_at).toLocaleDateString()}</span>
+            <select aria-label={`Family for ${r.name}`} value={family[r.id] ?? "Modern"} onChange={(e) => { const f = MOOD_FAMILIES.find((x) => x === e.target.value); if (f) setFamily({ ...family, [r.id]: f }); }} className="h-9 rounded-sm border border-input bg-card px-2 text-[14px]">
+              {MOOD_FAMILIES.map((f) => <option key={f}>{f}</option>)}
+            </select>
+            <Button size="sm" disabled={busy === r.id} onClick={() => void run(r.id, "approve")}>Add to list</Button>
+            <Button size="sm" variant="plain" disabled={busy === r.id} onClick={() => void run(r.id, "deny")}>Deny</Button>
+          </li>
+        ))}
+      </ul>
+      {decided.length > 0 && (
+        <details className="mt-3">
+          <summary className="cursor-pointer text-[13px] text-secondary-text">Decided ({decided.length})</summary>
+          <ul className="mt-2 grid gap-1">
+            {decided.map((r) => (
+              <li key={r.id} className="flex flex-wrap items-center gap-2 text-[13px]">
+                <span className="capitalize">{r.name}</span>
+                <span>{r.status}</span>
+                <span className="tabular-nums text-secondary-text">{new Date(r.decided_at ?? r.created_at).toLocaleDateString()}</span>
+                {r.note && <span className="text-secondary-text">{r.note}</span>}
+              </li>
+            ))}
+          </ul>
+        </details>
+      )}
+    </section>
+  );
 }
