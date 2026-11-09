@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { PageTitle } from "@/components/admin/AdminShell";
-import { MOOD_FAMILIES } from "@/lib/directory/mood-admin";
+import { MOOD_FAMILIES, type MoodFamily } from "@/lib/directory/mood-admin";
 import { listAdminMoods, saveAdminMood, deleteAdminMood, listMoodRequests, decideMoodRequest } from "@/lib/directory/moods.functions";
 
 const options = queryOptions({ queryKey: ["admin", "moods"], queryFn: () => listAdminMoods() });
