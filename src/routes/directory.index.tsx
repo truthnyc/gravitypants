@@ -330,9 +330,7 @@ function DirectoryPage() {
   useEffect(() => {
     const media = window.matchMedia("(max-width: 767px)");
     const update = () => {
-      if (input.current)
-        input.current.placeholder =
-          isAim && media.matches ? "Try: cozy knitwear, Purl Soho" : "Try: cozy knitwear, square, Purl Soho";
+      if (input.current) input.current.placeholder = isAim && media.matches ? " " : "  ";
     };
     update();
     media.addEventListener("change", update);
@@ -676,7 +674,7 @@ function DirectoryPage() {
               ref={input}
               value={value}
               onChange={(e) => setValue(e.target.value)}
-              placeholder=" "
+              placeholder=""
               aria-label="Search the Directory"
               aria-keyshortcuts="/"
               className="dir-search-input h-full min-w-0 flex-1 bg-transparent text-[19px] outline-hidden placeholder:text-ap-muted"
