@@ -1,9 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { BRAND_MOODS_MAX } from "./directory";
 
 const REEL_AI_MAX = 6;
+/** Auto-tagging stays conservative: the AI adds a few moods, people can add as many as they like. */
+const BRAND_AI_MAX = 3;
 
 /** Signed-in: suggest moods for a reel being shared. Membership is checked by reading the ad through RLS. */
 export const suggestReelMoods = createServerFn({ method: "POST" })
@@ -47,10 +48,10 @@ export const autoTagAllMoods = createServerFn({ method: "POST" })
 
     for (const b of brands ?? []) {
       const have = (b.moods ?? []) as string[];
-      if (have.length >= BRAND_MOODS_MAX) continue;
+      if (have.length >= BRAND_AI_MAX) continue;
       try {
-        const add = await pickMoods({ brand: b.name, category: b.category, description: b.description, brandMoods: have }, catalog, { min: 1, max: BRAND_MOODS_MAX });
-        const next = merge(have, add).slice(0, BRAND_MOODS_MAX);
+        const add = await pickMoods({ brand: b.name, category: b.category, description: b.description, brandMoods: have }, catalog, { min: 1, max: BRAND_AI_MAX });
+        const next = merge(have, add).slice(0, BRAND_AI_MAX);
         if (next.length > have.length) { await db.from("directory_brands").update({ moods: next }).eq("id", b.id); b.moods = next; out.brands++; }
       } catch { out.failed++; }
     }

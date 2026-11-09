@@ -243,11 +243,11 @@ function DescriptionBox({ brand, onSaved }: { brand: BrandInfo; onSaved: () => v
       <div className="mt-4"><span className={lbl}>Moods</span>
         <div className="flex flex-wrap gap-1.5">
           {[...new Set([...forCategory(category), ...moods])].map((m) => { const on = moods.includes(m); return (
-            <button key={m} type="button" aria-pressed={on} disabled={!on && moods.length >= BRAND_MOODS_MAX} onClick={() => setMoods(on ? moods.filter((x) => x !== m) : [...moods, m])}
+            <button key={m} type="button" aria-pressed={on} onClick={() => setMoods(on ? moods.filter((x) => x !== m) : [...moods, m])}
               className={cn("h-9 rounded-lg px-3 text-[14px]", on ? "bg-ap-blue text-ap-card" : "bg-ap-panel text-ap-body hover:bg-ap-media", "disabled:opacity-40")}>{moodLabel(m)}</button>
           ); })}
         </div>
-        <small className="mt-1.5 block text-[12px] text-ap-muted">Pick 1 to 3 moods that fit your brand. The list matches your category.</small>
+        <small className="mt-1.5 block text-[12px] text-ap-muted">Pick as many moods as fit your brand. The list matches your category.</small>
       </div>
       <label htmlFor="brand-description" className={cn(lbl, "mt-4")}>Brand description <Counter n={value.length} max={BRAND_DESCRIPTION_MAX} /></label>
       <textarea id="brand-description" value={value} maxLength={BRAND_DESCRIPTION_MAX} rows={3} onChange={(e) => setValue(e.target.value)} className="w-full resize-y bg-ap-card px-3.5 py-2.5 text-[14px] leading-[1.5]" />
