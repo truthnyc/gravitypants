@@ -21,6 +21,7 @@ import { FORMAT_SIZE } from "@/render/formats";
 import { loadImages } from "@/render/images";
 import { ensureFonts, mediaPaths, renderAt, restTime, type BrandStyle } from "@/render/renderFrame";
 import { useMoodCatalog } from "@/lib/directory/moods";
+import { MoodRequestBox } from "@/components/directory/MoodRequestBox";
 import { suggestReelMoods } from "@/lib/directory/mood-tagging.functions";
 import { cn } from "@/lib/utils";
 
