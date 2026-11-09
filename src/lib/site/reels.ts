@@ -42,7 +42,7 @@ export type SiteReel = {
 
 /** Files uploaded from the admin form are stored as `site-reels:<path>`. */
 export const REEL_PREFIX = "site-reels:";
-export const FORMAT_LABEL: Record<ReelFormat, string> = { "916": "9:16", "11": "1:1", "169": "16:9" };
+export const FORMAT_LABEL: Record<ReelFormat, string> = { "916": "9:16", "45": "4:5", "11": "1:1", "54": "5:4", "169": "16:9" };
 
 /** Aimanté reel title: the set display title, otherwise the brand name — never the template name. */
 export const aimanteTitle = (r: { displayTitle?: string | null; title?: string | null; brand: string }) => r.displayTitle?.trim() || r.title?.trim() || r.brand;
