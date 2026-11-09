@@ -279,7 +279,8 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
                   </div>
                 );
               })()}
-              <small className="text-[12px] text-ap-muted">Pick up to 3.</small>
+              <small className="text-[12px] text-ap-muted">Pick as many as fit.</small>
+              <MoodRequestBox />
             </AppField>
 
             <AppField label="Keywords" className="mb-[18px]">

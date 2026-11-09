@@ -11,11 +11,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { PageTitle } from "@/components/admin/AdminShell";
 import { MOOD_FAMILIES } from "@/lib/directory/mood-admin";
-import { listAdminMoods, saveAdminMood, deleteAdminMood } from "@/lib/directory/moods.functions";
+import { listAdminMoods, saveAdminMood, deleteAdminMood, listMoodRequests, decideMoodRequest } from "@/lib/directory/moods.functions";
 
 const options = queryOptions({ queryKey: ["admin", "moods"], queryFn: () => listAdminMoods() });
+const requestOptions = queryOptions({ queryKey: ["admin", "mood-requests"], queryFn: () => listMoodRequests() });
 export const Route = createFileRoute("/_authenticated/admin/moods")({
-  loader: ({ context }) => context.queryClient.ensureQueryData(options),
+  loader: ({ context }) => Promise.all([
+    context.queryClient.ensureQueryData(options),
+    context.queryClient.ensureQueryData(requestOptions),
+  ]),
   head: () => ({ meta: [
     { title: "Moods — Gravity Pants Admin" },
     { name: "description", content: "Manage the Gravity Pants master mood list by family." },
@@ -32,6 +36,7 @@ export const Route = createFileRoute("/_authenticated/admin/moods")({
 type Draft = { id?: string; name: string; family: typeof MOOD_FAMILIES[number]; page_intro?: string };
 function Moods() {
   const { data } = useSuspenseQuery(options);
+  const { data: requests } = useSuspenseQuery(requestOptions);
   const qc = useQueryClient();
   const save = useServerFn(saveAdminMood);
   const remove = useServerFn(deleteAdminMood);
@@ -39,7 +44,7 @@ function Moods() {
   const [deleting, setDeleting] = useState<{ id: string; name: string } | null>(null);
   const [busy, setBusy] = useState(false);
   const refresh = async () => {
-    await Promise.all([qc.invalidateQueries({ queryKey: ["admin", "moods"] }), qc.invalidateQueries({ queryKey: ["mood-catalog"] }), qc.invalidateQueries({ queryKey: ["admin", "directory"] })]);
+    await Promise.all([qc.invalidateQueries({ queryKey: ["admin", "moods"] }), qc.invalidateQueries({ queryKey: ["mood-catalog"] }), qc.invalidateQueries({ queryKey: ["admin", "directory"] }), qc.invalidateQueries({ queryKey: ["admin", "mood-requests"] })]);
   };
   async function submit() {
     if (!draft) return;
@@ -71,6 +76,7 @@ function Moods() {
       <Button variant="outline" disabled={tagging} onClick={() => void runAutoTag()}><Sparkles className="size-4" strokeWidth={1.7} />{tagging ? "Tagging…" : "Auto-tag all reels"}</Button>
       <Button onClick={() => setDraft({ name: "", family: "Calm" })}><Plus className="size-4" strokeWidth={1.7} />Add mood</Button>
     </div>} />
+    <MoodRequests requests={requests} onDone={() => void refresh()} />
     <div className="divide-y divide-border">
       {MOOD_FAMILIES.map((family) => {
         const moods = data.filter((m) => m.family === family);
