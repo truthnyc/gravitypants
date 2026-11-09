@@ -170,10 +170,10 @@ const industry = (slug: string, name: string, title: string, description: string
 export const SEARCH_PAGES: SearchPage[] = [
   {
     slug: "photo-to-video", path: "/photo-to-video",
-    title: "Turn Photos Into a Video Ad in Minutes | Gravity Pants",
-    description: "Add a few photos and get a short video with your words, logo and colors, sized for Reels, TikTok and ads. Your first video is free.",
-    h1: "Turn your photos into a video",
-    subhead: "Add a few photos, type a headline, and get a finished video with your logo and colors. No editing.",
+    title: "Image to Video Ads: Turn Product Photos Into Video | Gravity Pants",
+    description: "Turn product images into a short video ad with your words, logo and colors, sized for Reels, TikTok and ads. Your first image-to-video ad is free.",
+    h1: "Turn your product images into a video",
+    subhead: "Image to video, made for product ads. Add a few photos, type a headline, and get a finished video with your logo and colors. No editing.",
     example: { reelId: REEL.purl, label: "Purl Soho, Launch Kit (3 photos → 7.8 sec reel)" },
     why: [
       "People scroll past still photos. A few seconds of movement makes them stop, and a stop is the start of every sale.",
@@ -185,7 +185,11 @@ export const SEARCH_PAGES: SearchPage[] = [
       "Leave some space around the product. Your headline and logo sit there.",
       "Phone photos are fine.",
     ] },
-    faqs: PHOTO_FAQS,
+    faqs: [
+      { q: "How does image to video work in Gravity Pants?", a: "You add 3 to 8 product images and a headline. Gravity Pants moves between your photos with pans, zooms and transitions, then adds your words, logo and colors. It uses the photos you give it and doesn't invent new scenes." },
+      { q: "Can I make an image to video ad for my products?", a: "Yes. That's what it's built for: product image to video ads for Reels, TikTok, Stories, email and display ads." },
+      ...PHOTO_FAQS,
+    ],
     related: ["/instagram-reels-from-photos", "/product-video-maker", "/blog/how-to-turn-photos-into-a-video"],
   },
   {
