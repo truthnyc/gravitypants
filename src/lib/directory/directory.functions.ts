@@ -269,6 +269,23 @@ export const hideReel = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+/** Brands can change a reel's moods at any time; only names from the master list are kept. */
+export const saveReelMoods = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({
+    adId: z.string().uuid(),
+    moods: z.array(z.string().trim().toLowerCase().max(30)).max(60),
+  }).parse(d))
+  .handler(async ({ data, context }) => {
+    const sb = context.supabase as any;
+    const { data: reel } = await sb.from("directory_reels").select("id, ad_id").eq("ad_id", data.adId).maybeSingle();
+    if (!reel) throw new Error("This reel isn't in the Directory.");
+    const moods = await cleanMoods(sb, data.moods);
+    const { error } = await sb.from("directory_reels").update({ moods }).eq("id", reel.id);
+    if (error) throw new Error(error.message);
+    return { ok: true, moods };
+  });
+
 /** Directory status per ad for Your Ads. */
 export const getAdStatuses = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -291,7 +308,7 @@ export const getDirectoryAccount = createServerFn({ method: "POST" })
     const sb = context.supabase as any;
     const { data: b } = await sb.from("directory_brands").select("*").eq("workspace_id", data.workspaceId).maybeSingle();
     if (!b) return null;
-    const { data: reels } = await sb.from("directory_reels").select("id, ad_id, status, updated_at, title, formats, poster_url, in_showcase, pending_status, pending_submitted_at, pending_note, projects(name)").eq("brand_id", b.id).order("updated_at", { ascending: false });
+    const { data: reels } = await sb.from("directory_reels").select("id, ad_id, status, updated_at, title, formats, poster_url, in_showcase, pending_status, pending_submitted_at, pending_note, moods, projects(name)").eq("brand_id", b.id).order("updated_at", { ascending: false });
     const { data: log } = await sb.from("permission_log").select("id, created_at, ad_id, action, full_name, job_title, email, wording_version, wording_text").eq("brand_id", b.id).order("created_at", { ascending: false }).limit(500);
     const names = new Map<string, string>((reels ?? []).map((r: any) => [r.ad_id, r.title ?? r.projects?.name ?? "Untitled"]));
     const { data: featured } = await sb.rpc("is_featured_brand", { _brand: b.id });
@@ -306,7 +323,7 @@ export const getDirectoryAccount = createServerFn({ method: "POST" })
     }
     return {
       brand: { id: b.id as string, name: b.name as string, slug: b.slug as string, description: (b.description ?? "") as string, logo: await signLogo(b.logo_url), website: (b.website_url ?? "") as string, category: (b.category ?? "Other") as string, moods: (b.moods ?? []) as string[], featured: !!featured, planEndedAt: (b.plan_ended_at ?? null) as string | null, live: b.status === "live" },
-      reels: ((reels ?? []) as any[]).map((r: any) => ({ adId: r.ad_id as string, name: (r.title as string | null) ?? r.projects?.name ?? "Untitled", status: r.status as DirStatus, updated: r.updated_at as string, size: ((r.formats ?? [])[0] ?? "").replace("x", ":") as string, thumb: r.poster_url?.startsWith("media:") ? signedPosters.get(r.poster_url.slice(6)) ?? null : null, inShowcase: !!r.in_showcase, pending: (r.pending_status ?? "none") as PendingStatus, pendingAt: (r.pending_submitted_at ?? null) as string | null, pendingNote: (r.pending_note ?? null) as string | null })),
+      reels: ((reels ?? []) as any[]).map((r: any) => ({ adId: r.ad_id as string, name: (r.title as string | null) ?? r.projects?.name ?? "Untitled", status: r.status as DirStatus, updated: r.updated_at as string, size: ((r.formats ?? [])[0] ?? "").replace("x", ":") as string, thumb: r.poster_url?.startsWith("media:") ? signedPosters.get(r.poster_url.slice(6)) ?? null : null, inShowcase: !!r.in_showcase, moods: (r.moods ?? []) as string[], pending: (r.pending_status ?? "none") as PendingStatus, pendingAt: (r.pending_submitted_at ?? null) as string | null, pendingNote: (r.pending_note ?? null) as string | null })),
       siteReels: ((siteReels ?? []) as any[]).map((r) => ({ id: r.id as string, name: ((r.display_title as string | null) || (r.title as string)) as string, size: (r.format ?? "") as string })),
       log: (log ?? []).map((l: any) => ({ ...l, reel: names.get(l.ad_id) ?? "Removed ad" })) as {
         id: string; created_at: string; reel: string; action: "granted" | "withdrawn"; full_name: string; job_title: string | null; email: string; wording_version: string; wording_text: string;
