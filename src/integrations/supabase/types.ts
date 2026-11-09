@@ -1167,6 +1167,42 @@ export type Database = {
         }
         Relationships: []
       }
+      mood_requests: {
+        Row: {
+          created_at: string
+          decided_at: string | null
+          decided_by: string | null
+          id: string
+          name: string
+          note: string | null
+          requested_by: string
+          status: string
+          workspace_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          id?: string
+          name: string
+          note?: string | null
+          requested_by: string
+          status?: string
+          workspace_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          id?: string
+          name?: string
+          note?: string | null
+          requested_by?: string
+          status?: string
+          workspace_id?: string | null
+        }
+        Relationships: []
+      }
       moods: {
         Row: {
           created_at: string
