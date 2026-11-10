@@ -60,4 +60,5 @@
 - Public referral instructions live at `/referrals`; shared plan FAQ entries carry typed optional guide links so Pricing and Help point to the same explanation.
 - Google video schema points at permanent `/api/public/reel/$id/{video|poster}` links that redirect only published/live Showcase reels to fresh signed files, so search listings never expire while storage stays private.
 - Video markup lives only on `/reels/$slug` watch pages (slugs from `watch.ts`, VideoObject from `videoObject()`, sitemap entries from `watchPages()`); galleries just link there, so each video is listed once on a page where it is the main content.
+- Watch-page videos constrain both width and viewport height for every format without cropping, so the complete player stays prominent on shorter screens.
 - The `/embed/reel/$id` player runs the root shell in bare mode (no auth listener, page tracking or notices) because other people's sites frame it where the browser blocks stored sign-in data; keep that route free of app-wide boot.

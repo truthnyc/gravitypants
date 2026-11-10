@@ -18,7 +18,10 @@ export const Route = createFileRoute("/reels/$slug")({
     const slugs = watchSlugs(all); // same set as siteWatchSlugs
     const reel = all.find((r) => slugs.get(r.id) === params.slug);
     if (!reel) throw notFound();
-    const related = relatedReels(reel, all).map((r) => ({ reel: r, slug: slugs.get(r.id)! }));
+    const related = relatedReels(reel, all).flatMap((r) => {
+      const slug = slugs.get(r.id);
+      return slug ? [{ reel: r, slug }] : [];
+    });
     return { reel, slug: params.slug, related };
   },
   head: ({ loaderData, params }) => {
@@ -59,7 +62,6 @@ export const Route = createFileRoute("/reels/$slug")({
 function WatchPage() {
   const { reel, related } = Route.useLoaderData();
   const size = FORMAT_SIZE[reel.format];
-  const tall = reel.format === "916";
   const seconds = Math.round(reel.seconds);
   // Permanent same-site links, so the server-rendered page never carries an expiring storage link.
   const media = (u: string | null, kind: "video" | "poster") => (u && /[?&]token=/.test(u) ? `/api/public/reel/${encodeURIComponent(reel.id)}/${kind}` : u ?? undefined);
@@ -68,7 +70,7 @@ function WatchPage() {
       <article className={`${wrap} pb-20 pt-6 md:pt-10`}>
         <div className="grid w-full place-items-center rounded-lg">
           <video
-            className={`block rounded-lg ${tall ? "h-[min(72svh,760px)] w-auto" : "w-full"}`}
+            className="block h-auto max-h-[min(65svh,760px)] w-auto max-w-full rounded-lg object-contain"
             style={{ aspectRatio: `${size.width} / ${size.height}` }}
             src={media(reel.video, "video")}
             poster={media(reel.poster, "poster")}
