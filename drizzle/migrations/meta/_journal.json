@@ -267,6 +267,13 @@
       "when": 1794260059155,
       "tag": "0037_reel_formats_match_videos",
       "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1794390421314,
+      "tag": "0038_brand_approval_moods_and_directory_formats",
+      "breakpoints": true
     }
   ]
 }
