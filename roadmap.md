@@ -1,7 +1,7 @@
 # Launch video correction
 ## Current monitoring fixes
-- [ ] Verify and repair brand application approval for more than three moods, preserving staff checks.
-- [ ] Verify and repair 4:5/5:4 Directory formats and carousel sizing; run regression checks.
+- [x] Repair brand approval and legacy mood-link trigger; rollback-only six-mood approval creates the draft and all links, with staff access protections unchanged.
+- [x] Repair 4:5/5:4 Directory mappings and explicit 4:5 carousel sizing; 19 tests pass and Sail Racing's portrait grid thumbnail verified. Carousel sizing awaits publishing.
 
 - [x] Replace the launch film’s Aro segment with its corrected reel, preserve the rest of the film, and provide a versioned download.
 - [x] Update the website preview video asset; verified corrected AW 26-27 wording, all scenes, 19-second 1080p output and three video schema/sitemap tests. Not published.
