@@ -274,6 +274,13 @@
       "when": 1794390421314,
       "tag": "0038_brand_approval_moods_and_directory_formats",
       "breakpoints": true
+    },
+    {
+      "idx": 39,
+      "version": "7",
+      "when": 1794417856983,
+      "tag": "0039_directory_randomized_grid",
+      "breakpoints": true
     }
   ]
 }

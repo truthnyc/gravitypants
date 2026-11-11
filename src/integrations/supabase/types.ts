@@ -2236,6 +2236,7 @@ export type Database = {
           page?: number
           page_size?: number
           q?: string
+          seed?: string
         }
         Returns: Json
       }

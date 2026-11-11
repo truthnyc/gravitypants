@@ -892,6 +892,8 @@ const slugList = z.array(z.string().trim().toLowerCase().max(60)).max(60).defaul
 export const facetedInput = z.object({
   q: z.string().max(200).default(""), moods: slugList, categories: slugList, brands: slugList,
   page: z.number().int().min(1).max(1000).default(1), pageSize: z.number().int().min(1).max(240).default(DIRECTORY_PAGE_SIZE),
+  // Per-visit shuffle seed: same seed keeps pagination stable, a new visit reshuffles.
+  seed: z.string().max(64).default(""),
 });
 
 /** One query for /directory: OR within a filter, AND across filters, disjunctive facet counts. */
@@ -900,7 +902,7 @@ export const searchDirectory = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<FacetedResult> => {
     const { publicClient } = await import("@/lib/site/reels.server");
     const { data: r, error } = await (publicClient() as any).rpc("directory_faceted_search", {
-      q: data.q, f_moods: data.moods, f_categories: data.categories, f_brands: data.brands, page: data.page, page_size: data.pageSize,
+      q: data.q, f_moods: data.moods, f_categories: data.categories, f_brands: data.brands, page: data.page, page_size: data.pageSize, seed: data.seed,
     });
     if (error) throw new Error(error.message);
     const res = r as any;
