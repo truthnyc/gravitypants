@@ -70,3 +70,6 @@
 - [x] Add single-recipient Gmail sending with final approval, audit-backed duplicate protection and sender visibility; keep DMs manual. Nine safeguard tests pass; build OK.
 - [x] Verify real signed-in draft generation, blocked Gmail state and desktop/phone layout; no outreach sent.
 - [ ] Verify live approval/cancellation and Gmail send/read-back — connected Google account reports “Mail service not enabled”; requires an active Gmail inbox. Preview only.
+
+# Directory
+- [x] Randomize the Directory grid per visit: seeded shuffle in directory_faceted_search (stable while paging, reshuffles each visit); verified two preview visits show different orders. Live in the database now; page code ships on next publish.
