@@ -82,9 +82,11 @@ export const Route = createFileRoute("/directory/")({
       featured: [] as FacetedReel[],
     }));
     const filters = { moods: list(deps.mood), categories: list(deps.category), brands: list(deps.brand) };
+    // One shuffle seed per visit: the grid order changes between visits but stays stable while paging.
+    const seed = crypto.randomUUID();
     // First page of results is server-rendered so crawlers see every card before JavaScript runs.
     const initialP = dirP
-      .then((d) => searchDirectory({ data: { q: deps.q, ...filters, page: 1, pageSize: d.settings.pageSize } }))
+      .then((d) => searchDirectory({ data: { q: deps.q, ...filters, page: 1, pageSize: d.settings.pageSize, seed } }))
       .catch(() => null);
     const single =
       !deps.q && !deps.brand
@@ -118,6 +120,7 @@ export const Route = createFileRoute("/directory/")({
       featuredReels: dir.featured,
       initial,
       initialKey: `${deps.q}|${JSON.stringify(filters)}`,
+      seed,
       listing: single && listing ? { ...single, ...listing } : null,
       brandCount: brandCount(initial?.facets),
       guides: guides.map((g) => ({
@@ -304,6 +307,7 @@ function DirectoryPage() {
     featuredReels: featuredSet,
     initial,
     initialKey,
+    seed,
     listing,
     guides,
   } = Route.useLoaderData();
@@ -392,7 +396,7 @@ function DirectoryPage() {
     startPage.current = page;
   }
   const results = useInfiniteQuery({
-    queryKey: ["directory-search", q, fKey],
+    queryKey: ["directory-search", q, fKey, seed],
     placeholderData: keepPreviousData,
     // The loader already fetched page 1 on the server, so cards are in the first HTML.
     ...(initial && startPage.current === 1 && initialKey === `${q}|${fKey}`
@@ -401,8 +405,8 @@ function DirectoryPage() {
     initialPageParam: startPage.current,
     queryFn: ({ pageParam }) =>
       pageParam === startPage.current
-        ? searchFn({ data: { q, ...filters, page: 1, pageSize: PAGE * pageParam } })
-        : searchFn({ data: { q, ...filters, page: pageParam, pageSize: PAGE } }),
+        ? searchFn({ data: { q, ...filters, page: 1, pageSize: PAGE * pageParam, seed } })
+        : searchFn({ data: { q, ...filters, page: pageParam, pageSize: PAGE, seed } }),
     getNextPageParam: (last, all) => {
       const loaded = all.reduce((n, p) => n + p.reels.length, 0);
       return loaded < last.total ? startPage.current + all.length : undefined;
