@@ -39,7 +39,7 @@ export function ReelProductsEditor({ adId }: { adId: string }) {
     <p className="mb-2 text-[13px] text-ap-muted">Shown under your reel. Shoppers buy on your site.</p>
     <ul className="flex flex-col gap-2">
       {rows.map((r, i) => <li key={r.key} draggable onDragStart={() => setDrag(i)} onDragOver={(e) => e.preventDefault()}
-        onDrop={() => { if (drag == null || drag === i) return; setRows((l) => { const n = [...l]; const [m] = n.splice(drag, 1); n.splice(i, 0, m); return n; }); setDrag(null); }}
+        onDrop={() => { if (drag == null || drag === i) return; setRows((l) => { const n = [...l]; const [m] = n.splice(drag, 1); if (m) n.splice(i, 0, m); return n; }); setDrag(null); }}
         className="rounded-[4px] border border-ap-hairline p-2">
         <div className="flex flex-wrap items-center gap-2">
           <GripVertical aria-label="Drag to reorder" className="size-4 flex-none cursor-grab text-ap-muted" strokeWidth={1.7} />

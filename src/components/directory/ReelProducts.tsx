@@ -3,7 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { getBrandProducts, getReelProducts, recordProductClick } from "@/lib/directory/products.functions";
 import { formatPrice, productHref, type ReelProduct } from "@/lib/directory/products";
 
-function ProductRows({ products, heading, className }: { products: ReelProduct[]; heading: string; className?: string }) {
+function ProductRows({ products, heading, className }: { products: ReelProduct[]; heading: string; className?: string | undefined }) {
   const record = useServerFn(recordProductClick);
   if (!products.length) return null;
   return <div className={className}>
@@ -24,7 +24,7 @@ function ProductRows({ products, heading, className }: { products: ReelProduct[]
 }
 
 /** "From this reel" list; renders nothing when the reel has no products. */
-export function ReelProductList({ reelId, className }: { reelId: string | null | undefined; className?: string }) {
+export function ReelProductList({ reelId, className }: { reelId: string | null | undefined; className?: string | undefined }) {
   const fetchFn = useServerFn(getReelProducts);
   const { data } = useQuery({ queryKey: ["reel-products", reelId], enabled: !!reelId, staleTime: 60_000, queryFn: () => fetchFn({ data: { reelIds: [reelId!] } }) });
   return <ProductRows products={data ?? []} heading="From this reel" className={className} />;
