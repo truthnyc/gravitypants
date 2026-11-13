@@ -9,7 +9,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 export type ReelNav = {
   index: number; total: number; noun?: string;
   onPrev: () => void; onNext: () => void;
-  mood?: string; fit?: string[];
+  mood?: string | undefined; fit?: string[] | undefined;
 };
 export const ReelNavContext = createContext<ReelNav | null>(null);
 
