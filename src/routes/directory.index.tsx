@@ -408,7 +408,7 @@ function DirectoryPage() {
     const p = parseSearch(t, { moods: families.flatMap((f) => f.moods), brands });
     if (!p.mood && !p.brand && p.categories.length === 0) {
       setReadAs({ line: "No mood or category words found, so this is a plain text search.", occasion: null });
-      go(t);
+      applyFilters({ moods: [], categories: [], brands: [] }, t);
       return;
     }
     const catNames = p.categories.map((c) => CATEGORIES.find((x) => categorySlug(x) === c) ?? c);
