@@ -20,7 +20,7 @@ function NavButtons({ nav }: { nav: ReelNav }) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const t = e.target as HTMLElement | null;
-      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.tagName === "VIDEO" || t.isContentEditable)) return;
+      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
       if (e.key === "ArrowLeft" && hasPrev) { e.preventDefault(); nav.onPrev(); }
       if (e.key === "ArrowRight" && hasNext) { e.preventDefault(); nav.onNext(); }
     };
