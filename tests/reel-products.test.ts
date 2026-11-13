@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isHttpsUrl, productHref } from "./products";
+import { isHttpsUrl, productHref } from "../src/lib/directory/products";
 
 describe("reel products", () => {
   it("adds Aimanté tracking with the reel id as campaign", () => {
