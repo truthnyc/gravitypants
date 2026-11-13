@@ -309,6 +309,13 @@
       "when": 1794602156422,
       "tag": "0043_reel_products_link_sync",
       "breakpoints": true
+    },
+    {
+      "idx": 44,
+      "version": "7",
+      "when": 1794602330836,
+      "tag": "0044_brand_product_feeds",
+      "breakpoints": true
     }
   ]
 }
