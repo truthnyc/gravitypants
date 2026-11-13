@@ -42,7 +42,7 @@ export function StageView({ mood, categories, start, data }: { mood: string | nu
 
   const reel = list[index];
   const total = list.length;
-  const go = (i: number) => { if (i >= 0 && i < total) { setIndex(i); setProgress(0); } };
+  const go = (i: number) => { if (i >= 0 && i < total) { setIndex(i); setProgress(0); setDuration(0); } };
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const t = e.target as HTMLElement | null;
@@ -126,7 +126,7 @@ export function StageView({ mood, categories, start, data }: { mood: string | nu
               {src ? <video key={reel.id} ref={video} src={src} poster={reel.poster ?? undefined} muted playsInline autoPlay={!paused} loop={reduced}
                 aria-label={`${reel.brand_name} reel`}
                 onLoadedMetadata={(e) => setDuration(e.currentTarget.duration || 0)}
-                onTimeUpdate={(e) => setProgress(e.currentTarget.duration ? e.currentTarget.currentTime / e.currentTarget.duration : 0)}
+                onTimeUpdate={(e) => { const dd = e.currentTarget.duration; if (dd && isFinite(dd) && dd !== duration) setDuration(dd); setProgress(e.currentTarget.duration ? e.currentTarget.currentTime / e.currentTarget.duration : 0); }}
                 onEnded={() => { if (!reduced) go(index + 1 < total ? index + 1 : index); }} />
                 : reel.poster ? <img src={reel.poster} alt={`${reel.brand_name} reel`} /> : null}
             </div>
