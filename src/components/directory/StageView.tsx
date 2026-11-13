@@ -106,8 +106,8 @@ export function StageView({ mood, categories, start, data }: { mood: string | nu
           <h2 className="mt-2 text-[28px] leading-tight font-semibold">{reel.title}</h2>
           <p className="mt-1 text-[15px]">by <Link to="/directory/$slug" params={{ slug: reel.brand_slug }} className="font-semibold text-ap-blue hover:underline">{reel.brand_name}</Link></p>
           {d && d.tags.length > 0 && <ul className="mt-4 flex flex-wrap gap-1.5" aria-label="Tags">{d.tags.map((t) => <li key={t} className={cn("rounded-[4px] border px-2.5 py-0.5 text-[13px]", fitSet.has(t.toLowerCase()) ? "border-transparent bg-ap-soft-blue text-ap-blue" : "border-ap-hairline")}>{t}</li>)}</ul>}
-          <div className="mt-6 flex items-center gap-3">
-            {d?.href && <a href={d.href} target="_blank" rel="noreferrer" className="inline-flex h-10 items-center gap-1.5 rounded-lg bg-ap-blue px-4 text-[15px] font-medium text-ap-card hover:bg-ap-blue-hover">Visit {reel.brand_name} <ArrowUpRight className="size-4" strokeWidth={1.7} /></a>}
+          <div className="mt-6 flex flex-wrap items-center gap-3">
+            {d?.href && <a href={d.href} target="_blank" rel="noreferrer" className="inline-flex h-10 items-center gap-1.5 whitespace-nowrap rounded-lg bg-ap-blue px-4 text-[15px] font-medium text-ap-card hover:bg-ap-blue-hover">Visit {reel.brand_name} <ArrowUpRight className="size-4" strokeWidth={1.7} /></a>}
             <span className="stage-save inline-flex items-center gap-1.5 text-[14px]">
               {reel.kind === "site" ? <SiteReelHeart inline reelId={reel.id} name={reel.title} /> : <DirectoryReelHeart inline reelId={reel.id} name={reel.title} />}
               Save

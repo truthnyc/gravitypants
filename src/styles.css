@@ -1481,9 +1481,10 @@ p.concept-reel-notice { font-size: 10px !important; }
 .stage-progress { flex: 1; height: 2px; background: var(--ap-hairline); }
 .stage-progress span { display: block; height: 100%; background: var(--ap-ink); }
 .stage-also-list { display: grid; gap: 12px; }
+.stage-grid > * { min-width: 0; }
 .stage-save button { position: static; }
 @media (max-width: 899px) {
-  .stage-grid { grid-template-columns: 1fr; justify-items: center; gap: 28px; }
+  .stage-grid { grid-template-columns: minmax(0, 1fr); justify-items: center; gap: 28px; }
   .stage-center { order: 1; width: 100%; max-width: 380px; }
   .stage-info { order: 2; width: 100%; }
   .stage-also { order: 3; width: 100%; }
