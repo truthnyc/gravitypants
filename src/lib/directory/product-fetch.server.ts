@@ -15,10 +15,10 @@ function checkUrl(raw: string): URL {
 }
 
 /** Fetches a public https product page (redirects re-checked, 8 s, 2 MB cap) and returns parsed details only. */
-export async function fetchProductInfo(raw: string): Promise<ProductInfo> {
+export async function fetchProductInfo(raw: string, timeoutMs = TIMEOUT_MS): Promise<ProductInfo> {
   let u = checkUrl(raw.trim());
   const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
+  const timer = setTimeout(() => ctrl.abort(), timeoutMs);
   try {
     let res: Response | null = null;
     for (let hop = 0; hop < 5; hop++) {
