@@ -30,7 +30,6 @@ import { aimanteHead } from "@/lib/site/brand-site";
 import { SiteReelHeart } from "@/components/site/SiteReelHeart";
 import { SiteReelModal } from "@/components/site/SiteReelModal";
 import { parseSearch } from "@/lib/directory/parse-search";
-import { CATEGORIES, categorySlug } from "@/lib/directory/directory";
 const SUGGESTIONS = ["Something cozy for a host", "Elegant jewellery", "Bold fashion", "Calm for the home"];
 import { ReelNavContext, type ReelNav } from "@/components/directory/ReelPopup";
 import { useMoodCatalog } from "@/lib/directory/moods";
@@ -346,7 +345,7 @@ function DirectoryPage() {
   useEffect(() => {
     const media = window.matchMedia("(max-width: 767px)");
     const update = () => {
-      if (input.current) input.current.placeholder = isAim && media.matches ? " " : "  ";
+      if (input.current) input.current.placeholder = "Try “something cozy for a host”";
     };
     update();
     media.addEventListener("change", update);
