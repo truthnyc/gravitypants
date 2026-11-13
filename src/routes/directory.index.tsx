@@ -29,6 +29,8 @@ import { siteHead } from "@/lib/site/seo";
 import { aimanteHead } from "@/lib/site/brand-site";
 import { SiteReelHeart } from "@/components/site/SiteReelHeart";
 import { SiteReelModal } from "@/components/site/SiteReelModal";
+import { parseSearch } from "@/lib/directory/parse-search";
+const SUGGESTIONS = ["Something cozy for a host", "Elegant jewellery", "Bold fashion", "Calm for the home"];
 import { ReelNavContext, type ReelNav } from "@/components/directory/ReelPopup";
 import { useMoodCatalog } from "@/lib/directory/moods";
 import { FeaturedBand } from "@/components/directory/FeaturedBand";
@@ -343,7 +345,7 @@ function DirectoryPage() {
   useEffect(() => {
     const media = window.matchMedia("(max-width: 767px)");
     const update = () => {
-      if (input.current) input.current.placeholder = isAim && media.matches ? " " : "  ";
+      if (input.current) input.current.placeholder = "Try “something cozy for a host”";
     };
     update();
     media.addEventListener("change", update);
@@ -384,7 +386,10 @@ function DirectoryPage() {
     return () => io.disconnect();
   }, []);
 
-  const setFilters = (f: FilterValue) =>
+  // What the last typed sentence was read as; cleared whenever filters change by hand.
+  const [readAs, setReadAs] = useState<{ line: string; occasion: string | null } | null>(null);
+  const setFilters = (f: FilterValue) => { setReadAs(null); applyFilters(f); };
+  const applyFilters = (f: FilterValue, q?: string) =>
     void navigate({
       replace: true,
       resetScroll: false,
@@ -393,9 +398,25 @@ function DirectoryPage() {
         mood: f.moods.join(",") || undefined,
         category: f.categories.join(",") || undefined,
         brand: f.brands.join(",") || undefined,
+        ...(q !== undefined ? { q: q || undefined } : {}),
         page: undefined,
       }),
     });
+  const runSentence = (text: string) => {
+    const t = text.trim();
+    if (!t) { setReadAs(null); go(""); return; }
+    const p = parseSearch(t, { moods: families.flatMap((f) => f.moods), brands });
+    if (!p.mood && !p.brand && p.categories.length === 0) {
+      setReadAs({ line: "No mood or category words found, so this is a plain text search.", occasion: null });
+      applyFilters({ moods: [], categories: [], brands: [] }, t);
+      return;
+    }
+    const catNames = p.categories.map((c) => CATEGORIES.find((x) => categorySlug(x) === c) ?? c);
+    const parts = [p.mood && `mood ${cap(p.mood)}`, catNames.length && `category ${catNames.join(", ")}`, p.brand && `brand ${brands.find((b) => b.slug === p.brand)?.name ?? p.brand}`].filter(Boolean);
+    setValue("");
+    applyFilters({ moods: p.mood ? [p.mood] : [], categories: p.categories, brands: p.brand ? [p.brand] : [] }, "");
+    setReadAs({ line: `Read as: ${parts.join(" · ")}`, occasion: p.occasion ? `${p.occasion} (${p.categories.length})` : null });
+  };
   const searchFn = useServerFn(searchDirectory);
   if (typeof window !== "undefined" && !browserSeed) browserSeed = seed;
   // A shared ?page=3 loads pages 1–3 in one request; later pages are appended one at a time.
@@ -708,7 +729,7 @@ function DirectoryPage() {
             role="search"
             onSubmit={(e) => {
               e.preventDefault();
-              go(value);
+              runSentence(value);
             }}
             className="dir-search-bar mx-auto flex h-[60px] max-w-[680px] items-center gap-2.5 rounded-[12px] border border-transparent bg-ap-panel pr-2 pl-5 transition-[background,border-color,box-shadow] motion-reduce:transition-none focus-within:border-ap-hairline focus-within:bg-ap-card focus-within:shadow-[0_10px_30px_rgba(20,30,50,.10)]"
           >
@@ -716,7 +737,7 @@ function DirectoryPage() {
               ref={input}
               value={value}
               onChange={(e) => setValue(e.target.value)}
-              placeholder=""
+              placeholder="Try “something cozy for a host”"
               aria-label="Search the Directory"
               aria-keyshortcuts="/"
               className="dir-search-input h-full min-w-0 flex-1 bg-transparent text-[19px] outline-hidden placeholder:text-ap-muted"
@@ -742,6 +763,16 @@ function DirectoryPage() {
               Search
             </Button>
           </form>
+          <ul className="mx-auto mt-3 flex max-w-[680px] flex-wrap justify-center gap-2" aria-label="Search suggestions">
+            {SUGGESTIONS.map((sg) => (
+              <li key={sg}>
+                <button type="button" onClick={() => { setValue(sg); runSentence(sg); }}
+                  className="rounded-full border border-ap-hairline bg-ap-card px-3 py-1 text-[13px] text-ap-body hover:border-ap-blue hover:text-ap-blue">
+                  {sg}
+                </button>
+              </li>
+            ))}
+          </ul>
         </section>
         <div ref={sentinel} aria-hidden className="h-px" />
         <div
@@ -762,7 +793,9 @@ function DirectoryPage() {
             families={families}
             brands={brands}
             compact={stuck}
+            categoryLabel={readAs?.occasion ?? undefined}
           />
+          {readAs && <p data-read-as className="mt-2 text-center text-[13px] text-ap-body" aria-live="polite">{readAs.line}</p>}
           {isAim && (
             <p className="mt-2 text-center text-[13px]">
               <Link to="/aimante/about" className="text-ap-blue hover:underline">
