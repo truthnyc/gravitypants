@@ -1,3 +1,4 @@
+import { BrandProductList } from "./ReelProducts";
 import { Link } from "@tanstack/react-router";
 import { Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -54,6 +55,7 @@ export function AimanteBrandPage({ brand, reels, siteReels, more, onOpen, onOpen
       </div>
       {total === 0 && <p className="py-8 text-ap-muted">No reels yet. Check back soon.</p>}
     </section>
+    <BrandProductList brandId={brand.id} />
     {more.length > 0 && <section className="mt-8" aria-labelledby="related-brands-title">
       <h2 id="related-brands-title" className="mb-4 text-[22px] font-semibold tracking-[-0.02em]">Similar brands</h2>
       <ul className="flex gap-10 overflow-x-auto pb-3">

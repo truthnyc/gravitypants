@@ -1,3 +1,4 @@
+import { ReelProductsEditor } from "@/components/directory/ReelProductsEditor";
 import { AIMANTE_ORIGIN } from "@/lib/site/brand-site";
 import { EmbedDialog } from "@/components/site/EmbedCode";
 import { createFileRoute, Link } from "@tanstack/react-router";
@@ -123,6 +124,7 @@ function DirectoryAccount() {
                     {r.pending === "in_review" && <p className="mt-1 text-[13px] text-ap-amber">Update in review. The current version stays live until it's approved.</p>}
                     {r.pending === "declined" && <p className="mt-1 text-[13px] text-destructive">Update not approved{r.pendingNote ? `: ${r.pendingNote}` : "."} The live version is unchanged.</p>}
                     <ReelMoods adId={r.adId} moods={r.moods} category={d.brand.category} onSaved={refresh} />
+                    <ReelProductsEditor adId={r.adId} />
                   </div>
                   <ReelActions adId={r.adId} title={r.name} format={r.size} status={r.status} pending={r.pending} onDone={refresh} />
                 </li>
