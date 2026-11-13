@@ -115,11 +115,11 @@ export function StageView({ mood, categories, start, data }: { mood: string | nu
           </div>
         </section>
 
-        <div className="stage-center">
+        <div className="stage-center" style={wash ? { ["--stage-wash" as string]: wash } : undefined}>
           <button type="button" aria-label="Previous reel" disabled={index === 0} onClick={() => go(index - 1)} className="reel-popup-step stage-step">
             <ChevronLeft className="size-5" strokeWidth={1.7} />
           </button>
-          <div className="stage-frame" style={wash ? { ["--stage-wash" as string]: wash } : undefined}
+          <div className="stage-frame"
             onPointerDown={(e) => { swipe.current = e.clientX; }}
             onPointerUp={(e) => { const s = swipe.current; swipe.current = null; if (s === null) return; const dx = e.clientX - s; if (dx > 50) go(index - 1); else if (dx < -50) go(index + 1); }}>
             <div className="stage-media">

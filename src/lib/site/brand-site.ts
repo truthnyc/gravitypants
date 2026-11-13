@@ -62,7 +62,7 @@ export const currentSite = createIsomorphicFn()
 /** True for the public paths that belong to Aimanté. */
 export function isAimantePath(pathname: string): boolean {
   const p = pathname.replace(/\/+$/, "") || "/";
-  return p === "/" || p === "/join" || p === "/about" || p === "/sign-in" || p === "/sign-up" || p === "/reset" || /^\/(c|mood|b|guides)\/[^/]+$/.test(p) || p === "/guides" || p === "/brand-kit" || /^\/badge\/(light|dark)\.svg$/.test(p);
+  return p === "/" || p === "/join" || p === "/about" || p === "/sign-in" || p === "/sign-up" || p === "/reset" || /^\/(c|mood|b|guides)\/[^/]+$/.test(p) || p === "/guides" || p === "/stage" || /^\/stage\/[^/]+$/.test(p) || p === "/brand-kit" || /^\/badge\/(light|dark)\.svg$/.test(p);
 }
 
 /** Public Aimanté URL → the app's internal page. Pure apart from the site check. */

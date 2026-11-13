@@ -1467,3 +1467,28 @@ p.concept-reel-notice { font-size: 10px !important; }
 .features-drawer-scope { display: flex; gap: 2px; padding: 2px; border-radius: 999px; background: var(--ap-panel); }
 .features-drawer-scope span { flex: 1; text-align: center; padding: 5px 4px; border-radius: 999px; color: var(--ap-body); }
 .features-drawer-scope span.on { background: var(--ap-card); color: var(--ap-ink); box-shadow: var(--ap-shadow-soft, 0 1px 2px rgb(0 0 0 / 0.08)); }
+
+/* Stage view */
+.stage-headline { font-size: clamp(30px, 4.4vw, 52px); line-height: 1.1; letter-spacing: -0.02em; }
+.stage-grid { display: grid; grid-template-columns: minmax(0, 340px) auto minmax(0, 240px); align-items: center; justify-content: space-between; gap: 40px; }
+.stage-center { position: relative; display: flex; align-items: center; gap: 20px; }
+.stage-center::before { content: ""; position: absolute; inset: -12% -20%; z-index: -1; pointer-events: none; background: radial-gradient(closest-side, color-mix(in oklab, var(--stage-wash, var(--ap-blue)) 16%, transparent), transparent); }
+.stage-step { position: static; transform: none; flex: none; }
+.stage-frame { position: relative; height: min(56vh, 560px); aspect-ratio: 4 / 5; display: flex; flex-direction: column; border-radius: 0; background: var(--ap-panel); box-shadow: var(--ap-shadow-thumb); touch-action: pan-y; }
+.stage-media { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; }
+.stage-media video, .stage-media img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.stage-controls { height: 44px; flex: none; display: flex; align-items: center; gap: 10px; padding: 0 12px 0 6px; color: var(--ap-ink); }
+.stage-progress { flex: 1; height: 2px; background: var(--ap-hairline); }
+.stage-progress span { display: block; height: 100%; background: var(--ap-ink); }
+.stage-also-list { display: grid; gap: 12px; }
+.stage-save button { position: static; }
+@media (max-width: 899px) {
+  .stage-grid { grid-template-columns: 1fr; justify-items: center; gap: 28px; }
+  .stage-center { order: 1; width: 100%; max-width: 380px; }
+  .stage-info { order: 2; width: 100%; }
+  .stage-also { order: 3; width: 100%; }
+  .stage-step { display: none; }
+  .stage-frame { width: 100%; height: auto; }
+  .stage-also-list { display: flex; overflow-x: auto; gap: 16px; }
+  .stage-also-list li { flex: none; width: 200px; }
+}
