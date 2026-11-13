@@ -29,6 +29,7 @@ import { siteHead } from "@/lib/site/seo";
 import { aimanteHead } from "@/lib/site/brand-site";
 import { SiteReelHeart } from "@/components/site/SiteReelHeart";
 import { SiteReelModal } from "@/components/site/SiteReelModal";
+import { ReelNavContext, type ReelNav } from "@/components/directory/ReelPopup";
 import { useMoodCatalog } from "@/lib/directory/moods";
 import { FeaturedBand } from "@/components/directory/FeaturedBand";
 import { DEFAULT_DIRECTORY_SETTINGS, SPEED_SECONDS } from "@/lib/directory/settings";
@@ -567,7 +568,9 @@ function DirectoryPage() {
     filtered && featured.whenFiltering === "follow"
       ? `Featured · ${total} ${total === 1 ? "match" : "matches"}`
       : featured.title;
-  const openReel = (r: FacetedReel) => {
+  const opener = useRef<HTMLElement | null>(null);
+  const [navList, setNavList] = useState<{ list: FacetedReel[]; index: number } | null>(null);
+  const showReel = (r: FacetedReel) => {
     if (r.kind === "site") {
       const reel = reels.find((x) => x.id === r.id);
       if (!reel) return;
@@ -579,6 +582,32 @@ function DirectoryPage() {
     }
     void recordOpen({ data: { eventId: crypto.randomUUID(), reelId: r.id, kind: r.kind } }).catch(() => {});
   };
+  const openReel = (r: FacetedReel, list: FacetedReel[] = found) => {
+    const index = list.findIndex((x) => x.id === r.id && x.kind === r.kind);
+    setNavList(index >= 0 ? { list, index } : null);
+    opener.current = document.activeElement as HTMLElement | null;
+    showReel(r);
+  };
+  const stepTo = (index: number) => {
+    const target = navList?.list[index];
+    if (!navList || !target) return;
+    setOpen(null);
+    setOpenSite(null);
+    setNavList({ list: navList.list, index });
+    showReel(target);
+  };
+  const closeReel = () => {
+    setOpen(null); setOpenSite(null); setNavList(null);
+    const el = opener.current;
+    if (el) setTimeout(() => el.focus({ preventScroll: true }), 0);
+  };
+  const activeMood = filters.moods.at(-1)?.toLowerCase();
+  const reelNav: ReelNav | null = navList ? {
+    index: navList.index, total: navList.list.length,
+    onPrev: () => stepTo(navList.index - 1), onNext: () => stepTo(navList.index + 1),
+    mood: activeMood,
+    fit: activeMood ? [activeMood, ...families.filter((f) => f.moods.some((m) => m.toLowerCase() === activeMood)).flatMap((f) => f.moods.map((m) => m.toLowerCase()))] : undefined,
+  } : null;
 
   return (
     <SiteShell>
@@ -784,7 +813,7 @@ function DirectoryPage() {
             labelSize={featured.carouselLabelSize}
             labelGap={featured.carouselLabelGap}
             seconds={(r) => (r.kind === "site" ? (reels.find((x) => x.id === r.id)?.seconds ?? null) : null)}
-            onOpen={openReel}
+            onOpen={(r: FacetedReel) => openReel(r, featuredReels)}
           />
         )}
         <section
@@ -973,14 +1002,16 @@ function DirectoryPage() {
           )}
         </section>
       </div>
-      <ReelDetail card={open} onClose={() => setOpen(null)} />
+      <ReelNavContext.Provider value={reelNav}>
+      <ReelDetail card={open} onClose={closeReel} />
       <SiteReelModal
         reel={openSite}
         tags={
           found.find((r) => r.id === openSite?.id)?.moods ?? featuredSet.find((r) => r.id === openSite?.id)?.moods ?? []
         }
-        onClose={() => setOpenSite(null)}
+        onClose={closeReel}
       />
+      </ReelNavContext.Provider>
     </SiteShell>
   );
 }

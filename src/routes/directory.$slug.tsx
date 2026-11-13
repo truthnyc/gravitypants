@@ -12,6 +12,7 @@ import { siteHead } from "@/lib/site/seo";
 import { aimanteHead, AIMANTE_ORIGIN } from "@/lib/site/brand-site";
 import { SiteReelHeart } from "@/components/site/SiteReelHeart";
 import { SiteReelModal } from "@/components/site/SiteReelModal";
+import { ReelNavContext, type ReelNav } from "@/components/directory/ReelPopup";
 import type { SiteReel } from "@/lib/site/reels";
 import { useServerFn } from "@tanstack/react-start";
 import { useBrandSite } from "@/components/site/AimanteShell";
@@ -102,13 +103,23 @@ function BrandPage() {
   const openDirectoryReel = (card: DirectoryCard) => { setOpen(card); track(card.reel_id, "directory"); };
   const openSiteReel = (reel: SiteReel) => { setOpenSite(reel); track(reel.id, "site"); };
   const total = reels.length + siteReels.length;
+  const ordered = [...reels.map((r) => ({ id: r.reel_id, kind: "directory" as const })), ...siteReels.map((r) => ({ id: r.id, kind: "site" as const }))];
+  const current = open ? ordered.findIndex((x) => x.kind === "directory" && x.id === open.reel_id) : openSite ? ordered.findIndex((x) => x.kind === "site" && x.id === openSite.id) : -1;
+  const stepTo = (i: number) => {
+    const t = ordered[i];
+    if (!t) return;
+    setOpen(null); setOpenSite(null);
+    if (t.kind === "directory") { const c = reels.find((r) => r.reel_id === t.id); if (c) openDirectoryReel(c); }
+    else { const r = siteReels.find((x) => x.id === t.id); if (r) openSiteReel(r); }
+  };
+  const reelNav: ReelNav | null = current >= 0 ? { index: current, total: ordered.length, onPrev: () => stepTo(current - 1), onNext: () => stepTo(current + 1) } : null;
   if (!brand) return null;
   const sizes = new Set([...reels.flatMap((r) => r.formats), ...siteReels.map((r) => r.format)]);
   const initials = brand.name.split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase();
   if (site === "aimante") return <SiteShell>
     <AimanteBrandPage linkedMoods={linkedMoods} brand={brand} reels={reels} siteReels={siteReels} more={more} onOpen={openDirectoryReel} onOpenSite={openSiteReel} />
-    <ReelDetail card={open} onClose={() => setOpen(null)} />
-    <SiteReelModal reel={openSite} onClose={() => setOpenSite(null)} />
+    <ReelNavContext.Provider value={reelNav}><ReelDetail card={open} onClose={() => setOpen(null)} />
+    <SiteReelModal reel={openSite} onClose={() => setOpenSite(null)} /></ReelNavContext.Provider>
   </SiteShell>;
   return (
     <SiteShell>
@@ -184,8 +195,8 @@ function BrandPage() {
           </section>
         )}
       </main>
-      <ReelDetail card={open} onClose={() => setOpen(null)} />
-      <SiteReelModal reel={openSite} onClose={() => setOpenSite(null)} />
+      <ReelNavContext.Provider value={reelNav}><ReelDetail card={open} onClose={() => setOpen(null)} />
+      <SiteReelModal reel={openSite} onClose={() => setOpenSite(null)} /></ReelNavContext.Provider>
     </SiteShell>
   );
 }

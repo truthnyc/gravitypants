@@ -12,5 +12,5 @@ export function SiteReelModal({ reel, onClose, description, tags = [] }: { reel:
     favorite={<SiteReelHeart inline reelId={reel.id} name={reel.title} />}
     brand={reel.brandSlug ? <BrandProfileLink slug={reel.brandSlug} className="font-semibold text-ap-blue hover:underline">{reel.brand}</BrandProfileLink> : <span className="font-semibold">{reel.brand}</span>}
     profile={reel.brandSlug ? <BrandProfileLink slug={reel.brandSlug} cta="reel-popup-brand-page" className="reel-popup-shop">About {reel.brand} →</BrandProfileLink> : undefined}
-    media={<video controls autoPlay loop muted playsInline poster={reel.poster ?? undefined}>{reel.videoWebm && <source src={reel.videoWebm} type="video/webm" />}<source src={reel.video} type="video/mp4" /></video>} /></ReelPopup>;
+    media={<video key={reel.id} controls autoPlay loop muted playsInline poster={reel.poster ?? undefined}>{reel.videoWebm && <source src={reel.videoWebm} type="video/webm" />}<source src={reel.video} type="video/mp4" /></video>} /></ReelPopup>;
 }
