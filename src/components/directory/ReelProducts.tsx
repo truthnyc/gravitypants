@@ -13,7 +13,7 @@ function ProductRows({ products, heading, className }: { products: ReelProduct[]
         <a href={productHref(p.url, p.reel_id)} target="_blank" rel="noopener" onClick={() => void record({ data: { productId: p.id } }).catch(() => {})}
           className="flex !min-h-0 items-center justify-between gap-3 rounded-[10px] bg-ap-panel px-3 py-2 text-[14px] text-ap-ink no-underline">
           <span className="flex min-w-0 items-center gap-2">
-            {p.image_path && <img src={p.image_path} alt="" loading="lazy" className="size-7 flex-none rounded-[4px] object-cover" />}
+            {(p.image_url ?? p.image_path) && <img src={(p.image_url ?? p.image_path)!} alt="" loading="lazy" className="size-7 flex-none rounded-[4px] object-cover" />}
             <span className="truncate">{p.name} <span aria-hidden>↗</span></span>
           </span>
           {p.price != null && <span className="flex-none font-semibold tabular-nums">{formatPrice(p.price, p.currency)}</span>}
