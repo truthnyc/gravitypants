@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseSearch } from "./parse-search";
+import { parseSearch } from "@/lib/directory/parse-search";
 const catalog = { moods: ["cozy", "calm", "warm", "luxurious", "moody", "vibrant", "bold"], brands: [{ name: "Agnona", slug: "agnona" }] };
 describe("parseSearch", () => {
   it("reads a host occasion as three categories", () => {
