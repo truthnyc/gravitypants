@@ -16,7 +16,7 @@ export const Route = createFileRoute("/api/public/jobs/sync-feeds")({
         const { syncSource } = await import("@/lib/directory/feed-sync.server");
         const db = supabaseAdmin as any;
         const due = new Date(Date.now() - DUE_MS).toISOString();
-        const { data: src } = await db.from("brand_sources").select("id").or(`last_synced_at.is.null,last_synced_at.lt.${due}`).neq("status", "syncing")
+        const { data: src } = await db.from("brand_sources").select("id").or(`last_synced_at.is.null,last_synced_at.lt.${due}`)
           .order("last_synced_at", { ascending: true, nullsFirst: true }).limit(1).maybeSingle();
         if (!src) return Response.json({ synced: 0 });
         const r = await syncSource(db, src.id);

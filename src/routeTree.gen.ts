@@ -122,6 +122,7 @@ import { Route as AuthenticatedAppJoinWsRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAppReelKeyRouteImport } from './routes/_authenticated/app/reel.$key'
 import { Route as AuthenticatedAppTemplatesIndexRouteImport } from './routes/_authenticated/app/templates.index'
 import { Route as AuthenticatedAppTemplatesSlugRouteImport } from './routes/_authenticated/app/templates.$slug'
+import { Route as ApiPublicJobsSyncFeedsRouteImport } from './routes/api/public/jobs/sync-feeds'
 import { Route as ApiPublicJobsSyncProductsRouteImport } from './routes/api/public/jobs/sync-products'
 import { Route as ApiPublicMarketingCampaignIdRouteImport } from './routes/api/public/marketing-campaign.$id'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
@@ -737,6 +738,11 @@ const AuthenticatedAppTemplatesSlugRoute =
     path: '/templates/$slug',
     getParentRoute: () => AuthenticatedAppRouteRoute,
   } as any)
+const ApiPublicJobsSyncFeedsRoute = ApiPublicJobsSyncFeedsRouteImport.update({
+  id: '/api/public/jobs/sync-feeds',
+  path: '/api/public/jobs/sync-feeds',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicJobsSyncProductsRoute =
   ApiPublicJobsSyncProductsRouteImport.update({
     id: '/api/public/jobs/sync-products',
@@ -955,6 +961,7 @@ export interface FileRoutesByFullPath {
   '/app/join/$ws': typeof AuthenticatedAppJoinWsRoute
   '/app/reel/$key': typeof AuthenticatedAppReelKeyRoute
   '/app/templates/$slug': typeof AuthenticatedAppTemplatesSlugRoute
+  '/api/public/jobs/sync-feeds': typeof ApiPublicJobsSyncFeedsRoute
   '/api/public/jobs/sync-products': typeof ApiPublicJobsSyncProductsRoute
   '/api/public/marketing-campaign/$id': typeof ApiPublicMarketingCampaignIdRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -1085,6 +1092,7 @@ export interface FileRoutesByTo {
   '/app/join/$ws': typeof AuthenticatedAppJoinWsRoute
   '/app/reel/$key': typeof AuthenticatedAppReelKeyRoute
   '/app/templates/$slug': typeof AuthenticatedAppTemplatesSlugRoute
+  '/api/public/jobs/sync-feeds': typeof ApiPublicJobsSyncFeedsRoute
   '/api/public/jobs/sync-products': typeof ApiPublicJobsSyncProductsRoute
   '/api/public/marketing-campaign/$id': typeof ApiPublicMarketingCampaignIdRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -1220,6 +1228,7 @@ export interface FileRoutesById {
   '/_authenticated/app/join/$ws': typeof AuthenticatedAppJoinWsRoute
   '/_authenticated/app/reel/$key': typeof AuthenticatedAppReelKeyRoute
   '/_authenticated/app/templates/$slug': typeof AuthenticatedAppTemplatesSlugRoute
+  '/api/public/jobs/sync-feeds': typeof ApiPublicJobsSyncFeedsRoute
   '/api/public/jobs/sync-products': typeof ApiPublicJobsSyncProductsRoute
   '/api/public/marketing-campaign/$id': typeof ApiPublicMarketingCampaignIdRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -1355,6 +1364,7 @@ export interface FileRouteTypes {
     | '/app/join/$ws'
     | '/app/reel/$key'
     | '/app/templates/$slug'
+    | '/api/public/jobs/sync-feeds'
     | '/api/public/jobs/sync-products'
     | '/api/public/marketing-campaign/$id'
     | '/api/public/payments/webhook'
@@ -1485,6 +1495,7 @@ export interface FileRouteTypes {
     | '/app/join/$ws'
     | '/app/reel/$key'
     | '/app/templates/$slug'
+    | '/api/public/jobs/sync-feeds'
     | '/api/public/jobs/sync-products'
     | '/api/public/marketing-campaign/$id'
     | '/api/public/payments/webhook'
@@ -1619,6 +1630,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/join/$ws'
     | '/_authenticated/app/reel/$key'
     | '/_authenticated/app/templates/$slug'
+    | '/api/public/jobs/sync-feeds'
     | '/api/public/jobs/sync-products'
     | '/api/public/marketing-campaign/$id'
     | '/api/public/payments/webhook'
@@ -1704,6 +1716,7 @@ export interface RootRouteChildren {
   EmbedReelIdRoute: typeof EmbedReelIdRoute
   ShopifyReelIdRoute: typeof ShopifyReelIdRoute
   AimanteGuidesIndexRoute: typeof AimanteGuidesIndexRoute
+  ApiPublicJobsSyncFeedsRoute: typeof ApiPublicJobsSyncFeedsRoute
   ApiPublicJobsSyncProductsRoute: typeof ApiPublicJobsSyncProductsRoute
   ApiPublicMarketingCampaignIdRoute: typeof ApiPublicMarketingCampaignIdRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
@@ -2512,6 +2525,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppTemplatesSlugRouteImport
       parentRoute: typeof AuthenticatedAppRouteRoute
     }
+    '/api/public/jobs/sync-feeds': {
+      id: '/api/public/jobs/sync-feeds'
+      path: '/api/public/jobs/sync-feeds'
+      fullPath: '/api/public/jobs/sync-feeds'
+      preLoaderRoute: typeof ApiPublicJobsSyncFeedsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/jobs/sync-products': {
       id: '/api/public/jobs/sync-products'
       path: '/api/public/jobs/sync-products'
@@ -2912,6 +2932,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmbedReelIdRoute: EmbedReelIdRoute,
   ShopifyReelIdRoute: ShopifyReelIdRoute,
   AimanteGuidesIndexRoute: AimanteGuidesIndexRoute,
+  ApiPublicJobsSyncFeedsRoute: ApiPublicJobsSyncFeedsRoute,
   ApiPublicJobsSyncProductsRoute: ApiPublicJobsSyncProductsRoute,
   ApiPublicMarketingCampaignIdRoute: ApiPublicMarketingCampaignIdRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
