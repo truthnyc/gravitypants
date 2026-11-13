@@ -1,3 +1,4 @@
+import { CatalogBox } from "@/components/directory/CatalogBox";
 import { ReelProductsEditor } from "@/components/directory/ReelProductsEditor";
 import { AIMANTE_ORIGIN } from "@/lib/site/brand-site";
 import { EmbedDialog } from "@/components/site/EmbedCode";
@@ -85,6 +86,8 @@ function DirectoryAccount() {
           <SlugBox brandId={d.brand.id} slug={d.brand.slug} live={d.brand.live} onSaved={() => void qc.invalidateQueries({ queryKey: ["directory-account", ws] })} />
           <p className="mt-4 text-[14px] text-ap-body">Optional: link to your page from your own site. <Link to="/app/account/brand-kit" data-cta="account-directory-badge" className="text-ap-blue">Get your badge</Link></p>
         </section>
+
+        <CatalogBox brandId={d.brand.id} />
 
         {d.siteReels.length > 0 && (
           <section className="acct-card">
