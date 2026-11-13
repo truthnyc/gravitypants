@@ -997,9 +997,8 @@ function DirectoryPage() {
         </section>
       </div>
       <ReelNavContext.Provider value={reelNav}>
-      <ReelDetail key={open?.reel_id} card={open} onClose={closeReel} />
+      <ReelDetail card={open} onClose={closeReel} />
       <SiteReelModal
-        key={openSite?.id}
         reel={openSite}
         tags={
           found.find((r) => r.id === openSite?.id)?.moods ?? featuredSet.find((r) => r.id === openSite?.id)?.moods ?? []

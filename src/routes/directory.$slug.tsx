@@ -118,8 +118,8 @@ function BrandPage() {
   const initials = brand.name.split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase();
   if (site === "aimante") return <SiteShell>
     <AimanteBrandPage linkedMoods={linkedMoods} brand={brand} reels={reels} siteReels={siteReels} more={more} onOpen={openDirectoryReel} onOpenSite={openSiteReel} />
-    <ReelNavContext.Provider value={reelNav}><ReelDetail key={open?.reel_id} card={open} onClose={() => setOpen(null)} />
-    <SiteReelModal key={openSite?.id} reel={openSite} onClose={() => setOpenSite(null)} /></ReelNavContext.Provider>
+    <ReelNavContext.Provider value={reelNav}><ReelDetail card={open} onClose={() => setOpen(null)} />
+    <SiteReelModal reel={openSite} onClose={() => setOpenSite(null)} /></ReelNavContext.Provider>
   </SiteShell>;
   return (
     <SiteShell>
@@ -195,8 +195,8 @@ function BrandPage() {
           </section>
         )}
       </main>
-      <ReelNavContext.Provider value={reelNav}><ReelDetail key={open?.reel_id} card={open} onClose={() => setOpen(null)} />
-      <SiteReelModal key={openSite?.id} reel={openSite} onClose={() => setOpenSite(null)} /></ReelNavContext.Provider>
+      <ReelNavContext.Provider value={reelNav}><ReelDetail card={open} onClose={() => setOpen(null)} />
+      <SiteReelModal reel={openSite} onClose={() => setOpenSite(null)} /></ReelNavContext.Provider>
     </SiteShell>
   );
 }
