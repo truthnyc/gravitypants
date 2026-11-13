@@ -568,6 +568,7 @@ function DirectoryPage() {
     filtered && featured.whenFiltering === "follow"
       ? `Featured · ${total} ${total === 1 ? "match" : "matches"}`
       : featured.title;
+  const opener = useRef<HTMLElement | null>(null);
   const [navList, setNavList] = useState<{ list: FacetedReel[]; index: number } | null>(null);
   const showReel = (r: FacetedReel) => {
     if (r.kind === "site") {
@@ -584,6 +585,7 @@ function DirectoryPage() {
   const openReel = (r: FacetedReel, list: FacetedReel[] = found) => {
     const index = list.findIndex((x) => x.id === r.id && x.kind === r.kind);
     setNavList(index >= 0 ? { list, index } : null);
+    opener.current = document.activeElement as HTMLElement | null;
     showReel(r);
   };
   const stepTo = (index: number) => {
@@ -594,7 +596,11 @@ function DirectoryPage() {
     setNavList({ list: navList.list, index });
     showReel(target);
   };
-  const closeReel = () => { setOpen(null); setOpenSite(null); setNavList(null); };
+  const closeReel = () => {
+    setOpen(null); setOpenSite(null); setNavList(null);
+    const el = opener.current;
+    if (el) setTimeout(() => el.focus({ preventScroll: true }), 0);
+  };
   const activeMood = filters.moods.at(-1)?.toLowerCase();
   const reelNav: ReelNav | null = navList ? {
     index: navList.index, total: navList.list.length,
