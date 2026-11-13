@@ -6,9 +6,12 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { fetchProduct, getMyReelProducts, saveMyReelProducts } from "@/lib/directory/products.functions";
+import { searchMyCatalog } from "@/lib/directory/feeds.functions";
+import { formatPrice } from "@/lib/directory/products";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { REEL_PRODUCTS_MAX, isHttpsUrl } from "@/lib/directory/products";
 
-type Row = { key: string; id?: string; name: string; price: string; currency: string; url: string; image: string; source: "manual" | "link"; availability?: "in_stock" | "out_of_stock" | "unknown" | undefined; syncedAt?: string | null; failures?: number };
+type Row = { key: string; id?: string; name: string; price: string; currency: string; url: string; image: string; source: "manual" | "link" | "feed"; catalogId?: string | null; availability?: "in_stock" | "out_of_stock" | "unknown" | undefined; syncedAt?: string | null; failures?: number };
 const blank = (patch: Partial<Row> = {}): Row => ({ key: crypto.randomUUID(), name: "", price: "", currency: "USD", url: "", image: "", source: "manual", ...patch });
 
 function ago(iso: string): string {
@@ -30,7 +33,7 @@ export function ReelProductsEditor({ adId }: { adId: string }) {
   const [drag, setDrag] = useState<number | null>(null);
   const [busy, setBusy] = useState(false);
   useEffect(() => {
-    if (q.data) setRows(q.data.products.map((p) => ({ key: p.id, id: p.id, name: p.name, price: p.price == null ? "" : String(p.price), currency: p.currency, url: p.url, image: (p.source_type === "link" ? p.image_url : p.image_path) ?? "", source: p.source_type === "link" ? "link" : "manual", availability: p.availability, syncedAt: p.last_synced_at ?? null, failures: p.sync_failures ?? 0 })));
+    if (q.data) setRows(q.data.products.map((p) => ({ key: p.id, id: p.id, name: p.name, price: p.price == null ? "" : String(p.price), currency: p.currency, url: p.url, image: (p.source_type === "manual" ? p.image_path : p.image_url) ?? "", source: p.source_type === "link" || p.source_type === "feed" ? p.source_type : "manual", catalogId: p.catalog_id ?? null, availability: p.availability, syncedAt: p.last_synced_at ?? null, failures: p.sync_failures ?? 0 })));
   }, [q.data]);
   if (!q.data) return null;
   const set = (i: number, patch: Partial<Row>) => setRows((r) => r.map((x, j) => (j === i ? { ...x, ...patch } : x)));
@@ -55,7 +58,7 @@ export function ReelProductsEditor({ adId }: { adId: string }) {
   const onSave = async () => {
     setBusy(true);
     try {
-      await save({ data: { adId, products: rows.map((r) => ({ id: r.id, name: r.name.trim(), price: r.price ? Number(r.price) : null, currency: /^[A-Z]{3}$/.test(r.currency) ? r.currency : "USD", url: r.url.trim(), image_path: r.source === "manual" ? r.image.trim() || null : null, image_url: r.source === "link" ? r.image.trim() || null : null, source_type: r.source, ...(r.availability ? { availability: r.availability } : {}) })) } });
+      await save({ data: { adId, products: rows.map((r) => ({ id: r.id, name: r.name.trim(), price: r.price ? Number(r.price) : null, currency: /^[A-Z]{3}$/.test(r.currency) ? r.currency : "USD", url: r.url.trim(), image_path: r.source === "manual" ? r.image.trim() || null : null, image_url: r.source === "link" ? r.image.trim() || null : null, source_type: r.source, catalog_id: r.catalogId ?? null, ...(r.availability ? { availability: r.availability } : {}) })) } });
       await qc.invalidateQueries({ queryKey: ["my-reel-products", adId] });
       toast.success("Products saved");
     } catch (e) { toast.error(e instanceof Error ? e.message : "Couldn't save products."); } finally { setBusy(false); }
@@ -75,7 +78,7 @@ export function ReelProductsEditor({ adId }: { adId: string }) {
         <div className="flex flex-wrap items-center gap-2">
           <GripVertical aria-label="Drag to reorder" className="size-4 flex-none cursor-grab text-ap-muted" strokeWidth={1.7} />
           <Input aria-label="Product name" placeholder="Name" value={r.name} onChange={(e) => set(i, { name: e.target.value })} className="h-9 min-w-[140px] flex-1" />
-          {r.source === "link" && r.image && <img src={r.image} alt="" className="size-9 flex-none rounded-[4px] object-cover" />}
+          {r.source !== "manual" && r.image && <img src={r.image} alt="" className="size-9 flex-none rounded-[4px] object-cover" />}
           <Input aria-label="Price" placeholder="Price" inputMode="decimal" value={r.price} onChange={(e) => set(i, { price: e.target.value })} className="h-9 w-24 tabular-nums" />
           <Input aria-label="Currency" value={r.currency} maxLength={3} onChange={(e) => set(i, { currency: e.target.value.toUpperCase() })} className="h-9 w-16 uppercase" />
           <Button variant="ghost" size="icon" aria-label="Remove product" onClick={() => setRows((l) => l.filter((_, j) => j !== i))}><X className="size-4" strokeWidth={1.7} /></Button>
@@ -86,9 +89,9 @@ export function ReelProductsEditor({ adId }: { adId: string }) {
         </div>
         <div className="mt-1 flex justify-between pl-6 text-[12px]">
           <span className="flex flex-wrap gap-x-2">
-            <span className="text-ap-muted">{r.source === "link" ? `From link${r.syncedAt ? ` · updated ${ago(r.syncedAt)}` : ""}` : "Entered by hand"}</span>
+            <span className="text-ap-muted">{r.source === "manual" ? "Entered by hand" : `${r.source === "feed" ? "From catalogue" : "From link"}${r.syncedAt ? ` · updated ${ago(r.syncedAt)}` : ""}`}</span>
             {(r.failures ?? 0) >= 3 && <span className="font-medium text-ap-amber">Needs checking</span>}
-            {r.availability === "out_of_stock" && <span className="text-ap-muted">Sold out, hidden from shoppers</span>}
+            {r.availability === "out_of_stock" && <span className="text-ap-muted">Out of stock, hidden from shoppers</span>}
             <span className="text-destructive">{errs[i]}</span>
           </span>
           {r.id && <span className="text-ap-muted tabular-nums">{q.data.clicks[r.id] ?? 0} {(q.data.clicks[r.id] ?? 0) === 1 ? "click" : "clicks"}</span>}
@@ -97,7 +100,49 @@ export function ReelProductsEditor({ adId }: { adId: string }) {
     </ul>
     <div className="mt-2 flex gap-2">
       {rows.length < REEL_PRODUCTS_MAX && <Button variant="outline" size="sm" onClick={() => setRows((l) => [...l, blank()])}><Plus className="size-4" strokeWidth={1.7} />Add product</Button>}
+      {rows.length < REEL_PRODUCTS_MAX && <CatalogPicker adId={adId} room={REEL_PRODUCTS_MAX - rows.length} taken={new Set(rows.map((r) => r.catalogId).filter(Boolean) as string[])}
+        onPick={(items) => setRows((l) => [...l, ...items.map((c) => blank({ name: c.name, price: c.price == null ? "" : String(c.price), currency: c.currency, url: c.url, image: c.image_url ?? "", source: "feed", catalogId: c.id, availability: c.availability }))])} />}
       <Button size="sm" disabled={busy || errs.some(Boolean)} onClick={onSave}>Save products</Button>
     </div>
   </div>;
+}
+
+type CatalogItem = { id: string; name: string; price: number | null; currency: string; url: string; image_url: string | null; availability: "in_stock" | "out_of_stock" | "unknown" };
+
+/** "Add from catalogue": shown only when the brand has a connected feed. */
+function CatalogPicker({ adId, room, taken, onPick }: { adId: string; room: number; taken: Set<string>; onPick: (items: CatalogItem[]) => void }) {
+  const search = useServerFn(searchMyCatalog);
+  const [open, setOpen] = useState(false);
+  const [q, setQ] = useState("");
+  const [picked, setPicked] = useState<CatalogItem[]>([]);
+  const probe = useQuery({ queryKey: ["my-catalog", adId, ""], queryFn: () => search({ data: { adId, q: "" } }), staleTime: 60_000 });
+  const list = useQuery({ queryKey: ["my-catalog", adId, q], enabled: open, queryFn: () => search({ data: { adId, q } }), staleTime: 30_000 });
+  if (!probe.data?.hasCatalog) return null;
+  const items = (list.data ?? probe.data).items as CatalogItem[];
+  const toggle = (c: CatalogItem) => setPicked((p) => p.some((x) => x.id === c.id) ? p.filter((x) => x.id !== c.id) : p.length < room ? [...p, c] : p);
+  return <>
+    <Button variant="outline" size="sm" onClick={() => { setPicked([]); setOpen(true); }}>Add from catalogue</Button>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader><DialogTitle>Add from catalogue</DialogTitle></DialogHeader>
+        <Input aria-label="Search products" placeholder="Search products" value={q} onChange={(e) => setQ(e.target.value)} className="h-9" />
+        <p className="text-[12px] text-ap-muted tabular-nums">{picked.length} of {room} picked</p>
+        <ul className="max-h-[50vh] overflow-y-auto">
+          {items.map((c) => {
+            const on = picked.some((x) => x.id === c.id), used = taken.has(c.id);
+            return <li key={c.id}>
+              <button type="button" disabled={used || (!on && picked.length >= room)} onClick={() => toggle(c)} aria-pressed={on}
+                className={"flex w-full items-center gap-3 rounded-[4px] px-2 py-2 text-left disabled:opacity-50 " + (on ? "bg-ap-soft-blue" : "hover:bg-ap-panel")}>
+                {c.image_url ? <img src={c.image_url} alt="" loading="lazy" className="size-10 flex-none rounded-[4px] object-cover" /> : <span className="size-10 flex-none rounded-[4px] bg-ap-panel" />}
+                <span className="min-w-0 flex-1"><span className="block truncate text-[14px]">{c.name}</span><span className="text-[12px] text-ap-muted">{used ? "Already on this reel" : c.availability === "out_of_stock" ? "Out of stock" : c.availability === "in_stock" ? "In stock" : "Stock unknown"}</span></span>
+                <span className="flex-none text-[14px] font-semibold tabular-nums">{formatPrice(c.price, c.currency)}</span>
+              </button>
+            </li>;
+          })}
+          {items.length === 0 && <li className="py-6 text-center text-[13px] text-ap-muted">No products match.</li>}
+        </ul>
+        <DialogFooter><Button disabled={!picked.length} onClick={() => { onPick(picked); setOpen(false); }}>Add {picked.length || ""}</Button></DialogFooter>
+      </DialogContent>
+    </Dialog>
+  </>;
 }

@@ -98,6 +98,63 @@ export type Database = {
         }
         Relationships: []
       }
+      brand_catalog: {
+        Row: {
+          availability: string
+          brand_id: string
+          currency: string
+          external_id: string
+          id: string
+          image_url: string | null
+          name: string
+          price: number | null
+          source_id: string
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          availability?: string
+          brand_id: string
+          currency?: string
+          external_id: string
+          id?: string
+          image_url?: string | null
+          name: string
+          price?: number | null
+          source_id: string
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          availability?: string
+          brand_id?: string
+          currency?: string
+          external_id?: string
+          id?: string
+          image_url?: string | null
+          name?: string
+          price?: number | null
+          source_id?: string
+          updated_at?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_catalog_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "directory_brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brand_catalog_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "brand_sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       brand_kit: {
         Row: {
           body_font: string | null
@@ -318,6 +375,50 @@ export type Database = {
           {
             foreignKeyName: "brand_requests_created_brand_id_fkey"
             columns: ["created_brand_id"]
+            isOneToOne: true
+            referencedRelation: "directory_brands"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      brand_sources: {
+        Row: {
+          brand_id: string
+          created_at: string
+          feed_url: string
+          id: string
+          last_error: string | null
+          last_synced_at: string | null
+          product_count: number
+          status: string
+          type: string
+        }
+        Insert: {
+          brand_id: string
+          created_at?: string
+          feed_url: string
+          id?: string
+          last_error?: string | null
+          last_synced_at?: string | null
+          product_count?: number
+          status?: string
+          type?: string
+        }
+        Update: {
+          brand_id?: string
+          created_at?: string
+          feed_url?: string
+          id?: string
+          last_error?: string | null
+          last_synced_at?: string | null
+          product_count?: number
+          status?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_sources_brand_id_fkey"
+            columns: ["brand_id"]
             isOneToOne: true
             referencedRelation: "directory_brands"
             referencedColumns: ["id"]
@@ -1537,6 +1638,7 @@ export type Database = {
       reel_products: {
         Row: {
           availability: string
+          catalog_id: string | null
           created_at: string
           currency: string
           id: string
@@ -1553,6 +1655,7 @@ export type Database = {
         }
         Insert: {
           availability?: string
+          catalog_id?: string | null
           created_at?: string
           currency?: string
           id?: string
@@ -1569,6 +1672,7 @@ export type Database = {
         }
         Update: {
           availability?: string
+          catalog_id?: string | null
           created_at?: string
           currency?: string
           id?: string
@@ -1584,6 +1688,13 @@ export type Database = {
           url?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "reel_products_catalog_id_fkey"
+            columns: ["catalog_id"]
+            isOneToOne: false
+            referencedRelation: "brand_catalog"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "reel_products_reel_id_fkey"
             columns: ["reel_id"]

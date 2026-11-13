@@ -19,7 +19,7 @@ function publicClient() {
   }) as any;
 }
 
-const COLS = "id, reel_id, name, price, currency, url, image_path, image_url, position, source_type, availability, last_synced_at, sync_failures";
+const COLS = "id, reel_id, name, price, currency, url, image_path, image_url, position, source_type, availability, last_synced_at, sync_failures, catalog_id";
 
 /** Public: products on live reels (empty for reels without any). */
 export const getReelProducts = createServerFn({ method: "GET" })
@@ -84,7 +84,8 @@ const productInput = z.object({
   url: z.string().trim().max(2000).refine(isHttpsUrl, "Use a link that starts with https://"),
   image_path: z.string().trim().max(2000).refine(isHttpsUrl, "Image link must start with https://").nullable(),
   image_url: z.string().trim().max(2000).refine(isHttpsUrl).nullable().optional(),
-  source_type: z.enum(["manual", "link"]).default("manual"),
+  source_type: z.enum(["manual", "link", "feed"]).default("manual"),
+  catalog_id: z.string().uuid().nullable().optional(),
   availability: z.enum(["in_stock", "out_of_stock", "unknown"]).optional(),
 });
 
@@ -103,7 +104,13 @@ export const saveMyReelProducts = createServerFn({ method: "POST" })
       const row: Record<string, unknown> = { reel_id: reelId, name: p.name, price: p.price, currency: p.currency, url: p.url, image_path: p.image_path, position: i };
       const isNew = !(p.id && (existing ?? []).some((r: any) => r.id === p.id));
       // Source is fixed when a row is created, so hand-entered products are never picked up by the nightly sync.
-      if (isNew) Object.assign(row, { source_type: p.source_type, image_url: p.source_type === "link" ? p.image_url ?? null : null, availability: p.availability ?? "unknown", last_synced_at: p.source_type === "link" ? new Date().toISOString() : null });
+      if (isNew && p.source_type === "feed") {
+        // Catalogue rows are read as the user (RLS) and must belong to this reel's brand.
+        const { data: c } = await sb.from("brand_catalog").select("id, brand_id, image_url, availability").eq("id", p.catalog_id ?? "").maybeSingle();
+        const { data: rb } = await sb.from("directory_reels").select("brand_id").eq("id", reelId).maybeSingle();
+        if (!c || c.brand_id !== rb?.brand_id) throw new Error("That catalogue product isn't available.");
+        Object.assign(row, { source_type: "feed", catalog_id: c.id, image_url: c.image_url, availability: c.availability, last_synced_at: new Date().toISOString() });
+      } else if (isNew) Object.assign(row, { source_type: p.source_type, image_url: p.source_type === "link" ? p.image_url ?? null : null, availability: p.availability ?? "unknown", last_synced_at: p.source_type === "link" ? new Date().toISOString() : null });
       const { error } = !isNew
         ? await sb.from("reel_products").update(row).eq("id", p.id).eq("reel_id", reelId)
         : await sb.from("reel_products").insert(row);
