@@ -38,8 +38,8 @@ export const Route = createFileRoute("/api/public/jobs/sync-products")({
             const info = await fetchProductInfo(r.url, 3000);
             if (info.price == null && info.availability === "unknown") throw new Error("no data");
             const patch: Record<string, unknown> = { last_synced_at: now, sync_failures: 0, availability: info.availability };
-            if (info.price != null) patch.price = info.price;
-            if (info.currency) patch.currency = info.currency;
+            if (info.price != null) patch['price'] = info.price;
+            if (info.currency) patch['currency'] = info.currency;
             await db.from("reel_products").update(patch).eq("id", r.id).eq("source_type", "link");
             ok++;
           } catch {

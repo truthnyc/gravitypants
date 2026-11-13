@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { fetchProduct, getMyReelProducts, saveMyReelProducts } from "@/lib/directory/products.functions";
 import { REEL_PRODUCTS_MAX, isHttpsUrl } from "@/lib/directory/products";
 
-type Row = { key: string; id?: string; name: string; price: string; currency: string; url: string; image: string; source: "manual" | "link"; availability?: "in_stock" | "out_of_stock" | "unknown"; syncedAt?: string | null; failures?: number };
+type Row = { key: string; id?: string; name: string; price: string; currency: string; url: string; image: string; source: "manual" | "link"; availability?: "in_stock" | "out_of_stock" | "unknown" | undefined; syncedAt?: string | null; failures?: number };
 const blank = (patch: Partial<Row> = {}): Row => ({ key: crypto.randomUUID(), name: "", price: "", currency: "USD", url: "", image: "", source: "manual", ...patch });
 
 function ago(iso: string): string {
