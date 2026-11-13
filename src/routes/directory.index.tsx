@@ -590,7 +590,7 @@ function DirectoryPage() {
       ? `Featured · ${total} ${total === 1 ? "match" : "matches"}`
       : featured.title;
   const opener = useRef<HTMLElement | null>(null);
-  const [navList, setNavList] = useState<{ list: FacetedReel[]; index: number } | null>(null);
+  const [navList, setNavList] = useState<{ list: FacetedReel[]; index: number; grid?: boolean } | null>(null);
   const showReel = (r: FacetedReel) => {
     if (r.kind === "site") {
       const reel = reels.find((x) => x.id === r.id);
@@ -605,7 +605,7 @@ function DirectoryPage() {
   };
   const openReel = (r: FacetedReel, list: FacetedReel[] = found) => {
     const index = list.findIndex((x) => x.id === r.id && x.kind === r.kind);
-    setNavList(index >= 0 ? { list, index } : null);
+    setNavList(index >= 0 ? { list, index, grid: list === found } : null);
     opener.current = document.activeElement as HTMLElement | null;
     showReel(r);
   };
@@ -614,7 +614,7 @@ function DirectoryPage() {
     if (!navList || !target) return;
     setOpen(null);
     setOpenSite(null);
-    setNavList({ list: navList.list, index });
+    setNavList({ ...navList, index });
     showReel(target);
   };
   const closeReel = () => {
@@ -627,6 +627,7 @@ function DirectoryPage() {
     index: navList.index, total: navList.list.length,
     onPrev: () => stepTo(navList.index - 1), onNext: () => stepTo(navList.index + 1),
     mood: activeMood,
+    stage: navList.grid && navList.list[navList.index] ? { mood: activeMood, categories: filters.categories, seed: browserSeed ?? seed, start: navList.list[navList.index]!.id } : undefined,
     fit: activeMood ? [activeMood, ...families.filter((f) => f.moods.some((m) => m.toLowerCase() === activeMood)).flatMap((f) => f.moods.map((m) => m.toLowerCase()))] : undefined,
   } : null;
 
