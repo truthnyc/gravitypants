@@ -795,7 +795,7 @@ function DirectoryPage() {
             compact={stuck}
             categoryLabel={readAs?.occasion ?? undefined}
           />
-          {readAs && <p className="mt-2 text-center text-[13px] text-ap-body" aria-live="polite">{readAs.line}</p>}
+          {readAs && <p data-read-as className="mt-2 text-center text-[13px] text-ap-body" aria-live="polite">{readAs.line}</p>}
           {isAim && (
             <p className="mt-2 text-center text-[13px]">
               <Link to="/aimante/about" className="text-ap-blue hover:underline">
