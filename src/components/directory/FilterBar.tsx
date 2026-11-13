@@ -36,7 +36,9 @@ function Mark({ text, q }: { text: string; q: string }) {
   return <>{text.slice(0, i)}<mark className="rounded-[2px] bg-ap-soft-blue text-inherit">{text.slice(i, i + q.length)}</mark>{text.slice(i + q.length)}</>;
 }
 
-export function FilterBar({ value, onChange, facets, total, families, brands, compact = false, comingSoon = true, phoneStyle = false }: {
+export function FilterBar({ value, onChange, facets, total, families, brands, compact = false, comingSoon = true, phoneStyle = false, categoryLabel }: {
+  /** Shown instead of the category names when one occasion word chose several categories, e.g. "A host (3)". */
+  categoryLabel?: string | undefined;
   phoneStyle?: boolean; compact?: boolean; comingSoon?: boolean; value: FilterValue; onChange: (v: FilterValue) => void; facets: Facets; total: number; families: Family[]; brands: Brand[];
 }) {
   const [open, setOpen] = useState<Seg | null>(null);
@@ -130,7 +132,7 @@ export function FilterBar({ value, onChange, facets, total, families, brands, co
                         {value.moods.slice(0, 3).map((m) => <span key={m} className="size-2.5 rounded-full ring-2 ring-ap-panel" style={{ background: famColor(familyOf.get(m))?.bg }} />)}
                       </span>
                     )}
-                    <span className="truncate">{active ? summary(s.names) : s.empty}</span>
+                    <span className="truncate">{active ? (s.id === "category" && categoryLabel ? categoryLabel : summary(s.names)) : s.empty}</span>
                   </span>
                 </span>
                  {phoneStyle && <span className="dir-phone-filter-label">{s.label}{active ? ` (${s.names.length})` : ""}<span aria-hidden="true" className="ml-2 text-ap-muted">▾</span></span>}
