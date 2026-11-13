@@ -65,6 +65,8 @@ import { Route as ReelsIndexRouteImport } from './routes/reels.index'
 import { Route as ReelsSlugRouteImport } from './routes/reels.$slug'
 import { Route as ShopifyWelcomeRouteImport } from './routes/shopify_.welcome'
 import { Route as SitePhotoSplatRouteImport } from './routes/site-photo.$'
+import { Route as StageIndexRouteImport } from './routes/stage.index'
+import { Route as StageMoodRouteImport } from './routes/stage.$mood'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedAdminAdminsRouteImport } from './routes/_authenticated/admin/admins'
 import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin/analytics'
@@ -418,6 +420,16 @@ const ShopifyWelcomeRoute = ShopifyWelcomeRouteImport.update({
 const SitePhotoSplatRoute = SitePhotoSplatRouteImport.update({
   id: '/site-photo/$',
   path: '/site-photo/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StageIndexRoute = StageIndexRouteImport.update({
+  id: '/stage/',
+  path: '/stage/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StageMoodRoute = StageMoodRouteImport.update({
+  id: '/stage/$mood',
+  path: '/stage/$mood',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
@@ -878,9 +890,11 @@ export interface FileRoutesByFullPath {
   '/reels/$slug': typeof ReelsSlugRoute
   '/shopify/welcome': typeof ShopifyWelcomeRoute
   '/site-photo/$': typeof SitePhotoSplatRoute
+  '/stage/$mood': typeof StageMoodRoute
   '/blog/': typeof BlogIndexRoute
   '/directory/': typeof DirectoryIndexRoute
   '/reels/': typeof ReelsIndexRoute
+  '/stage/': typeof StageIndexRoute
   '/admin/admins': typeof AuthenticatedAdminAdminsRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
@@ -1005,9 +1019,11 @@ export interface FileRoutesByTo {
   '/reels/$slug': typeof ReelsSlugRoute
   '/shopify/welcome': typeof ShopifyWelcomeRoute
   '/site-photo/$': typeof SitePhotoSplatRoute
+  '/stage/$mood': typeof StageMoodRoute
   '/blog': typeof BlogIndexRoute
   '/directory': typeof DirectoryIndexRoute
   '/reels': typeof ReelsIndexRoute
+  '/stage': typeof StageIndexRoute
   '/admin/admins': typeof AuthenticatedAdminAdminsRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
@@ -1137,9 +1153,11 @@ export interface FileRoutesById {
   '/reels/$slug': typeof ReelsSlugRoute
   '/shopify_/welcome': typeof ShopifyWelcomeRoute
   '/site-photo/$': typeof SitePhotoSplatRoute
+  '/stage/$mood': typeof StageMoodRoute
   '/blog/': typeof BlogIndexRoute
   '/directory/': typeof DirectoryIndexRoute
   '/reels/': typeof ReelsIndexRoute
+  '/stage/': typeof StageIndexRoute
   '/_authenticated/admin/admins': typeof AuthenticatedAdminAdminsRoute
   '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
@@ -1269,9 +1287,11 @@ export interface FileRouteTypes {
     | '/reels/$slug'
     | '/shopify/welcome'
     | '/site-photo/$'
+    | '/stage/$mood'
     | '/blog/'
     | '/directory/'
     | '/reels/'
+    | '/stage/'
     | '/admin/admins'
     | '/admin/analytics'
     | '/admin/audit'
@@ -1396,9 +1416,11 @@ export interface FileRouteTypes {
     | '/reels/$slug'
     | '/shopify/welcome'
     | '/site-photo/$'
+    | '/stage/$mood'
     | '/blog'
     | '/directory'
     | '/reels'
+    | '/stage'
     | '/admin/admins'
     | '/admin/analytics'
     | '/admin/audit'
@@ -1527,9 +1549,11 @@ export interface FileRouteTypes {
     | '/reels/$slug'
     | '/shopify_/welcome'
     | '/site-photo/$'
+    | '/stage/$mood'
     | '/blog/'
     | '/directory/'
     | '/reels/'
+    | '/stage/'
     | '/_authenticated/admin/admins'
     | '/_authenticated/admin/analytics'
     | '/_authenticated/admin/audit'
@@ -1653,8 +1677,10 @@ export interface RootRouteChildren {
   ReelsSlugRoute: typeof ReelsSlugRoute
   ShopifyWelcomeRoute: typeof ShopifyWelcomeRoute
   SitePhotoSplatRoute: typeof SitePhotoSplatRoute
+  StageMoodRoute: typeof StageMoodRoute
   DirectoryIndexRoute: typeof DirectoryIndexRoute
   ReelsIndexRoute: typeof ReelsIndexRoute
+  StageIndexRoute: typeof StageIndexRoute
   AimanteGuidesSlugRoute: typeof AimanteGuidesSlugRoute
   ApiPublicCleanupExportsRoute: typeof ApiPublicCleanupExportsRoute
   ApiPublicClientErrorRoute: typeof ApiPublicClientErrorRoute
@@ -2071,6 +2097,20 @@ declare module '@tanstack/react-router' {
       path: '/site-photo/$'
       fullPath: '/site-photo/$'
       preLoaderRoute: typeof SitePhotoSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/stage/': {
+      id: '/stage/'
+      path: '/stage'
+      fullPath: '/stage/'
+      preLoaderRoute: typeof StageIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/stage/$mood': {
+      id: '/stage/$mood'
+      path: '/stage/$mood'
+      fullPath: '/stage/$mood'
+      preLoaderRoute: typeof StageMoodRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin/': {
@@ -2837,8 +2877,10 @@ const rootRouteChildren: RootRouteChildren = {
   ReelsSlugRoute: ReelsSlugRoute,
   ShopifyWelcomeRoute: ShopifyWelcomeRoute,
   SitePhotoSplatRoute: SitePhotoSplatRoute,
+  StageMoodRoute: StageMoodRoute,
   DirectoryIndexRoute: DirectoryIndexRoute,
   ReelsIndexRoute: ReelsIndexRoute,
+  StageIndexRoute: StageIndexRoute,
   AimanteGuidesSlugRoute: AimanteGuidesSlugRoute,
   ApiPublicCleanupExportsRoute: ApiPublicCleanupExportsRoute,
   ApiPublicClientErrorRoute: ApiPublicClientErrorRoute,
