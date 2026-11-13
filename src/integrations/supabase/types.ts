@@ -1381,6 +1381,42 @@ export type Database = {
         }
         Relationships: []
       }
+      product_clicks: {
+        Row: {
+          created_at: string
+          id: string
+          product_id: string
+          reel_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          product_id: string
+          reel_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          product_id?: string
+          reel_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_clicks_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "reel_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_clicks_reel_id_fkey"
+            columns: ["reel_id"]
+            isOneToOne: false
+            referencedRelation: "directory_reels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -1494,6 +1530,50 @@ export type Database = {
             columns: ["template_id"]
             isOneToOne: false
             referencedRelation: "templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reel_products: {
+        Row: {
+          created_at: string
+          currency: string
+          id: string
+          image_path: string | null
+          name: string
+          position: number
+          price: number | null
+          reel_id: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          id?: string
+          image_path?: string | null
+          name: string
+          position?: number
+          price?: number | null
+          reel_id: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          id?: string
+          image_path?: string | null
+          name?: string
+          position?: number
+          price?: number | null
+          reel_id?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reel_products_reel_id_fkey"
+            columns: ["reel_id"]
+            isOneToOne: false
+            referencedRelation: "directory_reels"
             referencedColumns: ["id"]
           },
         ]
