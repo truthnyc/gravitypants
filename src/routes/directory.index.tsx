@@ -396,6 +396,7 @@ function DirectoryPage() {
       }),
     });
   const searchFn = useServerFn(searchDirectory);
+  if (typeof window !== "undefined" && !browserSeed) browserSeed = seed;
   // A shared ?page=3 loads pages 1–3 in one request; later pages are appended one at a time.
   const startPage = useRef(page);
   const keyRef = useRef(`${q}|${fKey}`);
