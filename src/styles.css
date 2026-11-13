@@ -1475,7 +1475,7 @@ p.concept-reel-notice { font-size: 10px !important; }
 .stage-center::before { content: ""; position: absolute; inset: -12% -20%; z-index: -1; pointer-events: none; background: radial-gradient(closest-side, color-mix(in oklab, var(--stage-wash, var(--ap-blue)) 16%, transparent), transparent); }
 .stage-step { position: static; transform: none; flex: none; }
 .stage-frame { position: relative; height: min(56vh, 560px); aspect-ratio: 4 / 5; display: flex; flex-direction: column; border-radius: 0; background: var(--ap-panel); box-shadow: var(--ap-shadow-thumb); touch-action: pan-y; }
-.stage-media { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; }
+.stage-media { flex: 1; min-height: 0; min-width: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; }
 .stage-media video, .stage-media img { max-width: 100%; max-height: 100%; object-fit: contain; }
 .stage-controls { height: 44px; flex: none; display: flex; align-items: center; gap: 10px; padding: 0 12px 0 6px; color: var(--ap-ink); }
 .stage-progress { flex: 1; height: 2px; background: var(--ap-hairline); }
@@ -1488,7 +1488,8 @@ p.concept-reel-notice { font-size: 10px !important; }
   .stage-info { order: 2; width: 100%; }
   .stage-also { order: 3; width: 100%; }
   .stage-step { display: none; }
-  .stage-frame { width: 100%; height: auto; }
+  .stage-frame { width: 100%; height: auto; flex: 1 1 auto; min-width: 0; }
+  .stage-center { justify-content: center; }
   .stage-also-list { display: flex; overflow-x: auto; gap: 16px; }
   .stage-also-list li { flex: none; width: 200px; }
 }
