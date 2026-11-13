@@ -1492,3 +1492,5 @@ p.concept-reel-notice { font-size: 10px !important; }
   .stage-also-list { display: flex; overflow-x: auto; gap: 16px; }
   .stage-also-list li { flex: none; width: 200px; }
 }
+.reel-popup-stage { margin-top: 24px; gap: 6px; }
+.reel-popup-stage + .reel-popup-credit { margin-top: 10px; }
