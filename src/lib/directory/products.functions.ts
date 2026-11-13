@@ -19,14 +19,14 @@ function publicClient() {
   }) as any;
 }
 
-const COLS = "id, reel_id, name, price, currency, url, image_path, position";
+const COLS = "id, reel_id, name, price, currency, url, image_path, image_url, position, source_type, availability, last_synced_at, sync_failures";
 
 /** Public: products on live reels (empty for reels without any). */
 export const getReelProducts = createServerFn({ method: "GET" })
   .inputValidator((d: unknown) => z.object({ reelIds: z.array(z.string().uuid()).max(100) }).parse(d))
   .handler(async ({ data }) => {
     if (!data.reelIds.length) return [] as ReelProduct[];
-    const { data: rows } = await publicClient().from("reel_products").select(COLS).in("reel_id", data.reelIds).order("position");
+    const { data: rows } = await publicClient().from("reel_products").select(COLS).in("reel_id", data.reelIds).neq("availability", "out_of_stock").order("position");
     return (rows ?? []) as ReelProduct[];
   });
 
@@ -38,7 +38,7 @@ export const getBrandProducts = createServerFn({ method: "GET" })
     const { data: reels } = await sb.from("directory_reels").select("id").eq("brand_id", data.brandId).eq("status", "live");
     const ids = (reels ?? []).map((r: any) => r.id);
     if (!ids.length) return [] as ReelProduct[];
-    const { data: rows } = await sb.from("reel_products").select(COLS).in("reel_id", ids).order("position");
+    const { data: rows } = await sb.from("reel_products").select(COLS).in("reel_id", ids).neq("availability", "out_of_stock").order("position");
     return (rows ?? []) as ReelProduct[];
   });
 
@@ -83,6 +83,9 @@ const productInput = z.object({
   currency: z.string().regex(/^[A-Z]{3}$/).default("USD"),
   url: z.string().trim().max(2000).refine(isHttpsUrl, "Use a link that starts with https://"),
   image_path: z.string().trim().max(2000).refine(isHttpsUrl, "Image link must start with https://").nullable(),
+  image_url: z.string().trim().max(2000).refine(isHttpsUrl).nullable().optional(),
+  source_type: z.enum(["manual", "link"]).default("manual"),
+  availability: z.enum(["in_stock", "out_of_stock", "unknown"]).optional(),
 });
 
 /** Brand owner: replaces the reel's product list in the given order. Kept rows keep their click history. */
@@ -97,11 +100,34 @@ export const saveMyReelProducts = createServerFn({ method: "POST" })
     const drop = (existing ?? []).map((r: any) => r.id).filter((id: string) => !keep.has(id));
     if (drop.length) { const { error } = await sb.from("reel_products").delete().in("id", drop); if (error) throw new Error(error.message); }
     for (const [i, p] of data.products.entries()) {
-      const row = { reel_id: reelId, name: p.name, price: p.price, currency: p.currency, url: p.url, image_path: p.image_path, position: i };
-      const { error } = p.id && (existing ?? []).some((r: any) => r.id === p.id)
+      const row: Record<string, unknown> = { reel_id: reelId, name: p.name, price: p.price, currency: p.currency, url: p.url, image_path: p.image_path, position: i };
+      const isNew = !(p.id && (existing ?? []).some((r: any) => r.id === p.id));
+      // Source is fixed when a row is created, so hand-entered products are never picked up by the nightly sync.
+      if (isNew) Object.assign(row, { source_type: p.source_type, image_url: p.source_type === "link" ? p.image_url ?? null : null, availability: p.availability ?? "unknown", last_synced_at: p.source_type === "link" ? new Date().toISOString() : null });
+      const { error } = !isNew
         ? await sb.from("reel_products").update(row).eq("id", p.id).eq("reel_id", reelId)
         : await sb.from("reel_products").insert(row);
       if (error) throw new Error(error.message);
     }
     return { ok: true };
+  });
+
+/** Brand owner or admin: reads name, price, image and stock from a product page. Saves nothing. */
+export const fetchProduct = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ adId: z.string().uuid(), url: z.string().trim().max(2000) }).parse(d))
+  .handler(async ({ data, context }) => {
+    const sb = context.supabase as any;
+    const { data: reel } = await sb.from("directory_reels").select("brand_id").eq("ad_id", data.adId).maybeSingle();
+    if (!reel) throw new Error("This reel isn't in the Directory.");
+    const [{ data: member }, { data: admin }] = await Promise.all([sb.rpc("is_brand_member", { _brand: reel.brand_id }), sb.rpc("is_platform_admin")]);
+    if (member !== true && admin !== true) throw new Error("Only this brand can add products.");
+    const { fetchProductInfo, ProductFetchError } = await import("./product-fetch.server");
+    const { hasProductData } = await import("./product-page");
+    try {
+      const info = await fetchProductInfo(data.url);
+      return { ok: true as const, found: hasProductData(info), product: info };
+    } catch (e) {
+      return { ok: false as const, error: e instanceof ProductFetchError ? e.message : "We couldn't reach that page." };
+    }
   });
