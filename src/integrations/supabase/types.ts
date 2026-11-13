@@ -1536,36 +1536,51 @@ export type Database = {
       }
       reel_products: {
         Row: {
+          availability: string
           created_at: string
           currency: string
           id: string
           image_path: string | null
+          image_url: string | null
+          last_synced_at: string | null
           name: string
           position: number
           price: number | null
           reel_id: string
+          source_type: string
+          sync_failures: number
           url: string
         }
         Insert: {
+          availability?: string
           created_at?: string
           currency?: string
           id?: string
           image_path?: string | null
+          image_url?: string | null
+          last_synced_at?: string | null
           name: string
           position?: number
           price?: number | null
           reel_id: string
+          source_type?: string
+          sync_failures?: number
           url: string
         }
         Update: {
+          availability?: string
           created_at?: string
           currency?: string
           id?: string
           image_path?: string | null
+          image_url?: string | null
+          last_synced_at?: string | null
           name?: string
           position?: number
           price?: number | null
           reel_id?: string
+          source_type?: string
+          sync_failures?: number
           url?: string
         }
         Relationships: [
