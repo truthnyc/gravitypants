@@ -627,6 +627,7 @@ function DirectoryPage() {
     index: navList.index, total: navList.list.length,
     onPrev: () => stepTo(navList.index - 1), onNext: () => stepTo(navList.index + 1),
     mood: activeMood,
+    stage: navList.list === found && navList.list[navList.index] ? { mood: activeMood, categories: filters.categories, seed: browserSeed ?? seed, start: navList.list[navList.index]!.id } : undefined,
     fit: activeMood ? [activeMood, ...families.filter((f) => f.moods.some((m) => m.toLowerCase() === activeMood)).flatMap((f) => f.moods.map((m) => m.toLowerCase()))] : undefined,
   } : null;
 
