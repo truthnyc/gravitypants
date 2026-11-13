@@ -9,12 +9,16 @@ export function HoverReelPreview({ video, poster, className, alt = "" }: {
   const [loaded, setLoaded] = useState(false);
   const [playing, setPlaying] = useState(false);
 
+  // Only fetch the video after a deliberate pause on the tile, so sweeping the cursor across the grid downloads nothing.
+  const intent = useRef<ReturnType<typeof setTimeout> | null>(null);
   const start = () => {
     if (!video) return;
-    setLoaded(true);
-    setActive(true);
+    if (intent.current) clearTimeout(intent.current);
+    intent.current = setTimeout(() => { setLoaded(true); setActive(true); }, 350);
   };
+  useEffect(() => () => { if (intent.current) clearTimeout(intent.current); }, []);
   const stop = () => {
+    if (intent.current) { clearTimeout(intent.current); intent.current = null; }
     setActive(false);
     setPlaying(false);
     const element = ref.current;
