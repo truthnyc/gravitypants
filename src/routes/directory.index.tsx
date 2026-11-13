@@ -83,7 +83,7 @@ export const Route = createFileRoute("/directory/")({
     }));
     const filters = { moods: list(deps.mood), categories: list(deps.category), brands: list(deps.brand) };
     // One shuffle seed per visit: the grid order changes between visits but stays stable while paging.
-    const seed = crypto.randomUUID();
+    const seed = visitSeed();
     // First page of results is server-rendered so crawlers see every card before JavaScript runs.
     const initialP = dirP
       .then((d) => searchDirectory({ data: { q: deps.q, ...filters, page: 1, pageSize: d.settings.pageSize, seed } }))
@@ -297,6 +297,14 @@ function withLd(head: HeadOut, { noindex, ld }: { noindex: boolean; ld: object[]
   };
 }
 type Tag = { key: keyof FilterValue; value: string; label: string };
+
+// Server renders get a fresh seed per request; in the browser one seed lives for the whole visit,
+// so loader reruns (e.g. ?page= changes from Load more) never reshuffle already-loaded pages.
+let browserSeed: string | null = null;
+function visitSeed() {
+  if (typeof window === "undefined") return crypto.randomUUID();
+  return (browserSeed ??= crypto.randomUUID());
+}
 
 function DirectoryPage() {
   const {
