@@ -413,9 +413,11 @@ function DirectoryPage() {
     }
     const catNames = p.categories.map((c) => CATEGORIES.find((x) => categorySlug(x) === c) ?? c);
     const parts = [p.mood && `mood ${cap(p.mood)}`, catNames.length && `category ${catNames.join(", ")}`, p.brand && `brand ${brands.find((b) => b.slug === p.brand)?.name ?? p.brand}`].filter(Boolean);
+    // Words that are not a mood, category or brand still narrow the results as a text search.
+    const leftover = p.leftoverText.trim();
     setValue("");
-    applyFilters({ moods: p.mood ? [p.mood] : [], categories: p.categories, brands: p.brand ? [p.brand] : [] }, "");
-    setReadAs({ line: `Read as: ${parts.join(" · ")}`, occasion: p.occasion ? `${p.occasion} (${p.categories.length})` : null });
+    applyFilters({ moods: p.mood ? [p.mood] : [], categories: p.categories, brands: p.brand ? [p.brand] : [] }, leftover);
+    setReadAs({ line: `Read as: ${parts.join(" · ")}${leftover ? ` · “${leftover}”` : ""}`, occasion: p.occasion ? `${p.occasion} (${p.categories.length})` : null });
   };
   const searchFn = useServerFn(searchDirectory);
   if (typeof window !== "undefined" && !browserSeed) browserSeed = seed;
