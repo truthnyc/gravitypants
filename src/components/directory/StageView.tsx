@@ -137,11 +137,10 @@ export function StageView({ mood, family, start, data }: { mood: string | null; 
             onPointerDown={(e) => { swipe.current = e.clientX; }}
             onPointerUp={(e) => { const s = swipe.current; swipe.current = null; if (s === null) return; const dx = e.clientX - s; if (dx > 50) go(index - 1); else if (dx < -50) go(index + 1); }}>
             <div className="stage-media">
-              {src ? <video key={reel.id} ref={video} src={src} poster={reel.poster ?? undefined} muted playsInline autoPlay={!paused} loop={reduced}
+              {src ? <video key={reel.id} ref={video} src={src} poster={reel.poster ?? undefined} muted playsInline autoPlay={!paused} loop
                 aria-label={`${reel.brand_name} reel`}
                 onLoadedMetadata={(e) => setDuration(e.currentTarget.duration || 0)}
-                onTimeUpdate={(e) => { const dd = e.currentTarget.duration; if (dd && isFinite(dd) && dd !== duration) setDuration(dd); setProgress(e.currentTarget.duration ? e.currentTarget.currentTime / e.currentTarget.duration : 0); }}
-                onEnded={() => { if (!reduced) go(index + 1 < total ? index + 1 : index); }} />
+                onTimeUpdate={(e) => { const dd = e.currentTarget.duration; if (dd && isFinite(dd) && dd !== duration) setDuration(dd); setProgress(e.currentTarget.duration ? e.currentTarget.currentTime / e.currentTarget.duration : 0); }} />
                 : reel.poster ? <img src={reel.poster} alt={`${reel.brand_name} reel`} /> : null}
             </div>
             <div className="stage-controls">
