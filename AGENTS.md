@@ -11,6 +11,8 @@
 
 ## Stillframe architecture rules
 
+- Product page extraction resolves explicitly linked variant offers; unqualified product groups are available if any variant is in stock, and unidentified requested variants stay unknown to avoid borrowing another variant's stock.
+
 - Brand-owner published reel rows separate identity, actions and product editing into full-width grid rows; product inputs use shrinkable grid tracks so action buttons cannot squeeze the form.
 - Stage desktop tags and saving sit beneath the reel in its center grid track; phone detail placement remains unchanged through shared controls.
 

@@ -4,6 +4,22 @@ import { hasProductData, isPublicHost, parseProductPage } from "@/lib/directory/
 const ld = (o: unknown) => `<html><head><script type="application/ld+json">${JSON.stringify(o)}</script></head></html>`;
 
 describe("product page reader", () => {
+  const variantGroup = { "@type": "ProductGroup", name: "Jacket", hasVariant: [
+    { "@type": "Product", offers: { url: "https://shop.example.com/jacket?variant=53286360613200", price: 600, priceCurrency: "USD", availability: "https://schema.org/OutOfStock" } },
+    { "@type": "Product", offers: { url: "https://shop.example.com/jacket?variant=53286360678736", price: 600, priceCurrency: "USD", availability: "https://schema.org/InStock" } },
+  ] };
+  it("reads available variant 53286360678736 rather than the first sold-out offer", () => {
+    expect(parseProductPage(ld(variantGroup), "https://shop.example.com/jacket?variant=53286360678736").availability).toBe("in_stock");
+  });
+  it("keeps unavailable variant 53286360613200 sold out", () => {
+    expect(parseProductPage(ld(variantGroup), "https://shop.example.com/jacket?variant=53286360613200").availability).toBe("out_of_stock");
+  });
+  it("keeps a product group visible when any variant is available", () => {
+    expect(parseProductPage(ld(variantGroup), "https://shop.example.com/jacket").availability).toBe("in_stock");
+  });
+  it("does not guess stock for an unidentified variant", () => {
+    expect(parseProductPage(ld(variantGroup), "https://shop.example.com/jacket?variant=missing").availability).toBe("unknown");
+  });
   it("reads a Shopify-style Product with an offers array", () => {
     const p = parseProductPage(ld({ "@context": "https://schema.org", "@type": "Product", name: "Wool Throw", image: ["//cdn.shop.com/a.jpg"], offers: [{ "@type": "Offer", price: "120.00", priceCurrency: "usd", availability: "https://schema.org/InStock" }] }), "https://shop.example.com/products/throw");
     expect(p).toMatchObject({ name: "Wool Throw", price: 120, currency: "USD", image_url: "https://cdn.shop.com/a.jpg", availability: "in_stock" });
