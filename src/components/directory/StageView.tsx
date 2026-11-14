@@ -72,10 +72,10 @@ export function StageView({ mood, family, start, data }: { mood: string | null; 
     if (!r) return null;
     if (r.kind === "directory") {
       const c = data.cards.find((x) => x.reel_id === r.id);
-      return { tags: Array.from(new Set([...(c?.moods ?? r.moods), ...(c?.tags ?? [])])), href: c?.website_url ?? null };
+      return { tags: Array.from(new Set([...(c?.moods ?? r.moods), ...(c?.tags ?? [])])), href: c?.website_url ?? null, description: c?.description ?? null };
     }
     const s = data.siteReels.find((x) => x.id === r.id);
-    return { tags: Array.from(new Set(r.moods)), href: s?.href ?? null };
+    return { tags: Array.from(new Set(r.moods)), href: s?.href ?? null, description: s?.description ?? null };
   };
   const d = details(reel);
   const fits = (d?.tags ?? []).filter((t) => fitSet.has(t.toLowerCase())).slice(0, 3);
@@ -120,6 +120,7 @@ export function StageView({ mood, family, start, data }: { mood: string | null; 
           <p className="text-[14px] font-semibold text-ap-blue">{reel.category}</p>
           <h2 className="mt-2 text-[28px] leading-tight font-semibold">{reel.title}</h2>
           <p className="mt-1 text-[15px]">by <Link to="/directory/$slug" params={{ slug: reel.brand_slug }} className="font-semibold text-ap-blue hover:underline">{reel.brand_name}</Link></p>
+          {d?.description && <p className="mt-3 text-[15px] leading-relaxed text-ap-body">{d.description}</p>}
           <div className="stage-mobile-details mt-4">{tags}</div>
           {reel && <ReelProductList reelId={reel.id} className="mt-4" />}
           <div className="mt-6 flex flex-wrap items-center gap-3">

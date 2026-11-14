@@ -591,6 +591,7 @@ function DirectoryPage() {
     filtered && featured.whenFiltering === "follow"
       ? `Featured · ${total} ${total === 1 ? "match" : "matches"}`
       : featured.title;
+  const activeMood = filters.moods.at(-1)?.toLowerCase();
   const opener = useRef<HTMLElement | null>(null);
   const [navList, setNavList] = useState<{ list: FacetedReel[]; index: number; grid?: boolean } | null>(null);
   const showReel = (r: FacetedReel) => {
@@ -606,6 +607,12 @@ function DirectoryPage() {
     void recordOpen({ data: { eventId: crypto.randomUUID(), reelId: r.id, kind: r.kind } }).catch(() => {});
   };
   const openReel = (r: FacetedReel, list: FacetedReel[] = found) => {
+    if (list === found) {
+      void recordOpen({ data: { eventId: crypto.randomUUID(), reelId: r.id, kind: r.kind } }).catch(() => {});
+      const search = { start: r.id, seed: (browserSeed ?? seed) || undefined, categories: filters.categories.join("|") || undefined };
+      void (activeMood ? navigate({ to: "/stage/$mood", params: { mood: activeMood }, search }) : navigate({ to: "/stage", search }));
+      return;
+    }
     const index = list.findIndex((x) => x.id === r.id && x.kind === r.kind);
     setNavList(index >= 0 ? { list, index, grid: list === found } : null);
     opener.current = document.activeElement as HTMLElement | null;
@@ -624,7 +631,6 @@ function DirectoryPage() {
     const el = opener.current;
     if (el) setTimeout(() => el.focus({ preventScroll: true }), 0);
   };
-  const activeMood = filters.moods.at(-1)?.toLowerCase();
   const reelNav: ReelNav | null = navList ? {
     index: navList.index, total: navList.list.length,
     onPrev: () => stepTo(navList.index - 1), onNext: () => stepTo(navList.index + 1),
