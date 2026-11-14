@@ -16,7 +16,7 @@ function ProductRows({ products, heading, className }: { products: ReelProduct[]
             {(p.image_url ?? p.image_path) && <img src={(p.image_url ?? p.image_path)!} alt="" loading="lazy" className="size-7 flex-none rounded-[4px] object-cover" />}
             <span className="truncate">{p.name} <span aria-hidden>↗</span></span>
           </span>
-          {p.price != null && <span className="flex-none font-semibold tabular-nums">{formatPrice(p.price, p.currency)}</span>}
+          {p.price != null && <span className="flex-none text-[9.5px] font-semibold tabular-nums">{formatPrice(p.price, p.currency)}</span>}
         </a>
       </li>)}
     </ul>
