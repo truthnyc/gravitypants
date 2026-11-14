@@ -124,7 +124,7 @@ export function useAdminReelProducts(target: AdminTarget) {
   const errs = rows.map((r) => !r.name.trim() ? "Add a name." : !isHttpsUrl(r.url) ? "Link must start with https://" : r.image && !isHttpsUrl(r.image) ? "Image link must start with https://" : r.price && !(Number(r.price) >= 0) ? "Price must be a number." : null);
   const saveProducts = async () => {
     if (!key || errs.some(Boolean)) return;
-    await save({ data: { reelId: target.reelId ?? null, siteReelId: target.siteReelId ?? null, products: rows.map((r) => ({ id: r.id, name: r.name.trim(), price: r.price ? Number(r.price) : null, currency: /^[A-Z]{3}$/.test(r.currency) ? r.currency : "USD", url: r.url.trim(), image_path: r.image.trim() || null, source_type: "manual" as const })) } });
+    await save({ data: { reelId: target.reelId ?? null, siteReelId: target.siteReelId ?? null, products: rows.map((r) => ({ id: r.id, name: r.name.trim(), price: r.price ? Number(r.price) : null, currency: /^[A-Z]{3}$/.test(r.currency) ? r.currency : "USD", url: r.url.trim(), image_path: r.source === "manual" ? r.image.trim() || null : null, image_url: r.source === "link" ? r.image.trim() || null : null, source_type: r.source, ...(r.availability ? { availability: r.availability } : {}) })) } });
   };
   return { rows, setRows, errs, clicks: q.data?.clicks ?? {}, loaded: !!q.data || !key, saveProducts };
 }
