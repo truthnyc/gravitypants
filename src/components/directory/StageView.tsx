@@ -96,9 +96,8 @@ export function StageView({ mood, family, categories, start, data }: { mood: str
           <span className="text-ap-headline-muted">Show me something: </span>
           <span className="relative inline-block text-ap-blue">
             <span className="font-light text-ap-headline-bracket">[ </span>
-            <button type="button" aria-haspopup="menu" aria-expanded={menuOpen} onClick={() => setMenuOpen((o) => !o)} className="text-ap-blue hover:underline">{mood ?? "anything"}</button>
+            <button ref={wordBtn} type="button" aria-haspopup="dialog" aria-expanded={mapOpen} onClick={() => setMapOpen(true)} className="text-ap-blue hover:underline">{word}</button>
             <span className="font-light text-ap-headline-bracket"> ]</span>
-            {menuOpen && <MoodMenu families={families} current={mood} categories={categories} onClose={() => setMenuOpen(false)} />}
           </span>
         </h1>
         <p className="mt-3 text-[15px] text-ap-body nums">
@@ -163,6 +162,7 @@ export function StageView({ mood, family, categories, start, data }: { mood: str
           </ul>
         </aside>
       </div>}
+      {mapOpen && <MoodMap families={families} current={mood} currentFamily={family} returnFocus={wordBtn} onClose={() => setMapOpen(false)} />}
     </main>
   </SiteShell>;
 }
