@@ -17,7 +17,7 @@ const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 const andJoin = (xs: string[]) => xs.length < 2 ? xs.join("") : `${xs.slice(0, -1).join(", ")} and ${xs.at(-1)}`;
 
 /** Plays the current selection one reel at a time, large. */
-export function StageView({ mood, categories, start, data }: { mood: string | null; categories: string[]; start: string | null; data: StageData }) {
+export function StageView({ mood, family, categories, start, data }: { mood: string | null; family: string | null; categories: string[]; start: string | null; data: StageData }) {
   const router = useRouter();
   const navigate = useNavigate();
   const { families } = useMoodCatalog();
@@ -25,12 +25,13 @@ export function StageView({ mood, categories, start, data }: { mood: string | nu
   const [index, setIndex] = useState(() => Math.max(0, list.findIndex((r) => r.id === start)));
   const [userPaused, setUserPaused] = useState(false);
   const [hidden, setHidden] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [mapOpen, setMapOpen] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const [reduced, setReduced] = useState(false);
   const video = useRef<HTMLVideoElement>(null);
   const swipe = useRef<number | null>(null);
+  const wordBtn = useRef<HTMLButtonElement>(null);
 
   useEffect(() => { setIndex(Math.max(0, list.findIndex((r) => r.id === start))); }, [list, start]);
   useEffect(() => {
@@ -46,6 +47,7 @@ export function StageView({ mood, categories, start, data }: { mood: string | nu
   const go = (i: number) => { if (i >= 0 && i < total) { setIndex(i); setProgress(0); setDuration(0); } };
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      if (mapOpen) return; // arrows belong to the mood map while it is open
       const t = e.target as HTMLElement | null;
       if (t?.closest("input, textarea, [contenteditable=true]")) return;
       if (e.key === "ArrowLeft") go(index - 1);
@@ -55,16 +57,20 @@ export function StageView({ mood, categories, start, data }: { mood: string | nu
     return () => window.removeEventListener("keydown", onKey);
   });
 
-  const paused = userPaused || hidden || menuOpen;
+  const paused = userPaused || hidden || mapOpen;
   useEffect(() => {
     const v = video.current;
     if (!v) return;
     if (paused) v.pause(); else void v.play().catch(() => {});
   }, [paused, index]);
 
-  const family = families.find((f) => f.moods.some((m) => m.toLowerCase() === mood));
-  const fitSet = useMemo(() => new Set(mood ? [mood, ...(family?.moods ?? []).map((m) => m.toLowerCase())] : []), [mood, family]);
-  const wash = family ? MOOD_FAMILY_COLORS[family.family as MoodFamily]?.bg : undefined;
+  const currentFamily = families.find((f) => mood ? f.moods.some((m) => m.toLowerCase() === mood) : family ? f.family.toLowerCase() === family : false);
+  const fitSet = useMemo(() => {
+    const ms = (currentFamily?.moods ?? []).map((m) => m.toLowerCase());
+    return new Set(mood ? [mood, ...ms] : family ? ms : []);
+  }, [mood, family, currentFamily]);
+  const wash = currentFamily ? MOOD_FAMILY_COLORS[currentFamily.family as MoodFamily]?.bg : undefined;
+  const word = mood ?? family ?? "anything";
 
   const details = (r: FacetedReel | undefined) => {
     if (!r) return null;
