@@ -130,6 +130,58 @@ export const saveMyReelProducts = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+const adminTarget = z.object({ reelId: z.string().uuid().nullable(), siteReelId: z.string().uuid().nullable() })
+  .refine((t) => (t.reelId ? 1 : 0) + (t.siteReelId ? 1 : 0) === 1, "Pick exactly one reel");
+
+/** Admin: products on any reel (Directory or website), with click counts. */
+export const getReelProductsAdmin = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => adminTarget.parse(d))
+  .handler(async ({ data, context }) => {
+    const sb = context.supabase as any;
+    const { data: admin } = await sb.rpc("is_platform_admin");
+    if (admin !== true) throw new Error("Admins only.");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const col = data.reelId ? "reel_id" : "site_reel_id";
+    const id = (data.reelId ?? data.siteReelId)!;
+    const { data: rows } = await (supabaseAdmin as any).from("reel_products").select(COLS).eq(col, id).order("position");
+    const products = (rows ?? []) as ReelProduct[];
+    const clicks: Record<string, number> = {};
+    if (products.length) {
+      const { data: c } = await (supabaseAdmin as any).from("product_clicks").select("product_id").in("product_id", products.map((p) => p.id));
+      for (const r of c ?? []) clicks[r.product_id] = (clicks[r.product_id] ?? 0) + 1;
+    }
+    return { products, clicks };
+  });
+
+/** Admin: replaces a reel's product list in the given order. Kept rows keep their click history. */
+export const saveReelProductsAdmin = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => adminTarget.and(z.object({ products: z.array(productInput).max(REEL_PRODUCTS_MAX) })).parse(d))
+  .handler(async ({ data, context }) => {
+    const sb = context.supabase as any;
+    const { data: admin } = await sb.rpc("is_platform_admin");
+    if (admin !== true) throw new Error("Admins only.");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const sa = supabaseAdmin as any;
+    const col = data.reelId ? "reel_id" : "site_reel_id";
+    const id = (data.reelId ?? data.siteReelId)!;
+    const { data: existing } = await sa.from("reel_products").select("id").eq(col, id);
+    const keep = new Set(data.products.map((p) => p.id).filter(Boolean));
+    const drop = (existing ?? []).map((r: any) => r.id).filter((x: string) => !keep.has(x));
+    if (drop.length) { const { error } = await sa.from("reel_products").delete().in("id", drop); if (error) throw new Error(error.message); }
+    for (const [i, p] of data.products.entries()) {
+      const row: Record<string, unknown> = { reel_id: data.reelId, site_reel_id: data.siteReelId, name: p.name, price: p.price, currency: p.currency, url: p.url, image_path: p.image_path, image_url: p.image_url ?? null, position: i };
+      const isNew = !(p.id && (existing ?? []).some((r: any) => r.id === p.id));
+      if (isNew) Object.assign(row, { source_type: p.source_type === "feed" ? "manual" : p.source_type, availability: p.availability ?? "unknown", last_synced_at: p.source_type === "link" ? new Date().toISOString() : null });
+      const { error } = !isNew
+        ? await sa.from("reel_products").update(row).eq("id", p.id).eq(col, id)
+        : await sa.from("reel_products").insert(row);
+      if (error) throw new Error(error.message);
+    }
+    return { ok: true };
+  });
+
 /** Brand owner or admin: reads name, price, image and stock from a product page. Saves nothing. */
 export const fetchProduct = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
