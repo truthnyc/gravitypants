@@ -71,7 +71,7 @@ function probeVideo(file: File): Promise<Probe> {
     v.onerror = () => done({ format: "916", seconds: 8, poster: null });
     v.onloadedmetadata = () => {
       const r = v.videoWidth / Math.max(1, v.videoHeight);
-      const format: ReelFormat = r < 0.8 ? "916" : r > 1.3 ? "169" : "11";
+      const format: ReelFormat = r < 0.7 ? "916" : r < 0.9 ? "45" : r < 1.15 ? "11" : r < 1.4 ? "54" : "169";
       const seconds = Math.round(v.duration * 10) / 10 || 8;
       v.currentTime = Math.min(0.5, v.duration / 2);
       v.onseeked = () => {
