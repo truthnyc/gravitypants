@@ -1,4 +1,6 @@
 # Launch video correction
+## Stage desktop layout
+- [x] Move tags and Save beneath the reel on desktop; verified reel-width tag alignment, expand/collapse and next-arrow navigation, with phone layout unchanged. Preview only.
 ## Brand owner dashboard layout
 - [x] Give reel details, actions and product editing separate full-width rows; signed-in desktop/phone checks confirm contained product inputs, full-width tabs and no dashboard overflow. Preview only.
 ## Current monitoring fixes
