@@ -1,4 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { ServiceUnavailable } from "@/components/site/ServiceUnavailable";
 import { StageView } from "@/components/directory/StageView";
 import { getStage } from "@/lib/directory/stage.functions";
 import { stageSearch, stageCategories } from "@/lib/directory/stage";
@@ -21,6 +22,7 @@ export const Route = createFileRoute("/stage/$mood")({
     ],
   }),
   component: Page,
+  errorComponent: StageError,
 });
 
 function Page() {
@@ -28,4 +30,9 @@ function Page() {
   const { mood } = Route.useParams();
   const s = Route.useSearch();
   return <StageView mood={mood.toLowerCase()} categories={stageCategories(s.categories)} start={s.start ?? null} data={data} />;
+}
+
+function StageError() {
+  const router = useRouter();
+  return <ServiceUnavailable onRetry={() => router.invalidate()} />;
 }
