@@ -19,37 +19,48 @@ function publicClient() {
   }) as any;
 }
 
-const COLS = "id, reel_id, name, price, currency, url, image_path, image_url, position, source_type, availability, last_synced_at, sync_failures, catalog_id";
+const COLS = "id, reel_id, site_reel_id, name, price, currency, url, image_path, image_url, position, source_type, availability, last_synced_at, sync_failures, catalog_id";
 
-/** Public: products on live reels (empty for reels without any). */
+/** Public: products on live Directory reels and published website reels (empty for reels without any). */
 export const getReelProducts = createServerFn({ method: "GET" })
-  .inputValidator((d: unknown) => z.object({ reelIds: z.array(z.string().uuid()).max(100) }).parse(d))
+  .inputValidator((d: unknown) => z.object({ reelIds: z.array(z.string().uuid()).max(100).default([]), siteReelIds: z.array(z.string().uuid()).max(100).default([]) }).parse(d))
   .handler(async ({ data }) => {
-    if (!data.reelIds.length) return [] as ReelProduct[];
-    const { data: rows } = await publicClient().from("reel_products").select(COLS).in("reel_id", data.reelIds).neq("availability", "out_of_stock").order("position");
-    return (rows ?? []) as ReelProduct[];
+    if (!data.reelIds.length && !data.siteReelIds.length) return [] as ReelProduct[];
+    const sb = publicClient();
+    const [a, b] = await Promise.all([
+      data.reelIds.length ? sb.from("reel_products").select(COLS).in("reel_id", data.reelIds).neq("availability", "out_of_stock").order("position") : { data: [] },
+      data.siteReelIds.length ? sb.from("reel_products").select(COLS).in("site_reel_id", data.siteReelIds).neq("availability", "out_of_stock").order("position") : { data: [] },
+    ]);
+    return [...(a.data ?? []), ...(b.data ?? [])] as ReelProduct[];
   });
 
-/** Public: products across a brand's live reels. */
+/** Public: products across a brand's live Directory reels and published website reels. */
 export const getBrandProducts = createServerFn({ method: "GET" })
   .inputValidator((d: unknown) => z.object({ brandId: z.string().uuid() }).parse(d))
   .handler(async ({ data }) => {
     const sb = publicClient();
-    const { data: reels } = await sb.from("directory_reels").select("id").eq("brand_id", data.brandId).eq("status", "live");
+    const [{ data: reels }, { data: siteReels }] = await Promise.all([
+      sb.from("directory_reels").select("id").eq("brand_id", data.brandId).eq("status", "live"),
+      sb.from("site_reels").select("id").eq("brand_id", data.brandId).eq("published", true),
+    ]);
     const ids = (reels ?? []).map((r: any) => r.id);
-    if (!ids.length) return [] as ReelProduct[];
-    const { data: rows } = await sb.from("reel_products").select(COLS).in("reel_id", ids).neq("availability", "out_of_stock").order("position");
-    return (rows ?? []) as ReelProduct[];
+    const siteIds = (siteReels ?? []).map((r: any) => r.id);
+    if (!ids.length && !siteIds.length) return [] as ReelProduct[];
+    const [a, b] = await Promise.all([
+      ids.length ? sb.from("reel_products").select(COLS).in("reel_id", ids).neq("availability", "out_of_stock").order("position") : { data: [] },
+      siteIds.length ? sb.from("reel_products").select(COLS).in("site_reel_id", siteIds).neq("availability", "out_of_stock").order("position") : { data: [] },
+    ]);
+    return [...(a.data ?? []), ...(b.data ?? [])] as ReelProduct[];
   });
 
-/** Public: records one click; only for products visible on a live reel. No personal data. */
+/** Public: records one click; only for products visible on a live or published reel. No personal data. */
 export const recordProductClick = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ productId: z.string().uuid() }).parse(d))
   .handler(async ({ data }) => {
-    const { data: p } = await publicClient().from("reel_products").select("id, reel_id").eq("id", data.productId).maybeSingle();
+    const { data: p } = await publicClient().from("reel_products").select("id, reel_id, site_reel_id").eq("id", data.productId).maybeSingle();
     if (!p) return { recorded: false };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    await (supabaseAdmin as any).from("product_clicks").insert({ product_id: p.id, reel_id: p.reel_id });
+    await (supabaseAdmin as any).from("product_clicks").insert({ product_id: p.id, reel_id: p.reel_id, site_reel_id: p.site_reel_id });
     return { recorded: true };
   });
 
