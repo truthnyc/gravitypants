@@ -1496,3 +1496,26 @@ p.concept-reel-notice { font-size: 10px !important; }
 }
 .reel-popup-stage { margin-top: 24px; gap: 6px; }
 .reel-popup-stage + .reel-popup-credit { margin-top: 10px; }
+
+/* Stage view mood map (full-screen ring, stage page only) */
+.moodmap { position: fixed; inset: 0; z-index: 60; display: flex; align-items: center; justify-content: center; background: rgb(255 255 255 / 0.97); }
+.moodmap-close { position: absolute; top: 20px; right: 20px; height: 36px; padding: 0 16px; border-radius: 8px; background: var(--ap-panel); font-size: 14px; font-weight: 500; color: var(--ap-ink); }
+.moodmap-close:hover { background: var(--ap-hairline); }
+.moodmap-ring { position: relative; width: min(78vmin, 600px); height: min(78vmin, 600px); border: 1px solid var(--ap-hairline); border-radius: 9999px; }
+.moodmap-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; pointer-events: none; }
+.moodmap-center a { pointer-events: auto; }
+.moodmap-question { font-size: 32px; font-weight: 600; line-height: 1.15; letter-spacing: -0.02em; }
+.moodmap-node { position: absolute; width: 130px; transform: translate(-50%, -50%); text-align: center; }
+.moodmap-dot { width: 18px; height: 18px; border-radius: 9999px; box-shadow: 0 0 0 5px #fff; transition: transform 200ms; }
+.moodmap-node:hover .moodmap-dot, .moodmap-node:focus-within .moodmap-dot, .moodmap-node.is-current .moodmap-dot { transform: scale(1.5); }
+.moodmap-name { font-size: 16px; }
+.moodmap-moods { font-size: 11.5px; line-height: 1.4; color: var(--ap-muted); }
+@media (max-width: 899px) {
+  .moodmap-question { font-size: 22px; }
+  .moodmap-node { width: 88px; }
+  .moodmap-name { font-size: 14px; }
+  .moodmap-moods { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .moodmap-dot { transition: none; }
+}
