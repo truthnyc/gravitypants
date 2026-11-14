@@ -917,12 +917,21 @@ export const searchDirectory = createServerFn({ method: "POST" })
       for (const x of s ?? []) if (x.path && x.signedUrl) sm.set(x.path, x.signedUrl);
     }
     const sign = (u: string | null) => (u?.startsWith("site-reels:") ? sm.get(u.slice(11)) ?? null : u);
+    // Directory reel videos live in private media storage; sign them so players get a playable link.
+    const dirVideoPaths = rows.filter((x) => x.kind === "directory" && x.video_url?.startsWith(POSTER_PREFIX)).map((x) => (x.video_url as string).slice(POSTER_PREFIX.length));
+    const dv = new Map<string, string>();
+    if (dirVideoPaths.length) {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: s } = await supabaseAdmin.storage.from("media").createSignedUrls(dirVideoPaths, 60 * 60 * 24);
+      for (const x of s ?? []) if (x.path && x.signedUrl) dv.set(x.path, x.signedUrl);
+    }
+    const signDirVideo = (u: string | null) => (u?.startsWith(POSTER_PREFIX) ? dv.get(u.slice(POSTER_PREFIX.length)) ?? null : u ?? null);
     const byId = new Map(signed.map((x) => [x.id as string, x.poster]));
     const reels: FacetedReel[] = rows.map((x) => ({
       kind: x.kind, id: x.id, title: x.title, brand_id: x.brand_id, brand_name: x.brand_name, brand_slug: x.brand_slug,
       category: x.category, cat_slug: x.cat_slug, formats: x.formats ?? [], moods: x.moods ?? [], featured: !!x.featured,
       poster: x.kind === "site" ? sign(x.poster_url) : byId.get(x.id) ?? null,
-      preview_url: x.preview_url ?? null, video_url: x.kind === "site" ? sign(x.video_url) : x.video_url ?? null,
+      preview_url: x.preview_url ?? null, video_url: x.kind === "site" ? sign(x.video_url) : signDirVideo(x.video_url),
     }));
     // Every category is listed, even with 0 reels, so the UI can say "Coming soon".
     const categories: Record<string, number> = {};
