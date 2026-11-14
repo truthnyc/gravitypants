@@ -119,7 +119,7 @@ export function useAdminReelProducts(target: AdminTarget) {
   const q = useQuery({ queryKey: ["admin-reel-products", key], enabled: !!key, queryFn: () => load({ data: { reelId: target.reelId ?? null, siteReelId: target.siteReelId ?? null } }) });
   const [rows, setRows] = useState<Row[]>([]);
   useEffect(() => {
-    if (q.data) setRows(q.data.products.map((p) => ({ key: p.id, id: p.id, name: p.name, price: p.price == null ? "" : String(p.price), currency: p.currency, url: p.url, image: p.image_path ?? p.image_url ?? "", source: "manual" as const })));
+    if (q.data) setRows(q.data.products.map((p) => ({ key: p.id, id: p.id, name: p.name, price: p.price == null ? "" : String(p.price), currency: p.currency, url: p.url, image: p.image_path ?? p.image_url ?? "", source: p.source_type === "link" || p.source_type === "feed" ? p.source_type : "manual" as const, availability: p.availability })));
   }, [q.data]);
   const errs = rows.map((r) => !r.name.trim() ? "Add a name." : !isHttpsUrl(r.url) ? "Link must start with https://" : r.image && !isHttpsUrl(r.image) ? "Image link must start with https://" : r.price && !(Number(r.price) >= 0) ? "Price must be a number." : null);
   const saveProducts = async () => {
@@ -132,10 +132,36 @@ export function useAdminReelProducts(target: AdminTarget) {
 /** The shared "Products" section: rows with add, remove and drag to reorder. Save happens in the parent form. */
 export function AdminProductsFields({ rows, setRows, errs, clicks }: { rows: Row[]; setRows: React.Dispatch<React.SetStateAction<Row[]>>; errs: (string | null)[]; clicks: Record<string, number> }) {
   const [drag, setDrag] = useState<number | null>(null);
+  const read = useServerFn(fetchProductAdmin);
+  const [link, setLink] = useState("");
+  const [reading, setReading] = useState(false);
+  const [notice, setNotice] = useState<string | null>(null);
   const set = (i: number, patch: Partial<Row>) => setRows((r) => r.map((x, j) => (j === i ? { ...x, ...patch } : x)));
+  const onRead = async () => {
+    setNotice(null);
+    if (!isHttpsUrl(link)) { setNotice("Use a link that starts with https://"); return; }
+    setReading(true);
+    try {
+      const res = await read({ data: { url: link.trim() } });
+      if (!res.ok) { setNotice(res.error); return; }
+      const p = res.product;
+      if (!res.found) {
+        setNotice("We couldn't read this page. Enter the details below.");
+        setRows((l) => [...l, blank({ url: link.trim() })]);
+      } else {
+        setRows((l) => [...l, blank({ name: p.name ?? "", price: p.price == null ? "" : String(p.price), currency: p.currency ?? "USD", url: p.url, image: p.image_url ?? "", source: "link", availability: p.availability })]);
+      }
+      setLink("");
+    } catch (e) { setNotice(e instanceof Error ? e.message : "We couldn't reach that page."); } finally { setReading(false); }
+  };
   return <div className="grid gap-2 text-[13px] text-secondary-text sm:col-span-2">
     <p className="font-medium text-foreground">Products</p>
     <p>Shown under the reel on Aimanté. Shoppers buy on the brand's site.</p>
+    {rows.length < REEL_PRODUCTS_MAX && <div className="flex flex-wrap gap-2">
+      <Input aria-label="Paste a product link" placeholder="Paste a product link to autofill" value={link} onChange={(e) => setLink(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); void onRead(); } }} className="h-9 min-w-[200px] flex-1 bg-card text-foreground" />
+      <Button type="button" size="sm" variant="outline" disabled={reading || !link.trim()} onClick={() => void onRead()}>{reading ? "Reading…" : "Add"}</Button>
+    </div>}
+    {notice && <p className="text-[13px] text-ap-amber" role="status">{notice}</p>}
     <ul className="flex flex-col gap-2">
       {rows.map((r, i) => <li key={r.key} draggable onDragStart={() => setDrag(i)} onDragOver={(e) => e.preventDefault()}
         onDrop={() => { if (drag == null || drag === i) return; setRows((l) => { const n = [...l]; const [m] = n.splice(drag, 1); if (m) n.splice(i, 0, m); return n; }); setDrag(null); }}
