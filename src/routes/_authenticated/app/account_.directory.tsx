@@ -115,7 +115,7 @@ function DirectoryAccount() {
               const tone = r.status === "live" ? (until ? "text-ap-amber" : "text-ap-green") : r.status === "in_review" ? "text-ap-amber" : "text-ap-muted";
               const refresh = () => void qc.invalidateQueries({ queryKey: ["directory-account", ws] });
               return (
-                <li key={r.adId} className="flex flex-wrap items-start gap-3 border-b border-ap-hairline py-3.5 last:border-0">
+                <li key={r.adId} className="grid min-w-0 grid-cols-[44px_minmax(0,1fr)] items-start gap-3 border-b border-ap-hairline py-5 last:border-0">
                   {r.thumb ? <img src={r.thumb} alt="" className="size-11 flex-none rounded-[8px] object-cover" /> : <span className="block size-11 flex-none rounded-[8px] bg-ap-panel" />}
                   <div className="min-w-0 flex-1">
                     <ReelName adId={r.adId} name={r.name} onSaved={refresh} />
@@ -127,9 +127,13 @@ function DirectoryAccount() {
                     {r.pending === "in_review" && <p className="mt-1 text-[13px] text-ap-amber">Update in review. The current version stays live until it's approved.</p>}
                     {r.pending === "declined" && <p className="mt-1 text-[13px] text-destructive">Update not approved{r.pendingNote ? `: ${r.pendingNote}` : "."} The live version is unchanged.</p>}
                     <ReelMoods adId={r.adId} moods={r.moods} category={d.brand.category} onSaved={refresh} />
+                  </div>
+                  <div className="col-span-2 min-w-0">
+                  <ReelActions adId={r.adId} title={r.name} format={r.size} status={r.status} pending={r.pending} onDone={refresh} />
+                  </div>
+                  <div className="col-span-2 min-w-0">
                     <ReelProductsEditor adId={r.adId} />
                   </div>
-                  <ReelActions adId={r.adId} title={r.name} format={r.size} status={r.status} pending={r.pending} onDone={refresh} />
                 </li>
               );
             })}
