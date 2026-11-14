@@ -10,7 +10,7 @@ function ProductRows({ products, heading, className }: { products: ReelProduct[]
     <p className="mb-1.5 text-[10px] font-medium uppercase tracking-[0.06em] text-ap-muted">{heading}</p>
     <ul className="flex flex-col gap-1.5">
       {products.map((p) => <li key={p.id}>
-        <a href={productHref(p.url, p.reel_id)} target="_blank" rel="noopener" onClick={() => void record({ data: { productId: p.id } }).catch(() => {})}
+        <a href={productHref(p.url, p.reel_id ?? p.site_reel_id ?? null)} target="_blank" rel="noopener" onClick={() => void record({ data: { productId: p.id } }).catch(() => {})}
           className="flex !min-h-0 items-center justify-between gap-3 rounded-[10px] bg-ap-panel px-3 py-2 text-[14px] text-ap-ink no-underline">
           <span className="flex min-w-0 items-center gap-2">
             {(p.image_url ?? p.image_path) && <img src={(p.image_url ?? p.image_path)!} alt="" loading="lazy" className="size-7 flex-none rounded-[4px] object-cover" />}
@@ -23,10 +23,10 @@ function ProductRows({ products, heading, className }: { products: ReelProduct[]
   </div>;
 }
 
-/** "From this reel" list; renders nothing when the reel has no products. */
+/** "From this reel" list; renders nothing when the reel has no products. Works for Directory and website reels. */
 export function ReelProductList({ reelId, className }: { reelId: string | null | undefined; className?: string | undefined }) {
   const fetchFn = useServerFn(getReelProducts);
-  const { data } = useQuery({ queryKey: ["reel-products", reelId], enabled: !!reelId, staleTime: 60_000, queryFn: () => fetchFn({ data: { reelIds: [reelId!] } }) });
+  const { data } = useQuery({ queryKey: ["reel-products", reelId], enabled: !!reelId, staleTime: 60_000, queryFn: () => fetchFn({ data: { reelIds: [reelId!], siteReelIds: [reelId!] } }) });
   return <ProductRows products={data ?? []} heading="From this reel" className={className} />;
 }
 
