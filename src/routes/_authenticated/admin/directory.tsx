@@ -377,11 +377,14 @@ function AdminReel({ r, brandId, onChanged, siteReels }: { r: Detail["reels"][nu
   const [tags, setTags] = useState(r.tags.join(", "));
   const [moods, setMoods] = useState<string[]>(r.moods);
   const [busy, setBusy] = useState(false);
+  const prod = useAdminReelProducts({ reelId: r.id });
   const run = async (fn: () => Promise<unknown>, msg: string) => {
     setBusy(true);
     try { await fn(); toast.success(msg); onChanged(); } catch (e) { toast.error(e instanceof Error ? e.message : "That didn't work"); } finally { setBusy(false); }
   };
   const save = () => run(async () => {
+    if (prod.errs.some(Boolean)) throw new Error("Fix the product rows first.");
+    await prod.saveProducts();
     if (title.trim() && title.trim() !== r.title) await rename({ data: { reelId: r.id, title: title.trim() } });
     await review({ data: { id: r.id, action: "edit", tags: tags.split(",").map((t) => t.trim()).filter(Boolean), moods: moods as string[], description: desc.trim() } });
   }, "Reel saved");
@@ -400,6 +403,7 @@ function AdminReel({ r, brandId, onChanged, siteReels }: { r: Detail["reels"][nu
         <textarea value={desc} maxLength={REEL_DESCRIPTION_MAX} rows={2} onChange={(e) => setDesc(e.target.value)} aria-label="Reel description" placeholder="Description shown with the reel" className={cn(field, "h-auto min-h-16 resize-y py-1.5")} />
         <small className="block text-right text-[12px] nums"><span className={cn(nearLimit(desc.length, REEL_DESCRIPTION_MAX) && "text-amber-700")}>{desc.length} / {REEL_DESCRIPTION_MAX}</span></small>
         <input value={tags} onChange={(e) => setTags(e.target.value)} aria-label="Tags" placeholder="Tags, comma separated" className={field} />
+        {prod.loaded && <AdminProductsFields rows={prod.rows} setRows={prod.setRows} errs={prod.errs} clicks={prod.clicks} />}
         <div className="flex flex-wrap gap-1">
           {moodCatalog.all.map((m) => {
             const on = moods.includes(m);
