@@ -13,11 +13,10 @@ import type { SiteReel } from "@/lib/site/reels";
 import { cn } from "@/lib/utils";
 
 export type StageData = { reels: FacetedReel[]; cards: DirectoryCard[]; siteReels: SiteReel[] };
-const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 const andJoin = (xs: string[]) => xs.length < 2 ? xs.join("") : `${xs.slice(0, -1).join(", ")} and ${xs.at(-1)}`;
 
 /** Plays the current selection one reel at a time, large. */
-export function StageView({ mood, family, categories, start, data }: { mood: string | null; family: string | null; categories: string[]; start: string | null; data: StageData }) {
+export function StageView({ mood, family, start, data }: { mood: string | null; family: string | null; categories: string[]; start: string | null; data: StageData }) {
   const router = useRouter();
   const navigate = useNavigate();
   const { families } = useMoodCatalog();
@@ -175,7 +174,7 @@ function MoodMap({ families, current, currentFamily, returnFocus, onClose }: {
   returnFocus: React.RefObject<HTMLButtonElement | null>;
   onClose: () => void;
 }) {
-  const nameRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const nameRefs = useRef<(HTMLAnchorElement | null)[]>([]);
   const isCurrent = (f: { family: string; moods: string[] }) =>
     current ? f.moods.some((m) => m.toLowerCase() === current) : currentFamily ? f.family.toLowerCase() === currentFamily : false;
 
@@ -189,7 +188,7 @@ function MoodMap({ families, current, currentFamily, returnFocus, onClose }: {
   }, []);
 
   // Choosing clears the categories filter and restarts from the first reel; the seed keeps the grid's order.
-  const keepSeed = (prev: Record<string, unknown>) => ({ seed: prev.seed as string | undefined });
+  const keepSeed = (prev: Record<string, unknown>) => ({ seed: prev["seed"] as string | undefined });
 
   return <div role="dialog" aria-modal="true" aria-label="Choose a mood" className="moodmap"
     onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
