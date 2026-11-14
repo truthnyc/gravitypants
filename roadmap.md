@@ -1,6 +1,6 @@
 # Launch video correction
 ## Brand owner dashboard layout
-- [ ] Give reel details, actions and product editing separate full-width rows; verify product inputs and dashboard tabs on desktop and phone.
+- [x] Give reel details, actions and product editing separate full-width rows; signed-in desktop/phone checks confirm contained product inputs, full-width tabs and no dashboard overflow. Preview only.
 ## Current monitoring fixes
 - [x] Repair brand approval and legacy mood-link trigger; rollback-only six-mood approval creates the draft and all links, with staff access protections unchanged.
 - [x] Repair 4:5/5:4 Directory mappings and explicit 4:5 carousel sizing; 19 tests pass and Sail Racing's portrait grid thumbnail verified. Carousel sizing awaits publishing.
