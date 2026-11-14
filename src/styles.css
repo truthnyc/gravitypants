@@ -1470,8 +1470,12 @@ p.concept-reel-notice { font-size: 10px !important; }
 
 /* Stage view */
 .stage-headline { font-size: clamp(30px, 4.4vw, 52px); line-height: 1.1; letter-spacing: -0.02em; }
-.stage-grid { display: grid; grid-template-columns: minmax(0, 340px) auto minmax(0, 240px); align-items: center; justify-content: space-between; gap: 40px; }
-.stage-center { position: relative; display: flex; align-items: center; gap: 20px; }
+.stage { min-height: calc(100dvh - 64px); display: flex; flex-direction: column; }
+.stage-grid { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; align-content: center; gap: clamp(20px, 3.5vw, 48px); flex: 1; }
+.stage-info { max-width: 340px; justify-self: end; }
+.stage-also { max-width: 240px; justify-self: start; }
+.stage-center { position: relative; display: flex; align-items: center; gap: 12px; }
+.stage-center > * { flex: none; }
 .stage-center::before { content: ""; position: absolute; inset: -12% -20%; z-index: -1; pointer-events: none; background: radial-gradient(closest-side, color-mix(in oklab, var(--stage-wash, var(--ap-blue)) 16%, transparent), transparent); }
 .stage-step { position: static; transform: none; flex: none; }
 .stage-frame { position: relative; height: min(56vh, 560px); aspect-ratio: 4 / 5; display: flex; flex-direction: column; border-radius: 0; background: var(--ap-panel); box-shadow: var(--ap-shadow-thumb); touch-action: pan-y; }
@@ -1486,8 +1490,8 @@ p.concept-reel-notice { font-size: 10px !important; }
 @media (max-width: 899px) {
   .stage-grid { grid-template-columns: minmax(0, 1fr); justify-items: center; gap: 28px; }
   .stage-center { order: 1; width: 100%; max-width: 380px; }
-  .stage-info { order: 2; width: 100%; }
-  .stage-also { order: 3; width: 100%; }
+  .stage-info { order: 2; width: 100%; max-width: none; justify-self: stretch; }
+  .stage-also { order: 3; width: 100%; max-width: none; justify-self: stretch; }
   .stage-step { display: none; }
   .stage-frame { width: 100%; height: auto; flex: 1 1 auto; min-width: 0; }
   .stage-center { justify-content: center; }
