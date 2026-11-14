@@ -5,7 +5,7 @@ import { GripVertical, Plus, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { fetchProduct, getMyReelProducts, saveMyReelProducts, getReelProductsAdmin, saveReelProductsAdmin } from "@/lib/directory/products.functions";
+import { fetchProduct, fetchProductAdmin, getMyReelProducts, saveMyReelProducts, getReelProductsAdmin, saveReelProductsAdmin } from "@/lib/directory/products.functions";
 import { searchMyCatalog } from "@/lib/directory/feeds.functions";
 import { formatPrice } from "@/lib/directory/products";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
