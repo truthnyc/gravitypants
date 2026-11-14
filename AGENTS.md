@@ -11,6 +11,8 @@
 
 ## Stillframe architecture rules
 
+- Brand-owner published reel rows separate identity, actions and product editing into full-width grid rows; product inputs use shrinkable grid tracks so action buttons cannot squeeze the form.
+
 - Project/frame data uses `data.ts` autosave; strip popovers reuse Inspector panels and editor undo actions to avoid parallel logic.
 - Types/constants live in `types.ts`; `format-settings.ts` resolves size visuals and shared motion for preview/export parity.
 - Media URLs: `getMediaUrl()` in `media.ts`. Colors: semantic tokens in `src/styles.css`, never raw colors.

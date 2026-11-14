@@ -63,31 +63,33 @@ export function ReelProductsEditor({ adId }: { adId: string }) {
       toast.success("Products saved");
     } catch (e) { toast.error(e instanceof Error ? e.message : "Couldn't save products."); } finally { setBusy(false); }
   };
-  return <div className="mt-3">
+  return <div className="w-full min-w-0 border-t border-ap-hairline pt-4">
     <p className="text-[13px] font-medium text-ap-ink">Products</p>
     <p className="mb-2 text-[13px] text-ap-muted">Shown under your reel. Shoppers buy on your site.</p>
-    {rows.length < REEL_PRODUCTS_MAX && <div className="mb-2 flex flex-wrap gap-2">
-      <Input aria-label="Paste a product link" placeholder="Paste a product link" value={link} onChange={(e) => setLink(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); void onRead(); } }} className="h-9 min-w-[200px] flex-1" />
-      <Button size="sm" variant="outline" disabled={reading || !link.trim()} onClick={() => void onRead()}>{reading ? "Reading…" : "Add"}</Button>
+    {rows.length < REEL_PRODUCTS_MAX && <div className="mb-3 grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
+      <Input aria-label="Paste a product link" placeholder="Paste a product link" value={link} onChange={(e) => setLink(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); void onRead(); } }} className="h-11 min-w-0 w-full" />
+      <Button size="sm" variant="outline" className="h-11 shrink-0" disabled={reading || !link.trim()} onClick={() => void onRead()}>{reading ? "Reading…" : "Add"}</Button>
     </div>}
     {notice && <p className="mb-2 text-[13px] text-ap-amber" role="status">{notice}</p>}
     <ul className="flex flex-col gap-2">
       {rows.map((r, i) => <li key={r.key} draggable onDragStart={() => setDrag(i)} onDragOver={(e) => e.preventDefault()}
         onDrop={() => { if (drag == null || drag === i) return; setRows((l) => { const n = [...l]; const [m] = n.splice(drag, 1); if (m) n.splice(i, 0, m); return n; }); setDrag(null); }}
-        className="rounded-[4px] border border-ap-hairline p-2">
-        <div className="flex flex-wrap items-center gap-2">
+        className="min-w-0 rounded-[4px] border border-ap-hairline p-3">
+        <div className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2">
           <GripVertical aria-label="Drag to reorder" className="size-4 flex-none cursor-grab text-ap-muted" strokeWidth={1.7} />
-          <Input aria-label="Product name" placeholder="Name" value={r.name} onChange={(e) => set(i, { name: e.target.value })} className="h-9 min-w-[140px] flex-1" />
-          {r.source !== "manual" && r.image && <img src={r.image} alt="" className="size-9 flex-none rounded-[4px] object-cover" />}
-          <Input aria-label="Price" placeholder="Price" inputMode="decimal" value={r.price} onChange={(e) => set(i, { price: e.target.value })} className="h-9 w-24 tabular-nums" />
-          <Input aria-label="Currency" value={r.currency} maxLength={3} onChange={(e) => set(i, { currency: e.target.value.toUpperCase() })} className="h-9 w-16 uppercase" />
+          <label className="min-w-0 text-[12px] text-ap-body">Product name<Input aria-label="Product name" placeholder="Name" value={r.name} onChange={(e) => set(i, { name: e.target.value })} className="mt-1 h-11 min-w-0 w-full" /></label>
           <Button variant="ghost" size="icon" aria-label="Remove product" onClick={() => setRows((l) => l.filter((_, j) => j !== i))}><X className="size-4" strokeWidth={1.7} /></Button>
         </div>
-        <div className="mt-2 flex flex-wrap gap-2 pl-6">
-          <Input aria-label="Product link" placeholder="https://yourshop.com/product" value={r.url} onChange={(e) => set(i, { url: e.target.value })} className="h-9 min-w-[180px] flex-1" />
-          <Input aria-label="Image link (optional)" placeholder="Image link (optional)" value={r.image} onChange={(e) => set(i, { image: e.target.value })} className="h-9 min-w-[160px] flex-1" />
+        <div className="mt-3 grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-3 sm:grid-cols-[minmax(0,1fr)_100px] sm:pl-6">
+          <label className="min-w-0 text-[12px] text-ap-body">Price (optional)<Input aria-label="Price" placeholder="Price" inputMode="decimal" value={r.price} onChange={(e) => set(i, { price: e.target.value })} className="mt-1 h-11 min-w-0 w-full tabular-nums" /></label>
+          <label className="min-w-0 text-[12px] text-ap-body">Currency<Input aria-label="Currency" value={r.currency} maxLength={3} onChange={(e) => set(i, { currency: e.target.value.toUpperCase() })} className="mt-1 h-11 min-w-0 w-full uppercase" /></label>
         </div>
-        <div className="mt-1 flex justify-between pl-6 text-[12px]">
+        <div className="mt-3 grid min-w-0 gap-3 sm:grid-cols-2 sm:pl-6">
+          <label className="min-w-0 text-[12px] text-ap-body">Product link<Input aria-label="Product link" placeholder="https://yourshop.com/product" value={r.url} onChange={(e) => set(i, { url: e.target.value })} className="mt-1 h-11 min-w-0 w-full" /></label>
+          <label className="min-w-0 text-[12px] text-ap-body">Image link (optional)<Input aria-label="Image link (optional)" placeholder="Image link (optional)" value={r.image} onChange={(e) => set(i, { image: e.target.value })} className="mt-1 h-11 min-w-0 w-full" /></label>
+          {r.source !== "manual" && r.image && <img src={r.image} alt="" className="size-9 shrink-0 rounded-[4px] object-cover" />}
+        </div>
+        <div className="mt-2 grid min-w-0 grid-cols-[minmax(0,1fr)_auto] gap-2 text-[12px] sm:pl-6">
           <span className="flex flex-wrap gap-x-2">
             <span className="text-ap-muted">{r.source === "manual" ? "Entered by hand" : `${r.source === "feed" ? "From catalogue" : "From link"}${r.syncedAt ? ` · updated ${ago(r.syncedAt)}` : ""}`}</span>
             {(r.failures ?? 0) >= 3 && <span className="font-medium text-ap-amber">Needs checking</span>}
@@ -98,7 +100,7 @@ export function ReelProductsEditor({ adId }: { adId: string }) {
         </div>
       </li>)}
     </ul>
-    <div className="mt-2 flex gap-2">
+    <div className="mt-3 flex flex-wrap gap-2">
       {rows.length < REEL_PRODUCTS_MAX && <Button variant="outline" size="sm" onClick={() => setRows((l) => [...l, blank()])}><Plus className="size-4" strokeWidth={1.7} />Add product</Button>}
       {rows.length < REEL_PRODUCTS_MAX && <CatalogPicker adId={adId} room={REEL_PRODUCTS_MAX - rows.length} taken={new Set(rows.map((r) => r.catalogId).filter(Boolean) as string[])}
         onPick={(items) => setRows((l) => [...l, ...items.map((c) => blank({ name: c.name, price: c.price == null ? "" : String(c.price), currency: c.currency, url: c.url, image: c.image_url ?? "", source: "feed", catalogId: c.id, availability: c.availability }))])} />}
