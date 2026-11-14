@@ -1,4 +1,6 @@
 # Launch video correction
+## Stage desktop layout
+- [ ] Move tags and Save beneath the reel on desktop; leave only category, title, brand, products and Visit on the left, preserving phone layout.
 ## Brand owner dashboard layout
 - [x] Give reel details, actions and product editing separate full-width rows; signed-in desktop/phone checks confirm contained product inputs, full-width tabs and no dashboard overflow. Preview only.
 ## Current monitoring fixes

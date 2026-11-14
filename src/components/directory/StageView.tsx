@@ -84,6 +84,14 @@ export function StageView({ mood, family, start, data }: { mood: string | null; 
   useEffect(() => setTagsOpen(false), [reel?.id]);
   const orderedTags = useMemo(() => [...(d?.tags ?? [])].sort((a, b) => Number(fitSet.has(b.toLowerCase())) - Number(fitSet.has(a.toLowerCase()))), [d, fitSet]);
   const shownTags = tagsOpen ? orderedTags : orderedTags.slice(0, 6);
+  const tags = orderedTags.length > 0 && <ul className="flex flex-wrap items-center gap-1.5" aria-label="Tags">
+    {shownTags.map((t) => <li key={t} className={cn("rounded-[4px] border px-2.5 py-0.5 text-[13px]", fitSet.has(t.toLowerCase()) ? "border-transparent bg-ap-soft-blue text-ap-blue" : "border-ap-hairline")}>{t}</li>)}
+    {orderedTags.length > 6 && <li><button type="button" onClick={() => setTagsOpen((o) => !o)} className="px-1 text-[13px] text-ap-muted hover:text-ap-blue hover:underline">{tagsOpen ? "Show fewer" : `+ ${orderedTags.length - 6} more`}</button></li>}
+  </ul>;
+  const saveControl = reel && <span className="stage-save inline-flex items-center gap-1.5 text-[14px]">
+    {reel.kind === "site" ? <SiteReelHeart inline reelId={reel.id} name={reel.title} /> : <DirectoryReelHeart inline reelId={reel.id} name={reel.title} />}
+    Save
+  </span>;
   const others = list.map((r, i) => ({ r, i })).filter((x) => x.i !== index).slice(0, 4);
   const src = reel?.video_url ?? reel?.preview_url ?? null;
   const back = () => { if (window.history.length > 1) router.history.back(); else void navigate({ to: "/directory" }); };
@@ -112,17 +120,11 @@ export function StageView({ mood, family, start, data }: { mood: string | null; 
           <p className="text-[14px] font-semibold text-ap-blue">{reel.category}</p>
           <h2 className="mt-2 text-[28px] leading-tight font-semibold">{reel.title}</h2>
           <p className="mt-1 text-[15px]">by <Link to="/directory/$slug" params={{ slug: reel.brand_slug }} className="font-semibold text-ap-blue hover:underline">{reel.brand_name}</Link></p>
-          {orderedTags.length > 0 && <ul className="mt-4 flex flex-wrap items-center gap-1.5" aria-label="Tags">
-            {shownTags.map((t) => <li key={t} className={cn("rounded-[4px] border px-2.5 py-0.5 text-[13px]", fitSet.has(t.toLowerCase()) ? "border-transparent bg-ap-soft-blue text-ap-blue" : "border-ap-hairline")}>{t}</li>)}
-            {orderedTags.length > 6 && <li><button type="button" onClick={() => setTagsOpen((o) => !o)} className="px-1 text-[13px] text-ap-muted hover:text-ap-blue hover:underline">{tagsOpen ? "Show fewer" : `+ ${orderedTags.length - 6} more`}</button></li>}
-          </ul>}
+          <div className="stage-mobile-details mt-4">{tags}</div>
           {reel && <ReelProductList reelId={reel.id} className="mt-4" />}
           <div className="mt-6 flex flex-wrap items-center gap-3">
             {d?.href && <a href={d.href} target="_blank" rel="noreferrer" className="inline-flex h-10 items-center gap-1.5 whitespace-nowrap rounded-lg bg-ap-blue px-4 text-[15px] font-medium text-ap-card hover:bg-ap-blue-hover">Visit {reel.brand_name} <ArrowUpRight className="size-4" strokeWidth={1.7} /></a>}
-            <span className="stage-save inline-flex items-center gap-1.5 text-[14px]">
-              {reel.kind === "site" ? <SiteReelHeart inline reelId={reel.id} name={reel.title} /> : <DirectoryReelHeart inline reelId={reel.id} name={reel.title} />}
-              Save
-            </span>
+            <div className="stage-mobile-details">{saveControl}</div>
           </div>
         </section>
 
@@ -151,6 +153,10 @@ export function StageView({ mood, family, start, data }: { mood: string | null; 
           <button type="button" aria-label="Next reel" disabled={index >= total - 1} onClick={() => go(index + 1)} className="reel-popup-step stage-step">
             <ChevronRight className="size-5" strokeWidth={1.7} />
           </button>
+          <div className="stage-reel-details min-w-0">
+            {tags}
+            <div className="mt-3">{saveControl}</div>
+          </div>
         </div>
 
         <aside className="stage-also" aria-label="Also fits">

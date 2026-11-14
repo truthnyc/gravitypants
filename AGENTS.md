@@ -12,6 +12,7 @@
 ## Stillframe architecture rules
 
 - Brand-owner published reel rows separate identity, actions and product editing into full-width grid rows; product inputs use shrinkable grid tracks so action buttons cannot squeeze the form.
+- Stage desktop tags and saving sit beneath the reel in its center grid track; phone detail placement remains unchanged through shared controls.
 
 - Project/frame data uses `data.ts` autosave; strip popovers reuse Inspector panels and editor undo actions to avoid parallel logic.
 - Types/constants live in `types.ts`; `format-settings.ts` resolves size visuals and shared motion for preview/export parity.
