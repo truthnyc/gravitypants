@@ -48,7 +48,7 @@ const reelSchema = z.object({
   description: z.string().trim().max(1000).optional(),
   href: z.string().trim().url().max(500).nullable(),
   category: z.preprocess((c) => typeof c === "string" ? normalizeCategory(c) ?? c : c, z.enum(CATEGORIES)),
-  format: z.enum(["916", "11", "169"]),
+  format: z.enum(["916", "45", "11", "54", "169"]),
   seconds: z.number().min(0.5).max(600),
   photos: z.number().int().min(1).max(50),
   video_url: fileRef.optional(),
