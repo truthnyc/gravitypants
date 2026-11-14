@@ -182,6 +182,24 @@ export const saveReelProductsAdmin = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+/** Admin only: reads name, price, image and stock from a product page for any reel kind. Saves nothing. */
+export const fetchProductAdmin = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ url: z.string().trim().max(2000) }).parse(d))
+  .handler(async ({ data, context }) => {
+    const sb = context.supabase as any;
+    const { data: admin } = await sb.rpc("is_platform_admin");
+    if (admin !== true) throw new Error("Admins only.");
+    const { fetchProductInfo, ProductFetchError } = await import("./product-fetch.server");
+    const { hasProductData } = await import("./product-page");
+    try {
+      const info = await fetchProductInfo(data.url);
+      return { ok: true as const, found: hasProductData(info), product: info };
+    } catch (e) {
+      return { ok: false as const, error: e instanceof ProductFetchError ? e.message : "We couldn't reach that page." };
+    }
+  });
+
 /** Brand owner or admin: reads name, price, image and stock from a product page. Saves nothing. */
 export const fetchProduct = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
