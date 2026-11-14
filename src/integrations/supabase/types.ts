@@ -1487,19 +1487,22 @@ export type Database = {
           created_at: string
           id: string
           product_id: string
-          reel_id: string
+          reel_id: string | null
+          site_reel_id: string | null
         }
         Insert: {
           created_at?: string
           id?: string
           product_id: string
-          reel_id: string
+          reel_id?: string | null
+          site_reel_id?: string | null
         }
         Update: {
           created_at?: string
           id?: string
           product_id?: string
-          reel_id?: string
+          reel_id?: string | null
+          site_reel_id?: string | null
         }
         Relationships: [
           {
@@ -1514,6 +1517,13 @@ export type Database = {
             columns: ["reel_id"]
             isOneToOne: false
             referencedRelation: "directory_reels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_clicks_site_reel_id_fkey"
+            columns: ["site_reel_id"]
+            isOneToOne: false
+            referencedRelation: "site_reels"
             referencedColumns: ["id"]
           },
         ]
@@ -1648,7 +1658,8 @@ export type Database = {
           name: string
           position: number
           price: number | null
-          reel_id: string
+          reel_id: string | null
+          site_reel_id: string | null
           source_type: string
           sync_failures: number
           url: string
@@ -1665,7 +1676,8 @@ export type Database = {
           name: string
           position?: number
           price?: number | null
-          reel_id: string
+          reel_id?: string | null
+          site_reel_id?: string | null
           source_type?: string
           sync_failures?: number
           url: string
@@ -1682,7 +1694,8 @@ export type Database = {
           name?: string
           position?: number
           price?: number | null
-          reel_id?: string
+          reel_id?: string | null
+          site_reel_id?: string | null
           source_type?: string
           sync_failures?: number
           url?: string
@@ -1700,6 +1713,13 @@ export type Database = {
             columns: ["reel_id"]
             isOneToOne: false
             referencedRelation: "directory_reels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reel_products_site_reel_id_fkey"
+            columns: ["site_reel_id"]
+            isOneToOne: false
+            referencedRelation: "site_reels"
             referencedColumns: ["id"]
           },
         ]

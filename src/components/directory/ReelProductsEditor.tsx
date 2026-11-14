@@ -5,7 +5,7 @@ import { GripVertical, Plus, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { fetchProduct, getMyReelProducts, saveMyReelProducts } from "@/lib/directory/products.functions";
+import { fetchProduct, getMyReelProducts, saveMyReelProducts, getReelProductsAdmin, saveReelProductsAdmin } from "@/lib/directory/products.functions";
 import { searchMyCatalog } from "@/lib/directory/feeds.functions";
 import { formatPrice } from "@/lib/directory/products";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -108,6 +108,58 @@ export function ReelProductsEditor({ adId }: { adId: string }) {
 }
 
 type CatalogItem = { id: string; name: string; price: number | null; currency: string; url: string; image_url: string | null; availability: "in_stock" | "out_of_stock" | "unknown" };
+
+type AdminTarget = { reelId: string; siteReelId?: undefined } | { reelId?: undefined; siteReelId: string };
+
+/** Admin: product rows for one Directory or website reel, saved by the surrounding form's own save button. */
+export function useAdminReelProducts(target: AdminTarget) {
+  const load = useServerFn(getReelProductsAdmin);
+  const save = useServerFn(saveReelProductsAdmin);
+  const key = target.reelId ?? target.siteReelId;
+  const q = useQuery({ queryKey: ["admin-reel-products", key], enabled: !!key, queryFn: () => load({ data: { reelId: target.reelId ?? null, siteReelId: target.siteReelId ?? null } }) });
+  const [rows, setRows] = useState<Row[]>([]);
+  useEffect(() => {
+    if (q.data) setRows(q.data.products.map((p) => ({ key: p.id, id: p.id, name: p.name, price: p.price == null ? "" : String(p.price), currency: p.currency, url: p.url, image: p.image_path ?? p.image_url ?? "", source: "manual" as const })));
+  }, [q.data]);
+  const errs = rows.map((r) => !r.name.trim() ? "Add a name." : !isHttpsUrl(r.url) ? "Link must start with https://" : r.image && !isHttpsUrl(r.image) ? "Image link must start with https://" : r.price && !(Number(r.price) >= 0) ? "Price must be a number." : null);
+  const saveProducts = async () => {
+    if (!key || errs.some(Boolean)) return;
+    await save({ data: { reelId: target.reelId ?? null, siteReelId: target.siteReelId ?? null, products: rows.map((r) => ({ id: r.id, name: r.name.trim(), price: r.price ? Number(r.price) : null, currency: /^[A-Z]{3}$/.test(r.currency) ? r.currency : "USD", url: r.url.trim(), image_path: r.image.trim() || null, source_type: "manual" as const })) } });
+  };
+  return { rows, setRows, errs, clicks: q.data?.clicks ?? {}, loaded: !!q.data || !key, saveProducts };
+}
+
+/** The shared "Products" section: rows with add, remove and drag to reorder. Save happens in the parent form. */
+export function AdminProductsFields({ rows, setRows, errs, clicks }: { rows: Row[]; setRows: React.Dispatch<React.SetStateAction<Row[]>>; errs: (string | null)[]; clicks: Record<string, number> }) {
+  const [drag, setDrag] = useState<number | null>(null);
+  const set = (i: number, patch: Partial<Row>) => setRows((r) => r.map((x, j) => (j === i ? { ...x, ...patch } : x)));
+  return <div className="grid gap-2 text-[13px] text-secondary-text sm:col-span-2">
+    <p className="font-medium text-foreground">Products</p>
+    <p>Shown under the reel on Aimanté. Shoppers buy on the brand's site.</p>
+    <ul className="flex flex-col gap-2">
+      {rows.map((r, i) => <li key={r.key} draggable onDragStart={() => setDrag(i)} onDragOver={(e) => e.preventDefault()}
+        onDrop={() => { if (drag == null || drag === i) return; setRows((l) => { const n = [...l]; const [m] = n.splice(drag, 1); if (m) n.splice(i, 0, m); return n; }); setDrag(null); }}
+        className="rounded-sm border border-border p-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <GripVertical aria-label="Drag to reorder" className="size-4 flex-none cursor-grab text-secondary-text" strokeWidth={1.7} />
+          <Input aria-label="Product name" placeholder="Name" value={r.name} onChange={(e) => set(i, { name: e.target.value })} className="h-9 min-w-[140px] flex-1 bg-card text-foreground" />
+          <Input aria-label="Price" placeholder="Price" inputMode="decimal" value={r.price} onChange={(e) => set(i, { price: e.target.value })} className="h-9 w-24 bg-card tabular-nums text-foreground" />
+          <Input aria-label="Currency" value={r.currency} maxLength={3} onChange={(e) => set(i, { currency: e.target.value.toUpperCase() })} className="h-9 w-16 bg-card uppercase text-foreground" />
+          <Button type="button" variant="ghost" size="icon" aria-label="Remove product" onClick={() => setRows((l) => l.filter((_, j) => j !== i))}><X className="size-4" strokeWidth={1.7} /></Button>
+        </div>
+        <div className="mt-2 flex flex-wrap gap-2 pl-6">
+          <Input aria-label="Product link" placeholder="https://brand.com/product" value={r.url} onChange={(e) => set(i, { url: e.target.value })} className="h-9 min-w-[180px] flex-1 bg-card text-foreground" />
+          <Input aria-label="Image link (optional)" placeholder="Image link (optional)" value={r.image} onChange={(e) => set(i, { image: e.target.value })} className="h-9 min-w-[160px] flex-1 bg-card text-foreground" />
+        </div>
+        <div className="mt-1 flex justify-between pl-6 text-[12px]">
+          <span className="text-destructive">{errs[i]}</span>
+          {r.id && <span className="text-secondary-text tabular-nums">{clicks[r.id] ?? 0} {(clicks[r.id] ?? 0) === 1 ? "click" : "clicks"}</span>}
+        </div>
+      </li>)}
+    </ul>
+    {rows.length < REEL_PRODUCTS_MAX && <div><Button type="button" variant="outline" size="sm" onClick={() => setRows((l) => [...l, blank()])}><Plus className="size-4" strokeWidth={1.7} />Add product</Button></div>}
+  </div>;
+}
 
 /** "Add from catalogue": shown only when the brand has a connected feed. */
 function CatalogPicker({ adId, room, taken, onPick }: { adId: string; room: number; taken: Set<string>; onPick: (items: CatalogItem[]) => void }) {

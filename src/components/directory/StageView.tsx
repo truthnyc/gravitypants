@@ -119,7 +119,7 @@ export function StageView({ mood, family, start, data }: { mood: string | null; 
             {shownTags.map((t) => <li key={t} className={cn("rounded-[4px] border px-2.5 py-0.5 text-[13px]", fitSet.has(t.toLowerCase()) ? "border-transparent bg-ap-soft-blue text-ap-blue" : "border-ap-hairline")}>{t}</li>)}
             {orderedTags.length > 6 && <li><button type="button" onClick={() => setTagsOpen((o) => !o)} className="px-1 text-[13px] text-ap-muted hover:text-ap-blue hover:underline">{tagsOpen ? "Show fewer" : `+ ${orderedTags.length - 6} more`}</button></li>}
           </ul>}
-          {reel && reel.kind !== "site" && <ReelProductList reelId={reel.id} className="mt-4" />}
+          {reel && <ReelProductList reelId={reel.id} className="mt-4" />}
           <div className="mt-6 flex flex-wrap items-center gap-3">
             {d?.href && <a href={d.href} target="_blank" rel="noreferrer" className="inline-flex h-10 items-center gap-1.5 whitespace-nowrap rounded-lg bg-ap-blue px-4 text-[15px] font-medium text-ap-card hover:bg-ap-blue-hover">Visit {reel.brand_name} <ArrowUpRight className="size-4" strokeWidth={1.7} /></a>}
             <span className="stage-save inline-flex items-center gap-1.5 text-[14px]">
