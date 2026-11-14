@@ -167,22 +167,58 @@ export function StageView({ mood, family, categories, start, data }: { mood: str
   </SiteShell>;
 }
 
-function MoodMenu({ families, current, categories, onClose }: { families: { family: string; moods: string[] }[]; current: string | null; categories: string[]; onClose: () => void }) {
-  const ref = useRef<HTMLDivElement>(null);
+/** Full-screen mood map: one ring of family nodes around "How do you want to feel?". Stage view only. */
+function MoodMap({ families, current, currentFamily, returnFocus, onClose }: {
+  families: { family: string; moods: string[] }[];
+  current: string | null;
+  currentFamily: string | null;
+  returnFocus: React.RefObject<HTMLButtonElement | null>;
+  onClose: () => void;
+}) {
+  const nameRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const isCurrent = (f: { family: string; moods: string[] }) =>
+    current ? f.moods.some((m) => m.toLowerCase() === current) : currentFamily ? f.family.toLowerCase() === currentFamily : false;
+
   useEffect(() => {
-    const down = (e: MouseEvent) => { if (!ref.current?.contains(e.target as Node)) onClose(); };
     const key = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
-    document.addEventListener("mousedown", down); document.addEventListener("keydown", key);
-    return () => { document.removeEventListener("mousedown", down); document.removeEventListener("keydown", key); };
-  }, [onClose]);
-  const search = categories.length ? { categories: categories.join("|") } : {};
-  return <div ref={ref} role="menu" aria-label="Mood" className="absolute top-full left-1/2 z-40 mt-3 max-h-[60vh] w-[min(560px,90vw)] -translate-x-1/2 overflow-y-auto rounded-[4px] border border-ap-hairline bg-ap-card p-4 text-left text-[14px] font-normal text-ap-ink shadow-ap-soft">
-    <Link to="/stage" search={search} onClick={onClose} role="menuitem" className={cn("mb-3 inline-block hover:text-ap-blue", !current && "font-semibold text-ap-blue")}>Any mood</Link>
-    {families.map((f) => <div key={f.family} className="mb-3">
-      <p className="mb-1 text-[11px] font-semibold tracking-[.06em] text-ap-muted uppercase">{f.family}</p>
-      <div className="flex flex-wrap gap-x-3 gap-y-1">
-        {f.moods.map((m) => <Link key={m} to="/stage/$mood" params={{ mood: m.toLowerCase() }} search={search} onClick={onClose} role="menuitem" className={cn("hover:text-ap-blue", current === m.toLowerCase() && "font-semibold text-ap-blue")}>{cap(m)}</Link>)}
+    document.addEventListener("keydown", key);
+    const at = Math.max(0, families.findIndex(isCurrent));
+    nameRefs.current[at]?.focus();
+    return () => { document.removeEventListener("keydown", key); returnFocus.current?.focus(); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Choosing clears the categories filter and restarts from the first reel; the seed keeps the grid's order.
+  const keepSeed = (prev: Record<string, unknown>) => ({ seed: prev.seed as string | undefined });
+
+  return <div role="dialog" aria-modal="true" aria-label="Choose a mood" className="moodmap"
+    onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+    <button type="button" onClick={onClose} className="moodmap-close">Close</button>
+    <div className="moodmap-ring">
+      <div className="moodmap-center">
+        <p className="moodmap-question"><span className="text-ap-ink">How do you want</span><br /><span className="text-ap-headline-muted">to feel?</span></p>
+        <Link to="/stage" search={keepSeed} onClick={onClose} className="mt-3 inline-block text-[14px] font-medium text-ap-blue hover:underline">Any mood</Link>
       </div>
-    </div>)}
+      {families.map((f, i) => {
+        const a = (-90 + (i * 360) / families.length) * (Math.PI / 180);
+        const cur = isCurrent(f);
+        const color = MOOD_FAMILY_COLORS[f.family as MoodFamily]?.bg ?? "var(--ap-muted)";
+        return <div key={f.family} className={cn("moodmap-node", cur && "is-current")}
+          style={{ left: `${50 + 50 * Math.cos(a)}%`, top: `${50 + 50 * Math.sin(a)}%` }}>
+          <Link to="/stage" search={(prev) => ({ ...keepSeed(prev as Record<string, unknown>), family: f.family.toLowerCase() })} onClick={onClose}
+            aria-label={`Play ${f.family} reels`} className="moodmap-dot mx-auto block" style={{ background: color }} />
+          <Link to="/stage" search={(prev) => ({ ...keepSeed(prev as Record<string, unknown>), family: f.family.toLowerCase() })} onClick={onClose}
+            ref={(el) => { nameRefs.current[i] = el; }}
+            className={cn("moodmap-name mt-2 block font-semibold", cur ? "text-ap-blue" : "text-ap-ink")}>{f.family}</Link>
+          <p className="moodmap-moods mt-0.5">
+            {f.moods.map((m, j) => <span key={m}>
+              {j > 0 && <span aria-hidden> · </span>}
+              <Link to="/stage/$mood" params={{ mood: m.toLowerCase() }} search={keepSeed} onClick={onClose}
+                className={cn("hover:text-ap-blue hover:underline", current === m.toLowerCase() && "text-ap-blue")}>{m}</Link>
+            </span>)}
+          </p>
+        </div>;
+      })}
+    </div>
   </div>;
 }
