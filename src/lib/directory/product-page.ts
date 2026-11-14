@@ -52,20 +52,33 @@ function meta(html: string, key: string): string | null {
 
 export function parseProductPage(html: string, url: string): ProductInfo {
   const out: ProductInfo = { name: null, price: null, currency: null, image_url: null, availability: "unknown", url };
+  const variantId = new URL(url).searchParams.get("variant");
   for (const m of html.matchAll(/<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)) {
     let data: any;
-    try { data = JSON.parse(m[1]!.trim()); } catch { continue; }
+    try { data = JSON.parse(m[1]?.trim() ?? ""); } catch { continue; }
     const p = findProduct(data);
     if (!p) continue;
-    let offers = p.offers ?? (Array.isArray(p.hasVariant) ? p.hasVariant[0]?.offers : null);
-    if (Array.isArray(offers)) offers = offers[0];
+    const variants = Array.isArray(p.hasVariant) ? p.hasVariant : [];
+    const candidates = variants.length ? variants.flatMap((v: any) => (Array.isArray(v.offers) ? v.offers : v.offers ? [v.offers] : []).map((offer: any) => ({ product: v, offer })))
+      : (Array.isArray(p.offers) ? p.offers : p.offers ? [p.offers] : []).map((offer: any) => ({ product: p, offer }));
+    const selected = variantId ? candidates.find(({ product, offer }: any) => {
+      if ([product.productID, product.sku, offer.sku].some((id) => String(id ?? "") === variantId)) return true;
+      return [product.url, offer.url, product["@id"], offer["@id"]].some((link) => {
+        try { return new URL(String(link), url).searchParams.get("variant") === variantId; } catch { return false; }
+      });
+    }) : candidates.find(({ offer }: any) => availabilityOf(offer.availability) === "in_stock") ?? candidates[0];
+    const offers = selected?.offer;
     const agg = String(offers?.["@type"] ?? "").toLowerCase() === "aggregateoffer";
     const spec = Array.isArray(offers?.priceSpecification) ? offers.priceSpecification[0] : offers?.priceSpecification;
     out.name = typeof p.name === "string" ? decode(p.name) : null;
     out.image_url = absolute(firstImage(p.image), url);
     out.price = num(agg ? (offers?.lowPrice ?? offers?.price) : (offers?.price ?? spec?.price));
     out.currency = (offers?.priceCurrency ?? spec?.priceCurrency ?? null) && String(offers?.priceCurrency ?? spec?.priceCurrency).toUpperCase();
-    out.availability = availabilityOf(offers?.availability);
+    // A group is sold out only when every variant explicitly is; an unidentifiable
+    // requested variant must never inherit another variant's stock status.
+    out.availability = variantId ? availabilityOf(offers?.availability)
+      : candidates.some(({ offer }: any) => availabilityOf(offer.availability) === "in_stock") ? "in_stock"
+      : candidates.length && candidates.every(({ offer }: any) => availabilityOf(offer.availability) === "out_of_stock") ? "out_of_stock" : "unknown";
     break;
   }
   if (!out.name) out.name = meta(html, "og:title");
