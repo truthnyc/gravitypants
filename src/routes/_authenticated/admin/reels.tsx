@@ -144,11 +144,13 @@ function ReelForm({ initial, onDone, onCancel, videoSrc }: { videoSrc?: string |
   const input = useRef<HTMLInputElement>(null);
   const isNew = !initial.id;
   const coverSrc = fileUrl ?? videoSrc;
+  const prod = useAdminReelProducts({ siteReelId: initial.id ?? "" });
 
   const submit = async () => {
     if (isNew && !file) { toast.error("Pick a reel file."); return; }
     let href = d.href.trim();
     if (href && !/^https?:\/\//.test(href)) href = `https://${href}`;
+    if (!isNew && prod.errs.some(Boolean)) { toast.error("Fix the product rows first."); return; }
     setBusy(true);
     try {
       let files: { video_url?: string; poster_url?: string | null; format?: ReelFormat; seconds?: number } = {};
@@ -170,6 +172,7 @@ function ReelForm({ initial, onDone, onCancel, videoSrc }: { videoSrc?: string |
         ...(files.video_url ? { video_url: files.video_url } : {}),
         ...(files.video_url || cover ? { poster_url: files.poster_url ?? null } : {}),
       } });
+      if (!isNew) await prod.saveProducts();
       toast(isNew ? "Reel added to the website" : "Reel updated");
       setD(empty); setFile(null); setCover(null); setCoverPreview(null);
       onDone();
@@ -189,6 +192,7 @@ function ReelForm({ initial, onDone, onCancel, videoSrc }: { videoSrc?: string |
       <label className="grid gap-1 text-[13px] text-secondary-text">Brand link
         <Input value={d.href} onChange={(e) => setD({ ...d, href: e.target.value })} placeholder="https://brand.com" inputMode="url" className="h-11 bg-card text-[15px] text-foreground" />
       </label>
+      {!isNew && prod.loaded && <AdminProductsFields rows={prod.rows} setRows={prod.setRows} errs={prod.errs} clicks={prod.clicks} />}
       <label className="grid gap-1 text-[13px] text-secondary-text sm:col-span-2">Description
         <Textarea aria-label="Description" value={d.description} onChange={(e) => setD({ ...d, description: e.target.value })} maxLength={1000} rows={3} className="bg-card text-[15px] text-foreground" />
       </label>
