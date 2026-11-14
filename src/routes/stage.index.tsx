@@ -6,8 +6,8 @@ import { stageSearch, stageCategories } from "@/lib/directory/stage";
 
 export const Route = createFileRoute("/stage/")({
   validateSearch: stageSearch,
-  loaderDeps: ({ search }) => ({ categories: search.categories, seed: search.seed }),
-  loader: ({ deps }) => getStage({ data: { mood: null, categories: stageCategories(deps.categories), seed: deps.seed ?? "" } }),
+  loaderDeps: ({ search }) => ({ categories: search.categories, seed: search.seed, family: search.family }),
+  loader: ({ deps }) => getStage({ data: { mood: null, family: deps.family?.trim().toLowerCase() || null, categories: stageCategories(deps.categories), seed: deps.seed ?? "" } }),
   head: () => ({
     meta: [
       { title: "Stage view: every reel, one at a time | Aimanté" },
@@ -26,7 +26,7 @@ export const Route = createFileRoute("/stage/")({
 function Page() {
   const data = Route.useLoaderData();
   const s = Route.useSearch();
-  return <StageView mood={null} categories={stageCategories(s.categories)} start={s.start ?? null} data={data} />;
+  return <StageView mood={null} family={s.family?.trim().toLowerCase() || null} categories={stageCategories(s.categories)} start={s.start ?? null} data={data} />;
 }
 
 function StageError() {
