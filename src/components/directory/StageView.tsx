@@ -27,15 +27,12 @@ export function StageView({ mood, family, start, data }: { mood: string | null; 
   const [mapOpen, setMapOpen] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [reduced, setReduced] = useState(false);
   const video = useRef<HTMLVideoElement>(null);
   const swipe = useRef<number | null>(null);
   const wordBtn = useRef<HTMLButtonElement>(null);
 
   useEffect(() => { setIndex(Math.max(0, list.findIndex((r) => r.id === start))); }, [list, start]);
   useEffect(() => {
-    const m = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReduced(m.matches);
     const vis = () => setHidden(document.hidden);
     document.addEventListener("visibilitychange", vis);
     return () => document.removeEventListener("visibilitychange", vis);
