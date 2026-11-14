@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { deleteSiteReel, listAdminReels, listFeaturedClientReels, saveShowcaseOrder, saveSiteReel, type AdminReel, type FeaturedClientReel } from "@/lib/stillframe/admin-reels.functions";
 import { setReelFeatured } from "@/lib/directory/directory.functions";
 import { listDirectoryBrands } from "@/lib/directory/directory.functions";
+import { AdminProductsFields, useAdminReelProducts } from "@/components/directory/ReelProductsEditor";
 import { FORMAT_LABEL, type ReelFormat } from "@/lib/site/reels";
 import { cn } from "@/lib/utils";
 
