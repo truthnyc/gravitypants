@@ -76,6 +76,6 @@
 - [ ] Verify live approval/cancellation and Gmail send/read-back — connected Google account reports “Mail service not enabled”; requires an active Gmail inbox. Preview only.
 
 # Directory
-- [ ] Preserve Directory text and brand filters when opening stage reels; verify matching navigation.
-- [ ] Connect Instagram for Newsroom publication announcements; awaiting confirmation of announcement format and available connection support.
+- [x] Preserve Directory text, brand, mood and category filters when opening stage reels; verified real search/brand/mood entry and reload, with 10 regression tests including selections beyond 240 matches. Preview only.
+- [ ] Automatically announce new /blog articles as Instagram feed posts — blocked: existing Meta connection lacks Instagram publishing permission and returns no linked Instagram account; requires a professional Instagram publishing connection. No posting automation enabled.
 - [x] Randomize the Directory grid per visit: seeded shuffle in directory_faceted_search (stable while paging, reshuffles each visit); verified two preview visits show different orders. Live in the database now; page code ships on next publish.

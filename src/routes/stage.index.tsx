@@ -2,12 +2,12 @@ import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { ServiceUnavailable } from "@/components/site/ServiceUnavailable";
 import { StageView } from "@/components/directory/StageView";
 import { getStage } from "@/lib/directory/stage.functions";
-import { stageSearch, stageCategories } from "@/lib/directory/stage";
+import { stageSearch, stageCategories, stageFilters } from "@/lib/directory/stage";
 
 export const Route = createFileRoute("/stage/")({
   validateSearch: stageSearch,
-  loaderDeps: ({ search }) => ({ categories: search.categories, seed: search.seed, family: search.family }),
-  loader: ({ deps }) => getStage({ data: { mood: null, family: deps.family?.trim().toLowerCase() || null, categories: stageCategories(deps.categories), seed: deps.seed ?? "" } }),
+  loaderDeps: ({ search }) => ({ categories: search.categories, seed: search.seed, family: search.family, ...stageFilters(search) }),
+  loader: ({ deps }) => getStage({ data: { mood: null, family: deps.family?.trim().toLowerCase() || null, categories: stageCategories(deps.categories), seed: deps.seed ?? "", q: deps.q, brands: deps.brands, moods: deps.moods } }),
   head: () => ({
     meta: [
       { title: "Stage view: every reel, one at a time | Aimanté" },
