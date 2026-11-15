@@ -15,6 +15,7 @@
 
 - Brand-owner published reel rows separate identity, actions and product editing into full-width grid rows; product inputs use shrinkable grid tracks so action buttons cannot squeeze the form.
 - Stage desktop tags and saving sit beneath the reel in its center grid track; phone detail placement remains unchanged through shared controls.
+- Stage loaders preserve Directory text, brand, mood and category filters with the same seed and page through matching results, so arrows never broaden a search or lose a selected reel beyond page one.
 
 - Project/frame data uses `data.ts` autosave; strip popovers reuse Inspector panels and editor undo actions to avoid parallel logic.
 - Types/constants live in `types.ts`; `format-settings.ts` resolves size visuals and shared motion for preview/export parity.

@@ -609,7 +609,7 @@ function DirectoryPage() {
   const openReel = (r: FacetedReel, list: FacetedReel[] = found) => {
     if (list === found) {
       void recordOpen({ data: { eventId: crypto.randomUUID(), reelId: r.id, kind: r.kind } }).catch(() => {});
-      const search = { start: r.id, seed: (browserSeed ?? seed) || undefined, categories: filters.categories.join("|") || undefined };
+      const search = { start: r.id, seed: (browserSeed ?? seed) || undefined, categories: filters.categories.join("|") || undefined, q: q || undefined, brands: filters.brands.join("|") || undefined, moods: filters.moods.join("|") || undefined };
       void (activeMood ? navigate({ to: "/stage/$mood", params: { mood: activeMood }, search }) : navigate({ to: "/stage", search }));
       return;
     }

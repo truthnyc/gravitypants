@@ -2,14 +2,14 @@ import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { ServiceUnavailable } from "@/components/site/ServiceUnavailable";
 import { StageView } from "@/components/directory/StageView";
 import { getStage } from "@/lib/directory/stage.functions";
-import { stageSearch, stageCategories } from "@/lib/directory/stage";
+import { stageSearch, stageCategories, stageFilters } from "@/lib/directory/stage";
 
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 export const Route = createFileRoute("/stage/$mood")({
   validateSearch: stageSearch,
-  loaderDeps: ({ search }) => ({ categories: search.categories, seed: search.seed }),
-  loader: ({ deps, params }) => getStage({ data: { mood: params.mood.toLowerCase().slice(0, 60), family: null, categories: stageCategories(deps.categories), seed: deps.seed ?? "" } }),
+  loaderDeps: ({ search }) => ({ categories: search.categories, seed: search.seed, ...stageFilters(search) }),
+  loader: ({ deps, params }) => getStage({ data: { mood: params.mood.toLowerCase().slice(0, 60), family: null, categories: stageCategories(deps.categories), seed: deps.seed ?? "", q: deps.q, brands: deps.brands, moods: deps.moods } }),
   head: ({ params }) => ({
     meta: [
       { title: `Stage view: ${cap(params.mood)} reels | Aimanté` },
