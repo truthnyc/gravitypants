@@ -173,6 +173,12 @@ export function AdminProductsFields({ rows, setRows, errs, clicks }: { rows: Row
           <Input aria-label="Product name" placeholder="Name" value={r.name} onChange={(e) => set(i, { name: e.target.value })} className="h-9 min-w-[140px] flex-1 bg-card text-foreground" />
           <Input aria-label="Price" placeholder="Price" inputMode="decimal" value={r.price} onChange={(e) => set(i, { price: e.target.value })} className="h-9 w-24 bg-card tabular-nums text-foreground" />
           <Input aria-label="Currency" value={r.currency} maxLength={3} onChange={(e) => set(i, { currency: e.target.value.toUpperCase() })} className="h-9 w-16 bg-card uppercase text-foreground" />
+          <select aria-label="Stock status" value={r.availability ?? "unknown"} onChange={(e) => set(i, { availability: e.target.value as Row["availability"] })}
+            className="h-9 rounded-[4px] border border-border bg-card px-2 text-[13px] text-foreground">
+            <option value="in_stock">In stock</option>
+            <option value="out_of_stock">Out of stock</option>
+            <option value="unknown">Stock unknown</option>
+          </select>
           <Button type="button" variant="ghost" size="icon" aria-label="Remove product" onClick={() => setRows((l) => l.filter((_, j) => j !== i))}><X className="size-4" strokeWidth={1.7} /></Button>
         </div>
         <div className="mt-2 flex flex-wrap gap-2 pl-6">

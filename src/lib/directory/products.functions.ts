@@ -171,7 +171,7 @@ export const saveReelProductsAdmin = createServerFn({ method: "POST" })
     const drop = (existing ?? []).map((r: any) => r.id).filter((x: string) => !keep.has(x));
     if (drop.length) { const { error } = await sa.from("reel_products").delete().in("id", drop); if (error) throw new Error(error.message); }
     for (const [i, p] of data.products.entries()) {
-      const row: Record<string, unknown> = { reel_id: data.reelId, site_reel_id: data.siteReelId, name: p.name, price: p.price, currency: p.currency, url: p.url, image_path: p.image_path, image_url: p.image_url ?? null, position: i };
+      const row: Record<string, unknown> = { reel_id: data.reelId, site_reel_id: data.siteReelId, name: p.name, price: p.price, currency: p.currency, url: p.url, image_path: p.image_path, image_url: p.image_url ?? null, position: i, ...(p.availability ? { availability: p.availability } : {}) };
       const isNew = !(p.id && (existing ?? []).some((r: any) => r.id === p.id));
       if (isNew) Object.assign(row, { source_type: p.source_type === "feed" ? "manual" : p.source_type, availability: p.availability ?? "unknown", last_synced_at: p.source_type === "link" ? new Date().toISOString() : null });
       const { error } = !isNew
