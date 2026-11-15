@@ -13,7 +13,7 @@ export const stageSearch = zodValidator(z.object({
 }));
 export const stageCategories = (s: string | undefined) => (s ?? "").split("|").map((x) => x.trim().toLowerCase()).filter(Boolean).slice(0, 20);
 
-export const stageFilters = (s: { q?: string; brands?: string; moods?: string }) => ({
+export const stageFilters = (s: { q?: string | undefined; brands?: string | undefined; moods?: string | undefined }) => ({
   q: (s.q ?? "").slice(0, 200),
   brands: stageCategories(s.brands),
   moods: (s.moods ?? "").split("|").map((x) => x.trim().toLowerCase()).filter(Boolean).slice(0, 60),
