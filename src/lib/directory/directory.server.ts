@@ -24,6 +24,9 @@ export async function findLatestVideo(sb: any, wsId: string, adId: string): Prom
 
 /** Copies the newest export MP4 to <ws>/directory/<ad>.mp4 (outside exports/, so cleanup never deletes it). Returns the media: path, or null without an export. */
 export async function pinReelVideo(_sb: any, wsId: string, adId: string): Promise<string | null> {
+  // The ad may live in a different workspace than the brand (editorial ownership), so use the ad's own.
+  const { data: proj } = await (await admin()).from("projects").select("workspace_id").eq("id", adId).maybeSingle();
+  if (proj?.workspace_id) wsId = proj.workspace_id;
   const src = await findLatestVideo(await admin(), wsId, adId);
   if (!src) return null;
   const store = (await admin()).storage.from("media");
