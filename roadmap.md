@@ -1,6 +1,6 @@
 # Launch video correction
 ## Product-link AI public pages
-- [ ] Describe page understanding, fact/photo review and three story drafts on Features, How it works, homepage, Pricing and Help; preserve paid-only availability and existing pricing.
+- [x] Describe page understanding, fact/photo review and three story drafts on Features, How it works, homepage, Pricing and Help; preserve paid-only availability and existing pricing. Verified all five pages at desktop/phone sizes with no overflow; 25 pricing/metadata tests pass. Preview only.
 ## Agent integrations
 - [x] Add protected workspace/ad reading tools, consent and sign-in return handling, plus browser-local ad search. Manifest generated; safe-return tests pass; signed-in approve/deny, OAuth exchange and real workspace/ad reading verified with the allowed hosted Origin substituted for localhost. Unsigned requests rejected; build OK.
 - [ ] Republish to expose the new agent integrations on the hosted app; verify the full hosted sign-in/consent flow after publishing. Existing account service retained; OAuth server newly enabled.
