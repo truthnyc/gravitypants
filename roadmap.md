@@ -1,4 +1,7 @@
 # Launch video correction
+## Agent integrations
+- [x] Add protected workspace/ad reading tools, consent and sign-in return handling, plus browser-local ad search. Manifest generated; safe-return tests pass; signed-in approve/deny, OAuth exchange and real workspace/ad reading verified with the allowed hosted Origin substituted for localhost. Unsigned requests rejected; build OK.
+- [ ] Republish to expose the new agent integrations on the hosted app; verify the full hosted sign-in/consent flow after publishing. Existing account service retained; OAuth server newly enabled.
 ## Stage desktop layout
 - [x] Move tags and Save beneath the reel on desktop; verified reel-width tag alignment, expand/collapse and next-arrow navigation, with phone layout unchanged. Preview only.
 ## Brand owner dashboard layout
@@ -77,5 +80,5 @@
 
 # Directory
 - [x] Preserve Directory text, brand, mood and category filters when opening stage reels; verified real search/brand/mood entry and reload, with 10 regression tests including selections beyond 240 matches. Preview only.
-- [ ] Automatically announce new /blog articles as Instagram feed posts — blocked: existing Meta connection lacks Instagram publishing permission and returns no linked Instagram account; requires a professional Instagram publishing connection. No posting automation enabled.
+- [ ] Automatically announce new /blog articles as Instagram feed posts, tagging credited photographers using verified Instagram handles — blocked: existing Meta connection lacks Instagram publishing permission and returns no linked Instagram account; requires a professional Instagram publishing connection. No posting automation enabled.
 - [x] Randomize the Directory grid per visit: seeded shuffle in directory_faceted_search (stable while paging, reshuffles each visit); verified two preview visits show different orders. Live in the database now; page code ships on next publish.

@@ -6,6 +6,7 @@
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 import { html5Runtime } from "./vite.html5-runtime";
+import { mcpPlugin } from "@lovable.dev/mcp-js/stacks/tanstack/vite";
 
 export default defineConfig({
   tanstackStart: {
@@ -14,7 +15,7 @@ export default defineConfig({
     server: { entry: "server" },
   },
   vite: {
-    plugins: [html5Runtime()],
+    plugins: [html5Runtime(), mcpPlugin()],
     // ffmpeg.wasm spins up its own worker via new URL(); pre-bundling breaks that path.
     optimizeDeps: { exclude: ["@ffmpeg/ffmpeg", "@ffmpeg/util"] },
     // Lets the dev preview be opened as aimante.co to check the second brand.
