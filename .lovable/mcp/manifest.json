@@ -12,7 +12,7 @@
   "mcp": {
     "server": {
       "name": "gravity-pants",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "title": "Gravity Pants"
     },
     "tools": [
@@ -175,6 +175,158 @@
               "default": 25
             }
           },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_ad_copy",
+        "title": "Read ad copy",
+        "description": "Read each frame's headline and subline for an ad you can access, with frame ids for editing.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "ad_id": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Ad ID from list_ads."
+            }
+          },
+          "required": [
+            "ad_id"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "update_ad_copy",
+        "title": "Edit ad copy",
+        "description": "Change the headline and/or subline text of one frame in an ad you can edit. Styling is kept. Use list_ad_copy first.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "frame_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "headline": {
+              "type": "string",
+              "maxLength": 200,
+              "description": "New headline text."
+            },
+            "subline": {
+              "type": "string",
+              "maxLength": 300,
+              "description": "New subline text."
+            }
+          },
+          "required": [
+            "frame_id"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_reel_products",
+        "title": "List reel products",
+        "description": "List products attached to reels you can see, with ids and stock status.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "type": "object",
+          "properties": {},
+          "additionalProperties": false
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "update_product_status",
+        "title": "Set product stock status",
+        "description": "Set a reel product to in stock, out of stock or unknown. Works for the brand's own members and staff. Sold-out products are hidden from shoppers.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "product_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "availability": {
+              "type": "string",
+              "enum": [
+                "in_stock",
+                "out_of_stock",
+                "unknown"
+              ]
+            }
+          },
+          "required": [
+            "product_id",
+            "availability"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "admin_approve_brand_request",
+        "title": "Admin: approve a brand application",
+        "description": "Staff only. Approve one pending brand application: creates its draft (unpublished) brand page and emails the applicant. Ask the user to confirm first.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": false,
+          "openWorldHint": true
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "request_id": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Application id from admin_brand_applications."
+            },
+            "note": {
+              "type": "string",
+              "maxLength": 1000,
+              "description": "Optional internal note."
+            },
+            "confirm": {
+              "type": "boolean",
+              "const": true,
+              "description": "Must be true, only after the user confirmed this approval."
+            }
+          },
+          "required": [
+            "request_id",
+            "confirm"
+          ],
           "additionalProperties": false,
           "$schema": "http://json-schema.org/draft-07/schema#"
         },
