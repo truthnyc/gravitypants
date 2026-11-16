@@ -36,7 +36,7 @@ async function savePhotos(db: SupabaseClient, ws: string, urls: string[]): Promi
       const { bytes, type } = await safeFetchBytes(u, { timeoutMs: 8000, maxBytes: 15 * 1024 * 1024, accept: "image/jpeg,image/png,image/webp", truncate: false });
       const ext = IMAGE_TYPES[type];
       if (!ext || bytes.byteLength < 2000) continue;
-      const size = imageSize(bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes as ArrayBuffer));
+      const size = imageSize(bytes);
       if (!bigEnough(size)) continue;
       const name = `product-${i + 1}.${ext}`;
       const path = `${ws}/photo/${crypto.randomUUID()}-${name}`;
