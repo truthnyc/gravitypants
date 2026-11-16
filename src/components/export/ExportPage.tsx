@@ -847,6 +847,10 @@ function saveBlob(blob: Blob, name: string) {
   a.rel = "noopener";
   // Safari ignores clicks on anchors that aren't in the document.
   document.body.appendChild(a);
+  // Framed previews often block downloads; open the file in a new tab there instead.
+  let framed = false;
+  try { framed = window.self !== window.top; } catch { framed = true; }
+  if (framed) a.target = "_blank";
   a.click();
   a.remove();
   // Keep the URL alive well past the click — revoking too early cancels the save on some browsers.
