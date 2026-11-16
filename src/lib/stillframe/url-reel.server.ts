@@ -8,10 +8,12 @@ import type { Format } from "./types";
 import {
   BANNED_PHRASES, DRAFT_COUNT, MAX_FRAMES, MAX_PRODUCT_PHOTOS, MIN_FRAMES, STORY_SHAPES, allowedShapes, bigEnough, checkDraft,
   fallbackDraft, imageSize, largerPhotoUrl, shopifyProductJs, matchTemplates, minimalBrief, parseBrief, parseDrafts, photoKey, pickDraftTemplates, priceLine, shapeById,
-  type DraftProduct, type ProductBrief, type RawDraft, type ReelDraft,
+  type BriefEdits, type DraftProduct, type ProductBrief, type RawDraft, type ReelDraft, applyEdits,
 } from "./url-reel";
 
 export type DraftPhoto = { assetId: string; path: string; width: number; height: number; name: string };
+export type ProductRead = { product: DraftProduct; photos: DraftPhoto[]; brief: ProductBrief };
+export type UrlReadResult = ({ ok: true; token: string } & ProductRead) | { ok: false; error: string };
 export type UrlDraftResult =
   | { ok: true; product: DraftProduct; photos: DraftPhoto[]; drafts: ReelDraft[]; brief: ProductBrief }
   | { ok: false; error: string };
@@ -91,21 +93,24 @@ function briefText(product: DraftProduct, brief: ProductBrief, price: string) {
 }
 
 /** Writes three shaped drafts from the brief, checks each in code, asks once for replacements, then falls back. */
-async function writeDrafts(db: SupabaseClient, product: DraftProduct, brief: ProductBrief, photos: DraftPhoto[]): Promise<RawDraft[]> {
+async function writeDrafts(db: SupabaseClient, product: DraftProduct, brief: ProductBrief, photos: DraftPhoto[], steer: { mustSay: string | null; given: string[] } = { mustSay: null, given: [] }): Promise<RawDraft[]> {
   const price = priceLine(product.price, product.currency);
   const shapes = allowedShapes(brief);
-  const system = storySystem(price, shapes, brief);
+  const system = storySystem(price, shapes, brief) + (brief.difference
+    ? `\nThe person says the one thing to remember is: ${brief.difference}. Carry it, in their words or very close to them, in at least two of the three drafts.` : "")
+    + (steer.mustSay ? `\nEvery draft must say this, in one frame, in the person's words: ${steer.mustSay}` : "");
   const usable = brief.photos.filter((p) => p.usable);
   const signed = await Promise.all(usable.map((p) => db.storage.from("media").createSignedUrl(photos[p.index]!.path, 600)));
   const images = signed.map((x) => x.data?.signedUrl).filter((u): u is string => !!u).map((u) => ({ type: "image" as const, image: new URL(u) }));
   const text = briefText(product, brief, price);
-  const ok = (d: RawDraft) => shapes.includes(d.shape as never) && !checkDraft(d, brief, price).length;
+  const check = (d: RawDraft) => checkDraft(d, brief, price, steer.given);
+  const ok = (d: RawDraft) => shapes.includes(d.shape as never) && !check(d).length;
 
   let drafts: RawDraft[] = [];
   try { drafts = parseDrafts(await gatewayText(system, [{ role: "user", content: [{ type: "text", text }, ...images] }], undefined, "medium")); } catch { /* retry below */ }
   const good = drafts.filter(ok).slice(0, DRAFT_COUNT);
   if (good.length < DRAFT_COUNT) {
-    const rejected = drafts.filter((d) => !ok(d)).map((d) => ({ draft: d, reasons: shapes.includes(d.shape as never) ? checkDraft(d, brief, price) : ["shape not allowed", ...checkDraft(d, brief, price)] }));
+    const rejected = drafts.filter((d) => !ok(d)).map((d) => ({ draft: d, reasons: shapes.includes(d.shape as never) ? check(d) : ["shape not allowed", ...check(d)] }));
     const need = DRAFT_COUNT - good.length;
     const note = [
       `${text}\n\nThese drafts were rejected:\n${JSON.stringify(rejected)}`,
@@ -193,7 +198,40 @@ export async function buildBrief(db: SupabaseClient, product: DraftProduct, page
   return fallback;
 }
 
-export async function draftReelsFromUrl(db: SupabaseClient, input: { workspaceId: string; url: string; format: Format }): Promise<UrlDraftResult> {
+/* A read is handed to the browser as a signed token, so the write step only accepts the server's own brief and photos. */
+const enc = new TextEncoder();
+const b64 = (b: Uint8Array) => btoa(String.fromCharCode(...b)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+const unb64 = (s: string) => Uint8Array.from(atob(s.replace(/-/g, "+").replace(/_/g, "/")), (c) => c.charCodeAt(0));
+async function hmac(data: string) {
+  const secret = process.env["SUPABASE_SERVICE_ROLE_KEY"];
+  if (!secret) throw new Error("Signing key missing");
+  const key = await crypto.subtle.importKey("raw", enc.encode(`url-reel:${secret}`), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+  return b64(new Uint8Array(await crypto.subtle.sign("HMAC", key, enc.encode(data))));
+}
+const READ_TTL_MS = 6 * 60 * 60 * 1000;
+async function signRead(ws: string, read: ProductRead) {
+  const body = b64(enc.encode(JSON.stringify({ ws, exp: Date.now() + READ_TTL_MS, ...read })));
+  return `${body}.${await hmac(body)}`;
+}
+async function openRead(ws: string, token: string): Promise<ProductRead | null> {
+  const [body, sig] = token.split(".");
+  if (!body || !sig || (await hmac(body)) !== sig) return null;
+  try {
+    const j = JSON.parse(new TextDecoder().decode(unb64(body))) as ProductRead & { ws: string; exp: number };
+    return j.ws === ws && j.exp > Date.now() ? { product: j.product, photos: j.photos, brief: j.brief } : null;
+  } catch { return null; }
+}
+
+async function draftTemplates(db: SupabaseClient, ws: string, format: Format) {
+  const { data: tpl } = await db.from("templates").select("id, name, format, featured, source, status, sort_order, settings")
+    .or(`workspace_id.eq.${ws},visibility.eq.global,source.eq.system`).order("sort_order", { ascending: true });
+  const withCounts = (tpl ?? []).map(({ settings, ...t }) => ({ ...t, slideCount: ((settings as { frames?: unknown[] } | null)?.frames ?? []).length || undefined }));
+  // A wider pool than three, so each story can take the template whose slide count is closest to its own.
+  return pickDraftTemplates(withCounts as never[], format, 12) as { id: string; name: string; slideCount?: number }[];
+}
+
+/** Step 1: reads the page, saves its photos and builds the brief. No drafts. */
+export async function readProductForDrafts(db: SupabaseClient, input: { workspaceId: string; url: string }): Promise<UrlReadResult> {
   const ws = input.workspaceId;
   let info;
   let images: string[];
@@ -207,23 +245,26 @@ export async function draftReelsFromUrl(db: SupabaseClient, input: { workspaceId
   if (!info.name) return { ok: false, error: "We couldn't find a product on that page." };
   if (info.image_url) { const main = largerPhotoUrl(info.image_url); if (!images.includes(main)) images.unshift(main); }
   const product: DraftProduct = { name: info.name, price: info.price, currency: info.currency, url: info.url };
-
-  const [{ data: tpl }, { data: w }] = await Promise.all([
-    db.from("templates").select("id, name, format, featured, source, status, sort_order, settings")
-      .or(`workspace_id.eq.${ws},visibility.eq.global,source.eq.system`).order("sort_order", { ascending: true }),
-    db.from("workspaces").select("name").eq("id", ws).maybeSingle(),
-  ]);
-  const withCounts = (tpl ?? []).map(({ settings, ...t }) => ({ ...t, slideCount: ((settings as { frames?: unknown[] } | null)?.frames ?? []).length || undefined }));
-  // A wider pool than three, so each story can take the template whose slide count is closest to its own.
-  const templates = pickDraftTemplates(withCounts as never[], input.format, 12) as { id: string; name: string; slideCount?: number }[];
-  if (!templates.length) return { ok: false, error: "No templates fit this size yet. Pick another size." };
-
   const photos = await savePhotos(db, ws, images);
   if (!photos.length) return { ok: false, error: "We couldn't download photos from that page." };
-
   const brief = await buildBrief(db, product, page, await brandVoice(db, ws), photos);
+  const read = { product, photos, brief };
+  return { ok: true, token: await signRead(ws, read), ...read };
+}
 
-  const raw = await writeDrafts(db, product, brief, photos);
+/** Step 2: writes three drafts from a read (by token) and the person's allowed edits. */
+export async function writeDraftsFromBrief(db: SupabaseClient, input: { workspaceId: string; format: Format; token: string; edits: BriefEdits | null }): Promise<UrlDraftResult> {
+  const read = await openRead(input.workspaceId, input.token);
+  if (!read) return { ok: false, error: "That page read has expired. Paste the link again." };
+  const edits = input.edits ?? { keepFacts: read.brief.facts.map((_, i) => i), keepPhotos: read.photos.map((p) => p.assetId), difference: read.brief.difference, mustSay: null };
+  // "Looks right, skip" keeps the brief's own photo choices; edits keep exactly what the person left on.
+  const keepPhotos = input.edits ? edits.keepPhotos : read.photos.filter((_, i) => read.brief.photos.find((x) => x.index === i)?.usable !== false).map((p) => p.assetId);
+  const applied = applyEdits(read.brief, read.photos, { ...edits, keepPhotos });
+  if (!applied) return { ok: false, error: "Keep at least one photo." };
+  const { brief, photos, given } = applied;
+  const templates = await draftTemplates(db, input.workspaceId, input.format);
+  if (!templates.length) return { ok: false, error: "No templates fit this size yet. Pick another size." };
+  const raw = await writeDrafts(db, read.product, brief, photos, { mustSay: input.edits?.mustSay?.trim() || null, given });
   const picked = matchTemplates(templates, raw.map((d) => d.frames.length));
   const drafts: ReelDraft[] = raw.slice(0, picked.length).map((d, i) => {
     const shape = shapeById(d.shape) ?? STORY_SHAPES[STORY_SHAPES.length - 1]!;
@@ -233,5 +274,12 @@ export async function draftReelsFromUrl(db: SupabaseClient, input: { workspaceId
       slides: d.frames.map((f) => ({ photo: f.photo, headline: f.headline, subline: f.subline })),
     };
   });
-  return { ok: true, product, photos, drafts, brief };
+  return { ok: true, product: read.product, photos, drafts, brief };
+}
+
+/** Both steps in one call, with no edits, for callers that don't show "What we understood" (e.g. the MCP connector). */
+export async function draftReelsFromUrl(db: SupabaseClient, input: { workspaceId: string; url: string; format: Format }): Promise<UrlDraftResult> {
+  const read = await readProductForDrafts(db, input);
+  if (!read.ok) return read;
+  return writeDraftsFromBrief(db, { workspaceId: input.workspaceId, format: input.format, token: read.token, edits: null });
 }
