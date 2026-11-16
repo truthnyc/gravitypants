@@ -19,6 +19,9 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { supabase } from "@/integrations/supabase/client";
 import { effectiveKit, useBrandKit, useBrandKits } from "@/lib/stillframe/data";
 import { MEDIA_BUCKET } from "@/lib/stillframe/media";
+import { deliverFile, downloadsBlockedHere, saveBlob, saveFromUrl } from "@/lib/stillframe/download";
+
+const SAFARI_PREVIEW = "Safari doesn't allow downloads inside the editor preview. Open the preview in its own tab, or download from your live site.";
 import { FontLoadError, registerCustomFonts } from "@/lib/stillframe/fonts";
 import { nearestFormat, slugify } from "@/lib/stillframe/channels";
 import { sizeIdOf, sizeLabel } from "@/lib/stillframe/main-size";
@@ -345,7 +348,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
     }
     track({ status: failure ? "failed" : counted ? "done" : "cancelled", error: failure, total_bytes: totalBytes });
     // A single finished file downloads straight away — no extra click needed.
-    if (!ac.signal.aborted && doneFiles.length === 1 && files.length === 1) saveBlob(doneFiles[0]!.blob, doneFiles[0]!.name);
+    if (!ac.signal.aborted && doneFiles.length === 1 && files.length === 1 && !downloadsBlockedHere()) saveBlob(doneFiles[0]!.blob, doneFiles[0]!.name);
     setState((prev) =>
       Object.fromEntries(Object.entries(prev).map(([k, v]) => [k, v.status === "waiting" || v.status === "working" ? { ...v, status: "cancelled" } : v])),
     );
@@ -437,7 +440,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
           <p className="mb-4 text-[14px] leading-normal text-ap-body">Download them one by one or all together. Files stay in Previous exports for 30 days, where GIFs can also be sent to Klaviyo.</p>
           <FileList files={files} state={state} />
           <div className="mt-4 flex flex-wrap gap-2">
-            {doneCount > 1 && <AppButton onClick={() => void zipAll(files, state, `${base}.zip`)}><Download className="size-4" strokeWidth={1.7} /> Download all</AppButton>}
+            {doneCount > 1 && <AppButton onClick={() => { if (downloadsBlockedHere()) { toast.error(SAFARI_PREVIEW); return; } void zipAll(files, state, `${base}.zip`); }}><Download className="size-4" strokeWidth={1.7} /> Download all</AppButton>}
             <AppButton variant="ghost" onClick={() => setOpen(false)}>Export more sizes</AppButton>
           </div>
           <div className="mt-3"><ReferralNote /></div>
@@ -839,20 +842,6 @@ function QualitySettings({ mp4, gif, fps, setFps, gSize, setGSize, gColors, setG
 
 /* ================================================================== progress */
 
-function saveBlob(blob: Blob, name: string) {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = name;
-  a.rel = "noopener";
-  // Safari ignores clicks on anchors that aren't in the document.
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  // Keep the URL alive well past the click — revoking too early cancels the save on some browsers.
-  setTimeout(() => URL.revokeObjectURL(url), 60_000);
-}
-
 async function zipAll(files: FileRow[], state: Record<string, JobState>, zipName: string) {
   const entries: Record<string, [Uint8Array, { level: 0 }]> = {};
   for (const f of files) { const b = state[f.job]?.blob; if (b) entries[f.name] = [new Uint8Array(await b.arrayBuffer()), { level: 0 }]; }
@@ -870,7 +859,7 @@ function FileList({ files, state }: { files: FileRow[]; state: Record<string, Jo
               <span className="rounded-md bg-ap-card px-1.5 py-0.5 text-[10px] font-semibold uppercase">{f.kind}</span>
               <span className="min-w-0 flex-1 truncate text-[14px]">{f.name}</span>
               {s?.blob ? (
-                <button type="button" className="flex items-center gap-1 text-[14px] font-medium text-ap-blue" onClick={() => saveBlob(s.blob!, f.name)}>
+                <button type="button" className="flex items-center gap-1 text-[14px] font-medium text-ap-blue" onClick={() => { if (downloadsBlockedHere()) { toast.error(SAFARI_PREVIEW); return; } void deliverFile(s.blob!, f.name); }}>
                   <Download className="size-4" strokeWidth={1.7} /> Download
                 </button>
               ) : (
@@ -920,7 +909,10 @@ function PreviousExports({ projectId, workspaceId, version }: { projectId: strin
   const download = async (stamp: string, name: string) => {
     const { data, error } = await supabase.storage.from(MEDIA_BUCKET).createSignedUrl(`${workspaceId}/exports/${projectId}/${stamp}/${name}`, 300, { download: name });
     if (error || !data) { toast.error("That file couldn't be downloaded. Try again."); return; }
-    // Fetch to a file first: navigating to another site inside the framed preview is blocked.
+    if (downloadsBlockedHere()) { toast.error(SAFARI_PREVIEW); return; }
+    // Outside the preview, the saved link itself tells the browser to save, so Safari's click rules don't matter.
+    if (window.self === window.top) { saveFromUrl(data.signedUrl, name); return; }
+    // Inside the preview frame, fetch to a file first: leaving for another site there is blocked.
     try {
       const res = await fetch(data.signedUrl);
       if (!res.ok) throw new Error(String(res.status));
