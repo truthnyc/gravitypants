@@ -46,15 +46,16 @@ export function FromLink({ format, kitId }: { format: Format; kitId: string | nu
   const [url, setUrl] = useState("");
   const [busy, setBusy] = useState<null | "reading" | "writing">(null);
   const [error, setError] = useState<string | null>(null);
+  const [blocked, setBlocked] = useState(false);
   const [understood, setUnderstood] = useState<Read | null>(null);
   const [choices, setChoices] = useState<Choices | null>(null);
   const [result, setResult] = useState<Drafts | null>(null);
 
-  const fail = (res: { error: string; locked?: boolean }) => { if (res.locked) openUpgrade("ai_copy"); setError(res.error); };
+  const fail = (res: { error: string; locked?: boolean; blocked?: boolean }) => { if (res.locked) openUpgrade("ai_copy"); setError(res.error); setBlocked(!!res.blocked); };
 
   const go = async () => {
     if (locked) { openUpgrade("ai_copy"); return; }
-    setBusy("reading"); setError(null); setResult(null); setUnderstood(null);
+    setBusy("reading"); setError(null); setBlocked(false); setResult(null); setUnderstood(null);
     try {
       const res = await read({ data: { workspaceId: getWorkspaceId(), url: url.trim() } });
       if (!res.ok) fail(res as never);
@@ -112,6 +113,7 @@ export function FromLink({ format, kitId }: { format: Format; kitId: string | nu
       </form>
       {busy === "reading" && <p className="mt-3 text-[13px] text-ap-muted">Reading the page…</p>}
       {error && <p role="alert" className="mt-3 text-[13px] text-destructive">{error}</p>}
+      {error && blocked && <p className="mt-1 text-[13px] text-ap-body">Pick a template below and add your own photos to start.</p>}
 
       {understood && choices && !result && (
         <div className="mt-4 space-y-4 rounded-[4px] bg-ap-card p-3" aria-label="What we understood" role="group">
