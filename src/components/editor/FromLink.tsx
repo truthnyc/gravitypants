@@ -20,7 +20,7 @@ type Drafts = { photos: Photo[]; drafts: ReelDraft[]; format: Format };
 type Choices = { facts: boolean[]; photos: boolean[]; difference: string; mustSay: string };
 
 const focus = "outline-none focus-visible:ring-2 focus-visible:ring-ap-blue focus-visible:ring-offset-2";
-const UNUSABLE: Record<string, string> = { other: "Looks like a chart, logo or duplicate" };
+const UNUSABLE_NOTE = "Looks like a chart, logo or duplicate";
 
 function Thumb({ path, className }: { path: string; className?: string }) {
   const [src, setSrc] = useState<string | null>(null);
@@ -153,7 +153,7 @@ export function FromLink({ format, kitId }: { format: Format; kitId: string | nu
               {understood.photos.map((p, i) => {
                 const on = choices.photos[i]!;
                 const note = understood.brief.photos.find((x) => x.index === i);
-                const reason = note && !note.usable ? (note.shows ? `Off: ${note.shows}` : UNUSABLE.other) : null;
+                const reason = note && !note.usable ? (note.shows ? `Off: ${note.shows}` : UNUSABLE_NOTE) : null;
                 return (
                   <button key={p.assetId} type="button" aria-pressed={on} disabled={on && photosOn <= 1}
                     title={on && photosOn <= 1 ? "Keep at least one photo" : undefined}
