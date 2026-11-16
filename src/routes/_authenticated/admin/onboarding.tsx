@@ -14,6 +14,7 @@ import { listSiteReels } from "@/lib/site/reels.functions";
 import { BRAND_NAME_MAX, BRAND_DESCRIPTION_MAX, CATEGORIES, SLUG_MAX, toSlug, moodLabel, type Category } from "@/lib/directory/directory";
 import { useMoodCatalog } from "@/lib/directory/moods";
 import { normalizeWebsite } from "@/lib/directory/application-security";
+import { briefTags, detectMoods, parseCreativeBrief } from "@/lib/directory/creative-brief";
 
 export const Route = createFileRoute("/_authenticated/admin/onboarding")({
   head: () => ({ meta: [
@@ -27,7 +28,7 @@ export const Route = createFileRoute("/_authenticated/admin/onboarding")({
   component: Onboarding,
 });
 
-const initial = { name: "", website: "", slug: "", description: "", category: "Other" as Category, workspace: "editorial", status: "live" as "live" | "draft", affiliated: false, moods: [] as string[], reels: [] as string[] };
+const initial = { name: "", website: "", slug: "", description: "", category: "Other" as Category, workspace: "editorial", status: "live" as "live" | "draft", affiliated: false, moods: [] as string[], reels: [] as string[], brief: "" };
 
 function Onboarding() {
   const create = useServerFn(adminCreateBrand);
@@ -46,6 +47,12 @@ function Onboarding() {
   const [created, setCreated] = useState<{ id: string; slug: string; name: string; status: string } | null>(null);
   const [logoError, setLogoError] = useState("");
   const update = <K extends keyof typeof initial>(key: K, value: typeof initial[K]) => setF((s) => ({ ...s, [key]: value }));
+  const brief = parseCreativeBrief(f.brief);
+  const tags = briefTags(brief);
+  function applyBrief(text: string) {
+    const found = detectMoods(parseCreativeBrief(text), catalog.forCategory(f.category));
+    setF((s) => ({ ...s, brief: text, moods: [...new Set([...s.moods, ...found])] }));
+  }
   const available = (reels.data ?? []).filter((r) => r.source !== "client" && !r.brandSlug);
 
   async function saveLogo(brandId: string) {
@@ -59,7 +66,7 @@ function Onboarding() {
     setBusy(true); setError("");
     try {
       const website = normalizeWebsite(f.website).url;
-      const result = await create({ data: { name: f.name, website, slug: f.slug, description: f.description, category: f.category, workspaceId: f.workspace === "editorial" ? null : f.workspace, siteReelIds: f.reels, moods: f.moods, affiliated: f.affiliated, status: f.status } });
+      const result = await create({ data: { name: f.name, website, slug: f.slug, description: f.description, category: f.category, workspaceId: f.workspace === "editorial" ? null : f.workspace, siteReelIds: f.reels, moods: f.moods, affiliated: f.affiliated, status: f.status, creativeBrief: f.brief.trim() ? brief : undefined, defaultTags: tags } });
       setCreated({ ...result, name: f.name, status: f.status });
       try { await saveLogo(result.id); } catch { setLogoError("The shop is saved, but its logo wasn't uploaded."); }
       await Promise.all([qc.invalidateQueries({ queryKey: ["admin"] }), qc.invalidateQueries({ queryKey: ["site-reels"] })]);
@@ -92,6 +99,16 @@ function Onboarding() {
         <label className="space-y-2 sm:col-span-2"><span className="text-sm font-medium">Description</span><Textarea maxLength={BRAND_DESCRIPTION_MAX} rows={3} value={f.description} onChange={(e) => update("description", e.target.value)} /><span className="block text-xs tabular-nums text-secondary-text">{f.description.length} / {BRAND_DESCRIPTION_MAX}</span></label>
         <label className="space-y-2"><span className="text-sm font-medium">Logo (optional)</span><Input type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" onChange={(e) => { const file = e.target.files?.[0]; if (file && file.size > 2_000_000) { e.target.value = ""; toast.error("Choose a logo under 2 MB."); return; } setLogo(file ?? null); }} /></label>
         <label className="space-y-2"><span className="text-sm font-medium">Client workspace</span><Select value={f.workspace} onValueChange={(v) => update("workspace", v)}><SelectTrigger aria-label="Client workspace"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="editorial">Not signed up yet (editorial)</SelectItem>{(ws.data ?? []).map((w) => <SelectItem key={w.id} value={w.id}>{w.name}{w.email ? ` · ${w.email}` : ""}</SelectItem>)}</SelectContent></Select></label>
+      </div>
+      <div className="space-y-3">
+        <label className="block space-y-2"><span className="text-sm font-medium">Creative brief and tags (optional)</span><Textarea rows={8} maxLength={6000} value={f.brief} placeholder={"Moods\n\nCold, calm and technical: a grey studio, cool light\n\nColour palette: charcoal, light grey, signal orange (#E8603C)\n\nTags\n\nCategory:\n#DownJacket #AlpineGear\n\nKeyword tags: down parka, belay jacket"} onChange={(e) => applyBrief(e.target.value)} /><span className="block text-xs text-secondary-text">Paste the brief. Matching moods are selected below; tags are added to this shop's reels.</span></label>
+        {f.brief.trim() && <div className="space-y-3 rounded border border-border p-4 text-sm">
+          {brief.scenes.length > 0 && <div><p className="mb-1 font-medium">Scenes</p><ul className="space-y-1">{brief.scenes.map((sc, i) => <li key={i}><span className="font-medium">{sc.title}</span>{sc.text && <span className="text-secondary-text"> — {sc.text}</span>}</li>)}</ul></div>}
+          {brief.palette && <div><p className="mb-1 font-medium">Colour palette</p><p className="text-secondary-text">{brief.palette}</p>{brief.colors.length > 0 && <div className="mt-2 flex gap-2">{brief.colors.map((c) => <span key={c} className="inline-flex items-center gap-1.5 text-xs tabular-nums"><span className="size-4 rounded-full border border-border" style={{ backgroundColor: c }} />{c}</span>)}</div>}</div>}
+          {brief.tagGroups.map((g) => <div key={g.label}><p className="mb-1 font-medium">{g.label}</p><p className="text-secondary-text">{g.tags.map((t) => `#${t}`).join(" ")}</p></div>)}
+          {brief.keywords.length > 0 && <div><p className="mb-1 font-medium">Keyword tags</p><p className="text-secondary-text">{brief.keywords.join(", ")}</p></div>}
+          <p className="text-xs tabular-nums text-secondary-text">{tags.length} tags will be saved</p>
+        </div>}
       </div>
       <fieldset className="space-y-3"><legend className="mb-3 text-sm font-medium">Moods</legend><div className="flex flex-wrap gap-2">{catalog.forCategory(f.category).map((m) => <Button key={m} type="button" size="sm" variant={f.moods.includes(m) ? "default" : "outline"} aria-pressed={f.moods.includes(m)} onClick={() => update("moods", f.moods.includes(m) ? f.moods.filter((x) => x !== m) : [...f.moods, m])}>{moodLabel(m)}</Button>)}</div></fieldset>
       <fieldset className="space-y-3"><legend className="mb-3 text-sm font-medium">Published website reels</legend>{available.map((r) => <label key={r.id} className="flex items-center gap-3 text-sm"><input type="checkbox" checked={f.reels.includes(r.id)} onChange={(e) => update("reels", e.target.checked ? [...f.reels, r.id] : f.reels.filter((id) => id !== r.id))} /><span>{r.brand} · {r.title}</span></label>)}{!available.length && <p className="text-sm text-secondary-text">No unlinked published reels.</p>}</fieldset>

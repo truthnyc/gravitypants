@@ -122,7 +122,7 @@ export const getShareContext = createServerFn({ method: "POST" })
       brandChoices,
       currentBrandId: ((reel as any)?.brand_id as string | undefined) ?? null,
       reel: reel ? { id: reel.id as string, status: reel.status as DirStatus, tags: reel.tags as string[], moods: reel.moods as string[], title: (reel.title as string | null) ?? null, displayTitle: (reel.display_title as string | null) ?? "", description: (reel.description as string | null) ?? "" } : null,
-      prefill: { tags: (reel?.tags ?? last?.tags ?? []) as string[], moods: (reel?.moods ?? last?.moods ?? []) as string[] },
+      prefill: { tags: (reel?.tags ?? (last?.tags?.length ? last.tags : null) ?? b?.default_tags ?? []) as string[], moods: (reel?.moods ?? last?.moods ?? []) as string[] },
       plan,
       email: (context.claims as any)?.email ?? "",
       role: (member?.role as string | undefined) ?? "member",
@@ -810,6 +810,7 @@ export const adminCreateBrand = createServerFn({ method: "POST" })
       website_url: website?.url || null, description: data.description || null,
       first_approved_at: new Date().toISOString(), is_editorial: !data.workspaceId,
       affiliated: data.affiliated, status: data.status,
+      creative_brief: data.creativeBrief ?? {}, default_tags: [...new Set(data.defaultTags)],
     }).select("id, slug").single();
     if (error) throw new Error(error.message);
     if (data.siteReelIds.length) await admin.from("site_reels").update({ brand_id: b.id }).in("id", data.siteReelIds);

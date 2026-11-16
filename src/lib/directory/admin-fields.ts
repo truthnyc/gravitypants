@@ -14,6 +14,13 @@ export const createBrandInput = z.object({
   siteReelIds: z.array(z.string().uuid()).max(100),
   moods: z.array(z.string().trim().toLowerCase().max(30)).max(BRAND_MOODS_MAX).default([]),
   affiliated: brandPublicationFields.affiliated.default(false), status: brandPublicationFields.status.default("live"),
+  creativeBrief: z.object({
+    scenes: z.array(z.object({ title: z.string().trim().max(120), text: z.string().trim().max(400) })).max(20),
+    palette: z.string().trim().max(400), colors: z.array(z.string().regex(/^#[0-9A-F]{3,6}$/)).max(12),
+    tagGroups: z.array(z.object({ label: z.string().trim().max(40), tags: z.array(z.string().trim().max(40)).max(40) })).max(12),
+    keywords: z.array(z.string().trim().max(60)).max(40),
+  }).optional(),
+  defaultTags: z.array(z.string().trim().toLowerCase().min(1).max(40)).max(60).default([]),
 });
 export const categoryHintInput = z.object({ id: z.string().uuid(), hint: z.string().trim().min(1).max(120), page_intro: z.string().trim().max(600).optional() });
 export const greetingEventInput = z.object({
