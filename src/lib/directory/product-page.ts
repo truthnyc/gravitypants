@@ -150,3 +150,31 @@ export function productImages(html: string, url: string, max = 6): string[] {
   }
   return out;
 }
+
+export type ProductText = { description: string; details: string; brand: string | null };
+
+const stripTags = (h: string) => decode(h
+  .replace(/<\s*(li|p|br|h[1-6]|div|tr|dt|dd)\b[^>]*>/gi, "\n")
+  .replace(/<[^>]+>/g, " ")
+  .replace(/&nbsp;/g, " ").replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n))))
+  .split("\n").map((l) => l.replace(/[ \t\r\f\v]+/g, " ").trim()).filter(Boolean).join("\n");
+
+/** Readable page text for the product brief: description, body details (lists kept on their own lines) and brand. */
+export function productText(html: string, _url: string): ProductText {
+  let product: any = null;
+  for (const m of html.matchAll(/<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)) {
+    try { product = findProduct(JSON.parse(m[1]?.trim() ?? "")); } catch { continue; }
+    if (product) break;
+  }
+  const meta = (name: string) => html.match(new RegExp(`<meta[^>]+(?:property|name)=["']${name}["'][^>]*>`, "i"))?.[0].match(/content=["']([^"']*)["']/i)?.[1] ?? "";
+  const ld = typeof product?.description === "string" ? product.description : "";
+  const description = stripTags(ld || meta("og:description") || meta("description")).replace(/\n/g, " ").slice(0, 1200);
+  const b = product?.brand;
+  const brand = typeof b === "string" ? b : typeof b?.name === "string" ? b.name : null;
+  let body = html.replace(/<(script|style|nav|header|footer|form|svg|noscript|template|iframe)\b[\s\S]*?<\/\1>/gi, " ");
+  const main = body.match(/<main\b[\s\S]*?<\/main>/i)?.[0];
+  if (main) body = main;
+  else { const bm = body.match(/<body\b[\s\S]*<\/body>/i)?.[0]; if (bm) body = bm; }
+  const details = stripTags(body).slice(0, 6000);
+  return { description, details, brand: brand ? decode(brand) : null };
+}
