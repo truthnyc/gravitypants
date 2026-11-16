@@ -23,6 +23,7 @@ import { Route as HelpRouteImport } from './routes/help'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as Html5AdsRouteImport } from './routes/html5-ads'
 import { Route as InstagramReelsFromPhotosRouteImport } from './routes/instagram-reels-from-photos'
+import { Route as McpRouteImport } from './routes/mcp'
 import { Route as PhotoToVideoRouteImport } from './routes/photo-to-video'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PrivacyRouteImport } from './routes/privacy'
@@ -42,6 +43,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as TiktokVideoFromPhotosRouteImport } from './routes/tiktok-video-from-photos'
 import { Route as VideoAdsForSmallBusinessRouteImport } from './routes/video-ads-for-small-business'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedAppRouteRouteImport } from './routes/_authenticated/app/route'
 import { Route as AimanteAboutRouteImport } from './routes/aimante.about'
@@ -67,6 +69,7 @@ import { Route as ShopifyWelcomeRouteImport } from './routes/shopify_.welcome'
 import { Route as SitePhotoSplatRouteImport } from './routes/site-photo.$'
 import { Route as StageIndexRouteImport } from './routes/stage.index'
 import { Route as StageMoodRouteImport } from './routes/stage.$mood'
+import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedAdminAdminsRouteImport } from './routes/_authenticated/admin/admins'
 import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin/analytics'
@@ -213,6 +216,11 @@ const InstagramReelsFromPhotosRoute =
     path: '/instagram-reels-from-photos',
     getParentRoute: () => rootRouteImport,
   } as any)
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PhotoToVideoRoute = PhotoToVideoRouteImport.update({
   id: '/photo-to-video',
   path: '/photo-to-video',
@@ -307,6 +315,12 @@ const VideoAdsForSmallBusinessRoute =
   VideoAdsForSmallBusinessRouteImport.update({
     id: '/video-ads-for-small-business',
     path: '/video-ads-for-small-business',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
     getParentRoute: () => rootRouteImport,
   } as any)
 const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
@@ -432,6 +446,11 @@ const StageIndexRoute = StageIndexRouteImport.update({
 const StageMoodRoute = StageMoodRouteImport.update({
   id: '/stage/$mood',
   path: '/stage/$mood',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
@@ -864,6 +883,7 @@ export interface FileRoutesByFullPath {
   '/how-it-works': typeof HowItWorksRoute
   '/html5-ads': typeof Html5AdsRoute
   '/instagram-reels-from-photos': typeof InstagramReelsFromPhotosRoute
+  '/mcp': typeof McpRoute
   '/photo-to-video': typeof PhotoToVideoRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -885,6 +905,7 @@ export interface FileRoutesByFullPath {
   '/video-ads-for-small-business': typeof VideoAdsForSmallBusinessRoute
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/app': typeof AuthenticatedAppRouteRouteWithChildren
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/aimante/about': typeof AimanteAboutRoute
   '/aimante/join': typeof AimanteJoinRoute
   '/badge/$file': typeof BadgeFileRoute
@@ -908,6 +929,7 @@ export interface FileRoutesByFullPath {
   '/directory/': typeof DirectoryIndexRoute
   '/reels/': typeof ReelsIndexRoute
   '/stage/': typeof StageIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/admin/admins': typeof AuthenticatedAdminAdminsRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
@@ -997,6 +1019,7 @@ export interface FileRoutesByTo {
   '/how-it-works': typeof HowItWorksRoute
   '/html5-ads': typeof Html5AdsRoute
   '/instagram-reels-from-photos': typeof InstagramReelsFromPhotosRoute
+  '/mcp': typeof McpRoute
   '/photo-to-video': typeof PhotoToVideoRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -1016,6 +1039,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/tiktok-video-from-photos': typeof TiktokVideoFromPhotosRoute
   '/video-ads-for-small-business': typeof VideoAdsForSmallBusinessRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/aimante/about': typeof AimanteAboutRoute
   '/aimante/join': typeof AimanteJoinRoute
   '/badge/$file': typeof BadgeFileRoute
@@ -1039,6 +1063,7 @@ export interface FileRoutesByTo {
   '/directory': typeof DirectoryIndexRoute
   '/reels': typeof ReelsIndexRoute
   '/stage': typeof StageIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/admin/admins': typeof AuthenticatedAdminAdminsRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
@@ -1131,6 +1156,7 @@ export interface FileRoutesById {
   '/how-it-works': typeof HowItWorksRoute
   '/html5-ads': typeof Html5AdsRoute
   '/instagram-reels-from-photos': typeof InstagramReelsFromPhotosRoute
+  '/mcp': typeof McpRoute
   '/photo-to-video': typeof PhotoToVideoRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -1152,6 +1178,7 @@ export interface FileRoutesById {
   '/video-ads-for-small-business': typeof VideoAdsForSmallBusinessRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/app': typeof AuthenticatedAppRouteRouteWithChildren
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/aimante/about': typeof AimanteAboutRoute
   '/aimante/join': typeof AimanteJoinRoute
   '/badge/$file': typeof BadgeFileRoute
@@ -1175,6 +1202,7 @@ export interface FileRoutesById {
   '/directory/': typeof DirectoryIndexRoute
   '/reels/': typeof ReelsIndexRoute
   '/stage/': typeof StageIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/_authenticated/admin/admins': typeof AuthenticatedAdminAdminsRoute
   '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
@@ -1267,6 +1295,7 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/html5-ads'
     | '/instagram-reels-from-photos'
+    | '/mcp'
     | '/photo-to-video'
     | '/pricing'
     | '/privacy'
@@ -1288,6 +1317,7 @@ export interface FileRouteTypes {
     | '/video-ads-for-small-business'
     | '/admin'
     | '/app'
+    | '/.well-known/oauth-protected-resource'
     | '/aimante/about'
     | '/aimante/join'
     | '/badge/$file'
@@ -1311,6 +1341,7 @@ export interface FileRouteTypes {
     | '/directory/'
     | '/reels/'
     | '/stage/'
+    | '/.lovable/oauth/consent'
     | '/admin/admins'
     | '/admin/analytics'
     | '/admin/audit'
@@ -1400,6 +1431,7 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/html5-ads'
     | '/instagram-reels-from-photos'
+    | '/mcp'
     | '/photo-to-video'
     | '/pricing'
     | '/privacy'
@@ -1419,6 +1451,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/tiktok-video-from-photos'
     | '/video-ads-for-small-business'
+    | '/.well-known/oauth-protected-resource'
     | '/aimante/about'
     | '/aimante/join'
     | '/badge/$file'
@@ -1442,6 +1475,7 @@ export interface FileRouteTypes {
     | '/directory'
     | '/reels'
     | '/stage'
+    | '/.lovable/oauth/consent'
     | '/admin/admins'
     | '/admin/analytics'
     | '/admin/audit'
@@ -1533,6 +1567,7 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/html5-ads'
     | '/instagram-reels-from-photos'
+    | '/mcp'
     | '/photo-to-video'
     | '/pricing'
     | '/privacy'
@@ -1554,6 +1589,7 @@ export interface FileRouteTypes {
     | '/video-ads-for-small-business'
     | '/_authenticated/admin'
     | '/_authenticated/app'
+    | '/.well-known/oauth-protected-resource'
     | '/aimante/about'
     | '/aimante/join'
     | '/badge/$file'
@@ -1577,6 +1613,7 @@ export interface FileRouteTypes {
     | '/directory/'
     | '/reels/'
     | '/stage/'
+    | '/.lovable/oauth/consent'
     | '/_authenticated/admin/admins'
     | '/_authenticated/admin/analytics'
     | '/_authenticated/admin/audit'
@@ -1669,6 +1706,7 @@ export interface RootRouteChildren {
   HowItWorksRoute: typeof HowItWorksRoute
   Html5AdsRoute: typeof Html5AdsRoute
   InstagramReelsFromPhotosRoute: typeof InstagramReelsFromPhotosRoute
+  McpRoute: typeof McpRoute
   PhotoToVideoRoute: typeof PhotoToVideoRoute
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -1688,6 +1726,7 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   TiktokVideoFromPhotosRoute: typeof TiktokVideoFromPhotosRoute
   VideoAdsForSmallBusinessRoute: typeof VideoAdsForSmallBusinessRoute
+  Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   AimanteAboutRoute: typeof AimanteAboutRoute
   AimanteJoinRoute: typeof AimanteJoinRoute
   BadgeFileRoute: typeof BadgeFileRoute
@@ -1706,6 +1745,7 @@ export interface RootRouteChildren {
   DirectoryIndexRoute: typeof DirectoryIndexRoute
   ReelsIndexRoute: typeof ReelsIndexRoute
   StageIndexRoute: typeof StageIndexRoute
+  DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   AimanteGuidesSlugRoute: typeof AimanteGuidesSlugRoute
   ApiPublicCleanupExportsRoute: typeof ApiPublicCleanupExportsRoute
   ApiPublicClientErrorRoute: typeof ApiPublicClientErrorRoute
@@ -1830,6 +1870,13 @@ declare module '@tanstack/react-router' {
       path: '/instagram-reels-from-photos'
       fullPath: '/instagram-reels-from-photos'
       preLoaderRoute: typeof InstagramReelsFromPhotosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/photo-to-video': {
@@ -1963,6 +2010,13 @@ declare module '@tanstack/react-router' {
       path: '/video-ads-for-small-business'
       fullPath: '/video-ads-for-small-business'
       preLoaderRoute: typeof VideoAdsForSmallBusinessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin': {
@@ -2138,6 +2192,13 @@ declare module '@tanstack/react-router' {
       path: '/stage/$mood'
       fullPath: '/stage/$mood'
       preLoaderRoute: typeof StageMoodRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.lovable/oauth/consent': {
+      id: '/.lovable/oauth/consent'
+      path: '/.lovable/oauth/consent'
+      fullPath: '/.lovable/oauth/consent'
+      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin/': {
@@ -2885,6 +2946,7 @@ const rootRouteChildren: RootRouteChildren = {
   HowItWorksRoute: HowItWorksRoute,
   Html5AdsRoute: Html5AdsRoute,
   InstagramReelsFromPhotosRoute: InstagramReelsFromPhotosRoute,
+  McpRoute: McpRoute,
   PhotoToVideoRoute: PhotoToVideoRoute,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
@@ -2904,6 +2966,8 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   TiktokVideoFromPhotosRoute: TiktokVideoFromPhotosRoute,
   VideoAdsForSmallBusinessRoute: VideoAdsForSmallBusinessRoute,
+  Char91DotwellKnownChar93OauthProtectedResourceRoute:
+    Char91DotwellKnownChar93OauthProtectedResourceRoute,
   AimanteAboutRoute: AimanteAboutRoute,
   AimanteJoinRoute: AimanteJoinRoute,
   BadgeFileRoute: BadgeFileRoute,
@@ -2922,6 +2986,7 @@ const rootRouteChildren: RootRouteChildren = {
   DirectoryIndexRoute: DirectoryIndexRoute,
   ReelsIndexRoute: ReelsIndexRoute,
   StageIndexRoute: StageIndexRoute,
+  DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   AimanteGuidesSlugRoute: AimanteGuidesSlugRoute,
   ApiPublicCleanupExportsRoute: ApiPublicCleanupExportsRoute,
   ApiPublicClientErrorRoute: ApiPublicClientErrorRoute,
