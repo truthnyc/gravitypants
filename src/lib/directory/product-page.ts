@@ -112,3 +112,41 @@ export function isPublicHost(hostname: string): boolean {
   }
   return true;
 }
+
+function allImages(img: any, out: string[]) {
+  if (!img) return;
+  if (typeof img === "string") { out.push(img); return; }
+  if (Array.isArray(img)) { for (const i of img) allImages(i, out); return; }
+  const u = typeof img.url === "string" ? img.url : typeof img.contentUrl === "string" ? img.contentUrl : null;
+  if (u) out.push(u);
+}
+
+/** Every distinct product photo on the page (JSON-LD product and variants first, then og:image), https only. */
+export function productImages(html: string, url: string, max = 6): string[] {
+  const raw: string[] = [];
+  for (const m of html.matchAll(/<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)) {
+    let data: any;
+    try { data = JSON.parse(m[1]?.trim() ?? ""); } catch { continue; }
+    const p = findProduct(data);
+    if (!p) continue;
+    allImages(p.image, raw);
+    for (const v of Array.isArray(p.hasVariant) ? p.hasVariant : []) allImages(v?.image, raw);
+    break;
+  }
+  for (const t of html.matchAll(/<meta[^>]+(?:property|name)=["']og:image(?::secure_url)?["'][^>]*>/gi)) {
+    const c = t[0].match(/content=["']([^"']*)["']/i)?.[1];
+    if (c) raw.push(c);
+  }
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const r of raw) {
+    const a = absolute(r, url);
+    if (!a) continue;
+    // Shopify-style size suffixes and query strings point at the same photo.
+    const key = a.replace(/\?.*$/, "").replace(/_(\d+x\d*|\d*x\d+)(?=\.[a-z]+$)/i, "");
+    if (seen.has(key)) continue;
+    seen.add(key); out.push(a);
+    if (out.length >= max) break;
+  }
+  return out;
+}

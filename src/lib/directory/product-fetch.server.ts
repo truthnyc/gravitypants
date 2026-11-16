@@ -22,6 +22,12 @@ export async function fetchProductInfo(raw: string, timeoutMs = TIMEOUT_MS): Pro
 
 /** Safe public https GET: redirects re-checked against private hosts, time and size capped. Returns text only. */
 export async function safeFetchText(raw: string, opts: { timeoutMs: number; maxBytes: number; accept: string; truncate?: boolean }): Promise<{ text: string; url: string }> {
+  const { bytes, url } = await safeFetchBytes(raw, opts);
+  return { text: new TextDecoder().decode(bytes), url };
+}
+
+/** Same safety rules as safeFetchText, returning raw bytes and the content type (for images). */
+export async function safeFetchBytes(raw: string, opts: { timeoutMs: number; maxBytes: number; accept: string; truncate?: boolean }): Promise<{ bytes: Uint8Array; url: string; type: string }> {
   const { timeoutMs, maxBytes: MAX_BYTES, accept } = opts;
   let u = checkUrl(raw.trim());
   const ctrl = new AbortController();
@@ -53,7 +59,7 @@ export async function safeFetchText(raw: string, opts: { timeoutMs: number; maxB
     const buf = new Uint8Array(Math.min(total, MAX_BYTES));
     let off = 0;
     for (const c of chunks) { const take = Math.min(c.byteLength, buf.length - off); buf.set(c.subarray(0, take), off); off += take; if (off >= buf.length) break; }
-    return { text: new TextDecoder().decode(buf), url: u.toString() };
+    return { bytes: buf, url: u.toString(), type: (res.headers.get("content-type") ?? "").split(";")[0]!.trim().toLowerCase() };
   } catch (e) {
     if (e instanceof ProductFetchError) throw e;
     throw new ProductFetchError(ctrl.signal.aborted ? "The address took too long to answer." : "We couldn't reach that address.");
