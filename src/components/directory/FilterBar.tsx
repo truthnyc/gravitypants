@@ -76,7 +76,7 @@ export function FilterBar({ value, onChange, facets, total, families, brands, co
         Clear ({value[k].length})
       </button>
       <button type="button" onClick={() => close()} className={cn("h-10 rounded-lg bg-ap-ink px-4 text-[14px] font-medium text-ap-card nums", narrow && "flex-1")}>
-        {total === 0 ? "No matches" : `Show ${total} ${total === 1 ? "reel" : "reels"}`}
+        {total === 0 ? "No matches" : "Show reels"}
       </button>
     </div>
   );
@@ -197,7 +197,7 @@ function MoodBody({ families, selected, counts, onChange }: { families: Family[]
                   const n = counts[m] ?? 0;
                   const off = !on && n === 0;
                   return (
-                    <button key={m} type="button" aria-pressed={on} disabled={off} aria-label={`${cap(m)}, ${n} ${n === 1 ? "reel" : "reels"}`} onClick={() => onChange(toggleIn(selected, m))}
+                    <button key={m} type="button" aria-pressed={on} disabled={off} onClick={() => onChange(toggleIn(selected, m))}
                       className={cn("inline-flex h-8 items-center gap-1 rounded-full px-3 text-[14px] transition-[background,box-shadow]",
                         on ? (c?.ink === "dark" ? "text-ap-ink" : "text-ap-card") : "bg-ap-panel text-ap-ink", !on && !off && "hover:bg-ap-media", off && "cursor-not-allowed opacity-45")}
                       style={on ? { background: c?.bg, boxShadow: `0 4px 14px -4px ${c?.bg}` } : undefined}>
@@ -233,7 +233,6 @@ function CategoryBody({ selected, counts, narrow, onChange, comingSoon }: { comi
               <label key={c.slug} className={cn("flex min-h-12 items-center gap-2.5 rounded-sm py-2 text-[14px]", off ? "cursor-not-allowed text-ap-muted opacity-60" : "cursor-pointer")}>
                 <input type="checkbox" disabled={off} checked={selected.includes(c.slug)} onChange={() => onChange(toggleIn(selected, c.slug))} className="size-4 accent-ap-blue disabled:cursor-not-allowed" />
                 <span className="min-w-0 flex-1"><span className="block break-words">{c.name}</span>{hints.get(c.name) && <span className="block text-[12px] leading-4 text-ap-muted">{hints.get(c.name)}</span>}</span>
-                <span className="text-[13px] text-ap-muted nums">{c.n}</span>
               </label>
             ); })}
           </div>
@@ -270,7 +269,6 @@ function BrandBody({ brands, selected, counts, onChange }: { brands: Brand[]; se
                   <span className="block truncate text-[14px] font-medium text-ap-ink"><Mark text={b.name} q={q} /></span>
                   <span className="block truncate text-[12px] text-ap-muted">{b.category}</span>
                 </span>
-                <span className="text-[13px] text-ap-muted nums">{n}</span>
                 <Check aria-hidden className={cn("size-4 text-ap-blue", !on && "invisible")} strokeWidth={2} />
               </button>
             </li>
