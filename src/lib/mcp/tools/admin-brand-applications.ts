@@ -16,7 +16,7 @@ export default defineTool({
     ]);
     if (apps.error) return { isError: true, content: [{ type: "text", text: apps.error.message }] };
     const o = {
-      applications: (apps.data ?? []).map((a: Record<string, unknown>) => ({ ...a, description: String(a.description ?? "").slice(0, 300) })),
+      applications: (apps.data ?? []).map((a: Record<string, unknown>) => ({ ...a, description: String(a["description"] ?? "").slice(0, 300) })),
       reelUpdates: reels.data ?? [],
     };
     return { content: [{ type: "text", text: JSON.stringify(o, null, 2) }], structuredContent: JSON.parse(JSON.stringify(o)) };
