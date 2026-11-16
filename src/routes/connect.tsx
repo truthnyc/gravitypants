@@ -107,17 +107,26 @@ function ConnectPage() {
             ]} />
           </Card>
           <Card title="Claude Code">
-            <Steps items={[
-              <>Run this one line in a terminal:</>,
-            ]} />
-            <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center">
-              <code className="min-w-0 flex-1 overflow-x-auto whitespace-nowrap rounded-lg border border-ap-hairline bg-ap-card px-3.5 py-2.5 text-[13px] tabular-nums text-ap-ink">{claudeCodeCmd}</code>
-              <CopyButton value={claudeCodeCmd} />
-            </div>
-            <Steps items={[
-              <>Start Claude Code and run /mcp to confirm Gravity Pants is connected. Sign in from that menu when asked.</>,
-              <>Ask Claude Code to use Gravity Pants.</>,
-            ]} />
+            <ol className="mt-4 flex flex-col gap-3">
+              <li className="flex gap-3 text-[15px] leading-[1.5] text-site-secondary">
+                <span className="grid size-6 min-h-0 min-w-0 shrink-0 place-items-center rounded-full bg-ap-soft-blue text-[13px] font-semibold tabular-nums text-ap-blue-strong">1</span>
+                <span className="min-w-0 flex-1 pt-px">
+                  Run this one line in a terminal:
+                  <span className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center">
+                    <code className="min-w-0 flex-1 overflow-x-auto whitespace-nowrap rounded-lg border border-ap-hairline bg-ap-card px-3.5 py-2.5 text-[13px] tabular-nums text-ap-ink">{claudeCodeCmd}</code>
+                    <CopyButton value={claudeCodeCmd} />
+                  </span>
+                </span>
+              </li>
+              <li className="flex gap-3 text-[15px] leading-[1.5] text-site-secondary">
+                <span className="grid size-6 min-h-0 min-w-0 shrink-0 place-items-center rounded-full bg-ap-soft-blue text-[13px] font-semibold tabular-nums text-ap-blue-strong">2</span>
+                <span className="pt-px">Start Claude Code and run /mcp to confirm Gravity Pants is connected. Sign in from that menu when asked.</span>
+              </li>
+              <li className="flex gap-3 text-[15px] leading-[1.5] text-site-secondary">
+                <span className="grid size-6 min-h-0 min-w-0 shrink-0 place-items-center rounded-full bg-ap-soft-blue text-[13px] font-semibold tabular-nums text-ap-blue-strong">3</span>
+                <span className="pt-px">Ask Claude Code to use Gravity Pants.</span>
+              </li>
+            </ol>
           </Card>
           <Card title="Other MCP clients">
             <Steps items={[
