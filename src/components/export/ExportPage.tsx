@@ -1,4 +1,3 @@
-import { getWorkspaceId } from "@/lib/stillframe/workspace";
 import { openUpgrade, usePlanAccess } from "@/lib/stillframe/plan";
 import { useEffect, useMemo, useRef, useState, type ComponentProps } from "react";
 import { Link } from "@tanstack/react-router";
