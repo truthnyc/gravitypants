@@ -153,7 +153,7 @@ function BrandPage() {
                   </p>
                 )}
                 <div className="mt-5 flex flex-wrap gap-2 text-[13px] nums">
-                  {[`${total} public ${total === 1 ? "reel" : "reels"}`, `${sizes.size} ${sizes.size === 1 ? "size" : "sizes"}`].map((c) => <span key={c} className="rounded-lg bg-ap-panel px-3 py-1.5">{c}</span>)}
+                  {[`${sizes.size} ${sizes.size === 1 ? "size" : "sizes"}`].map((c) => <span key={c} className="rounded-lg bg-ap-panel px-3 py-1.5">{c}</span>)}
                 </div>
               </div>
             </div>

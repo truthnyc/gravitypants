@@ -110,7 +110,7 @@ export function StageView({ mood, family, start, data }: { mood: string | null; 
           </span>
         </h1>
         <p className="mt-3 text-[15px] text-ap-body nums">
-          {total} {total === 1 ? "reel" : "reels"}.{reel && <> Leading with {reel.brand_name}{fits.length ? `: ${andJoin(fits)}` : ""}.</>}
+          {reel && <>Leading with {reel.brand_name}{fits.length ? `: ${andJoin(fits)}` : ""}.</>}
         </p>
       </header>
 

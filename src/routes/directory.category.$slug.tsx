@@ -79,7 +79,7 @@ function CategoryPage() {
         <h1 className="mt-2 text-[clamp(30px,4vw,44px)] font-semibold tracking-[-0.03em]">{category}</h1>
         <p className="mt-2 text-[17px] text-ap-muted">{CATEGORY_COVERS[category]}</p>
         <p className="mt-1 text-[14px] text-ap-muted nums">
-          {brands.length} {brands.length === 1 ? "brand" : "brands"} · {cards.length + reels.length} {cards.length + reels.length === 1 ? "reel" : "reels"}
+          {brands.length} {brands.length === 1 ? "brand" : "brands"}
         </p>
 
         {brands.length > 0 && (

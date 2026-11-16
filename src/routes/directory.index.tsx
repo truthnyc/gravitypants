@@ -30,7 +30,6 @@ import { aimanteHead } from "@/lib/site/brand-site";
 import { SiteReelHeart } from "@/components/site/SiteReelHeart";
 import { SiteReelModal } from "@/components/site/SiteReelModal";
 import { parseSearch } from "@/lib/directory/parse-search";
-const SUGGESTIONS = ["Something cozy for a host", "Elegant jewellery", "Bold fashion", "Calm for the home"];
 import { ReelNavContext, type ReelNav } from "@/components/directory/ReelPopup";
 import { useMoodCatalog } from "@/lib/directory/moods";
 import { FeaturedBand } from "@/components/directory/FeaturedBand";
@@ -772,16 +771,6 @@ function DirectoryPage() {
               Search
             </Button>
           </form>
-          <ul className="mx-auto mt-3 flex max-w-[680px] flex-wrap justify-center gap-2" aria-label="Search suggestions">
-            {SUGGESTIONS.map((sg) => (
-              <li key={sg}>
-                <button type="button" onClick={() => { setValue(sg); runSentence(sg); }}
-                  className="rounded-full border border-ap-hairline bg-ap-card px-3 py-1 text-[13px] text-ap-body hover:border-ap-blue hover:text-ap-blue">
-                  {sg}
-                </button>
-              </li>
-            ))}
-          </ul>
         </section>
         <div ref={sentinel} aria-hidden className="h-px" />
         <div
@@ -866,11 +855,7 @@ function DirectoryPage() {
           <div className="mb-5 flex items-baseline justify-between gap-4">
             <h2 className="text-[24px] font-semibold tracking-[-0.02em]">Browse the directory</h2>
             <p className="text-[15px] text-ap-muted nums" aria-live="polite">
-              {results.data
-                ? filtered
-                  ? `${total} of ${allTotal} reels`
-                  : `${total} ${total === 1 ? "reel" : "reels"}`
-                : ""}
+              
             </p>
           </div>
           {results.isPending && <SkeletonGrid n={PAGE} />}
@@ -982,9 +967,6 @@ function DirectoryPage() {
             ))}
           {found.length > 0 && !results.isPlaceholderData && (
             <div className="mt-10 flex flex-col items-center gap-3 text-center">
-              <p className="text-[14px] text-ap-muted nums">
-                Showing {found.length} of {total} reels
-              </p>
               <div
                 className="h-1 w-[180px] overflow-hidden rounded-full bg-ap-inner"
                 role="progressbar"
