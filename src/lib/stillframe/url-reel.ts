@@ -218,7 +218,7 @@ export const MAX_FRAMES = 5;
 const MONEY = /([$€£¥]\s?\d|\d[\d.,]*\s?(usd|eur|gbp|dollars?|euros?)\b|\d+\s?%\s?off|\bfree shipping\b|\bsale\b|\bdiscount)/i;
 
 /** Why a draft can't be used; empty when it passes. */
-export function checkDraft(d: RawDraft, brief: ProductBrief, price: string): string[] {
+export function checkDraft(d: RawDraft, brief: ProductBrief, price: string, given: string[] = []): string[] {
   const reasons: string[] = [];
   const shape = shapeById(d.shape);
   if (!shape) reasons.push("unknown shape");
@@ -234,7 +234,8 @@ export function checkDraft(d: RawDraft, brief: ProductBrief, price: string): str
   if (banned) reasons.push(`uses the empty phrase "${banned}"`);
   const heads = d.frames.map((f) => f.headline.toLowerCase());
   if (new Set(heads).size !== heads.length) reasons.push("two frames have the same headline");
-  const withoutPrice = price ? all.split(price.toLowerCase()).join(" ") : all;
+  // The given price and the person's own words (e.g. "Free shipping this week") are allowed; anything else about money isn't.
+  const withoutPrice = [price, ...given].filter(Boolean).reduce((t, g) => t.split(g.toLowerCase()).join(" "), all);
   if (MONEY.test(withoutPrice)) reasons.push("mentions a price or offer that wasn't given");
   return reasons;
 }
@@ -267,4 +268,30 @@ export function largerPhotoUrl(u: string): string {
 export function shopifyProductJs(pageUrl: string, html: string): string | null {
   if (!/cdn\.shopify\.com|\/cdn\/shop\/|Shopify\.theme/i.test(html)) return null;
   try { const x = new URL(pageUrl); const m = x.pathname.match(/\/products\/([^/?#]+)/); return m ? `${x.origin}/products/${m[1]}.js` : null; } catch { return null; }
+}
+
+/* ---------- The person's corrections ("What we understood") ---------- */
+
+export const DIFFERENCE_MAX = 140;
+export const MUST_SAY_MAX = 120;
+export type BriefEdits = { keepFacts: number[]; keepPhotos: string[]; difference: string | null; mustSay: string | null };
+
+/** Applies only the allowed edits to the server's own brief: kept facts are picked by index from what the server
+ *  produced (browser text is never read), kept photos by id, and the person's own difference/must-say lines become given facts. */
+export function applyEdits<P extends { assetId: string }>(brief: ProductBrief, photos: P[], e: BriefEdits): { brief: ProductBrief; photos: P[]; given: string[] } | null {
+  const keepIdx = new Set(e.keepFacts.filter((i) => Number.isInteger(i) && i >= 0 && i < brief.facts.length));
+  const facts = brief.facts.filter((_, i) => keepIdx.has(i));
+  const keepIds = new Set(e.keepPhotos);
+  const kept = photos.map((p, i) => ({ p, i })).filter(({ p }) => keepIds.has(p.assetId));
+  if (!kept.length) return null;
+  const notes = kept.map(({ i }, index) => {
+    const n = brief.photos.find((x) => x.index === i);
+    // A photo the person keeps is usable, even one the brief had turned off.
+    return { index, shows: n?.shows ?? "", role: n?.role ?? ("other" as const), usable: true };
+  });
+  const diff = (e.difference ?? "").replace(/\s+/g, " ").trim().slice(0, DIFFERENCE_MAX) || null;
+  const must = (e.mustSay ?? "").replace(/\s+/g, " ").trim().slice(0, MUST_SAY_MAX) || null;
+  const given = [diff, must].filter((x): x is string => !!x);
+  for (const g of given) if (!facts.some((f) => f.text.toLowerCase() === g.toLowerCase())) facts.push({ text: g, quote: g });
+  return { brief: { ...brief, facts, difference: diff, photos: notes }, photos: kept.map(({ p }) => p), given };
 }

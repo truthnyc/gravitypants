@@ -76,3 +76,24 @@ describe("story shapes", () => {
     expect(matchTemplates(t, [4, 3, 4]).map((x) => x.id)).toEqual(["four", "three", "two"]);
   });
 });
+
+import { applyEdits } from "@/lib/stillframe/url-reel";
+describe("what we understood", () => {
+  const photos = [{ assetId: "a" }, { assetId: "b" }, { assetId: "c" }, { assetId: "d" }];
+  it("keeps only server facts by index and the person's own lines", () => {
+    const r = applyEdits(brief, photos, { keepFacts: [1, 99], keepPhotos: ["a", "c"], difference: "Sewn by one tailor", mustSay: "Free shipping this week" })!;
+    expect(r.brief.facts.map((f) => f.text)).toEqual(["Made in Portugal", "Sewn by one tailor", "Free shipping this week"]);
+    expect(r.given).toEqual(["Sewn by one tailor", "Free shipping this week"]);
+  });
+  it("drops turned-off photos and re-numbers the rest", () => {
+    const r = applyEdits(brief, photos, { keepFacts: [], keepPhotos: ["b", "d"], difference: null, mustSay: null })!;
+    expect(r.photos.map((p) => p.assetId)).toEqual(["b", "d"]);
+    expect(r.brief.photos).toEqual([{ index: 0, shows: "lining", role: "detail", usable: true }, { index: 1, shows: "size chart", role: "other", usable: true }]);
+  });
+  it("needs at least one photo", () => expect(applyEdits(brief, photos, { keepFacts: [], keepPhotos: [], difference: null, mustSay: null })).toBeNull());
+  it("allows the person's own offer line but no other", () => {
+    const d = { ...ok, frames: [...ok.frames.slice(0, 3), { ...ok.frames[3]!, subline: "Free shipping this week" }] };
+    expect(checkDraft(d, brief, "$120", ["Free shipping this week"])).toEqual([]);
+    expect(checkDraft(d, brief, "$120")).toContain("mentions a price or offer that wasn't given");
+  });
+});
