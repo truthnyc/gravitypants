@@ -28,7 +28,7 @@ const columns: { label: string; links: FooterLink[] }[] = [
   },
   { label: "Made for", links: MADE_FOR_LINKS },
   { label: "Company", links: [{ label: "About", to: "/about" }, { label: "Commission a reel", to: "/contact", search: { topic: "brand-reel" } }, { label: "Contact", to: "/contact" }] },
-  { label: "Help", links: [{ label: "Help center", to: "/help" }, { label: "Status", to: STATUS_URL, external: true }] },
+  { label: "Help", links: [{ label: "Help center", to: "/help" }, { label: "Connect an AI assistant", to: "/connect" }, { label: "Status", to: STATUS_URL, external: true }] },
 ];
 
 const linkCls = "inline-flex items-center gap-1.5 text-[14px] text-ap-body hover:text-ap-blue";
