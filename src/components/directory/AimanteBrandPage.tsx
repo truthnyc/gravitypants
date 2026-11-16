@@ -1,6 +1,7 @@
 import { BrandProductList } from "./ReelProducts";
 import { Link } from "@tanstack/react-router";
 import { Play } from "lucide-react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { BrandActions } from "./BrandActions";
 import { categorySlug, ratio, type DirectoryCard } from "@/lib/directory/directory";
@@ -44,14 +45,7 @@ export function AimanteBrandPage({ brand, reels, siteReels, more, onOpen, onOpen
     <section className="mt-8" aria-labelledby="brand-reels-title">
       <h2 id="brand-reels-title" className="mb-4 text-[22px] font-semibold tracking-[-0.02em]">Reels</h2>
       <div className="grid items-start gap-5 md:grid-cols-2">
-        {cards.map((r) => <article key={r.id} className="overflow-hidden rounded-[12px] bg-ap-panel p-3">
-          <Button variant="ghost" onClick={r.open} aria-label={`Play ${r.title}`} className="relative block h-auto w-full overflow-hidden rounded-lg p-0" style={{ aspectRatio: r.format.replace(":", "/") }}>
-            {r.video ? <video src={r.video} poster={r.poster ?? undefined} preload="none" muted playsInline aria-label={`${brand.name} reel`} className="size-full object-contain" /> : r.poster ? <img src={r.poster} alt={`${brand.name} reel thumbnail`} loading="lazy" className="size-full object-contain" /> : null}
-            <span className="absolute top-1/2 left-1/2 grid size-12 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-ap-card text-ap-ink shadow-ap-soft"><Play aria-hidden className="ml-0.5 size-5" strokeWidth={1.7} /></span>
-          </Button>
-          <h3 className="mt-3 px-1 text-[16px] font-semibold">{r.title}</h3>
-          <p className="mt-0.5 px-1 pb-1 text-[13px] text-ap-muted tabular-nums">{r.seconds} sec · {r.format}</p>
-        </article>)}
+        {cards.map((r) => <BrandReelCard key={r.id} card={r} brandName={brand.name} />)}
       </div>
       {total === 0 && <p className="py-8 text-ap-muted">No reels yet. Check back soon.</p>}
     </section>
@@ -72,4 +66,24 @@ export function AimanteBrandPage({ brand, reels, siteReels, more, onOpen, onOpen
       <Link to="/aimante/join" hash="apply" data-cta="apply-to-join" className="mt-1 inline-block !min-h-0 text-[16px] font-semibold text-ap-blue">Have a brand? Apply to join →</Link>
     </div>
   </main>;
+}
+const KNOWN = ["9:16", "4:5", "1:1", "5:4", "16:9"];
+/** Nearest standard ratio name for a measured width/height. */
+function nearestRatio(w: number, h: number): string {
+  const v = w / h;
+  return KNOWN.reduce((best, k) => { const [a = 1, b = 1] = k.split(":").map(Number); const [c = 1, d = 1] = best.split(":").map(Number); return Math.abs(a / b - v) < Math.abs(c / d - v) ? k : best; });
+}
+
+/** Card box follows the reel's real shape once known, so a stale stored size never shrinks it. */
+function BrandReelCard({ card: r, brandName }: { card: { id: string; title: string; poster: string | null; video: string | null; seconds: number; format: string; open: () => void }; brandName: string }) {
+  const [format, setFormat] = useState(r.format);
+  const measure = (w: number, h: number) => { if (w > 0 && h > 0) setFormat(nearestRatio(w, h)); };
+  return <article className="overflow-hidden rounded-[12px] bg-ap-panel p-3">
+    <Button variant="ghost" onClick={r.open} aria-label={`Play ${r.title}`} className="relative block h-auto w-full overflow-hidden rounded-lg p-0" style={{ aspectRatio: format.replace(":", "/") }}>
+      {r.video ? <video src={r.video} poster={r.poster ?? undefined} preload="metadata" muted playsInline aria-label={`${brandName} reel`} onLoadedMetadata={(e) => measure(e.currentTarget.videoWidth, e.currentTarget.videoHeight)} className="size-full object-contain" /> : r.poster ? <img src={r.poster} alt={`${brandName} reel thumbnail`} loading="lazy" onLoad={(e) => measure(e.currentTarget.naturalWidth, e.currentTarget.naturalHeight)} className="size-full object-contain" /> : null}
+      <span className="absolute top-1/2 left-1/2 grid size-12 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-ap-card text-ap-ink shadow-ap-soft"><Play aria-hidden className="ml-0.5 size-5" strokeWidth={1.7} /></span>
+    </Button>
+    <h3 className="mt-3 px-1 text-[16px] font-semibold">{r.title}</h3>
+    <p className="mt-0.5 px-1 pb-1 text-[13px] text-ap-muted tabular-nums">{r.seconds} sec · {format}</p>
+  </article>;
 }
