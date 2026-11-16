@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { showcaseReelStatus } from "@/lib/site/reel-status.functions";
 
 const LABEL = { saved: "Video saved", pending: "Pending", failed: "Failed" } as const;
-const TONE = { saved: "bg-success", pending: "bg-warning", failed: "bg-destructive" } as const;
+const TONE = { saved: "bg-success-text", pending: "bg-warning-text", failed: "bg-destructive" } as const;
 
 /** Staff-only panel on Showcase; visitors never see it or trigger the request. */
 export function ShowcaseStatus() {
