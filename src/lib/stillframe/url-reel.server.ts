@@ -6,8 +6,9 @@ import { fetchProductInfo, ProductFetchError, safeFetchBytes } from "@/lib/direc
 import { productImages, productText, type ProductText } from "@/lib/directory/product-page";
 import type { Format } from "./types";
 import {
-  DRAFT_COUNT, FRAMES_PER_DRAFT, MAX_PRODUCT_PHOTOS, bigEnough, framePhotos, imageSize, minimalBrief, parseBrief, parseStories,
-  photoKey, pickDraftTemplates, priceLine, type DraftProduct, type ProductBrief, type ReelDraft,
+  BANNED_PHRASES, DRAFT_COUNT, MAX_FRAMES, MAX_PRODUCT_PHOTOS, MIN_FRAMES, STORY_SHAPES, allowedShapes, bigEnough, checkDraft,
+  fallbackDraft, imageSize, matchTemplates, minimalBrief, parseBrief, parseDrafts, photoKey, pickDraftTemplates, priceLine, shapeById,
+  type DraftProduct, type ProductBrief, type RawDraft, type ReelDraft,
 } from "./url-reel";
 
 export type DraftPhoto = { assetId: string; path: string; width: number; height: number; name: string };
@@ -50,21 +51,64 @@ async function savePhotos(db: SupabaseClient, ws: string, urls: string[]): Promi
   return out;
 }
 
-async function writeStories(product: DraftProduct, brand: string, format: Format, angles: string[], imageUrl: string | null) {
-  const price = priceLine(product.price, product.currency);
-  const system = [
-    `You write ${DRAFT_COUNT} different short social video ads for one product. Each ad has exactly ${FRAMES_PER_DRAFT} frames.`,
-    "Frame 1 is a hook, frame 2 a detail or feeling, frame 3 the product name and a call to shop.",
-    "Headlines 2 to 6 words, sublines 0 to 10 words. Plain, warm, confident. No emoji, hashtags or quotation marks.",
-    price ? `Put the price ${price} in the subline of frame 3.` : "Never mention a price.",
-    "Never invent discounts, materials, awards or facts that are not visible in the photo or given below.",
-    `Give each ad its own angle, in this order: ${angles.join(", ")}.`,
-    'Reply with JSON only: {"drafts":[{"angle":"...","frames":[{"headline":"...","subline":"..."}]}]}',
+function storySystem(price: string, shapes: string[], brief: ProductBrief) {
+  const allowed = STORY_SHAPES.filter((x) => shapes.includes(x.id));
+  return [
+    `You write ${DRAFT_COUNT} short social video ads for one product, as stories of ${MIN_FRAMES} to ${MAX_FRAMES} frames, from a checked product brief.`,
+    "Allowed story shapes (id: name — frame roles in order):",
+    ...allowed.map((x) => `- ${x.id}: ${x.name} — ${x.roles.join(" → ")}`),
+    `Use three different shapes where possible; they must differ in what they tell, not only in tone.${allowed.length < 3 ? ' Fewer than three shapes are allowed, so you may use "simple" and may write a second version of an allowed shape built on different facts.' : ""}`,
+    "Read top to bottom, the frames of one draft make sense as one short story. No frame repeats another.",
+    brief.facts.length >= 2 ? "At least two frames in each draft (except simple) carry a fact from the brief; set `fact` to its index. State the fact plainly; do not decorate it." : "Set `fact` to the index of a brief fact when a frame states one, otherwise null.",
+    "Each line must fit the photo it sits on, using the brief's note on what that photo shows. Use only the usable photos listed. Do not use the same photo twice in a draft unless there are fewer usable photos than frames.",
+    `The first frame is never just the product name. The last frame has the product name and the ask${price ? `, and the price exactly as ${price}` : ""}. ${price ? "Never write any other price, discount or offer." : "Never write any price, discount or offer."}`,
+    "Headlines 2 to 7 words. Sublines up to 12 words, optional (empty string). No emoji, hashtags or quotation marks.",
+    brief.voice ? `Write in this brand's voice: ${brief.voice}` : "Write plainly and specifically.",
+    `Use nothing that is not in the brief. Never use these empty phrases or anything like them: ${BANNED_PHRASES.map((b) => `"${b}"`).join(", ")}.`,
+    'Reply with JSON only: {"drafts":[{"shape":"id","frames":[{"role":"...","photo":0,"headline":"...","subline":"...","fact":0}]}]}',
   ].join("\n");
-  const lines = `Brand: ${brand}\nProduct: ${product.name}\nAd size: ${format}${imageUrl ? "\nThe product photo is attached." : ""}`;
-  const content = imageUrl ? [{ type: "text" as const, text: lines }, { type: "image" as const, image: new URL(imageUrl) }] : lines;
-  try { return parseStories(await gatewayText(system, [{ role: "user", content }]), product); }
-  catch { return parseStories("", product); }
+}
+
+function briefText(product: DraftProduct, brief: ProductBrief, price: string) {
+  const usable = brief.photos.filter((p) => p.usable);
+  return [
+    `Product: ${product.name}`, `Price line: ${price || "none — never mention a price"}`,
+    `What it is: ${brief.what_it_is}`, brief.who_its_for ? `Who it's for: ${brief.who_its_for}` : "",
+    brief.difference ? `What sets it apart: ${brief.difference}` : "", brief.feeling ? `Feeling: ${brief.feeling}` : "",
+    `Facts:\n${brief.facts.length ? brief.facts.map((f, i) => `${i}. ${f.text}`).join("\n") : "(none)"}`,
+    `Usable photos (attached in this order):\n${usable.map((p) => `${p.index}. ${p.role}${p.shows ? ` — ${p.shows}` : ""}`).join("\n")}`,
+  ].filter(Boolean).join("\n\n");
+}
+
+/** Writes three shaped drafts from the brief, checks each in code, asks once for replacements, then falls back. */
+async function writeDrafts(db: SupabaseClient, product: DraftProduct, brief: ProductBrief, photos: DraftPhoto[]): Promise<RawDraft[]> {
+  const price = priceLine(product.price, product.currency);
+  const shapes = allowedShapes(brief);
+  const system = storySystem(price, shapes, brief);
+  const usable = brief.photos.filter((p) => p.usable);
+  const signed = await Promise.all(usable.map((p) => db.storage.from("media").createSignedUrl(photos[p.index]!.path, 600)));
+  const images = signed.map((x) => x.data?.signedUrl).filter((u): u is string => !!u).map((u) => ({ type: "image" as const, image: new URL(u) }));
+  const text = briefText(product, brief, price);
+  const ok = (d: RawDraft) => shapes.includes(d.shape as never) && !checkDraft(d, brief, price).length;
+
+  let drafts: RawDraft[] = [];
+  try { drafts = parseDrafts(await gatewayText(system, [{ role: "user", content: [{ type: "text", text }, ...images] }], undefined, "medium")); } catch { /* retry below */ }
+  const good = drafts.filter(ok).slice(0, DRAFT_COUNT);
+  if (good.length < DRAFT_COUNT) {
+    const rejected = drafts.filter((d) => !ok(d)).map((d) => ({ draft: d, reasons: shapes.includes(d.shape as never) ? checkDraft(d, brief, price) : ["shape not allowed", ...checkDraft(d, brief, price)] }));
+    const need = DRAFT_COUNT - good.length;
+    const note = [
+      `${text}\n\nThese drafts were rejected:\n${JSON.stringify(rejected)}`,
+      `Kept drafts use these shapes: ${good.map((d) => d.shape).join(", ") || "none"}.`,
+      `Write ${need} replacement draft${need > 1 ? "s" : ""} only, fixing every reason. Same JSON format.`,
+    ].join("\n\n");
+    try {
+      const more = parseDrafts(await gatewayText(system, [{ role: "user", content: [{ type: "text", text: note }, ...images] }], undefined, "medium"));
+      good.push(...more.filter(ok).slice(0, need));
+    } catch { /* fall back */ }
+  }
+  while (good.length < DRAFT_COUNT) good.push(fallbackDraft(product, brief));
+  return good;
 }
 
 type Voice = { brand: { name: string; description: string | null; moods: string[] } | null; kit: string | null; headlines: string[] };
@@ -155,11 +199,13 @@ export async function draftReelsFromUrl(db: SupabaseClient, input: { workspaceId
   const product: DraftProduct = { name: info.name, price: info.price, currency: info.currency, url: info.url };
 
   const [{ data: tpl }, { data: w }] = await Promise.all([
-    db.from("templates").select("id, name, format, featured, source, status, sort_order")
+    db.from("templates").select("id, name, format, featured, source, status, sort_order, settings")
       .or(`workspace_id.eq.${ws},visibility.eq.global,source.eq.system`).order("sort_order", { ascending: true }),
     db.from("workspaces").select("name").eq("id", ws).maybeSingle(),
   ]);
-  const templates = pickDraftTemplates((tpl ?? []) as never[], input.format) as { id: string; name: string }[];
+  const withCounts = (tpl ?? []).map(({ settings, ...t }) => ({ ...t, slideCount: ((settings as { frames?: unknown[] } | null)?.frames ?? []).length || undefined }));
+  // A wider pool than three, so each story can take the template whose slide count is closest to its own.
+  const templates = pickDraftTemplates(withCounts as never[], input.format, 12) as { id: string; name: string; slideCount?: number }[];
   if (!templates.length) return { ok: false, error: "No templates fit this size yet. Pick another size." };
 
   const photos = await savePhotos(db, ws, images);
@@ -167,15 +213,15 @@ export async function draftReelsFromUrl(db: SupabaseClient, input: { workspaceId
 
   const brief = await buildBrief(db, product, page, await brandVoice(db, ws), photos);
 
-  const { data: signed } = await db.storage.from("media").createSignedUrl(photos[0]!.path, 600);
-  const angles = ["Bold and direct", "Calm and sensory", "Playful"].slice(0, templates.length);
-  const stories = await writeStories(product, (w?.name as string) ?? "the brand", input.format, angles, signed?.signedUrl ?? null);
-  const order = framePhotos(photos.length);
-  const drafts: ReelDraft[] = templates.map((t, i) => ({
-    templateId: t.id,
-    templateName: t.name,
-    angle: stories[i]!.angle,
-    slides: stories[i]!.lines.map(([headline, subline], f) => ({ photo: order[(f + i) % order.length]!, headline, subline })),
-  }));
+  const raw = await writeDrafts(db, product, brief, photos);
+  const picked = matchTemplates(templates, raw.map((d) => d.frames.length));
+  const drafts: ReelDraft[] = raw.slice(0, picked.length).map((d, i) => {
+    const shape = shapeById(d.shape) ?? STORY_SHAPES[STORY_SHAPES.length - 1]!;
+    const builtOn = [...new Set(d.frames.map((f) => f.fact).filter((x): x is number => x != null && !!brief.facts[x]).map((x) => brief.facts[x]!.text))];
+    return {
+      templateId: picked[i]!.id, templateName: picked[i]!.name, angle: shape.name, shape: { id: shape.id, name: shape.name }, builtOn,
+      slides: d.frames.map((f) => ({ photo: f.photo, headline: f.headline, subline: f.subline })),
+    };
+  });
   return { ok: true, product, photos, drafts, brief };
 }
