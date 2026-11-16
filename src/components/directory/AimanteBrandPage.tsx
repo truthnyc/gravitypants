@@ -16,7 +16,6 @@ export function AimanteBrandPage({ brand, reels, siteReels, more, onOpen, onOpen
   linkedMoods: string[]; brand: Brand; reels: DirectoryCard[]; siteReels: SiteReel[]; more: Related[]; onOpen: (r: DirectoryCard) => void; onOpenSite: (r: SiteReel) => void;
 }) {
   const total = reels.length + siteReels.length;
-  const sizes = new Set([...reels.flatMap((r) => r.formats.map(ratio)), ...siteReels.map((r) => FORMAT_LABEL[r.format])]);
   const cards = [
     ...reels.map((r) => ({ id: r.reel_id, title: r.title ?? r.brand_name, poster: r.poster, video: r.video, seconds: r.seconds, format: ratio(r.formats[0] ?? "9x16"), open: () => onOpen(r) })),
     ...siteReels.map((r) => ({ id: r.id, title: r.title, poster: r.poster, video: r.video, seconds: r.seconds, format: FORMAT_LABEL[r.format], open: () => onOpenSite(r) })),

@@ -463,7 +463,6 @@ function DirectoryPage() {
   });
   const found = results.data?.pages.flatMap((p) => p.reels) ?? [];
   const total = results.data?.pages[0]?.total ?? 0;
-  const allTotal = everything.data?.total ?? total;
   const allFacets = everything.data?.facets;
   const hasReels = (c: string | null, b: string | null) => {
     const bs = b ? brands.find((x) => x.name.toLowerCase() === b.toLowerCase())?.slug : null;
