@@ -3,7 +3,14 @@ import { isPublicHost, parseProductPage, type ProductInfo } from "./product-page
 const MAX_BYTES = 2 * 1024 * 1024;
 const TIMEOUT_MS = 8000;
 
-export class ProductFetchError extends Error {}
+export class ProductFetchError extends Error {
+  constructor(message: string, readonly status?: number) { super(message); }
+}
+
+/** Statuses shops use when they refuse automated readers (bot protection, blocked server addresses, rate limits). */
+export const isBlockedStatus = (s?: number) => s === 401 || s === 403 || s === 429 || s === 503;
+
+export { checkUrl as checkPublicUrl };
 
 function checkUrl(raw: string): URL {
   let u: URL;
@@ -45,7 +52,7 @@ export async function safeFetchBytes(raw: string, opts: { timeoutMs: number; max
       }
       break;
     }
-    if (!res || !res.ok || !res.body) throw new ProductFetchError(`The page answered ${res?.status ?? "nothing"}.`);
+    if (!res || !res.ok || !res.body) throw new ProductFetchError(`The page answered ${res?.status ?? "nothing"}.`, res?.status);
     const reader = res.body.getReader();
     const chunks: Uint8Array[] = [];
     let total = 0;
