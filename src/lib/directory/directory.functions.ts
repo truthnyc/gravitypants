@@ -810,6 +810,7 @@ export const adminCreateBrand = createServerFn({ method: "POST" })
       website_url: website?.url || null, description: data.description || null,
       first_approved_at: new Date().toISOString(), is_editorial: !data.workspaceId,
       affiliated: data.affiliated, status: data.status,
+      creative_brief: data.creativeBrief ?? {}, default_tags: [...new Set(data.defaultTags)],
     }).select("id, slug").single();
     if (error) throw new Error(error.message);
     if (data.siteReelIds.length) await admin.from("site_reels").update({ brand_id: b.id }).in("id", data.siteReelIds);
