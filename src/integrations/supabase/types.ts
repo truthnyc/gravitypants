@@ -506,6 +506,8 @@ export type Database = {
           category: string
           category_id: string | null
           created_at: string
+          creative_brief: Json
+          default_tags: string[]
           description: string | null
           first_approved_at: string | null
           grace_emails_sent: number
@@ -526,6 +528,8 @@ export type Database = {
           category?: string
           category_id?: string | null
           created_at?: string
+          creative_brief?: Json
+          default_tags?: string[]
           description?: string | null
           first_approved_at?: string | null
           grace_emails_sent?: number
@@ -546,6 +550,8 @@ export type Database = {
           category?: string
           category_id?: string | null
           created_at?: string
+          creative_brief?: Json
+          default_tags?: string[]
           description?: string | null
           first_approved_at?: string | null
           grace_emails_sent?: number
