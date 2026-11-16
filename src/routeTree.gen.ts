@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as BlogRouteImport } from './routes/blog'
+import { Route as ConnectRouteImport } from './routes/connect'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as EtsyListingVideosRouteImport } from './routes/etsy-listing-videos'
 import { Route as ExamplesRouteImport } from './routes/examples'
@@ -163,6 +164,11 @@ const AboutRoute = AboutRouteImport.update({
 const BlogRoute = BlogRouteImport.update({
   id: '/blog',
   path: '/blog',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConnectRoute = ConnectRouteImport.update({
+  id: '/connect',
+  path: '/connect',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -873,6 +879,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/blog': typeof BlogRouteWithChildren
+  '/connect': typeof ConnectRoute
   '/contact': typeof ContactRoute
   '/etsy-listing-videos': typeof EtsyListingVideosRoute
   '/examples': typeof ExamplesRoute
@@ -1009,6 +1016,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/connect': typeof ConnectRoute
   '/contact': typeof ContactRoute
   '/etsy-listing-videos': typeof EtsyListingVideosRoute
   '/examples': typeof ExamplesRoute
@@ -1146,6 +1154,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/blog': typeof BlogRouteWithChildren
+  '/connect': typeof ConnectRoute
   '/contact': typeof ContactRoute
   '/etsy-listing-videos': typeof EtsyListingVideosRoute
   '/examples': typeof ExamplesRoute
@@ -1285,6 +1294,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/blog'
+    | '/connect'
     | '/contact'
     | '/etsy-listing-videos'
     | '/examples'
@@ -1421,6 +1431,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/connect'
     | '/contact'
     | '/etsy-listing-videos'
     | '/examples'
@@ -1557,6 +1568,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/about'
     | '/blog'
+    | '/connect'
     | '/contact'
     | '/etsy-listing-videos'
     | '/examples'
@@ -1696,6 +1708,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
   BlogRoute: typeof BlogRouteWithChildren
+  ConnectRoute: typeof ConnectRoute
   ContactRoute: typeof ContactRoute
   EtsyListingVideosRoute: typeof EtsyListingVideosRoute
   ExamplesRoute: typeof ExamplesRoute
@@ -1800,6 +1813,13 @@ declare module '@tanstack/react-router' {
       path: '/blog'
       fullPath: '/blog'
       preLoaderRoute: typeof BlogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/connect': {
+      id: '/connect'
+      path: '/connect'
+      fullPath: '/connect'
+      preLoaderRoute: typeof ConnectRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -2936,6 +2956,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AboutRoute: AboutRoute,
   BlogRoute: BlogRouteWithChildren,
+  ConnectRoute: ConnectRoute,
   ContactRoute: ContactRoute,
   EtsyListingVideosRoute: EtsyListingVideosRoute,
   ExamplesRoute: ExamplesRoute,
