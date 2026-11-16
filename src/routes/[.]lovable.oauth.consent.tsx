@@ -20,10 +20,11 @@ export const Route = createFileRoute("/.lovable/oauth/consent")({
     if (!id) throw new Error("Missing connection request.");
     const { data, error } = await supabase.auth.oauth.getAuthorizationDetails(id);
     if (error) throw error;
-    if (data?.redirect_url && !data.client) throw redirect({ href: data.redirect_url });
+    if (!data) throw new Error("Connection request not found.");
+    if ("redirect_url" in data) throw redirect({ href: data.redirect_url });
     return { details: data, email: context.email };
   },
-  errorComponent: ({ error }) => <AuthShell title="Connection unavailable" subtitle="This request may have expired. Start again from your assistant."><p role="alert" className="text-sm text-destructive">{error.message}</p></AuthShell>,
+  errorComponent: ({ error }) => <AuthShell title="Connection unavailable" subtitle="This request may have expired. Start again from your assistant."><p role="alert" className="text-sm text-destructive">{error instanceof Error ? error.message : "Could not load this request."}</p></AuthShell>,
   component: Consent,
 });
 

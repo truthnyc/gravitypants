@@ -6,7 +6,7 @@ export default defineTool({
   title: "List your workspaces",
   description: "List accessible Gravity Pants workspaces to select an account for reading ads.",
   inputSchema: {},
-  annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false, untrustedContentHint: true },
+  annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
   handler: async (_args, ctx) => {
     const { data, error } = await supabaseForUser(ctx).from("workspaces").select("id, name").order("name").limit(100);
     if (error) return { isError: true, content: [{ type: "text", text: error.message }] };
