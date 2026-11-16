@@ -10,6 +10,7 @@ import { siteWatchSlugs } from "@/lib/site/watch";
 import { listSiteReels } from "@/lib/site/reels.functions";
 import { FORMAT_LABEL, ratioToFormat, type SiteReel } from "@/lib/site/reels";
 import { useState } from "react";
+import { ShowcaseStatus } from "@/components/site/ShowcaseStatus";
 
 export const Route = createFileRoute("/showcase")({
   head: () => {
@@ -100,6 +101,7 @@ function Showcase() {
             <p className="site-lede">Each reel starts as a few product photos. Tap a reel to visit the brand.</p>
           </div>
         </section>
+        <ShowcaseStatus />
         <section className="examples-gallery examples-container" aria-label="Brand reels">
           {reels.length > 0 ? (
             <div className="examples-grid">
