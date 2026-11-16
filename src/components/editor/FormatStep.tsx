@@ -9,6 +9,7 @@ import { useBrandKits, useCreateAdFromFormat, useTemplateName, type EditorDoc, t
 import { MAIN_SIZES, sizeLabel } from "@/lib/stillframe/main-size";
 import type { Format } from "@/lib/stillframe/types";
 import { FormatChooser } from "./FormatChooser";
+import { FromLink } from "./FromLink";
 import { useAutosave, useEditorDoc } from "./use-editor";
 
 const TITLE = "What are you making?";
@@ -56,6 +57,7 @@ export function NewAdFormatStep() {
       panel={
         <StudioPanel step="format" title={TITLE} footer={hint(format)}>
           <p className="mb-4 text-[14px] leading-normal text-ap-body">{LEAD}</p>
+          <FromLink format={format} kitId={kitId ?? null} />
           <FormatChooser format={format} onFormat={changeFormat} kitId={kitId ?? null} onKit={setKitId} template={template} onTemplate={setTemplate} />
         </StudioPanel>
       }

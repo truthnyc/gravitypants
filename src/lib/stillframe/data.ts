@@ -841,6 +841,31 @@ export function useCreateAdFromCustomization() {
   });
 }
 
+/** New ad from a "Create from a product link" draft: the draft's template, the chosen brand kit, saved product photos and AI text. */
+export function useCreateAdFromDraft() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ template, format, kitId, name, slides }: { template: Template; format: Format; kitId: string | null; name: string; slides: CustomSlide[] }) => {
+      const source = sourceFromTemplate(template, slides.length);
+      source.primary_format = format;
+      source.formats = Array.from(new Set([format, ...source.formats]));
+      source.brand_kit_id = kitId;
+      source.logo = { ...source.logo, kit_stamp: null };
+      source.frames = source.frames.map((f, i) => {
+        const s = slides[i]!;
+        const style = template.settings.frames[Math.min(i, template.settings.frames.length - 1)];
+        return {
+          ...f,
+          headline: s.headline.trim() ? { ...(style?.headline ?? f.headline ?? {}), text: s.headline.trim() } : null,
+          subline: s.subline.trim() ? { ...(style?.subline ?? f.subline ?? {}), text: s.subline.trim() } : null,
+        };
+      });
+      return insertCopy(source, name.slice(0, 80) || source.name, slides.map((s) => s.photo) as UploadedPhoto[]);
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: projectKeys.all }),
+  });
+}
+
 /** Name of the template an ad was made from, for the step pages' reel card. */
 export function useTemplateName(id: string | null | undefined) {
   return useQuery({
