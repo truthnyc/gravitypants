@@ -12,6 +12,10 @@ describe("create from a product link", () => {
     ];
     expect(pickDraftTemplates(t, "9:16").map((x) => x.id)).toEqual(["c", "a", "d"]);
   });
+  it("still offers three drafts when no template is made for the size", () => {
+    const t = [{ id: "a", name: "A", format: "9:16" }, { id: "b", name: "B", format: "1:1" }, { id: "x", name: "X", format: "1:1", status: "archived" }, { id: "c", name: "C", format: "16:9" }];
+    expect(pickDraftTemplates(t, "4:5").map((x) => x.id)).toEqual(["a", "b", "c"]);
+  });
   it("always returns three drafts, filling unusable AI answers", () => {
     const good = { angle: "Bold", frames: [{ headline: "Built for wind" }, { headline: "Soft inside" }, { headline: "Shop now", subline: "$120" }] };
     const s = parseStories(JSON.stringify({ drafts: [good, { frames: [] }] }), product);

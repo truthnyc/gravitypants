@@ -11,10 +11,15 @@ export type DraftProduct = { name: string; price: number | null; currency: strin
 
 type TemplateLike = { id: string; name: string; format?: string | null; featured?: boolean; source?: string; status?: string | null; sort_order?: number };
 
-/** Up to three different published templates usable at this size: featured first, then the catalogue order. */
+/** Up to three different published templates: ones made for this size first (featured before others), then
+ *  other sizes, which the ad refits to the chosen size — so a size without its own templates still gets three drafts. */
 export function pickDraftTemplates<T extends TemplateLike>(templates: T[], format: Format, n = DRAFT_COUNT): T[] {
-  const usable = templates.filter((t) => (t.source !== "system" || (t.status ?? "published") === "published") && (!t.format || t.format === format));
-  const ordered = [...usable.filter((t) => t.featured), ...usable.filter((t) => !t.featured)];
+  const usable = templates.filter((t) => (t.status ?? "published") === "published");
+  const fits = (t: T) => !t.format || t.format === format;
+  const ordered = [
+    ...usable.filter((t) => fits(t) && t.featured), ...usable.filter((t) => fits(t) && !t.featured),
+    ...usable.filter((t) => !fits(t) && t.featured), ...usable.filter((t) => !fits(t) && !t.featured),
+  ];
   const seen = new Set<string>();
   return ordered.filter((t) => !seen.has(t.id) && seen.add(t.id)).slice(0, n);
 }
