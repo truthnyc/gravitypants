@@ -847,10 +847,6 @@ function saveBlob(blob: Blob, name: string) {
   a.rel = "noopener";
   // Safari ignores clicks on anchors that aren't in the document.
   document.body.appendChild(a);
-  // Framed previews often block downloads; open the file in a new tab there instead.
-  let framed = false;
-  try { framed = window.self !== window.top; } catch { framed = true; }
-  if (framed) a.target = "_blank";
   a.click();
   a.remove();
   // Keep the URL alive well past the click — revoking too early cancels the save on some browsers.
@@ -924,7 +920,12 @@ function PreviousExports({ projectId, workspaceId, version }: { projectId: strin
   const download = async (stamp: string, name: string) => {
     const { data, error } = await supabase.storage.from(MEDIA_BUCKET).createSignedUrl(`${workspaceId}/exports/${projectId}/${stamp}/${name}`, 300, { download: name });
     if (error || !data) { toast.error("That file couldn't be downloaded. Try again."); return; }
-    window.location.href = data.signedUrl;
+    // Fetch to a file first: navigating to another site inside the framed preview is blocked.
+    try {
+      const res = await fetch(data.signedUrl);
+      if (!res.ok) throw new Error(String(res.status));
+      saveBlob(await res.blob(), name);
+    } catch { toast.error("That file couldn't be downloaded. Try again."); }
   };
   const parse = (stamp: string) => new Date(stamp.replace(/T(\d\d)-(\d\d)-(\d\d)-(\d+)Z/, "T$1:$2:$3.$4Z"));
   const when = (stamp: string) => {
