@@ -9,7 +9,7 @@ export type ShowcaseStatusRow = { id: string; brand: string; title: string; sour
 export const showcaseReelStatus = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<ShowcaseStatusRow[]> => {
-    const { data: ok } = await (context.supabase as any).rpc("is_platform_admin");
+    const { data: ok } = await (context.supabase as any).rpc("has_role", { _user_id: context.userId, _role: "admin" });
     if (!ok) throw new Error("Admin role required");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const sb = supabaseAdmin as any;
