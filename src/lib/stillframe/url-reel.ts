@@ -3,15 +3,14 @@ import { z } from "zod";
 import type { Format } from "./types";
 
 export const DRAFT_COUNT = 3;
-export const FRAMES_PER_DRAFT = 3;
 export const MAX_PRODUCT_PHOTOS = 6;
 export const MIN_PHOTO_SIDE = 600;
 
 export type DraftSlide = { photo: number; headline: string; subline: string };
-export type ReelDraft = { templateId: string; templateName: string; angle: string; slides: DraftSlide[] };
+export type ReelDraft = { templateId: string; templateName: string; angle: string; shape: { id: ShapeId; name: string }; builtOn: string[]; slides: DraftSlide[] };
 export type DraftProduct = { name: string; price: number | null; currency: string | null; url: string };
 
-type TemplateLike = { id: string; name: string; format?: string | null; featured?: boolean; source?: string; status?: string | null; sort_order?: number };
+type TemplateLike = { id: string; name: string; slideCount?: number; format?: string | null; featured?: boolean; source?: string; status?: string | null; sort_order?: number };
 
 /** Up to three different published templates: ones made for this size first (featured before others), then
  *  other sizes, which the ad refits to the chosen size — so a size without its own templates still gets three drafts. */
@@ -26,9 +25,22 @@ export function pickDraftTemplates<T extends TemplateLike>(templates: T[], forma
   return ordered.filter((t) => !seen.has(t.id) && seen.add(t.id)).slice(0, n);
 }
 
-/** Which photo each frame shows: walks the photos in order and repeats them when there are fewer than frames. */
-export const framePhotos = (photoCount: number, frames = FRAMES_PER_DRAFT) =>
-  Array.from({ length: frames }, (_, i) => (photoCount ? i % photoCount : 0));
+/** One template per draft from the candidates: each draft takes the unused template whose own slide count is closest
+ *  to its frame count (candidate order breaks ties), so a four-frame story isn't squeezed into a two-slide template. */
+export function matchTemplates<T extends TemplateLike>(candidates: T[], frameCounts: number[]): T[] {
+  const used = new Set<string>();
+  return frameCounts.map((n) => {
+    let best: T | undefined; let bestGap = Infinity;
+    for (const t of candidates) {
+      if (used.has(t.id)) continue;
+      const gap = Math.abs((t.slideCount ?? n) - n);
+      if (gap < bestGap) { best = t; bestGap = gap; }
+    }
+    best ??= candidates[0];
+    if (best) used.add(best.id);
+    return best!;
+  }).filter(Boolean);
+}
 
 /** Price as shown on the last frame, or empty when the page gave none. */
 export function priceLine(price: number | null, currency: string | null): string {
@@ -43,29 +55,6 @@ const clean = (s: unknown, max: number) => {
   const words = t.split(" ");
   return words.length > max ? words.slice(0, max).join(" ") : t;
 };
-
-/** Plain drafts used when the AI gives nothing usable: name, a short line, then the price. */
-export function fallbackStory(p: DraftProduct): { angle: string; lines: [string, string][] } {
-  const name = clean(p.name, 6) || "New arrival";
-  return { angle: "Simple", lines: [[name, ""], ["Made to be noticed", ""], ["Shop now", priceLine(p.price, p.currency)]] };
-}
-
-/** Reads the AI reply into exactly `count` stories of three frames each; gaps are filled from the fallback. */
-export function parseStories(text: string, p: DraftProduct, count = DRAFT_COUNT): { angle: string; lines: [string, string][] }[] {
-  let raw: unknown[] = [];
-  const m = text.match(/\{[\s\S]*\}/);
-  if (m) { try { const j = JSON.parse(m[0]); if (Array.isArray(j?.drafts)) raw = j.drafts; } catch { /* use fallback */ } }
-  const out: { angle: string; lines: [string, string][] }[] = [];
-  for (const d of raw) {
-    const frames = Array.isArray((d as { frames?: unknown })?.frames) ? (d as { frames: unknown[] }).frames : [];
-    const lines = frames.slice(0, FRAMES_PER_DRAFT).map((f) => [clean((f as { headline?: unknown })?.headline, 6), clean((f as { subline?: unknown })?.subline, 10)] as [string, string]);
-    if (lines.length < FRAMES_PER_DRAFT || lines.some(([h]) => !h)) continue;
-    out.push({ angle: clean((d as { angle?: unknown }).angle, 4) || "Story", lines });
-    if (out.length >= count) break;
-  }
-  while (out.length < count) out.push(fallbackStory(p));
-  return out;
-}
 
 /* ---------- Product brief (what the page says, checked against the page) ---------- */
 
@@ -162,3 +151,120 @@ export function imageSize(b: Uint8Array): { width: number; height: number } | nu
 
 /** A photo is kept when its short side is at least 600 px. */
 export const bigEnough = (s: { width: number; height: number } | null) => !!s && Math.min(s.width, s.height) >= MIN_PHOTO_SIDE;
+
+/* ---------- Story shapes (what each draft tells) ---------- */
+
+export type ShapeId = "why" | "made" | "moment" | "detail" | "simple";
+export type StoryShape = { id: ShapeId; name: string; when: string; roles: string[] };
+
+export const STORY_SHAPES: StoryShape[] = [
+  { id: "why", name: "Why it exists", when: "Needs who it's for or a fact about what it does.", roles: ["the problem or wish", "the product as the answer", "proof", "ask"] },
+  { id: "made", name: "How it's made", when: "Needs two facts about material, origin or making, and a detail photo.", roles: ["a material or origin", "the making or the detail up close", "the finished piece", "ask"] },
+  { id: "moment", name: "A moment with it", when: "Needs a photo of it in use.", roles: ["the scene", "the feeling", "the product in it", "ask"] },
+  { id: "detail", name: "Look closer", when: "Needs two detail or hero photos and two facts.", roles: ["one detail", "a second detail", "the whole product", "ask"] },
+  { id: "simple", name: "Just the product", when: "The fallback when little is known.", roles: ["the product", "one fact", "ask"] },
+];
+export const shapeById = (id: string) => STORY_SHAPES.find((x) => x.id === id);
+
+const MAKING = /\b(made|handmade|hand-|crafted|woven|knit|sewn|stitched|forged|thrown|carved|milled|roasted|brewed|grown|sourced|origin|cotton|wool|linen|silk|leather|cashmere|merino|wood|oak|walnut|steel|brass|copper|ceramic|stoneware|porcelain|glass|clay|organic|recycled|fiber|fibre|yarn|cocoa|beans?)\b/i;
+
+/** Shapes the brief can honestly support; "simple" is always allowed. */
+export function allowedShapes(brief: ProductBrief): ShapeId[] {
+  const usable = brief.photos.filter((p) => p.usable);
+  const role = (r: PhotoRole) => usable.filter((p) => p.role === r).length;
+  const out: ShapeId[] = [];
+  if (brief.who_its_for || brief.facts.length >= 1) out.push("why");
+  if (brief.facts.filter((f) => MAKING.test(f.text)).length >= 2 && role("detail") >= 1) out.push("made");
+  if (role("in_use") >= 1) out.push("moment");
+  if (role("detail") + role("hero") >= 2 && brief.facts.length >= 2) out.push("detail");
+  out.push("simple");
+  return out;
+}
+
+export const BANNED_PHRASES = [
+  "made to be noticed", "elevate your", "discover", "experience the", "redefined", "meet your new favorite",
+  "like never before", "timeless", "effortless", "your new go-to", "take it to the next level",
+];
+
+export type RawFrame = { role: string; photo: number; headline: string; subline: string; fact: number | null };
+export type RawDraft = { shape: string; frames: RawFrame[] };
+
+const tidy = (s: unknown, maxWords: number) => {
+  const t = String(s ?? "").replace(/["“”#]/g, "").replace(/\s+/g, " ").trim();
+  const w = t.split(" ");
+  return w.length > maxWords ? w.slice(0, maxWords).join(" ") : t;
+};
+
+/** Reads the AI reply into drafts with 3 to 5 frames; anything else is skipped. */
+export function parseDrafts(text: string): RawDraft[] {
+  const m = text.match(/\{[\s\S]*\}/);
+  if (!m) return [];
+  let j: any;
+  try { j = JSON.parse(m[0]); } catch { return []; }
+  const list: any[] = Array.isArray(j?.drafts) ? j.drafts : [];
+  return list.map((d) => ({
+    shape: String(d?.shape ?? ""),
+    frames: (Array.isArray(d?.frames) ? d.frames : []).slice(0, MAX_FRAMES).map((f: any) => ({
+      role: tidy(f?.role, 8), photo: Number.isInteger(f?.photo) ? f.photo : -1,
+      // Long headlines are kept long so the check below can reject them rather than cut them mid-thought.
+      headline: tidy(f?.headline, 20), subline: tidy(f?.subline, 14),
+      fact: Number.isInteger(f?.fact) ? f.fact : null,
+    })),
+  }));
+}
+
+export const MIN_FRAMES = 3;
+export const MAX_FRAMES = 5;
+const MONEY = /([$€£¥]\s?\d|\d[\d.,]*\s?(usd|eur|gbp|dollars?|euros?)\b|\d+\s?%\s?off|\bfree shipping\b|\bsale\b|\bdiscount)/i;
+
+/** Why a draft can't be used; empty when it passes. */
+export function checkDraft(d: RawDraft, brief: ProductBrief, price: string): string[] {
+  const reasons: string[] = [];
+  const shape = shapeById(d.shape);
+  if (!shape) reasons.push("unknown shape");
+  if (d.frames.length < MIN_FRAMES || d.frames.length > MAX_FRAMES) reasons.push(`needs ${MIN_FRAMES} to ${MAX_FRAMES} frames`);
+  const usable = new Set(brief.photos.filter((p) => p.usable).map((p) => p.index));
+  if (d.frames.some((f) => !usable.has(f.photo))) reasons.push("uses a missing or unusable photo");
+  if (d.frames.some((f) => !f.headline)) reasons.push("a frame has no headline");
+  const factFrames = d.frames.filter((f) => f.fact != null && f.fact >= 0 && f.fact < brief.facts.length).length;
+  if (d.shape !== "simple" && brief.facts.length >= 2 && factFrames < 2) reasons.push("fewer than two frames carry a fact");
+  if (d.frames.some((f) => f.headline.split(" ").filter(Boolean).length > 9)) reasons.push("a headline is longer than 9 words");
+  const all = d.frames.map((f) => `${f.headline} ${f.subline}`).join(" \n ").toLowerCase();
+  const banned = BANNED_PHRASES.find((b) => all.includes(b));
+  if (banned) reasons.push(`uses the empty phrase "${banned}"`);
+  const heads = d.frames.map((f) => f.headline.toLowerCase());
+  if (new Set(heads).size !== heads.length) reasons.push("two frames have the same headline");
+  const withoutPrice = price ? all.split(price.toLowerCase()).join(" ") : all;
+  if (MONEY.test(withoutPrice)) reasons.push("mentions a price or offer that wasn't given");
+  return reasons;
+}
+
+/** Plain draft when the AI gives nothing usable: the product, its first fact when there is one, then the ask and price. */
+export function fallbackDraft(p: DraftProduct, brief: ProductBrief): RawDraft {
+  const photos = brief.photos.filter((x) => x.usable).map((x) => x.index);
+  const ph = (i: number) => (photos.length ? photos[i % photos.length]! : 0);
+  const name = tidy(p.name, 6) || "New arrival";
+  const fact = brief.facts[0];
+  const frames: RawFrame[] = [{ role: "the product", photo: ph(0), headline: name, subline: "", fact: null }];
+  if (fact) frames.push({ role: "one fact", photo: ph(1), headline: tidy(fact.text, 9), subline: "", fact: 0 });
+  frames.push({ role: "ask", photo: ph(frames.length), headline: "Shop now", subline: priceLine(p.price, p.currency), fact: null });
+  return { shape: "simple", frames };
+}
+
+/** Shopify serves photos at any width; asks for a large one so a thumbnail link doesn't fail the size rule. */
+export function largerPhotoUrl(u: string): string {
+  try {
+    const x = new URL(u);
+    if (!(x.hostname === "cdn.shopify.com" || x.pathname.includes("/cdn/shop/"))) return u;
+    x.pathname = x.pathname.replace(/_(\d+x\d*|\d*x\d+)(?=\.[a-z]+$)/i, "");
+    ["width", "height", "crop"].forEach((k) => x.searchParams.delete(k));
+    x.searchParams.set("width", "2000");
+    return x.toString();
+  } catch { return u; }
+}
+
+/** Shopify product page → its `/products/<handle>.js` address, which lists every product photo; null elsewhere. */
+export function shopifyProductJs(pageUrl: string, html: string): string | null {
+  if (!/cdn\.shopify\.com|\/cdn\/shop\/|Shopify\.theme/i.test(html)) return null;
+  try { const x = new URL(pageUrl); const m = x.pathname.match(/\/products\/([^/?#]+)/); return m ? `${x.origin}/products/${m[1]}.js` : null; } catch { return null; }
+}
