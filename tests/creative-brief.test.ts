@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { briefTags, detectMoods, parseCreativeBrief } from "./creative-brief";
+import { briefTags, detectMoods, parseCreativeBrief } from "@/lib/directory/creative-brief";
 
 const sample = `Moods
 
