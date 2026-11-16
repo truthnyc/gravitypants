@@ -22,6 +22,8 @@ export type RenderOptions = {
   brand?: BrandStyle | undefined;
   /** Free-trial exports carry a small "Made with Gravity Pants" mark. */
   watermark?: boolean;
+  /** Editing shows complete text without changing playback or exported animation. */
+  completeText?: boolean;
 };
 
 export type BrandStyle = { color?: string | null; font?: string | null; endCard?: EndCard | null };
@@ -502,6 +504,7 @@ function drawFrame(
   W: number,
   H: number,
   images?: Map<string, HTMLImageElement>,
+  completeText = false,
 ) {
   const source = frames[j];
   const frame = source ? frameForFormat(source, format) : undefined;
@@ -532,8 +535,8 @@ function drawFrame(
   // Headline starts ~0.15s into the frame, subline ~0.45s; an optional delay lets the photo show first.
   const hd = frame.headline?.delay_sec ?? 0;
   const sd = frame.subline?.delay_sec ?? hd;
-  if (layout.headline && localT >= hd) drawText(ctx, layout.headline, layout.headline.animation === "none" ? localT : localT - 0.15 - hd, H, images);
-  if (layout.subline && localT >= sd) drawText(ctx, layout.subline, layout.subline.animation === "none" ? localT : localT - 0.45 - sd, H, images);
+  if (layout.headline && (completeText || localT >= hd)) drawText(ctx, layout.headline, completeText ? 0.5 : layout.headline.animation === "none" ? localT : localT - 0.15 - hd, H, images);
+  if (layout.subline && (completeText || localT >= sd)) drawText(ctx, layout.subline, completeText ? 0.5 : layout.subline.animation === "none" ? localT : localT - 0.45 - sd, H, images);
 }
 
 /** Draws exactly what the viewer sees at timeSec. Pure: the same call serves preview and export. */
@@ -543,7 +546,7 @@ export function renderAt(
   frames: Frame[],
   format: Format,
   timeSec: number,
-  { width: W, height: H, showGuides, images, brand, watermark }: RenderOptions,
+  { width: W, height: H, showGuides, images, brand, watermark, completeText }: RenderOptions,
 ) {
   project = projectForFormat(project, format);
   ctx.save();
@@ -563,7 +566,7 @@ export function renderAt(
   const t = clamp(timeSec, 0, Math.max(0, framesEnd - 0.0001));
   const i = frameIndexAt(frames, t);
   const localOf = (j: number) => t - (starts[j] ?? 0) + incoming(frames, j);
-  const layer = (j: number) => drawFrame(ctx, project, frames, j, localOf(j), format, W, H, images);
+  const layer = (j: number) => drawFrame(ctx, project, frames, j, localOf(j), format, W, H, images, completeText);
 
   const d = incoming(frames, i + 1);
   const end = (starts[i] ?? 0) + dur(frames[i]);

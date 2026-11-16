@@ -110,9 +110,9 @@ export function Stage({
     const ctx = canvasRef.current?.getContext("2d");
     if (!ctx || !W || !H) return;
     const frames = reduced ? calmFrames(doc.frames) : doc.frames;
-    renderAt(ctx, doc.project, frames, format, time, { width: W, height: H, images, brand, showGuides: !playing && Boolean(drag?.moving) });
+    renderAt(ctx, doc.project, frames, format, time, { width: W, height: H, images, brand, completeText: interactive && !playing, showGuides: !playing && Boolean(drag?.moving) });
     if (!playing) setLayout(layoutFrame(ctx, doc.project, doc.frames, frameIndex, format, W, H, images));
-  }, [doc, brand, format, time, W, H, images, version, playing, frameIndex, drag?.moving, reduced]);
+  }, [doc, brand, format, time, W, H, images, version, playing, frameIndex, drag?.moving, reduced, interactive]);
 
   const toCss = (b: Box) => ({ left: b.x / dpr, top: b.y / dpr, width: b.w / dpr, height: b.h / dpr });
 
