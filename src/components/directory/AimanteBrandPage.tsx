@@ -71,7 +71,7 @@ const KNOWN = ["9:16", "4:5", "1:1", "5:4", "16:9"];
 /** Nearest standard ratio name for a measured width/height. */
 function nearestRatio(w: number, h: number): string {
   const v = w / h;
-  return KNOWN.reduce((best, k) => { const [a, b] = k.split(":").map(Number); const [c, d] = best.split(":").map(Number); return Math.abs(a / b - v) < Math.abs(c / d - v) ? k : best; });
+  return KNOWN.reduce((best, k) => { const [a = 1, b = 1] = k.split(":").map(Number); const [c = 1, d = 1] = best.split(":").map(Number); return Math.abs(a / b - v) < Math.abs(c / d - v) ? k : best; });
 }
 
 /** Card box follows the reel's real shape once known, so a stale stored size never shrinks it. */
