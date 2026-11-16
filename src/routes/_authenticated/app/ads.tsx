@@ -11,6 +11,8 @@ import { rememberSignupChoice } from "@/lib/stillframe/signup-choice";
 import { PLANS } from "@/lib/stillframe/plans-config";
 import { useExportStatus } from "@/lib/stillframe/billing";
 import { Check, X } from "lucide-react";
+import { useWebMCP } from "use-webmcp-tool";
+import { runWebMCPTool } from "@/lib/webmcp-telemetry";
 
 // Shown once after signup: presents the usage-based trial (no clock) as something the user just unlocked.
 function TrialUnlocked({ onClose }: { onClose: () => void }) {
@@ -81,7 +83,7 @@ function YourAds() {
     });
     if (search.welcome || search.template || search.plan || search.billing) void navigate({ to: "/app/ads", search: {}, replace: true });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
-  const { query } = useSearch();
+  const { query, setQuery } = useSearch();
   const { data: projects, isLoading } = useProjects();
   const dir = useDirectoryStatuses();
 
@@ -92,6 +94,21 @@ function YourAds() {
     term ? project.name.toLowerCase().includes(term) || kitName(project.template_id).includes(term) : true,
   );
   const isEmpty = !isLoading && (projects ?? []).length === 0;
+  useWebMCP({
+    name: "list_visible_ads",
+    description: "Read the ads currently shown on Your Ads, respecting its search.",
+    annotations: { readOnlyHint: true, untrustedContentHint: true },
+    execute: () => runWebMCPTool("list_visible_ads", () => isLoading ? "Ads are loading." : visible.map(p => `${p.id}: ${p.name}`).join("\n") || "No ads shown."),
+  });
+  useWebMCP({
+    name: "search_ads",
+    description: "Change the Your Ads search by ad name or reusable kit name.",
+    inputSchema: { type: "object", properties: { query: { type: "string", description: "Search text; empty shows all ads." } }, required: ["query"] },
+    execute: ({ query: next }: { query: string }) => runWebMCPTool("search_ads", () => {
+      if (typeof next !== "string") throw new Error("Search text must be a string.");
+      setQuery(next); return "Ad search updated.";
+    }),
+  });
 
   return (
     <main className="px-4 py-7 sm:px-8 sm:py-10 lg:px-16">

@@ -5,16 +5,10 @@ import { AimanteLogo, useBrandSite } from "@/components/site/AimanteShell";
 import { Link, useRouter } from "@tanstack/react-router";
 import { ArrowLeft, X } from "lucide-react";
 import { lovable } from "@/integrations/lovable";
+import { oauthReturnPath } from "@/lib/oauth-return-path";
 
 export function safeRedirect(r: unknown, fallback = "/app/ads"): string {
-  if (typeof r !== "string" || !r) return fallback;
-  try {
-    const u = new URL(r, window.location.origin);
-    if (u.origin !== window.location.origin || !r.startsWith("/") || r.startsWith("//")) return fallback;
-    return u.pathname + u.search + u.hash;
-  } catch {
-    return fallback;
-  }
+  return oauthReturnPath(r, fallback);
 }
 
 export function AuthShell({ eyebrow, title, subtitle, children, beforeForm }: { eyebrow?: string | undefined; title: string; subtitle: string; children: ReactNode; mode?: "signup" | "signin"; beforeForm?: ReactNode }) {
@@ -61,9 +55,12 @@ export function GoogleButton({ redirectTo, onStart }: { redirectTo: string; onSt
           setBusy(true);
           setErr(null);
           onStart?.();
-          sessionStorage.setItem("sf-after-signin", redirectTo);
+          const target = safeRedirect(redirectTo);
+          sessionStorage.setItem("sf-after-signin", target);
           try {
-            const res = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin + (site === "aimante" ? "/sign-in" : "/signin") });
+            const callback = new URL(site === "aimante" ? "/sign-in" : "/signin", window.location.origin);
+            callback.searchParams.set("redirect", target);
+            const res = await lovable.auth.signInWithOAuth("google", { redirect_uri: callback.href });
             if (res.error) {
               sessionStorage.removeItem("gravity-pants:welcome");
               setErr("Google sign-in didn't work. Please try again.");

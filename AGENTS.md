@@ -11,6 +11,8 @@
 
 ## Stillframe architecture rules
 
+- MCP tools use OAuth client tokens and caller-scoped RLS in src/lib/mcp; WebMCP tools stay with visible controls and shared telemetry, so assistants never bypass account permissions or normal confirmations.
+
 - Product page extraction resolves explicitly linked variant offers; unqualified product groups are available if any variant is in stock, and unidentified requested variants stay unknown to avoid borrowing another variant's stock.
 
 - Brand-owner published reel rows separate identity, actions and product editing into full-width grid rows; product inputs use shrinkable grid tracks so action buttons cannot squeeze the form.
