@@ -410,7 +410,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
       adId={project.id}
       step="export"
       title={{ name: project.name, status: "saved" }}
-      menu={<AdMenu doc={doc} set={saveDoc} exports={<PreviousExports projectId={project.id} version={historyVersion} />} />}
+      menu={<AdMenu doc={doc} set={saveDoc} exports={<PreviousExports projectId={project.id} workspaceId={project.workspace_id} version={historyVersion} />} />}
       next={nextButton}
       stage={
         <>
@@ -895,12 +895,13 @@ function FileList({ files, state }: { files: FileRow[]; state: Record<string, Jo
 
 type PastExport = { stamp: string; files: string[] };
 
-function PreviousExports({ projectId, version }: { projectId: string; version: number }) {
+function PreviousExports({ projectId, workspaceId, version }: { projectId: string; workspaceId: string; version: number }) {
+  // The ad's own workspace, where exports are saved, not whichever workspace is selected.
   const [items, setItems] = useState<PastExport[]>([]);
   useEffect(() => {
     let alive = true;
     void (async () => {
-      const root = `${getWorkspaceId()}/exports/${projectId}`;
+      const root = `${workspaceId}/exports/${projectId}`;
       const { data: folders } = await supabase.storage.from(MEDIA_BUCKET).list(root, { limit: 50, sortBy: { column: "name", order: "desc" } });
       const out: PastExport[] = [];
       for (const f of folders ?? []) {
@@ -914,11 +915,11 @@ function PreviousExports({ projectId, version }: { projectId: string; version: n
     return () => {
       alive = false;
     };
-  }, [projectId, version]);
+  }, [projectId, workspaceId, version]);
 
   const [historyOpen, setHistoryOpen] = useState(false);
   const download = async (stamp: string, name: string) => {
-    const { data, error } = await supabase.storage.from(MEDIA_BUCKET).createSignedUrl(`${getWorkspaceId()}/exports/${projectId}/${stamp}/${name}`, 300, { download: name });
+    const { data, error } = await supabase.storage.from(MEDIA_BUCKET).createSignedUrl(`${workspaceId}/exports/${projectId}/${stamp}/${name}`, 300, { download: name });
     if (error || !data) { toast.error("That file couldn't be downloaded. Try again."); return; }
     window.location.href = data.signedUrl;
   };
