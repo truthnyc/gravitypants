@@ -253,7 +253,6 @@ function BrandBody({ brands, selected, counts, onChange }: { brands: Brand[]; se
       <ul className="grid gap-1">
         {shown.map((b) => {
           const on = selected.includes(b.slug);
-          const n = counts[b.slug] ?? 0;
           return (
             <li key={b.slug}>
               <button type="button" aria-pressed={on} onClick={() => onChange(toggleIn(selected, b.slug))}
