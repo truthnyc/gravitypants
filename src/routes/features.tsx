@@ -20,7 +20,7 @@ const groups = [
       "Review what we understood before any stories are written",
       "Keep or remove facts and photos, edit what makes it different and add a must-say line",
       "Choose from three story drafts, each with a different template and your selected brand kit",
-      "Story shapes include Why this one, How it’s made, The moment, Look closer and Just the product, where the page supports them",
+      "Story shapes include Why it exists, How it’s made, A moment with it, Look closer and Just the product, where the page supports them",
       "Templates matched to the story’s slide count, with checks for unsupported claims and clichés",
       "Open your chosen draft in the editor; nothing is posted automatically",
       "Included on every paid plan; not included on Free",
