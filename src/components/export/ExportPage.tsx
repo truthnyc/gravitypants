@@ -324,10 +324,16 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
           }
         }
         for (const f of files.filter((f) => f.job === key)) {
-          void supabase.storage
-            .from(MEDIA_BUCKET)
-            .upload(`${ws}/exports/${project.id}/${stamp}/${f.name}`, blob, { contentType: blob.type, upsert: true })
-            .then(({ error }) => !error && setHistoryVersion((v) => v + 1));
+          // Saved copies feed Your exports, the Directory, Showcase and Examples, so wait and retry rather than fail silently.
+          const path = `${ws}/exports/${project.id}/${stamp}/${f.name}`;
+          let saved = false;
+          for (let attempt = 0; attempt < 3 && !saved; attempt++) {
+            const { error } = await supabase.storage.from(MEDIA_BUCKET).upload(path, blob, { contentType: blob.type, upsert: true });
+            saved = !error;
+            if (error) console.error("Export save failed", error.message);
+          }
+          if (saved) setHistoryVersion((v) => v + 1);
+          else toast.error("Your file downloaded, but we couldn't save a copy to your account. Export again to share it.");
         }
       } catch (e) {
         if (e instanceof ExportCancelled || ac.signal.aborted) set(key, { status: "cancelled" });
