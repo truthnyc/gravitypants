@@ -113,7 +113,7 @@ export function FromLink({ format, kitId }: { format: Format; kitId: string | nu
       </form>
       {busy === "reading" && <p className="mt-3 text-[13px] text-ap-muted">Reading the page…</p>}
       {error && <p role="alert" className="mt-3 text-[13px] text-destructive">{error}</p>}
-      {error && blocked && <p className="mt-1 text-[13px] text-ap-body">Pick a template below and add your own photos to start.</p>}
+      {error && blocked && <p className="mt-1 text-[13px] text-ap-body">Choose a template below, then press Next: Photos to add your own.</p>}
 
       {understood && choices && !result && (
         <div className="mt-4 space-y-4 rounded-[4px] bg-ap-card p-3" aria-label="What we understood" role="group">
