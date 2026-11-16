@@ -122,7 +122,7 @@ export const getShareContext = createServerFn({ method: "POST" })
       brandChoices,
       currentBrandId: ((reel as any)?.brand_id as string | undefined) ?? null,
       reel: reel ? { id: reel.id as string, status: reel.status as DirStatus, tags: reel.tags as string[], moods: reel.moods as string[], title: (reel.title as string | null) ?? null, displayTitle: (reel.display_title as string | null) ?? "", description: (reel.description as string | null) ?? "" } : null,
-      prefill: { tags: (reel?.tags ?? last?.tags ?? []) as string[], moods: (reel?.moods ?? last?.moods ?? []) as string[] },
+      prefill: { tags: (reel?.tags ?? (last?.tags?.length ? last.tags : null) ?? b?.default_tags ?? []) as string[], moods: (reel?.moods ?? last?.moods ?? []) as string[] },
       plan,
       email: (context.claims as any)?.email ?? "",
       role: (member?.role as string | undefined) ?? "member",
