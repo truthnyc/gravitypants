@@ -1,7 +1,7 @@
 import { EXPORT_PACKS, PLANS, REFERRAL_NOTE, TRIAL } from "./plans-config";
 import { MAIN_SIZES } from "./main-size";
 
-export const TRIAL_ANSWER = `No time limit and no card. You get ${TRIAL.exports} exports: the first without a watermark, then ${TRIAL.exports - TRIAL.cleanExports} more with a small Gravity Pants mark. AI headline and subline suggestions need a paid plan.`;
+export const TRIAL_ANSWER = `No time limit and no card. You get ${TRIAL.exports} exports: the first without a watermark, then ${TRIAL.exports - TRIAL.cleanExports} more with a small Gravity Pants mark. AI product-link drafts and headline and subline suggestions need a paid plan.`;
 const team = PLANS.find((p) => p.id === "team");
 const sizes = MAIN_SIZES.map((s) => s.format).join(", ");
 
@@ -68,6 +68,7 @@ export const GUIDE_SECTIONS: readonly GuideSectionData[] = [
 ];
 
 export const HELP_FAQ = [
+  ["How do I create a reel from a product link?", "On a paid plan, open New ad, choose your size and brand kit, then paste a product-page link. Review What we understood before writing drafts: keep or remove facts and photos, edit what makes it different and add a must-say line. Make three drafts, then choose a story to open in the editor. Each uses a different template matched to its slide count and your selected brand kit. Check the result before exporting or sharing. If a website blocks reading, start with your own photos instead."],
   ["How do I make an ad?", "On Your Ads, start a new ad. Choose a main size, add your photos, then edit the words and logo before exporting."],
   ["What does the Free plan include?", TRIAL_ANSWER],
   ["Can the AI write my words?", "Yes, on paid plans. In Headline or Subline, click Suggest and pick one of three options. The Free plan does not include AI suggestions."],
