@@ -93,7 +93,7 @@ export function FromLink({ format, kitId }: { format: Format; kitId: string | nu
                   </li>
                 ))}
               </ol>
-              <AppButton size="sm" variant="secondary" className="mt-3 w-full" disabled={create.isPending} onClick={() => void use(d)}>Use this draft</AppButton>
+              <AppButton size="sm" variant="ghost" className="mt-3 w-full" disabled={create.isPending} onClick={() => void use(d)}>Use this draft</AppButton>
             </li>
           ))}
         </ul>
