@@ -10,16 +10,16 @@ const page = (title: string, description: string, type: PageMetadata["type"] = "
 });
 
 export const PAGE_METADATA: Record<string, PageMetadata> = {
-  "/": page("Product Video Maker from Photos", "Turn product photos into branded video ads, Instagram Reels and animated GIFs. Add your words, logo and motion. Try Gravity Pants without a card."),
-  "/how-it-works": page("How to Make Video Ads from Photos", "Choose photos, add your headline and brand, preview the motion and download your video ad. See the Gravity Pants photo-to-video process step by step."),
-  "/features": page("Video Ad Maker Features and Export Sizes", "Create branded product reels with photo motion, text, logos and saved brand kits. Export MP4 and GIF in five shapes, with HTML5 on Business and Team."),
+  "/": page("Product Video Maker from Photos", "Turn photos into branded video ads and GIFs. On paid plans, paste a product link, review facts and photos and choose from three AI reel drafts."),
+  "/how-it-works": page("How to Make Video Ads from Photos or Product Links", "Start with photos or, on a paid plan, paste a product link. Review facts and photos, choose one of three AI drafts, then edit and export your reel."),
+  "/features": page("Video Ad Maker Features and AI Product-Link Drafts", "Explore AI product-link drafts with fact and photo review on paid plans, brand kits, photo motion and five export shapes. HTML5 on Business and Team."),
   "/examples": page("Product Video Ad Examples and Styles", "Explore product video ads made from photos across fashion, jewellery, beauty, food and home decor. Compare reel styles and find ideas for your brand.", "CollectionPage"),
   "/showcase": page("Brand Reels and Product Video Showcase", "Watch branded product reels made with Gravity Pants, including fashion, homeware and beauty examples. See how still photos become short video ads.", "CollectionPage"),
   "/contact": page("Commission a Product Reel", "Tell Gravity Pants about your brand, products and the reel you want to make. Send a commission enquiry for a short video ad built from your photos.", "ContactPage"),
-  "/pricing": page("Video Ad Maker Pricing and Plans", "Compare Free, Starter, Simple, Business and Team video ad plans. Make MP4s and GIFs, with HTML5 on Business and Team. Free trial requires no card."),
+  "/pricing": page("Video Ad Maker Pricing and Plans", "Compare Free, Starter, Business and Team. Every paid plan includes AI product-link drafts and copy suggestions. HTML5 on Business and Team; Free needs no card."),
   "/about": page("About the Photo-to-Video Ad Maker", "Gravity Pants turns still product photos into short branded video ads and GIFs. Learn about the photo-first editor, brand kits and export formats.", "AboutPage"),
   "/blog": page("Product Video Tips and Photo-to-Reel Guides", "Read practical guides to making product videos, Instagram Reels, TikTok videos, email GIFs and HTML5 ads from photos, with ideas for different brands.", "CollectionPage"),
-  "/help": page("Help with Product Reels and Video Exports", "Find help with photos, brand kits, text, motion and export settings in Gravity Pants. Learn which sizes and file formats suit social posts and email."),
+  "/help": page("Help with Product Reels and Video Exports", "Get help with AI product-link drafts, fact and photo review, brand kits, text and exports. Learn how to choose a story and finish your product reel."),
   "/referrals": page("Give a Reel, Get a Reel — Referral Program", "Share your Gravity Pants referral link. When a friend signs up and exports their first reel, earn one free export with no watermark. Learn how it works."),
   "/photo-to-video": page("Image to Video Ads: Photo to Video for Products", "Turn product images into a short branded video ad with your headline, logo and motion. Export an MP4 or GIF for social, email and websites. No filming needed."),
   "/product-video-maker": page("Product Video Maker for Online Stores", "Make product videos from existing photos for your online store, social posts and ads. Show product details with motion, text and your saved brand kit."),

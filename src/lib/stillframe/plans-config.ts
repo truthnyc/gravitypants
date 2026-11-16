@@ -60,7 +60,7 @@ export const PLANS: PlanConfig[] = [
     monthly: 19,
     yearly: 190,
     team: false,
-    features: ["1 seat", "5 exports a month", "No watermark", "MP4 and GIF", "Brand kit: logo, colors, fonts", "Every Google Font", "AI headline and subline suggestions"],
+    features: ["1 seat", "5 exports a month", "No watermark", "MP4 and GIF", "Brand kit: logo, colors, fonts", "Every Google Font", "AI product-link creation: review facts and photos, choose from 3 drafts", "AI headline and subline suggestions"],
   },
   {
     id: "simple",
@@ -73,7 +73,7 @@ export const PLANS: PlanConfig[] = [
     yearly: 350,
     team: false,
     retired: true,
-    features: ["1 seat", "10 exports a month", "Vertical 9:16, Portrait 4:5, Square 1:1, Wide 5:4, Landscape 16:9 and custom", "MP4 and GIF", "Every Google Font", "Brand kit: logo, colors, fonts", "AI headline and subline suggestions", "Duplicate with new photos", "Save as template", "No watermark", "Need more? Packs of 5, 10 or 20 extra exports"],
+    features: ["1 seat", "10 exports a month", "Vertical 9:16, Portrait 4:5, Square 1:1, Wide 5:4, Landscape 16:9 and custom", "MP4 and GIF", "Every Google Font", "Brand kit: logo, colors, fonts", "AI product-link creation: review facts and photos, choose from 3 drafts", "AI headline and subline suggestions", "Duplicate with new photos", "Save as template", "No watermark", "Need more? Packs of 5, 10 or 20 extra exports"],
   },
   {
     id: "business",
@@ -85,7 +85,7 @@ export const PLANS: PlanConfig[] = [
     monthly: 79,
     yearly: 790,
     team: false,
-    features: ["Everything in Starter", "30 exports a month", "AI headline and subline suggestions", "HTML5 export", "Aimanté insights"],
+    features: ["Everything in Starter", "30 exports a month", "AI product-link creation: review facts and photos, choose from 3 drafts", "AI headline and subline suggestions", "HTML5 export", "Aimanté insights"],
   },
   {
     id: "team",
@@ -97,7 +97,7 @@ export const PLANS: PlanConfig[] = [
     monthly: 175,
     yearly: 1750,
     team: true,
-    features: ["Everything in Business", "AI headline and subline suggestions", "HTML5 export", "You + 4 teammates", "150 exports a month, shared", "Shared brand kits", "Shared templates", "Priority support"],
+    features: ["Everything in Business", "AI product-link creation: review facts and photos, choose from 3 drafts", "AI headline and subline suggestions", "HTML5 export", "You + 4 teammates", "150 exports a month, shared", "Shared brand kits", "Shared templates", "Priority support"],
   },
 ];
 
@@ -163,6 +163,7 @@ export const COMPARE: CompareGroup[] = [
     rows: [
       ...["9:16, 4:5, 1:1, 5:4, 16:9 and custom", "MP4", "GIF", "Every Google Font"].map((label) => ({ label, cells: all(true) })),
       { label: "AI headline and subline suggestions", cells: byPlan(false, () => true) },
+      { label: "AI product-link creation: review facts and photos, choose from 3 drafts", cells: byPlan(false, () => true) },
       { label: "HTML5", cells: byPlan(false, (p) => HTML5_TIERS.includes(p.id)) },
     ],
   },
@@ -180,6 +181,7 @@ export const COMPARE: CompareGroup[] = [
 ];
 
 export const FAQ: { q: string; a: string; href?: "/referrals" }[] = [
+  { q: "Can I create a reel from a product link?", a: "Yes, on every paid plan. In New ad, choose your size and brand kit and paste a product-page link. Gravity Pants reads the name, price when available, photos and page details. Review What we understood: keep or remove facts and photos, edit what makes the product different and add a must-say line. Then generate three stories, each with a different template matched to its slide count and your selected brand kit. Choose one to open in the editor. The drafts use facts checked against the page, with checks for clichés and unsupported claims; review the result before exporting. Some websites block page reading, so you can use your own photos instead. Product-link AI creation is not included on Free." },
   { q: "Can I try it before paying?", a: "Yes. Every account starts on the Free plan, with no time limit and no card. Your first export has no watermark, and you get 5 more exports with a small Gravity Pants mark. Your reels and brand kit stay saved, and a reel on Aimanté stays live." },
   { q: "What if I need more than 5 exports on Starter?", a: "For a busy month, buy a pack from Account → Billing: 5 exports for $25, 10 for $45 or 20 for $80. Packs never expire and are available on every paid plan. If you regularly need 20 or more, Business is the better deal: 30 exports a month for $79, about $2.63 a reel." },
   { q: "How does the referral program work?", a: `${REFERRAL_NOTE} Your link, your credits and the friends who joined are all in Account → Billing. The reward lands when your friend's first export finishes — signing up alone doesn't trigger it.`, href: "/referrals" },

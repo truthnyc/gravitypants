@@ -11,6 +11,22 @@ export const Route = createFileRoute("/features")({
 
 const groups = [
   {
+    id: "product-link",
+    eyebrow: "AI product-link drafts",
+    title: "One product link. Three ways to tell its story.",
+    points: [
+      "Read the product name, available price and photos from a product page",
+      "Check the facts against the page and take your brand’s voice into account",
+      "Review what we understood before any stories are written",
+      "Keep or remove facts and photos, edit what makes it different and add a must-say line",
+      "Choose from three story drafts, each with a different template and your selected brand kit",
+      "Story shapes include Why it exists, How it’s made, A moment with it, Look closer and Just the product, where the page supports them",
+      "Templates matched to the story’s slide count, with checks for unsupported claims and clichés",
+      "Open your chosen draft in the editor; nothing is posted automatically",
+      "Included on every paid plan; not included on Free",
+    ],
+  },
+  {
     id: "photos",
     eyebrow: "Photos & frames",
     title: "Your photos, already in order.",
@@ -126,6 +142,7 @@ const groups = [
 ] as const;
 
 const allFeatures = [
+  ["AI product-link drafts", "Product facts checked against the page", "Review facts and photos before generation", "Your own must-say line", "Three stories on different templates", "Selected brand kit applied", "Paid plans only"],
   ["Photos", "Drag-and-drop photos", "Automatic frames and timing", "Move and zoom inside a frame", "Add, duplicate, delete frames"],
   ["Editing", "Photo, headline, subline, logo", "Tap to select", "Undo and redo", "Saves as you work"],
   ["Text", "Google Fonts picker", "Upload your own font", "Size, weight, color", "Nine-point position", "Same on all frames"],

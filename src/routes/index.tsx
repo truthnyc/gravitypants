@@ -845,11 +845,14 @@ function Home() {
             ))}
             <article className="site-card home-feature home-feature-full">
               <div>
-                <h3>AI writes your headlines</h3>
+                <h3>A product link becomes three reel drafts</h3>
                 <p>
-                  On every paid plan, click Suggest under a headline or subline and pick one of three short options
-                  written from your photo and your brand. Nothing changes until you click one.
+                  On every paid plan, paste a product link. Review the facts and photos, add the one line you
+                  must say, then choose from three different stories with your selected brand kit and templates
+                  matched to their slide counts. Open your favorite in the editor before exporting.
                 </p>
+                <p>Already editing? Suggest still offers three headline or subline options from your photo and brand.</p>
+                <Link to="/how-it-works" className="text-site-primary underline underline-offset-4">See how product-link drafts work</Link>
               </div>
               <FeatureArt art="ai" />
             </article>
