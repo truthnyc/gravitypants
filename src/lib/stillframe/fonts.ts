@@ -125,16 +125,24 @@ export function loadFontPreview(family: string) {
 /** Full stylesheet for one weight, then wait until the browser has the face. */
 export async function loadFont(family: string, weight: number, options: { strict?: boolean; text?: string } = {}) {
   if (typeof document === "undefined") return;
+  if (await waitForFace(family, weight, options)) return;
+  // Some families (e.g. Instrument Serif) only ship weight 400; a weighted css2
+  // request then fails outright. Retry at 400 — the browser fakes the weight.
+  if (weight !== 400 && (await waitForFace(family, 400, options))) return;
+  if (options.strict) throw new FontLoadError(family);
+}
+
+async function waitForFace(family: string, weight: number, options: { strict?: boolean; text?: string }) {
   if (!customFamilies.has(family)) {
     addLink(`https://fonts.googleapis.com/css2?family=${encodeURIComponent(family)}:wght@${weight}&display=swap`);
   }
   // the stylesheet itself needs a moment to arrive before fonts.load can see the face
   for (let i = 0; i < (options.strict ? 80 : 20); i++) {
     const faces = await document.fonts.load(`${weight} 48px "${family}"`, options.text).catch(() => []);
-    if (faces.length) return;
+    if (faces.length) return true;
     await new Promise((r) => setTimeout(r, 100));
   }
-  if (options.strict) throw new FontLoadError(family);
+  return false;
 }
 
 export class FontLoadError extends Error {
