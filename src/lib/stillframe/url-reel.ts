@@ -250,3 +250,21 @@ export function fallbackDraft(p: DraftProduct, brief: ProductBrief): RawDraft {
   frames.push({ role: "ask", photo: ph(frames.length), headline: "Shop now", subline: priceLine(p.price, p.currency), fact: null });
   return { shape: "simple", frames };
 }
+
+/** Shopify serves photos at any width; asks for a large one so a thumbnail link doesn't fail the size rule. */
+export function largerPhotoUrl(u: string): string {
+  try {
+    const x = new URL(u);
+    if (!(x.hostname === "cdn.shopify.com" || x.pathname.includes("/cdn/shop/"))) return u;
+    x.pathname = x.pathname.replace(/_(\d+x\d*|\d*x\d+)(?=\.[a-z]+$)/i, "");
+    ["width", "height", "crop"].forEach((k) => x.searchParams.delete(k));
+    x.searchParams.set("width", "2000");
+    return x.toString();
+  } catch { return u; }
+}
+
+/** Shopify product page → its `/products/<handle>.js` address, which lists every product photo; null elsewhere. */
+export function shopifyProductJs(pageUrl: string, html: string): string | null {
+  if (!/cdn\.shopify\.com|\/cdn\/shop\/|Shopify\.theme/i.test(html)) return null;
+  try { const x = new URL(pageUrl); const m = x.pathname.match(/\/products\/([^/?#]+)/); return m ? `${x.origin}/products/${m[1]}.js` : null; } catch { return null; }
+}

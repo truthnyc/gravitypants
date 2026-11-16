@@ -7,7 +7,7 @@ import { productImages, productText, type ProductText } from "@/lib/directory/pr
 import type { Format } from "./types";
 import {
   BANNED_PHRASES, DRAFT_COUNT, MAX_FRAMES, MAX_PRODUCT_PHOTOS, MIN_FRAMES, STORY_SHAPES, allowedShapes, bigEnough, checkDraft,
-  fallbackDraft, imageSize, matchTemplates, minimalBrief, parseBrief, parseDrafts, photoKey, pickDraftTemplates, priceLine, shapeById,
+  fallbackDraft, imageSize, largerPhotoUrl, shopifyProductJs, matchTemplates, minimalBrief, parseBrief, parseDrafts, photoKey, pickDraftTemplates, priceLine, shapeById,
   type DraftProduct, type ProductBrief, type RawDraft, type ReelDraft,
 } from "./url-reel";
 
@@ -21,7 +21,17 @@ const IMAGE_TYPES: Record<string, string> = { "image/jpeg": "jpg", "image/png": 
 async function readPage(url: string): Promise<{ images: string[]; text: ProductText }> {
   const { safeFetchText } = await import("@/lib/directory/product-fetch.server");
   const { text, url: final } = await safeFetchText(url, { timeoutMs: 8000, maxBytes: 2 * 1024 * 1024, accept: "text/html,application/xhtml+xml" });
-  return { images: productImages(text, final, 12), text: productText(text, final) };
+  let images = productImages(text, final, 12);
+  const js = shopifyProductJs(final, text);
+  if (js) {
+    try {
+      const { text: body } = await safeFetchText(js, { timeoutMs: 6000, maxBytes: 2 * 1024 * 1024, accept: "application/json" });
+      const list = (JSON.parse(body) as { images?: unknown[] }).images ?? [];
+      const extra = list.filter((u): u is string => typeof u === "string").map((u) => (u.startsWith("//") ? `https:${u}` : u)).filter((u) => u.startsWith("https://"));
+      images = [...images, ...extra];
+    } catch { /* page photos are enough */ }
+  }
+  return { images: images.map(largerPhotoUrl), text: productText(text, final) };
 }
 
 /** Downloads and stores up to six product photos (short side at least 600 px, no size/query duplicates) under `<ws>/photo/`, with asset rows, as the caller (RLS applies). */
@@ -195,7 +205,7 @@ export async function draftReelsFromUrl(db: SupabaseClient, input: { workspaceId
     return { ok: false, error: e instanceof ProductFetchError ? e.message : "We couldn't read that page." };
   }
   if (!info.name) return { ok: false, error: "We couldn't find a product on that page." };
-  if (info.image_url && !images.includes(info.image_url)) images.unshift(info.image_url);
+  if (info.image_url) { const main = largerPhotoUrl(info.image_url); if (!images.includes(main)) images.unshift(main); }
   const product: DraftProduct = { name: info.name, price: info.price, currency: info.currency, url: info.url };
 
   const [{ data: tpl }, { data: w }] = await Promise.all([

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { productText } from "@/lib/directory/product-page";
-import { bigEnough, imageSize, minimalBrief, parseBrief, photoKey, verifyFacts, MAX_PRODUCT_PHOTOS } from "@/lib/stillframe/url-reel";
+import { largerPhotoUrl, shopifyProductJs, bigEnough, imageSize, minimalBrief, parseBrief, photoKey, verifyFacts, MAX_PRODUCT_PHOTOS } from "@/lib/stillframe/url-reel";
 
 const fx = (n: string) => readFileSync(new URL(`./fixtures/${n}`, import.meta.url), "utf8");
 
@@ -54,5 +54,16 @@ describe("photo rules", () => {
   it("treats size and query variants as the same photo", () => {
     expect(photoKey("https://cdn.test/a_800x.jpg?v=2")).toBe(photoKey("https://cdn.test/a.jpg"));
     expect(photoKey("https://cdn.test/a.jpg")).not.toBe(photoKey("https://cdn.test/b.jpg"));
+  });
+});
+
+describe("Shopify photos", () => {
+  it("asks for a large version of a thumbnail", () => {
+    expect(largerPhotoUrl("https://www.allbirds.com/cdn/shop/files/a.png?v=1&width=100")).toBe("https://www.allbirds.com/cdn/shop/files/a.png?v=1&width=2000");
+    expect(largerPhotoUrl("https://other.test/a.jpg?width=100")).toBe("https://other.test/a.jpg?width=100");
+  });
+  it("finds the product photo list on Shopify pages only", () => {
+    expect(shopifyProductJs("https://s.test/products/mug?variant=1", "<img src='//cdn.shopify.com/x.jpg'>")).toBe("https://s.test/products/mug.js");
+    expect(shopifyProductJs("https://s.test/products/mug", "<html></html>")).toBeNull();
   });
 });
