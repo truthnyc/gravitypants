@@ -2,8 +2,8 @@
    One entry point (draftReelsFromUrl) so the app and, later, the MCP connector share it. */
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { gatewayText } from "@/lib/ai/gateway.server";
-import { fetchProductInfo, ProductFetchError, safeFetchBytes } from "@/lib/directory/product-fetch.server";
-import { productImages, productText, type ProductText } from "@/lib/directory/product-page";
+import { checkPublicUrl, isBlockedStatus, ProductFetchError, safeFetchBytes, safeFetchText } from "@/lib/directory/product-fetch.server";
+import { parseProductPage, productImages, productText, type ProductText } from "@/lib/directory/product-page";
 import type { Format } from "./types";
 import {
   BANNED_PHRASES, DRAFT_COUNT, MAX_FRAMES, MAX_PRODUCT_PHOTOS, MIN_FRAMES, STORY_SHAPES, allowedShapes, bigEnough, checkDraft,
@@ -13,18 +13,70 @@ import {
 
 export type DraftPhoto = { assetId: string; path: string; width: number; height: number; name: string };
 export type ProductRead = { product: DraftProduct; photos: DraftPhoto[]; brief: ProductBrief };
-export type UrlReadResult = ({ ok: true; token: string } & ProductRead) | { ok: false; error: string };
+export type UrlReadResult = ({ ok: true; token: string } & ProductRead) | { ok: false; error: string; blocked?: boolean };
 export type UrlDraftResult =
   | { ok: true; product: DraftProduct; photos: DraftPhoto[]; drafts: ReelDraft[]; brief: ProductBrief }
   | { ok: false; error: string };
 
 const IMAGE_TYPES: Record<string, string> = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp" };
 
-async function readPage(url: string): Promise<{ images: string[]; text: ProductText }> {
-  const { safeFetchText } = await import("@/lib/directory/product-fetch.server");
-  const { text, url: final } = await safeFetchText(url, { timeoutMs: 8000, maxBytes: 2 * 1024 * 1024, accept: "text/html,application/xhtml+xml" });
-  let images = productImages(text, final, 12);
-  const js = shopifyProductJs(final, text);
+export const BLOCKED_MESSAGE = "This shop doesn't allow automatic reading. Upload your photos instead.";
+const PAGE_LIMIT = { timeoutMs: 8000, maxBytes: 2 * 1024 * 1024, accept: "text/html,application/xhtml+xml" };
+
+const esc = (v: string) => v.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+
+/** Shopify's public product data, shaped as a tiny page (JSON-LD + description) so the usual parsers read it. */
+async function shopifyProductPage(url: string): Promise<string | null> {
+  let js: string;
+  try { const u = new URL(url); const m = u.pathname.match(/\/products\/([^/?#]+)/); if (!m) return null; js = `${u.origin}/products/${m[1]}.js`; } catch { return null; }
+  try {
+    const { text } = await safeFetchText(js, { timeoutMs: 6000, maxBytes: 2 * 1024 * 1024, accept: "application/json" });
+    const p = JSON.parse(text) as { title?: string; description?: string; vendor?: string; price?: number; available?: boolean; images?: string[] };
+    if (!p.title) return null;
+    const images = (p.images ?? []).map((i) => (i.startsWith("//") ? `https:${i}` : i)).filter((i) => i.startsWith("https://"));
+    const ld = { "@context": "https://schema.org", "@type": "Product", name: p.title, image: images, brand: p.vendor ? { name: p.vendor } : undefined, description: (p.description ?? "").replace(/<[^>]+>/g, " ").slice(0, 4000),
+      offers: p.price != null ? { "@type": "Offer", price: (p.price / 100).toFixed(2), availability: p.available ? "https://schema.org/InStock" : "https://schema.org/OutOfStock" } : undefined };
+    return `<html><head><meta property="og:site_name" content="${esc(p.vendor ?? "")}"><script type="application/ld+json">${JSON.stringify(ld).replace(/</g, "\\u003c")}</script></head><body><main>${p.description ?? ""}${images.map((i) => `<img src="${esc(i)}">`).join("")}</main></body></html>`;
+  } catch { return null; }
+}
+
+/** Page reading service (real browsers) for shops that refuse our server. The URL is sent as data; our server never fetches it. */
+async function firecrawlPage(url: string): Promise<{ html: string; url: string } | null> {
+  const key = process.env["FIRECRAWL_API_KEY"], auth = process.env["LOVABLE_API_KEY"];
+  if (!key || !auth) return null;
+  try {
+    const res = await fetch("https://connector-gateway.lovable.dev/firecrawl/v2/scrape", {
+      method: "POST", headers: { Authorization: `Bearer ${auth}`, "X-Connection-Api-Key": key, "Content-Type": "application/json" },
+      body: JSON.stringify({ url, formats: ["rawHtml"], onlyMainContent: false }), signal: AbortSignal.timeout(40000),
+    });
+    if (!res.ok) { console.error("Product page reader", res.status, (await res.text()).slice(0, 300)); return null; }
+    const raw = await res.json() as { data?: { rawHtml?: string; metadata?: { statusCode?: number; sourceURL?: string; url?: string } } };
+    const html = raw.data?.rawHtml, status = raw.data?.metadata?.statusCode;
+    if (!html || (status && status >= 400)) return null;
+    const final = raw.data?.metadata?.url ?? url;
+    try { checkPublicUrl(final); return { html, url: final }; } catch { return { html, url }; }
+  } catch (e) { console.error("Product page reader", e); return null; }
+}
+
+/** Reads a product page: directly first; if the shop refuses, Shopify product data, then the page reading service. */
+export async function loadProductHtml(raw: string): Promise<{ html: string; url: string }> {
+  try {
+    const { text, url } = await safeFetchText(raw, PAGE_LIMIT);
+    return { html: text, url };
+  } catch (e) {
+    if (!(e instanceof ProductFetchError) || !isBlockedStatus(e.status)) throw e;
+  }
+  const url = checkPublicUrl(raw.trim()).toString();
+  const shop = await shopifyProductPage(url);
+  if (shop) return { html: shop, url };
+  const page = await firecrawlPage(url);
+  if (page) return page;
+  throw new ProductFetchError(BLOCKED_MESSAGE, 403);
+}
+
+async function readPage(html: string, final: string): Promise<{ images: string[]; text: ProductText }> {
+  let images = productImages(html, final, 12);
+  const js = shopifyProductJs(final, html);
   if (js) {
     try {
       const { text: body } = await safeFetchText(js, { timeoutMs: 6000, maxBytes: 2 * 1024 * 1024, accept: "application/json" });
@@ -33,7 +85,7 @@ async function readPage(url: string): Promise<{ images: string[]; text: ProductT
       images = [...images, ...extra];
     } catch { /* page photos are enough */ }
   }
-  return { images: images.map(largerPhotoUrl), text: productText(text, final) };
+  return { images: images.map(largerPhotoUrl), text: productText(html, final) };
 }
 
 /** Downloads and stores up to six product photos (short side at least 600 px, no size/query duplicates) under `<ws>/photo/`, with asset rows, as the caller (RLS applies). */
@@ -237,16 +289,18 @@ export async function readProductForDrafts(db: SupabaseClient, input: { workspac
   let images: string[];
   let page: ProductText;
   try {
-    info = await fetchProductInfo(input.url);
-    ({ images, text: page } = await readPage(input.url));
+    const loaded = await loadProductHtml(input.url);
+    info = parseProductPage(loaded.html, loaded.url);
+    ({ images, text: page } = await readPage(loaded.html, loaded.url));
   } catch (e) {
-    return { ok: false, error: e instanceof ProductFetchError ? e.message : "We couldn't read that page." };
+    if (e instanceof ProductFetchError) return { ok: false, error: e.message, blocked: e.message === BLOCKED_MESSAGE || undefined };
+    return { ok: false, error: "We couldn't read that page." };
   }
   if (!info.name) return { ok: false, error: "We couldn't find a product on that page." };
   if (info.image_url) { const main = largerPhotoUrl(info.image_url); if (!images.includes(main)) images.unshift(main); }
   const product: DraftProduct = { name: info.name, price: info.price, currency: info.currency, url: info.url };
   const photos = await savePhotos(db, ws, images);
-  if (!photos.length) return { ok: false, error: "We couldn't download photos from that page." };
+  if (!photos.length) return { ok: false, error: "We couldn't download photos from that page. Upload your photos instead.", blocked: true };
   const brief = await buildBrief(db, product, page, await brandVoice(db, ws), photos);
   const read = { product, photos, brief };
   return { ok: true, token: await signRead(ws, read), ...read };
