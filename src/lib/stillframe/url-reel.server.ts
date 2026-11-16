@@ -293,7 +293,7 @@ export async function readProductForDrafts(db: SupabaseClient, input: { workspac
     info = parseProductPage(loaded.html, loaded.url);
     ({ images, text: page } = await readPage(loaded.html, loaded.url));
   } catch (e) {
-    if (e instanceof ProductFetchError) return { ok: false, error: e.message, blocked: e.message === BLOCKED_MESSAGE || undefined };
+    if (e instanceof ProductFetchError) return { ok: false, error: e.message, blocked: e.message === BLOCKED_MESSAGE };
     return { ok: false, error: "We couldn't read that page." };
   }
   if (!info.name) return { ok: false, error: "We couldn't find a product on that page." };
