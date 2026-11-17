@@ -7,8 +7,13 @@ export function revokePixel() {
   window.fbq?.('consent', 'revoke');
 }
 export function trackPixelPage(path: string) {
-  // This installation is visit-only: never expose query-string or fragment identifiers.
-  if (window.location.search || window.location.hash) window.history.replaceState(window.history.state, '', window.location.pathname);
+  // Visit-only: never expose query-string or fragment identifiers. Ad/campaign tags are removed from the
+  // address; when the address still carries page state (e.g. which Stage reel is open) we skip the visit
+  // instead of erasing it, so the page keeps working.
+  const url = new URL(window.location.href);
+  const kept = [...url.searchParams.keys()].filter((k) => !isAdParam(k));
+  if (kept.length || url.hash) return;
+  if (url.search) window.history.replaceState(window.history.state, '', url.pathname);
   if (document.referrer) {
     try {
       const ref = new URL(document.referrer);
@@ -33,4 +38,8 @@ export function trackPixelPage(path: string) {
   if (lastPage === path) return;
   lastPage = path;
   fbq('track', 'PageView', {}, { eventID: crypto.randomUUID() });
+}
+/** Campaign and click identifiers that are safe to drop from the address bar. */
+export function isAdParam(key: string) {
+  return /^(utm_|gclid$|gbraid$|wbraid$|fbclid$|msclkid$|ttclid$|dclid$|gad_|_gl$|igshid$|mc_)/i.test(key);
 }
