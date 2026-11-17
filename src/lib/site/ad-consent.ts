@@ -1,6 +1,6 @@
 export const CONSENT_KEY = 'gp:advertising-consent:v1';
-export const NOTICE_VERSION = '2026-11-01';
-export const AD_NOTICE = 'Meta Pixel shares page visits, cookie identifiers and technical connection data with Meta for advertising measurement. No account details, uploaded content or purchase events are sent. Accept or reject advertising tracking; change your choice in Cookie settings.';
+export const NOTICE_VERSION = '2026-11-17';
+export const AD_NOTICE = 'Meta Pixel and, on Aimanté, the Google Ads tag measure page visits for advertising. They share the page address, ad click and cookie identifiers and technical connection data with Meta and Google. No account details, uploaded content or purchase events are sent, and ads are not personalized from these visits. Accept or reject advertising tracking; change your choice in Cookie settings.';
 export type Choice = { advertising: boolean; at: string; noticeVersion: string; notice: string; region: string | null };
 export type ConsentRecord = { visitor: string; choices: Choice[] };
 const consentRegions = new Set('AT BE BG HR CY CZ DK EE FI FR DE GR HU IE IT LV LT LU MT NL PL PT RO SK SI ES SE IS LI NO GB CH BR KR ZA TR JP IN TH ID MY MX AR CL CO PE'.split(' '));

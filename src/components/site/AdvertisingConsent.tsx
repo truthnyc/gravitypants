@@ -3,6 +3,9 @@ import { Link } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { AD_NOTICE, CONSENT_KEY, advertisingAllowed, appendChoice, lookupAdRegion, parseConsent, pixelPageAllowed, requiresConsent } from '@/lib/site/ad-consent';
 import { revokePixel, trackPixelPage } from '@/lib/site/meta-pixel';
+import { reportAimanteVisit, revokeGoogleAds } from '@/lib/site/google-ads';
+
+function revokeAll() { revokePixel(); revokeGoogleAds(); }
 
 export function AdvertisingConsent({ pathname }: { pathname: string }) {
   const [ready, setReady] = useState(false);
@@ -14,7 +17,7 @@ export function AdvertisingConsent({ pathname }: { pathname: string }) {
   useEffect(() => {
     const allowed = pixelPageAllowed(window.location.hostname, pathname);
     setEligible(allowed);
-    if (!allowed) { revokePixel(); return; }
+    if (!allowed) { revokeAll(); return; }
     let active = true;
     void lookupAdRegion().then(value => { if (active) { setRegion(value); setReady(true); } });
     return () => { active = false; };
@@ -27,19 +30,24 @@ export function AdvertisingConsent({ pathname }: { pathname: string }) {
   useEffect(() => {
     if (!ready || !eligible) return;
     let record;
-    try { record = parseConsent(localStorage.getItem(CONSENT_KEY)); } catch { revokePixel(); setOpen(true); return; }
+    try { record = parseConsent(localStorage.getItem(CONSENT_KEY)); } catch { revokeAll(); setOpen(true); return; }
     const choice = record?.choices.at(-1);
     const optOut = (navigator as Navigator & { globalPrivacyControl?: boolean }).globalPrivacyControl === true || navigator.doNotTrack === '1';
-    if (advertisingAllowed(region, choice, optOut)) trackPixelPage(pathname); else revokePixel();
+    let active = true;
+    // Google reads the ad click identifier from the address, so it goes first; the Pixel then
+    // strips query strings before Meta sees the page.
+    if (advertisingAllowed(region, choice, optOut)) void reportAimanteVisit(window.location.hostname).then(() => { if (active) trackPixelPage(pathname); });
+    else revokeAll();
     if (!choice && requiresConsent(region)) setOpen(true);
+    return () => { active = false; };
   }, [ready, eligible, region, revision, pathname]);
   function choose(accept: boolean) {
     try {
       const record = appendChoice(parseConsent(localStorage.getItem(CONSENT_KEY)), accept, region);
       localStorage.setItem(CONSENT_KEY, JSON.stringify(record));
-      if (!accept) revokePixel();
+      if (!accept) revokeAll();
       setError(false); setOpen(false); setRevision(n => n + 1);
-    } catch { revokePixel(); setError(true); }
+    } catch { revokeAll(); setError(true); }
   }
   if (!ready || !eligible) return null;
   return <>
