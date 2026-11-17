@@ -1,4 +1,4 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { aimanteHead } from "@/lib/site/brand-site";
 import { AimanteShell } from "@/components/site/AimanteShell";
 import { listGuides } from "@/lib/directory/guides.functions";
@@ -6,14 +6,18 @@ import { listGuides } from "@/lib/directory/guides.functions";
 export const Route = createFileRoute("/aimante/guides/")({
   loader: async () => {
     const guides = await listGuides().catch(() => []);
-    if (!guides.length) throw notFound();
     return { guides };
   },
   head: () => aimanteHead({ path: "/guides", title: "Gift guides by mood — Aimanté", description: "Gift and mood guides from Aimanté. Cozy, playful and seasonal ideas from independent makers and well-known houses, shown in short reels." }),
   errorComponent: () => <AimanteShell><p className="py-20 text-center font-ap">Guides couldn't load. Try again.</p></AimanteShell>,
-  notFoundComponent: () => <AimanteShell><p className="py-20 text-center font-ap">No guides yet.</p></AimanteShell>,
   component: Guides,
 });
+
+const MOOD_GIFTS = [
+  { slug: "cozy", title: "Cozy gifts", body: "Warm, soft, slow-living finds for someone who loves staying in." },
+  { slug: "playful", title: "Playful gifts", body: "Bright, fun and bold makers for someone who likes a little surprise." },
+  { slug: "coastal", title: "Coastal gifts", body: "Sea air, linen and light for someone who misses the shore." },
+];
 
 const firstPara = (s: string) => s.split(/\n\s*\n/)[0] ?? "";
 
@@ -27,7 +31,17 @@ function Guides() {
           <p className="mx-auto mt-4 max-w-[560px] text-[18px] leading-[1.5] text-ap-body">Gift ideas by mood and by season. Each one is a short list of brands we think fit, shown in their own reels.</p>
         </section>
         <section className="mx-auto max-w-[1200px] px-6 pb-24">
-          {guides.length === 0 ? <p className="text-center text-ap-muted">New guides are on their way.</p> : (
+          {guides.length === 0 ? <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {MOOD_GIFTS.map((m) => (
+                <li key={m.slug}>
+                  <a href={`/mood/${m.slug}`} className="group block rounded-[12px] bg-ap-panel p-6 hover:shadow-ap-soft">
+                    <h2 className="text-[19px] font-semibold leading-snug group-hover:text-ap-blue">{m.title}</h2>
+                    <p className="mt-2 text-[15px] leading-[1.5] text-ap-body">{m.body}</p>
+                    <span className="mt-3 inline-block text-[14px] font-medium text-ap-blue">See the brands →</span>
+                  </a>
+                </li>
+              ))}
+            </ul> : (
             <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {guides.map((g) => (
                 <li key={g.slug}>
