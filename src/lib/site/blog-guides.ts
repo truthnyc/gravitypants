@@ -60,11 +60,15 @@ export const GUIDES: BlogPost[] = [
   },
   {
     slug: "how-to-make-instagram-reels-from-photos",
-    title: "How to make Instagram Reels from photos (no filming)",
-    seoTitle: "How to Make Instagram Reels From Photos",
-    dek: "Reels don't have to be filmed. A few good photos, the right size and short words make a Reel people stop for.",
+    title: "How to make a Reel with photos (no filming)",
+    seoTitle: "How to Make a Reel With Photos: 5 Steps",
+    dek: "Create a Reel from photos in five steps: pick three to five photos, make it 9:16, add short words, export the MP4 and post it in Instagram.",
     date: DATE, minutes: 4, tag: "How to", cover: drusus.url, pages: ["/instagram-reels-from-photos"],
     body: [
+      { h: "The short answer", p: [
+        "To make a Reel with photos: 1. Pick three to five photos, opening with your strongest one. 2. Set the size to Vertical 9:16. 3. Add one short headline per photo, kept in the middle of the frame. 4. Export the video as an MP4 and save it to your phone. 5. In Instagram, tap +, choose Reel, select the video, add a caption and share.",
+        "The steps below explain each one, with tips for product photos.",
+      ] },
       { p: [
         "Instagram shows Reels to people who don't follow you yet, which makes them one of the best places for a small brand to be seen. You can make one from photos.",
       ] },
@@ -79,6 +83,12 @@ export const GUIDES: BlogPost[] = [
       ] },
       { h: "4. Download the MP4 and post it yourself", p: [
         "Export the MP4 and save it to your phone. In Instagram, create a Reel, pick the video from your gallery, add a caption and share it. Gravity Pants does not post to Instagram for you.",
+      ] },
+      { h: "Questions people ask", p: [
+        "Can you make an Instagram Reel with only photos? Yes. Instagram itself can turn several photos into a simple slideshow Reel, and a tool like Gravity Pants adds motion, text and your logo so the photos look like a finished ad.",
+        "How many photos should a Reel have? Three to five works well for a product. Each photo gets a second or two, so the whole Reel stays short enough to watch to the end.",
+        "What size is an Instagram Reel? Vertical 9:16, which fills a phone screen. Keep words away from the bottom and right edges, where Instagram places the caption and buttons.",
+        "Can I turn an existing post into a Reel? Yes. Use the photos from that post, make a 9:16 video from them and share it as a new Reel.",
       ] },
     ],
   },
