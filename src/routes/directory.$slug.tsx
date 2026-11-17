@@ -1,4 +1,5 @@
 import { ConceptReelNotice } from "@/components/directory/ConceptReelNotice";
+import { brandSeo, uniqueProducts } from "@/lib/directory/brand-seo";
 import { createFileRoute, notFound, redirect, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowUpRight } from "lucide-react";
@@ -43,8 +44,7 @@ export const Route = createFileRoute("/directory/$slug")({
     // Every gravitypants.com page shares the home page card (og-cover.jpg), so no per-brand image.
     const head = aim ? aimanteHead({
       path: `/b/${params.slug}`,
-      title: `${b.name} on Aimanté${b.moods?.length ? ` — ${b.moods.slice(0, 3).map((m) => m.toLowerCase()).join(", ")}` : ""}`,
-      description: b.description || `Reels and video ads by ${b.name} on Aimanté.`,
+      ...brandSeo(b.name, uniqueProducts([...loaderData.reels.map((r) => r.title), ...loaderData.siteReels.map((r) => r.title)]), b.description),
       // Every aimante.co page shares the home page card (og-aimante.jpg).
     }) : siteHead({
       path: `/directory/${params.slug}`,
@@ -59,7 +59,7 @@ export const Route = createFileRoute("/directory/$slug")({
         // Permanent per-reel links: the stored files are private and signed links expire.
         ...loaderData.reels.filter((r) => r.uploadDate && (r.video || r.poster)).map((r) => ({
           "@type": "VideoObject",
-          name: `${b.name} reel`,
+          name: r.title ? `${b.name} — ${r.title}` : `${b.name} reel`,
           description: r.description || b.description || `A short reel from ${b.name} on Aimanté.`,
           thumbnailUrl: `${ORIGIN}/api/public/reel/${r.reel_id}/poster`,
           contentUrl: `${ORIGIN}/api/public/reel/${r.reel_id}/video`,
@@ -68,7 +68,7 @@ export const Route = createFileRoute("/directory/$slug")({
         })),
         ...loaderData.siteReels.filter((r) => r.uploadDate).map((r) => ({
           "@type": "VideoObject",
-          name: `${b.name} reel`,
+          name: r.title ? `${b.name} — ${r.title}` : `${b.name} reel`,
           description: r.description || b.description || `A short reel from ${b.name} on Aimanté.`,
           thumbnailUrl: `${ORIGIN}/api/public/reel/${r.id}/poster`,
           contentUrl: `${ORIGIN}/api/public/reel/${r.id}/video`,
