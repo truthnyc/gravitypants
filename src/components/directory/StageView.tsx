@@ -13,7 +13,6 @@ import type { SiteReel } from "@/lib/site/reels";
 import { cn } from "@/lib/utils";
 
 export type StageData = { reels: FacetedReel[]; cards: DirectoryCard[]; siteReels: SiteReel[] };
-const andJoin = (xs: string[]) => xs.length < 2 ? xs.join("") : `${xs.slice(0, -1).join(", ")} and ${xs.at(-1)}`;
 
 /** Plays the current selection one reel at a time, large. */
 export function StageView({ mood, family, start, data }: { mood: string | null; family: string | null; categories: string[]; start: string | null; data: StageData }) {
@@ -78,7 +77,6 @@ export function StageView({ mood, family, start, data }: { mood: string | null; 
     return { tags: Array.from(new Set(r.moods)), href: s?.href ?? null, description: s?.description ?? null };
   };
   const d = details(reel);
-  const fits = (d?.tags ?? []).filter((t) => fitSet.has(t.toLowerCase())).slice(0, 3);
   // Tags: mood-fitting ones first, at most 6 until expanded; resets per reel.
   const [tagsOpen, setTagsOpen] = useState(false);
   useEffect(() => setTagsOpen(false), [reel?.id]);
@@ -109,9 +107,6 @@ export function StageView({ mood, family, start, data }: { mood: string | null; 
             <span className="font-light text-ap-headline-bracket"> ]</span>
           </span>
         </h1>
-        <p className="mt-3 text-[15px] text-ap-body nums">
-          {reel && <>Leading with {reel.brand_name}{fits.length ? `: ${andJoin(fits)}` : ""}.</>}
-        </p>
       </header>
 
       {!reel ? <p className="mt-16 text-center text-ap-body">No reels match this selection yet. <Link to="/directory" className="text-ap-blue hover:underline">Browse the Directory</Link></p> :
