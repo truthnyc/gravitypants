@@ -3,7 +3,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { reelCaption, reelHashtags } from "./instagram-caption";
 
-export type InstagramReel = { id: string; brand: string; title: string; poster: string | null; video: string | null; caption: string; hashtags: string[]; publishedAt: string | null };
+export type InstagramReel = { id: string; brand: string; title: string; poster: string | null; video: string | null; caption: string; hashtags: string[]; moods: string[]; keywords: string[]; brandWebsite: string | null; publishedAt: string | null };
 
 const PREFIX = "media:";
 
@@ -16,7 +16,7 @@ export const instagramFeed = createServerFn({ method: "GET" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const sb = supabaseAdmin as any;
     const { data } = await sb.from("directory_reels")
-      .select("id, title, display_title, description, tags, video_url, poster_url, published_at, directory_brands(name)")
+      .select("id, title, display_title, description, tags, moods, video_url, poster_url, published_at, directory_brands(name, website_url)")
       .eq("status", "live").order("published_at", { ascending: false }).limit(200);
     const rows = data ?? [];
     const paths = rows.flatMap((r: any) => [r.video_url, r.poster_url]).filter((p: string | null) => p?.startsWith(PREFIX)).map((p: string) => p.slice(PREFIX.length));
@@ -29,6 +29,6 @@ export const instagramFeed = createServerFn({ method: "GET" })
     return rows.map((r: any) => {
       const brand = r.directory_brands?.name ?? "";
       const title = r.display_title || r.title || brand;
-      return { id: r.id, brand, title, poster: sign(r.poster_url), video: sign(r.video_url), caption: reelCaption({ brand, title, description: r.description }), hashtags: reelHashtags(brand, r.tags ?? []), publishedAt: r.published_at };
+      return { id: r.id, brand, title, poster: sign(r.poster_url), video: sign(r.video_url), caption: reelCaption({ brand, title, description: r.description }), hashtags: reelHashtags(brand, [...(r.tags ?? []), ...(r.moods ?? [])]), moods: r.moods ?? [], keywords: (r.tags ?? []).filter((t: string) => !t.startsWith("#")), brandWebsite: r.directory_brands?.website_url ?? null, publishedAt: r.published_at };
     });
   });
