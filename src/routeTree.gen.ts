@@ -83,6 +83,7 @@ import { Route as AuthenticatedAdminDirectorySettingsRouteImport } from './route
 import { Route as AuthenticatedAdminExportsRouteImport } from './routes/_authenticated/admin/exports'
 import { Route as AuthenticatedAdminGuidesRouteImport } from './routes/_authenticated/admin/guides'
 import { Route as AuthenticatedAdminHomepageRouteImport } from './routes/_authenticated/admin/homepage'
+import { Route as AuthenticatedAdminInstagramRouteImport } from './routes/_authenticated/admin/instagram'
 import { Route as AuthenticatedAdminMarketingRouteImport } from './routes/_authenticated/admin/marketing'
 import { Route as AuthenticatedAdminMoodsRouteImport } from './routes/_authenticated/admin/moods'
 import { Route as AuthenticatedAdminNewsletterRouteImport } from './routes/_authenticated/admin/newsletter'
@@ -529,6 +530,12 @@ const AuthenticatedAdminHomepageRoute =
     path: '/homepage',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminInstagramRoute =
+  AuthenticatedAdminInstagramRouteImport.update({
+    id: '/instagram',
+    path: '/instagram',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminMarketingRoute =
   AuthenticatedAdminMarketingRouteImport.update({
     id: '/marketing',
@@ -948,6 +955,7 @@ export interface FileRoutesByFullPath {
   '/admin/exports': typeof AuthenticatedAdminExportsRoute
   '/admin/guides': typeof AuthenticatedAdminGuidesRoute
   '/admin/homepage': typeof AuthenticatedAdminHomepageRoute
+  '/admin/instagram': typeof AuthenticatedAdminInstagramRoute
   '/admin/marketing': typeof AuthenticatedAdminMarketingRoute
   '/admin/moods': typeof AuthenticatedAdminMoodsRoute
   '/admin/newsletter': typeof AuthenticatedAdminNewsletterRoute
@@ -1083,6 +1091,7 @@ export interface FileRoutesByTo {
   '/admin/exports': typeof AuthenticatedAdminExportsRoute
   '/admin/guides': typeof AuthenticatedAdminGuidesRoute
   '/admin/homepage': typeof AuthenticatedAdminHomepageRoute
+  '/admin/instagram': typeof AuthenticatedAdminInstagramRoute
   '/admin/marketing': typeof AuthenticatedAdminMarketingRoute
   '/admin/moods': typeof AuthenticatedAdminMoodsRoute
   '/admin/newsletter': typeof AuthenticatedAdminNewsletterRoute
@@ -1223,6 +1232,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/exports': typeof AuthenticatedAdminExportsRoute
   '/_authenticated/admin/guides': typeof AuthenticatedAdminGuidesRoute
   '/_authenticated/admin/homepage': typeof AuthenticatedAdminHomepageRoute
+  '/_authenticated/admin/instagram': typeof AuthenticatedAdminInstagramRoute
   '/_authenticated/admin/marketing': typeof AuthenticatedAdminMarketingRoute
   '/_authenticated/admin/moods': typeof AuthenticatedAdminMoodsRoute
   '/_authenticated/admin/newsletter': typeof AuthenticatedAdminNewsletterRoute
@@ -1363,6 +1373,7 @@ export interface FileRouteTypes {
     | '/admin/exports'
     | '/admin/guides'
     | '/admin/homepage'
+    | '/admin/instagram'
     | '/admin/marketing'
     | '/admin/moods'
     | '/admin/newsletter'
@@ -1498,6 +1509,7 @@ export interface FileRouteTypes {
     | '/admin/exports'
     | '/admin/guides'
     | '/admin/homepage'
+    | '/admin/instagram'
     | '/admin/marketing'
     | '/admin/moods'
     | '/admin/newsletter'
@@ -1637,6 +1649,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/exports'
     | '/_authenticated/admin/guides'
     | '/_authenticated/admin/homepage'
+    | '/_authenticated/admin/instagram'
     | '/_authenticated/admin/marketing'
     | '/_authenticated/admin/moods'
     | '/_authenticated/admin/newsletter'
@@ -2305,6 +2318,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminHomepageRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/instagram': {
+      id: '/_authenticated/admin/instagram'
+      path: '/instagram'
+      fullPath: '/admin/instagram'
+      preLoaderRoute: typeof AuthenticatedAdminInstagramRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/marketing': {
       id: '/_authenticated/admin/marketing'
       path: '/marketing'
@@ -2776,6 +2796,7 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminExportsRoute: typeof AuthenticatedAdminExportsRoute
   AuthenticatedAdminGuidesRoute: typeof AuthenticatedAdminGuidesRoute
   AuthenticatedAdminHomepageRoute: typeof AuthenticatedAdminHomepageRoute
+  AuthenticatedAdminInstagramRoute: typeof AuthenticatedAdminInstagramRoute
   AuthenticatedAdminMarketingRoute: typeof AuthenticatedAdminMarketingRoute
   AuthenticatedAdminMoodsRoute: typeof AuthenticatedAdminMoodsRoute
   AuthenticatedAdminNewsletterRoute: typeof AuthenticatedAdminNewsletterRoute
@@ -2805,6 +2826,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminExportsRoute: AuthenticatedAdminExportsRoute,
     AuthenticatedAdminGuidesRoute: AuthenticatedAdminGuidesRoute,
     AuthenticatedAdminHomepageRoute: AuthenticatedAdminHomepageRoute,
+    AuthenticatedAdminInstagramRoute: AuthenticatedAdminInstagramRoute,
     AuthenticatedAdminMarketingRoute: AuthenticatedAdminMarketingRoute,
     AuthenticatedAdminMoodsRoute: AuthenticatedAdminMoodsRoute,
     AuthenticatedAdminNewsletterRoute: AuthenticatedAdminNewsletterRoute,

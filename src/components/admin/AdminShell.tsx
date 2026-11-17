@@ -14,6 +14,7 @@ const NAV = [
   { to: "/admin/templates", label: "Templates", icon: LayoutTemplate },
   { to: "/admin/published", label: "Published reels", icon: Clapperboard },
   { to: "/admin/reels", label: "Website Reels", icon: Clapperboard },
+  { to: "/admin/instagram", label: "Instagram feed", icon: Video },
   { to: "/admin/directory", label: "Directory", icon: Search },
   { to: "/admin/brand-applications", label: "Brand requests", icon: Inbox },
   { to: "/admin/support", label: "Client messages", icon: Mail },
