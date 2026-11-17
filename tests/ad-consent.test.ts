@@ -25,10 +25,13 @@ describe('Gravity Pants website visit permission', () => {
     expect(parseConsent(JSON.stringify(withdrawn))).toEqual(withdrawn);
     expect(parseConsent('{"advertising":true}')).toBeNull();
   });
-  it('limits tracking to public gravitypants.com pages', () => {
+  it('limits tracking to public gravitypants.com and aimante.co pages', () => {
+    expect(pixelPageAllowed('aimante.co', '/')).toBe(true);
+    expect(pixelPageAllowed('www.aimante.co', '/b/sail-racing')).toBe(true);
+    expect(pixelPageAllowed('aimante.co', '/embed/reel/id')).toBe(false);
     expect(pixelPageAllowed('gravitypants.com', '/')).toBe(true);
     expect(pixelPageAllowed('www.gravitypants.com', '/pricing')).toBe(true);
-    for (const host of ['aimante.co', 'www.aimante.co', 'localhost', 'gravitypants.lovable.app']) expect(pixelPageAllowed(host, '/')).toBe(false);
+    for (const host of ['localhost', 'gravitypants.lovable.app']) expect(pixelPageAllowed(host, '/')).toBe(false);
     for (const path of ['/app/ads', '/admin', '/shopify', '/embed/reel/id', '/signup', '/auth/callback']) expect(pixelPageAllowed('gravitypants.com', path)).toBe(false);
   });
 });
