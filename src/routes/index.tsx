@@ -716,9 +716,6 @@ function Home() {
           <div className="home-examples-top home-section">
             <Heading wide eyebrow="Made with Gravity Pants">
               Every one of these started as a few photos.
-              <Primary to="/examples">
-                Browse the gallery <ArrowRight size={18} strokeWidth={1.7} />
-              </Primary>
             </Heading>
           </div>
           <ReelCarousel
