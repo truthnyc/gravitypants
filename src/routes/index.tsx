@@ -242,9 +242,17 @@ function Secondary({ children, to, cta }: { children: React.ReactNode; to: "/pri
     </Button>
   );
 }
-function Heading({ eyebrow, children }: { eyebrow: string; children: React.ReactNode }) {
+function Heading({
+  eyebrow,
+  children,
+  wide,
+}: {
+  eyebrow: string;
+  children: React.ReactNode;
+  wide?: boolean;
+}) {
   return (
-    <div className="home-heading">
+    <div className="home-heading" style={wide ? { maxWidth: "none" } : undefined}>
       <span className="site-eyebrow">{eyebrow}</span>
       <h2 className="site-h2">{children}</h2>
     </div>
@@ -682,9 +690,8 @@ function Home() {
         {/* Hidden until brand approvals: <section id="customers" className="home-logos home-section"><p>Brands making reels with Gravity Pants</p><div>{Array.from({ length: 6 }, (_, i) => <span key={i}>[Customer logo]</span>)}</div></section> */}
         <section id="examples" className="home-examples">
           <div className="home-examples-top home-section">
-            <Heading eyebrow="Made with Gravity Pants">
-              Every one of these
-              <br className="home-desktop-only" /> started as a few photos.
+            <Heading wide eyebrow="Made with Gravity Pants">
+              Every one of these started as a few photos.
             </Heading>
             <div className="home-gallery-desktop">
               <Primary to="/examples">
