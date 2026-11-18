@@ -62,7 +62,8 @@ export const Route = createFileRoute("/")({
           applicationCategory: "MultimediaApplication",
           operatingSystem: "Web browser",
           url: `${SITE_ORIGIN}/`,
-          description: "Turns still product photos into short MP4 video ads, animated GIFs and HTML5 display ads for social media and the web.",
+          description:
+            "Turns still product photos into short MP4 video ads, animated GIFs and HTML5 display ads for social media and the web.",
           publisher: { "@id": `${SITE_ORIGIN}/#org` },
           offers: { "@type": "Offer", name: "Free", price: "0", priceCurrency: "USD" },
         },
@@ -79,10 +80,7 @@ export const Route = createFileRoute("/")({
           href: loaderData ? pickVideo(loaderData.content.hero.reelId, loaderData.allReels, 3).poster : heroPoster.url,
         },
       ],
-      scripts: [
-        ...head.scripts,
-        { type: "application/ld+json", children: JSON.stringify(jsonLd) },
-      ],
+      scripts: [...head.scripts, { type: "application/ld+json", children: JSON.stringify(jsonLd) }],
     };
   },
   loader: async () => {
@@ -169,7 +167,17 @@ function HomeReelVideo({ example }: { example: HomeExample }) {
   );
 }
 
-function HomeExampleMedia({ example, index, count, hidden }: { example: HomeExample; index: number; count: number; hidden: boolean }) {
+function HomeExampleMedia({
+  example,
+  index,
+  count,
+  hidden,
+}: {
+  example: HomeExample;
+  index: number;
+  count: number;
+  hidden: boolean;
+}) {
   const media = example.video ? (
     <HomeReelVideo example={example} />
   ) : example.frames ? (
@@ -228,29 +236,41 @@ const tabCopy: Record<Tab, { title: string; body: string }> = {
     body: "Export Vertical 9:16, Portrait 4:5, Square 1:1, Wide 5:4 and Landscape 16:9 together, plus custom sizes. Choose MP4 for ads and social posts, GIF for email and websites, or HTML5 for display ads (HTML5 on Business and Team).",
   },
 };
-function Primary({ children, to = "/signup", cta }: { children: React.ReactNode; to?: "/signup" | "/examples"; cta?: string }) {
+function Primary({
+  children,
+  to = "/signup",
+  cta,
+}: {
+  children: React.ReactNode;
+  to?: "/signup" | "/examples";
+  cta?: string;
+}) {
   return (
     <Button asChild variant="site" size="site" className="home-button">
-      <Link to={to} data-cta={cta}>{children}</Link>
+      <Link to={to} data-cta={cta}>
+        {children}
+      </Link>
     </Button>
   );
 }
-function Secondary({ children, to, cta }: { children: React.ReactNode; to: "/pricing" | "/signup" | "/examples"; cta?: string }) {
+function Secondary({
+  children,
+  to,
+  cta,
+}: {
+  children: React.ReactNode;
+  to: "/pricing" | "/signup" | "/examples";
+  cta?: string;
+}) {
   return (
     <Button asChild variant="siteSecondary" size="site" className="home-button">
-      <Link to={to} data-cta={cta}>{children}</Link>
+      <Link to={to} data-cta={cta}>
+        {children}
+      </Link>
     </Button>
   );
 }
-function Heading({
-  eyebrow,
-  children,
-  wide,
-}: {
-  eyebrow: string;
-  children: React.ReactNode;
-  wide?: boolean;
-}) {
+function Heading({ eyebrow, children, wide }: { eyebrow: string; children: React.ReactNode; wide?: boolean }) {
   return (
     <div className="home-heading" style={wide ? { maxWidth: "none" } : undefined}>
       <span className="site-eyebrow">{eyebrow}</span>
@@ -352,7 +372,9 @@ function BeforeAfter({
           <p>{detail}</p>
         </div>
         <Button asChild variant="siteSecondary" size="siteHeader" className="home-use">
-          <Link to="/signup" data-cta="begin-with-style">Begin with this style</Link>
+          <Link to="/signup" data-cta="begin-with-style">
+            Begin with this style
+          </Link>
         </Button>
       </div>
     </article>
@@ -658,7 +680,9 @@ function Home() {
                   alt={p.alt}
                   width={300}
                   height={400}
-                  {...(i === 0 ? { fetchPriority: "high" as const, loading: "eager" as const } : { loading: "lazy" as const })}
+                  {...(i === 0
+                    ? { fetchPriority: "high" as const, loading: "eager" as const }
+                    : { loading: "lazy" as const })}
                 />
               </div>
             ))}
@@ -693,11 +717,10 @@ function Home() {
             <Heading wide eyebrow="Made with Gravity Pants">
               Every one of these started as a few photos.
             </Heading>
-            <div className="home-gallery-desktop">
-              <Primary to="/examples">
-                Browse the gallery <ArrowRight size={18} strokeWidth={1.7} />
-              </Primary>
-            </div>
+
+            <Primary to="/examples">
+              Browse the gallery <ArrowRight size={18} strokeWidth={1.7} />
+            </Primary>
           </div>
           <ReelCarousel
             label="Example reels made with Gravity Pants"
@@ -766,7 +789,10 @@ function Home() {
               <div className="home-step-copy">
                 <span>03</span>
                 <h3>Download your files</h3>
-                <p>Get 9:16, 4:5, 1:1, 5:4, 16:9 and custom-size versions as MP4, GIF or HTML5, ready for social, ads, email and websites.</p>
+                <p>
+                  Get 9:16, 4:5, 1:1, 5:4, 16:9 and custom-size versions as MP4, GIF or HTML5, ready for social, ads,
+                  email and websites.
+                </p>
               </div>
             </article>
           </div>
@@ -854,12 +880,16 @@ function Home() {
               <div>
                 <h3>A product link becomes three reel drafts</h3>
                 <p>
-                  On every paid plan, paste a product link. Review the facts and photos, add the one line you
-                  must say, then choose from three different stories with your selected brand kit and templates
-                  matched to their slide counts. Open your favorite in the editor before exporting.
+                  On every paid plan, paste a product link. Review the facts and photos, add the one line you must say,
+                  then choose from three different stories with your selected brand kit and templates matched to their
+                  slide counts. Open your favorite in the editor before exporting.
                 </p>
-                <p>Already editing? Suggest still offers three headline or subline options from your photo and brand.</p>
-                <Link to="/how-it-works" className="text-site-primary underline underline-offset-4">See how product-link drafts work</Link>
+                <p>
+                  Already editing? Suggest still offers three headline or subline options from your photo and brand.
+                </p>
+                <Link to="/how-it-works" className="text-site-primary underline underline-offset-4">
+                  See how product-link drafts work
+                </Link>
               </div>
               <FeatureArt art="ai" />
             </article>
@@ -871,7 +901,16 @@ function Home() {
             <p>"{content.quote.quote}"</p>
             <div className="home-person">
               {content.quote.photo ? (
-                <img src={photoSrc(content.quote.photo)} alt={content.quote.photo.alt || `${[content.quote.name, content.quote.role].filter(Boolean).join(", ")} logo`} width={238} height={238} loading="lazy" />
+                <img
+                  src={photoSrc(content.quote.photo)}
+                  alt={
+                    content.quote.photo.alt ||
+                    `${[content.quote.name, content.quote.role].filter(Boolean).join(", ")} logo`
+                  }
+                  width={238}
+                  height={238}
+                  loading="lazy"
+                />
               ) : (
                 <span> </span>
               )}
@@ -905,7 +944,9 @@ function Home() {
               <p className="site-lede">Bring three photos. We'll take it from there.</p>
               <div className="home-actions">
                 <Primary cta="make-first-reel">Make your first reel</Primary>
-                <Secondary to="/pricing" cta="view-plans">View plans</Secondary>
+                <Secondary to="/pricing" cta="view-plans">
+                  View plans
+                </Secondary>
               </div>
             </div>
             <div className="home-closing-orbit" aria-hidden="true">
