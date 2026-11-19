@@ -105,21 +105,29 @@ const CATEGORY_LABEL: Record<string, string> = {
 };
 export const categoryLabel = (c: string) => CATEGORY_LABEL[c] ?? c;
 
-const loaded = new Set<string>();
-function addLink(href: string) {
-  if (typeof document === "undefined" || loaded.has(href)) return;
-  loaded.add(href);
+const loaded = new Map<string, Promise<void>>();
+/** Adds a stylesheet once; resolves when it has arrived (or failed), so font checks see its faces. */
+function addLink(href: string): Promise<void> {
+  if (typeof document === "undefined") return Promise.resolve();
+  const known = loaded.get(href);
+  if (known) return known;
   const link = document.createElement("link");
   link.rel = "stylesheet";
   link.href = href;
-  link.addEventListener("error", () => { loaded.delete(href); link.remove(); }, { once: true });
+  const done = new Promise<void>((resolve) => {
+    link.addEventListener("load", () => resolve(), { once: true });
+    link.addEventListener("error", () => { loaded.delete(href); link.remove(); resolve(); }, { once: true });
+    setTimeout(resolve, 8000);
+  });
+  loaded.set(href, done);
   document.head.appendChild(link);
+  return done;
 }
 
 /** Tiny stylesheet with just the glyphs of the family name, for list previews. */
 export function loadFontPreview(family: string) {
   if (customFamilies.has(family)) return;
-  addLink(`https://fonts.googleapis.com/css2?family=${encodeURIComponent(family)}&text=${encodeURIComponent(family)}&display=swap`);
+  void addLink(`https://fonts.googleapis.com/css2?family=${encodeURIComponent(family)}&text=${encodeURIComponent(family)}&display=swap`);
 }
 
 /** Full stylesheet for one weight, then wait until the browser has the face. */
@@ -134,7 +142,9 @@ export async function loadFont(family: string, weight: number, options: { strict
 
 async function waitForFace(family: string, weight: number, options: { strict?: boolean; text?: string }) {
   if (!customFamilies.has(family)) {
-    addLink(`https://fonts.googleapis.com/css2?family=${encodeURIComponent(family)}:wght@${weight}&display=swap`);
+    // Wait for the full stylesheet: Safari otherwise reports the picker's tiny name-only preview face
+    // as ready, and the ad is drawn before the real letters arrive.
+    await addLink(`https://fonts.googleapis.com/css2?family=${encodeURIComponent(family)}:wght@${weight}&display=swap`);
   }
   // the stylesheet itself needs a moment to arrive before fonts.load can see the face
   for (let i = 0; i < (options.strict ? 80 : 20); i++) {

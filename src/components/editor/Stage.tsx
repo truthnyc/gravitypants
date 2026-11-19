@@ -106,13 +106,22 @@ export function Stage({
   const W = Math.round(box.w * dpr);
   const H = Math.round(box.h * dpr);
 
+  // Redraw when a font finishes arriving; canvas text never updates by itself (Safari draws the fallback until then).
+  const [fontsTick, setFontsTick] = useState(0);
+  useEffect(() => {
+    if (typeof document === "undefined" || !document.fonts) return;
+    const bump = () => setFontsTick((n) => n + 1);
+    document.fonts.addEventListener("loadingdone", bump);
+    return () => document.fonts.removeEventListener("loadingdone", bump);
+  }, []);
+
   useEffect(() => {
     const ctx = canvasRef.current?.getContext("2d");
     if (!ctx || !W || !H) return;
     const frames = reduced ? calmFrames(doc.frames) : doc.frames;
     renderAt(ctx, doc.project, frames, format, time, { width: W, height: H, images, brand, completeText: interactive && !playing, showGuides: !playing && Boolean(drag?.moving) });
     if (!playing) setLayout(layoutFrame(ctx, doc.project, doc.frames, frameIndex, format, W, H, images));
-  }, [doc, brand, format, time, W, H, images, version, playing, frameIndex, drag?.moving, reduced, interactive]);
+  }, [doc, brand, format, time, W, H, images, version, playing, frameIndex, drag?.moving, reduced, interactive, fontsTick]);
 
   const toCss = (b: Box) => ({ left: b.x / dpr, top: b.y / dpr, width: b.w / dpr, height: b.h / dpr });
 

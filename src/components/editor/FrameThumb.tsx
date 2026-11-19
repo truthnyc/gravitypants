@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { EditorDoc } from "@/lib/stillframe/data";
 import type { Format } from "@/lib/stillframe/types";
 import { FORMAT_SIZE } from "@/render/formats";
@@ -28,6 +28,14 @@ export function FrameThumb({
   const w = width;
   const h = Math.round((width * size.height) / size.width);
 
+  const [fontsTick, setFontsTick] = useState(0);
+  useEffect(() => {
+    if (typeof document === "undefined" || !document.fonts) return;
+    const bump = () => setFontsTick((n) => n + 1);
+    document.fonts.addEventListener("loadingdone", bump);
+    return () => document.fonts.removeEventListener("loadingdone", bump);
+  }, []);
+
   useEffect(() => {
     const ctx = ref.current?.getContext("2d");
     if (!ctx) return;
@@ -36,7 +44,7 @@ export function FrameThumb({
       height: h,
       images,
     });
-  }, [doc, index, format, images, version, w, h]);
+  }, [doc, index, format, images, version, w, h, fontsTick]);
 
   return <canvas ref={ref} width={w} height={h} className={cn("object-cover", className)} />;
 }

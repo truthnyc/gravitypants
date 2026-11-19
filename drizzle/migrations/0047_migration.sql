@@ -1,0 +1,1 @@
+update public.frames set format_overrides = jsonb_set(jsonb_set(format_overrides, '{4:5,headline,font_family}', '"Montserrat"'), '{4:5,headline,font_weight}', '300') where id = '0540c518-73b5-4b65-8b46-621058774f58' and format_overrides #>> '{4:5,headline,font_family}' = 'Bebas Neue';
