@@ -1971,6 +1971,35 @@ export type Database = {
         }
         Relationships: []
       }
+      storage_alerts: {
+        Row: {
+          alerted_at: string
+          limit_bytes: number
+          used_bytes: number
+          workspace_id: string
+        }
+        Insert: {
+          alerted_at?: string
+          limit_bytes: number
+          used_bytes: number
+          workspace_id: string
+        }
+        Update: {
+          alerted_at?: string
+          limit_bytes?: number
+          used_bytes?: number
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "storage_alerts_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: true
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       support_sessions: {
         Row: {
           admin_user_id: string

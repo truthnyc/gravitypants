@@ -127,6 +127,7 @@ import { Route as AuthenticatedAppJoinWsRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAppReelKeyRouteImport } from './routes/_authenticated/app/reel.$key'
 import { Route as AuthenticatedAppTemplatesIndexRouteImport } from './routes/_authenticated/app/templates.index'
 import { Route as AuthenticatedAppTemplatesSlugRouteImport } from './routes/_authenticated/app/templates.$slug'
+import { Route as ApiPublicJobsStorageAlertsRouteImport } from './routes/api/public/jobs/storage-alerts'
 import { Route as ApiPublicJobsSyncFeedsRouteImport } from './routes/api/public/jobs/sync-feeds'
 import { Route as ApiPublicJobsSyncProductsRouteImport } from './routes/api/public/jobs/sync-products'
 import { Route as ApiPublicMarketingCampaignIdRouteImport } from './routes/api/public/marketing-campaign.$id'
@@ -770,6 +771,12 @@ const AuthenticatedAppTemplatesSlugRoute =
     path: '/templates/$slug',
     getParentRoute: () => AuthenticatedAppRouteRoute,
   } as any)
+const ApiPublicJobsStorageAlertsRoute =
+  ApiPublicJobsStorageAlertsRouteImport.update({
+    id: '/api/public/jobs/storage-alerts',
+    path: '/api/public/jobs/storage-alerts',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicJobsSyncFeedsRoute = ApiPublicJobsSyncFeedsRouteImport.update({
   id: '/api/public/jobs/sync-feeds',
   path: '/api/public/jobs/sync-feeds',
@@ -998,6 +1005,7 @@ export interface FileRoutesByFullPath {
   '/app/join/$ws': typeof AuthenticatedAppJoinWsRoute
   '/app/reel/$key': typeof AuthenticatedAppReelKeyRoute
   '/app/templates/$slug': typeof AuthenticatedAppTemplatesSlugRoute
+  '/api/public/jobs/storage-alerts': typeof ApiPublicJobsStorageAlertsRoute
   '/api/public/jobs/sync-feeds': typeof ApiPublicJobsSyncFeedsRoute
   '/api/public/jobs/sync-products': typeof ApiPublicJobsSyncProductsRoute
   '/api/public/marketing-campaign/$id': typeof ApiPublicMarketingCampaignIdRoute
@@ -1134,6 +1142,7 @@ export interface FileRoutesByTo {
   '/app/join/$ws': typeof AuthenticatedAppJoinWsRoute
   '/app/reel/$key': typeof AuthenticatedAppReelKeyRoute
   '/app/templates/$slug': typeof AuthenticatedAppTemplatesSlugRoute
+  '/api/public/jobs/storage-alerts': typeof ApiPublicJobsStorageAlertsRoute
   '/api/public/jobs/sync-feeds': typeof ApiPublicJobsSyncFeedsRoute
   '/api/public/jobs/sync-products': typeof ApiPublicJobsSyncProductsRoute
   '/api/public/marketing-campaign/$id': typeof ApiPublicMarketingCampaignIdRoute
@@ -1275,6 +1284,7 @@ export interface FileRoutesById {
   '/_authenticated/app/join/$ws': typeof AuthenticatedAppJoinWsRoute
   '/_authenticated/app/reel/$key': typeof AuthenticatedAppReelKeyRoute
   '/_authenticated/app/templates/$slug': typeof AuthenticatedAppTemplatesSlugRoute
+  '/api/public/jobs/storage-alerts': typeof ApiPublicJobsStorageAlertsRoute
   '/api/public/jobs/sync-feeds': typeof ApiPublicJobsSyncFeedsRoute
   '/api/public/jobs/sync-products': typeof ApiPublicJobsSyncProductsRoute
   '/api/public/marketing-campaign/$id': typeof ApiPublicMarketingCampaignIdRoute
@@ -1416,6 +1426,7 @@ export interface FileRouteTypes {
     | '/app/join/$ws'
     | '/app/reel/$key'
     | '/app/templates/$slug'
+    | '/api/public/jobs/storage-alerts'
     | '/api/public/jobs/sync-feeds'
     | '/api/public/jobs/sync-products'
     | '/api/public/marketing-campaign/$id'
@@ -1552,6 +1563,7 @@ export interface FileRouteTypes {
     | '/app/join/$ws'
     | '/app/reel/$key'
     | '/app/templates/$slug'
+    | '/api/public/jobs/storage-alerts'
     | '/api/public/jobs/sync-feeds'
     | '/api/public/jobs/sync-products'
     | '/api/public/marketing-campaign/$id'
@@ -1692,6 +1704,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/join/$ws'
     | '/_authenticated/app/reel/$key'
     | '/_authenticated/app/templates/$slug'
+    | '/api/public/jobs/storage-alerts'
     | '/api/public/jobs/sync-feeds'
     | '/api/public/jobs/sync-products'
     | '/api/public/marketing-campaign/$id'
@@ -1782,6 +1795,7 @@ export interface RootRouteChildren {
   EmbedReelIdRoute: typeof EmbedReelIdRoute
   ShopifyReelIdRoute: typeof ShopifyReelIdRoute
   AimanteGuidesIndexRoute: typeof AimanteGuidesIndexRoute
+  ApiPublicJobsStorageAlertsRoute: typeof ApiPublicJobsStorageAlertsRoute
   ApiPublicJobsSyncFeedsRoute: typeof ApiPublicJobsSyncFeedsRoute
   ApiPublicJobsSyncProductsRoute: typeof ApiPublicJobsSyncProductsRoute
   ApiPublicMarketingCampaignIdRoute: typeof ApiPublicMarketingCampaignIdRoute
@@ -2626,6 +2640,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppTemplatesSlugRouteImport
       parentRoute: typeof AuthenticatedAppRouteRoute
     }
+    '/api/public/jobs/storage-alerts': {
+      id: '/api/public/jobs/storage-alerts'
+      path: '/api/public/jobs/storage-alerts'
+      fullPath: '/api/public/jobs/storage-alerts'
+      preLoaderRoute: typeof ApiPublicJobsStorageAlertsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/jobs/sync-feeds': {
       id: '/api/public/jobs/sync-feeds'
       path: '/api/public/jobs/sync-feeds'
@@ -3040,6 +3061,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmbedReelIdRoute: EmbedReelIdRoute,
   ShopifyReelIdRoute: ShopifyReelIdRoute,
   AimanteGuidesIndexRoute: AimanteGuidesIndexRoute,
+  ApiPublicJobsStorageAlertsRoute: ApiPublicJobsStorageAlertsRoute,
   ApiPublicJobsSyncFeedsRoute: ApiPublicJobsSyncFeedsRoute,
   ApiPublicJobsSyncProductsRoute: ApiPublicJobsSyncProductsRoute,
   ApiPublicMarketingCampaignIdRoute: ApiPublicMarketingCampaignIdRoute,

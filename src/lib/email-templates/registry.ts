@@ -22,12 +22,14 @@ import { template as clientInviteCopy } from './client-invite-copy'
 import { template as directoryNotice } from './directory-notice'
 import { template as brandApplication } from './brand-application'
 import { template as trialSignup } from './trial-signup'
+import { template as storageWarning } from './storage-warning'
 
 /**
  * Template registry — maps template names to their React Email components.
  * Import and register new templates here after creating them in this directory.
  */
 export const TEMPLATES: Record<string, TemplateEntry> = {
+  'storage-warning': storageWarning,
   welcome,
   'plan-started': planStarted,
   'payment-failed': paymentFailed,
