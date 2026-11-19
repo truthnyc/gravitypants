@@ -71,4 +71,3 @@
 - Video markup lives only on `/reels/$slug` watch pages (slugs from `watch.ts`, VideoObject from `videoObject()`, sitemap entries from `watchPages()`); galleries just link there, so each video is listed once on a page where it is the main content.
 - Watch-page videos constrain both width and viewport height for every format without cropping, so the complete player stays prominent on shorter screens.
 - The `/embed/reel/$id` player runs the root shell in bare mode (no auth listener, page tracking or notices) because other people's sites frame it where the browser blocks stored sign-in data; keep that route free of app-wide boot.
-- Storage warnings: plan storage limits and the 80% rule live only in `src/lib/stillframe/storage-limits.ts`; the daily `/api/public/jobs/storage-alerts` job emails the workspace owner once and records it in service-only `storage_alerts`, cleared when usage drops below 80%, so owners are never emailed twice for one crossing.
