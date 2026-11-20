@@ -1,3 +1,4 @@
+import { mergeKeywords } from "@/lib/directory/keywords";
 import { useEffect, useMemo, useState, type KeyboardEvent } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -112,9 +113,13 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
   const primaryLabel = !show ? "Done" : alreadyShared && !agreed ? "Save changes" : approved ? "Publish" : "Submit for review";
 
   const addTag = (raw: string) => {
-    const t = raw.trim().replace(/,$/, "").toLowerCase();
-    if (t && !tags.includes(t) && tags.length < 20) setTags([...tags, t.slice(0, 40)]);
+    setTags((cur) => mergeKeywords(cur, raw));
     setDraft("");
+  };
+  const onTagChange = (v: string) => {
+    const parts = v.split(/[,;\n]/);
+    if (parts.length > 1) { setTags((cur) => mergeKeywords(cur, parts.slice(0, -1).join(","))); setDraft(parts[parts.length - 1] ?? ""); }
+    else setDraft(v);
   };
   const onTagKey = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" || e.key === ",") { e.preventDefault(); addTag(draft); }
@@ -292,7 +297,7 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
                     <button type="button" aria-label={`Remove ${t}`} onClick={() => setTags(tags.filter((x) => x !== t))} className="text-ap-muted"><X className="size-3.5" strokeWidth={2} /></button>
                   </span>
                 ))}
-                <input value={draft} onChange={(e) => (e.target.value.endsWith(",") ? addTag(e.target.value) : setDraft(e.target.value))} onKeyDown={onTagKey} onBlur={() => draft && addTag(draft)} placeholder={tags.length ? "" : "Add a keyword and press Enter"} aria-label="Add a keyword" className="min-w-[140px] flex-1 px-1.5 py-1 outline-hidden" />
+                <input value={draft} onChange={(e) => onTagChange(e.target.value)} onPaste={(e) => { const text = e.clipboardData.getData("text"); if (/[,;\n]/.test(text)) { e.preventDefault(); addTag(draft + text); } }} onKeyDown={onTagKey} onBlur={() => draft && addTag(draft)} placeholder={tags.length ? "" : "Add keywords, separated by commas"} aria-label="Add a keyword" className="min-w-[140px] flex-1 px-1.5 py-1 outline-hidden" />
               </div>
               {suggestions.length > 0 && (
                 <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
