@@ -8042,8 +8042,8 @@ p.concept-reel-notice {
   display: flex;
   flex-direction: column;
   border-radius: 0;
-  background: var(--ap-panel);
-  box-shadow: var(--ap-shadow-thumb);
+  background: transparent;
+  box-shadow: none;
   touch-action: pan-y;
 }
 .stage-media {
