@@ -16,15 +16,15 @@ describe("plans", () => {
   it("prices and limits", () => {
     expect([planById("starter").monthly, planById("starter").yearly, planById("starter").monthlyExports]).toEqual([19, 190, 5]);
     expect([planById("simple").monthly, planById("simple").yearly, planById("simple").monthlyExports]).toEqual([35, 350, 10]);
-    expect([planById("business").monthly, planById("business").yearly, planById("business").monthlyExports]).toEqual([79, 790, 30]);
-    expect([planById("team").monthly, planById("team").yearly, planById("team").monthlyExports, planById("team").seats]).toEqual([175, 1750, 150, 5]);
+    expect([planById("business").monthly, planById("business").yearly, planById("business").monthlyExports]).toEqual([49, 490, 30]);
+    expect([planById("team").monthly, planById("team").yearly, planById("team").monthlyExports, planById("team").seats]).toEqual([129, 1290, 150, 5]);
   });
   it("yearly per-month equivalents", () => {
-    expect(PLANS.map((p) => priceFor(p, "yearly").price)).toEqual(["$16", "$29", "$66", "$146"]);
+    expect(PLANS.map((p) => priceFor(p, "yearly").price)).toEqual(["$16", "$29", "$41", "$108"]);
     expect(priceFor(planById("simple"), "yearly").note).toBe("billed $350 yearly");
   });
   it("cost per reel at monthly price", () => {
-    expect(PLANS.map(perReel)).toEqual(["$3.80", "$3.50", "$2.63", "$1.17"]);
+    expect(PLANS.map(perReel)).toEqual(["$3.80", "$3.50", "$1.63", "$0.86"]);
   });
   it("packs: 5/$25, 10/$45, 20/$80", () => {
     expect(EXPORT_PACKS.map((p) => [p.exports, p.price])).toEqual([[5, 25], [10, 45], [20, 80]]);

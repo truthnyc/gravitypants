@@ -83,8 +83,8 @@ export const PLANS: PlanConfig[] = [
     seats: 1,
     monthlyExports: 30,
     sharedExports: false,
-    monthly: 79,
-    yearly: 790,
+    monthly: 49,
+    yearly: 490,
     team: false,
     features: ["Everything in Starter", "30 exports a month", "AI product-link creation: review facts and photos, choose from 3 drafts", "AI headline and subline suggestions", "HTML5 export", "Aimanté insights"],
   },
@@ -95,15 +95,12 @@ export const PLANS: PlanConfig[] = [
     seats: 5,
     monthlyExports: 150,
     sharedExports: true,
-    monthly: 175,
-    yearly: 1750,
+    monthly: 129,
+    yearly: 1290,
     team: true,
     features: ["Everything in Business", "AI product-link creation: review facts and photos, choose from 3 drafts", "AI headline and subline suggestions", "HTML5 export", "You + 4 teammates", "150 exports a month, shared", "Shared brand kits", "Shared templates", "Priority support"],
   },
 ];
-
-/** The plan marked "Most popular" on /pricing. */
-export const POPULAR_PLAN: PlanId = "business";
 
 /** Customer-visible Stripe catalogue copy, derived from the same plan rows shown on /pricing. */
 export function checkoutProductCopy(p: PlanConfig) {
@@ -186,7 +183,7 @@ export const COMPARE: CompareGroup[] = [
 export const FAQ: { q: string; a: string; href?: "/referrals" }[] = [
   { q: "Can I create a reel from a product link?", a: "Yes, on every paid plan. In New ad, choose your size and brand kit and paste a product-page link. Gravity Pants reads the name, price when available, photos and page details. Review What we understood: keep or remove facts and photos, edit what makes the product different and add a must-say line. Then generate three stories, each with a different template matched to its slide count and your selected brand kit. Choose one to open in the editor. The drafts use facts checked against the page, with checks for clichés and unsupported claims; review the result before exporting. Some websites block page reading, so you can use your own photos instead. Product-link AI creation is not included on Free." },
   { q: "Can I try it before paying?", a: "Yes. Every account starts on the Free plan, with no time limit and no card. Your first export has no watermark, and you get 5 more exports with a small Gravity Pants mark. Your reels and brand kit stay saved, and a reel on Aimanté stays live." },
-  { q: "What if I need more than 5 exports on Starter?", a: "For a busy month, buy a pack from Account → Billing: 5 exports for $25, 10 for $45 or 20 for $80. Packs never expire and are available on every paid plan. If you regularly need 20 or more, Business is the better deal: 30 exports a month for $79, about $2.63 a reel." },
+  { q: "What if I need more than 5 exports on Starter?", a: "For a busy month, buy a pack from Account → Billing: 5 exports for $25, 10 for $45 or 20 for $80. Packs never expire and are available on every paid plan. If you regularly need 20 or more, Business is the better deal: 30 exports a month for $49, about $1.63 a reel." },
   { q: "What if I run out of storage?", a: `Free includes 1 GB, Starter 5 GB, Business 20 GB and Team 50 GB for your photos and exports. We email you at 80%. You can free up space from Account → Billing → Free up space, which lists your largest files and keeps anything still used by an ad or a published reel. Or, on any paid plan, add ${STORAGE_ADDON.gb} GB for $${STORAGE_ADDON.price} a month and remove it anytime. Uploads keep working either way.` },
   { q: "How does the referral program work?", a: `${REFERRAL_NOTE} Your link, your credits and the friends who joined are all in Account → Billing. The reward lands when your friend's first export finishes — signing up alone doesn't trigger it.`, href: "/referrals" },
   { q: "What kind of photos work best?", a: "Clear product photos with some space around the product work best. Phone photos are fine: three to five of them make a good reel." },

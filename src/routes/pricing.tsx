@@ -4,7 +4,7 @@ import { Check } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { CheckoutDialog, type CheckoutTarget } from "@/components/billing/CheckoutDialog";
 import { currentWorkspaceId, isPaid, useBilling, useManageBilling } from "@/lib/stillframe/billing";
-import { COMPARE, FAQ, SALE_PLANS, POPULAR_PLAN, REFERRAL_NOTE, TRIAL, YEARLY_LABEL, perReel, priceFor, signupHref, type Billing, type PlanConfig } from "@/lib/stillframe/plans-config";
+import { COMPARE, FAQ, SALE_PLANS, REFERRAL_NOTE, TRIAL, YEARLY_LABEL, perReel, priceFor, signupHref, type Billing, type PlanConfig } from "@/lib/stillframe/plans-config";
 import { SITE_ORIGIN, siteHead } from "@/lib/site/seo";
 
 export const Route = createFileRoute("/pricing")({
@@ -43,13 +43,12 @@ function CellView({ v }: { v: string | boolean }) {
 }
 
 function Pricing() {
-  const [billing, setBilling] = useState<Billing>("yearly");
+  const [billing, setBilling] = useState<Billing>("monthly");
   const [open, setOpen] = useState<number | null>(0);
   const [checkout, setCheckout] = useState<CheckoutTarget | null>(null);
   const { data: appBilling } = useBilling();
   const manage = useManageBilling();
   const cols = [TRIAL.name, ...SALE_PLANS.map((p) => p.name)];
-  const popName = SALE_PLANS.find((p) => p.id === POPULAR_PLAN)!.name;
 
   // Signed-in users pay right away and the workspace switches to the plan; visitors sign up first.
   async function choose(p: PlanConfig) {
@@ -92,15 +91,13 @@ function Pricing() {
             </article>
             {SALE_PLANS.map((p) => {
               const pr = priceFor(p, billing);
-              const pop = p.id === POPULAR_PLAN;
               return (
-                  <article key={p.id} className={`pr-tier${pop ? " pop" : ""}`}>
-                  {pop && <span className="pr-badge">Most popular</span>}
+                  <article key={p.id} className="pr-tier">
                   <div className="pr-tier-top"><h3>{p.name}</h3><p>{p.tagline}</p></div>
                   <div className="pr-price"><b>{pr.price}</b><span>{pr.per}</span></div>
                   <span className="pr-note">{pr.note}</span>
                   <span className="pr-reel">{perReel(p)} per reel</span>
-                  <button type="button" data-cta={`choose-${p.id.replace(/_yearly$/, "")}`} onClick={() => void choose(p)} className={`pr-btn ${pop ? "pri" : "sec"} full`}>Choose {p.name}</button>
+                  <button type="button" data-cta={`choose-${p.id.replace(/_yearly$/, "")}`} onClick={() => void choose(p)} className="pr-btn sec full">Choose {p.name}</button>
                   <ul>{p.features.map((f) => <li key={f}><Tick /><span>{f}</span></li>)}</ul>
                 </article>
               );
@@ -113,7 +110,7 @@ function Pricing() {
         <section className="pr-compare">
           <h2 className="site-h2">Compare plans</h2>
           <table className="pr-cmp">
-            <thead><tr><th scope="col"><span className="sr-only">Feature</span></th>{cols.map((c) => <th key={c} scope="col" className={c === popName ? "simple" : undefined}>{c}</th>)}</tr></thead>
+            <thead><tr><th scope="col"><span className="sr-only">Feature</span></th>{cols.map((c) => <th key={c} scope="col">{c}</th>)}</tr></thead>
             <tbody>
               {COMPARE.flatMap((g) => [
                 <tr key={g.group} className="grp"><th colSpan={cols.length + 1} scope="colgroup">{g.group}</th></tr>,
