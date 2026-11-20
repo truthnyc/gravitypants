@@ -24,7 +24,9 @@ export const Route = createFileRoute("/api/public/jobs/storage-alerts")({
           if (!uuid.test(row.workspace_id)) continue;
           const used = Number(row.bytes);
           const { data: plan } = await db.rpc("directory_effective_plan", { _ws: row.workspace_id });
-          const limit = storageLimitFor(plan);
+          const { data: src } = await db.rpc("billing_source", { _ws: row.workspace_id });
+          const { data: wb } = await db.from("workspace_billing").select("storage_addon_units").eq("workspace_id", src ?? row.workspace_id).maybeSingle();
+          const limit = storageLimitFor(plan, wb?.storage_addon_units ?? 0);
           const action = storageAlertAction(used, limit, alerted.has(row.workspace_id));
           if (action === "reset") await db.from("storage_alerts").delete().eq("workspace_id", row.workspace_id);
           if (action !== "send") continue;

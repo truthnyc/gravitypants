@@ -17,9 +17,12 @@ const Email = ({ workspaceName, used = '4.0 GB', limit = '5 GB', percent = 80 }:
           {workspaceName ? `${workspaceName} is` : 'Your workspace is'} using {used} of its {limit} storage.
         </Text>
         <Text style={brandText}>
-          To keep room for new photos and exports, delete ads or photos you no longer need, or move to a plan with more space.
+          To keep room for new photos and exports, free up space by deleting old photos and exports, or add 10 GB for $5 a month.
         </Text>
-        <Button style={brandButton} href="https://gravitypants.com/app/ads">Review your ads</Button>
+        <Button style={brandButton} href="https://gravitypants.com/app/storage">Free up space</Button>
+        <Text style={brandText}>
+          Prefer more room? <a href="https://gravitypants.com/app/account/billing#storage">Add storage</a>
+        </Text>
         <Text style={brandFooter}>Gravity Pants · You're getting this because you own a Gravity Pants workspace.</Text>
       </Container>
     </Body>

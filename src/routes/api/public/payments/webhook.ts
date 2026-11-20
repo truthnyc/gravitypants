@@ -1,3 +1,4 @@
+import { STORAGE_ADDON } from "@/lib/stillframe/storage-limits";
 import { EXPORT_PACKS } from "@/lib/stillframe/plans-config";
 import { createFileRoute } from "@tanstack/react-router";
 import { type StripeEnv, verifyWebhook } from "@/lib/stripe.server";
@@ -69,9 +70,12 @@ async function syncSubscription(sub: any, env: StripeEnv, deleted = false) {
     // Throw so the webhook answers 400 and Stripe retries instead of dropping the sync.
     throw new Error(`Subscription without workspace ${sub.id}`);
   }
-  const item = sub.items?.data?.[0];
-  const key = item?.price?.lookup_key || item?.price?.metadata?.lovable_external_id || "";
+  const keyOf = (i: any) => i?.price?.lookup_key || i?.price?.metadata?.lovable_external_id || "";
+  const items: any[] = sub.items?.data ?? [];
+  const item = items.find((i) => PLAN_BY_PRICE[keyOf(i)]) ?? items[0];
+  const key = keyOf(item);
   const plan = PLAN_BY_PRICE[key];
+  const storageItem = items.find((i) => keyOf(i) === STORAGE_ADDON.priceId);
   await db
     .from("workspace_billing")
     .update({
@@ -83,6 +87,7 @@ async function syncSubscription(sub: any, env: StripeEnv, deleted = false) {
       current_period_start: iso(item?.current_period_start ?? sub.current_period_start),
       current_period_end: iso(item?.current_period_end ?? sub.current_period_end),
       cancel_at_period_end: Boolean(sub.cancel_at_period_end || sub.cancel_at),
+      storage_addon_units: deleted ? 0 : Number(storageItem?.quantity ?? 0),
     })
     .eq("workspace_id", ws);
   return { ws, plan };

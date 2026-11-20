@@ -337,6 +337,20 @@
       "when": 1795101833818,
       "tag": "0047_migration",
       "breakpoints": true
+    },
+    {
+      "idx": 48,
+      "version": "7",
+      "when": 1795140198267,
+      "tag": "0048_storage_addon_and_usage",
+      "breakpoints": true
+    },
+    {
+      "idx": 49,
+      "version": "7",
+      "when": 1795140655597,
+      "tag": "0049_faster_workspace_storage_files",
+      "breakpoints": true
     }
   ]
 }

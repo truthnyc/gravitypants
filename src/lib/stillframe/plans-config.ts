@@ -1,3 +1,4 @@
+import { STORAGE_ADDON, STORAGE_LIMITS } from "./storage-limits";
 /**
  * The one place prices, limits and features for every plan are defined.
  * Read by the public /pricing page and by the app's plan checks (plan.ts, plan-map.ts).
@@ -155,6 +156,8 @@ export const COMPARE: CompareGroup[] = [
       { label: "Exports a month", cells: byPlan(`${TRIAL.exports} in total`, (p) => (p.sharedExports ? `${p.monthlyExports}, shared` : String(p.monthlyExports))) },
       { label: "Watermark", cells: byPlan("After first export", () => "No") },
       { label: "Export packs", cells: byPlan(false, () => true) },
+      { label: "Storage", cells: byPlan(`${STORAGE_LIMITS["free"]! / 1024 ** 3} GB`, (p) => `${(STORAGE_LIMITS[p.id] ?? 0) / 1024 ** 3} GB`) },
+      { label: `Extra storage, +${STORAGE_ADDON.gb} GB for $${STORAGE_ADDON.price}/month`, cells: byPlan(false, () => true) },
       { label: "Aimanté brand page", href: "https://aimante.co/join", cells: byPlan("Your page, reels without a watermark", (p) => (HTML5_TIERS.includes(p.id) ? "Full page + insights" : "Full page, unlimited reels")) },
     ],
   },
@@ -184,6 +187,7 @@ export const FAQ: { q: string; a: string; href?: "/referrals" }[] = [
   { q: "Can I create a reel from a product link?", a: "Yes, on every paid plan. In New ad, choose your size and brand kit and paste a product-page link. Gravity Pants reads the name, price when available, photos and page details. Review What we understood: keep or remove facts and photos, edit what makes the product different and add a must-say line. Then generate three stories, each with a different template matched to its slide count and your selected brand kit. Choose one to open in the editor. The drafts use facts checked against the page, with checks for clichés and unsupported claims; review the result before exporting. Some websites block page reading, so you can use your own photos instead. Product-link AI creation is not included on Free." },
   { q: "Can I try it before paying?", a: "Yes. Every account starts on the Free plan, with no time limit and no card. Your first export has no watermark, and you get 5 more exports with a small Gravity Pants mark. Your reels and brand kit stay saved, and a reel on Aimanté stays live." },
   { q: "What if I need more than 5 exports on Starter?", a: "For a busy month, buy a pack from Account → Billing: 5 exports for $25, 10 for $45 or 20 for $80. Packs never expire and are available on every paid plan. If you regularly need 20 or more, Business is the better deal: 30 exports a month for $79, about $2.63 a reel." },
+  { q: "What if I run out of storage?", a: `Free includes 1 GB, Starter 5 GB, Business 20 GB and Team 50 GB for your photos and exports. We email you at 80%. You can free up space from Account → Billing → Free up space, which lists your largest files and keeps anything still used by an ad or a published reel. Or, on any paid plan, add ${STORAGE_ADDON.gb} GB for $${STORAGE_ADDON.price} a month and remove it anytime. Uploads keep working either way.` },
   { q: "How does the referral program work?", a: `${REFERRAL_NOTE} Your link, your credits and the friends who joined are all in Account → Billing. The reward lands when your friend's first export finishes — signing up alone doesn't trigger it.`, href: "/referrals" },
   { q: "What kind of photos work best?", a: "Clear product photos with some space around the product work best. Phone photos are fine: three to five of them make a good reel." },
   { q: "Which formats can I export?", a: "Choose Vertical 9:16 for Reels, Stories and TikTok; Portrait 4:5, recommended for Instagram, Facebook and LinkedIn feeds; Square 1:1 for square posts; Wide 5:4 for websites, Facebook and LinkedIn feeds; or Landscape 16:9 for banners and YouTube. Custom sizes are available too. Each selected shape exports as MP4, GIF or both. HTML5 is on Business and Team." },

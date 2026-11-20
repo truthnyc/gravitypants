@@ -102,6 +102,7 @@ import { Route as AuthenticatedAppGuideRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAppHelpRouteImport } from './routes/_authenticated/app/help'
 import { Route as AuthenticatedAppNewRouteImport } from './routes/_authenticated/app/new'
 import { Route as AuthenticatedAppStatsRouteImport } from './routes/_authenticated/app/stats'
+import { Route as AuthenticatedAppStorageRouteImport } from './routes/_authenticated/app/storage'
 import { Route as AimanteGuidesIndexRouteImport } from './routes/aimante.guides.index'
 import { Route as AimanteGuidesSlugRouteImport } from './routes/aimante.guides.$slug'
 import { Route as ApiPublicCleanupExportsRouteImport } from './routes/api/public/cleanup-exports'
@@ -633,6 +634,11 @@ const AuthenticatedAppStatsRoute = AuthenticatedAppStatsRouteImport.update({
   path: '/stats',
   getParentRoute: () => AuthenticatedAppRouteRoute,
 } as any)
+const AuthenticatedAppStorageRoute = AuthenticatedAppStorageRouteImport.update({
+  id: '/storage',
+  path: '/storage',
+  getParentRoute: () => AuthenticatedAppRouteRoute,
+} as any)
 const AimanteGuidesIndexRoute = AimanteGuidesIndexRouteImport.update({
   id: '/aimante/guides/',
   path: '/aimante/guides/',
@@ -980,6 +986,7 @@ export interface FileRoutesByFullPath {
   '/app/help': typeof AuthenticatedAppHelpRoute
   '/app/new': typeof AuthenticatedAppNewRoute
   '/app/stats': typeof AuthenticatedAppStatsRoute
+  '/app/storage': typeof AuthenticatedAppStorageRoute
   '/aimante/guides/$slug': typeof AimanteGuidesSlugRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
   '/api/public/client-error': typeof ApiPublicClientErrorRoute
@@ -1117,6 +1124,7 @@ export interface FileRoutesByTo {
   '/app/help': typeof AuthenticatedAppHelpRoute
   '/app/new': typeof AuthenticatedAppNewRoute
   '/app/stats': typeof AuthenticatedAppStatsRoute
+  '/app/storage': typeof AuthenticatedAppStorageRoute
   '/aimante/guides/$slug': typeof AimanteGuidesSlugRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
   '/api/public/client-error': typeof ApiPublicClientErrorRoute
@@ -1259,6 +1267,7 @@ export interface FileRoutesById {
   '/_authenticated/app/help': typeof AuthenticatedAppHelpRoute
   '/_authenticated/app/new': typeof AuthenticatedAppNewRoute
   '/_authenticated/app/stats': typeof AuthenticatedAppStatsRoute
+  '/_authenticated/app/storage': typeof AuthenticatedAppStorageRoute
   '/aimante/guides/$slug': typeof AimanteGuidesSlugRoute
   '/api/public/cleanup-exports': typeof ApiPublicCleanupExportsRoute
   '/api/public/client-error': typeof ApiPublicClientErrorRoute
@@ -1401,6 +1410,7 @@ export interface FileRouteTypes {
     | '/app/help'
     | '/app/new'
     | '/app/stats'
+    | '/app/storage'
     | '/aimante/guides/$slug'
     | '/api/public/cleanup-exports'
     | '/api/public/client-error'
@@ -1538,6 +1548,7 @@ export interface FileRouteTypes {
     | '/app/help'
     | '/app/new'
     | '/app/stats'
+    | '/app/storage'
     | '/aimante/guides/$slug'
     | '/api/public/cleanup-exports'
     | '/api/public/client-error'
@@ -1679,6 +1690,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/help'
     | '/_authenticated/app/new'
     | '/_authenticated/app/stats'
+    | '/_authenticated/app/storage'
     | '/aimante/guides/$slug'
     | '/api/public/cleanup-exports'
     | '/api/public/client-error'
@@ -2465,6 +2477,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppStatsRouteImport
       parentRoute: typeof AuthenticatedAppRouteRoute
     }
+    '/_authenticated/app/storage': {
+      id: '/_authenticated/app/storage'
+      path: '/storage'
+      fullPath: '/app/storage'
+      preLoaderRoute: typeof AuthenticatedAppStorageRouteImport
+      parentRoute: typeof AuthenticatedAppRouteRoute
+    }
     '/aimante/guides/': {
       id: '/aimante/guides/'
       path: '/aimante/guides'
@@ -2880,6 +2899,7 @@ interface AuthenticatedAppRouteRouteChildren {
   AuthenticatedAppHelpRoute: typeof AuthenticatedAppHelpRoute
   AuthenticatedAppNewRoute: typeof AuthenticatedAppNewRoute
   AuthenticatedAppStatsRoute: typeof AuthenticatedAppStatsRoute
+  AuthenticatedAppStorageRoute: typeof AuthenticatedAppStorageRoute
   AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
   AuthenticatedAppAccountBillingRoute: typeof AuthenticatedAppAccountBillingRoute
   AuthenticatedAppAccountBrandKitRoute: typeof AuthenticatedAppAccountBrandKitRoute
@@ -2910,6 +2930,7 @@ const AuthenticatedAppRouteRouteChildren: AuthenticatedAppRouteRouteChildren = {
   AuthenticatedAppHelpRoute: AuthenticatedAppHelpRoute,
   AuthenticatedAppNewRoute: AuthenticatedAppNewRoute,
   AuthenticatedAppStatsRoute: AuthenticatedAppStatsRoute,
+  AuthenticatedAppStorageRoute: AuthenticatedAppStorageRoute,
   AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
   AuthenticatedAppAccountBillingRoute: AuthenticatedAppAccountBillingRoute,
   AuthenticatedAppAccountBrandKitRoute: AuthenticatedAppAccountBrandKitRoute,

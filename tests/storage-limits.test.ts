@@ -10,4 +10,7 @@ describe("storage limits", () => {
   it("no send below 80%", () => expect(storageAlertAction(0.79 * GB, GB, false)).toBe("none"));
   it("sends only once", () => expect(storageAlertAction(0.9 * GB, GB, true)).toBe("none"));
   it("resets below 80%", () => expect(storageAlertAction(0.5 * GB, GB, true)).toBe("reset"));
+  it("one add-on adds 10 GB on Starter", () => expect(storageLimitFor("starter", 1)).toBe(15 * GB));
+  it("add-ons stack", () => expect(storageLimitFor("business_yearly", 3)).toBe(50 * GB));
+  it("free never gets add-on space", () => expect(storageLimitFor(null, 2)).toBe(1 * GB));
 });

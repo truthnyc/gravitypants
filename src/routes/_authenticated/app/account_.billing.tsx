@@ -4,6 +4,7 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { AccountTabs } from "@/components/billing/AccountTabs";
 import { TopUpCard } from "@/components/billing/TopUp";
+import { StorageCard } from "@/components/billing/StorageCard";
 import { ReferralCard } from "@/components/billing/ReferralCard";
 import { BillingHelp } from "@/components/billing/BillingHelp";
 import { type ExportStatus, isPaid, money, planName, statusLine, useBilling, useExportStatus, useManageBilling, usePlans, useRefreshBilling } from "@/lib/stillframe/billing";
@@ -135,6 +136,7 @@ function BillingPage() {
       </section>
 
       {canManage && <TopUpCard extras={status?.extras ?? billing?.extra_exports} />}
+      <StorageCard canManage={canManage} />
       <ReferralCard />
       {canManage && <BillingHelp />}
     </main>

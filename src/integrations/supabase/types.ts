@@ -2299,6 +2299,7 @@ export type Database = {
           plan: string
           referral_credits: number
           status: string
+          storage_addon_units: number
           stripe_customer_id: string | null
           stripe_subscription_id: string | null
           trial_ends_at: string
@@ -2319,6 +2320,7 @@ export type Database = {
           plan?: string
           referral_credits?: number
           status?: string
+          storage_addon_units?: number
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           trial_ends_at?: string
@@ -2339,6 +2341,7 @@ export type Database = {
           plan?: string
           referral_credits?: number
           status?: string
+          storage_addon_units?: number
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           trial_ends_at?: string
@@ -2621,6 +2624,16 @@ export type Database = {
         }[]
       }
       workspace_seats: { Args: { _ws: string }; Returns: number }
+      workspace_storage_files: {
+        Args: { _ws: string }
+        Returns: {
+          bytes: number
+          created_at: string
+          in_use: boolean
+          kind: string
+          name: string
+        }[]
+      }
     }
     Enums: {
       app_role: "admin"
