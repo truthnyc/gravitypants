@@ -13,7 +13,7 @@ async function graph(path: string, init?: { method?: string; body?: Record<strin
   const res = await fetch(`${GATEWAY}${path}`, {
     method: init?.method ?? "GET",
     headers: { Authorization: `Bearer ${lovable}`, "X-Connection-Api-Key": conn, "Content-Type": "application/x-www-form-urlencoded" },
-    body: init?.body ? new URLSearchParams(init.body).toString() : undefined,
+    body: init?.body ? new URLSearchParams(init.body).toString() : null,
   });
   const text = await res.text();
   if (!res.ok) { console.error(`Instagram request failed [${res.status}]: ${text}`); throw new Error(`Instagram said no [${res.status}]: ${text.slice(0, 300)}`); }
