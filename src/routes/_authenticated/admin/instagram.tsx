@@ -3,13 +3,15 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Check, Copy, Download, Instagram } from "lucide-react";
+import { Check, Copy, Download, Instagram, Send } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, PageTitle } from "@/components/admin/AdminShell";
 import { instagramFeed, type InstagramReel } from "@/lib/site/instagram-feed.functions";
+import { startInstagramPost, checkInstagramPost } from "@/lib/site/instagram-publish.functions";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 export const Route = createFileRoute("/_authenticated/admin/instagram")({
   head: () => ({ meta: [
@@ -84,6 +86,31 @@ function PostDialog({ reel, onClose, onPosted, copy }: { reel: InstagramReel; on
   const [handles, setHandles] = useState("");
   const [keywords, setKeywords] = useState(reel.keywords.join(", "));
   const full = [caption, handles.trim() && `Credits: ${handles.trim()}`, tags].filter(Boolean).join("\n\n");
+  const start = useServerFn(startInstagramPost);
+  const check = useServerFn(checkInstagramPost);
+  const [confirm, setConfirm] = useState(false);
+  const [busy, setBusy] = useState<string | null>(null);
+  const publish = async () => {
+    setConfirm(false);
+    setBusy("Uploading to Instagram…");
+    try {
+      const { containerId } = await start({ data: { reelId: reel.id, caption: full, coverAlt: keywords } });
+      setBusy("Instagram is processing the video…");
+      for (let i = 0; i < 60; i++) {
+        await new Promise((r) => setTimeout(r, 5000));
+        const s = await check({ data: { reelId: reel.id, containerId } });
+        if (s.state === "published") {
+          toast.success("Posted to @gravity.pants", s.permalink ? { action: { label: "Open", onClick: () => window.open(s.permalink!, "_blank") } } : undefined);
+          onPosted();
+          return;
+        }
+        if (s.state === "failed") throw new Error(`Instagram couldn't process the video: ${s.message}`);
+      }
+      throw new Error("Instagram is still processing. Check @gravity.pants in a few minutes.");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Couldn't post to Instagram.");
+    } finally { setBusy(null); }
+  };
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-h-[90dvh] max-w-2xl overflow-y-auto">
@@ -104,12 +131,25 @@ function PostDialog({ reel, onClose, onPosted, copy }: { reel: InstagramReel; on
             <p className="text-[12px] text-secondary-text">Only add handles you've checked on Instagram.{reel.brandWebsite ? <> Brand site: <a className="text-primary underline" href={reel.brandWebsite} target="_blank" rel="noreferrer">{reel.brandWebsite}</a></> : null}</p>
             <label className="block text-[13px] font-medium">Keywords (cover alt text)<Input value={keywords} onChange={(e) => setKeywords(e.target.value)} className="mt-1" /></label>
             <div className="flex flex-wrap gap-2 pt-1">
-              <Button size="sm" onClick={() => copy(full, "Post text")}><Copy strokeWidth={1.7} /> Copy post text</Button>
+              <Button size="sm" disabled={!reel.video || !!busy || full.length > 2200} onClick={() => setConfirm(true)}><Send strokeWidth={1.7} /> {busy ?? "Post to Instagram"}</Button>
+              <Button size="sm" variant="outline" onClick={() => copy(full, "Post text")}><Copy strokeWidth={1.7} /> Copy post text</Button>
               <Button size="sm" variant="outline" onClick={() => copy(keywords, "Keywords")}><Copy strokeWidth={1.7} /> Keywords</Button>
               <Button size="sm" variant="outline" onClick={onPosted}><Check strokeWidth={1.7} /> Mark posted</Button>
             </div>
           </div>
         </div>
+        <AlertDialog open={confirm} onOpenChange={setConfirm}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Post this reel to @gravity.pants?</AlertDialogTitle>
+              <AlertDialogDescription>It goes live on Instagram right away with the caption, credits and hashtags shown. You can only post each reel once from here.</AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={publish}>Post now</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </DialogContent>
     </Dialog>
   );
