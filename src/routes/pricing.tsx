@@ -115,14 +115,14 @@ function Pricing() {
               {COMPARE.flatMap((g) => [
                 <tr key={g.group} className="grp"><th colSpan={cols.length + 1} scope="colgroup">{g.group}</th></tr>,
                 ...g.rows.map((r) => (
-                  <tr key={g.group + r.label}><th scope="row">{r.href ? <a href={r.href}>{r.label}</a> : r.label}</th>{r.cells.map((c, i) => <td key={i} className={cols[i] === popName ? "simple" : undefined}><CellView v={c} /></td>)}</tr>
+                  <tr key={g.group + r.label}><th scope="row">{r.href ? <a href={r.href}>{r.label}</a> : r.label}</th>{r.cells.map((c, i) => <td key={i}><CellView v={c} /></td>)}</tr>
                 )),
               ])}
             </tbody>
           </table>
           <div className="pr-cmp-cards">
             {cols.map((c, i) => (
-              <div key={c} className={`pr-cmp-card${c === popName ? " pop" : ""}`}>
+              <div key={c} className="pr-cmp-card">
                 <h3>{c}</h3>
                 {COMPARE.map((g) => (
                   <div key={g.group}>
