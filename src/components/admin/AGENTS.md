@@ -1,0 +1,2 @@
+# Admin reporting
+- GoogleAdsTab reads only the staff-verified adminGoogleAdsReport; its server helper uses the configured account and provider currency/time zone, with account-level daily totals distinct from campaign rows, so private credentials and reporting grains never reach the browser incorrectly.

@@ -7,14 +7,16 @@ import { Download } from "lucide-react";
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
+import { GoogleAdsTab } from "@/components/admin/GoogleAdsTab";
 import { Card, fmtMoney, PageTitle } from "@/components/admin/AdminShell";
 import { newsletterStats } from "@/lib/site/newsletter-stats.functions";
 import { adminSignupSources } from "@/lib/stillframe/admin.functions";
 import { adminAnalytics, adminSearch, getReportPrefs, setReportPrefs } from "@/lib/stillframe/admin-analytics.functions";
 
-const TABS = ["traffic", "funnel", "search", "marketing", "revenue", "newsletter"] as const;
+const TABS = ["traffic", "funnel", "search", "ads", "marketing", "revenue", "newsletter"] as const;
 type Tab = (typeof TABS)[number];
-const LABEL: Record<Tab, string> = { traffic: "Traffic", funnel: "Funnel", search: "Google Search", marketing: "Marketing", revenue: "Revenue", newsletter: "Newsletter" };
+const LABEL: Record<Tab, string> = { traffic: "Traffic", funnel: "Funnel", search: "Google Search", ads: "Google Ads", marketing: "Marketing", revenue: "Revenue", newsletter: "Newsletter" };
 
 export const Route = createFileRoute("/_authenticated/admin/analytics")({
   validateSearch: (s) => z.object({ tab: z.enum(TABS).catch("traffic") }).parse(s),
@@ -49,16 +51,16 @@ function Analytics() {
   const [from, setFrom] = useState(ago(29));
   const [to, setTo] = useState(ago(0));
   const fn = useServerFn(adminAnalytics);
-  const { data, error } = useQuery({ queryKey: ["admin", "analytics", from, to], queryFn: () => fn({ data: { from, to } }), enabled: tab !== "search" && tab !== "newsletter" });
+  const { data, error } = useQuery({ queryKey: ["admin", "analytics", from, to], queryFn: () => fn({ data: { from, to } }), enabled: tab !== "search" && tab !== "newsletter" && tab !== "ads" });
 
   return (
     <>
       <PageTitle title="Analytics" sub="Traffic, conversion, search and revenue." right={<WeeklyToggle />} />
       <div className="mb-4 flex flex-wrap items-center gap-2">
-        <div role="tablist" className="flex gap-1 rounded-lg bg-control-fill p-1">
+        <div role="tablist" className="flex max-w-full flex-wrap gap-1 rounded-lg bg-control-fill p-1">
           {TABS.map((t) => (
-            <button key={t} role="tab" aria-selected={tab === t} onClick={() => navigate({ search: { tab: t } })}
-              className={`h-8 rounded-lg px-3 text-[13px] font-medium ${tab === t ? "bg-card shadow-card" : "text-secondary-text"}`}>{LABEL[t]}</button>
+            <Button variant="ghost" key={t} role="tab" aria-selected={tab === t} onClick={() => navigate({ search: { tab: t } })}
+              className={`h-8 rounded-lg px-3 text-[13px] font-medium ${tab === t ? "bg-card shadow-card" : "text-secondary-text"}`}>{LABEL[t]}</Button>
           ))}
         </div>
         {tab !== "search" && tab !== "newsletter" && (
@@ -71,7 +73,7 @@ function Analytics() {
           </div>
         )}
       </div>
-      {tab === "search" ? <SearchTab /> : tab === "newsletter" ? <NewsletterTab /> : error ? <p className="text-destructive">Couldn't load analytics.</p> : !data ? <div aria-busy="true" className="h-96" /> : (
+      {tab === "search" ? <SearchTab /> : tab === "ads" ? <GoogleAdsTab from={from} to={to} /> : tab === "newsletter" ? <NewsletterTab /> : error ? <p className="text-destructive">Couldn't load analytics.</p> : !data ? <div aria-busy="true" className="h-96" /> : (
         <>
           {tab === "traffic" && (
             <>
@@ -91,7 +93,7 @@ function Analytics() {
               <Table cols={["Source", "Campaign", "Sign-ups", "Paid", "Conversion"]}
                 rows={data.marketing.map((m) => [m.source, m.campaign, m.signups, m.paid, pct(m.signups ? m.paid / m.signups : 0)])}
                 empty="No sign-ups in this period. Add utm_source and utm_campaign to your ad links to see campaigns here." />
-              <p className="px-4 pb-4 text-[13px] text-secondary-text">Ad spend appears here once Google Ads or Meta Ads is connected.</p>
+              <p className="px-4 pb-4 text-[13px] text-secondary-text">Paid campaign results appear in Google Ads.</p>
             </Card>
           )}
           {tab === "marketing" && <SignupSources />}

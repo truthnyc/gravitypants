@@ -1,4 +1,6 @@
 # Launch video correction
+## Google Ads analytics
+- [x] Add staff-only live Google Ads reporting and dedicated Analytics tab; signed-in real account data, date filters, CSV and mobile layout verified; four reporting/tag tests pass. Preview only.
 ## Product-link AI public pages
 - [x] Describe page understanding, fact/photo review and three story drafts on Features, How it works, homepage, Pricing and Help; preserve paid-only availability and existing pricing. Verified all five pages at desktop/phone sizes with no overflow; 25 pricing/metadata tests pass. Preview only.
 ## Agent integrations
