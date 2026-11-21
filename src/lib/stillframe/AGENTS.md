@@ -7,6 +7,7 @@
 - Billing uses `peekWorkspaceId()`, refuses duplicate subscriptions server-side, and switches via Manage Billing; `signup-choice.ts` stores only a per-user suggestion, never paid access.
 - Pre-release billing checks: `bun run test` (unit) and `bun run check:billing` (test-mode checkout per plan, portal, plan change, DB plan values).
 - Export sizes and platform shortcuts live only in `export-sizes.ts`; 4:5 and custom shapes render via `renderAt` with the nearest built-in layout — one config, no second drawing path.
+- Export defaults and every segmented-control option list live only in `export-quality.ts`, and each default must appear in its own list (tests/export-quality.test.ts) so the export screen always opens on a selectable setting.
 - Main size: `projects.primary_format` is the ad's main size; `main-size.ts` holds the five size names and `refitForMainSize`; header `AdPills` changes it on every step; preview size is temporary UI state.
 - Plan gates: every feature check goes through `usePlanAccess().canUse(feature)` in `src/lib/stillframe/plan.ts`; blocked features call `openUpgrade()` (one shared dialog) instead of hiding — one place for plan rules.
 - Templates are photo-less styles; examples reuse `insertCopy`; imported system templates preserve per-slide overrides and logo visibility.

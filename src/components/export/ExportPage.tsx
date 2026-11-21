@@ -45,7 +45,7 @@ import { RadioGroup } from "@/components/ui/radio-group";
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import { PlanCards } from "@/components/billing/PlanCards";
 
-import { DEFAULT_EXPORT_FORMATS, DEFAULT_VIDEO_FPS, DEFAULT_GIF_LOOP, DEFAULT_GIF_QUALITY, GIF_PRESETS, matchingGifPreset, estimateExportBytes, type GifSize, type GifPresetId } from "@/lib/stillframe/export-quality";
+import { DEFAULT_EXPORT_FORMATS, DEFAULT_VIDEO_FPS, DEFAULT_GIF_LOOP, DEFAULT_GIF_QUALITY, GIF_PRESETS, GIF_SIZE_OPTIONS, GIF_COLOR_OPTIONS, GIF_FPS_OPTIONS, VIDEO_FPS_OPTIONS, matchingGifPreset, estimateExportBytes, type GifSize, type GifPresetId } from "@/lib/stillframe/export-quality";
 type Target = { key: string; name: string; ratio: string; format: Format; width: number; height: number; custom?: boolean };
 type CustomRow = { id: string; w: string; h: string };
 type FileRow = { sizeName: string; ratio: string; name: string; kind: "mp4" | "gif" | "html5"; job: string; width: number; height: number };
@@ -121,7 +121,7 @@ export function ExportPage({ project, frames }: { project: Project; frames: Fram
     if (!preset) return;
     setGSize(preset.size); setGColors(preset.colors); setGFps(preset.fps);
   };
-  const qualitySummary = [mp4 && `${fps === 24 ? "Film" : fps === 60 ? "Smooth" : "Standard"} ${fps} fps`, gif && (gifPreset ? `GIF ${gifPreset === "small" ? "small file" : gifPreset}` : "GIF custom")].filter(Boolean).join(" · ");
+  const qualitySummary = [mp4 && `${fps === 24 ? "Film" : fps === 60 ? "Smooth" : "Standard"} ${fps} fps`, gif && (gifPreset ? `GIF ${gifPreset === "small" ? "small file" : gifPreset}` : `GIF ${gSize} · ${gColors} · ${gFps} fps`)].filter(Boolean).join(" · ");
 
   const validCustoms = useMemo(
     () => (customOn ? customs.flatMap((c) => {
@@ -815,7 +815,7 @@ function QualitySettings({ mp4, gif, fps, setFps, gSize, setGSize, gColors, setG
               {!mp4 && !gif && <p className="mt-4 text-[13px] text-ap-muted">Pick a format to see its options.</p>}
               <Reveal show={mp4}>
                 <div className="mt-5 mb-2 text-[13px] font-semibold">Video motion</div>
-                <Seg label="Video motion" value={fps} onChange={setFps} options={[{ v: 24, l: "Film", s: "24 fps" }, { v: 30, l: "Standard", s: "30 fps" }, { v: 60, l: "Smooth", s: "60 fps" }]} />
+                <Seg label="Video motion" value={fps} onChange={setFps} options={VIDEO_FPS_OPTIONS} />
               </Reveal>
               <Reveal show={gif}>
                 <div className="mt-6 border-t border-ap-hairline pt-5">
@@ -826,9 +826,9 @@ function QualitySettings({ mp4, gif, fps, setFps, gSize, setGSize, gColors, setG
                   <Collapsible open={advancedOpen} onOpenChange={setAdvancedOpen} className="mt-3">
                     <CollapsibleTrigger asChild><Button variant="ghost" className="h-7 px-0 text-[13px] font-normal text-ap-blue">Advanced <ChevronDown className={cn("size-3", advancedOpen && "rotate-180")} strokeWidth={1.7} /></Button></CollapsibleTrigger>
                     <CollapsibleContent className="mt-3 space-y-3">
-                      <Sub label="Size"><Seg label="GIF size" value={gSize} onChange={setGSize} options={[{ v: "full", l: "Full" }, { v: "half", l: "Half" }, { v: "small", l: "Small", s: "480px" }]} /></Sub>
-                      <Sub label="Colors"><Seg label="GIF colors" value={gColors} onChange={setGColors} options={[{ v: "best", l: "Best" }, { v: "balanced", l: "Balanced" }, { v: "smallest", l: "Smallest" }]} /></Sub>
-                      <Sub label="Frame rate"><Seg label="GIF frame rate" value={gFps} onChange={setGFps} options={[{ v: 25, l: "High", s: "25 fps" }, { v: 15, l: "Medium", s: "15 fps" }, { v: 10, l: "Low", s: "10 fps" }]} /></Sub>
+                      <Sub label="Size"><Seg label="GIF size" value={gSize} onChange={setGSize} options={GIF_SIZE_OPTIONS} /></Sub>
+                      <Sub label="Colors"><Seg label="GIF colors" value={gColors} onChange={setGColors} options={GIF_COLOR_OPTIONS} /></Sub>
+                      <Sub label="Frame rate"><Seg label="GIF frame rate" value={gFps} onChange={setGFps} options={GIF_FPS_OPTIONS} /></Sub>
                     </CollapsibleContent>
                   </Collapsible>
                   {gSize === "full" && <p className="mt-3 text-[12px] text-ap-amber">Full-size GIFs are large files. Pick Balanced or Small for email.</p>}

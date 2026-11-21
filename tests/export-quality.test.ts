@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { DEFAULT_EXPORT_FORMATS, DEFAULT_VIDEO_FPS, DEFAULT_GIF_LOOP, DEFAULT_GIF_QUALITY, GIF_PRESETS, matchingGifPreset, exportSelectionCount, estimateExportBytes } from "@/lib/stillframe/export-quality";
+import { DEFAULT_EXPORT_FORMATS, DEFAULT_VIDEO_FPS, DEFAULT_GIF_LOOP, DEFAULT_GIF_QUALITY, GIF_PRESETS, GIF_SIZE_OPTIONS, GIF_COLOR_OPTIONS, GIF_FPS_OPTIONS, VIDEO_FPS_OPTIONS, matchingGifPreset, exportSelectionCount, estimateExportBytes } from "@/lib/stillframe/export-quality";
 describe("export quality rules", () => {
   it("estimates each format using duration, output dimensions and selected quality", () => {
     expect(estimateExportBytes("mp4", 1080, 1350, 13.5, 30)).toBe(10_125_000);
@@ -14,13 +14,24 @@ describe("export quality rules", () => {
     expect(exportSelectionCount(0, 2)).toBe(0);
     expect(exportSelectionCount(2, 0)).toBe(0);
   });
-  it("starts with MP4 only at 30 fps", () => {
+  it("starts with MP4 only at 24 fps", () => {
     expect(DEFAULT_EXPORT_FORMATS).toEqual({ mp4: true, gif: false });
-    expect(DEFAULT_VIDEO_FPS).toBe(30);
+    expect(DEFAULT_VIDEO_FPS).toBe(24);
   });
-  it("defaults to balanced GIF quality and forever looping", () => {
-    expect(DEFAULT_GIF_QUALITY).toEqual({ size: "half", colors: "balanced", fps: 15 });
+  it("defaults to small size, best colours and 12 fps for GIF, with forever looping", () => {
+    expect(DEFAULT_GIF_QUALITY).toEqual({ size: "small", colors: "best", fps: 12 });
     expect(DEFAULT_GIF_LOOP).toBe("forever");
+  });
+  it("keeps every default selectable in its own export control", () => {
+    expect(VIDEO_FPS_OPTIONS.map((o) => o.v)).toContain(DEFAULT_VIDEO_FPS);
+    expect(GIF_SIZE_OPTIONS.map((o) => o.v)).toContain(DEFAULT_GIF_QUALITY.size);
+    expect(GIF_COLOR_OPTIONS.map((o) => o.v)).toContain(DEFAULT_GIF_QUALITY.colors);
+    expect(GIF_FPS_OPTIONS.map((o) => o.v)).toContain(DEFAULT_GIF_QUALITY.fps);
+    for (const preset of GIF_PRESETS) {
+      expect(GIF_SIZE_OPTIONS.map((o) => o.v)).toContain(preset.size);
+      expect(GIF_COLOR_OPTIONS.map((o) => o.v)).toContain(preset.colors);
+      expect(GIF_FPS_OPTIONS.map((o) => o.v)).toContain(preset.fps);
+    }
   });
   it.each([
     ["small", "small", "smallest", 10],
