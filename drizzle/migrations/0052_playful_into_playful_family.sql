@@ -1,0 +1,2 @@
+UPDATE public.moods m SET family = 'Playful', family_id = f.id FROM public.mood_families f WHERE f.name = 'Playful' AND m.name = 'playful' AND m.kind = 'mood';
+DELETE FROM public.mood_families ef WHERE ef.name = 'Energy' AND NOT EXISTS (SELECT 1 FROM public.moods mm WHERE mm.family_id = ef.id OR mm.family = 'Energy');
