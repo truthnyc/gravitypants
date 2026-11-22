@@ -98,8 +98,7 @@ export function StageView({ mood, family, start, data }: { mood: string | null; 
     <main data-stage-view="" className="stage font-ap text-ap-ink mx-auto max-w-[1180px] px-6 pt-8 pb-16">
       <button type="button" onClick={back} className="text-[15px] font-medium text-ap-blue hover:underline">← Directory</button>
       <header className="mt-4 text-center">
-        <p className="text-[13px] font-semibold tracking-[0.06em] text-ap-muted uppercase">Stage view</p>
-        <h1 className="stage-headline mt-2 font-semibold">
+        <h1 className="stage-headline font-semibold">
           <span className="text-ap-headline-muted">Show me something: </span>
           <span className="relative inline-block text-ap-blue">
             <span className="font-light text-ap-headline-bracket">[ </span>
