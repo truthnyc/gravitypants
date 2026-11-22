@@ -8,15 +8,15 @@ import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, X
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
-import { GoogleAdsTab } from "@/components/admin/GoogleAdsTab";
+import { GoogleAdsTab, MetaAdsTab } from "@/components/admin/GoogleAdsTab";
 import { Card, fmtMoney, PageTitle } from "@/components/admin/AdminShell";
 import { newsletterStats } from "@/lib/site/newsletter-stats.functions";
 import { adminSignupSources } from "@/lib/stillframe/admin.functions";
 import { adminAnalytics, adminSearch, getReportPrefs, setReportPrefs } from "@/lib/stillframe/admin-analytics.functions";
 
-const TABS = ["traffic", "funnel", "search", "ads", "marketing", "revenue", "newsletter"] as const;
+const TABS = ["traffic", "funnel", "search", "ads", "meta", "marketing", "revenue", "newsletter"] as const;
 type Tab = (typeof TABS)[number];
-const LABEL: Record<Tab, string> = { traffic: "Traffic", funnel: "Funnel", search: "Google Search", ads: "Google Ads", marketing: "Marketing", revenue: "Revenue", newsletter: "Newsletter" };
+const LABEL: Record<Tab, string> = { traffic: "Traffic", funnel: "Funnel", search: "Google Search", ads: "Google Ads", meta: "Facebook Ads", marketing: "Marketing", revenue: "Revenue", newsletter: "Newsletter" };
 
 export const Route = createFileRoute("/_authenticated/admin/analytics")({
   validateSearch: (s) => z.object({ tab: z.enum(TABS).catch("traffic") }).parse(s),
@@ -51,7 +51,7 @@ function Analytics() {
   const [from, setFrom] = useState(ago(29));
   const [to, setTo] = useState(ago(0));
   const fn = useServerFn(adminAnalytics);
-  const { data, error } = useQuery({ queryKey: ["admin", "analytics", from, to], queryFn: () => fn({ data: { from, to } }), enabled: tab !== "search" && tab !== "newsletter" && tab !== "ads" });
+  const { data, error } = useQuery({ queryKey: ["admin", "analytics", from, to], queryFn: () => fn({ data: { from, to } }), enabled: tab !== "search" && tab !== "newsletter" && tab !== "ads" && tab !== "meta" });
 
   return (
     <>
@@ -73,7 +73,7 @@ function Analytics() {
           </div>
         )}
       </div>
-      {tab === "search" ? <SearchTab /> : tab === "ads" ? <GoogleAdsTab from={from} to={to} /> : tab === "newsletter" ? <NewsletterTab /> : error ? <p className="text-destructive">Couldn't load analytics.</p> : !data ? <div aria-busy="true" className="h-96" /> : (
+      {tab === "search" ? <SearchTab /> : tab === "ads" ? <GoogleAdsTab from={from} to={to} /> : tab === "meta" ? <MetaAdsTab from={from} to={to} /> : tab === "newsletter" ? <NewsletterTab /> : error ? <p className="text-destructive">Couldn't load analytics.</p> : !data ? <div aria-busy="true" className="h-96" /> : (
         <>
           {tab === "traffic" && (
             <>

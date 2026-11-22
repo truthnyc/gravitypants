@@ -27,6 +27,21 @@ export const adminGoogleAdsReport = createServerFn({ method: 'POST' })
     return googleAdsReport(data.from, data.to);
   });
 
+export const adminMetaAdsReport = createServerFn({ method: 'POST' })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => range.refine(value => {
+    const from = new Date(`${value.from}T00:00:00Z`);
+    const to = new Date(`${value.to}T00:00:00Z`);
+    return Number.isFinite(from.getTime()) && Number.isFinite(to.getTime()) && from.toISOString().slice(0, 10) === value.from && to.toISOString().slice(0, 10) === value.to && to >= from && to.getTime() - from.getTime() <= 366 * 86400000;
+  }, 'Choose a valid date range of up to one year.').parse(input))
+  .handler(async ({ data, context }) => {
+    const db = await adminDb(context);
+    const { error } = await db.from('admin_audit_log').insert({ admin_user_id: context.userId, action: 'analytics.meta_ads.read', target: 'meta_ads', reason: `${data.from} through ${data.to}` });
+    if (error) throw new Error('Could not record this report request.');
+    const { metaAdsReport } = await import('./meta-ads-report.server');
+    return metaAdsReport(data.from, data.to);
+  });
+
 export const adminAnalytics = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d) => range.parse(d))
