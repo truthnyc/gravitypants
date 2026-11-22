@@ -2,7 +2,7 @@ import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
-import { domainRedirect } from "./lib/site/brand-site";
+import { domainRedirect, legacyCategoryRedirect, isAimanteHost, AIMANTE_ORIGIN } from "./lib/site/brand-site";
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
@@ -70,6 +70,9 @@ export default {
       // Resolve that domain here so the redirect happens before TanStack renders any HTML.
       const to = domainRedirect(request.url, forwardedHost);
       if (to) return Response.redirect(to, 301);
+      // Old category links (from before the category restructure) go straight to the current /c/ page.
+      const legacy = legacyCategoryRedirect(request.url, forwardedHost, request.headers.get("cookie"));
+      if (legacy) return new Response(null, { status: 301, headers: { location: isAimanteHost(forwardedHost) ? `${AIMANTE_ORIGIN}${legacy}` : legacy } });
     }
     try {
       const handler = await getServerEntry();

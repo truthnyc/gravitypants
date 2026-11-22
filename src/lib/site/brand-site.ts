@@ -2,6 +2,7 @@ import { createIsomorphicFn } from "@tanstack/react-start";
 import { getCookie, getRequestHost, getRequestUrl, setCookie } from "@tanstack/react-start/server";
 import type { LocationRewrite } from "@tanstack/react-router";
 import aimanteCover from "@/assets/site/og-aimante.jpg.asset.json";
+import { legacyCategorySlug } from "@/lib/directory/directory";
 
 /** Which brand a visit is on. aimante.co shows the Aimanté directory; everything else is Gravity Pants. */
 export type BrandSite = "gravitypants" | "aimante";
@@ -167,3 +168,27 @@ export const isIndexedHost = createIsomorphicFn()
     try { const h = getRequestHost({ xForwardedHost: true }); return isGravityPantsHost(h) || isAimanteHost(h); } catch { return false; }
   })
   .client(() => isGravityPantsHost(window.location.hostname) || isAimanteHost(window.location.hostname));
+
+/**
+ * Old Aimanté category links (?category=old-slug on the home page, /c/old-slug, /directory?category=old-slug)
+ * go straight to the current /c/ page with one permanent redirect. Returns a path (with query) or null.
+ */
+export function legacyCategoryRedirect(href: string, forwardedHost: string | null | undefined, cookieHeader: string | null | undefined): string | null {
+  const url = new URL(href);
+  const host = forwardedHost ? hostOf(forwardedHost) : url.host;
+  const cookie = (cookieHeader ?? "").split(/;\s*/).find((c) => c.startsWith(`${BRAND_COOKIE}=`))?.split("=")[1];
+  if (resolveSite(host, url.searchParams.get("brand"), cookie) !== "aimante") return null;
+  const p = url.pathname.replace(/\/+$/, "") || "/";
+  const m = p.match(/^\/c\/([^/]+)$/);
+  const raw = m ? decodeURIComponent(m[1] ?? "") : p === "/" || p === "/directory" ? url.searchParams.get("category") : null;
+  if (!raw) return null;
+  const next = raw.split(",").map((c) => c.trim().toLowerCase()).filter(Boolean).map((c) => legacyCategorySlug(c) ?? c);
+  const fixed = [...new Set(next)];
+  if (fixed.join(",") === raw.toLowerCase().split(",").map((c) => c.trim()).filter(Boolean).join(",")) return null;
+  const rest = new URLSearchParams(url.searchParams);
+  rest.delete("category");
+  if (isSiteParam(rest.get("brand"))) rest.delete("brand");
+  if (fixed.length === 1 && [...rest.keys()].length === 0) return `/c/${fixed[0]}`;
+  rest.set("category", fixed.join(","));
+  return `/?${rest.toString()}`;
+}
