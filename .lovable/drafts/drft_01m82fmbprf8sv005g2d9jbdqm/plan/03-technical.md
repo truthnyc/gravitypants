@@ -6,7 +6,7 @@
 - `comingSoon` toggle: removed from public behaviour; admin always shows empty categories.
 
 **Search function** — new migration replacing `directory_faceted_search` (same name and arguments):
-- Moods: `p.bmoods @> fm` instead of `&&` (all selected moods). Categories and brands are single-value per reel, so AND inside those would always give 0; they stay OR within the group and AND across groups. Confirm this is what you want.
+- Filter logic unchanged: OR within a group (`&&` / `= any`), AND across groups.
 - Add `s.tags` to Showcase reels' `extra_text`.
 - Facet counts already computed; zero-count values filtered in `FilterBar.tsx` (`CategoryBody` "Coming soon" group removed for visitors).
 

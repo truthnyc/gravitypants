@@ -23,5 +23,5 @@ Much of this already exists. The plan reuses the existing **Admin → Directory 
 5. **Filters.**
    - Show the count next to each value (overrides your earlier "remove all reel counts" for filters only; reel totals elsewhere stay hidden).
    - Hide values with 0 matching reels, unless selected.
-   - Inside one filter type, switch to AND: Cozy + Coastal shows only reels tagged with both. Counts update to match.
+   - Combining stays as today: different filter types combine with AND (mood AND category AND brand); several values inside one type stay OR (Cozy or Coastal).
    - Add Showcase reels' tags to search too.
