@@ -88,3 +88,8 @@
 - [x] Randomize the Directory grid per visit: seeded shuffle in directory_faceted_search (stable while paging, reshuffles each visit); verified two preview visits show different orders. Live in the database now; page code ships on next publish.
 - [x] Fix Cloud Down Hood export download link
 - [ ] Aimanté Google ad: goal visits, $10/day; next: locations, research, campaign type
+
+# Discovery plan
+- [x] Step 1: filter counts, hide empty values, on-screen autoplay, headline mood end dates; draft accepted into main, 4 headline-mood tests pass, signed-in admin settings and live Directory verified (12 per click kept). Preview only.
+- [ ] Step 2: reclassify categories in a fresh draft.
+- [ ] Step 3: migrate reel tags in a fresh draft.
