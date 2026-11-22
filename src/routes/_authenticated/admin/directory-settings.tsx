@@ -16,7 +16,7 @@ import { FeaturedBand } from "@/components/directory/FeaturedBand";
 import { getDirectorySettingsAdmin, saveDirectorySettings } from "@/lib/directory/settings.functions";
 import { listPublicBrands, searchDirectory, type FacetedReel } from "@/lib/directory/directory.functions";
 import { listSiteReels } from "@/lib/site/reels.functions";
-import { CATEGORIES, categorySlug } from "@/lib/directory/directory";
+import { PUBLIC_CATEGORIES, categorySlug } from "@/lib/directory/directory";
 import { useMoodCatalog } from "@/lib/directory/moods";
 import {
   DEFAULT_DIRECTORY_SETTINGS, MIN_MANUAL_PICKS, SPEED_SECONDS, mondayOf, resolveFeatured, type DirectorySettings, type FeaturedPick,
@@ -146,7 +146,7 @@ function DirectorySettingsAdmin() {
 
   if (saved.isLoading) return <p className="text-[14px] text-secondary-text">Loading…</p>;
   const brandOpts: [string, string][] = (brands.data ?? []).map((b) => [b.slug, b.name]);
-  const catOpts: [string, string][] = CATEGORIES.map((c) => [categorySlug(c), c]);
+  const catOpts: [string, string][] = PUBLIC_CATEGORIES.map((c) => [categorySlug(c), c]);
   const moodOpts: [string, string][] = allMoods.map((m) => [m, cap(m)]);
 
   return (

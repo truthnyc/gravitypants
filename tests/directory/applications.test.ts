@@ -3,7 +3,7 @@ import { brandApplicationInput, reviewInput } from '../../src/lib/directory/appl
 
 import { decodeApplicationLogo, normalizeWebsite } from '../../src/lib/directory/application-security'
 
-const valid = { name: 'Jane Smith', email: 'jane@example.com', brand: 'North Star', website: 'https://example.com', category: 'Crafts & Hobbies', description: 'Independent yarn and craft supplies made with care.', moods: ['cozy'], message: '', company: '', logo: { base64: 'aGVsbG8=', type: 'image/png' } }
+const valid = { name: 'Jane Smith', email: 'jane@example.com', brand: 'North Star', website: 'https://example.com', category: 'Crafts & Making', description: 'Independent yarn and craft supplies made with care.', moods: ['cozy'], message: '', company: '', logo: { base64: 'aGVsbG8=', type: 'image/png' } }
 
 describe('Aimanté brand applications', () => {
   it('matches www and scheme variants by website', () => expect(normalizeWebsite('http://www.EXAMPLE.com/shop').key).toBe(normalizeWebsite('https://example.com/').key))

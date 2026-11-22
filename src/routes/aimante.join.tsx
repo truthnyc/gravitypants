@@ -5,7 +5,7 @@ import { Check, LayoutTemplate, Sparkles, Users, BadgeCheck } from 'lucide-react
 import { FeaturedAdVideo } from '@/components/site/FeaturedAdVideo'
 import { AimanteShell } from '@/components/site/AimanteShell'
 import { Button } from '@/components/ui/button'
-import { categorySlug, CATEGORIES, BRAND_DESCRIPTION_MAX, type Category } from '@/lib/directory/directory'
+import { categorySlug, PUBLIC_CATEGORIES, BRAND_DESCRIPTION_MAX, type Category } from '@/lib/directory/directory'
 import { useMoodCatalog } from '@/lib/directory/moods'
 import { brandApplicationInput, submitBrandApplication } from '@/lib/directory/applications.functions'
 import { aimanteHead } from '@/lib/site/brand-site'
@@ -84,7 +84,7 @@ function Join() {
               <Field label="Brand name"><input className={input} required maxLength={50} autoComplete="organization" value={form.brand} onChange={(event) => set('brand', event.target.value)} /></Field>
               <Field label="Website"><input className={input} required maxLength={300} inputMode="url" placeholder="https://" value={form.website} onChange={(event) => set('website', event.target.value)} /></Field>
               <Field label="Category">
-                <select className={input} value={form.category} onChange={(event) => set('category', event.target.value as Category)}>{CATEGORIES.map((category) => <option key={category}>{category}</option>)}</select>
+                <select className={input} value={form.category} onChange={(event) => set('category', event.target.value as Category)}>{PUBLIC_CATEGORIES.map((category) => <option key={category}>{category}</option>)}</select>
               </Field>
               <Field label="Logo" note="PNG, JPG or WebP · up to 2 MB">
                 <input className={cn(input, 'py-2 file:mr-3 file:border-0 file:bg-transparent file:text-[13px] file:font-medium')} required type="file" accept="image/png,image/jpeg,image/webp" onChange={(event) => set('logo', event.target.files?.[0] ?? null)} />
@@ -134,7 +134,7 @@ const PLANS = [
   { eyebrow: 'Full brand page', price: 'With Starter', note: 'from $19 a month', items: ['Everything in Brand page', 'Unlimited reels on your page', 'Every reel shown in mood and category search'], highlight: true },
   { eyebrow: 'Brand insights', price: 'Included', note: 'With Business and Team', items: ['Everything in Full brand page', 'Views, saves and clicks to your website', 'See which reels and moods work best'] },
 ]
-const WHO: [string, string][] = [['Fashion', 'Fashion & Apparel'], ['Beauty', 'Beauty & Fragrance'], ['Food & Drink', 'Food & Drink'], ['Home', 'Home & Living'], ['Travel', 'Travel & Hospitality'], ['Crafts', 'Crafts & Hobbies'], ['Photography', 'Photography & Visual Arts'], ['Nonprofits', 'Nonprofit & Causes']]
+const WHO: [string, string][] = [['Fashion', 'Fashion'], ['Beauty', 'Beauty & Fragrance'], ['Food & Drink', 'Food & Drink'], ['Home', 'Home & Living'], ['Travel', 'Travel & Stays'], ['Crafts', 'Crafts & Making'], ['Photography', 'Art & Photography'], ['Nonprofits', 'Nonprofit & Events']]
 const FAQ = [
   ['Do I need a Gravity Pants account?', 'Yes, your reels and your brand page live in the same account. Your first reel is free.'],
   ['Does it cost anything?', 'Listing is free. Paid Gravity Pants plans let you add more reels and see how your page performs.'],

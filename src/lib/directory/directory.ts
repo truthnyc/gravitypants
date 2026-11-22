@@ -1,34 +1,51 @@
 /** Shared Directory constants (client- and server-safe). */
-/** A–Z, with Other last. Must match the directory_brands_category_check constraint. */
-export const CATEGORIES = [
-  "Beauty & Fragrance", "Crafts & Hobbies", "Events & Entertainment", "Fashion & Apparel", "Food & Drink",
-  "Health & Wellness", "Home & Living", "Jewelry & Watches", "Kids & Family", "Nonprofit & Causes", "Pets",
-  "Photography & Visual Arts", "Real Estate", "Restaurants & Cafés", "Services & Local Business", "Travel & Hospitality", "Wine & Spirits", "Other",
+/** Visitor order first, then admin-only. Must match the directory_brands_category_check constraint. */
+export const PUBLIC_CATEGORIES = [
+  "Fashion", "Sports & Outdoor", "Jewelry & Watches", "Beauty & Fragrance", "Home & Living", "Crafts & Making", "Food & Drink",
+  "Wellness", "Travel & Stays", "Kids & Family", "Pets", "Art & Photography", "Local Services", "Nonprofit & Events",
 ] as const;
+/** Kept for staff (admin forms) but never listed to visitors. */
+export const ADMIN_ONLY_CATEGORIES = ["Real Estate", "Other"] as const;
+export const CATEGORIES = [...PUBLIC_CATEGORIES, ...ADMIN_ONLY_CATEGORIES] as const;
 export type Category = (typeof CATEGORIES)[number];
+export const isPublicCategory = (c: string) => (PUBLIC_CATEGORIES as readonly string[]).includes(c);
+export const SUBCATEGORIES: Partial<Record<Category, readonly string[]>> = {
+  Fashion: ["Menswear", "Womenswear", "Knitwear", "Shoes & Bags", "Accessories"],
+  "Food & Drink": ["Producers", "Restaurants & Cafés", "Wine & Spirits"],
+};
 export const CATEGORY_COVERS: Record<Category, string> = {
-  "Crafts & Hobbies": "Yarn, craft supplies, handmade goods, hobbies",
+  Fashion: "Menswear, womenswear, knitwear, shoes, bags, accessories",
+  "Sports & Outdoor": "Activewear, outdoor gear, bikes, sailing",
+  "Jewelry & Watches": "Fine jewelry, watches",
   "Beauty & Fragrance": "Skincare, makeup, perfume, hair",
-  "Events & Entertainment": "Venues, concerts, festivals, weddings",
-  "Fashion & Apparel": "Clothing, shoes, bags, knitwear",
-  "Food & Drink": "Chocolate, coffee, bakeries, packaged food",
-  "Health & Wellness": "Supplements, fitness, spas, yoga",
   "Home & Living": "Furniture, decor, textiles, candles",
-  "Jewelry & Watches": "Fine jewelry, watches, accessories",
+  "Crafts & Making": "Yarn, craft supplies, patterns, handmade goods",
+  "Food & Drink": "Producers, restaurants, cafés, wine and spirits",
+  Wellness: "Supplements, fitness, spas, yoga",
+  "Travel & Stays": "Hotels, villas, tours, destinations",
   "Kids & Family": "Toys, baby goods, children's fashion",
-  "Nonprofit & Causes": "Charities, NGOs, fundraisers",
   Pets: "Pet food, accessories, grooming",
-  "Photography & Visual Arts": "Photography, galleries, artists, visual art",
+  "Art & Photography": "Photography, galleries, artists, visual art",
+  "Local Services": "Salons, studios, agencies, shops",
+  "Nonprofit & Events": "Charities, causes, venues, festivals",
   "Real Estate": "Listings, developments, agents",
-  "Restaurants & Cafés": "Menus, specials, openings",
-  "Services & Local Business": "Salons, studios, agencies, shops",
-  "Travel & Hospitality": "Hotels, villas, tours, destinations",
-  "Wine & Spirits": "Wineries, breweries, distilleries",
   Other: "Everything else",
+};
+/** Old category names (before the 2026-11 restructure) and the category each moved to. */
+export const LEGACY_CATEGORY_NAMES: Record<string, Category> = {
+  "Fashion & Apparel": "Fashion", "Crafts & Hobbies": "Crafts & Making", "Health & Wellness": "Wellness",
+  "Services & Local Business": "Local Services", "Travel & Hospitality": "Travel & Stays",
+  "Photography & Visual Arts": "Art & Photography", "Nonprofit & Causes": "Nonprofit & Events",
+  "Events & Entertainment": "Nonprofit & Events", "Restaurants & Cafés": "Food & Drink", "Wine & Spirits": "Food & Drink",
 };
 export const categorySlug = (c: string) =>
   c.toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 export const categoryFromSlug = (s: string): Category | null => CATEGORIES.find((c) => categorySlug(c) === s) ?? null;
+/** Old category slug -> its current slug (null when the slug is already current or unknown). */
+export const legacyCategorySlug = (s: string): string | null => {
+  const hit = Object.entries(LEGACY_CATEGORY_NAMES).find(([old]) => categorySlug(old) === s);
+  return hit ? categorySlug(hit[1]) : null;
+};
 /** Moods live in the database (moods + category_moods); see src/lib/directory/moods.ts. Stored lowercase. */
 export type Mood = string;
 /** Safety ceiling only — brands may pick as many moods as fit; the whole catalog is ~60. */
@@ -94,9 +111,10 @@ export const ratio = (f: string) => f.replace("x", ":");
 export function normalizeCategory(value: string): Category | null {
   const slug = categorySlug(value);
   const aliases: Record<string, Category> = {
-    fashion: "Fashion & Apparel", beauty: "Beauty & Fragrance", food: "Food & Drink",
-    home: "Home & Living", travel: "Travel & Hospitality", "travel-photography": "Travel & Hospitality",
-    nonprofits: "Nonprofit & Causes", "arts-crafts-hobbies": "Crafts & Hobbies",
+    beauty: "Beauty & Fragrance", food: "Food & Drink",
+    home: "Home & Living", travel: "Travel & Stays", "travel-photography": "Travel & Stays",
+    nonprofits: "Nonprofit & Events", "arts-crafts-hobbies": "Crafts & Making",
   };
-  return categoryFromSlug(slug) ?? aliases[slug] ?? null;
+  const legacy = legacyCategorySlug(slug);
+  return categoryFromSlug(legacy ?? slug) ?? LEGACY_CATEGORY_NAMES[value] ?? aliases[slug] ?? null;
 }

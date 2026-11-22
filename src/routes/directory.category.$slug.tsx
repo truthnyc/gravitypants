@@ -3,7 +3,7 @@ import { useState } from "react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { DirectoryGrid, ReelDetail } from "@/components/directory/DirectoryGrid";
 import { listPublicBrands, searchDirectoryLegacy } from "@/lib/directory/directory.functions";
-import { CATEGORIES, CATEGORY_COVERS, categoryFromSlug, categorySlug, type DirectoryCard } from "@/lib/directory/directory";
+import { PUBLIC_CATEGORIES, CATEGORY_COVERS, categoryFromSlug, categorySlug, legacyCategorySlug, type DirectoryCard } from "@/lib/directory/directory";
 import { listSiteReels } from "@/lib/site/reels.functions";
 import { aimanteTitle } from "@/lib/site/reels";
 import type { SiteReel } from "@/lib/site/reels";
@@ -21,6 +21,8 @@ const posterFor = (format: string | undefined) =>
 export const Route = createFileRoute("/directory/category/$slug")({
   // Category pages now open the Directory with that category already filtered.
   beforeLoad: ({ params }) => {
+    const legacy = legacyCategorySlug(params.slug);
+    if (legacy) throw redirect({ to: "/directory", search: { category: legacy }, statusCode: 301 });
     if (categoryFromSlug(params.slug)) throw redirect({ to: "/directory", search: { category: params.slug }, statusCode: 301 });
   },
   loader: async ({ params }) => {
@@ -127,7 +129,7 @@ function CategoryPage() {
 function CategoryChips({ current }: { current?: string }) {
   return (
     <ul className="flex flex-wrap gap-2">
-      {CATEGORIES.filter((c) => c !== current).map((c) => (
+      {PUBLIC_CATEGORIES.filter((c) => c !== current).map((c) => (
         <li key={c}>
           <Link to="/directory/category/$slug" params={{ slug: categorySlug(c) }} className="inline-block rounded-lg bg-ap-panel px-3.5 py-2 text-[14px] hover:bg-ap-media">
             {c}

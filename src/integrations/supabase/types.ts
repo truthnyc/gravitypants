@@ -7,11 +7,6 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
-  __InternalSupabase: {
-    PostgrestVersion: "14.17"
-  }
   public: {
     Tables: {
       admin_audit_log: {
@@ -435,8 +430,10 @@ export type Database = {
           meta_description_draft: string | null
           name: string
           page_intro: string
+          parent_id: string | null
           slug: string
           sort_order: number
+          visibility: string
         }
         Insert: {
           created_at?: string
@@ -447,8 +444,10 @@ export type Database = {
           meta_description_draft?: string | null
           name: string
           page_intro?: string
+          parent_id?: string | null
           slug: string
           sort_order?: number
+          visibility?: string
         }
         Update: {
           created_at?: string
@@ -459,8 +458,48 @@ export type Database = {
           meta_description_draft?: string | null
           name?: string
           page_intro?: string
+          parent_id?: string | null
           slug?: string
           sort_order?: number
+          visibility?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "categories_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      category_backup: {
+        Row: {
+          backed_up_at: string
+          category: string | null
+          category_id: string | null
+          entity: string
+          entity_id: string
+          extra: Json | null
+          id: string
+        }
+        Insert: {
+          backed_up_at?: string
+          category?: string | null
+          category_id?: string | null
+          entity: string
+          entity_id: string
+          extra?: Json | null
+          id?: string
+        }
+        Update: {
+          backed_up_at?: string
+          category?: string | null
+          category_id?: string | null
+          entity?: string
+          entity_id?: string
+          extra?: Json | null
+          id?: string
         }
         Relationships: []
       }
@@ -500,6 +539,21 @@ export type Database = {
           },
         ]
       }
+      category_slug_aliases: {
+        Row: {
+          new_slug: string
+          old_slug: string
+        }
+        Insert: {
+          new_slug: string
+          old_slug: string
+        }
+        Update: {
+          new_slug?: string
+          old_slug?: string
+        }
+        Relationships: []
+      }
       directory_brands: {
         Row: {
           affiliated: boolean
@@ -519,6 +573,7 @@ export type Database = {
           plan_ended_at: string | null
           slug: string
           status: string
+          subcategory_id: string | null
           updated_at: string
           website_url: string | null
           workspace_id: string
@@ -541,6 +596,7 @@ export type Database = {
           plan_ended_at?: string | null
           slug: string
           status?: string
+          subcategory_id?: string | null
           updated_at?: string
           website_url?: string | null
           workspace_id: string
@@ -563,6 +619,7 @@ export type Database = {
           plan_ended_at?: string | null
           slug?: string
           status?: string
+          subcategory_id?: string | null
           updated_at?: string
           website_url?: string | null
           workspace_id?: string
@@ -571,6 +628,13 @@ export type Database = {
           {
             foreignKeyName: "directory_brands_category_id_fkey"
             columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "directory_brands_subcategory_id_fkey"
+            columns: ["subcategory_id"]
             isOneToOne: false
             referencedRelation: "categories"
             referencedColumns: ["id"]
@@ -2813,3 +2877,4 @@ export const Constants = {
     },
   },
 } as const
+

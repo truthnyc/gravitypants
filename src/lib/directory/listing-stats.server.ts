@@ -14,7 +14,7 @@ export async function listingStats(): Promise<Listing[]> {
   const { publicClient } = await import("@/lib/site/reels.server");
   const pc = publicClient() as any;
   const [{ data: cats }, { data: moods }, { data: dreels }, { data: sreels }] = await Promise.all([
-    pc.from("categories").select("slug, name"),
+    pc.from("categories").select("slug, name").eq("visibility", "public").is("parent_id", null),
     pc.from("moods").select("name"),
     pc.from("directory_reels").select("published_at, updated_at, moods, directory_brands!inner(category, moods, status)").eq("status", "live"),
     pc.from("site_reels").select("updated_at, created_at, category, moods").eq("published", true),

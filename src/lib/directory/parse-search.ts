@@ -23,21 +23,21 @@ const MOOD_SYNONYMS: Record<string, string> = {
   dark: "moody", colourful: "vibrant", colorful: "vibrant",
 };
 const CATEGORY_WORDS: [string[], Category][] = [
-  [["wine", "wines", "champagne", "sparkling"], "Wine & Spirits"],
+  [["wine", "wines", "champagne", "sparkling"], "Food & Drink"],
   [["coffee", "food", "chocolate"], "Food & Drink"],
-  [["fashion", "clothes", "clothing", "shoes", "coat", "coats"], "Fashion & Apparel"],
+  [["fashion", "clothes", "clothing", "shoes", "coat", "coats"], "Fashion"],
   [["home", "bed", "interior", "interiors", "decor"], "Home & Living"],
   [["jewellery", "jewelry", "ring", "rings", "earrings"], "Jewelry & Watches"],
   [["fragrance", "perfume", "beauty"], "Beauty & Fragrance"],
-  [["travel", "hotel", "hotels", "trip"], "Travel & Hospitality"],
-  [["photo", "photos", "photography", "art", "print", "prints"], "Photography & Visual Arts"],
+  [["travel", "hotel", "hotels", "trip"], "Travel & Stays"],
+  [["photo", "photos", "photography", "art", "print", "prints"], "Art & Photography"],
 ];
 const OCCASIONS: Record<string, { label: string; categories: Category[] }> = {
-  host: { label: "A host", categories: ["Wine & Spirits", "Food & Drink", "Home & Living"] },
-  hostess: { label: "A host", categories: ["Wine & Spirits", "Food & Drink", "Home & Living"] },
-  table: { label: "The table", categories: ["Wine & Spirits", "Food & Drink", "Home & Living"] },
-  dinner: { label: "Dinner", categories: ["Wine & Spirits", "Food & Drink", "Home & Living"] },
-  thanksgiving: { label: "Thanksgiving", categories: ["Wine & Spirits", "Food & Drink", "Home & Living"] },
+  host: { label: "A host", categories: ["Food & Drink", "Home & Living"] },
+  hostess: { label: "A host", categories: ["Food & Drink", "Home & Living"] },
+  table: { label: "The table", categories: ["Food & Drink", "Home & Living"] },
+  dinner: { label: "Dinner", categories: ["Food & Drink", "Home & Living"] },
+  thanksgiving: { label: "Thanksgiving", categories: ["Food & Drink", "Home & Living"] },
 };
 
 const words = (s: string) => s.toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "").match(/[a-z0-9]+/g) ?? [];
@@ -89,7 +89,7 @@ export function parseSearch(text: string, catalog: { moods: string[]; brands: { 
     if (hit) { if (!cats.includes(hit[1])) cats.push(hit[1]); used.add(i); }
   });
   // An occasion label only describes the selection when nothing else was added.
-  if (occasion && cats.length !== 3) occasion = null;
+  if (occasion && cats.length !== 2) occasion = null;
 
   const tags = [mood, picked.occasion, picked.season, picked.setting].filter((x): x is string => !!x);
   return { mood, categories: cats.map(categorySlug), occasion, brand, tags, leftoverText: ws.filter((_, i) => !used.has(i)).join(" ") };

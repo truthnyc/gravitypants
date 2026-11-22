@@ -110,7 +110,7 @@ function CoverPicker({ src, onPick }: { src: string; onPick: (b: Blob, preview: 
 }
 
 type Draft = { id?: string; brand: string; title: string; description: string; href: string; category: string; published: boolean; photos: number; brand_id?: string | null; moods?: string[] };
-const empty: Draft = { brand: "", title: "", description: "", href: "", category: "Fashion & Apparel", published: true, photos: 3, moods: [] };
+const empty: Draft = { brand: "", title: "", description: "", href: "", category: "Fashion", published: true, photos: 3, moods: [] };
 
 function ReelForm({ initial, onDone, onCancel, videoSrc }: { videoSrc?: string | null; initial: Draft; onDone: () => void; onCancel?: () => void }) {
   const save = useServerFn(saveSiteReel);

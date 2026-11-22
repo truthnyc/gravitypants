@@ -1,6 +1,7 @@
+import { canonicalDirectorySearch } from "@/lib/directory/legacy-urls";
 import { splitByKind, TAG_KIND_LABEL, type TagKind } from "@/lib/directory/tag-kinds";
 import { ConceptReelNotice } from "@/components/directory/ConceptReelNotice";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { useBrandSite } from "@/components/site/AimanteShell";
 import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
@@ -75,9 +76,9 @@ export const Route = createFileRoute("/directory/")({
       .transform((v) =>
         v
           ?.split(",")
-          .map((m) => (m.trim().toLowerCase() === "urgent" ? "lively" : m))
+          .map((m) => m.trim())
           .join(","),
-      ), // old ?mood=urgent links still work
+      ),
     occasion: z.string().optional(),
     season: z.string().optional(),
     setting: z.string().optional(),
@@ -85,6 +86,11 @@ export const Route = createFileRoute("/directory/")({
     brand: z.string().optional(),
     page: z.union([z.number(), z.string()]).optional(),
   }),
+  // Old category and mood names redirect permanently, so search engines only index current names.
+  beforeLoad: ({ search }) => {
+    const next = canonicalDirectorySearch(search);
+    if (next) throw redirect({ to: "/directory", search: next, statusCode: 301 });
+  },
   loaderDeps: ({ search }) => ({
     q: (search.q ?? "").slice(0, 200),
     category: search.category,

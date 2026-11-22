@@ -2,10 +2,10 @@ import { describe, expect, it } from "vitest";
 import { parseSearch } from "@/lib/directory/parse-search";
 const catalog = { moods: ["cozy", "calm", "warm", "luxurious", "moody", "vibrant", "bold"], brands: [{ name: "Agnona", slug: "agnona" }] };
 describe("parseSearch", () => {
-  it("reads a host occasion as three categories", () => {
+  it("reads a host occasion as its categories", () => {
     const r = parseSearch("something cozy for a host", catalog);
     expect(r.mood).toBe("cozy");
-    expect(r.categories).toEqual(["wine-spirits", "food-drink", "home-living"]);
+    expect(r.categories).toEqual(["food-drink", "home-living"]);
     expect(r.occasion).toBe("A host");
   });
   it("maps synonyms", () => expect(parseSearch("cosy", catalog).mood).toBe("cozy"));

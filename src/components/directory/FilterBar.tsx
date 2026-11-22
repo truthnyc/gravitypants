@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Check, ChevronDown, Search, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { CATEGORIES, categorySlug } from "@/lib/directory/directory";
+import { CATEGORIES, PUBLIC_CATEGORIES, categorySlug } from "@/lib/directory/directory";
 import { MOOD_FAMILY_COLORS, type MoodFamily } from "@/lib/directory/mood-admin";
 import { useQuery } from "@tanstack/react-query";
 import { listCategories } from "@/lib/directory/categories.functions";
@@ -228,7 +228,7 @@ function MoodBody({ families, selected, counts, onChange }: { families: Family[]
 function CategoryBody({ selected, counts, narrow, onChange }: { selected: string[]; counts: Record<string, number>; narrow: boolean; onChange: (v: string[]) => void }) {
   const catalog = useQuery({ queryKey: ["category-catalog"], queryFn: () => listCategories(), staleTime: 30_000 });
   const hints = new Map((catalog.data ?? []).map((c) => [c.name, c.hint]));
-  const list = CATEGORIES.map((c) => ({ name: c, slug: categorySlug(c), n: counts[categorySlug(c)] ?? 0 }));
+  const list = PUBLIC_CATEGORIES.map((c) => ({ name: c, slug: categorySlug(c), n: counts[categorySlug(c)] ?? 0 }));
   // Visitors only see categories with matching reels (or ones they already picked).
   const groups = [{ title: "Categories", items: list.filter((c) => c.n > 0 || selected.includes(c.slug)) }].filter((g) => g.items.length);
   return (

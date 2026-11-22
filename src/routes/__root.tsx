@@ -23,7 +23,7 @@ import { currentSite, isIndexedHost } from "@/lib/site/brand-site";
 import { ServiceUnavailable } from "@/components/site/ServiceUnavailable";
 import { AdvertisingConsent } from "@/components/site/AdvertisingConsent";
 import { useBrandSite } from "@/components/site/AimanteShell";
-import { CATEGORIES, categorySlug } from "@/lib/directory/directory";
+import { PUBLIC_CATEGORIES, categorySlug } from "@/lib/directory/directory";
 import favicon from "@/assets/site/favicon.svg.asset.json";
 import touchIcon from "@/assets/site/apple-touch-icon.png.asset.json";
 
@@ -60,7 +60,7 @@ function AimanteNotFound() {
       <nav aria-label="Categories" className="mt-10">
         <h2 className="text-[15px] font-semibold">Browse by category</h2>
         <ul className="mt-3 flex flex-wrap justify-center gap-2">
-          {CATEGORIES.map((c) => (
+          {PUBLIC_CATEGORIES.map((c) => (
             <li key={c}><Link to="/directory" search={{ category: categorySlug(c) }} className="inline-flex h-9 items-center rounded-lg bg-ap-panel px-3 text-[14px] hover:bg-ap-media">{c}</Link></li>
           ))}
         </ul>

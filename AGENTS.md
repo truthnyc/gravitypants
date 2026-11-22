@@ -71,3 +71,4 @@
 - Video markup lives only on `/reels/$slug` watch pages (slugs from `watch.ts`, VideoObject from `videoObject()`, sitemap entries from `watchPages()`); galleries just link there, so each video is listed once on a page where it is the main content.
 - Watch-page videos constrain both width and viewport height for every format without cropping, so the complete player stays prominent on shorter screens.
 - The `/embed/reel/$id` player runs the root shell in bare mode (no auth listener, page tracking or notices) because other people's sites frame it where the browser blocks stored sign-in data; keep that route free of app-wide boot.
+- Categories: `PUBLIC_CATEGORIES` (visitor lists/forms) and `ADMIN_ONLY_CATEGORIES` in `directory.ts`; old names/slugs map via `LEGACY_CATEGORY_NAMES` and `legacy-urls.ts` (301s for old category/mood links), so renamed taxonomy never breaks indexed URLs; originals are kept in `category_backup` for undo.

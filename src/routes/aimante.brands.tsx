@@ -4,7 +4,7 @@ import { Search } from "lucide-react";
 import { aimanteHead } from "@/lib/site/brand-site";
 import { AimanteShell } from "@/components/site/AimanteShell";
 import { listPublicBrands } from "@/lib/directory/directory.functions";
-import { CATEGORIES, CATEGORY_COVERS, categorySlug } from "@/lib/directory/directory";
+import { PUBLIC_CATEGORIES, CATEGORY_COVERS, categorySlug } from "@/lib/directory/directory";
 
 export const Route = createFileRoute("/aimante/brands")({
   loader: async () => {
@@ -23,7 +23,7 @@ function BrandsPage() {
   const { brands } = Route.useLoaderData();
   const [q, setQ] = useState("");
   const used = new Set(brands.map((b) => b.category));
-  const cats = CATEGORIES.filter((c) => used.has(c));
+  const cats = PUBLIC_CATEGORIES.filter((c) => used.has(c));
   const groups = useMemo(() => {
     const t = q.trim().toLowerCase();
     const list = brands.filter((b) => !t || b.name.toLowerCase().includes(t) || b.category.toLowerCase().includes(t));
