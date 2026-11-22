@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { MOOD_FAMILIES, moodInput, moodRequestInput, normalizeMoodName } from "./mood-admin";
+import { MOOD_FAMILIES, kindForFamily, moodInput, moodRequestInput, normalizeMoodName } from "./mood-admin";
 
 async function adminClient(context: { supabase: { rpc: (name: "is_platform_admin") => PromiseLike<{ data: unknown; error: unknown }> } }) {
   const { data, error } = await context.supabase.rpc("is_platform_admin");
@@ -24,7 +24,7 @@ export const saveAdminMood = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => moodInput.parse(data))
   .handler(async ({ data, context }) => {
     const db = await adminClient(context);
-    const fields = { name: data.name, family: data.family, ...(data.page_intro !== undefined ? { page_intro: data.page_intro } : {}) };
+    const fields = { name: data.name, family: data.family, kind: kindForFamily(data.family), ...(kindForFamily(data.family) !== "mood" ? { family_id: null } : {}), ...(data.page_intro !== undefined ? { page_intro: data.page_intro } : {}) };
     const result = data.id
       ? await db.from("moods").update(fields).eq("id", data.id).select("id").single()
       : await db.from("moods").insert(fields).select("id").single();
@@ -95,7 +95,7 @@ export const decideMoodRequest = createServerFn({ method: "POST" })
     if (data.decision === "approve") {
       const { data: existing } = await db.from("moods").select("id").eq("name", req.name).maybeSingle();
       if (!existing) {
-        const { error: insErr } = await db.from("moods").insert({ name: req.name, family: data.family ?? "Modern" });
+        const { error: insErr } = await db.from("moods").insert({ name: req.name, family: data.family ?? "Modern", kind: kindForFamily(data.family ?? "Modern") });
         if (insErr) throw new Error(insErr.code === "23505" ? "That mood already exists." : insErr.message);
       }
     }

@@ -1,6 +1,8 @@
 import { z } from "zod";
 
-export const MOOD_FAMILIES = ["Calm", "Luxe", "Warm", "Energetic", "Playful", "Natural", "Romantic", "Dramatic", "Modern", "Heartfelt", "Festive"] as const;
+export const MOOD_FAMILIES = ["Calm", "Luxe", "Warm", "Energetic", "Playful", "Natural", "Romantic", "Dramatic", "Modern", "Heartfelt", "Festive", "Occasion", "Season", "Setting"] as const;
+/** The Occasion, Season and Setting "families" are their own filter types (moods.kind); every other family is a Mood. */
+export const kindForFamily = (f: string) => (f === "Occasion" ? "occasion" : f === "Season" ? "season" : f === "Setting" ? "setting" : "mood") as "mood" | "occasion" | "season" | "setting";
 export const moodInput = z.object({
   id: z.string().uuid().optional(),
   name: z.string().trim().toLowerCase().min(2).max(30),
@@ -33,4 +35,5 @@ export const MOOD_FAMILY_COLORS: Record<MoodFamily, { bg: string; ink: "light" |
   Energetic: { bg: "#e8562a", ink: "light" }, Playful: { bg: "#e6a700", ink: "dark" }, Natural: { bg: "#5c8a4e", ink: "light" },
   Romantic: { bg: "#c96b85", ink: "light" }, Dramatic: { bg: "#4b3d63", ink: "light" }, Modern: { bg: "#4f5b6b", ink: "light" },
   Heartfelt: { bg: "#d0585e", ink: "light" }, Festive: { bg: "#c79a12", ink: "dark" },
+  Occasion: { bg: "#0071e3", ink: "light" }, Season: { bg: "#3f8f8a", ink: "light" }, Setting: { bg: "#6b6f76", ink: "light" },
 };

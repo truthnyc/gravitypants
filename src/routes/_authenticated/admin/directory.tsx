@@ -1,3 +1,4 @@
+import { TagPicker } from "@/components/directory/TagPicker";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -247,12 +248,7 @@ function ReviewCard({ r, act }: { r: Row; act: (a: Act, msg: string) => Promise<
           <select value={category} onChange={(e) => setCategory(e.target.value as Category)} className="h-8 rounded-sm bg-control-fill px-2 text-[13px]">{CATEGORIES.map((c) => <option key={c}>{c}</option>)}</select>
           <input value={tags} onChange={(e) => setTags(e.target.value)} aria-label="Tags" placeholder="Tags, comma separated" className="h-8 min-w-[220px] flex-1 rounded-sm bg-control-fill px-2 text-[13px]" />
         </div>
-        <div className="flex flex-wrap gap-1">
-          {[...new Set([...forCategory(category), ...moods])].map((m) => {
-            const on = moods.includes(m);
-            return <button key={m} type="button" onClick={() => setMoods(on ? moods.filter((x) => x !== m) : [...moods, m])} className={cn("rounded-lg border px-2 py-0.5 text-[12px] disabled:opacity-40", on ? "border-primary text-primary" : "border-border")}>{moodLabel(m)}</button>;
-          })}
-        </div>
+        <TagPicker value={moods} onChange={setMoods} moodOptions={forCategory(category)} capMoods />
         <div className="rounded-sm bg-control-fill px-3 py-2 text-[12px] text-secondary-text">
           {p ? <>Permission {p.action}: <b className="text-foreground">{p.full_name}</b>{p.job_title ? `, ${p.job_title}` : ""} · {p.email} · <span className="nums">{new Date(p.created_at).toLocaleString()}</span> · wording {p.wording_version}</> : "No permission on record"}
         </div>
@@ -313,7 +309,7 @@ type Detail = Awaited<ReturnType<typeof adminBrandDetail>>;
 function BrandForm({ b, onSaved }: { b: Detail["brand"]; onSaved: () => void }) {
   const save = useServerFn(adminSaveBrand);
   const logo = useServerFn(setBrandLogo);
-  const { forCategory } = useMoodCatalog();
+  const { forCategory, kindOf } = useMoodCatalog();
   const [f, setF] = useState({ name: b.name, website: b.website, category: b.category as Category, description: b.description, moods: b.moods as string[], affiliated: b.affiliated, status: b.status });
   const [busy, setBusy] = useState(false);
   const run = async (fn: () => Promise<unknown>, msg: string) => {
@@ -342,7 +338,7 @@ function BrandForm({ b, onSaved }: { b: Detail["brand"]; onSaved: () => void }) 
       <div className="grid flex-1 gap-2 sm:grid-cols-2">
         <label className="space-y-1"><span className="flex justify-between text-[12px] text-secondary-text"><span>Brand name</span><span className={cn("nums", nearLimit(f.name.length, BRAND_NAME_MAX) && "text-warning-text")}>{f.name.length} / {BRAND_NAME_MAX}</span></span><input value={f.name} maxLength={BRAND_NAME_MAX} onChange={(e) => setF({ ...f, name: e.target.value })} className={field} /></label>
         <label className="space-y-1"><span className="text-[12px] text-secondary-text">Website</span><input value={f.website} maxLength={200} placeholder="https://" onChange={(e) => setF({ ...f, website: e.target.value })} className={field} /></label>
-        <label className="space-y-1"><span className="text-[12px] text-secondary-text">Category</span><select value={f.category} onChange={(e) => { const c = e.target.value as Category; setF({ ...f, category: c, moods: f.moods.filter((m) => forCategory(c).includes(m)) }); }} className={field}>{CATEGORIES.map((c) => <option key={c}>{c}</option>)}</select></label>
+        <label className="space-y-1"><span className="text-[12px] text-secondary-text">Category</span><select value={f.category} onChange={(e) => { const c = e.target.value as Category; setF({ ...f, category: c, moods: f.moods.filter((m) => kindOf(m) !== "mood" || forCategory(c).includes(m)) }); }} className={field}>{CATEGORIES.map((c) => <option key={c}>{c}</option>)}</select></label>
         <div className="space-y-1 text-[12px] text-secondary-text">
           <div>Status: {b.approved ? `Approved ${new Date(b.approved).toLocaleDateString()}` : "Not approved yet"}</div>
           {b.planEnded && <div>Plan ended {new Date(b.planEnded).toLocaleDateString()}</div>}
@@ -352,12 +348,7 @@ function BrandForm({ b, onSaved }: { b: Detail["brand"]; onSaved: () => void }) 
         <label className="flex items-center gap-2 text-[13px]"><input type="checkbox" checked={f.affiliated} onChange={(e) => setF({ ...f, affiliated: e.target.checked })} />Affiliated</label>
         <div className="space-y-1 sm:col-span-2">
           <span className="text-[12px] text-secondary-text">Moods (from the {f.category} list)</span>
-          <div className="flex flex-wrap gap-1.5">
-            {[...new Set([...forCategory(f.category), ...f.moods])].map((m) => { const on = f.moods.includes(m); return (
-              <button key={m} type="button" aria-pressed={on} onClick={() => setF({ ...f, moods: on ? f.moods.filter((x) => x !== m) : [...f.moods, m] })}
-                className={cn("h-7 rounded-lg px-2.5 text-[12px]", on ? "bg-primary text-primary-foreground" : "bg-control-fill", "disabled:opacity-40")}>{moodLabel(m)}</button>
-            ); })}
-          </div>
+          <TagPicker value={f.moods} onChange={(moods) => setF({ ...f, moods })} moodOptions={forCategory(f.category)} />
         </div>
         <label className="space-y-1 sm:col-span-2">
           <span className="flex justify-between text-[12px] text-secondary-text"><span>Brand description</span><span className={cn("nums", nearLimit(f.description.length, BRAND_DESCRIPTION_MAX) && "text-warning-text")}>{f.description.length} / {BRAND_DESCRIPTION_MAX}</span></span>
@@ -405,12 +396,7 @@ function AdminReel({ r, brandId, onChanged, siteReels }: { r: Detail["reels"][nu
         <small className="block text-right text-[12px] nums"><span className={cn(nearLimit(desc.length, REEL_DESCRIPTION_MAX) && "text-amber-700")}>{desc.length} / {REEL_DESCRIPTION_MAX}</span></small>
         <input value={tags} onChange={(e) => setTags(e.target.value)} aria-label="Tags" placeholder="Tags, comma separated" className={field} />
         {prod.loaded && <AdminProductsFields rows={prod.rows} setRows={prod.setRows} errs={prod.errs} clicks={prod.clicks} />}
-        <div className="flex flex-wrap gap-1">
-          {moodCatalog.all.map((m) => {
-            const on = moods.includes(m);
-            return <button key={m} type="button" onClick={() => setMoods(on ? moods.filter((x) => x !== m) : [...moods, m])} className={cn("rounded-lg border px-2 py-0.5 text-[12px] disabled:opacity-40", on ? "border-primary text-primary" : "border-border")}>{moodLabel(m)}</button>;
-          })}
-        </div>
+        <TagPicker value={moods} onChange={setMoods} moodOptions={moodCatalog.all} capMoods />
         <div className="flex flex-wrap gap-2">
           <Button size="sm" disabled={busy} onClick={() => void save()}>Save reel</Button>
           {r.status === "in_review" && <Button size="sm" variant="plain" disabled={busy} onClick={() => void run(() => review({ data: { id: r.id, action: "approve" } }), "Approved")}>Approve</Button>}

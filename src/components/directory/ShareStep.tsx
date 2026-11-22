@@ -1,3 +1,5 @@
+import { TagPicker } from "@/components/directory/TagPicker";
+import { capMoodTags } from "@/lib/directory/tag-kinds";
 import { mergeKeywords } from "@/lib/directory/keywords";
 import { useEffect, useMemo, useState, type KeyboardEvent } from "react";
 import { Link } from "@tanstack/react-router";
@@ -81,7 +83,7 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
   const [aimTitle, setAimTitle] = useState(ctx.reel?.displayTitle ?? "");
   const [tags, setTags] = useState<string[]>(ctx.prefill.tags);
   const [draft, setDraft] = useState("");
-  const [moods, setMoods] = useState<string[]>(ctx.prefill.moods);
+  const [moods, setMoods] = useState<string[]>(ctx.prefill.moods.slice(0, 12));
   const [show, setShow] = useState(ctx.reel?.status === "live" || ctx.reel?.status === "in_review");
   const [agreed, setAgreed] = useState(false);
   const [fullName, setFullName] = useState(ctx.displayName);
@@ -91,14 +93,14 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
   const [moreMoods, setMoreMoods] = useState(false);
   const [terms, setTerms] = useState(false);
   const [thumbFrame, setThumbFrame] = useState(0);
-  const { forCategory } = useMoodCatalog();
+  const { forCategory, kindOf } = useMoodCatalog();
   const suggestFn = useServerFn(suggestReelMoods);
   const [suggesting, setSuggesting] = useState(false);
   const suggestMoods = async (replace: boolean) => {
     setSuggesting(true);
     try {
       const res = await suggestFn({ data: { adId: doc.project.id, brand: targetBrand?.name ?? name.trim(), category: targetBrand?.category ?? category, title: aimTitle.trim() || undefined, description: desc.trim() || undefined, tags } });
-      if (res.moods.length) setMoods((cur) => (replace ? res.moods : [...new Set([...cur, ...res.moods])]));
+      if (res.moods.length) setMoods((cur) => capMoodTags(replace ? res.moods : [...new Set([...cur, ...res.moods])], kindOf));
       else if (replace) toast("No mood suggestions right now.");
     } catch { if (replace) toast.error("Couldn't suggest moods right now."); }
     finally { setSuggesting(false); }
@@ -259,33 +261,11 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
             </AppField>
 
             <AppField label="Mood" className="mb-[18px]">
-              {(() => {
-                const all = [...new Set([...moods, ...forCategory((targetBrand?.category as Category | undefined) ?? category)])];
-                const list = moreMoods ? all : all.slice(0, 6);
-                return (
-                  <div className="flex flex-wrap items-center gap-1.5">
-                    {list.map((m) => {
-                      const on = moods.includes(m);
-                      return (
-                        <button key={m} type="button" aria-pressed={on}
-                          onClick={() => setMoods(on ? moods.filter((x) => x !== m) : [...moods, m])}
-                          className={cn("rounded-lg border bg-ap-card px-[13px] py-[7px] text-[14px] disabled:opacity-40", on ? "border-ap-blue font-semibold text-ap-blue" : "border-ap-hairline")}>
-                          {moodLabel(m)}
-                        </button>
-                      );
-                    })}
-                    <button type="button" disabled={suggesting} onClick={() => void suggestMoods(true)} className="px-2 py-[7px] text-[14px] text-ap-blue disabled:opacity-50">
-                      {suggesting ? "Suggesting…" : "Suggest moods"}
-                    </button>
-                    {all.length > 6 && (
-                      <button type="button" aria-expanded={moreMoods} onClick={() => setMoreMoods(!moreMoods)} className="inline-flex items-center gap-0.5 px-2 py-[7px] text-[14px] text-ap-blue">
-                        {moreMoods ? "Fewer moods" : "More moods"} <ChevronDown className={cn("size-4 transition-transform", moreMoods && "rotate-180")} strokeWidth={1.7} />
-                      </button>
-                    )}
-                  </div>
-                );
-              })()}
-              <small className="text-[12px] text-ap-muted">Pick as many as fit.</small>
+              <TagPicker value={moods} onChange={setMoods} moodOptions={forCategory((targetBrand?.category as Category | undefined) ?? category)} capMoods />
+              <button type="button" disabled={suggesting} onClick={() => void suggestMoods(true)} className="mt-1 self-start px-0 py-[7px] text-[14px] text-ap-blue disabled:opacity-50">
+                {suggesting ? "Suggesting…" : "Suggest moods"}
+              </button>
+              <small className="text-[12px] text-ap-muted">Up to 3 moods, plus any occasion, season or setting.</small>
               <MoodRequestBox />
             </AppField>
 

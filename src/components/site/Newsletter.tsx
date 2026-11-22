@@ -91,6 +91,20 @@ export function FooterNewsletter() {
   );
 }
 
+/** True while something the visitor is using is open: a filter panel, reel popup, Stage or a focused search/text field. */
+export function popupBlocked(doc: Document) {
+  if (doc.querySelector('[role="dialog"], [id^="dir-panel-"], [data-stage-view]')) return true;
+  const a = doc.activeElement;
+  return !!a && (a.tagName === "INPUT" || a.tagName === "TEXTAREA" || a.tagName === "SELECT");
+}
+/** Past the first page of reels: the end-of-grid marker is on screen; without one, after two screens or at the page bottom. */
+export function pastFirstPage(doc: Document, win: Window) {
+  const mark = doc.querySelector("[data-newsletter-after]");
+  if (mark) return mark.getBoundingClientRect().top < win.innerHeight;
+  const bottom = win.scrollY > 0 && win.scrollY + win.innerHeight >= doc.documentElement.scrollHeight - 200;
+  return bottom || win.scrollY > win.innerHeight * 2;
+}
+
 export function NewsletterPopup() {
   const [open, setOpen] = useState(false);
   const load = useServerFn(getNewsletterPopup);
@@ -99,8 +113,29 @@ export function NewsletterPopup() {
 
   useEffect(() => {
     if (localStorage.getItem(KEY)) return;
-    const t = window.setTimeout(() => setOpen(true), 12000);
-    return () => window.clearTimeout(t);
+    let wanted = false;
+    let done = false;
+    const show = () => {
+      if (done || localStorage.getItem(KEY)) return;
+      done = true;
+      localStorage.setItem(KEY, "shown"); // once per visitor, whatever they do next
+      setOpen(true);
+      cleanup();
+    };
+    // Wait while a filter panel, search box, reel popup or Stage is in use.
+    const tryShow = () => { wanted = true; if (!popupBlocked(document)) show(); };
+    const onScroll = () => { if (!wanted && pastFirstPage(document, window)) tryShow(); };
+    const onLeave = (e: MouseEvent) => { if (!e.relatedTarget && e.clientY <= 0) tryShow(); };
+    const fine = window.matchMedia("(pointer: fine)").matches;
+    const poll = window.setInterval(() => { if (wanted) tryShow(); }, 1000);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    if (fine) document.addEventListener("mouseout", onLeave);
+    function cleanup() {
+      window.clearInterval(poll);
+      window.removeEventListener("scroll", onScroll);
+      document.removeEventListener("mouseout", onLeave);
+    }
+    return cleanup;
   }, []);
   const close = (v: boolean) => {
     setOpen(v);

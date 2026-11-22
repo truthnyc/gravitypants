@@ -95,7 +95,7 @@ export function StageView({ mood, family, start, data }: { mood: string | null; 
   const back = () => { if (window.history.length > 1) router.history.back(); else void navigate({ to: "/directory" }); };
 
   return <SiteShell>
-    <main className="stage font-ap text-ap-ink mx-auto max-w-[1180px] px-6 pt-8 pb-16">
+    <main data-stage-view="" className="stage font-ap text-ap-ink mx-auto max-w-[1180px] px-6 pt-8 pb-16">
       <button type="button" onClick={back} className="text-[15px] font-medium text-ap-blue hover:underline">← Directory</button>
       <header className="mt-4 text-center">
         <p className="text-[13px] font-semibold tracking-[0.06em] text-ap-muted uppercase">Stage view</p>

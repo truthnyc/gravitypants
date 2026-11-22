@@ -7,11 +7,6 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
-  __InternalSupabase: {
-    PostgrestVersion: "14.17"
-  }
   public: {
     Tables: {
       admin_audit_log: {
@@ -1253,6 +1248,24 @@ export type Database = {
         }
         Relationships: []
       }
+      mood_aliases: {
+        Row: {
+          alias: string
+          created_at: string
+          target: string
+        }
+        Insert: {
+          alias: string
+          created_at?: string
+          target: string
+        }
+        Update: {
+          alias?: string
+          created_at?: string
+          target?: string
+        }
+        Relationships: []
+      }
       mood_families: {
         Row: {
           created_at: string
@@ -1271,6 +1284,30 @@ export type Database = {
           id?: string
           name?: string
           sort_order?: number
+        }
+        Relationships: []
+      }
+      mood_remap_backup: {
+        Row: {
+          created_at: string
+          id: number
+          moods: string[]
+          row_id: string
+          table_name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          moods: string[]
+          row_id: string
+          table_name: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          moods?: string[]
+          row_id?: string
+          table_name?: string
         }
         Relationships: []
       }
@@ -1317,6 +1354,7 @@ export type Database = {
           family_id: string | null
           id: string
           intro_draft: string | null
+          kind: string
           meta_description: string
           meta_description_draft: string | null
           name: string
@@ -1329,6 +1367,7 @@ export type Database = {
           family_id?: string | null
           id?: string
           intro_draft?: string | null
+          kind?: string
           meta_description?: string
           meta_description_draft?: string | null
           name: string
@@ -1341,6 +1380,7 @@ export type Database = {
           family_id?: string | null
           id?: string
           intro_draft?: string | null
+          kind?: string
           meta_description?: string
           meta_description_draft?: string | null
           name?: string
@@ -2768,3 +2808,4 @@ export const Constants = {
     },
   },
 } as const
+
