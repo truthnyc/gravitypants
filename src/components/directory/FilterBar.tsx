@@ -11,13 +11,9 @@ export type Facets = { moods: Record<string, number>; categories: Record<string,
 export type FilterValue = { moods: string[]; categories: string[]; brands: string[] };
 type Family = { family: string; moods: string[] };
 type Brand = { slug: string; name: string; category: string; logo_url: string | null };
-type Seg = "mood" | "category" | "brand" | "occasion" | "season" | "setting";
+type Seg = "mood" | "category" | "brand";
 type ExtraKind = "occasion" | "season" | "setting";
-const EXTRA: { id: ExtraKind; label: string; empty: string; hint: string }[] = [
-  { id: "occasion", label: "Occasion", empty: "Any occasion", hint: "Gifts, holidays and celebrations." },
-  { id: "season", label: "Season", empty: "Any season", hint: "The time of year it feels like." },
-  { id: "setting", label: "Setting", empty: "Any setting", hint: "Where the reel takes place." },
-];
+const SEARCH_TAG_KINDS: ExtraKind[] = ["occasion", "season", "setting"];
 
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 const famColor = (f?: string) => (f ? MOOD_FAMILY_COLORS[f as MoodFamily] : undefined);
@@ -53,8 +49,9 @@ export function FilterBar({ value, onChange, facets, total, families, brands, co
   const [hover, setHover] = useState<Seg | null>(null);
   const narrow = useNarrow(phoneStyle);
   const wrap = useRef<HTMLDivElement>(null);
-  const segRefs = { mood: useRef<HTMLButtonElement>(null), category: useRef<HTMLButtonElement>(null), brand: useRef<HTMLButtonElement>(null), occasion: useRef<HTMLButtonElement>(null), season: useRef<HTMLButtonElement>(null), setting: useRef<HTMLButtonElement>(null) };
-  const kindOfTag = (m: string): Seg => (EXTRA.find((k) => kinds[k.id].includes(m))?.id ?? "mood");
+  const segRefs = { mood: useRef<HTMLButtonElement>(null), category: useRef<HTMLButtonElement>(null), brand: useRef<HTMLButtonElement>(null) };
+  // Search-only tags stay separate so changing Mood never clears a search's occasion, season or setting.
+  const kindOfTag = (m: string): Seg | ExtraKind => (SEARCH_TAG_KINDS.find((k) => kinds[k].includes(m)) ?? "mood");
   const pickedOf = (k: Seg) => value.moods.filter((m) => kindOfTag(m) === k);
   const setKind = (k: Seg, list: string[]) => onChange({ ...value, moods: [...value.moods.filter((m) => kindOfTag(m) !== k), ...list] });
   const familyOf = new Map(families.flatMap((f) => f.moods.map((m) => [m, f.family] as const)));
@@ -78,7 +75,6 @@ export function FilterBar({ value, onChange, facets, total, families, brands, co
     { id: "category", label: "Category", empty: "Any category", names: value.categories.map(catName), key: "categories" },
     { id: "brand", label: "Brand", empty: "Any brand", names: value.brands.map(brandName), key: "brands" },
     { id: "mood", label: "Mood", empty: "Any mood", names: pickedOf("mood").map(cap), key: "moods" },
-    ...EXTRA.filter((k) => kinds[k.id].some((m) => (facets.moods[m] ?? 0) > 0) || pickedOf(k.id).length > 0).map((k) => ({ id: k.id as Seg, label: k.label, empty: k.empty, names: pickedOf(k.id).map(cap), key: "moods" as const })),
   ];
   const set = (k: keyof FilterValue, list: string[]) => onChange({ ...value, [k]: list });
   const clearSeg = (s: Seg, k: keyof FilterValue) => (k === "moods" ? setKind(s, []) : set(k, []));
@@ -95,12 +91,12 @@ export function FilterBar({ value, onChange, facets, total, families, brands, co
   ); };
 
   const panel = (seg: Seg, title: string, hint: string, body: ReactNode, k: keyof FilterValue) => {
-    const width = seg === "mood" ? 620 : seg === "category" ? 540 : seg === "brand" ? 400 : 360;
+    const width = seg === "mood" ? 620 : seg === "category" ? 540 : 400;
     const inner = (
       <div role="dialog" aria-modal={narrow} aria-label={`${title} filter`} id={`dir-panel-${seg}`}
         className={cn("flex flex-col bg-ap-card text-left shadow-[var(--ap-shadow-menu)]",
           narrow ? "fixed inset-x-0 bottom-0 z-50 max-h-[82vh] rounded-t-[20px]" : "absolute top-[calc(100%+8px)] z-40 max-h-[560px] max-w-[calc(100vw-32px)] rounded-[18px]",
-          !narrow && (seg === "occasion" || seg === "season" || seg === "setting" ? "right-0" : "left-0"))}
+          !narrow && "left-0")}
         style={narrow ? undefined : { width }}>
         {narrow && <div aria-hidden className="mx-auto mt-2 h-1 w-9 rounded-full bg-ap-switch-off" />}
         <div className="px-5 pt-4 pb-3">
@@ -122,7 +118,7 @@ export function FilterBar({ value, onChange, facets, total, families, brands, co
   return (
     <div ref={wrap} className={cn("relative mx-auto max-w-[1040px]", phoneStyle && "aimante-filter-bar")}>
       <div className={cn("dir-filter-height grid transition-[height] motion-reduce:transition-none", compact ? "h-[52px]" : "h-[60px]")}>
-      <div className="dir-filter-row grid h-full auto-cols-[minmax(124px,1fr)] grid-flow-col overflow-x-auto rounded-[14px] bg-ap-panel p-1 [scrollbar-width:none]" role="group" aria-label="Filter reels">
+      <div className="dir-filter-row grid h-full grid-cols-3 overflow-x-auto rounded-[14px] bg-ap-panel p-1 [scrollbar-width:none]" role="group" aria-label="Filter reels">
         {segs.map((s, i) => {
           const active = s.names.length > 0;
           const isOpen = open === s.id;
@@ -164,8 +160,6 @@ export function FilterBar({ value, onChange, facets, total, families, brands, co
       </div>
       {open === "mood" && panel("mood", "Mood", "Pick the feelings you're after. Tap a family to pick all of it.",
         <MoodBody families={families} selected={pickedOf("mood")} counts={facets.moods} onChange={(m) => setKind("mood", m)} />, "moods")}
-      {EXTRA.map((k) => open === k.id && <div key={k.id} className="contents">{panel(k.id, k.label, k.hint,
-        <ChipBody names={kinds[k.id]} selected={pickedOf(k.id)} counts={facets.moods} onChange={(m) => setKind(k.id, m)} />, "moods")}</div>)}
       {open === "category" && panel("category", "Category", "What the brand sells.",
         <CategoryBody selected={value.categories} counts={facets.categories} narrow={narrow} onChange={(c) => set("categories", c)} />, "categories")}
       {open === "brand" && panel("brand", "Brand", "See reels from specific brands.",
@@ -228,25 +222,6 @@ function MoodBody({ families, selected, counts, onChange }: { families: Family[]
         })}
       </div>
     </>
-  );
-}
-
-function ChipBody({ names, selected, counts, onChange }: { names: string[]; selected: string[]; counts: Record<string, number>; onChange: (v: string[]) => void }) {
-  const shown = names.filter((m) => (counts[m] ?? 0) > 0 || selected.includes(m));
-  return (
-    <div className="flex flex-wrap gap-1.5">
-      {shown.map((m) => {
-        const on = selected.includes(m);
-        return (
-          <button key={m} type="button" aria-pressed={on} onClick={() => onChange(toggleIn(selected, m))}
-            className={cn("inline-flex h-8 items-center gap-1 rounded-full px-3 text-[14px]", on ? "bg-ap-blue text-ap-card" : "bg-ap-panel text-ap-ink hover:bg-ap-media")}>
-            {on && <Check aria-hidden className="size-3.5" strokeWidth={2} />}
-            {cap(m)}
-            <span className={cn("text-[12px] nums", on ? "opacity-80" : "text-ap-muted")}>{counts[m] ?? 0}</span>
-          </button>
-        );
-      })}
-    </div>
   );
 }
 
