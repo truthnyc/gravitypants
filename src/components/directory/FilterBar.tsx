@@ -11,7 +11,13 @@ export type Facets = { moods: Record<string, number>; categories: Record<string,
 export type FilterValue = { moods: string[]; categories: string[]; brands: string[] };
 type Family = { family: string; moods: string[] };
 type Brand = { slug: string; name: string; category: string; logo_url: string | null };
-type Seg = "mood" | "category" | "brand";
+type Seg = "mood" | "category" | "brand" | "occasion" | "season" | "setting";
+type ExtraKind = "occasion" | "season" | "setting";
+const EXTRA: { id: ExtraKind; label: string; empty: string; hint: string }[] = [
+  { id: "occasion", label: "Occasion", empty: "Any occasion", hint: "Gifts, holidays and celebrations." },
+  { id: "season", label: "Season", empty: "Any season", hint: "The time of year it feels like." },
+  { id: "setting", label: "Setting", empty: "Any setting", hint: "Where the reel takes place." },
+];
 
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 const famColor = (f?: string) => (f ? MOOD_FAMILY_COLORS[f as MoodFamily] : undefined);
@@ -36,7 +42,9 @@ function Mark({ text, q }: { text: string; q: string }) {
   return <>{text.slice(0, i)}<mark className="rounded-[2px] bg-ap-soft-blue text-inherit">{text.slice(i, i + q.length)}</mark>{text.slice(i + q.length)}</>;
 }
 
-export function FilterBar({ value, onChange, facets, total, families, brands, compact = false, phoneStyle = false, categoryLabel }: {
+export function FilterBar({ value, onChange, facets, total, families, brands, compact = false, phoneStyle = false, categoryLabel, kinds = { occasion: [], season: [], setting: [] } }: {
+  /** Occasion, Season and Setting values; `value.moods` holds every picked tag across the four kinds. */
+  kinds?: Record<ExtraKind, string[]>;
   /** Shown instead of the category names when one occasion word chose several categories, e.g. "A host (3)". */
   categoryLabel?: string | undefined;
   phoneStyle?: boolean; compact?: boolean; value: FilterValue; onChange: (v: FilterValue) => void; facets: Facets; total: number; families: Family[]; brands: Brand[];
@@ -45,7 +53,10 @@ export function FilterBar({ value, onChange, facets, total, families, brands, co
   const [hover, setHover] = useState<Seg | null>(null);
   const narrow = useNarrow(phoneStyle);
   const wrap = useRef<HTMLDivElement>(null);
-  const segRefs = { mood: useRef<HTMLButtonElement>(null), category: useRef<HTMLButtonElement>(null), brand: useRef<HTMLButtonElement>(null) };
+  const segRefs = { mood: useRef<HTMLButtonElement>(null), category: useRef<HTMLButtonElement>(null), brand: useRef<HTMLButtonElement>(null), occasion: useRef<HTMLButtonElement>(null), season: useRef<HTMLButtonElement>(null), setting: useRef<HTMLButtonElement>(null) };
+  const kindOfTag = (m: string): Seg => (EXTRA.find((k) => kinds[k.id].includes(m))?.id ?? "mood");
+  const pickedOf = (k: Seg) => value.moods.filter((m) => kindOfTag(m) === k);
+  const setKind = (k: Seg, list: string[]) => onChange({ ...value, moods: [...value.moods.filter((m) => kindOfTag(m) !== k), ...list] });
   const familyOf = new Map(families.flatMap((f) => f.moods.map((m) => [m, f.family] as const)));
 
   const close = (focus = true) => { const s = open; setOpen(null); if (focus && s) segRefs[s].current?.focus(); };
@@ -64,30 +75,32 @@ export function FilterBar({ value, onChange, facets, total, families, brands, co
   const catName = (s: string) => CATEGORIES.find((c) => categorySlug(c) === s) ?? s;
   const brandName = (s: string) => brands.find((b) => b.slug === s)?.name ?? s;
   const segs: { id: Seg; label: string; empty: string; names: string[]; key: keyof FilterValue }[] = [
-    { id: "mood", label: "Mood", empty: "Any mood", names: value.moods.map(cap), key: "moods" },
     { id: "category", label: "Category", empty: "Any category", names: value.categories.map(catName), key: "categories" },
     { id: "brand", label: "Brand", empty: "Any brand", names: value.brands.map(brandName), key: "brands" },
+    { id: "mood", label: "Mood", empty: "Any mood", names: pickedOf("mood").map(cap), key: "moods" },
+    ...EXTRA.filter((k) => kinds[k.id].some((m) => (facets.moods[m] ?? 0) > 0) || pickedOf(k.id).length > 0).map((k) => ({ id: k.id as Seg, label: k.label, empty: k.empty, names: pickedOf(k.id).map(cap), key: "moods" as const })),
   ];
   const set = (k: keyof FilterValue, list: string[]) => onChange({ ...value, [k]: list });
+  const clearSeg = (s: Seg, k: keyof FilterValue) => (k === "moods" ? setKind(s, []) : set(k, []));
 
-  const footer = (k: keyof FilterValue) => (
+  const footer = (seg: Seg, k: keyof FilterValue) => { const n = k === "moods" ? pickedOf(seg).length : value[k].length; return (
     <div className="flex items-center justify-between gap-3 border-t border-ap-hairline px-5 py-3 pb-[max(12px,env(safe-area-inset-bottom))]">
-      <button type="button" disabled={!value[k].length} onClick={() => set(k, [])} className="text-[14px] font-medium text-ap-blue disabled:text-ap-muted disabled:opacity-60 nums">
-        Clear ({value[k].length})
+      <button type="button" disabled={!n} onClick={() => clearSeg(seg, k)} className="text-[14px] font-medium text-ap-blue disabled:text-ap-muted disabled:opacity-60 nums">
+        Clear ({n})
       </button>
       <button type="button" onClick={() => close()} className={cn("h-10 rounded-lg bg-ap-ink px-4 text-[14px] font-medium text-ap-card nums", narrow && "flex-1")}>
         {total === 0 ? "No matches" : "Show reels"}
       </button>
     </div>
-  );
+  ); };
 
   const panel = (seg: Seg, title: string, hint: string, body: ReactNode, k: keyof FilterValue) => {
-    const width = seg === "mood" ? 620 : seg === "category" ? 540 : 400;
+    const width = seg === "mood" ? 620 : seg === "category" ? 540 : seg === "brand" ? 400 : 360;
     const inner = (
       <div role="dialog" aria-modal={narrow} aria-label={`${title} filter`} id={`dir-panel-${seg}`}
         className={cn("flex flex-col bg-ap-card text-left shadow-[var(--ap-shadow-menu)]",
           narrow ? "fixed inset-x-0 bottom-0 z-50 max-h-[82vh] rounded-t-[20px]" : "absolute top-[calc(100%+8px)] z-40 max-h-[560px] max-w-[calc(100vw-32px)] rounded-[18px]",
-          !narrow && (seg === "mood" ? "left-0" : seg === "brand" ? "right-0" : "left-1/2 -translate-x-1/2"))}
+          !narrow && (seg === "occasion" || seg === "season" || seg === "setting" ? "right-0" : "left-0"))}
         style={narrow ? undefined : { width }}>
         {narrow && <div aria-hidden className="mx-auto mt-2 h-1 w-9 rounded-full bg-ap-switch-off" />}
         <div className="px-5 pt-4 pb-3">
@@ -95,7 +108,7 @@ export function FilterBar({ value, onChange, facets, total, families, brands, co
           <p className="text-[13px] text-ap-muted">{hint}</p>
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-4">{body}</div>
-        {footer(k)}
+        {footer(seg, k)}
       </div>
     );
     return narrow ? (
@@ -107,9 +120,9 @@ export function FilterBar({ value, onChange, facets, total, families, brands, co
   };
 
   return (
-    <div ref={wrap} className={cn("relative mx-auto max-w-[680px]", phoneStyle && "aimante-filter-bar")}>
+    <div ref={wrap} className={cn("relative mx-auto max-w-[1040px]", phoneStyle && "aimante-filter-bar")}>
       <div className={cn("dir-filter-height grid transition-[height] motion-reduce:transition-none", compact ? "h-[52px]" : "h-[60px]")}>
-      <div className="dir-filter-row grid h-full grid-cols-[1.15fr_1fr_1fr] rounded-[14px] bg-ap-panel p-1" role="group" aria-label="Filter reels">
+      <div className="dir-filter-row grid h-full auto-cols-[minmax(124px,1fr)] grid-flow-col overflow-x-auto rounded-[14px] bg-ap-panel p-1 [scrollbar-width:none]" role="group" aria-label="Filter reels">
         {segs.map((s, i) => {
           const active = s.names.length > 0;
           const isOpen = open === s.id;
@@ -129,7 +142,7 @@ export function FilterBar({ value, onChange, facets, total, families, brands, co
                   <span className={cn("flex items-center gap-1.5 text-[15px]", active ? "font-medium text-ap-ink" : "text-ap-muted")}>
                     {s.id === "mood" && active && (
                       <span aria-hidden className="hidden shrink-0 -space-x-1 sm:flex">
-                        {value.moods.slice(0, 3).map((m) => <span key={m} className="size-2.5 rounded-full ring-2 ring-ap-panel" style={{ background: famColor(familyOf.get(m))?.bg }} />)}
+                        {pickedOf("mood").slice(0, 3).map((m) => <span key={m} className="size-2.5 rounded-full ring-2 ring-ap-panel" style={{ background: famColor(familyOf.get(m))?.bg }} />)}
                       </span>
                     )}
                     <span className="truncate">{active ? (s.id === "category" && categoryLabel ? categoryLabel : summary(s.names)) : s.empty}</span>
@@ -139,7 +152,7 @@ export function FilterBar({ value, onChange, facets, total, families, brands, co
                 {!active && <ChevronDown aria-hidden className={cn("hidden size-4 shrink-0 text-ap-muted transition-transform motion-reduce:transition-none sm:block", isOpen && "rotate-180")} strokeWidth={1.7} />}
                </Button>
               {active && (
-                <button type="button" aria-label={`Clear ${s.label.toLowerCase()} filter`} onClick={() => set(s.key, [])}
+                <button type="button" aria-label={`Clear ${s.label.toLowerCase()} filter`} onClick={() => clearSeg(s.id, s.key)}
                   className="absolute top-1/2 right-2 grid size-6 -translate-y-1/2 place-items-center rounded-full bg-ap-media text-ap-ink hover:bg-ap-switch-off sm:right-3">
                   <X className="size-3.5" strokeWidth={1.7} />
                 </button>
@@ -150,7 +163,9 @@ export function FilterBar({ value, onChange, facets, total, families, brands, co
       </div>
       </div>
       {open === "mood" && panel("mood", "Mood", "Pick the feelings you're after. Tap a family to pick all of it.",
-        <MoodBody families={families} selected={value.moods} counts={facets.moods} onChange={(m) => set("moods", m)} />, "moods")}
+        <MoodBody families={families} selected={pickedOf("mood")} counts={facets.moods} onChange={(m) => setKind("mood", m)} />, "moods")}
+      {EXTRA.map((k) => open === k.id && <div key={k.id} className="contents">{panel(k.id, k.label, k.hint,
+        <ChipBody names={kinds[k.id]} selected={pickedOf(k.id)} counts={facets.moods} onChange={(m) => setKind(k.id, m)} />, "moods")}</div>)}
       {open === "category" && panel("category", "Category", "What the brand sells.",
         <CategoryBody selected={value.categories} counts={facets.categories} narrow={narrow} onChange={(c) => set("categories", c)} />, "categories")}
       {open === "brand" && panel("brand", "Brand", "See reels from specific brands.",
@@ -213,6 +228,25 @@ function MoodBody({ families, selected, counts, onChange }: { families: Family[]
         })}
       </div>
     </>
+  );
+}
+
+function ChipBody({ names, selected, counts, onChange }: { names: string[]; selected: string[]; counts: Record<string, number>; onChange: (v: string[]) => void }) {
+  const shown = names.filter((m) => (counts[m] ?? 0) > 0 || selected.includes(m));
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      {shown.map((m) => {
+        const on = selected.includes(m);
+        return (
+          <button key={m} type="button" aria-pressed={on} onClick={() => onChange(toggleIn(selected, m))}
+            className={cn("inline-flex h-8 items-center gap-1 rounded-full px-3 text-[14px]", on ? "bg-ap-blue text-ap-card" : "bg-ap-panel text-ap-ink hover:bg-ap-media")}>
+            {on && <Check aria-hidden className="size-3.5" strokeWidth={2} />}
+            {cap(m)}
+            <span className={cn("text-[12px] nums", on ? "opacity-80" : "text-ap-muted")}>{counts[m] ?? 0}</span>
+          </button>
+        );
+      })}
+    </div>
   );
 }
 

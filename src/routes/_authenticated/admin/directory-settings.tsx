@@ -1,3 +1,4 @@
+import { TAG_KIND_LABEL } from "@/lib/directory/tag-kinds";
 import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, useBlocker } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -93,7 +94,10 @@ function DirectorySettingsAdmin() {
   });
   const brands = useQuery({ queryKey: ["admin", "directory-public-brands"], queryFn: () => brandsFn() });
   const siteReels = useQuery({ queryKey: ["admin", "site-reels-public"], queryFn: () => siteFn() });
-  const { families, all: allMoods } = useMoodCatalog();
+  const moodCat = useMoodCatalog();
+  // Same group order as the public filters: Mood families, then Occasion, Season, Setting.
+  const families = [...moodCat.families, ...(["occasion", "season", "setting"] as const).map((k) => ({ family: TAG_KIND_LABEL[k], moods: moodCat.kinds[k] }))].filter((f) => f.moods.length);
+  const allMoods = families.flatMap((f) => f.moods);
   const loadG = useServerFn(getGreetingAdmin);
   const saveG = useServerFn(saveGreetingConfig);
   const savedG = useQuery({ queryKey: ["admin", "directory-greeting"], queryFn: () => loadG() });

@@ -1,3 +1,4 @@
+import { splitByKind, TAG_KIND_LABEL, type TagKind } from "@/lib/directory/tag-kinds";
 import { ConceptReelNotice } from "@/components/directory/ConceptReelNotice";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useBrandSite } from "@/components/site/AimanteShell";
@@ -53,6 +54,16 @@ const posterFor = (format: string | undefined) =>
       ? `absolute top-1/2 left-1/2 w-[84%] aspect-[5/4] object-contain -translate-x-1/2 -translate-y-1/2 ${POSTER_RING}`
       : `absolute top-1/2 left-1/2 h-auto w-auto max-h-[72%] max-w-[72%] object-contain -translate-x-1/2 -translate-y-1/2 ${POSTER_RING}`;
 
+/** Every picked tag across Mood, Occasion, Season and Setting, as one comma list for the server. */
+function mergeTagParams(s: { mood?: string | undefined; occasion?: string | undefined; season?: string | undefined; setting?: string | undefined }) {
+  return [s.mood, s.occasion, s.season, s.setting].filter(Boolean).join(",") || undefined;
+}
+/** Splits picked tags back into one URL param per kind. */
+function tagParams(tags: string[], kindOf: (n: string) => TagKind) {
+  const by = splitByKind(tags, kindOf);
+  return { mood: by.mood.join(",") || undefined, occasion: by.occasion.join(",") || undefined, season: by.season.join(",") || undefined, setting: by.setting.join(",") || undefined };
+}
+
 // Moods the headline cycles through when none are picked.
 const ROTATING = ["soothing", "energizing", "hopeful", "inspiring", "cozy", "luxurious", "playful"];
 export const Route = createFileRoute("/directory/")({
@@ -67,6 +78,9 @@ export const Route = createFileRoute("/directory/")({
           .map((m) => (m.trim().toLowerCase() === "urgent" ? "lively" : m))
           .join(","),
       ), // old ?mood=urgent links still work
+    occasion: z.string().optional(),
+    season: z.string().optional(),
+    setting: z.string().optional(),
     category: z.string().optional(),
     brand: z.string().optional(),
     page: z.union([z.number(), z.string()]).optional(),
@@ -74,7 +88,7 @@ export const Route = createFileRoute("/directory/")({
   loaderDeps: ({ search }) => ({
     q: (search.q ?? "").slice(0, 200),
     category: search.category,
-    mood: search.mood,
+    mood: mergeTagParams(search),
     brand: search.brand,
   }),
   loader: async ({ deps, context }) => {
@@ -326,13 +340,13 @@ function DirectoryPage() {
   const search = Route.useSearch();
   const q = (search.q ?? "").slice(0, 200);
   const page = Math.min(Math.max(1, Math.floor(Number(search.page) || 1)), 20);
+  const { families, kinds, kindOf, resolve, aliases } = useMoodCatalog();
   const filters: FilterValue = {
-    moods: list(search.mood),
+    moods: [...new Set(list(mergeTagParams(search)).map(resolve))],
     categories: list(search.category),
     brands: list(search.brand),
   };
   const fKey = JSON.stringify(filters);
-  const { families } = useMoodCatalog();
   const navigate = useNavigate({ from: "/directory/" });
   const [value, setValue] = useState(q);
   const [open, setOpen] = useState<DirectoryCard | null>(null);
@@ -394,7 +408,7 @@ function DirectoryPage() {
       resetScroll: false,
       search: (prev) => ({
         ...prev,
-        mood: f.moods.join(",") || undefined,
+        ...tagParams(f.moods, kindOf),
         category: f.categories.join(",") || undefined,
         brand: f.brands.join(",") || undefined,
         ...(q !== undefined ? { q: q || undefined } : {}),
@@ -404,18 +418,18 @@ function DirectoryPage() {
   const runSentence = (text: string) => {
     const t = text.trim();
     if (!t) { setReadAs(null); go(""); return; }
-    const p = parseSearch(t, { moods: families.flatMap((f) => f.moods), brands });
-    if (!p.mood && !p.brand && p.categories.length === 0) {
+    const p = parseSearch(t, { moods: families.flatMap((f) => f.moods), brands, kinds, aliases });
+    if (!p.tags.length && !p.brand && p.categories.length === 0) {
       setReadAs({ line: "No mood or category words found, so this is a plain text search.", occasion: null });
       applyFilters({ moods: [], categories: [], brands: [] }, t);
       return;
     }
     const catNames = p.categories.map((c) => CATEGORIES.find((x) => categorySlug(x) === c) ?? c);
-    const parts = [p.mood && `mood ${cap(p.mood)}`, catNames.length && `category ${catNames.join(", ")}`, p.brand && `brand ${brands.find((b) => b.slug === p.brand)?.name ?? p.brand}`].filter(Boolean);
+    const parts = [...p.tags.map((t) => `${TAG_KIND_LABEL[kindOf(t)].toLowerCase()} ${cap(t)}`), catNames.length && `category ${catNames.join(", ")}`, p.brand && `brand ${brands.find((b) => b.slug === p.brand)?.name ?? p.brand}`].filter(Boolean);
     // Words that are not a mood, category or brand still narrow the results as a text search.
     const leftover = p.leftoverText.trim();
     setValue("");
-    applyFilters({ moods: p.mood ? [p.mood] : [], categories: p.categories, brands: p.brand ? [p.brand] : [] }, leftover);
+    applyFilters({ moods: p.tags, categories: p.categories, brands: p.brand ? [p.brand] : [] }, leftover);
     setReadAs({ line: `Read as: ${parts.join(" · ")}${leftover ? ` · “${leftover}”` : ""}`, occasion: p.occasion ? `${p.occasion} (${p.categories.length})` : null });
   };
   const searchFn = useServerFn(searchDirectory);
@@ -548,7 +562,7 @@ function DirectoryPage() {
 
   const famOf = new Map(families.flatMap((f) => f.moods.map((m) => [m, f.family] as const)));
   const tags: Tag[] = [
-    ...filters.moods.map((v) => ({ key: "moods" as const, value: v, label: `Mood · ${cap(v)}` })),
+    ...filters.moods.map((v) => ({ key: "moods" as const, value: v, label: `${TAG_KIND_LABEL[kindOf(v)]} · ${cap(v)}` })),
     ...filters.categories.map((v) => ({
       key: "categories" as const,
       value: v,
@@ -782,6 +796,7 @@ function DirectoryPage() {
           )}
         >
           <FilterBar
+            kinds={kinds}
             phoneStyle={isAim}
             value={filters}
             onChange={setFilters}
@@ -968,6 +983,7 @@ function DirectoryPage() {
           {found.length > 0 && !results.isPlaceholderData && (
             <div className="mt-10 flex flex-col items-center gap-3 text-center">
               <div
+                data-newsletter-after=""
                 className="h-1 w-[180px] overflow-hidden rounded-full bg-ap-inner"
                 role="progressbar"
                 aria-label="Reels loaded"
@@ -1041,7 +1057,7 @@ function DirectoryPage() {
 
 function nextQuery(search: Record<string, unknown>, page: number) {
   const p = new URLSearchParams();
-  for (const k of ["q", "mood", "category", "brand"]) {
+  for (const k of ["q", "mood", "occasion", "season", "setting", "category", "brand"] as const) {
     const v = search[k];
     if (typeof v === "string" && v) p.set(k, v);
   }

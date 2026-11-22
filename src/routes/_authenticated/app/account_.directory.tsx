@@ -1,3 +1,4 @@
+import { TagPicker } from "@/components/directory/TagPicker";
 import { CatalogBox } from "@/components/directory/CatalogBox";
 import { ReelProductsEditor } from "@/components/directory/ReelProductsEditor";
 import { AIMANTE_ORIGIN } from "@/lib/site/brand-site";
@@ -243,9 +244,9 @@ function ReelMoods({ adId, moods, category, onSaved }: { adId: string; moods: st
   }
   return (
     <div className="mt-2 rounded-[8px] bg-ap-panel p-3">
-      <MoodChips value={picked} options={options} onChange={setPicked} disabled={busy} />
+      <TagPicker value={picked} onChange={setPicked} moodOptions={options} capMoods disabled={busy} />
       <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
-        <small className="text-[12px] text-ap-muted">Pick as many as fit this reel.</small>
+        <small className="text-[12px] text-ap-muted">Up to 3 moods, plus any occasion, season or setting.</small>
         <div className="flex gap-2">
           <AppButton variant="ghost" size="sm" disabled={busy} onClick={() => setOpen(false)}>Cancel</AppButton>
           <AppButton size="sm" disabled={busy || picked.join() === moods.join()} onClick={() => void commit()}>{busy ? "Saving..." : "Save moods"}</AppButton>
@@ -263,7 +264,7 @@ function Counter({ n, max }: { n: number; max: number }) {
 }
 function DescriptionBox({ brand, onSaved }: { brand: BrandInfo; onSaved: () => void }) {
   const save = useServerFn(saveBrandDescription);
-  const { forCategory } = useMoodCatalog();
+  const { forCategory, kindOf } = useMoodCatalog();
   const [name, setName] = useState(brand.name);
   const [website, setWebsite] = useState(brand.website);
   const [category, setCategory] = useState(brand.category);
@@ -290,16 +291,11 @@ function DescriptionBox({ brand, onSaved }: { brand: BrandInfo; onSaved: () => v
           <input type="url" value={website} placeholder="https://yourbrand.com" onChange={(e) => setWebsite(e.target.value)} className={fieldCls} /></label>
       </div>
       <label className="mt-4 block sm:w-1/2 sm:pr-[7px]"><span className={lbl}>Category</span>
-        <select value={category} onChange={(e) => { const c = e.target.value; setCategory(c); setMoods(moods.filter((m) => forCategory(c).includes(m))); }} className={fieldCls}>
+        <select value={category} onChange={(e) => { const c = e.target.value; setCategory(c); setMoods(moods.filter((m) => kindOf(m) !== "mood" || forCategory(c).includes(m))); }} className={fieldCls}>
           {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
         </select></label>
       <div className="mt-4"><span className={lbl}>Moods</span>
-        <div className="flex flex-wrap gap-1.5">
-          {[...new Set([...forCategory(category), ...moods])].map((m) => { const on = moods.includes(m); return (
-            <button key={m} type="button" aria-pressed={on} onClick={() => setMoods(on ? moods.filter((x) => x !== m) : [...moods, m])}
-              className={cn("h-9 rounded-lg px-3 text-[14px]", on ? "bg-ap-blue text-ap-card" : "bg-ap-panel text-ap-body hover:bg-ap-media", "disabled:opacity-40")}>{moodLabel(m)}</button>
-          ); })}
-        </div>
+        <TagPicker value={moods} onChange={setMoods} moodOptions={forCategory(category)} />
         <small className="mt-1.5 block text-[12px] text-ap-muted">Pick as many moods as fit your brand. The list matches your category.</small>
         <MoodRequestBox />
       </div>
