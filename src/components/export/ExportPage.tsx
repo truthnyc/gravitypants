@@ -1,5 +1,5 @@
 import { openUpgrade, usePlanAccess } from "@/lib/stillframe/plan";
-import { useEffect, useMemo, useRef, useState, type ComponentProps } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ComponentProps } from "react";
 import { Link } from "@tanstack/react-router";
 import { KitAgainButton } from "@/components/templates/KitAgain";
 import { TRIAL, planById } from "@/lib/stillframe/plans-config";
@@ -579,10 +579,19 @@ function MiniRender({ project, frames, brand, images, format, width, index = 0, 
 /** Left preview: the ad drawn by renderAt at the chosen size's shape. */
 function ExportStage({ target, time, project, frames, brand, images }: { target: Target; time: number; project: Project; frames: Frame[]; brand: BrandStyle; images: Map<string, HTMLImageElement> | null }) {
   const ref = useRef<HTMLCanvasElement>(null);
-  // Draw at the real export size (capped) so logos and text stay sharp on large retina screens.
-  const scale = Math.min(1, 1920 / Math.max(target.width, target.height));
-  const W = Math.round(target.width * scale);
-  const H = Math.round(target.height * scale);
+  // Like the editor Stage: draw at on-screen size x pixel ratio so logos and text stay sharp on retina screens.
+  const [cssW, setCssW] = useState(0);
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const ro = new ResizeObserver(([e]) => e && setCssW(Math.floor(e.contentRect.width)));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  const dpr = typeof window === "undefined" ? 1 : Math.min(2, window.devicePixelRatio || 1);
+  const base = Math.min(1, 900 / Math.max(target.width, target.height)) * target.width;
+  const W = Math.round(cssW ? cssW * dpr : base);
+  const H = Math.round((W * target.height) / target.width);
   useEffect(() => {
     const ctx = ref.current?.getContext("2d");
     if (!ctx || !images) return;
