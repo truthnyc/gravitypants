@@ -48,6 +48,7 @@ import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } fr
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedAppRouteRouteImport } from './routes/_authenticated/app/route'
 import { Route as AimanteAboutRouteImport } from './routes/aimante.about'
+import { Route as AimanteBrandsRouteImport } from './routes/aimante.brands'
 import { Route as AimanteJoinRouteImport } from './routes/aimante.join'
 import { Route as BadgeFileRouteImport } from './routes/badge.$file'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
@@ -345,6 +346,11 @@ const AuthenticatedAppRouteRoute = AuthenticatedAppRouteRouteImport.update({
 const AimanteAboutRoute = AimanteAboutRouteImport.update({
   id: '/aimante/about',
   path: '/aimante/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AimanteBrandsRoute = AimanteBrandsRouteImport.update({
+  id: '/aimante/brands',
+  path: '/aimante/brands',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AimanteJoinRoute = AimanteJoinRouteImport.update({
@@ -934,6 +940,7 @@ export interface FileRoutesByFullPath {
   '/app': typeof AuthenticatedAppRouteRouteWithChildren
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/aimante/about': typeof AimanteAboutRoute
+  '/aimante/brands': typeof AimanteBrandsRoute
   '/aimante/join': typeof AimanteJoinRoute
   '/badge/$file': typeof BadgeFileRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -1072,6 +1079,7 @@ export interface FileRoutesByTo {
   '/video-ads-for-small-business': typeof VideoAdsForSmallBusinessRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/aimante/about': typeof AimanteAboutRoute
+  '/aimante/brands': typeof AimanteBrandsRoute
   '/aimante/join': typeof AimanteJoinRoute
   '/badge/$file': typeof BadgeFileRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -1215,6 +1223,7 @@ export interface FileRoutesById {
   '/_authenticated/app': typeof AuthenticatedAppRouteRouteWithChildren
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/aimante/about': typeof AimanteAboutRoute
+  '/aimante/brands': typeof AimanteBrandsRoute
   '/aimante/join': typeof AimanteJoinRoute
   '/badge/$file': typeof BadgeFileRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -1358,6 +1367,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/.well-known/oauth-protected-resource'
     | '/aimante/about'
+    | '/aimante/brands'
     | '/aimante/join'
     | '/badge/$file'
     | '/blog/$slug'
@@ -1496,6 +1506,7 @@ export interface FileRouteTypes {
     | '/video-ads-for-small-business'
     | '/.well-known/oauth-protected-resource'
     | '/aimante/about'
+    | '/aimante/brands'
     | '/aimante/join'
     | '/badge/$file'
     | '/blog/$slug'
@@ -1638,6 +1649,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app'
     | '/.well-known/oauth-protected-resource'
     | '/aimante/about'
+    | '/aimante/brands'
     | '/aimante/join'
     | '/badge/$file'
     | '/blog/$slug'
@@ -1779,6 +1791,7 @@ export interface RootRouteChildren {
   VideoAdsForSmallBusinessRoute: typeof VideoAdsForSmallBusinessRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   AimanteAboutRoute: typeof AimanteAboutRoute
+  AimanteBrandsRoute: typeof AimanteBrandsRoute
   AimanteJoinRoute: typeof AimanteJoinRoute
   BadgeFileRoute: typeof BadgeFileRoute
   DirectorySlugRoute: typeof DirectorySlugRoute
@@ -2097,6 +2110,13 @@ declare module '@tanstack/react-router' {
       path: '/aimante/about'
       fullPath: '/aimante/about'
       preLoaderRoute: typeof AimanteAboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/aimante/brands': {
+      id: '/aimante/brands'
+      path: '/aimante/brands'
+      fullPath: '/aimante/brands'
+      preLoaderRoute: typeof AimanteBrandsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/aimante/join': {
@@ -3054,6 +3074,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
   AimanteAboutRoute: AimanteAboutRoute,
+  AimanteBrandsRoute: AimanteBrandsRoute,
   AimanteJoinRoute: AimanteJoinRoute,
   BadgeFileRoute: BadgeFileRoute,
   DirectorySlugRoute: DirectorySlugRoute,

@@ -78,6 +78,7 @@ async function aimanteEntries(): Promise<Entry[]> {
     { loc: `${AIMANTE_ORIGIN}/`, lastmod: "", changefreq: "daily", priority: "1.0" },
     { loc: `${AIMANTE_ORIGIN}/about`, lastmod: "2026-10-07", changefreq: "yearly", priority: "0.5" },
     { loc: `${AIMANTE_ORIGIN}/join`, lastmod: "2026-10-07", changefreq: "monthly", priority: "0.6" },
+    { loc: `${AIMANTE_ORIGIN}/brands`, lastmod: "2026-11-22", changefreq: "weekly", priority: "0.7" },
     ...(guides.length ? [{ loc: `${AIMANTE_ORIGIN}/guides`, lastmod: isoDate(guides[0]!.updated_at), changefreq: "weekly", priority: "0.6" }] : []),
     ...guides.map((g) => ({ loc: `${AIMANTE_ORIGIN}/guides/${g.slug}`, lastmod: isoDate(g.updated_at), changefreq: "monthly", priority: "0.6" })),
     ...shown.map((l) => ({ loc: `${AIMANTE_ORIGIN}/${l.kind === "category" ? "c" : "mood"}/${encodeURIComponent(l.slug)}`, lastmod: l.lastmod, changefreq: "weekly", priority: l.kind === "category" ? "0.7" : "0.6" })),
