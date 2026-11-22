@@ -194,9 +194,9 @@ function KitCard({
           <h3 className="min-w-0 flex-1 truncate text-[15px] font-semibold">{kit.name}</h3>
           {kit.is_default && <span className="rounded-lg bg-control-fill px-2 py-0.5 text-[11px] font-medium text-secondary-text">Default</span>}
           {canEdit && (
-            <DropdownMenu>
+            <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
-                <button type="button" aria-label={`More for ${kit.name}`} className="-mr-2 flex size-11 items-center justify-center text-icon">
+                <button type="button" aria-label={`More for ${kit.name}`} onClick={(e) => e.stopPropagation()} className="-mr-2 flex size-11 items-center justify-center text-icon">
                   <MoreHorizontal className="size-4" strokeWidth={1.7} />
                 </button>
               </DropdownMenuTrigger>
