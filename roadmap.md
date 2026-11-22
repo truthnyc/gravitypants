@@ -90,6 +90,7 @@
 - [ ] Aimanté Google ad: goal visits, $10/day; next: locations, research, campaign type
 
 # Discovery plan
+- [x] Correct category links with tracking/preview parameters; confirm updated public intros and Food & Drink hint; group/create/rename subcategories and save validated brand assignments. Signed-in create/rename/reload and real brand assignment read-back verified; temporary data removed and original assignment restored. Desktop/phone checked, 18 tests pass. Page changes await publishing.
 - [x] Trim public filters to Category, Brand and Mood; search tags and 12-per-click loading unchanged. All three panels, real category selection and phone sheet verified; 37 regression tests pass. Preview only.
 - [x] Step 1: filter counts, hide empty values, on-screen autoplay, headline mood end dates; draft accepted into main, 4 headline-mood tests pass, signed-in admin settings and live Directory verified (12 per click kept). Preview only.
 - [ ] Step 2: reclassify categories in a fresh draft.

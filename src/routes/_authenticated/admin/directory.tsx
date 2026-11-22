@@ -14,9 +14,13 @@ import { Switch } from "@/components/ui/switch";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { setSiteReelPublished } from "@/lib/stillframe/admin-reels.functions";
 import { BrandOwnership, NewBrandPage } from "@/components/admin/BrandPageAdmin";
+import { listCategories } from "@/lib/directory/categories.functions";
+import { subcategoriesFor } from "@/lib/directory/subcategories";
+import { ChevronDown } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 export const Route = createFileRoute("/_authenticated/admin/directory")({
-  head: () => ({ meta: [{ title: "Directory review — Admin" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Directory review — Gravity Pants Admin" }, { name: "description", content: "Review reels and manage Aimanté brand details and category assignments." }, { property: "og:title", content: "Directory review — Gravity Pants Admin" }, { property: "og:description", content: "Review reels and manage Aimanté brand details and category assignments." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" }] }),
   component: AdminDirectory,
 });
 
@@ -310,7 +314,10 @@ function BrandForm({ b, onSaved }: { b: Detail["brand"]; onSaved: () => void }) 
   const save = useServerFn(adminSaveBrand);
   const logo = useServerFn(setBrandLogo);
   const { forCategory, kindOf } = useMoodCatalog();
-  const [f, setF] = useState({ name: b.name, website: b.website, category: b.category as Category, description: b.description, moods: b.moods as string[], affiliated: b.affiliated, status: b.status });
+  const [f, setF] = useState({ name: b.name, website: b.website, category: b.category as Category, subcategoryId: b.subcategoryId, description: b.description, moods: b.moods as string[], affiliated: b.affiliated, status: b.status });
+  const catalog = useQuery({ queryKey: ["category-catalog"], queryFn: () => listCategories() });
+  const parent = catalog.data?.find((c) => c.name === f.category && c.parent_id === null);
+  const children = parent ? subcategoriesFor(catalog.data ?? [], parent.id) : [];
   const [busy, setBusy] = useState(false);
   const run = async (fn: () => Promise<unknown>, msg: string) => {
     setBusy(true);
@@ -338,7 +345,8 @@ function BrandForm({ b, onSaved }: { b: Detail["brand"]; onSaved: () => void }) 
       <div className="grid flex-1 gap-2 sm:grid-cols-2">
         <label className="space-y-1"><span className="flex justify-between text-[12px] text-secondary-text"><span>Brand name</span><span className={cn("nums", nearLimit(f.name.length, BRAND_NAME_MAX) && "text-warning-text")}>{f.name.length} / {BRAND_NAME_MAX}</span></span><input value={f.name} maxLength={BRAND_NAME_MAX} onChange={(e) => setF({ ...f, name: e.target.value })} className={field} /></label>
         <label className="space-y-1"><span className="text-[12px] text-secondary-text">Website</span><input value={f.website} maxLength={200} placeholder="https://" onChange={(e) => setF({ ...f, website: e.target.value })} className={field} /></label>
-        <label className="space-y-1"><span className="text-[12px] text-secondary-text">Category</span><select value={f.category} onChange={(e) => { const c = e.target.value as Category; setF({ ...f, category: c, moods: f.moods.filter((m) => kindOf(m) !== "mood" || forCategory(c).includes(m)) }); }} className={field}>{CATEGORIES.map((c) => <option key={c}>{c}</option>)}</select></label>
+        <label className="space-y-1"><span className="text-[12px] text-secondary-text">Category</span><select value={f.category} onChange={(e) => { const c = e.target.value as Category; setF({ ...f, category: c, subcategoryId: null, moods: f.moods.filter((m) => kindOf(m) !== "mood" || forCategory(c).includes(m)) }); }} className={field}>{CATEGORIES.map((c) => <option key={c}>{c}</option>)}</select></label>
+        <div className="min-w-0 space-y-1"><span className="text-[12px] text-secondary-text">Subcategory</span><DropdownMenu modal={false}><DropdownMenuTrigger asChild><Button variant="outline" size="sm" className="w-full justify-between" aria-label="Brand subcategory" disabled={busy || catalog.isPending || children.length === 0}><span className="truncate">{children.find((c) => c.id === f.subcategoryId)?.name ?? "None"}</span><ChevronDown className="size-4 shrink-0" strokeWidth={1.7} /></Button></DropdownMenuTrigger><DropdownMenuContent align="start"><DropdownMenuRadioGroup value={f.subcategoryId ?? "none"} onValueChange={(id) => setF({ ...f, subcategoryId: id === "none" ? null : id })}><DropdownMenuRadioItem value="none">None</DropdownMenuRadioItem>{children.map((c) => <DropdownMenuRadioItem key={c.id} value={c.id}>{c.name}</DropdownMenuRadioItem>)}</DropdownMenuRadioGroup></DropdownMenuContent></DropdownMenu></div>
         <div className="space-y-1 text-[12px] text-secondary-text">
           <div>Status: {b.approved ? `Approved ${new Date(b.approved).toLocaleDateString()}` : "Not approved yet"}</div>
           {b.planEnded && <div>Plan ended {new Date(b.planEnded).toLocaleDateString()}</div>}

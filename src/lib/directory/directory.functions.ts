@@ -7,6 +7,7 @@ import { brandPublicationFields, createBrandInput } from "./admin-fields";
 import { reelMoodsInput } from "./mood-admin";
 import { sanitizeSvg } from "@/lib/stillframe/svg-safety";
 import { normalizeWebsite } from "./application-security";
+import { validSubcategory } from "./subcategories";
 import {
   BRAND_DESCRIPTION_MAX, BRAND_NAME_MAX, CATEGORIES, categorySlug, GRACE_DAYS, BRAND_MOODS_MAX, REEL_DESCRIPTION_MAX, SLUG_MAX,
   WORDING_VERSION, permissionWording, toSlug, validFullName,
@@ -604,13 +605,13 @@ export const adminBrandDetail = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const sb = context.supabase as any;
     await assertAdmin(sb);
-    const { data: b, error } = await sb.from("directory_brands").select("id, name, slug, website_url, category, description, logo_url, moods, first_approved_at, plan_ended_at, created_at, affiliated, status").eq("id", data.brandId).single();
+    const { data: b, error } = await sb.from("directory_brands").select("id, name, slug, website_url, category, subcategory_id, description, logo_url, moods, first_approved_at, plan_ended_at, created_at, affiliated, status").eq("id", data.brandId).single();
     if (error) throw new Error(error.message);
     const { data: reels } = await sb.from("directory_reels").select("id, ad_id, title, display_title, description, status, tags, moods, formats, poster_url, published_at, review_note, hidden_reason, in_showcase, showcase_order, projects(name)").eq("brand_id", b.id).order("created_at", { ascending: false });
     const { data: siteRows } = await sb.from("site_reels").select("id, title, display_title, published").eq("brand_id", b.id).order("sort_order");
     const signed = await signPosters((reels ?? []) as any[]);
     return {
-      brand: { id: b.id as string, name: b.name as string, slug: b.slug as string, website: (b.website_url ?? "") as string, category: b.category as string, description: (b.description ?? "") as string, moods: (b.moods ?? []) as string[], logo: await signLogo(b.logo_url), approved: b.first_approved_at as string | null, planEnded: b.plan_ended_at as string | null, affiliated: !!b.affiliated, status: b.status as "draft" | "live" },
+      brand: { id: b.id as string, name: b.name as string, slug: b.slug as string, website: (b.website_url ?? "") as string, category: b.category as string, subcategoryId: (b.subcategory_id ?? null) as string | null, description: (b.description ?? "") as string, moods: (b.moods ?? []) as string[], logo: await signLogo(b.logo_url), approved: b.first_approved_at as string | null, planEnded: b.plan_ended_at as string | null, affiliated: !!b.affiliated, status: b.status as "draft" | "live" },
       siteReels: ((siteRows ?? []) as any[]).map((r) => ({ id: r.id as string, title: r.title as string, displayTitle: (r.display_title ?? "") as string, published: !!r.published })),
       reels: signed.map((r: any) => ({ id: r.id as string, title: (r.title ?? r.projects?.name ?? "Untitled") as string, displayTitle: (r.display_title ?? "") as string, description: (r.description ?? "") as string, ad: (r.projects?.name ?? "Removed ad") as string, status: r.status as DirStatus, tags: (r.tags ?? []) as string[], moods: (r.moods ?? []) as string[], formats: (r.formats ?? []) as string[], poster: r.poster as string | null, published: r.published_at as string | null, note: (r.review_note ?? r.hidden_reason ?? null) as string | null, inShowcase: !!r.in_showcase, showcaseOrder: (r.showcase_order ?? null) as number | null })),
     };
@@ -625,13 +626,21 @@ export const adminSaveBrand = createServerFn({ method: "POST" })
     category: z.enum(CATEGORIES), description: z.string().trim().max(BRAND_DESCRIPTION_MAX),
     moods: z.array(z.string().trim().toLowerCase().max(30)).max(BRAND_MOODS_MAX).default([]),
     ...brandPublicationFields,
+    subcategoryId: z.string().uuid().nullable().optional(),
   }).parse(d))
   .handler(async ({ data, context }) => {
     const sb = context.supabase as any;
     await assertAdmin(sb);
     const { data: category, error: categoryError } = await sb.from("categories").select("id").eq("name", data.category).single();
     if (categoryError) throw new Error(categoryError.message);
-    const { error } = await sb.from("directory_brands").update({ name: data.name, website_url: data.website || null, category: data.category, category_id: category.id, description: data.description || null, moods: await cleanMoods(sb, data.moods), ...(data.affiliated !== undefined ? { affiliated: data.affiliated } : {}), ...(data.status ? { status: data.status } : {}) }).eq("id", data.brandId);
+    const { data: current, error: currentError } = await sb.from("directory_brands").select("category_id,subcategory_id").eq("id", data.brandId).single();
+    if (currentError) throw new Error(currentError.message);
+    const subcategoryId = data.subcategoryId !== undefined ? data.subcategoryId : current.category_id === category.id ? current.subcategory_id : null;
+    if (subcategoryId) {
+      const { data: child, error: childError } = await sb.from("categories").select("parent_id,visibility").eq("id", subcategoryId).single();
+      if (childError || !validSubcategory(child, category.id)) throw new Error("Choose a subcategory within the selected category.");
+    }
+    const { error } = await sb.from("directory_brands").update({ name: data.name, website_url: data.website || null, category: data.category, category_id: category.id, subcategory_id: subcategoryId, description: data.description || null, moods: await cleanMoods(sb, data.moods), ...(data.affiliated !== undefined ? { affiliated: data.affiliated } : {}), ...(data.status ? { status: data.status } : {}) }).eq("id", data.brandId);
     if (error) throw new Error(error.message);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error: auditError } = await supabaseAdmin.from("admin_audit_log").insert({ admin_user_id: context.userId, action: "brand.update", target: data.brandId });

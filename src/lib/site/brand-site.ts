@@ -93,11 +93,11 @@ export function aimanteOut(url: URL, site: BrandSite = siteForUrl(url)): URL | u
   const out = new URL(url.href);
   let m: RegExpMatchArray | null;
   if (p === "/directory" || p === "/directory/") {
-    const keys = [...url.searchParams.keys()];
+    const keys = [...url.searchParams.keys()].filter((key) => !["seed", "page"].includes(key) && !key.startsWith("utm_") && !["gclid", "gbraid", "wbraid", "fbclid"].includes(key) && !(key === "brand" && isSiteParam(url.searchParams.get(key))));
     const cat = url.searchParams.get("category");
     const mood = url.searchParams.get("mood");
-    if (keys.length === 1 && cat && !cat.includes(",")) { out.pathname = `/c/${encodeURIComponent(cat)}`; out.search = ""; }
-    else if (keys.length === 1 && mood && !mood.includes(",")) { out.pathname = `/mood/${encodeURIComponent(mood)}`; out.search = ""; }
+    if (keys.length === 1 && cat && !cat.includes(",")) { out.pathname = `/c/${encodeURIComponent(legacyCategorySlug(cat) ?? cat)}`; out.searchParams.delete("category"); }
+    else if (keys.length === 1 && mood && !mood.includes(",")) { out.pathname = `/mood/${encodeURIComponent(mood)}`; out.searchParams.delete("mood"); }
     else out.pathname = "/";
   } else if ((m = p.match(/^\/directory\/category\/([^/]+)$/))) out.pathname = `/c/${m[1]}`;
   else if ((m = p.match(/^\/directory\/([^/]+)$/))) out.pathname = `/b/${m[1]}`;
@@ -188,7 +188,7 @@ export function legacyCategoryRedirect(href: string, forwardedHost: string | nul
   const rest = new URLSearchParams(url.searchParams);
   rest.delete("category");
   if (isSiteParam(rest.get("brand"))) rest.delete("brand");
-  if (fixed.length === 1 && [...rest.keys()].length === 0) return `/c/${fixed[0]}`;
+  if (fixed.length === 1 && ![...rest.keys()].some((key) => ["q", "brand", "mood", "occasion", "season", "setting"].includes(key))) return `/c/${fixed[0]}${rest.size ? `?${rest.toString()}` : ""}${url.hash}`;
   rest.set("category", fixed.join(","));
   return `/?${rest.toString()}`;
 }
