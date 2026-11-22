@@ -33,7 +33,7 @@ import { parseSearch } from "@/lib/directory/parse-search";
 import { ReelNavContext, type ReelNav } from "@/components/directory/ReelPopup";
 import { useMoodCatalog } from "@/lib/directory/moods";
 import { FeaturedBand } from "@/components/directory/FeaturedBand";
-import { DEFAULT_DIRECTORY_SETTINGS, SPEED_SECONDS } from "@/lib/directory/settings";
+import { DEFAULT_DIRECTORY_SETTINGS, SPEED_SECONDS, activeHeadlineMoods } from "@/lib/directory/settings";
 import { getDirectoryPublic } from "@/lib/directory/settings.functions";
 import { useGreeting, logGreeting } from "@/components/directory/useGreeting";
 import { rememberVisit } from "@/lib/directory/greeting";
@@ -445,7 +445,7 @@ function DirectoryPage() {
     },
   });
   const loadedPages = startPage.current + Math.max(0, (results.data?.pages.length ?? 1) - 1);
-  const [autoLeft, setAutoLeft] = useState(-1); // -1 until the first click
+  const [autoLeft, setAutoLeft] = useState(settings.autoLoadPages); // pages loaded on scroll before the button takes over
   const focusIdx = useRef<number | null>(null);
   const moreRef = useRef<HTMLAnchorElement>(null);
   const loadMore = (keyboard: boolean) => {
@@ -470,14 +470,15 @@ function DirectoryPage() {
       (!c || (allFacets?.categories[categorySlug(c)] ?? 0) > 0) && (!b || (!!bs && (allFacets?.brands[bs] ?? 0) > 0))
     );
   };
+  const headlineMoods = activeHeadlineMoods(settings.headlineMoods, new Date());
   const greeting = useGreeting(
     hasReels,
-    (settings.headlineMoods[0] ?? ROTATING[0])!,
+    (headlineMoods[0] ?? ROTATING[0])!,
     !!everything.data || everything.isError,
   );
   // Only rotate/suggest moods that currently have live reels, so clicking never opens an empty grid.
   const liveMood = (m: string | undefined) => !!m && (allFacets?.moods[m.toLowerCase()] ?? 0) > 0;
-  const configured = settings.headlineMoods.length ? settings.headlineMoods : ROTATING;
+  const configured = headlineMoods.length ? headlineMoods : ROTATING;
   const livePool = allFacets ? configured.filter(liveMood) : configured;
   const fallbackPool =
     allFacets && !livePool.length
@@ -526,7 +527,7 @@ function DirectoryPage() {
     document.querySelector<HTMLElement>(`[data-reel-idx="${focusIdx.current}"] button`)?.focus();
     focusIdx.current = null;
   }, [found.length]);
-  // After the first click, keep loading as the button nears the screen, a few pages at most.
+  // Load the first few pages on scroll as the button nears the screen, then visitors click "Load more".
   useEffect(() => {
     const el = moreRef.current;
     if (!el || autoLeft <= 0 || !hasMore) return;
@@ -782,7 +783,6 @@ function DirectoryPage() {
         >
           <FilterBar
             phoneStyle={isAim}
-            comingSoon={settings.comingSoon}
             value={filters}
             onChange={setFilters}
             facets={facets}
@@ -883,6 +883,7 @@ function DirectoryPage() {
                       poster={r.poster}
                       alt={`${r.brand_name} reel thumbnail`}
                       className={posterFor(r.formats[0])}
+                      autoplay
                     />
                   </button>
                   {r.kind === "site" ? (
@@ -987,13 +988,12 @@ function DirectoryPage() {
                     href={`/directory?${nextQuery(search, loadedPages + 1)}`}
                     onClick={(e) => {
                       e.preventDefault();
-                      if (autoLeft < 0) setAutoLeft(settings.autoLoadPages);
                       loadMore(e.detail === 0);
                     }}
                     aria-disabled={results.isFetchingNextPage}
                     className="mt-1 inline-flex h-11 items-center rounded-lg bg-ap-panel px-5 text-[15px] font-medium text-ap-ink hover:bg-ap-media nums"
                   >
-                    {results.isFetchingNextPage ? "Loading…" : `Show ${Math.min(PAGE, remaining)} more`}
+                    {results.isFetchingNextPage ? "Loading…" : "Load more"}
                   </a>
                 </>
               ) : (

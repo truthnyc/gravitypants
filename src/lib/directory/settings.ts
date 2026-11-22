@@ -21,7 +21,10 @@ export const directorySettingsSchema = z.object({
   comingSoon: z.boolean(),
   pageSize: z.number().int().min(8).max(48),
   autoLoadPages: z.number().int().min(0).max(5),
-  headlineMoods: z.array(z.string().max(30)).max(100),
+  headlineMoods: z.preprocess(
+    (v) => (Array.isArray(v) ? v.map((x) => (typeof x === "string" ? { mood: x, until: null } : x)) : v),
+    z.array(z.object({ mood: z.string().max(30), until: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable() })).max(100),
+  ),
 });
 export type DirectorySettings = z.infer<typeof directorySettingsSchema>;
 
@@ -30,13 +33,26 @@ export const DEFAULT_DIRECTORY_SETTINGS: DirectorySettings = {
   filterCarouselGap: 24, carouselLabelSize: 13, carouselLabelGap: 16,
   ruleMoods: [], ruleCategories: [], ruleBrands: [], count: 12, speed: "normal", whenFiltering: "follow",
   rotateWeekly: false, showFrom: null, showUntil: null,
-  comingSoon: true, pageSize: 12, autoLoadPages: 3, headlineMoods: [],
+  comingSoon: true, pageSize: 12, autoLoadPages: 2, headlineMoods: [],
 };
 export const SPEED_SECONDS: Record<DirectorySettings["speed"], number> = { slow: 9, normal: 6, fast: 4 };
 export const MIN_MANUAL_PICKS = 4;
 
 export const pickSchema = z.object({ reelId: z.string().uuid(), kind: z.enum(["directory", "site"]), week: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable() });
 export type FeaturedPick = z.infer<typeof pickSchema>;
+
+export type HeadlineMood = DirectorySettings["headlineMoods"][number];
+
+/** Today's date in New York as YYYY-MM-DD. */
+export function nyDate(now: Date): string {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York", year: "numeric", month: "2-digit", day: "2-digit" }).format(now);
+}
+
+/** Headline moods still in their window: a mood with an end date shows through that whole day (New York time). */
+export function activeHeadlineMoods(list: HeadlineMood[], now: Date): string[] {
+  const today = nyDate(now);
+  return list.filter((m) => !m.until || today <= m.until).map((m) => m.mood);
+}
 
 /** Saved settings merged over the defaults, so new fields always have a value. */
 export function mergeSettings(saved: unknown): DirectorySettings {

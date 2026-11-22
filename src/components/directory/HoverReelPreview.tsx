@@ -1,10 +1,23 @@
 import { useEffect, useRef, useState } from "react";
 
 /** Silent, on-demand playback; the surrounding thumbnail still opens the reel. */
-export function HoverReelPreview({ video, poster, className, alt = "" }: {
-  video: string | null; poster: string | null; className: string; alt?: string;
+export function HoverReelPreview({ video, poster, className, alt = "", autoplay = false }: {
+  video: string | null; poster: string | null; className: string; alt?: string; autoplay?: boolean;
 }) {
   const ref = useRef<HTMLVideoElement>(null);
+  const box = useRef<HTMLDivElement>(null);
+  const inView = useRef(false);
+  // Autoplay only while the tile is mostly on screen; off-screen tiles pause. Reduced motion keeps posters.
+  useEffect(() => {
+    const el = box.current;
+    if (!autoplay || !video || !el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const io = new IntersectionObserver(([e]) => {
+      inView.current = !!e?.isIntersecting;
+      if (inView.current) { setLoaded(true); setActive(true); } else { setActive(false); setPlaying(false); ref.current?.pause(); }
+    }, { threshold: 0.6 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [autoplay, video]);
   const [active, setActive] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [playing, setPlaying] = useState(false);
@@ -18,6 +31,7 @@ export function HoverReelPreview({ video, poster, className, alt = "" }: {
   };
   useEffect(() => () => { if (intent.current) clearTimeout(intent.current); }, []);
   const stop = () => {
+    if (autoplay && inView.current) return;
     if (intent.current) { clearTimeout(intent.current); intent.current = null; }
     setActive(false);
     setPlaying(false);
@@ -39,7 +53,7 @@ export function HoverReelPreview({ video, poster, className, alt = "" }: {
     return () => { cancelled = true; element.pause(); };
   }, [active, loaded, video]);
 
-  return <div className="absolute inset-0" onPointerEnter={(event) => {
+  return <div ref={box} className="absolute inset-0" onPointerEnter={(event) => {
     if (event.pointerType !== "touch") start();
   }} onPointerLeave={stop}>
     {video && loaded && <video ref={ref} src={video} poster={poster ?? undefined}

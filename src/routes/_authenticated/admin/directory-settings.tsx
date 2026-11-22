@@ -235,19 +235,32 @@ function DirectorySettingsAdmin() {
 
       <Card className="space-y-4">
         <h2 className="text-[17px] font-semibold">Filters & results</h2>
-        <Toggle label="Show empty categories as 'Coming soon'" hint="Categories without reels stay visible in the Category filter." checked={s.comingSoon} onChange={(comingSoon) => setS({ ...s, comingSoon })} />
+        <p className="text-[13px] text-secondary-text">Visitors only see categories, moods and brands that have reels, each with its reel count. Empty categories are listed here as Coming soon.</p>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Reels per page" hint="8 to 48."><Input aria-label="Reels per page" type="number" min={8} max={48} value={s.pageSize} onChange={num("pageSize", 8, 48)} className="w-28 nums" /></Field>
-          <Field label="Auto-load pages after first 'Show more'" hint="0 to 5. 0 means visitors always click."><Input aria-label="Auto-load pages" type="number" min={0} max={5} value={s.autoLoadPages} onChange={num("autoLoadPages", 0, 5)} className="w-28 nums" /></Field>
+          <Field label="Pages auto-loaded on scroll" hint="0 to 5. After these, visitors click 'Load more'."><Input aria-label="Auto-load pages" type="number" min={0} max={5} value={s.autoLoadPages} onChange={num("autoLoadPages", 0, 5)} className="w-28 nums" /></Field>
         </div>
         <Field label="Moods in the headline rotation" hint={s.headlineMoods.length ? `${s.headlineMoods.length} chosen.` : "None chosen — the headline rotates through every mood."}>
           <div className="space-y-2">
             {families.map((f) => (
               <div key={f.family} className="grid gap-2 sm:grid-cols-[100px_1fr]">
                 <span className="pt-1.5 text-[13px] font-medium">{f.family}</span>
-                <Chips label={`${f.family} headline moods`} options={f.moods.map((m) => [m, cap(m)])} value={s.headlineMoods} onChange={(headlineMoods) => setS({ ...s, headlineMoods })} />
+                <Chips label={`${f.family} headline moods`} options={f.moods.map((m) => [m, cap(m)])} value={s.headlineMoods.map((h) => h.mood)}
+                  onChange={(moods) => setS({ ...s, headlineMoods: moods.map((mood) => s.headlineMoods.find((h) => h.mood === mood) ?? { mood, until: null }) })} />
               </div>
             ))}
+            {s.headlineMoods.length > 0 && (
+              <div className="grid gap-2 pt-2 sm:grid-cols-2">
+                {s.headlineMoods.map((h) => (
+                  <label key={h.mood} className="flex items-center justify-between gap-3 text-[13px]">
+                    <span className="font-medium">{cap(h.mood)} <span className="font-normal text-secondary-text">show until</span></span>
+                    <Input aria-label={`${cap(h.mood)} show until`} type="date" value={h.until ?? ""} className="w-40 nums"
+                      onChange={(e) => setS({ ...s, headlineMoods: s.headlineMoods.map((x) => x.mood === h.mood ? { ...x, until: e.target.value || null } : x) })} />
+                  </label>
+                ))}
+                <p className="text-[12px] text-secondary-text sm:col-span-2">Leave the date empty to keep a mood. A dated mood stops showing after that day, New York time.</p>
+              </div>
+            )}
           </div>
         </Field>
       </Card>

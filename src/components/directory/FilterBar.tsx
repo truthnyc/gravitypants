@@ -36,10 +36,10 @@ function Mark({ text, q }: { text: string; q: string }) {
   return <>{text.slice(0, i)}<mark className="rounded-[2px] bg-ap-soft-blue text-inherit">{text.slice(i, i + q.length)}</mark>{text.slice(i + q.length)}</>;
 }
 
-export function FilterBar({ value, onChange, facets, total, families, brands, compact = false, comingSoon = true, phoneStyle = false, categoryLabel }: {
+export function FilterBar({ value, onChange, facets, total, families, brands, compact = false, phoneStyle = false, categoryLabel }: {
   /** Shown instead of the category names when one occasion word chose several categories, e.g. "A host (3)". */
   categoryLabel?: string | undefined;
-  phoneStyle?: boolean; compact?: boolean; comingSoon?: boolean; value: FilterValue; onChange: (v: FilterValue) => void; facets: Facets; total: number; families: Family[]; brands: Brand[];
+  phoneStyle?: boolean; compact?: boolean; value: FilterValue; onChange: (v: FilterValue) => void; facets: Facets; total: number; families: Family[]; brands: Brand[];
 }) {
   const [open, setOpen] = useState<Seg | null>(null);
   const [hover, setHover] = useState<Seg | null>(null);
@@ -152,7 +152,7 @@ export function FilterBar({ value, onChange, facets, total, families, brands, co
       {open === "mood" && panel("mood", "Mood", "Pick the feelings you're after. Tap a family to pick all of it.",
         <MoodBody families={families} selected={value.moods} counts={facets.moods} onChange={(m) => set("moods", m)} />, "moods")}
       {open === "category" && panel("category", "Category", "What the brand sells.",
-        <CategoryBody comingSoon={comingSoon} selected={value.categories} counts={facets.categories} narrow={narrow} onChange={(c) => set("categories", c)} />, "categories")}
+        <CategoryBody selected={value.categories} counts={facets.categories} narrow={narrow} onChange={(c) => set("categories", c)} />, "categories")}
       {open === "brand" && panel("brand", "Brand", "See reels from specific brands.",
         <BrandBody brands={brands} selected={value.brands} counts={facets.brands} onChange={(b) => set("brands", b)} />, "brands")}
     </div>
@@ -172,7 +172,7 @@ function SearchBox({ value, onChange, placeholder }: { value: string; onChange: 
 function MoodBody({ families, selected, counts, onChange }: { families: Family[]; selected: string[]; counts: Record<string, number>; onChange: (v: string[]) => void }) {
   const [q, setQ] = useState("");
   const total = families.reduce((n, f) => n + f.moods.length, 0);
-  const rows = families.map((f) => ({ ...f, shown: f.moods.filter((m) => m.includes(q.toLowerCase())) })).filter((f) => f.shown.length);
+  const rows = families.map((f) => ({ ...f, shown: f.moods.filter((m) => m.includes(q.toLowerCase()) && ((counts[m] ?? 0) > 0 || selected.includes(m))) })).filter((f) => f.shown.length);
   return (
     <>
       <SearchBox value={q} onChange={setQ} placeholder={`Search ${total} moods…`} />
@@ -203,6 +203,7 @@ function MoodBody({ families, selected, counts, onChange }: { families: Family[]
                       style={on ? { background: c?.bg, boxShadow: `0 4px 14px -4px ${c?.bg}` } : undefined}>
                       {on && <Check aria-hidden className="size-3.5" strokeWidth={2} />}
                       <Mark text={cap(m)} q={q} />
+                      <span className={cn("text-[12px] nums", on ? "opacity-80" : "text-ap-muted")}>{n}</span>
                     </button>
                   );
                 })}
@@ -215,14 +216,12 @@ function MoodBody({ families, selected, counts, onChange }: { families: Family[]
   );
 }
 
-function CategoryBody({ selected, counts, narrow, onChange, comingSoon }: { comingSoon: boolean; selected: string[]; counts: Record<string, number>; narrow: boolean; onChange: (v: string[]) => void }) {
+function CategoryBody({ selected, counts, narrow, onChange }: { selected: string[]; counts: Record<string, number>; narrow: boolean; onChange: (v: string[]) => void }) {
   const catalog = useQuery({ queryKey: ["category-catalog"], queryFn: () => listCategories(), staleTime: 30_000 });
   const hints = new Map((catalog.data ?? []).map((c) => [c.name, c.hint]));
   const list = CATEGORIES.map((c) => ({ name: c, slug: categorySlug(c), n: counts[categorySlug(c)] ?? 0 }));
-  const groups = [
-    { title: "With reels", items: list.filter((c) => c.n > 0 || selected.includes(c.slug)) },
-    { title: "Coming soon", items: comingSoon ? list.filter((c) => c.n === 0 && !selected.includes(c.slug)) : [] },
-  ].filter((g) => g.items.length);
+  // Visitors only see categories with matching reels (or ones they already picked).
+  const groups = [{ title: "Categories", items: list.filter((c) => c.n > 0 || selected.includes(c.slug)) }].filter((g) => g.items.length);
   return (
     <div className="grid gap-4">
       {groups.map((g) => (
@@ -232,7 +231,7 @@ function CategoryBody({ selected, counts, narrow, onChange, comingSoon }: { comi
             {g.items.map((c) => { const off = c.n === 0 && !selected.includes(c.slug); return (
               <label key={c.slug} className={cn("flex min-h-12 items-center gap-2.5 rounded-sm py-2 text-[14px]", off ? "cursor-not-allowed text-ap-muted opacity-60" : "cursor-pointer")}>
                 <input type="checkbox" disabled={off} checked={selected.includes(c.slug)} onChange={() => onChange(toggleIn(selected, c.slug))} className="size-4 accent-ap-blue disabled:cursor-not-allowed" />
-                <span className="min-w-0 flex-1"><span className="block break-words">{c.name}</span>{hints.get(c.name) && <span className="block text-[12px] leading-4 text-ap-muted">{hints.get(c.name)}</span>}</span>
+                <span className="min-w-0 flex-1"><span className="block break-words">{c.name} <span className="text-ap-muted nums">{c.n}</span></span>{hints.get(c.name) && <span className="block text-[12px] leading-4 text-ap-muted">{hints.get(c.name)}</span>}</span>
               </label>
             ); })}
           </div>
@@ -245,7 +244,7 @@ function CategoryBody({ selected, counts, narrow, onChange, comingSoon }: { comi
 function BrandBody({ brands, selected, counts, onChange }: { brands: Brand[]; selected: string[]; counts: Record<string, number>; onChange: (v: string[]) => void }) {
   const [q, setQ] = useState("");
   const t = q.toLowerCase();
-  const shown = brands.filter((b) => b.name.toLowerCase().includes(t) || b.category.toLowerCase().includes(t));
+  const shown = brands.filter((b) => (b.name.toLowerCase().includes(t) || b.category.toLowerCase().includes(t)) && ((counts[b.slug] ?? 0) > 0 || selected.includes(b.slug)));
   return (
     <>
       <SearchBox value={q} onChange={setQ} placeholder="Search brands…" />
@@ -268,6 +267,7 @@ function BrandBody({ brands, selected, counts, onChange }: { brands: Brand[]; se
                   <span className="block truncate text-[14px] font-medium text-ap-ink"><Mark text={b.name} q={q} /></span>
                   <span className="block truncate text-[12px] text-ap-muted">{b.category}</span>
                 </span>
+                <span className="shrink-0 text-[12px] text-ap-muted nums">{counts[b.slug] ?? 0}</span>
                 <Check aria-hidden className={cn("size-4 text-ap-blue", !on && "invisible")} strokeWidth={2} />
               </button>
             </li>
