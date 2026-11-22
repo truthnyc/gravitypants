@@ -579,7 +579,8 @@ function MiniRender({ project, frames, brand, images, format, width, index = 0, 
 /** Left preview: the ad drawn by renderAt at the chosen size's shape. */
 function ExportStage({ target, time, project, frames, brand, images }: { target: Target; time: number; project: Project; frames: Frame[]; brand: BrandStyle; images: Map<string, HTMLImageElement> | null }) {
   const ref = useRef<HTMLCanvasElement>(null);
-  const scale = Math.min(1, 900 / Math.max(target.width, target.height));
+  // Draw at the real export size (capped) so logos and text stay sharp on large retina screens.
+  const scale = Math.min(1, 1920 / Math.max(target.width, target.height));
   const W = Math.round(target.width * scale);
   const H = Math.round(target.height * scale);
   useEffect(() => {
