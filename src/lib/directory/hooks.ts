@@ -14,6 +14,8 @@ export function useDirectoryStatuses() {
   return {
     statuses: q.data?.statuses ?? {},
     liveUntil: q.data?.liveUntil ?? null,
+    /** null while loading, so prompts never flash before we know. */
+    hasBrand: q.data ? q.data.hasBrand : null,
     hide: async (adId: string) => {
       try {
         await hide({ data: { adId } });

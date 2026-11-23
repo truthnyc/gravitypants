@@ -13,6 +13,7 @@ import { useExportStatus } from "@/lib/stillframe/billing";
 import { Check, X } from "lucide-react";
 import { useWebMCP } from "use-webmcp-tool";
 import { runWebMCPTool } from "@/lib/webmcp-telemetry";
+import { SHOW_SHARE } from "@/lib/features";
 
 // Shown once after signup: presents the usage-based trial (no clock) as something the user just unlocked.
 function TrialUnlocked({ onClose }: { onClose: () => void }) {
@@ -32,6 +33,24 @@ function TrialUnlocked({ onClose }: { onClose: () => void }) {
         <li className="flex items-center gap-2"><Check size={16} strokeWidth={1.7} className="text-link" />No time limit, no card</li>
       </ul>
       <p className="mt-3 text-[15px] font-medium">Drop in your first photos to start.</p>
+    </section>
+  );
+}
+
+const LIST_PROMPT_KEY = "gravity-pants:aimante-prompt-dismissed";
+
+// Invites workspaces with a reel but no brand page to list on Aimanté via the normal Share step (permission and review included).
+function ListOnAimante({ adId, onClose }: { adId: string; onClose: () => void }) {
+  return (
+    <section data-cta="ads-aimante-prompt" className="relative mt-8 flex flex-col gap-4 rounded-sm bg-card px-5 py-5 shadow-card sm:flex-row sm:items-center">
+      <button type="button" onClick={onClose} aria-label="Not now" className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full text-secondary-text">
+        <X size={18} strokeWidth={1.7} />
+      </button>
+      <div className="flex-1 pr-8">
+        <h2 className="text-[19px] font-bold tracking-[-0.02em]">List your brand on Aimanté</h2>
+        <p className="mt-1 text-[15px] text-secondary-text">Your reels already qualify. Get a free brand page where shoppers find brands by mood, with visits sent straight to your shop. We review every page before it goes live.</p>
+      </div>
+      <Link to="/app/ad/$id/share" params={{ id: adId }} data-cta="ads-aimante-list" className="inline-flex h-11 shrink-0 items-center justify-center rounded-lg bg-primary px-5 text-[15px] font-medium text-primary-foreground">List my brand</Link>
     </section>
   );
 }
@@ -94,6 +113,10 @@ function YourAds() {
     term ? project.name.toLowerCase().includes(term) || kitName(project.template_id).includes(term) : true,
   );
   const isEmpty = !isLoading && (projects ?? []).length === 0;
+  const [promptHidden, setPromptHidden] = useState(true);
+  useEffect(() => { setPromptHidden(localStorage.getItem(LIST_PROMPT_KEY) === "1"); }, []);
+  const latestAd = (projects ?? [])[0];
+  const showListPrompt = SHOW_SHARE && !promptHidden && dir.hasBrand === false && !!latestAd;
   useWebMCP({
     name: "list_visible_ads",
     description: "Read the ads currently shown on Your Ads, respecting its search.",
@@ -123,6 +146,8 @@ function YourAds() {
       <div className={isEmpty ? "mx-auto max-w-[860px] py-4 lg:py-16" : ""}>
         <DropZone spacious={isEmpty} />
       </div>
+
+      {showListPrompt && latestAd && <ListOnAimante adId={latestAd.id} onClose={() => { localStorage.setItem(LIST_PROMPT_KEY, "1"); setPromptHidden(true); }} />}
 
       {!isEmpty && (
         <section className="mt-12">

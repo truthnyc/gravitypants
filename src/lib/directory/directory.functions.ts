@@ -294,11 +294,11 @@ export const getAdStatuses = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const sb = context.supabase as any;
     const { data: b } = await sb.from("directory_brands").select("id, plan_ended_at").eq("workspace_id", data.workspaceId).maybeSingle();
-    if (!b) return { statuses: {} as Record<string, DirStatus>, liveUntil: null as string | null };
+    if (!b) return { statuses: {} as Record<string, DirStatus>, liveUntil: null as string | null, hasBrand: false };
     const { data: reels } = await sb.from("directory_reels").select("ad_id, status").eq("brand_id", b.id);
     const plan = await planState(sb, data.workspaceId, b.plan_ended_at);
     const liveUntil = plan.tag === "ended" && plan.endedAt ? new Date(new Date(plan.endedAt).getTime() + GRACE_DAYS * 86_400_000).toISOString() : null;
-    return { statuses: Object.fromEntries((reels ?? []).map((r: any) => [r.ad_id, r.status])) as Record<string, DirStatus>, liveUntil };
+    return { statuses: Object.fromEntries((reels ?? []).map((r: any) => [r.ad_id, r.status])) as Record<string, DirStatus>, liveUntil, hasBrand: true };
   });
 
 /** Account → Directory: brand, its reels and the permission log. */
