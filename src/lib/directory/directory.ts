@@ -9,6 +9,11 @@ export const ADMIN_ONLY_CATEGORIES = ["Real Estate", "Other"] as const;
 export const CATEGORIES = [...PUBLIC_CATEGORIES, ...ADMIN_ONLY_CATEGORIES] as const;
 export type Category = (typeof CATEGORIES)[number];
 export const isPublicCategory = (c: string) => (PUBLIC_CATEGORIES as readonly string[]).includes(c);
+/** Default for a brand that has never picked a category; must be public so the form state matches what the dropdown shows. */
+export const DEFAULT_BRAND_CATEGORY: Category = PUBLIC_CATEGORIES[0];
+/** Dropdown choices: the public list, with the brand's current staff-only category prepended so the select never shows a value that isn't saved. */
+export const categoryOptions = (current: string): readonly string[] =>
+  isPublicCategory(current) ? PUBLIC_CATEGORIES : [current, ...PUBLIC_CATEGORIES];
 export const SUBCATEGORIES: Partial<Record<Category, readonly string[]>> = {
   Fashion: ["Menswear", "Womenswear", "Knitwear", "Shoes & Bags", "Accessories"],
   "Food & Drink": ["Producers", "Restaurants & Cafés", "Wine & Spirits"],

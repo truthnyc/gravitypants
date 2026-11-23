@@ -18,7 +18,7 @@ import { useMoodCatalog } from "@/lib/directory/moods";
 import { MoodChips } from "@/components/directory/MoodChips";
 import { MoodRequestBox } from "@/components/directory/MoodRequestBox";
 import { cn } from "@/lib/utils";
-import { BRAND_DESCRIPTION_MAX, BRAND_NAME_MAX, CATEGORIES, PUBLIC_CATEGORIES, GRACE_DAYS, SLUG_MAX, moodLabel, nearLimit } from "@/lib/directory/directory";
+import { BRAND_DESCRIPTION_MAX, BRAND_NAME_MAX, CATEGORIES, categoryOptions, GRACE_DAYS, SLUG_MAX, moodLabel, nearLimit } from "@/lib/directory/directory";
 
 export const Route = createFileRoute("/_authenticated/app/account_/directory")({
   head: () => ({
@@ -292,7 +292,7 @@ function DescriptionBox({ brand, onSaved }: { brand: BrandInfo; onSaved: () => v
       </div>
       <label className="mt-4 block sm:w-1/2 sm:pr-[7px]"><span className={lbl}>Category</span>
         <select value={category} onChange={(e) => { const c = e.target.value; setCategory(c); setMoods(moods.filter((m) => kindOf(m) !== "mood" || forCategory(c).includes(m))); }} className={fieldCls}>
-          {PUBLIC_CATEGORIES.map((c) => <option key={c}>{c}</option>)}
+          {categoryOptions(category).map((c) => <option key={c}>{c}</option>)}
         </select></label>
       <div className="mt-4"><span className={lbl}>Moods</span>
         <TagPicker value={moods} onChange={setMoods} moodOptions={forCategory(category)} />

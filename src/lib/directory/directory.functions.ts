@@ -9,7 +9,7 @@ import { sanitizeSvg } from "@/lib/stillframe/svg-safety";
 import { normalizeWebsite } from "./application-security";
 import { validSubcategory } from "./subcategories";
 import {
-  BRAND_DESCRIPTION_MAX, BRAND_NAME_MAX, CATEGORIES, categorySlug, GRACE_DAYS, BRAND_MOODS_MAX, REEL_DESCRIPTION_MAX, SLUG_MAX,
+  BRAND_DESCRIPTION_MAX, BRAND_NAME_MAX, CATEGORIES, categorySlug, DEFAULT_BRAND_CATEGORY, GRACE_DAYS, BRAND_MOODS_MAX, isPublicCategory, REEL_DESCRIPTION_MAX, SLUG_MAX,
   WORDING_VERSION, permissionWording, toSlug, validFullName,
   type DirStatus, type DirectoryCard, type PlanTag, type ShareBrand,
 } from "./directory";
@@ -112,7 +112,7 @@ export const getShareContext = createServerFn({ method: "POST" })
     const fallbackName = kit?.name ?? String(ws?.name ?? "").replace(/'s ads$/, "");
     const brand: ShareBrand = b
       ? { id: b.id, name: b.name, website_url: b.website_url ?? "", category: b.category, description: b.description ?? "", slug: b.slug, first_approved_at: b.first_approved_at }
-      : { id: null, name: fallbackName, website_url: "", category: "Other", description: "", slug: toSlug(fallbackName || "brand"), first_approved_at: null };
+      : { id: null, name: fallbackName, website_url: "", category: DEFAULT_BRAND_CATEGORY, description: "", slug: toSlug(fallbackName || "brand"), first_approved_at: null };
     let brandChoices: { id: string; name: string; slug: string; category: string; approved: boolean }[] = [];
     if (isStaff === true) {
       const { data: all } = await sb.from("directory_brands").select("id, name, slug, category, first_approved_at").order("name").limit(1000);
@@ -204,6 +204,8 @@ export const shareReel = createServerFn({ method: "POST" })
         const { error } = await sb.from("directory_brands").update(fields).eq("id", brand.id);
         if (error) throw new Error(error.message);
       } else {
+        // A brand's first listing must land in a visitor-visible category; staff-only ones are set later from the admin screens.
+        if (!isPublicCategory(data.brand.category)) throw new Error("Pick a category for your brand.");
         const slug = await uniqueSlug(sb, toSlug(data.brand.name));
         const { data: created, error } = await sb.from("directory_brands").insert({ ...fields, workspace_id: ad.workspace_id, slug }).select("id, name, first_approved_at").single();
         if (error) throw new Error(error.message);

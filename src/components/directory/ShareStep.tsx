@@ -16,7 +16,7 @@ const ratioOf = (f: string) => pxOf(f).width / pxOf(f).height;
 import { useReelPlayer } from "@/components/editor/ReelPreview";
 import { supabase } from "@/integrations/supabase/client";
 import { getShareContext, shareReel } from "@/lib/directory/directory.functions";
-import { BRAND_NAME_MAX, PUBLIC_CATEGORIES, GRACE_DAYS, REEL_DESCRIPTION_MAX, moodLabel, nearLimit, permissionWording, validFullName, type Category } from "@/lib/directory/directory";
+import { BRAND_NAME_MAX, categoryOptions, GRACE_DAYS, REEL_DESCRIPTION_MAX, moodLabel, nearLimit, permissionWording, validFullName, type Category } from "@/lib/directory/directory";
 import { MEDIA_BUCKET } from "@/lib/stillframe/media";
 import { useTemplateName, type EditorDoc } from "@/lib/stillframe/data";
 import type { Format } from "@/lib/stillframe/types";
@@ -246,7 +246,7 @@ function ShareForm({ doc, player, templateName, ctx, save, onSaved }: {
               </AppField>
               <AppField label="Category" htmlFor="d-cat" className="mb-[18px]">
                 <AppSelect id="d-cat" value={category} onChange={(e) => setCategory(e.target.value as Category)}>
-                  {PUBLIC_CATEGORIES.map((c) => <option key={c}>{c}</option>)}
+                  {categoryOptions(category).map((c) => <option key={c}>{c}</option>)}
                 </AppSelect>
               </AppField>
             </div>}
