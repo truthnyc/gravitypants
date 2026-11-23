@@ -94,6 +94,15 @@ function WatchPage() {
           {reel.brandSlug && <a className="showcase-visit !ml-0" href={`${AIMANTE_ORIGIN}/b/${reel.brandSlug}`}>{reel.brand} on Aimanté <ArrowRight size={13} strokeWidth={1.7} /></a>}
         </div>
 
+        {reel.id === LAUNCH_FILM.id ? (
+          <section className="mt-12 max-w-[720px]" aria-labelledby="made">
+            <h2 id="made" className="text-[24px] font-semibold tracking-[-0.02em] text-site-ink">How Gravity Pants works</h2>
+            <p className="mt-4 text-[17px] leading-[1.6] text-site-secondary">Gravity Pants turns your still product photos into short, on-brand video ads and GIFs for your shop and social feeds, without video editing software.</p>
+            <Button asChild variant="site" size="site" className="mt-6">
+              <a href="/signup?ref=walkthrough" data-cta="walkthrough-signup">Try Gravity Pants free</a>
+            </Button>
+          </section>
+        ) : (
         <section className="mt-12 max-w-[720px]" aria-labelledby="made">
           <h2 id="made" className="text-[24px] font-semibold tracking-[-0.02em] text-site-ink">How this reel was made</h2>
           <dl className="mt-5 grid grid-cols-2 gap-4 md:grid-cols-4">
@@ -116,6 +125,7 @@ function WatchPage() {
             <a href="/signup?ref=watch" data-cta="watch-signup">Make a reel like this</a>
           </Button>
         </section>
+        )}
 
         {related.length > 0 && (
           <section className="mt-16" aria-labelledby="more">

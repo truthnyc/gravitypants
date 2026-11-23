@@ -21,5 +21,5 @@ export const LAUNCH_FILM: SiteReel = {
   uploadDate: "2026-11-02T09:00:00Z",
 };
 
-export const LAUNCH_FILM_PAGES = ["/product-video-maker"];
+export const LAUNCH_FILM_PAGES = ["/product-video-maker", "/how-it-works"];
 export const hasLaunchFilm = (path: string) => LAUNCH_FILM_PAGES.includes(path);
