@@ -1,7 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
 import { requireSupabaseAuth } from '@/integrations/supabase/auth-middleware'
-import { BRAND_DESCRIPTION_MAX, BRAND_MOODS_MAX, BRAND_NAME_MAX, CATEGORIES } from './directory'
+import { BRAND_DESCRIPTION_MAX, BRAND_MOODS_MAX, BRAND_NAME_MAX, CATEGORIES, isPublicCategory } from './directory'
 import { decodeApplicationLogo, normalizeWebsite, websiteInput } from './application-security'
 
 const logoSchema = z.object({
@@ -52,7 +52,7 @@ export const submitBrandApplication = createServerFn({ method: 'POST' })
       db.from('moods').select('name').in('name', moods),
       db.from('categories').select('id').eq('name', data.category).maybeSingle(),
     ])
-    if (!category || (validMoods ?? []).length !== moods.length) return { error: 'Choose a valid category and moods.' }
+    if (!category || !isPublicCategory(data.category) || (validMoods ?? []).length !== moods.length) return { error: 'Choose a valid category and moods.' }
 
     const requestId = crypto.randomUUID()
     let logoUrl: string | null = null

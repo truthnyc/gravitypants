@@ -5,7 +5,7 @@ import { Check, LayoutTemplate, Sparkles, Users, BadgeCheck } from 'lucide-react
 import { FeaturedAdVideo } from '@/components/site/FeaturedAdVideo'
 import { AimanteShell } from '@/components/site/AimanteShell'
 import { Button } from '@/components/ui/button'
-import { categorySlug, PUBLIC_CATEGORIES, BRAND_DESCRIPTION_MAX, type Category } from '@/lib/directory/directory'
+import { categorySlug, DEFAULT_BRAND_CATEGORY, PUBLIC_CATEGORIES, BRAND_DESCRIPTION_MAX, type Category } from '@/lib/directory/directory'
 import { useMoodCatalog } from '@/lib/directory/moods'
 import { brandApplicationInput, submitBrandApplication } from '@/lib/directory/applications.functions'
 import { aimanteHead } from '@/lib/site/brand-site'
@@ -22,7 +22,7 @@ type Form = {
   description: string; moods: string[]; message: string; company: string; logo: File | null;
 }
 
-const empty: Form = { name: '', email: '', brand: '', website: '', category: 'Other', description: '', moods: [], message: '', company: '', logo: null }
+const empty: Form = { name: '', email: '', brand: '', website: '', category: DEFAULT_BRAND_CATEGORY, description: '', moods: [], message: '', company: '', logo: null }
 const input = 'h-11 w-full rounded-sm border border-ap-hairline bg-ap-card px-3 text-[15px] outline-none focus:border-ap-blue focus:ring-2 focus:ring-ap-soft-blue'
 
 async function encodeLogo(file: File | null) {
