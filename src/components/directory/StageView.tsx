@@ -1,3 +1,4 @@
+import { aimanteHref } from "@/lib/directory/products";
 import { ReelProductList } from "./ReelProducts";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
@@ -115,7 +116,7 @@ export function StageView({ mood, family, start, data }: { mood: string | null; 
           <div className="stage-mobile-details mt-4">{tags}</div>
           {reel && <ReelProductList reelId={reel.id} className="mt-4" />}
           <div className="mt-6 flex flex-wrap items-center gap-3">
-            {d?.href && <a href={d.href} target="_blank" rel="noreferrer" className="inline-flex h-10 items-center gap-1.5 whitespace-nowrap rounded-lg bg-ap-blue px-4 text-[15px] font-medium text-ap-card hover:bg-ap-blue-hover">Visit {reel.brand_name} <ArrowUpRight className="size-4" strokeWidth={1.7} /></a>}
+            {d?.href && <a href={aimanteHref(d.href)} target="_blank" rel="noreferrer" className="inline-flex h-10 items-center gap-1.5 whitespace-nowrap rounded-lg bg-ap-blue px-4 text-[15px] font-medium text-ap-card hover:bg-ap-blue-hover">Visit {reel.brand_name} <ArrowUpRight className="size-4" strokeWidth={1.7} /></a>}
             <div className="stage-mobile-details">{saveControl}</div>
           </div>
         </section>

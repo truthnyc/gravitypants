@@ -1,3 +1,4 @@
+import { aimanteHref } from "@/lib/directory/products";
 import { ConceptReelNotice } from "@/components/directory/ConceptReelNotice";
 import { Link } from "@tanstack/react-router";
 import { type DirectoryCard } from "@/lib/directory/directory";
@@ -81,7 +82,7 @@ export function CardCarousel({ cards, label, onOpen }: { cards: DirectoryCard[];
         ),
         title: c.brand_name,
         detail: `${c.title ?? c.brand_name} · ${c.seconds} sec`,
-        visit: c.website_url ? { href: c.website_url, label: `Visit ${c.brand_name}` } : undefined,
+        visit: c.website_url ? { href: aimanteHref(c.website_url), label: `Visit ${c.brand_name}` } : undefined,
       }))}
     />
   );

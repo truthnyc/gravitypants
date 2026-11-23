@@ -6,6 +6,18 @@ export function isHttpsUrl(v: string): boolean {
   try { return new URL(v.trim()).protocol === "https:"; } catch { return false; }
 }
 
+/** Brand website link tagged as Aimanté traffic; keeps the brand's own query and fragment. */
+export function aimanteHref(url: string, campaign: string | null = null): string {
+  try {
+    const u = new URL(url);
+    if (u.protocol !== "https:" && u.protocol !== "http:") return url;
+    u.searchParams.set("utm_source", "aimante");
+    u.searchParams.set("utm_medium", "directory");
+    if (campaign) u.searchParams.set("utm_campaign", campaign);
+    return u.toString();
+  } catch { return url; }
+}
+
 /** Product link with Aimanté tracking; keeps the brand's own query and fragment. */
 export function productHref(url: string, reelId: string | null): string {
   const u = new URL(url);

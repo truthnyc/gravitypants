@@ -16,3 +16,15 @@ describe("reel products", () => {
     expect(isHttpsUrl("javascript:alert(1)")).toBe(false);
   });
 });
+
+import { aimanteHref } from "../src/lib/directory/products";
+describe("aimanteHref", () => {
+  it("tags brand links and keeps the brand's query and fragment", () => {
+    const h = new URL(aimanteHref("https://brand.example.com/shop?ref=x#a"));
+    expect(h.searchParams.get("utm_source")).toBe("aimante");
+    expect(h.searchParams.get("utm_medium")).toBe("directory");
+    expect(h.searchParams.get("ref")).toBe("x");
+    expect(h.hash).toBe("#a");
+  });
+  it("leaves invalid links untouched", () => { expect(aimanteHref("not a url")).toBe("not a url"); });
+});
