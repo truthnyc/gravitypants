@@ -1,6 +1,6 @@
 import { ReelProductList } from "./ReelProducts";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link, useNavigate, useRouter } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { ArrowUpRight, ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { DirectoryReelHeart } from "@/components/directory/LikeSave";
@@ -16,8 +16,6 @@ export type StageData = { reels: FacetedReel[]; cards: DirectoryCard[]; siteReel
 
 /** Plays the current selection one reel at a time, large. */
 export function StageView({ mood, family, start, data }: { mood: string | null; family: string | null; categories: string[]; start: string | null; data: StageData }) {
-  const router = useRouter();
-  const navigate = useNavigate();
   const { families } = useMoodCatalog();
   const list = data.reels;
   const [index, setIndex] = useState(() => Math.max(0, list.findIndex((r) => r.id === start)));
@@ -92,11 +90,10 @@ export function StageView({ mood, family, start, data }: { mood: string | null; 
   </span>;
   const others = list.map((r, i) => ({ r, i })).filter((x) => x.i !== index).slice(0, 4);
   const src = reel?.video_url ?? reel?.preview_url ?? null;
-  const back = () => { if (window.history.length > 1) router.history.back(); else void navigate({ to: "/directory" }); };
 
   return <SiteShell>
     <main data-stage-view="" className="stage font-ap text-ap-ink mx-auto max-w-[1180px] px-6 pt-8 pb-16">
-      <button type="button" onClick={back} className="text-[15px] font-medium text-ap-blue hover:underline">← Directory</button>
+      <Link to="/directory" className="text-[15px] font-medium text-ap-blue hover:underline">← Directory</Link>
       <header className="mt-4 text-center">
         <h1 className="stage-headline font-semibold">
           <span className="text-ap-headline-muted">Show me something: </span>

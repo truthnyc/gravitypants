@@ -87,6 +87,7 @@
 - [ ] Automatically announce new /blog articles as Instagram feed posts, tagging credited photographers using verified Instagram handles — blocked: existing Meta connection lacks Instagram publishing permission and returns no linked Instagram account; requires a professional Instagram publishing connection. No posting automation enabled.
 - [x] Randomize the Directory grid per visit: seeded shuffle in directory_faceted_search (stable while paging, reshuffles each visit); verified two preview visits show different orders. Live in the database now; page code ships on next publish.
 - [x] Fix Cloud Down Hood export download link
+- [x] Stage view "← Directory" now opens the top of the grid (clean address) instead of the browser's Back step, so ?page=… no longer follows you home. Verified in preview: /stage → / with no page param. Preview only.
 - [ ] Aimanté Google ad: goal visits, $10/day; next: locations, research, campaign type
 
 # Discovery plan
