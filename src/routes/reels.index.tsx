@@ -10,7 +10,8 @@ export const Route = createFileRoute("/reels/")({
   loader: async () => {
     const all = [...(await listSiteReels().catch(() => [] as SiteReel[])), LAUNCH_FILM];
     const slugs = watchSlugs(all); // same set as siteWatchSlugs
-    return all.map((reel) => ({ reel, slug: slugs.get(reel.id)! }));
+    const time = (r: SiteReel) => (r.uploadDate ? Date.parse(r.uploadDate) || 0 : 0);
+    return [...all].sort((a, b) => time(b) - time(a)).map((reel) => ({ reel, slug: slugs.get(reel.id)! }));
   },
   head: () => siteHead({ path: "/reels", title: "Video ad reels made from product photos | Gravity Pants", description: "Watch every reel made with Gravity Pants: short video ads that brands made from a few still product photos." }),
   component: ReelsIndex,
